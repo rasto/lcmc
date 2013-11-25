@@ -2016,73 +2016,26 @@ public final class Tools {
         }
     }
 
+    public static boolean areEqual(final Value v1, final Value v2) {
+        if (v1 != null) {
+            return v1.equals(v2);
+        } else if (v2 == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Returns whether two objects are equal. Special handling for Unit.
      */
-    public static boolean areEqual(final Object o1, final Object o2) {
-        if (o1 == null && o2 == null) {
+    public static boolean areEqual(final String s1, final String s2) {
+        if (s1 != null) {
+            return s1.equals(s2);
+        } else if (s2 == null) {
             return true;
-        } else if (o1 != null && o1 instanceof DrbdResourceInfo) {
-            /* this is special case, because this object represents devices in
-             * filesystem ra and also after field in drbd.conf. */
-            final String device = ((DrbdResourceInfo) o1).getInternalValue();
-            if (device != null && device.equals(o2)) {
-                return true;
-            }
-            final String res = ((DrbdResourceInfo) o1).getName();
-            if (res == null) {
-                return res == o2;
-            }
-            if (res.equals(o2)) {
-                return true;
-            }
-            return false;
-        } else if (o1 != null && o1 instanceof Info) {
-            final String s1 = ((Info) o1).getInternalValue();
-            if (s1 == null) {
-                return o2 == null;
-            }
-            if (o2 == null) {
-                return false;
-            }
-            if (o2 instanceof Info) {
-                return s1.equals(((Info) o2).getInternalValue());
-            } else {
-                return s1.equals(o2) || o1.toString().equals(o2);
-            }
-        } else if (o2 != null && o2 instanceof Info) {
-            final String s2 = ((Info) o2).getInternalValue();
-            if (s2 == null) {
-                return o1 == null;
-            }
-            if (o1 == null) {
-                return false;
-            }
-            if (o1 instanceof Info) {
-                return s2.equals(((Info) o1).getInternalValue());
-            } else {
-                return s2.equals(o1) || o2.toString().equals(o1);
-            }
-        } else if (o1 == null && o2 != null) {
-            return o2.toString().isEmpty();
-        } else if (o2 == null && o1 != null) {
-            return o1.toString().isEmpty();
-        } else if (o1 instanceof Object[]
-                   && o2 instanceof Object[]) {
-            final Object[] array1 = (Object[]) o1;
-            final Object[] array2 = (Object[]) o2;
-            for (int i = 0; i < array1.length; i++) {
-                if (!areEqual(array1[i], array2[i])) {
-                    return false;
-                }
-            }
-            return true;
-        } else if (o1 instanceof Unit) {
-            return ((Unit) o1).equals(o2);
-        } else if (o2 instanceof Unit) {
-            return ((Unit) o2).equals(o1);
         } else {
-            return o1.equals(o2);
+            return false;
         }
     }
 

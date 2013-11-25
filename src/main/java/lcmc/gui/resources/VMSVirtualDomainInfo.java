@@ -217,7 +217,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     private volatile Map<String, VMSVideoInfo> videoKeyToInfo =
                                        new HashMap<String, VMSVideoInfo>();
     /** Previous type. */
-    private volatile String prevType = null;
+    private volatile Value prevType = null;
     /** Autostart possible values - hosts. */
     private final Value[] autostartPossibleValues;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
@@ -3579,7 +3579,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                                 Widget.WIZARD_PREFIX);
                 final Widget inWi = getWidget(VMSXML.VM_PARAM_INIT,
                                               Widget.WIZARD_PREFIX);
-                if (Tools.areEqual(DOMAIN_TYPE_XEN, newValue)) {
+                if (Tools.areEqual(DOMAIN_TYPE_XEN,
+                                   newValue.getValueForConfig())) {
                     if (emWi != null) {
                         emWi.setValue(new StringValue(xenLibPath + "/bin/qemu-dm"));
                     }
@@ -3595,7 +3596,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (inWi != null) {
                         inWi.setValue(NO_SELECTION_VALUE);
                     }
-                } else if (Tools.areEqual(DOMAIN_TYPE_LXC, newValue)) {
+                } else if (Tools.areEqual(DOMAIN_TYPE_LXC,
+                                          newValue.getValueForConfig())) {
                     if (emWi != null) {
                         emWi.setValue(new StringValue(lxcLibPath + "/libvirt_lxc"));
                     }
@@ -3611,7 +3613,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (inWi != null) {
                         inWi.setValue(new StringValue("/bin/sh"));
                     }
-                } else if (Tools.areEqual(DOMAIN_TYPE_VBOX, newValue)) {
+                } else if (Tools.areEqual(DOMAIN_TYPE_VBOX,
+                                          newValue.getValueForConfig())) {
                     if (emWi != null) {
                         emWi.setValue(new StringValue(xenLibPath + ""));
                     }
@@ -3627,7 +3630,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (inWi != null) {
                         inWi.setValue(NO_SELECTION_VALUE);
                     }
-                } else if (Tools.areEqual(DOMAIN_TYPE_OPENVZ, newValue)) {
+                } else if (Tools.areEqual(DOMAIN_TYPE_OPENVZ,
+                                          newValue.getValueForConfig())) {
                     if (emWi != null) {
                         emWi.setValue(NO_SELECTION_VALUE);
                     }
@@ -3643,7 +3647,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     if (inWi != null) {
                         inWi.setValue(new StringValue("/sbin/init"));
                     }
-                } else if (Tools.areEqual(DOMAIN_TYPE_UML, newValue)) {
+                } else if (Tools.areEqual(DOMAIN_TYPE_UML,
+                                          newValue.getValueForConfig())) {
                     if (emWi != null) {
                         emWi.setValue(NO_SELECTION_VALUE);
                     }
@@ -3677,7 +3682,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                 }
             }
-            prevType = wi.getStringValue();
+            prevType = wi.getValue();
         }
         return true;
     }

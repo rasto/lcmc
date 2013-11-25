@@ -710,7 +710,7 @@ public class ServiceInfo extends EditableInfo {
                                                 hi.getName(),
                                                 false);
             final HostLocation savedLocation = savedHostLocations.get(hi);
-            if (!Tools.areEqual(hostLocation, savedLocation)) {
+            if (hostLocation.equals(savedLocation)) {
                 if (hostLocation == null) {
                     savedHostLocations.remove(hi);
                 } else {

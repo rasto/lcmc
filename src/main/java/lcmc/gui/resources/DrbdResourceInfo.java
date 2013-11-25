@@ -1817,7 +1817,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (ipSaved == null) {
                 ipSaved = defaultInsideIp;
             }
-            final Object value = wi.getValue();
+            final Value value = wi.getValue();
             if (!Tools.areEqual(ipSaved, value)) {
                 changed = true;
             }

@@ -939,10 +939,10 @@ public abstract class EditableInfo extends Info {
                 if (wi == null) {
                     continue;
                 }
-                final Object newValue = wi.getValue();
+                final Value newValue = wi.getValue();
 
                 /* check if value has changed */
-                Object oldValue = getParamSaved(otherParam);
+                Value oldValue = getParamSaved(otherParam);
                 if (oldValue == null) {
                     oldValue = getParamDefault(otherParam);
                 }
