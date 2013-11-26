@@ -467,7 +467,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdDistCombo.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     String v = getHost().getDistVersion();
                     if (drbdDistItems == null || !drbdDistItems.contains(v)) {
                         v = NO_MATCH_STRING;
@@ -481,7 +481,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdKernelDirCombo.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     String v = getHost().getKernelVersion();
                     if (drbdKernelDirItems == null
                         || !drbdKernelDirItems.contains(v)) {
@@ -495,7 +495,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdArchCombo.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     enableComponentsLater(
                                 new JComponent[]{buttonClass(nextButton())});
                     getHost().setArch(drbdArchCombo.getStringValue());

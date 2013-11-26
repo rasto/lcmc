@@ -44,6 +44,7 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import lcmc.data.StringValue;
+import lcmc.data.Value;
 /**
  * This class implements LVM snapshot dialog.
  *
@@ -191,7 +192,7 @@ public final class LVSnapshot extends LV {
         inputPane.add(new JLabel());
         lvNameWi.addListeners(new WidgetListener() {
                                   @Override
-                                  public void check(final Object value) {
+                                  public void check(final Value value) {
                                       checkButtons();
                                   }
                               });
@@ -262,7 +263,7 @@ public final class LVSnapshot extends LV {
         inputPane.add(new JLabel());
         sizeWi.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkButtons();
                                 }
                             });

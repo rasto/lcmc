@@ -342,7 +342,7 @@ final class CreateMD extends DrbdConfig {
         metadataWi.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     if (metadataWi.getStringValue().equals(
                                                 useExistingMetadata)) {
                         makeMDButton.setEnabled(false);

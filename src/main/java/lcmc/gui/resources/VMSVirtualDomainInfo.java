@@ -2058,7 +2058,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             wi.addListeners(
                         new WidgetListener() {
                             @Override
-                            public void check(final Object value) {
+                            public void check(final Value value) {
                                 checkParameterFields(wi,
                                                      realParamWi,
                                                      ServiceInfo.CACHED_FIELD,

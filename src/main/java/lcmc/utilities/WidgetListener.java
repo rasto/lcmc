@@ -20,6 +20,8 @@
 
 package lcmc.utilities;
 
+import lcmc.data.Value;
+
 public abstract class WidgetListener {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -34,5 +36,5 @@ public abstract class WidgetListener {
         this.enabled = enabled;
     }
 
-    public abstract void check(final Object value);
+    public abstract void check(final Value value);
 }

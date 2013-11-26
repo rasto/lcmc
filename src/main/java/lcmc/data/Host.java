@@ -1085,10 +1085,11 @@ public final class Host implements Comparable<Host>, Value {
                         public String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
                                 if (tag != null && command.indexOf(tag) > -1) {
-                                    final String s = replaceHash.get(tag);
-                                    if (s != null) {
-                                        command = command.replaceAll(tag, s);
+                                    String s = replaceHash.get(tag);
+                                    if (s == null) {
+                                        s = "";
                                     }
+                                    command = command.replaceAll(tag, s);
                                 }
                             }
                             return command;

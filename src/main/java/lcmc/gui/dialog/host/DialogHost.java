@@ -279,7 +279,7 @@ public abstract class DialogHost extends WizardDialog {
         }
         instMethodWi.addListeners(new WidgetListener() {
             @Override
-            public void check(final Object value) {
+            public void check(final Value value) {
                 final InstallMethods method =
                                       (InstallMethods) instMethodWi.getValue();
                 final String toolTip =

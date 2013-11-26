@@ -231,7 +231,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
         /* tarball combo box */
         drbdTarballCombo.addListeners(new WidgetListener() {
             @Override
-            public void check(final Object value) {
+            public void check(final Value value) {
                 final Value item = drbdTarballCombo.getValue();
                     allDone(item);
             }

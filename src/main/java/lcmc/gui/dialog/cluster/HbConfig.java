@@ -1129,7 +1129,7 @@ final class HbConfig extends DialogCluster {
         typeW.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     final Value type = typeW.getValue();
                     if (type != null) {
                         if (MCAST_TYPE.equals(type)
@@ -1170,7 +1170,7 @@ final class HbConfig extends DialogCluster {
 
         ifaceW.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkInterface();
                                 }
                             });
@@ -1179,7 +1179,7 @@ final class HbConfig extends DialogCluster {
 
         serialW.addListeners(new WidgetListener() {
                                  @Override
-                                 public void check(final Object value) {
+                                 public void check(final Value value) {
                                      checkInterface();
                                  }
                              });
@@ -1189,19 +1189,19 @@ final class HbConfig extends DialogCluster {
 
         ucastLink1W.addListeners(new WidgetListener() {
                                      @Override
-                                     public void check(final Object value) {
+                                     public void check(final Value value) {
                                          checkInterface();
                                      }
                                  });
         ucastLink2W.addListeners(new WidgetListener() {
                                      @Override
-                                     public void check(final Object value) {
+                                     public void check(final Value value) {
                                          checkInterface();
                                      }
                                  });
         addrW.addListeners(new WidgetListener() {
                                @Override
-                               public void check(final Object value) {
+                               public void check(final Value value) {
                                    checkInterface();
                                }
                            });
@@ -1377,7 +1377,7 @@ final class HbConfig extends DialogCluster {
     private WidgetListener getOptionListener() {
         return new WidgetListener() {
             @Override
-            public void check(final Object value) {
+            public void check(final Value value) {
                 if (fieldCheckLatch.getCount() > 0) {
                     return;
                 }

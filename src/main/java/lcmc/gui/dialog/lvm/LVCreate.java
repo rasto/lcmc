@@ -55,6 +55,7 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 /** Create LV dialog. */
 public final class LVCreate extends LV {
@@ -234,7 +235,7 @@ public final class LVCreate extends LV {
         inputPane.add(new JLabel());
         lvNameWi.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkButtons();
                                 }
                             });
@@ -322,7 +323,7 @@ public final class LVCreate extends LV {
         inputPane.add(new JLabel());
         sizeWi.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkButtons();
                                 }
                             });

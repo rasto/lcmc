@@ -2043,8 +2043,8 @@ public final class Tools {
      * Returns value unit pair extracting from string. E.g. "10min" becomes 10
      * and "min" pair.
      */
-    public static Object[] extractUnit(final String time) {
-        final Object[] o = new Object[]{null, null};
+    public static String[] extractUnit(final String time) {
+        final String[] o = new String[]{null, null};
         if (time == null) {
             return o;
         }
@@ -2120,10 +2120,10 @@ public final class Tools {
 
     /** Converts value with unit to kilobites. */
     public static long convertToKilobytes(final String value) {
-        final Object[] v = Tools.extractUnit(value);
-        if (v.length == 2 && Tools.isNumber((String) v[0])) {
-            long num = Long.parseLong((String) v[0]);
-            final String unit = (String) v[1];
+        final String[] v = Tools.extractUnit(value);
+        if (v.length == 2 && Tools.isNumber(v[0])) {
+            long num = Long.parseLong(v[0]);
+            final String unit = v[1];
             if ("P".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024 * 1024 * 1024;
             } else if ("T".equalsIgnoreCase(unit)) {
@@ -2143,10 +2143,10 @@ public final class Tools {
 
     /** Converts value with units. */
     public static long convertUnits(final String value) {
-        final Object[] v = Tools.extractUnit(value);
-        if (v.length == 2 && Tools.isNumber((String) v[0])) {
-            long num = Long.parseLong((String) v[0]);
-            final String unit = (String) v[1];
+        final String[] v = Tools.extractUnit(value);
+        if (v.length == 2 && Tools.isNumber(v[0])) {
+            long num = Long.parseLong(v[0]);
+            final String unit = v[1];
             if ("P".equalsIgnoreCase(unit)) {
                 num = num * 1024 * 1024 * 1024 * 1024 * 1024;
             } else if ("T".equalsIgnoreCase(unit)) {

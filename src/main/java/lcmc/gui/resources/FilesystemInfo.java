@@ -188,14 +188,12 @@ final class FilesystemInfo extends ServiceInfo {
         paramWi.addListeners(
                     new WidgetListener() {
                         @Override
-                        public void check(final Object value) {
+                        public void check(final Value value) {
                             if (fstypeParamWi != null) {
                                 if (!(value instanceof Info)) {
                                     return;
                                 }
-                                final Info item = (Info) value;
-                                if (item.getInternalValue() == null
-                                    || "".equals(item.getInternalValue())) {
+                                if (value.isNothingSelected()) {
                                     return;
                                 }
                                 final String selectedValue =
@@ -204,7 +202,7 @@ final class FilesystemInfo extends ServiceInfo {
                                 if (selectedValue == null
                                     || "".equals(selectedValue)) {
                                     final CommonDeviceInterface cdi =
-                                             (CommonDeviceInterface) item;
+                                             (CommonDeviceInterface) value;
                                     createdFs = cdi.getCreatedFs();
                                 } else {
                                     createdFs = selectedValue;
@@ -449,17 +447,11 @@ final class FilesystemInfo extends ServiceInfo {
     @Override
     public int getUsed() {
         if (blockDeviceParamWi != null) {
-            final Object value = blockDeviceParamWi.getValue();
-            if (Tools.isStringClass(value)) {
-                // TODO:
+            final Value value = blockDeviceParamWi.getValue();
+            if (value.isNothingSelected()) {
                 return -1;
             }
-            final Info item = (Info) value;
-            final String sValue = item.getInternalValue();
-            if (sValue == null || "".equals(sValue)) {
-                return -1;
-            }
-            final CommonDeviceInterface cdi = (CommonDeviceInterface) item;
+            final CommonDeviceInterface cdi = (CommonDeviceInterface) value;
             return cdi.getUsed();
         }
         return -1;

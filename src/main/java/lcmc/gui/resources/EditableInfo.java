@@ -430,7 +430,7 @@ public abstract class EditableInfo extends Info {
             final Widget realParamWi = rpwi;
             paramWi.addListeners(new WidgetListener() {
                         @Override
-                        public void check(final Object value) {
+                        public void check(final Value value) {
                             checkParameterFields(paramWi,
                                                  realParamWi,
                                                  param,

@@ -52,6 +52,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -312,7 +313,7 @@ public final class LVResize extends LV {
         inputPane.add(new JLabel());
         sizeWi.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     enableResizeButton(true);
                                 }
                             });

@@ -317,7 +317,7 @@ final class CreateFS extends DrbdConfig {
                                        Widget.NO_BUTTON);
         hostW.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkButtons();
                                 }
                             });
@@ -350,7 +350,7 @@ final class CreateFS extends DrbdConfig {
         inputPane.add(filesystemW.getComponent());
         filesystemW.addListeners(new WidgetListener() {
                             @Override
-                            public void check(final Object value) {
+                            public void check(final Value value) {
                                 if (NO_HOST_STRING.equals(
                                                 hostW.getValue())
                                     && !NO_FILESYSTEM_STRING.equals(

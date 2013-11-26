@@ -989,14 +989,14 @@ final class CoroConfig extends DialogCluster {
 
         typeW.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkInterface();
                                 }
                             });
 
         ifaceW.addListeners(new WidgetListener() {
                                  @Override
-                                 public void check(final Object value) {
+                                 public void check(final Value value) {
                                      checkInterface();
                                  }
                              });
@@ -1014,14 +1014,14 @@ final class CoroConfig extends DialogCluster {
                 Widget.NO_BUTTON);
         portW.addListeners(new WidgetListener() {
                                  @Override
-                                 public void check(final Object value) {
+                                 public void check(final Value value) {
                                      checkInterface();
                                  }
                              });
 
         addrW.addListeners(new WidgetListener() {
                                  @Override
-                                 public void check(final Object value) {
+                                 public void check(final Value value) {
                                      checkInterface();
                                  }
                              });

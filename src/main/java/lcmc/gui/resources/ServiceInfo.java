@@ -545,14 +545,12 @@ public class ServiceInfo extends EditableInfo {
 
         /* id-refs */
         if (sameAsMetaAttrsWi != null) {
-            final Info info = sameAsMetaAttrsWiValue();
+            final Value info = sameAsMetaAttrsWiValue();
             final boolean defaultValues =
                     info != null
                     && META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(info.toString());
             final boolean nothingSelected =
-                      info == null
-                      || Widget.NOTHING_SELECTED_DISPLAY.equals(
-                                                              info.toString());
+                      info == null || info.isNothingSelected();
             if (!nothingSelected
                 && !defaultValues
                 && info != savedMetaAttrInfoRef) {
@@ -1393,14 +1391,12 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (sameAsOperationsWi != null) {
-            final Info info = sameAsOperationsWiValue();
+            final Value info = sameAsOperationsWiValue();
             final boolean defaultValues =
                     info != null
-                    && OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString());
+                    && OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.getValueForConfig());
             final boolean nothingSelected =
-                      info == null
-                      || Widget.NOTHING_SELECTED_DISPLAY.equals(
-                                                              info.toString());
+                              info == null || info.isNothingSelected();
             if (!nothingSelected
                 && !defaultValues
                 && info != savedOperationIdRef) {
@@ -1782,8 +1778,8 @@ public class ServiceInfo extends EditableInfo {
      * Sets meta attrs with same values as other service info, or default
      * values.
      */
-    private void setMetaAttrsSameAs(final Info info) {
-        if (sameAsMetaAttrsWi == null || info == null) {
+    private void setMetaAttrsSameAs(final Value info) {
+        if (sameAsMetaAttrsWi == null || info.isNothingSelected()) {
             return;
         }
         boolean nothingSelected = false;
@@ -1808,7 +1804,7 @@ public class ServiceInfo extends EditableInfo {
                 if (wi == null) {
                     continue;
                 }
-                Object oldValue = wi.getValue();
+                Value oldValue = wi.getValue();
                 if (oldValue == null) {
                     oldValue = defaultValue;
                 }
@@ -1979,18 +1975,18 @@ public class ServiceInfo extends EditableInfo {
      * Sets operations with same values as other service info, or default
      * values.
      */
-    private void setOperationsSameAs(final Info info) {
+    private void setOperationsSameAs(final Value info) {
         if (sameAsOperationsWi == null) {
             return;
         }
         boolean nothingSelected = false;
         if (info == null
-            || Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString())) {
+            || info.isNothingSelected()) {
             nothingSelected = true;
         }
         boolean sameAs = true;
         if (info == null
-            || OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.toString())) {
+            || OPERATIONS_DEFAULT_VALUES_TEXT.equals(info.getValueForConfig())) {
             sameAs = false;
         }
         mSavedOperationsLock.lock();
@@ -2007,7 +2003,7 @@ public class ServiceInfo extends EditableInfo {
                 mOperationsComboBoxHashReadLock.lock();
                 final Widget wi = operationsComboBoxHash.get(op, param);
                 mOperationsComboBoxHashReadLock.unlock();
-                final Object oldValue = wi.getValue();
+                final Value oldValue = wi.getValue();
                 wi.setEnabled(!sameAs || nothingSelected);
                 if (!nothingSelected) {
                     if (sameAs) {
@@ -2192,8 +2188,8 @@ public class ServiceInfo extends EditableInfo {
         sameAsOperationsWi.addListeners(
                         new WidgetListener() {
                             @Override
-                            public void check(final Object value) {
-                                final Info info = sameAsOperationsWiValue();
+                            public void check(final Value value) {
+                                final Value info = sameAsOperationsWiValue();
                                 setOperationsSameAs(info);
                                 final String[] params = getParametersFromXML();
                                 setApplyButtons(CACHED_FIELD, params);
@@ -2202,7 +2198,7 @@ public class ServiceInfo extends EditableInfo {
                                     public void run() {
                                         if (info != null) {
                                             sameAsOperationsWi.setToolTipText(
-                                                              info.toString());
+                                                              info.getValueForConfig());
                                         }
                                     }
                                 });
@@ -2378,16 +2374,16 @@ public class ServiceInfo extends EditableInfo {
             return "";
         }
         if (isMetaAttr(param)) {
-            final Info info = sameAsMetaAttrsWiValue();
+            final Value info = sameAsMetaAttrsWiValue();
             if (info == null) {
                 return null;
             }
             boolean nothingSelected = false;
-            if (Widget.NOTHING_SELECTED_DISPLAY.equals(info.toString())) {
+            if (info.isNothingSelected()) {
                 nothingSelected = true;
             }
             boolean sameAs = true;
-            if (META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(info.toString())) {
+            if (META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(info.getValueForConfig())) {
                 sameAs = false;
             }
             if (!sameAs || nothingSelected) {
@@ -2591,7 +2587,7 @@ public class ServiceInfo extends EditableInfo {
             final Widget wi = scoreComboBoxHash.get(hi);
             wi.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     setApplyButtons(CACHED_FIELD, params);
                                     Tools.invokeLater(
                                         new Runnable() {
@@ -2605,7 +2601,7 @@ public class ServiceInfo extends EditableInfo {
         }
         pingComboBox.addListeners(new WidgetListener() {
                                       @Override
-                                      public void check(final Object value) {
+                                      public void check(final Value value) {
                                           setApplyButtons(CACHED_FIELD, params);
                                       }
                                   });
@@ -2623,7 +2619,7 @@ public class ServiceInfo extends EditableInfo {
         final String[] params = getParametersFromXML();
         wi.addListeners(new WidgetListener() {
                             @Override
-                            public void check(final Object value) {
+                            public void check(final Value value) {
                                 setApplyButtons(CACHED_FIELD, params);
                             }
                         });
@@ -2656,23 +2652,18 @@ public class ServiceInfo extends EditableInfo {
                          sameAsMetaAttrsWi);
         sameAsMetaAttrsWi.addListeners(new WidgetListener() {
                             @Override
-                            public void check(final Object value) {
-                                Info i = null;
-                                final Object o = sameAsMetaAttrsWiValue();
-                                if (o instanceof Info) {
-                                    i = (Info) o;
-                                }
-                                final Info info = i;
-                                setMetaAttrsSameAs(info);
+                            public void check(final Value value) {
+                                final Value v = sameAsMetaAttrsWiValue();
+                                setMetaAttrsSameAs(v);
                                 final String[] params =
                                                     getParametersFromXML();
                                 setApplyButtons(CACHED_FIELD, params);
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (info != null) {
+                                        if (v != null) {
                                             sameAsMetaAttrsWi.setToolTipText(
-                                                              info.toString());
+                                                          v.getValueForGui());
                                         }
                                     }
                                 });
@@ -2874,7 +2865,7 @@ public class ServiceInfo extends EditableInfo {
             }
             typeRadioGroup.addListeners(new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     typeRadioGroup.setEnabled(false);
                     changeType(new StringValue(((JRadioButton) value).getText()));
                 }
@@ -3136,9 +3127,9 @@ public class ServiceInfo extends EditableInfo {
     protected String getMetaAttrsRefId() {
         String metaAttrsRefId = null;
         if (sameAsMetaAttrsWi != null) {
-            final Info i = sameAsMetaAttrsWiValue();
-            if (!Widget.NOTHING_SELECTED_DISPLAY.equals(i.toString())
-                && !META_ATTRS_DEFAULT_VALUES_TEXT.getValueForConfig().equals(i.toString())) {
+            final Value i = sameAsMetaAttrsWiValue();
+            if (!i.isNothingSelected()
+                && !META_ATTRS_DEFAULT_VALUES_TEXT.equals(i)) {
                 final ServiceInfo si  = (ServiceInfo) i;
                 final ClusterStatus cs = getBrowser().getClusterStatus();
                 metaAttrsRefId = cs.getMetaAttrsId(
@@ -3155,9 +3146,9 @@ public class ServiceInfo extends EditableInfo {
     protected String getOperationsRefId() {
         String operationsRefId = null;
         if (sameAsOperationsWi != null) {
-            final Info i = sameAsOperationsWiValue();
-            if (!Widget.NOTHING_SELECTED_DISPLAY.equals(i.toString())
-                && !OPERATIONS_DEFAULT_VALUES_TEXT.equals(i.toString())) {
+            final Value i = sameAsOperationsWiValue();
+            if (!i.isNothingSelected()
+                && !META_ATTRS_DEFAULT_VALUES_TEXT.equals(i)) {
                 final ServiceInfo si  = (ServiceInfo) i;
                 final ClusterStatus cs = getBrowser().getClusterStatus();
                 operationsRefId = cs.getOperationsId(
@@ -3376,7 +3367,7 @@ public class ServiceInfo extends EditableInfo {
         boolean sameAs = false;
         final ServiceInfo savedOpIdRef = savedOperationIdRef;
         ServiceInfo operationIdRef = null;
-        final Info ref = sameAsOperationsWiValue();
+        final Value ref = sameAsOperationsWiValue();
         if (ref instanceof ServiceInfo) {
             operationIdRef = (ServiceInfo) ref;
         }
@@ -3538,7 +3529,7 @@ public class ServiceInfo extends EditableInfo {
         final String refCRMId = getOperationsRefId();
         savedOperationsId = refCRMId;
         savedOperationIdRef = getBrowser().getServiceInfoFromCRMId(refCRMId);
-        final Info i = sameAsOperationsWiValue();
+        final Value i = sameAsOperationsWiValue();
         if (i == null || i.isNothingSelected()) {
             savedOperationsId = null;
         } else {
@@ -6282,7 +6273,7 @@ public class ServiceInfo extends EditableInfo {
     public void reloadComboBoxes() {
         if (sameAsOperationsWi != null) {
             String defaultOpIdRef = null;
-            final Info savedOpIdRef = sameAsOperationsWiValue();
+            final Value savedOpIdRef = sameAsOperationsWiValue();
             if (savedOpIdRef != null) {
                 defaultOpIdRef = savedOpIdRef.toString();
             }
@@ -6298,7 +6289,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (sameAsMetaAttrsWi != null) {
             String defaultMAIdRef = null;
-            final Info savedMAIdRef = sameAsMetaAttrsWiValue();
+            final Value savedMAIdRef = sameAsMetaAttrsWiValue();
             if (savedMAIdRef != null) {
                 defaultMAIdRef = savedMAIdRef.toString();
             }
@@ -6357,31 +6348,21 @@ public class ServiceInfo extends EditableInfo {
     /**
      * Returns value of the same as drop down menu as an info object or null.
      */
-    final Info sameAsOperationsWiValue() {
+    final Value sameAsOperationsWiValue() {
         if (sameAsOperationsWi == null) {
             return null;
         }
-        Info i = null;
-        final Object o = sameAsOperationsWi.getValue();
-        if (o instanceof Info) {
-            i = (Info) o;
-        }
-        return i;
+        return sameAsOperationsWi.getValue();
     }
 
     /**
      * Returns value of the same as drop down menu as an info object or null.
      */
-    final Info sameAsMetaAttrsWiValue() {
+    final Value sameAsMetaAttrsWiValue() {
         if (sameAsMetaAttrsWi == null) {
             return null;
         }
-        Info i = null;
-        final Object o = sameAsMetaAttrsWi.getValue();
-        if (o instanceof Info) {
-            i = (Info) o;
-        }
-        return i;
+        return sameAsMetaAttrsWi.getValue();
     }
 
     /** Store operation values. */

@@ -281,7 +281,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Widget awi = addressComboBoxHash.get(host);
                 final Widget pwi = portComboBox;
                 if (awi != null && pwi != null) {
-                    final Object o = awi.getValue();
+                    final Value o = awi.getValue();
                     LOG.debug1("drbdResourceConfig: host: "
                                + host.getName() + " ni: " + o);
                     for (final NetInterface ni : host.getNetInterfaces()) {
@@ -2003,7 +2003,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Widget realComboBox = rwi;
             comboBox.addListeners(new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     checkParameterFields(comboBox,
                                          realComboBox,
                                          null,
@@ -2022,7 +2022,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                        s, s + NetInfo.IP_PLACEHOLDER.length());
                             }
                         });
-                    } else if (value instanceof String) {
+                    } else if (value instanceof StringValue) {
                         comboBox.setAlwaysEditable(true);
                     } else {
                         comboBox.setAlwaysEditable(false);
@@ -2037,7 +2037,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             cb = insideIpComboBoxHash;
                         }
                         final Host proxyHost = getProxyHost(host, wizard);
-                        cb.get(proxyHost).setValue(new StringValue(getIp(value)));
+                        cb.get(proxyHost).setValue(new StringValue(getIp(value.getValueForConfig())));
                     }
                 }
             });
@@ -2067,7 +2067,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Widget realComboBox = rwi;
             comboBox.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkParameterFields(comboBox,
                                                          realComboBox,
                                                          null,
@@ -2096,7 +2096,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         final Widget realComboBox = prwi;
         pwi.addListeners(new WidgetListener() {
                                 @Override
-                                public void check(final Object value) {
+                                public void check(final Value value) {
                                     checkParameterFields(comboBox,
                                                          realComboBox,
                                                          null,

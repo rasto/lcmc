@@ -314,7 +314,7 @@ public class DrbdAvailFiles extends DialogHost {
         drbdVersionCombo.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     enableComponentsLater(
                             new JComponent[]{buttonClass(nextButton())});
                     disableComponents(new Component[]{drbdBuildCombo.getComponent()});
@@ -334,7 +334,7 @@ public class DrbdAvailFiles extends DialogHost {
         drbdBuildCombo.addListeners(
             new WidgetListener() {
                 @Override
-                public void check(final Object value) {
+                public void check(final Value value) {
                     final String item = drbdBuildCombo.getStringValue();
                     getHost().setDrbdBuildToInstall(item);
                     availFiles();
