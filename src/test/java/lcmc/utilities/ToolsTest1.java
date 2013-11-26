@@ -1195,7 +1195,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testAreEqual() {
-        assertTrue(Tools.areEqual(null, null));
+        assertTrue(Tools.areEqual((String) null, (String) null));
         assertTrue(Tools.areEqual("", ""));
         assertTrue(Tools.areEqual("x", "x"));
 

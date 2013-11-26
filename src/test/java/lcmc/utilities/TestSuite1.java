@@ -225,6 +225,7 @@ public final class TestSuite1 {
             if (!Tools.getConfigData().existsCluster(cluster)) {
                 Tools.getConfigData().addClusterToClusters(cluster);
                 Tools.invokeAndWait(new Runnable() {
+                    @Override
                     public void run() {
                         Tools.getGUIData().addClusterTab(cluster);
                     }

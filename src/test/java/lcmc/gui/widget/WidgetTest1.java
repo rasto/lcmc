@@ -6,6 +6,8 @@ import org.junit.After;
 import org.junit.Before;
 import lcmc.utilities.TestSuite1;
 import lcmc.data.ConfigData;
+import lcmc.data.Value;
+import lcmc.data.StringValue;
 import lcmc.data.AccessMode;
 
 public final class WidgetTest1 extends TestCase {
@@ -18,7 +20,9 @@ public final class WidgetTest1 extends TestCase {
             widget = WidgetFactory.createInstance(
                           Widget.GUESS_TYPE,
                           Widget.NO_DEFAULT,
-                          new String[]{"a", "b", "c"},
+                          new Value[]{new StringValue("a"),
+                                      new StringValue("b"),
+                                      new StringValue("c")},
                           Widget.NO_REGEXP,
                           100, /* width */
                           Widget.NO_ABBRV,
@@ -37,11 +41,23 @@ public final class WidgetTest1 extends TestCase {
     @Test
     public void testReloadComboBox() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            widget.reloadComboBox(null, new Object[]{"a", "b"});
-            widget.reloadComboBox(null, new Object[]{"a", "b", "c"});
-            widget.reloadComboBox("as", new Object[]{"a", "b", "c"});
-            widget.reloadComboBox(null, new Object[]{"a", "b", "c"});
-            widget.reloadComboBox(null, new Object[]{"a"});
+            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
+                                                    new StringValue("b")});
+
+            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
+                                                    new StringValue("b"),
+                                                    new StringValue("c")});
+
+            widget.reloadComboBox(new StringValue("as"),
+                                  new Value[]{new StringValue("a"),
+                                              new StringValue("b"),
+                                              new StringValue("c")});
+
+            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
+                                                    new StringValue("b"),
+                                                    new StringValue("c")});
+
+            widget.reloadComboBox(null, new Value[]{new StringValue("a")});
         }
     }
 
@@ -91,19 +107,23 @@ public final class WidgetTest1 extends TestCase {
 
     @Test
     public void testGetStringValue() {
+        widget.setValueAndWait(new StringValue("a"));
         assertEquals("a", widget.getStringValue());
     }
 
     @Test
     public void testGetValue() {
-        assertEquals("a", widget.getValue());
+        widget.setValueAndWait(new StringValue("a"));
+        assertEquals("a", widget.getValue().getValueForConfig());
     }
 
     @Test
     public void testClear() {
         for (int i = 0; i < TestSuite1.getFactor(); i++) {
             widget.clear();
-            widget.reloadComboBox(null, new Object[]{"a", "b", "c"});
+            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
+                                                    new StringValue("b"),
+                                                    new StringValue("c")});
         }
     }
 }
