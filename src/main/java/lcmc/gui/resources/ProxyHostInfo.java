@@ -195,7 +195,7 @@ public final class ProxyHostInfo extends Info {
         if (otherHI == null) {
             return false;
         }
-        return otherHI.toString().equals(host.getName());
+        return otherHI.toString().equals(host.getName()); //TODO: ?
     }
 
     /** Returns string representation of the host. It's same as name. */

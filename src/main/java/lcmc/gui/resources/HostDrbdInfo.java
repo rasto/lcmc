@@ -228,21 +228,6 @@ public final class HostDrbdInfo extends Info {
         return host;
     }
 
-
-    ///**
-    // * Compares this host info name with specified hostdrbdinfo's name.
-    // *
-    // * @param otherHI
-    // *              other host info
-    // * @return true if they are equal
-    // */
-    //boolean equals(final HostDrbdInfo otherHI) {
-    //    if (otherHI == null) {
-    //        return false;
-    //    }
-    //    return otherHI.toString().equals(host.getName());
-    //}
-
     /** Returns string representation of the host. It's same as name. */
     @Override
     public String toString() {

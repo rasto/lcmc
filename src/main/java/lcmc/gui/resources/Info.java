@@ -290,6 +290,7 @@ public class Info implements Comparable<Info>, Value {
         int hash = 5;
         hash = 59 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
         hash = 59 * hash + (this.getUnit() != null ? this.getUnit().hashCode() : 0);
+        hash = 59 * hash + (this.browser != null ? this.browser.hashCode() : 0);
         return hash;
     }
 
@@ -308,22 +309,13 @@ public class Info implements Comparable<Info>, Value {
         if (this.getUnit() != other.getUnit() && (this.getUnit() == null || !this.getUnit().equals(other.getUnit()))) {
             return false;
         }
+        if (obj instanceof Info) {
+            if (this.browser != ((Info) other).browser && (this.browser == null || !this.browser.equals(((Info) other).browser))) {
+                return false;
+            }
+        }
         return true;
     }
-
-    ///**
-    // * Returns whether two info objects are equal.
-    // */
-    //public boolean equals(final Object value) {
-    //    if (value == null) {
-    //        return false;
-    //    }
-    //    return toString().equals(value.toString());
-    //}
-
-    //public int hashCode() {
-    //    return toString().hashCode();
-    //}
 
     /** Updates the info text. */
     public void updateInfo() {

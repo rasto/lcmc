@@ -718,23 +718,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         return "drbd: " + name;
     }
 
-    /** Returns whether two drbd resources are equal. */
-    @Override
-    public boolean equals(final Object value) {
-        if (value == null) {
-            return false;
-        }
-            if (toString() == null) {
-                return false;
-            }
-            return toString().equals(value.toString());
-    }
-
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
-
     /** Returns common file systems. */
     public Value[] getCommonFileSystems(final String defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);

@@ -697,4 +697,30 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             }
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final VMSHardwareInfo other = (VMSHardwareInfo) obj;
+        if (this.getName() != other.getName() && (this.getName() == null || !this.getName().equals(other.getName()))) {
+            return false;
+        }
+        if (this.vmsVirtualDomainInfo != other.vmsVirtualDomainInfo && (this.vmsVirtualDomainInfo == null || !this.vmsVirtualDomainInfo.equals(other.vmsVirtualDomainInfo))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + (this.getName() != null ? this.getName().hashCode() : 0);
+        hash = 97 * hash + (this.vmsVirtualDomainInfo != null ? this.vmsVirtualDomainInfo.hashCode() : 0);
+        return hash;
+    }
 }
