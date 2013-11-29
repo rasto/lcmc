@@ -193,7 +193,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         Value selectedValueInfo = null;
         if (items != null) {
             for (int i = 0; i < items.length; i++) {
-                if (Tools.valuesEqual(items[i], selectedValue)) {
+                if (Tools.areEqual(items[i], selectedValue)) {
                     selectedValueInfo = items[i];
                 }
                 comboList.add(items[i]);

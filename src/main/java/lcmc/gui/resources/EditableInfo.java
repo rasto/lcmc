@@ -946,9 +946,6 @@ public abstract class EditableInfo extends Info {
                 if (oldValue == null) {
                     oldValue = getParamDefault(otherParam);
                 }
-                //if (isTimeType(otherParam) || hasUnitPrefix(otherParam)) {
-                //    oldValue = oldValue.getValueForConfig();
-                //}
                 if (!Tools.areEqual(newValue, oldValue)) {
                     changedValue = true;
                 }
@@ -1044,7 +1041,7 @@ public abstract class EditableInfo extends Info {
                 v = getParamDefault(param);
             }
             final Widget wi = getWidget(param, null);
-            if (wi != null && !wi.getValue().equals(v)) {
+            if (wi != null && !Tools.areEqual(wi.getValue(), v)) {
                 wi.setValue(v);
                 final Widget wizardWi = getWidget(param, Widget.WIZARD_PREFIX);
                 if (wizardWi != null) {

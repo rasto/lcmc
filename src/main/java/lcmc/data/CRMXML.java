@@ -26,6 +26,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.CRM;
+import lcmc.utilities.Unit;
 import lcmc.robotest.RoboTest;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServiceInfo;
@@ -574,6 +575,9 @@ public final class CRMXML extends XML {
                              "hypervisor",
                              Tools.getString("CRMXML.OtherOptions"));
     }
+
+    private static final Pattern UNIT_PATTERN =
+                                             Pattern.compile("^(\\d+)(\\D*)$");
 
     /** Prepares a new <code>CRMXML</code> object. */
     public CRMXML(final Host host, final ServicesInfo ssi) {
@@ -1603,11 +1607,11 @@ public final class CRMXML extends XML {
                                          final boolean metaAttr,
                                          final String param,
                                          Value value) {
-        //if (metaAttr
-        //    && isRscDefaultsInteger(param)
-        //    && DISABLED_STRING.equals(value)) {
-        //    value = "";
-        //}
+        if (metaAttr
+            && isRscDefaultsInteger(param)
+            && DISABLED_STRING.equals(value)) {
+            value = new StringValue();
+        }
         boolean correctValue = true;
         if (PARAM_TYPE_BOOLEAN.equals(type)) {
             if (!PCMK_YES.equals(value) && !PCMK_NO.equals(value)
@@ -1620,16 +1624,20 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (!value.isNothingSelected()) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (!value.isNothingSelected()) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if ((value == null || value.isNothingSelected()) && required) {
             correctValue = false;
@@ -1655,17 +1663,21 @@ public final class CRMXML extends XML {
             }
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
-                Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
+            if (!value.isNothingSelected()) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (!value.isNothingSelected()) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (value.isNothingSelected() && isGlobalRequired(param)) {
             correctValue = false;
@@ -2135,16 +2147,20 @@ public final class CRMXML extends XML {
                         String defaultValue = getAttribute(contentParamNode,
                                                            "default");
                         paramGlobalTypeMap.put(param, type);
-                        if (PARAM_TYPE_TIME.equals(type)) {
-                            final Pattern p = Pattern.compile("^(\\d+)s$");
-                            final Matcher m = p.matcher(defaultValue);
-                            if (m.matches()) {
-                                defaultValue = m.group(1);
-                            }
-                        }
                         if (!"expected-quorum-votes".equals(param)) {
-                            // TODO: workaround
-                            paramGlobalDefaultMap.put(param, new StringValue(defaultValue));
+                            Unit unit = null;
+                            if (PARAM_TYPE_TIME.equals(type)) {
+                                final Matcher m = UNIT_PATTERN.matcher(defaultValue);
+                                if (m.matches()) {
+                                    defaultValue = m.group(1);
+                                    String u = m.group(2);
+                                    unit = parseUnit(param, u);
+                                }
+                            }
+                            paramGlobalDefaultMap.put(
+                                                  param,
+                                                  new StringValue(defaultValue,
+                                                                  unit));
                         }
                         if (PARAM_TYPE_BOOLEAN.equals(type)) {
                             paramGlobalPossibleChoices.put(param,
@@ -3663,16 +3679,20 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (!value.isNothingSelected()) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (!value.isNothingSelected()) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (value.isNothingSelected() && isOrderRequired(param)) {
             correctValue = false;
@@ -3811,16 +3831,20 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (value.getValueForConfig() != null) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (!m.matches()) {
-                correctValue = false;
+            if (value.getValueForConfig() != null) {
+                final Matcher m = p.matcher(value.getValueForConfig());
+                if (!m.matches()) {
+                    correctValue = false;
+                }
             }
         } else if (value.isNothingSelected() && isColocationRequired(param)) {
             correctValue = false;
@@ -4367,5 +4391,23 @@ public final class CRMXML extends XML {
             s.append(") ");
             return s.toString();
         }
+    }
+
+    private Unit parseUnit(final String param, final String u) {
+        if ("s".equals(u) || "".equals(u)) {
+            return ServicesInfo.UNIT_SECOND;
+        } else if ("ms".equals(u)) {
+            return ServicesInfo.UNIT_MILLISEC;
+        } else if ("us".equals(u)) {
+            return ServicesInfo.UNIT_MICROSEC;
+        } else if ("m".equals(u)
+                   || "min".equals(u)) {
+            return ServicesInfo.UNIT_MINUTE;
+        } else if ("h".equals(u)) {
+            return ServicesInfo.UNIT_HOUR;
+        } else {
+            LOG.appError("can't parse unit: " + u + " param: " + param);
+        }
+        return null;
     }
 }

@@ -1525,7 +1525,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* outside port */
         Value outsideDefaultPort = savedOutsidePort;
         int outsideDefaultPortInt;
-        if (outsideDefaultPort.isNothingSelected()) {
+        if (outsideDefaultPort == null
+            || outsideDefaultPort.isNothingSelected()) {
             outsideDefaultPortInt = getLowestUnusedProxyPort();
             if (outsideDefaultPortInt < insideDefaultPortInt - 1) {
                 outsideDefaultPortInt = insideDefaultPortInt - 1;
@@ -1756,7 +1757,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
             final Value haSaved = savedHostAddresses.get(host);
             final Value value = wi.getValue();
-            if (!Tools.valuesEqual(haSaved, value)) {
+            if (!Tools.areEqual(haSaved, value)) {
                 changed = true;
             }
         }

@@ -91,6 +91,31 @@ public final class ServicesInfo extends EditableInfo {
     /** Icon of the cluster. */
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
+    /** Default unit. */
+    public static final Unit UNIT_SEC =
+                    new Unit("",    "s",  "Second",      "Seconds");
+
+    public static final Unit UNIT_MILLISEC =
+                    new Unit("ms",  "ms", "Millisecond", "Milliseconds");
+
+    public static final Unit UNIT_MICROSEC =
+                    new Unit("us",  "us", "Microsecond", "Microseconds");
+
+    public static final Unit UNIT_SECOND =
+                    new Unit("s",   "s",  "Second",      "Seconds");
+
+    public static final Unit UNIT_MINUTE =
+                    new Unit("min", "m",  "Minute",      "Minutes");
+
+    public static final Unit UNIT_HOUR =
+                    new Unit("h",   "h",  "Hour",        "Hours");
+
+    private static final Unit[] UNITS = new Unit[]{UNIT_SEC,
+                                                   UNIT_MILLISEC,
+                                                   UNIT_MICROSEC,
+                                                   UNIT_SECOND,
+                                                   UNIT_MINUTE,
+                                                   UNIT_HOUR};
 
     /** Prepares a new <code>ServicesInfo</code> object. */
     public ServicesInfo(final String name, final Browser browser) {
@@ -279,8 +304,8 @@ public final class ServicesInfo extends EditableInfo {
                                            new LinkedHashMap<String, String>();
         for (final String param : rdiParams) {
             final Value value = rdi.getComboBoxValue(param);
-            if (value.equals(rdi.getParamDefault(param))) {
-                    continue;
+            if (Tools.areEqual(value, rdi.getParamDefault(param))) {
+                continue;
             }
             if (!value.isNothingSelected()) {
                 rdiMetaArgs.put(param, value.getValueForConfig());
@@ -321,9 +346,13 @@ public final class ServicesInfo extends EditableInfo {
     public void setGlobalConfig(final ClusterStatus clStatus) {
         final String[] params = getParametersFromXML();
         for (String param : params) {
-            final Value value = new StringValue(clStatus.getGlobalParam(param));
+            final String valueS = clStatus.getGlobalParam(param);
+            if (valueS == null) {
+                continue;
+            }
+            final Value value = new StringValue(valueS);
             final Value oldValue = getParamSaved(param);
-            if (value != null && !value.equals(oldValue)) {
+            if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
                 final Widget wi = getWidget(param, null);
                 if (wi != null) {
@@ -1896,14 +1925,7 @@ public final class ServicesInfo extends EditableInfo {
     /** Returns units. */
     @Override
     protected Unit[] getUnits() {
-        return new Unit[]{
-            new Unit("", "s", "Second", "Seconds"), /* default unit */
-            new Unit("ms",  "ms", "Millisecond", "Milliseconds"),
-            new Unit("us",  "us", "Microsecond", "Microseconds"),
-            new Unit("s",   "s",  "Second",      "Seconds"),
-            new Unit("min", "m",  "Minute",      "Minutes"),
-            new Unit("h",   "h",  "Hour",        "Hours")
-        };
+        return UNITS;
     }
 
     /**

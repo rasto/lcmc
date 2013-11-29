@@ -42,6 +42,11 @@ public final class StringValue implements Value {
     }
 
     public StringValue(final String valueForConfig,
+                       final Unit unit) {
+        this(valueForConfig, valueForConfig, unit);
+    }
+
+    public StringValue(final String valueForConfig,
                        final String valueForGui) {
         if (valueForGui == null) {
             throw new RuntimeException(

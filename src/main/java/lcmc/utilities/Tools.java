@@ -375,10 +375,10 @@ public final class Tools {
                 strace.append('\n');
                 strace.append(e.getStackTrace()[i].toString());
             }
-        }
-        if (e.getCause() != null) {
-            strace.append("\n\ncaused by:");
-            strace.append(getStackTrace(e.getCause()));
+            if (e.getCause() != null) {
+                strace.append("\n\ncaused by:");
+                strace.append(getStackTrace(e.getCause()));
+            }
         }
         return strace.toString();
     }
@@ -2006,23 +2006,27 @@ public final class Tools {
         return list.toString();
     }
 
-    public static boolean valuesEqual(final Value v1, final Value v2) {
-        if (v1 == null && v2 == null) {
-            return true;
-        } else if (v1 == null || v2 == null) {
-            return false;
-        } else {
-            return v1.equals(v2);
-        }
-    }
+    //public static boolean valuesEqual(final Value v1, final Value v2) {
+    //    if (v1 == null && v2 == null) {
+    //        return true;
+    //    } else if (v1 == null || v2 == null) {
+    //        return false;
+    //    } else {
+    //        return v1.equals(v2);
+    //    }
+    //}
 
     public static boolean areEqual(final Value v1, final Value v2) {
         if (v1 != null) {
-            return v1.equals(v2);
+            if (v2 == null) {
+                return v1.isNothingSelected();
+            } else {
+                return v1.equals(v2);
+            }
         } else if (v2 == null) {
             return true;
         } else {
-            return false;
+            return v2.isNothingSelected();
         }
     }
 

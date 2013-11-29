@@ -70,7 +70,8 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Combo box with units. */
     private final MComboBox<Unit> unitComboBox;
     /** Pattern that matches value and unit. */
-    private final Pattern unitPattern = Pattern.compile("^(\\d+)(\\D*)$");
+    private static final Pattern UNIT_PATTERN =
+                                             Pattern.compile("^(\\d+)(\\D*)$");
     /** Whether the unit combo box should be enabled. */
     private boolean unitEnabled = true;
 
@@ -208,9 +209,6 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Override
     protected Value getValueInternal() {
         String text = textFieldPart.getText();
-        if (text == null) {
-            text = "";
-        }
         final Unit unit = ((Unit) unitComboBox.getSelectedItem());
         if (unit != null) {
             if (unit.isPlural() == "1".equals(text)) {
@@ -219,7 +217,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
             }
             final boolean accessible =
                      Tools.getConfigData().isAccessible(getEnableAccessMode());
-            if ("".equals(text)) {
+            if (text == null || "".equals(text)) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
@@ -249,8 +247,11 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 }
             }
         }
-        final Value value = new StringValue(text, text, unit);
-        return value;
+        if (text == null || "".equals(text)) {
+            return new StringValue();
+        } else {
+            return new StringValue(text, unit);
+        }
     }
 
     /** Set component visible or invisible. */
@@ -286,8 +287,8 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Override
     protected void setValueAndWait0(final Value item) {
         Matcher m = null;
-        if (item != null) {
-            m = unitPattern.matcher(item.getValueForConfig());
+        if (item != null && item.getValueForConfig() != null) {
+            m = UNIT_PATTERN.matcher(item.getValueForConfig());
         }
         String number = "";
         String unit = "";
@@ -303,7 +304,8 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
         Unit selectedUnitInfo = null;
         for (Unit u : units) {
-            if (u.getShortName().equals(unit)) { //TODO:
+            if (u.getShortName().equals(unit)
+                || u.getSecShortName().equals(unit)) {
                 selectedUnitInfo = u;
             }
         }

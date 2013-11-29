@@ -88,34 +88,17 @@ public final class Unit implements Value {
         return name;
     }
 
-    /** Returns true if units are equals. */
-    @Override
-    public boolean equals(final Object o) {
-        if (o == null || !(o instanceof Unit)) {
-            return false;
-        }
-
-        if (Tools.isStringClass(o)) {
-            return shortName.equalsIgnoreCase((String) o)
-                   || secShortName.equalsIgnoreCase((String) o);
-        }
-
-        return name.equals(((Unit) o).toString())
-               || pluralName.equals(((Unit) o).toString());
-    }
-
-    /** Hash code. */
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
-
     /** Returns short name of the unit. */
     public String getShortName() {
         if (empty) {
             return "";
         }
         return shortName;
+    }
+
+    /** Returns second short name of the unit. */
+    public String getSecShortName() {
+        return secShortName;
     }
 
     @Override
@@ -141,5 +124,27 @@ public final class Unit implements Value {
     @Override
     public String getValueForConfigWithUnit() {
         return getValueForConfig();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Unit other = (Unit) obj;
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+        return hash;
     }
 }
