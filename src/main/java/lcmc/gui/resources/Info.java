@@ -1242,4 +1242,9 @@ public class Info implements Comparable<Info>, Value {
     public boolean isNothingSelected() {
         return name == null;
     }
+
+    @Override
+    public String getNothingSelected() {
+        return NOTHING_SELECTED;
+    }
 }

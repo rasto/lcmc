@@ -1624,7 +1624,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
@@ -1938,14 +1938,26 @@ public final class CRMXML extends XML {
                 final String startDelay = getAttribute(actionNode,
                                                                "start-delay");
                 final String role = getAttribute(actionNode, "role");
-                ra.addOperationDefault(name, "depth", depth);
-                ra.addOperationDefault(name, "timeout", timeout);
-                ra.addOperationDefault(name, "interval", interval);
-                ra.addOperationDefault(name, "start-delay", startDelay);
-                ra.addOperationDefault(name, "role", role);
+                ra.addOperationDefault(name, "depth", new StringValue(depth));
+                ra.addOperationDefault(name,
+                                       "timeout",
+                                       new StringValue(
+                                                    timeout,
+                                                    ServicesInfo.UNIT_SECOND));
+                ra.addOperationDefault(name,
+                                       "interval",
+                                       new StringValue(
+                                                    interval,
+                                                    ServicesInfo.UNIT_SECOND));
+                ra.addOperationDefault(name,
+                                       "start-delay",
+                                       new StringValue(
+                                                    startDelay,
+                                                    ServicesInfo.UNIT_SECOND));
+                ra.addOperationDefault(name, "role", new StringValue(role));
             }
         }
-        ra.addOperationDefault("monitor", PAR_CHECK_LEVEL, "");
+        ra.addOperationDefault("monitor", PAR_CHECK_LEVEL, new StringValue(""));
     }
 
     /** Parses the actions node that is list of values for action param. */
@@ -2069,12 +2081,21 @@ public final class CRMXML extends XML {
         /* <actions> */
         for (final String name
                 : new String[]{"start", "stop", "status", "meta-data"}) {
-            ra.addOperationDefault(name, "timeout", "15");
+            ra.addOperationDefault(name,
+                                   "timeout",
+                                   new StringValue("15",
+                                                   ServicesInfo.UNIT_SECOND));
         }
         final String monitorName = "monitor";
-        ra.addOperationDefault(monitorName, "timeout", "15");
-        ra.addOperationDefault(monitorName, "interval", "15");
-        ra.addOperationDefault(monitorName, "start-delay", "15");
+        ra.addOperationDefault(monitorName,
+                               "timeout",
+                               new StringValue("15", ServicesInfo.UNIT_SECOND));
+        ra.addOperationDefault(monitorName,
+                               "interval",
+                               new StringValue("15", ServicesInfo.UNIT_SECOND));
+        ra.addOperationDefault(monitorName,
+                               "start-delay",
+                               new StringValue("15", ServicesInfo.UNIT_SECOND));
         ra.setProbablyMasterSlave(false);
     }
 
@@ -2144,23 +2165,22 @@ public final class CRMXML extends XML {
                     if (contentParamNode != null) {
                         final String type = getAttribute(contentParamNode,
                                                          "type");
-                        String defaultValue = getAttribute(contentParamNode,
-                                                           "default");
+                        final String dv = getAttribute(contentParamNode,
+                                                       "default");
                         paramGlobalTypeMap.put(param, type);
                         if (!"expected-quorum-votes".equals(param)) {
-                            Unit unit = null;
+                            Value defaultValue;
                             if (PARAM_TYPE_TIME.equals(type)) {
-                                final Matcher m = UNIT_PATTERN.matcher(defaultValue);
-                                if (m.matches()) {
-                                    defaultValue = m.group(1);
-                                    String u = m.group(2);
-                                    unit = parseUnit(param, u);
+                                final Value v = parseValue(param, dv);
+                                if (v == null) {
+                                    defaultValue = new StringValue(dv);
+                                } else {
+                                    defaultValue = v;
                                 }
+                            } else {
+                                defaultValue = new StringValue(dv);
                             }
-                            paramGlobalDefaultMap.put(
-                                                  param,
-                                                  new StringValue(defaultValue,
-                                                                  unit));
+                            paramGlobalDefaultMap.put(param, defaultValue);
                         }
                         if (PARAM_TYPE_BOOLEAN.equals(type)) {
                             paramGlobalPossibleChoices.put(param,
@@ -2274,7 +2294,7 @@ public final class CRMXML extends XML {
 
     /** Parse op defaults. */
     void parseOpDefaults(final Node opDefaultsNode,
-                         final Map<String, String> opDefaultsParams) {
+                         final Map<String, Value> opDefaultsParams) {
 
         final Map<String, String> nvpairIds =
                                         new HashMap<String, String>();
@@ -2297,7 +2317,7 @@ public final class CRMXML extends XML {
                 if (maNode.getNodeName().equals("nvpair")) {
                     final String name = getAttribute(maNode, "name");
                     final String value = getAttribute(maNode, "value");
-                    opDefaultsParams.put(name, value);
+                    opDefaultsParams.put(name, parseValue(name, value));
                 }
             }
         }
@@ -2310,7 +2330,7 @@ public final class CRMXML extends XML {
               final Map<String, Map<String, String>> parametersMap,
               final Map<String, Map<String, String>> parametersNvpairsIdsMap,
               final Map<String, String> resourceInstanceAttrIdMap,
-              final MultiKeyMap<String, String> operationsMap,
+              final MultiKeyMap<String, Value> operationsMap,
               final Map<String, String> metaAttrsIdMap,
               final Map<String, String> operationsIdMap,
               final Map<String, Map<String, String>> resOpIdsMap,
@@ -2378,19 +2398,28 @@ public final class CRMXML extends XML {
                                                              "interval");
                         final String startDelay = getAttribute(opNode,
                                                                "start-delay");
-                        operationsMap.put(crmId, name, "interval", interval);
-                        operationsMap.put(crmId, name, "timeout", timeout);
+                        operationsMap.put(crmId,
+                                          name,
+                                          "interval",
+                                          parseValue("interval", interval));
+
+                        operationsMap.put(crmId,
+                                          name,
+                                          "timeout",
+                                          parseValue("timeout", timeout));
+
                         operationsMap.put(crmId,
                                           name,
                                           "start-delay",
-                                          startDelay);
+                                          parseValue("startDelay", startDelay));
+
                         opIds.put(name, opId);
                         if ("monitor".equals(name)) {
                             final String checkLevel = parseCheckLevel(opNode);
                             operationsMap.put(crmId,
                                               name,
                                               PAR_CHECK_LEVEL,
-                                              checkLevel);
+                                              new StringValue(checkLevel));
                         }
                     }
                 }
@@ -2468,7 +2497,7 @@ public final class CRMXML extends XML {
                 final Map<String, ResourceAgent> resourceTypeMap,
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
-                final MultiKeyMap<String, String> operationsMap,
+                final MultiKeyMap<String, Value> operationsMap,
                 final Map<String, String> metaAttrsIdMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap,
@@ -2563,7 +2592,7 @@ public final class CRMXML extends XML {
                 final Map<String, Map<String, String>> parametersMap,
                 final Map<String, Map<String, String>> parametersNvpairsIdsMap,
                 final Map<String, String> resourceInstanceAttrIdMap,
-                final MultiKeyMap<String, String> operationsMap,
+                final MultiKeyMap<String, Value> operationsMap,
                 final Map<String, String> metaAttrsIdMap,
                 final Map<String, String> operationsIdMap,
                 final Map<String, Map<String, String>> resOpIdsMap,
@@ -2982,8 +3011,8 @@ public final class CRMXML extends XML {
 
         /* <op_defaults> */
         final Node opDefaultsNode = getChildNode(confNode, "op_defaults");
-        final Map<String, String> opDefaultsParams =
-                                                new HashMap<String, String>();
+        final Map<String, Value> opDefaultsParams =
+                                                new HashMap<String, Value>();
         if (opDefaultsNode != null) {
             parseOpDefaults(opDefaultsNode, opDefaultsParams);
         }
@@ -3075,8 +3104,8 @@ public final class CRMXML extends XML {
                                         new HashMap<String, Set<String>>();
         final Map<String, String> resourceInstanceAttrIdMap =
                                       new HashMap<String, String>();
-        final MultiKeyMap<String, String> operationsMap =
-                                            new MultiKeyMap<String, String>();
+        final MultiKeyMap<String, Value> operationsMap =
+                                            new MultiKeyMap<String, Value>();
         final Map<String, String> metaAttrsIdMap =
                                                 new HashMap<String, String>();
         final Map<String, String> operationsIdMap =
@@ -3694,7 +3723,8 @@ public final class CRMXML extends XML {
                     correctValue = false;
                 }
             }
-        } else if (value.isNothingSelected() && isOrderRequired(param)) {
+        } else if ((value == null || value.isNothingSelected())
+                   && isOrderRequired(param)) {
             correctValue = false;
         }
         return correctValue;
@@ -3846,7 +3876,8 @@ public final class CRMXML extends XML {
                     correctValue = false;
                 }
             }
-        } else if (value.isNothingSelected() && isColocationRequired(param)) {
+        } else if ((value == null || value.isNothingSelected())
+                   && isColocationRequired(param)) {
             correctValue = false;
         }
         return correctValue;
@@ -4407,6 +4438,20 @@ public final class CRMXML extends XML {
             return ServicesInfo.UNIT_HOUR;
         } else {
             LOG.appError("can't parse unit: " + u + " param: " + param);
+        }
+        return null;
+    }
+
+    private Value parseValue(final String param, final String v) {
+        if (v == null) {
+            return null;
+        }
+        final Matcher m = UNIT_PATTERN.matcher(v);
+        if (m.matches()) {
+            final String value = m.group(1);
+            final String u = m.group(2);
+            final Unit unit = parseUnit(param, u);
+            return new StringValue(value, unit);
         }
         return null;
     }

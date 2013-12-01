@@ -719,7 +719,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Returns common file systems. */
-    public Value[] getCommonFileSystems(final String defaultValue) {
+    public Value[] getCommonFileSystems(final Value defaultValue) {
         return getBrowser().getCommonFileSystems(defaultValue);
     }
 

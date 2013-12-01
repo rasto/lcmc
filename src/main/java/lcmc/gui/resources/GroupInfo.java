@@ -113,7 +113,7 @@ public final class GroupInfo extends ServiceInfo {
                 continue;
             }
             Value value = getComboBoxValue(param);
-            if (value.equals(getParamDefault(param))) {
+            if (Tools.areEqual(value, getParamDefault(param))) {
                 continue;
             }
             if (!value.isNothingSelected()) {
@@ -194,7 +194,7 @@ public final class GroupInfo extends ServiceInfo {
                     continue;
                 }
                 final Value value = ci.getComboBoxValue(param);
-                if (value.equals(ci.getParamDefault(param))) {
+                if (Tools.areEqual(value, ci.getParamDefault(param))) {
                     continue;
                 }
                 if (!GUI_ID.equals(param) && !value.isNothingSelected()) {
@@ -336,7 +336,7 @@ public final class GroupInfo extends ServiceInfo {
                     continue;
                 }
                 final Value value = getComboBoxValue(param);
-                if (value.equals(getParamDefault(param))) {
+                if (Tools.areEqual(value, getParamDefault(param))) {
                     continue;
                 }
                 if (!value.isNothingSelected()) {

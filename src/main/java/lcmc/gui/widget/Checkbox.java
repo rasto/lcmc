@@ -119,7 +119,7 @@ public class Checkbox extends GenericWidget<JComponent> {
 
     /** Returns whether component is editable or not. */
     @Override
-    boolean isEditable() {
+    public boolean isEditable() {
         return false;
     }
 

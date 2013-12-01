@@ -151,4 +151,8 @@ public interface Widget {
     public void setEditable();
     /** Sets extra button enabled. */
     public void setTFButtonEnabled(boolean tfButtonEnabled);
+
+    public boolean isEditable();
+
+    public void setText(final String text);
 }

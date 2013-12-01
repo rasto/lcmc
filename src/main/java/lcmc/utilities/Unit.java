@@ -127,6 +127,11 @@ public final class Unit implements Value {
     }
 
     @Override
+    public String getNothingSelected() {
+        return NOTHING_SELECTED;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;

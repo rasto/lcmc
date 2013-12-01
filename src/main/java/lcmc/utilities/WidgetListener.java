@@ -21,6 +21,7 @@
 package lcmc.utilities;
 
 import lcmc.data.Value;
+import lcmc.data.StringValue;
 
 public abstract class WidgetListener {
     /** Serial version UID. */
@@ -37,4 +38,8 @@ public abstract class WidgetListener {
     }
 
     public abstract void check(final Value value);
+
+    public void checkText(final String text) {
+        check(new StringValue(text));
+    }
 }

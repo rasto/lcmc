@@ -193,7 +193,8 @@ final class FilesystemInfo extends ServiceInfo {
                                 if (!(value instanceof Info)) {
                                     return;
                                 }
-                                if (value.isNothingSelected()) {
+                                if (value == null
+                                    || value.isNothingSelected()) {
                                     return;
                                 }
                                 final String selectedValue =
@@ -233,10 +234,15 @@ final class FilesystemInfo extends ServiceInfo {
                 selectedValue = selectedInfo;
             }
             Value defaultValue = null;
-            if (selectedValue.isNothingSelected()) {
-                defaultValue = new StringValue(
-                           "",
-                           Tools.getString("ClusterBrowser.SelectBlockDevice"));
+            if (selectedValue == null || selectedValue.isNothingSelected()) {
+                defaultValue = 
+                          new StringValue() {
+                              @Override
+                              public String getNothingSelected() {
+                                  return Tools.getString(
+                                         "ClusterBrowser.SelectBlockDevice");
+                              }
+                          };
             }
             final Value[] commonBlockDevInfos =
                                         getCommonBlockDevInfos(defaultValue,
@@ -258,18 +264,25 @@ final class FilesystemInfo extends ServiceInfo {
             widgetAdd(param, prefix, paramWi);
         } else if ("fstype".equals(param)) {
             final Value defaultValue =
-                        new StringValue(Tools.getString("ClusterBrowser.SelectFilesystem"));
+              new StringValue() {
+                  @Override
+                  public String getNothingSelected() {
+                      return Tools.getString("ClusterBrowser.SelectFilesystem");
+                  }
+              };
+
             Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
-            if (selectedValue.isNothingSelected()) {
+            if (selectedValue == null || selectedValue.isNothingSelected()) {
                 selectedValue = defaultValue;
             }
+
             paramWi = WidgetFactory.createInstance(
                               Widget.GUESS_TYPE,
                               selectedValue,
-                              getBrowser().getCommonFileSystems(defaultValue.getValueForConfig()),
+                              getBrowser().getCommonFileSystems(defaultValue),
                               Widget.NO_REGEXP,
                               width,
                               Widget.NO_ABBRV,
@@ -284,20 +297,26 @@ final class FilesystemInfo extends ServiceInfo {
         } else if ("directory".equals(param)) {
             final String[] cmp = getBrowser().getCommonMountPoints();
             Value[] items = new Value[cmp.length + 1];
-            System.arraycopy(cmp,
-                             0,
-                             items,
-                             1,
-                             cmp.length);
-            final Value defaultValue =
-                      new StringValue(Tools.getString("ClusterBrowser.SelectMountPoint"));
+            final Value defaultValue = new StringValue() {
+                              @Override
+                              public String getNothingSelected() {
+                                  return Tools.getString(
+                                            "ClusterBrowser.SelectMountPoint");
+                              }
+                          };
             items[0] = defaultValue;
+            int i = 1;
+            for (final String c : cmp) {
+                items[i] = new StringValue(c);
+                i++;
+            }
+
             getResource().setPossibleChoices(param, items);
             Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
-            if (selectedValue.isNothingSelected()) {
+            if (selectedValue == null || selectedValue.isNothingSelected()) {
                 selectedValue = defaultValue;
             }
             final String regexp = "^.+$";
@@ -448,7 +467,7 @@ final class FilesystemInfo extends ServiceInfo {
     public int getUsed() {
         if (blockDeviceParamWi != null) {
             final Value value = blockDeviceParamWi.getValue();
-            if (value.isNothingSelected()) {
+            if (value == null || value.isNothingSelected()) {
                 return -1;
             }
             final CommonDeviceInterface cdi = (CommonDeviceInterface) value;
@@ -476,10 +495,14 @@ final class FilesystemInfo extends ServiceInfo {
             selectedValue = selectedInfo;
         }
         Value defaultValue = null;
-        if (selectedValue.isNothingSelected()) {
-            defaultValue = new StringValue(
-                       "",
-                       Tools.getString("ClusterBrowser.SelectBlockDevice"));
+        if (selectedValue == null || selectedValue.isNothingSelected()) {
+            defaultValue = new StringValue() {
+                              @Override
+                              public String getNothingSelected() {
+                                  return Tools.getString(
+                                         "ClusterBrowser.SelectBlockDevice");
+                              }
+                          };
         }
         final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
                                                                    getName());

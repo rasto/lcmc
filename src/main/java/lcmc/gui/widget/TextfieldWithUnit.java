@@ -279,38 +279,19 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     /** Return whether component is editable or not. */
     @Override
-    boolean isEditable() {
+    public boolean isEditable() {
         return false;
     }
 
     /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
-        Matcher m = null;
-        if (item != null && item.getValueForConfig() != null) {
-            m = UNIT_PATTERN.matcher(item.getValueForConfig());
+        if (item == null) {
+            textFieldPart.setText(null);
+        } else {
+            textFieldPart.setText(item.getValueForConfig());
+            unitComboBox.setSelectedItem(item.getUnit());
         }
-        String number = "";
-        String unit = "";
-        if (m != null && m.matches()) {
-            number = m.group(1);
-            final String parsedUnit = m.group(2);
-            if (!"".equals(parsedUnit)) {
-                unit = parsedUnit;
-            }
-        }
-
-        textFieldPart.setText(number);
-
-        Unit selectedUnitInfo = null;
-        for (Unit u : units) {
-            if (u.getShortName().equals(unit)
-                || u.getSecShortName().equals(unit)) {
-                selectedUnitInfo = u;
-            }
-        }
-
-        unitComboBox.setSelectedItem(selectedUnitInfo);
     }
 
     /** Return document object of the component. */

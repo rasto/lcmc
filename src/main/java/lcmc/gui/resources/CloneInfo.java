@@ -103,8 +103,6 @@ final class CloneInfo extends ServiceInfo {
      */
     void setCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
-        getBrowser().addNameToServiceInfoHash(this);
-        getBrowser().addToHeartbeatIdList(this);
         newServiceInfo.setCloneInfo(this);
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
         setNode(node);
@@ -855,5 +853,9 @@ final class CloneInfo extends ServiceInfo {
     @Override
     public ImageIcon getCategoryIcon(final boolean testOnly) {
         return getMenuIcon(testOnly);
+    }
+
+    void setContainedService(final ServiceInfo containedService) {
+        this.containedService = containedService;
     }
 }

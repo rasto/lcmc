@@ -21,18 +21,14 @@
 package lcmc.data;
 
 import lcmc.utilities.Unit;
-import lcmc.utilities.Tools;
 
-public final class StringValue implements Value {
+public class StringValue implements Value {
     /** Internal string, used in configs. */
     private final String valueForConfig;
     /** Value visible in the GUI. */
     private final String valueForGui;
     
     private final Unit unit;
-
-    private static final String NOTHING_SELECTED =
-                                Tools.getString("Widget.NothingSelected");
 
     private static final String NOTHING_VALUE = null;
     
@@ -48,36 +44,29 @@ public final class StringValue implements Value {
 
     public StringValue(final String valueForConfig,
                        final String valueForGui) {
-        if (valueForGui == null) {
-            throw new RuntimeException(
-                                "Value: valueForGui is null, valueForConfig: "
-                                 + valueForConfig);
-        }
-        this.valueForConfig = valueForConfig;
-        this.valueForGui = valueForGui;
-        this.unit = null;
+        this(valueForConfig, valueForGui, null);
     }
 
     public StringValue(final String valueForConfig,
                        final String valueForGui,
                        final Unit unit) {
-        if (valueForGui == null) {
-            throw new RuntimeException("Value: valueForGui is null, valueForConfig: "
-                                       + valueForConfig);
+        if (valueForConfig == null || "".equals(valueForConfig)) {
+            this.valueForConfig = NOTHING_VALUE;
+        } else {
+            this.valueForConfig = valueForConfig;
         }
-        this.valueForConfig = valueForConfig;
         this.valueForGui = valueForGui;
         this.unit = unit;
     }
 
     public StringValue(final String valueForConfig) {
-        if (valueForConfig == null) {
+        if (valueForConfig == null || "".equals(valueForConfig)) {
             this.valueForConfig = NOTHING_VALUE;
         } else {
             this.valueForConfig = valueForConfig;
         }
-        if (isNothingSelected()) { //TODO can be ""
-            this.valueForGui = getNothingSelected();
+        if (isNothingSelected()) {
+            this.valueForGui = null;
         } else {
             this.valueForGui = valueForConfig;
         }
@@ -87,7 +76,7 @@ public final class StringValue implements Value {
     /** Returns the display name. It will be shown in the GUI. */
     @Override
     public String toString() {
-        return valueForGui;
+        return getValueForGui();
     }
 
     /** Returns the string that is used for config. */
@@ -98,6 +87,9 @@ public final class StringValue implements Value {
 
     @Override
     public String getValueForGui() {
+        if (valueForGui == null) {
+            return getNothingSelected();
+        }
         return valueForGui;
     }
 
@@ -122,12 +114,13 @@ public final class StringValue implements Value {
         if (nv == null && valueForConfig == null) {
             return true;
         }
-        if (nv != null && nv.equals(valueForConfig)) {
+        if (nv != null && (nv.equals(valueForConfig))) {
             return true;
         }
         return false;
     }
 
+    @Override
     public String getNothingSelected() {
         return NOTHING_SELECTED;
     }

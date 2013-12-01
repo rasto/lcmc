@@ -87,6 +87,9 @@ public class Textfield extends GenericWidget<JComponent> {
     @Override
     public String getStringValue() {
         final Value v = getValue();
+        if (v == null) {
+            return "";
+        }
         return v.getValueForConfig();
     }
 
@@ -102,7 +105,7 @@ public class Textfield extends GenericWidget<JComponent> {
 
     /** Returns whether component is editable or not. */
     @Override
-    boolean isEditable() {
+    public boolean isEditable() {
         return true;
     }
 

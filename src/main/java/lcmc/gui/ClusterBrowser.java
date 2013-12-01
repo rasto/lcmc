@@ -2365,9 +2365,9 @@ public final class ClusterBrowser extends Browser {
      * Returns common file systems on all nodes as StringValue array.
      * The defaultValue is stored as the first item in the array.
      */
-    public Value[] getCommonFileSystems(final String defaultValue) {
+    public Value[] getCommonFileSystems(final Value defaultValue) {
         Value[] cfs =  new Value[commonFileSystems.length + 2];
-        cfs[0] = new StringValue(null, defaultValue);
+        cfs[0] = defaultValue;
         int i = 1;
         for (String cf : commonFileSystems) {
             cfs[i] = new StringValue(cf);

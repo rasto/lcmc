@@ -203,6 +203,11 @@ public abstract class DialogHost extends WizardDialog {
         }
 
         @Override
+        public String getNothingSelected() {
+            return NOTHING_SELECTED;
+        }
+
+        @Override
         public Unit getUnit() {
             return null;
         }

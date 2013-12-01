@@ -159,7 +159,7 @@ public final class ClusterStatus {
     }
 
     /** Returns op defaults value pairs. */
-    public Map<String, String> getOpDefaultsValuePairs() {
+    public Map<String, Value> getOpDefaultsValuePairs() {
         return cibQueryMap.getOpDefaultsParams();
     }
 
@@ -384,9 +384,9 @@ public final class ClusterStatus {
     }
 
     /** Returns value of an operation. */
-    public String getOperation(final String hbId,
-                               final String op,
-                               final String param) {
+    public Value getOperation(final String hbId,
+                              final String op,
+                              final String param) {
         return cibQueryMap.getOperations().get(hbId, op, param);
     }
 

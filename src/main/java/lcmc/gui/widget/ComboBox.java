@@ -218,13 +218,11 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                 if (isAlwaysEditable()) {
                     ((MComboBox) comp).setEditable(true);
                     final JTextComponent editor = getTextComponent();
-                    if (v.isNothingSelected()) {
+                    if (v == null || v.isNothingSelected()) {
                         editor.selectAll();
                     }
                 } else {
-                    if (v == null || v.isNothingSelected()) {
-                        ((MComboBox) comp).setEditable(false);
-                    } else {
+                    if (v != null && !v.isNothingSelected()) {
                         ((MComboBox) comp).setEditable(editable);
                     }
                 }
@@ -257,18 +255,21 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
             if (text == null) {
                 text = "";
             }
-            value = (Value) cb.getSelectedItem();
-            if (value == null || !text.equals(value.getValueForConfig())) {
-                value = new StringValue(text);
+            final Object comboBoxValue0 = cb.getSelectedItem();
+            if (comboBoxValue0 instanceof Value) {
+                final Value comboBoxValue = (Value) comboBoxValue0;
+                if (text.equals(comboBoxValue.getValueForGui())) {
+                    if (comboBoxValue.isNothingSelected()) {
+                        return null;
+                    }
+                    return comboBoxValue;
+                }
             }
-
-            if (value.isNothingSelected()) {
-                return value;
-            }
+            return new StringValue(text);
         } else {
             value = (Value) cb.getSelectedItem();
         }
-        if (value.isNothingSelected()) {
+        if (value == null || value.isNothingSelected()) {
             return null;
         }
         return value;
@@ -287,7 +288,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
 
     /** Returns whether component is editable or not. */
     @Override
-    boolean isEditable() {
+    public boolean isEditable() {
         return ((MComboBox) getInternalComponent()).isEditable();
     }
 
@@ -296,22 +297,11 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     protected void setValueAndWait0(final Value item) {
         Tools.isSwingThread();
         final MComboBox<Value> cb = getInternalComponent();
-        cb.setSelectedItem(item);
-        //if (Tools.isStringClass(item)) {
-        //    Value selectedObject = null;
-        //    for (int i = 0; i < cb.getItemCount(); i++) {
-        //        final Value it = cb.getItemAt(i);
-        //        if (it.equals(item)) {
-        //            selectedObject = it;
-        //            cb.setSelectedItem(it);
-        //            break;
-        //        }
-        //    }
-        //    if (selectedObject == null) {
-        //        cb.addItem(item);
-        //        cb.setSelectedItem(item);
-        //    }
-        //}
+        if (item == null) {
+            cb.setSelectedItem(new StringValue());
+        } else {
+            cb.setSelectedItem(item);
+        }
     }
 
     /** Set selected index. */
@@ -397,7 +387,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     /** Returns the text component of the combo box. */
-    private JTextComponent getTextComponent() {
+    public JTextComponent getTextComponent() {
         final JComponent comp = getInternalComponent();
         final ComboBoxEditor editor = ((MComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
@@ -407,5 +397,10 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Override
     public void select(final int selectionStart, final int selectionEnd) {
         getTextComponent().select(selectionStart, selectionEnd);
+    }
+
+    @Override
+    public void setText(final String text) {
+        getTextComponent().setText(text);
     }
 }

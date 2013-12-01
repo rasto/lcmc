@@ -30,7 +30,6 @@ import lcmc.data.UserConfig;
 import lcmc.data.HostOptions;
 import lcmc.data.Value;
 import lcmc.configs.DistResource;
-import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.ClusterBrowser;
@@ -418,7 +417,7 @@ public final class Tools {
         Pattern pattern = null;
         final String ipPattern =
                 "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})";
-        if ("".equals(ipString)) {
+        if (ipString == null || "".equals(ipString)) {
             wasValid = false;
         } else {
             try {
@@ -2006,15 +2005,13 @@ public final class Tools {
         return list.toString();
     }
 
-    //public static boolean valuesEqual(final Value v1, final Value v2) {
-    //    if (v1 == null && v2 == null) {
-    //        return true;
-    //    } else if (v1 == null || v2 == null) {
-    //        return false;
-    //    } else {
-    //        return v1.equals(v2);
-    //    }
-    //}
+    public static <T> boolean areEqual(final T v1, final T v2) {
+        if (v1 == null) {
+            return v2 == null;
+        } else {
+            return v1.equals(v2);
+        }
+    }
 
     public static boolean areEqual(final Value v1, final Value v2) {
         if (v1 != null) {
@@ -2027,19 +2024,6 @@ public final class Tools {
             return true;
         } else {
             return v2.isNothingSelected();
-        }
-    }
-
-    /**
-     * Returns whether two objects are equal. Special handling for Unit.
-     */
-    public static boolean areEqual(final String s1, final String s2) {
-        if (s1 != null) {
-            return s1.equals(s2);
-        } else if (s2 == null) {
-            return true;
-        } else {
-            return false;
         }
     }
 

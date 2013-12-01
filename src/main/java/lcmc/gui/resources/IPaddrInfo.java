@@ -145,13 +145,14 @@ final class IPaddrInfo extends ServiceInfo {
 
         final StringBuilder s = new StringBuilder(getName());
         final String inside = id + " / ";
-        String ip = getParamSaved("ip").getValueForConfig();
-        if (ip == null || "".equals(ip)) {
-            ip = Tools.getString("ClusterBrowser.Ip.Unconfigured");
+        Value ip = getParamSaved("ip");
+        if (ip == null || ip.isNothingSelected()) {
+            ip = new StringValue(
+                          Tools.getString("ClusterBrowser.Ip.Unconfigured"));
         }
         s.append(" (");
         s.append(inside);
-        s.append(ip);
+        s.append(ip.getValueForConfig());
         s.append(')');
         return s.toString();
     }

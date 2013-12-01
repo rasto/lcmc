@@ -3255,5 +3255,10 @@ public final class Host implements Comparable<Host>, Value {
     public String getValueForConfigWithUnit() {
         return getValueForConfig();
     }
+
+    @Override
+    public String getNothingSelected() {
+        return NOTHING_SELECTED;
+    }
 }
 

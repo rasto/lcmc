@@ -705,6 +705,9 @@ public abstract class EditableInfo extends Info {
         }
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
+            if (newValue == null || newValue.isNothingSelected()) {
+                return true;
+            }
             final Matcher m = p.matcher(newValue.getValueForConfig());
             if (m.matches()) {
                 return true;

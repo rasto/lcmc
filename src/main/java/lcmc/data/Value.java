@@ -22,13 +22,18 @@
 package lcmc.data;
 
 import lcmc.utilities.Unit;
+import lcmc.utilities.Tools;
 
 /**
  */
 public interface Value {
+    static final String NOTHING_SELECTED =
+                                     Tools.getString("Widget.NothingSelected");
+
     public String getValueForGui();
     public String getValueForConfig();
     public boolean isNothingSelected();
     public Unit getUnit();
     public String getValueForConfigWithUnit();
+    public String getNothingSelected();
 }

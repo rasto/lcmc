@@ -494,9 +494,6 @@ implements Widget {
                 }
                 if (wl.isEnabled()
                     && e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!(e.getItem() instanceof Value)) {
-                        LOG.appError("not a value: " + e.getItem());
-                    }
                     final Value value = (Value) e.getItem();
                     final Thread t = new Thread(new Runnable() {
                         @Override

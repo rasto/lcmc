@@ -21,11 +21,13 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.Value;
+
 /**
  * This interface provides getDevice function for drbd block devices or block
  * devices that don't have drbd over them but are used by crm.
  */
-public interface CommonDeviceInterface {
+public interface CommonDeviceInterface extends Value {
     /** Returns the name. */
     String getName();
     /** Returns the device name. */

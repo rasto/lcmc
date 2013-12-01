@@ -98,8 +98,8 @@ final class CibQuery {
     /** Map from resource to location id for ping. */
     private Map<String, String> resPingToLocId = new HashMap<String, String>();
     /** Operations map. */
-    private MultiKeyMap<String, String> operations =
-                                            new MultiKeyMap<String, String>();
+    private MultiKeyMap<String, Value> operations =
+                                            new MultiKeyMap<String, Value>();
     /** Operations refs map. */
     private Map<String, String> operationsRefs = new HashMap<String, String>();
     /** Meta attrs id map. */
@@ -144,8 +144,7 @@ final class CibQuery {
     private Map<String, String> rscDefaultsParamsNvpairIds =
                                                  new HashMap<String, String>();
     /** op_defaults parameters with values. */
-    private Map<String, String> opDefaultsParams =
-                                                 new HashMap<String, String>();
+    private Map<String, Value> opDefaultsParams = new HashMap<String, Value>();
 
     /** Sets crm config map. */
     void setCrmConfig(final Map<String, String> crmConfig) {
@@ -386,7 +385,7 @@ final class CibQuery {
 
 
     /** Sets operations map. */
-    void setOperations(final MultiKeyMap<String, String> operations) {
+    void setOperations(final MultiKeyMap<String, Value> operations) {
         this.operations = operations;
     }
 
@@ -417,7 +416,7 @@ final class CibQuery {
 
 
     /** Returns operations map. */
-    MultiKeyMap<String, String> getOperations() {
+    MultiKeyMap<String, Value> getOperations() {
         return operations;
     }
 
@@ -590,12 +589,12 @@ final class CibQuery {
     }
 
     /** Sets op_defaults parameters with values. */
-    void setOpDefaultsParams(final Map<String, String> opDefaultsParams) {
+    void setOpDefaultsParams(final Map<String, Value> opDefaultsParams) {
         this.opDefaultsParams = opDefaultsParams;
     }
 
     /** Gets op_defaults parameters with values. */
-    Map<String, String> getOpDefaultsParams() {
+    Map<String, Value> getOpDefaultsParams() {
         return opDefaultsParams;
     }
 }

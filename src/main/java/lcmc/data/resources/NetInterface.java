@@ -303,4 +303,9 @@ public final class NetInterface extends Resource implements Value {
     public String getValueForConfigWithUnit() {
         return getValueForConfig();
     }
+
+    @Override
+    public String getNothingSelected() {
+        return NOTHING_SELECTED;
+    }
 }

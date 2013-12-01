@@ -334,7 +334,7 @@ final class CreateFS extends DrbdConfig {
         }
         final Value[] filesystems =
             getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
-                                             defaultValue.getValueForConfig());
+                                                                defaultValue);
 
         filesystemW = WidgetFactory.createInstance(
                                      Widget.Type.COMBOBOX,

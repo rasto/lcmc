@@ -92,7 +92,7 @@ public final class ServicesInfo extends EditableInfo {
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
     /** Default unit. */
-    public static final Unit UNIT_SEC =
+    public static final Unit UNIT_SECOND =
                     new Unit("",    "s",  "Second",      "Seconds");
 
     public static final Unit UNIT_MILLISEC =
@@ -101,21 +101,17 @@ public final class ServicesInfo extends EditableInfo {
     public static final Unit UNIT_MICROSEC =
                     new Unit("us",  "us", "Microsecond", "Microseconds");
 
-    public static final Unit UNIT_SECOND =
-                    new Unit("s",   "s",  "Second",      "Seconds");
-
     public static final Unit UNIT_MINUTE =
                     new Unit("min", "m",  "Minute",      "Minutes");
 
     public static final Unit UNIT_HOUR =
                     new Unit("h",   "h",  "Hour",        "Hours");
 
-    private static final Unit[] UNITS = new Unit[]{UNIT_SEC,
-                                                   UNIT_MILLISEC,
-                                                   UNIT_MICROSEC,
-                                                   UNIT_SECOND,
-                                                   UNIT_MINUTE,
-                                                   UNIT_HOUR};
+    public static final Unit[] UNITS = new Unit[]{UNIT_SECOND,
+                                                  UNIT_MILLISEC,
+                                                  UNIT_MICROSEC,
+                                                  UNIT_MINUTE,
+                                                  UNIT_HOUR};
 
     /** Prepares a new <code>ServicesInfo</code> object. */
     public ServicesInfo(final String name, final Browser browser) {
@@ -289,11 +285,11 @@ public final class ServicesInfo extends EditableInfo {
         final Map<String, String> args = new HashMap<String, String>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            if (value.equals(getParamDefault(param))) {
+            if (Tools.areEqual(value, getParamDefault(param))) {
                 continue;
             }
 
-            if (value.isNothingSelected()) {
+            if (value == null || value.isNothingSelected()) {
                 continue;
             }
             args.put(param, value.getValueForConfig());
@@ -307,7 +303,7 @@ public final class ServicesInfo extends EditableInfo {
             if (Tools.areEqual(value, rdi.getParamDefault(param))) {
                 continue;
             }
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 rdiMetaArgs.put(param, value.getValueForConfig());
             }
         }
@@ -1242,13 +1238,13 @@ public final class ServicesInfo extends EditableInfo {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
         final CRMGraph hg = getBrowser().getCRMGraph();
+        getBrowser().addNameToServiceInfoHash(newServiceInfo);
         if (!hg.addResource(newServiceInfo,
                             null,
                             pos,
                             false, /* colocation only */
                             false, /* order only */
                             testOnly)) {
-            getBrowser().addNameToServiceInfoHash(newServiceInfo);
             final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
@@ -2018,7 +2014,7 @@ public final class ServicesInfo extends EditableInfo {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                if (oldValue.isNothingSelected()) {
+                if (oldValue == null || oldValue.isNothingSelected()) {
                     newWi.setValueNoListeners(null);
                 } else {
                     newWi.setValueNoListeners(oldValue);

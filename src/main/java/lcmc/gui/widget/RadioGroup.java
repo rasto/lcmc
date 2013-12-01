@@ -38,6 +38,7 @@ import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import java.util.Map;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import lcmc.data.StringValue;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -93,9 +95,9 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
             final Value item = items[i];
-            final JRadioButton rb = new JRadioButton(item.toString());
-            radioGroupHash.put(item.toString(), item);
-            rb.setActionCommand(item.toString());
+            final JRadioButton rb = new JRadioButton(item.getValueForConfig());
+            radioGroupHash.put(item.getValueForConfig(), item);
+            rb.setActionCommand(item.getValueForConfig());
             group.add(rb);
             radioPanel.add(rb);
 
@@ -209,7 +211,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
 
     /** Returns whether component is editable or not. */
     @Override
-    boolean isEditable() {
+    public boolean isEditable() {
         return false;
     }
 
@@ -318,5 +320,25 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         } finally {
             mComponentsReadLock.unlock();
         }
+    }
+
+    @Override
+    protected ItemListener getItemListener(final WidgetListener wl) {
+        return new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                if (wl.isEnabled()
+                    && e.getStateChange() == ItemEvent.SELECTED) {
+                    final Value value = new StringValue(((JRadioButton) e.getItem()).getText());
+                    final Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            wl.check(value);
+                        }
+                    });
+                    t.start();
+                }
+            }
+        };
     }
 }
