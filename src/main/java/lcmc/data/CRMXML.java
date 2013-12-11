@@ -1933,27 +1933,24 @@ public final class CRMXML extends XML {
                     continue;
                 }
                 final String depth = getAttribute(actionNode, "depth");
-                final String timeout = getAttribute(actionNode, "timeout");
-                final String interval = getAttribute(actionNode, "interval");
-                final String startDelay = getAttribute(actionNode,
-                                                               "start-delay");
+
+                final Value timeout =
+                             parseValue(ra + ": " + name + " timeout",
+                                        getAttribute(actionNode, "timeout"));
+
+                final Value interval =
+                            parseValue(ra + ": " + name + " interval",
+                                       getAttribute(actionNode, "interval"));
+
+                final Value startDelay =
+                         parseValue(ra + ": " + name + " start-delay",
+                                    getAttribute(actionNode, "start-delay"));
+
                 final String role = getAttribute(actionNode, "role");
                 ra.addOperationDefault(name, "depth", new StringValue(depth));
-                ra.addOperationDefault(name,
-                                       "timeout",
-                                       new StringValue(
-                                                    timeout,
-                                                    ServicesInfo.UNIT_SECOND));
-                ra.addOperationDefault(name,
-                                       "interval",
-                                       new StringValue(
-                                                    interval,
-                                                    ServicesInfo.UNIT_SECOND));
-                ra.addOperationDefault(name,
-                                       "start-delay",
-                                       new StringValue(
-                                                    startDelay,
-                                                    ServicesInfo.UNIT_SECOND));
+                ra.addOperationDefault(name, "timeout", timeout);
+                ra.addOperationDefault(name, "interval", interval);
+                ra.addOperationDefault(name, "start-delay", startDelay );
                 ra.addOperationDefault(name, "role", new StringValue(role));
             }
         }
