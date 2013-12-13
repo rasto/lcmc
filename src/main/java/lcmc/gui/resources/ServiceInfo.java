@@ -1379,18 +1379,11 @@ public class ServiceInfo extends EditableInfo {
                     wi.setBackground(defaultValue, savedOp, false);
                 } else {
                     Value value = wi.getValue();
-                    if (value == null || value.isNothingSelected()) {
-                        value = getOpDefaultsDefault(param);
-                    }
                     if (!Tools.areEqual(value, defaultValue)) {
                         allAreDefaultValues = false;
                     }
                     final Value savedOp = savedOperation.get(op, param);
-                    if (savedOp == null) {
-                        if (!Tools.areEqual(value, defaultValue)) {
-                            changed = true;
-                        }
-                    } else if (!Tools.areEqual(value, savedOp)) {
+                    if (!Tools.areEqual(value, savedOp)) {
                         changed = true;
                     }
                     wi.setBackground(defaultValue, savedOp, false);
@@ -2106,6 +2099,9 @@ public class ServiceInfo extends EditableInfo {
                     && (savedValue == null
                         || savedValue.isNothingSelected())) {
                     savedValue = getOpDefaultsDefault(param);
+                    if (savedValue ==null) {
+                        savedValue = new StringValue("");
+                    }
                 }
                 if (!Tools.areEqual(defaultValue, savedValue)) {
                     allAreDefaultValues = false;
