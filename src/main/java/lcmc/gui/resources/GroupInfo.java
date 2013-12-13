@@ -1117,6 +1117,7 @@ public final class GroupInfo extends ServiceInfo {
                                                        fromServicesInfo,
                                                        fromCloneInfo,
                                                        true);
+        boolean hasSevices = false;
         for (final ServiceInfo child : getGroupServices()) {
             if (!child.checkResourceFieldsCorrect(null,
                                                   child.getParametersFromXML(),
@@ -1125,8 +1126,9 @@ public final class GroupInfo extends ServiceInfo {
                                                   true)) {
                 cor = false;
             }
+            hasSevices = true;
         }
-        return cor;
+        return cor && hasSevices;
     }
 
     /** Update menus with positions and calles their update methods. */
