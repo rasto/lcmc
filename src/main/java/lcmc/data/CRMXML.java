@@ -2081,18 +2081,18 @@ public final class CRMXML extends XML {
             ra.addOperationDefault(name,
                                    "timeout",
                                    new StringValue("15",
-                                                   ServicesInfo.UNIT_SECOND));
+                                                   CRMXML.getUnitSecond()));
         }
         final String monitorName = "monitor";
         ra.addOperationDefault(monitorName,
                                "timeout",
-                               new StringValue("15", ServicesInfo.UNIT_SECOND));
+                               new StringValue("15", CRMXML.getUnitSecond()));
         ra.addOperationDefault(monitorName,
                                "interval",
-                               new StringValue("15", ServicesInfo.UNIT_SECOND));
+                               new StringValue("15", CRMXML.getUnitSecond()));
         ra.addOperationDefault(monitorName,
                                "start-delay",
-                               new StringValue("15", ServicesInfo.UNIT_SECOND));
+                               new StringValue("15", CRMXML.getUnitSecond()));
         ra.setProbablyMasterSlave(false);
     }
 
@@ -4423,16 +4423,16 @@ public final class CRMXML extends XML {
 
     private Unit parseUnit(final String param, final String u) {
         if ("s".equals(u) || "".equals(u)) {
-            return ServicesInfo.UNIT_SECOND;
+            return getUnitSecond();
         } else if ("ms".equals(u)) {
-            return ServicesInfo.UNIT_MILLISEC;
+            return getUnitMilliSec();
         } else if ("us".equals(u)) {
-            return ServicesInfo.UNIT_MICROSEC;
+            return getUnitMicroSec();
         } else if ("m".equals(u)
                    || "min".equals(u)) {
-            return ServicesInfo.UNIT_MINUTE;
+            return getUnitMinute();
         } else if ("h".equals(u)) {
-            return ServicesInfo.UNIT_HOUR;
+            return getUnitHour();
         } else {
             LOG.appError("can't parse unit: " + u + " param: " + param);
         }
@@ -4451,5 +4451,36 @@ public final class CRMXML extends XML {
             return new StringValue(value, unit);
         }
         return null;
+    }
+
+    public static Unit getUnitMilliSec() {
+        return new Unit("ms", "ms", "Millisecond", "Milliseconds");
+    }
+
+    public static Unit getUnitMicroSec() {
+        return new Unit("us", "us", "Microsecond", "Microseconds");
+    }
+
+    public static Unit getUnitSecond() {
+        return new Unit("", "s", "Second", "Seconds");
+    }
+
+    public static Unit getUnitMinute() {
+        return new Unit("min", "m", "Minute", "Minutes");
+    }
+
+    public static Unit getUnitHour() {
+        return new Unit("h", "h", "Hour", "Hours");
+    }
+
+    /** Returns units. */
+
+    public static Unit[] getUnits() {
+        /** Default unit. */
+        return new Unit[]{getUnitMilliSec(),
+                          getUnitMicroSec(),
+                          getUnitSecond(),
+                          getUnitMinute(),
+                          getUnitHour()};
     }
 }

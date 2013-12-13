@@ -91,27 +91,6 @@ public final class ServicesInfo extends EditableInfo {
     /** Icon of the cluster. */
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
-    /** Default unit. */
-    public static final Unit UNIT_SECOND =
-                    new Unit("",    "s",  "Second",      "Seconds");
-
-    public static final Unit UNIT_MILLISEC =
-                    new Unit("ms",  "ms", "Millisecond", "Milliseconds");
-
-    public static final Unit UNIT_MICROSEC =
-                    new Unit("us",  "us", "Microsecond", "Microseconds");
-
-    public static final Unit UNIT_MINUTE =
-                    new Unit("min", "m",  "Minute",      "Minutes");
-
-    public static final Unit UNIT_HOUR =
-                    new Unit("h",   "h",  "Hour",        "Hours");
-
-    public static final Unit[] UNITS = new Unit[]{UNIT_SECOND,
-                                                  UNIT_MILLISEC,
-                                                  UNIT_MICROSEC,
-                                                  UNIT_MINUTE,
-                                                  UNIT_HOUR};
 
     /** Prepares a new <code>ServicesInfo</code> object. */
     public ServicesInfo(final String name, final Browser browser) {
@@ -1916,12 +1895,6 @@ public final class ServicesInfo extends EditableInfo {
             };
         items.add((UpdatableItem) viewLogsItem);
         return items;
-    }
-
-    /** Returns units. */
-    @Override
-    protected Unit[] getUnits() {
-        return UNITS;
     }
 
     /**

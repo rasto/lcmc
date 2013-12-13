@@ -6195,7 +6195,7 @@ public class ServiceInfo extends EditableInfo {
     /** Returns units. */
     @Override
     protected final Unit[] getUnits() {
-        return ServicesInfo.UNITS;
+        return CRMXML.getUnits();
     }
 
     /** Returns whether it is slave on all nodes. */
