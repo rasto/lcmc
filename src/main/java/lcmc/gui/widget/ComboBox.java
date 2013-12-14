@@ -400,6 +400,11 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     @Override
+    public void selectAll() {
+        getTextComponent().selectAll();
+    }
+
+    @Override
     public void setText(final String text) {
         getTextComponent().setText(text);
     }

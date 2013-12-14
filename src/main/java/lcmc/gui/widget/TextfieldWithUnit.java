@@ -322,7 +322,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     /** Select the whole text in the widget if applicable. */
     @Override
-    void selectAll() {
+    public void selectAll() {
         textFieldPart.selectAll();
     }
 

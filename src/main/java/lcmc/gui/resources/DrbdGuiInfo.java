@@ -337,7 +337,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 boolean inPlugin = false;
                 for (String param : params) {
                     final Value value = getComboBoxValue(param);
-                    if (value.isNothingSelected()) {
+                    if (value == null || value.isNothingSelected()) {
                         continue;
                     }
                     if (!value.equals(getParamDefault(param))) {
@@ -375,7 +375,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                                 sectionConfig.append(param);
                                 sectionConfig.append('\t');
                                 sectionConfig.append(
-                                        Tools.escapeConfig(value.getValueForConfig()));
+                                        Tools.escapeConfig(value.getValueForConfigWithUnit()));
                                 sectionConfig.append(";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
@@ -404,7 +404,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                             sectionConfig.append("\t\t");
                             sectionConfig.append(param);
                             sectionConfig.append('\t');
-                            sectionConfig.append(Tools.escapeConfig(value.getValueForConfig()));
+                            sectionConfig.append(Tools.escapeConfig(value.getValueForConfigWithUnit()));
                             sectionConfig.append(";\n");
                         }
                     }

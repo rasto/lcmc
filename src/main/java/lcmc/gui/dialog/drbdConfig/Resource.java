@@ -230,9 +230,7 @@ public final class Resource extends DrbdConfig {
                 if (commonPreferredValue.containsKey(commonP)) {
                     final Value defaultValue =
                                drbdInfo.getParamDefault(commonP);
-                    if ((defaultValue.isNothingSelected() && commonValue.isNothingSelected())
-                        || (!defaultValue.isNothingSelected()
-                            && defaultValue.equals(commonValue))) {
+                    if (Tools.areEqual(defaultValue, commonValue)) {
                         drbdInfo.getWidget(commonP, null).setValue(
                                             commonPreferredValue.get(commonP));
                         dri.getResource().setValue(
@@ -248,7 +246,7 @@ public final class Resource extends DrbdConfig {
             for (final String commonP : COMMON_PARAMS) {
                 final Value commonValue =
                                       drbdInfo.getResource().getValue(commonP);
-                if (commonValue.isNothingSelected()
+                if (commonValue == null || commonValue.isNothingSelected()
                     && commonPreferredValue.containsKey(commonP)) {
                     dri.getResource().setValue(
                                             commonP,

@@ -543,12 +543,6 @@ public abstract class EditableInfo extends Info {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                //Tools.invokeLater(new Runnable() {
-                //    @Override
-                //    public void run() {
-                //        paramWi.setEditable();
-                //    }
-                //});
                 boolean c;
                 boolean ch = false;
                 if (realParamWi == null) {

@@ -994,7 +994,8 @@ public final class BlockDevInfo extends EditableInfo {
             storeComboBoxValues(params);
 
             final Value v = getWidget(DRBD_MD_PARAM, null).getValue();
-            if (v.isNothingSelected()) {
+            if (v.isNothingSelected()
+                || "internal".equals(v.getValueForConfig())) {
                 getBlockDevice().setMetaDisk(null); /* internal */
             } else {
                 final BlockDevice metaDisk =

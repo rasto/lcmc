@@ -806,19 +806,15 @@ public final class DrbdXML extends XML {
             final Node option = options.item(i);
             if (option.getNodeName().equals("option")) {
                 final String name = getAttribute(option, "name");
-                String value = getAttribute(option, "value");
-                if (value == null) { /* boolean option */
-                    value = CONFIG_YES.getValueForConfig();
-                } else if (hasUnitPrefix(name)) { /* with unit */
-                    final Pattern p = Pattern.compile("\\d+([kmgs])");
-                    final Matcher m = p.matcher(value);
-                    if (m.matches()) {
-                        /* uppercase unit in value */
-                        final String unit = m.group(1).toUpperCase();
-                        value = value.substring(0, value.length()
-                                                   - unit.length())
-                                + unit;
-                    }
+                final String valueS = getAttribute(option, "value");
+
+                Value value;
+                if (valueS == null) { /* boolean option */
+                    value = CONFIG_YES;
+                } else if (hasUnitPrefix(name)) {
+                    value = parseValue(name, valueS);
+                } else {
+                    value = new StringValue(valueS);
                 }
                 nameValueMap.put(name, new StringValue(value));
             } else if (option.getNodeName().equals("section")) {
@@ -1554,4 +1550,146 @@ public final class DrbdXML extends XML {
     public String getOldConfig() {
         return oldConfig;
     }
+<<<<<<< Updated upstream
+=======
+
+    private Value parseValue(final String param, final String v) {
+        if (v == null) {
+            return null;
+        }
+        final Matcher m = UNIT_PATTERN.matcher(v);
+        if (m.matches()) {
+            final String value = m.group(1);
+            final String u = m.group(2);
+
+            final Unit unit = parseUnit(param, u);
+            return new StringValue(value, unit);
+        }
+        return new StringValue(v);
+    }
+
+    private Unit parseUnit(final String param, final String u) {
+        if (!hasUnitPrefix(param)) {
+            return null;
+        }
+        final String unitType = getUnitLong(param);
+        if (unitType == null || "".equals(unitType)) {
+            return parseSizeUnit(param, u);
+        } else {
+            return parseByteUnit(param, u);
+        }
+    }
+
+    private Unit parseSizeUnit(final String param, final String u) {
+        final String unitPart = getUnitPart(getUnitLong(param));
+        if (u == null || "".equals(u)) {
+            return getUnitDefault(unitPart);
+        } else if ("k".equalsIgnoreCase(u)) {
+            return getUnitKi(unitPart);
+        } else if ("m".equalsIgnoreCase(u)) {
+            return getUnitMi(unitPart);
+        } else if ("g".equalsIgnoreCase(u)) {
+            return getUnitGi(unitPart);
+        } else if ("t".equalsIgnoreCase(u)) {
+            return getUnitTi(unitPart);
+        } else {
+            LOG.appError("can't parse unit: " + u + " param: " + param);
+        }
+        return null;
+    }
+
+    private Unit parseByteUnit(final String param, final String u) {
+        final String unitPart = getUnitPart(getUnitLong(param));
+        if (u == null || "".equals(u)) {
+            return getUnitBytes(unitPart);
+        } else if ("k".equalsIgnoreCase(u)) {
+            return getUnitKiBytes(unitPart);
+        } else if ("m".equalsIgnoreCase(u)) {
+            return getUnitMiBytes(unitPart);
+        } else if ("g".equalsIgnoreCase(u)) {
+            return getUnitGiBytes(unitPart);
+        } else if ("t".equalsIgnoreCase(u)) {
+            return getUnitTiBytes(unitPart);
+        } else if ("s".equalsIgnoreCase(u)) {
+            return getUnitSectors(unitPart);
+        } else {
+            LOG.appError("can't parse unit: " + u + " param: " + param);
+        }
+        return null;
+    }
+
+    public static Unit getUnitBytes(final String unitPart) {
+        return new Unit("", "", "Byte" + unitPart, "Bytes" + unitPart);
+    }
+
+    public static Unit getUnitKiBytes(final String unitPart) {
+        return new Unit("K", "k", "KiByte" + unitPart, "KiBytes" + unitPart);
+    }
+
+    public static Unit getUnitMiBytes(final String unitPart) {
+        return new Unit("M", "m", "MiByte" + unitPart, "MiBytes" + unitPart);
+    }
+
+    public static Unit getUnitGiBytes(final String unitPart) {
+        return new Unit("G", "g", "GiByte" + unitPart, "GiBytes" + unitPart);
+    }
+
+    public static Unit getUnitTiBytes(final String unitPart) {
+        return new Unit("T", "t", "TiByte" + unitPart, "TiBytes" + unitPart);
+    }
+
+    public static Unit getUnitSectors(final String unitPart) {
+        return new Unit("s", "s", "Sector" + unitPart, "Sectors" + unitPart); }
+
+    /** Returns units. */
+
+    public static Unit[] getByteUnits(final String unitPart) {
+        return new Unit[]{getUnitBytes(unitPart),
+                          getUnitKiBytes(unitPart),
+                          getUnitMiBytes(unitPart),
+                          getUnitGiBytes(unitPart),
+                          getUnitSectors(unitPart)};
+    }
+
+    public static Unit getUnitDefault(final String unitPart) {
+        return new Unit("", "", "", "");
+    }
+
+    public static Unit getUnitKi(final String unitPart) {
+        return new Unit("k", "K", "k", "k");
+    }
+                    
+    public static Unit getUnitMi(final String unitPart) {
+        return new Unit("m", "M", "m", "m");
+    }
+
+    public static Unit getUnitGi(final String unitPart) {
+        return new Unit("g", "G", "g", "g");
+    }
+
+    public static Unit getUnitTi(final String unitPart) {
+        return new Unit("t", "T", "t", "t");
+    }
+
+    public static Unit[] getUnits(final String unitPart) {
+        return new Unit[]{getUnitDefault(unitPart),
+                          getUnitKi(unitPart),
+                          getUnitMi(unitPart),
+                          getUnitGi(unitPart)};
+    }
+
+    /** Return part after '/' from the unit long description. */
+    public static String getUnitPart(final String unitLong) {
+        if (unitLong == null) {
+            return "";
+        }
+
+        final int index = unitLong.indexOf('/');
+        String unitPart = "";
+        if (index > -1) {
+            unitPart = unitLong.substring(index);
+        }
+        return unitPart;
+    }
+>>>>>>> Stashed changes
 }

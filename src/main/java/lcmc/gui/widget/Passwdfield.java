@@ -103,7 +103,7 @@ public final class Passwdfield extends Textfield {
 
     /** Selects the whole text in the widget if applicable. */
     @Override
-    void selectAll() {
+    public void selectAll() {
         ((JPasswordField) getInternalComponent()).selectAll();
     }
 }

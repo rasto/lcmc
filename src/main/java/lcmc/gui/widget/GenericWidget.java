@@ -492,6 +492,7 @@ implements Widget {
                     /* handled by document listener */
                     return;
                 }
+                setEditable();
                 if (wl.isEnabled()
                     && e.getStateChange() == ItemEvent.SELECTED) {
                     final Value value = (Value) e.getItem();
@@ -696,7 +697,8 @@ implements Widget {
     }
 
     /** Selects the whole text in the widget if applicable. */
-    void selectAll() {
+    @Override
+    public void selectAll() {
     }
 
     /** Sets the width of the widget. */

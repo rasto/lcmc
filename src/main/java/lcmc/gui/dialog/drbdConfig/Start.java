@@ -87,7 +87,7 @@ public final class Start extends WizardDialog {
     public WizardDialog nextDialog() {
         boolean newResource = false;
         final Info i = (Info) drbdResourceWi.getValue();
-        if (i.getInternalValue() == null) {
+        if (i == null || i.isNothingSelected()) {
             final List<BlockDevInfo> bdis =
                     new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
                                                               blockDevInfo2));

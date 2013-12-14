@@ -146,7 +146,7 @@ public class Textfield extends GenericWidget<JComponent> {
 
     /** Selects the whole text in the widget if applicable. */
     @Override
-    void selectAll() {
+    public void selectAll() {
         ((MTextField) getInternalComponent()).selectAll();
     }
 

@@ -199,7 +199,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final boolean volumesAvailable = host.hasVolumes();
             for (final String param : params) {
                 Value value = getComboBoxValue(param);
-                if (value.isNothingSelected()) {
+                if (value == null || value.isNothingSelected()) {
                     if ("usage-count".equals(param)) {
                         value = DrbdXML.CONFIG_YES;
                     } else {
@@ -222,7 +222,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         global.append("\t\t");
                         global.append(param);
                         global.append('\t');
-                        global.append(Tools.escapeConfig(value.getValueForConfig()));
+                        global.append(Tools.escapeConfig(value.getValueForConfigWithUnit()));
                         global.append(";\n");
                     }
                 }

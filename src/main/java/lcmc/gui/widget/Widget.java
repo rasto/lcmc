@@ -137,6 +137,8 @@ public interface Widget {
     public JLabel getLabel();
     /** Select the text component. */
     public void select(int selectionStart, int selectionEnd);
+
+    public void selectAll();
     /** Sets reason why it is disabled. */
     public void setDisabledReason(String disabledReason);
     /** Sets this item enabled and visible according to its access type. */

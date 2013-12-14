@@ -1432,4 +1432,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     public DrbdInfo getDrbdInfo() {
         return getDrbdResourceInfo().getDrbdInfo();
     }
+
+    public String getValueForConfig() {
+        return getDrbdResourceInfo().getName() + "/" + getName();
+    }
 }

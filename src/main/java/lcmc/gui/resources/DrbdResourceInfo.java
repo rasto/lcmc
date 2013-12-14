@@ -234,7 +234,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             config.append('\t');
             config.append(param);
             config.append('\t');
-            config.append(value.getValueForConfig());
+            config.append(value.getValueForConfigWithUnit());
             config.append(";\n");
         }
         if (params.length != 0) {
@@ -433,8 +433,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final DrbdResourceInfo r = drbdResHash.get(drbdRes);
                 DrbdResourceInfo odri = r;
                 boolean cyclicRef = false;
-                while ((odri = drbdResHash.get(
-                       odri.getParamSaved(param).getValueForConfig())) != null) {
+                while (true) {
+                    final Value valueS = odri.getParamSaved(param);
+                    if (valueS == null) {
+                        break;
+                    }
+                    odri = drbdResHash.get(valueS.getValueForConfig());
+                    if (odri == null) {
+                        break;
+                    }
                     if (odri == this) {
                         cyclicRef = true;
                     }
@@ -770,7 +777,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             hostPort = hp;
             final Value savedAddress = savedHostAddresses.get(host);
             if (!hostAddress.equals(savedAddress)) {
-                if (hostAddress.isNothingSelected()) {
+                if (hostAddress == null || hostAddress.isNothingSelected()) {
                     savedHostAddresses.remove(host);
                 } else {
                     savedHostAddresses.put(host, hostAddress);
@@ -828,23 +835,19 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 proxyHost = host;
             }
 
-            if (!insidePort.isNothingSelected()
-                && !hostInsidePort.isNothingSelected()
-                && !insidePort.equals(hostInsidePort)) {
+            if (!Tools.areEqual(insidePort, hostInsidePort)) {
                 LOG.appWarning("setProxyParameters: multiple proxy inside ports in " + getName() + " " + insidePort + " " + hostInsidePort);
             }
             hostInsidePort = insidePort;
 
-            if (!outsidePort.isNothingSelected()
-                && !hostOutsidePort.isNothingSelected()
-                && !outsidePort.equals(hostOutsidePort)) {
+            if (!Tools.areEqual(outsidePort, hostOutsidePort)) {
                 LOG.appWarning("setProxyParameters: multiple proxy outside ports in " + getName() + " " + outsidePort + " " + hostOutsidePort);
             }
             hostOutsidePort = outsidePort;
 
             final Value savedInsideIp = savedInsideIps.get(proxyHost);
             if (!insideIp.equals(savedInsideIp)) {
-                if (insideIp.isNothingSelected()) {
+                if (insideIp == null || insideIp.isNothingSelected()) {
                     savedInsideIps.remove(proxyHost);
                 } else {
                     savedInsideIps.put(proxyHost, insideIp);
@@ -859,7 +862,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
             final Value savedOutsideIp = savedOutsideIps.get(proxyHost);
             if (!outsideIp.equals(savedOutsideIp)) {
-                if (outsideIp.isNothingSelected()) {
+                if (outsideIp == null || outsideIp.isNothingSelected()) {
                     savedOutsideIps.remove(proxyHost);
                 } else {
                     savedOutsideIps.put(proxyHost, outsideIp);
@@ -1229,7 +1232,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final Host host : insideIpComboBoxHashClone.keySet()) {
             final Widget wi = insideIpComboBoxHashClone.get(host);
             Value ipSaved = savedInsideIps.get(host);
-            if (ipSaved.isNothingSelected()) {
+            if (ipSaved == null || ipSaved.isNothingSelected()) {
                 ipSaved = getDefaultInsideIp(host);
             }
             if (!Tools.areEqual(wi.getValue(), ipSaved)) {
@@ -1386,7 +1389,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         /* Port */
         Value defaultPort = savedPort;
         int defaultPortInt;
-        if (defaultPort.isNothingSelected()) {
+        if (defaultPort == null || defaultPort.isNothingSelected()) {
             defaultPortInt = getLowestUnusedPort();
             defaultPort = new StringValue(Integer.toString(defaultPortInt));
         } else {
@@ -1705,7 +1708,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                                final HostBrowser hostBrowser) {
         final List<Value> list = new ArrayList<Value>();
 
-        list.add(null);
+        list.add(new StringValue());
         @SuppressWarnings("unchecked")
         final Enumeration<DefaultMutableTreeNode> n =
                                  hostBrowser.getNetInterfacesNode().children();
@@ -1763,7 +1766,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
         /* port */
         final Widget pwi = portComboBox;
-        if (pwi != null && !savedPort.equals(pwi.getValue())) {
+        if (pwi != null && !Tools.areEqual(savedPort, pwi.getValue())) {
             changed = true;
         }
         return changed;
@@ -1842,7 +1845,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 continue;
             }
             final Value address = new StringValue(getIp(wi.getValue()));
-            if (address.isNothingSelected()) {
+            if (address == null || address.isNothingSelected()) {
                 savedHostAddresses.remove(host);
             } else {
                 savedHostAddresses.put(host, address);
@@ -1866,7 +1869,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (insideWi != null) {
                 final Value defaultInsideIp = getDefaultInsideIp(host);
                 final Value insideIp = new StringValue(getIp(insideWi.getValue()));
-                if (insideIp.isNothingSelected()) {
+                if (insideIp == null || insideIp.isNothingSelected()) {
                     savedInsideIps.remove(host);
                 } else {
                     savedInsideIps.put(host, insideIp);
@@ -1877,7 +1880,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Widget outsideWi = outsideIpComboBoxHash.get(host);
             if (outsideWi != null) {
                 final Value outsideIp = new StringValue(getIp(outsideWi.getValue()));
-                if (outsideIp.isNothingSelected()) {
+                if (outsideIp == null || outsideIp.isNothingSelected()) {
                     savedOutsideIps.remove(host);
                 } else {
                     savedOutsideIps.put(host, outsideIp);
@@ -1932,11 +1935,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         enableSection(SECTION_PROXY_PORTS, isProxy, wizard);
         String portLabel;
         if (isProxy) {
-            if (insidePortCB.isNew() && savedInsidePort.isNothingSelected()) {
+            if (insidePortCB.isNew()
+                && (savedInsidePort == null
+                    || savedInsidePort.isNothingSelected())) {
                 insidePortCB.setValue(
                                  new StringValue(Integer.toString(getDefaultInsidePort())));
             }
-            if (outsidePortCB.isNew() && savedOutsidePort.isNothingSelected()) {
+            if (outsidePortCB.isNew()
+                && (savedOutsidePort == null
+                    || savedOutsidePort.isNothingSelected())) {
                 outsidePortCB.setValue(savedPort);
             }
             portLabel =
@@ -2171,8 +2178,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final DrbdResourceInfo r = drbdResHash.get(drbdRes);
             DrbdResourceInfo odri = r;
             boolean cyclicRef = false;
-            while ((odri = drbdResHash.get(
-                   odri.getParamSaved(param).getValueForConfig())) != null) {
+            while (true) {
+                final Value valueS = odri.getParamSaved(param);
+                if (valueS == null) {
+                    break;
+                }
+                odri = drbdResHash.get(valueS.getValueForConfig());
+                if (odri == null) {
+                    break;
+                }
                 if (odri == this) {
                     cyclicRef = true;
                 }
@@ -2373,8 +2387,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private int getDefaultInsidePort() {
         final Value insideDefaultPort = savedInsidePort;
         int insideDefaultPortInt;
-        if (insideDefaultPort.isNothingSelected()) {
-            if (savedPort.isNothingSelected()) {
+        if (insideDefaultPort == null
+            || insideDefaultPort.isNothingSelected()) {
+            if (savedPort == null || savedPort.isNothingSelected()) {
                 insideDefaultPortInt = getLowestUnusedPort() + 1;
             } else {
                 insideDefaultPortInt = Integer.parseInt(savedPort.getValueForConfig()) + 1;
