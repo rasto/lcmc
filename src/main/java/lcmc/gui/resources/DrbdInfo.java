@@ -150,7 +150,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             }
             final Value oldValue = getParamSaved(param);
             final Widget wi = getWidget(param, null);
-            if (Tools.areEqual(value, oldValue)) {
+            if (!Tools.areEqual(value, oldValue)) {
                 getResource().setValue(param, value);
                 if (wi != null) {
                     wi.setValueAndWait(value);

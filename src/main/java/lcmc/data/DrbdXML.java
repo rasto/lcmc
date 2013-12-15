@@ -30,6 +30,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
 import lcmc.Exceptions;
+import lcmc.utilities.Unit;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -165,21 +166,26 @@ public final class DrbdXML extends XML {
     private boolean unknownSections = false;
     /** Old config. */
     private String oldConfig = null;
+
+    private static final Pattern UNIT_PATTERN =
+                                     Pattern.compile("(\\d*)([kmgtsKMGTS]?)");
     /** Global section. */
     public static final String GLOBAL_SECTION = "global";
     /** DRBD protocol A. */
-    private static final String PROTOCOL_A = "A / Asynchronous";
+    public static final Value PROTOCOL_A =
+                                    new StringValue("A", "A / Asynchronous");
+
+    public static final Value PROTOCOL_B =
+                                new StringValue("B", "B / Semi-Synchronous");
     /** DRBD protocol C, that is a default. */
-    private static final String PROTOCOL_C = "C / Synchronous";
+    public static final Value PROTOCOL_C =
+                                     new StringValue("C", "C / Synchronous");
     /** Protocol parameter. */
     public static final String PROTOCOL_PARAM = "protocol";
     /** Ping timeout parameter. */
     public static final String PING_TIMEOUT_PARAM = "ping-timeout";
     /** DRBD communication protocols. */
-    static final Value[] PROTOCOLS =
-        {new StringValue("A", PROTOCOL_A),
-         new StringValue("B", "B / Semi-Synchronous"),
-         new StringValue("C", PROTOCOL_C)};
+    static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
     /** Some non advanced parameters. */
     static final List<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
     static {
@@ -227,7 +233,7 @@ public final class DrbdXML extends XML {
         HARDCODED_DEFAULTS.put("usage-count", new StringValue());
         HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
 
-        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, new StringValue("C"));
+        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, PROTOCOL_C);
         HARDCODED_DEFAULTS.put("after-sb-0pri", new StringValue("disconnect"));
         HARDCODED_DEFAULTS.put("after-sb-1pri", new StringValue("disconnect"));
         HARDCODED_DEFAULTS.put("after-sb-2pri", new StringValue("disconnect"));
@@ -402,15 +408,10 @@ public final class DrbdXML extends XML {
     public Value getParamDefault(final String param) {
         final Value defaultValue = paramDefaultMap.get(param);
 
-        if (hasUnitPrefix(param)) {
-            final StringBuilder defaultValueBuf =
-                                               new StringBuilder(defaultValue.getValueForConfig());
-            final String unit = getDefaultUnit(param);
-            if (unit != null) {
-                defaultValueBuf.append(unit);
-            }
-            return new StringValue(defaultValueBuf.toString());
-        }
+        //if (hasUnitPrefix(param)) {
+        //    final String unit = getDefaultUnit(param);
+        //    return new StringValue(defaultValue, unit);
+        //}
         return defaultValue;
     }
 
@@ -433,18 +434,18 @@ public final class DrbdXML extends XML {
         boolean correctValue = true;
 
         Value value = rawValue;
-        String unit = null;
-        if (rawValue != null && hasUnitPrefix(param)) {
-            /* number with unit */
-            final Pattern p = Pattern.compile("\\d*([kmgtsKMGTS])");
-            final Matcher m = p.matcher(rawValue.getValueForConfig());
-            if (m.matches()) {
-                /* remove unit from value */
-                unit = m.group(1).toUpperCase();
-                value = new StringValue(rawValue.getValueForConfig().substring(0,
-                            rawValue.getValueForConfig().length() - unit.length())); //TODO:
-            }
-        }
+        //String unit = null;
+        //if (rawValue != null && hasUnitPrefix(param)) {
+        //    /* number with unit */
+        //    final Pattern p = Pattern.compile("\\d*([kmgtsKMGTS])");
+        //    final Matcher m = p.matcher(rawValue.getValueForConfig());
+        //    if (m.matches()) {
+        //        /* remove unit from value */
+        //        unit = m.group(1).toUpperCase();
+        //        value = new StringValue(rawValue.getValueForConfig().substring(0,
+        //                    rawValue.getValueForConfig().length() - unit.length())); //TODO:
+        //    }
+        //}
 
         if (value == null || value.isNothingSelected()) {
             if (isRequired(param)) {
@@ -462,35 +463,35 @@ public final class DrbdXML extends XML {
             final Matcher m = p.matcher(value.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
-            } else if ((unit == null
-                        || "k".equalsIgnoreCase(unit)
-                        || "m".equalsIgnoreCase(unit)
-                        || "g".equalsIgnoreCase(unit)
-                        || "t".equalsIgnoreCase(unit))
-                       && "K".equalsIgnoreCase(getDefaultUnit(param))) {
-                /* except sectors */
-                long v;
-                if (unit == null) {
-                    v = Long.parseLong(rawValue.getValueForConfig()) / 1024;
-                } else {
-                    v = Tools.convertToKilobytes(rawValue.getValueForConfig());
-                }
-                if (paramMaxMap.get(param) != null
-                    && v > paramMaxMap.get(param).longValue()) {
-                    correctValue = false;
-                } else if (paramMinMap.get(param) != null
-                           && v < paramMinMap.get(param).longValue()) {
-                    correctValue = false;
-                }
-            } else if (!"s".equalsIgnoreCase(unit)) {
-                final long v = Tools.convertUnits(rawValue.getValueForConfig());
-                if (paramMaxMap.get(param) != null
-                    && v > paramMaxMap.get(param).longValue()) {
-                    correctValue = false;
-                } else if (paramMinMap.get(param) != null
-                           && v < paramMinMap.get(param).longValue()) {
-                    correctValue = false;
-                }
+            //} else if ((unit == null //TODO:
+            //            || "k".equalsIgnoreCase(unit)
+            //            || "m".equalsIgnoreCase(unit)
+            //            || "g".equalsIgnoreCase(unit)
+            //            || "t".equalsIgnoreCase(unit))
+            //           && "K".equalsIgnoreCase(getDefaultUnit(param))) {
+            //    /* except sectors */
+            //    long v;
+            //    if (unit == null) {
+            //        v = Long.parseLong(rawValue.getValueForConfig()) / 1024;
+            //    } else {
+            //        v = Tools.convertToKilobytes(rawValue.getValueForConfig());
+            //    }
+            //    if (paramMaxMap.get(param) != null
+            //        && v > paramMaxMap.get(param).longValue()) {
+            //        correctValue = false;
+            //    } else if (paramMinMap.get(param) != null
+            //               && v < paramMinMap.get(param).longValue()) {
+            //        correctValue = false;
+            //    }
+            //} else if (!"s".equalsIgnoreCase(unit)) {
+            //    final long v = Tools.convertUnits(rawValue.getValueForConfig());
+            //    if (paramMaxMap.get(param) != null
+            //        && v > paramMaxMap.get(param).longValue()) {
+            //        correctValue = false;
+            //    } else if (paramMinMap.get(param) != null
+            //               && v < paramMinMap.get(param).longValue()) {
+            //        correctValue = false;
+            //    }
             }
         } else {
             correctValue = true;
@@ -542,7 +543,7 @@ public final class DrbdXML extends XML {
     /** Add parameter with choice combo box. */
     private void addParameter(final String section,
                               final String param,
-                              final String defaultValue,
+                              final Value defaultValue,
                               final Value[] items,
                               final boolean required) {
         addParameter(section, param, defaultValue, required);
@@ -568,16 +569,16 @@ public final class DrbdXML extends XML {
     /** Adds parameter with a default value to the specified section. */
     private void addParameter(final String section,
                               final String param,
-                              final String defaultValue,
+                              final Value defaultValue,
                               final boolean required) {
         addParameter(section, param, required);
-        paramDefaultMap.put(param, new StringValue(defaultValue));
+        paramDefaultMap.put(param, defaultValue);
     }
 
     /** Adds parameter with the specified type. */
     private void addParameter(final String section,
                               final String param,
-                              final String defaultValue,
+                              final Value defaultValue,
                               final boolean required,
                               final String type) {
         addParameter(section, param, defaultValue, required);
@@ -753,8 +754,11 @@ public final class DrbdXML extends XML {
                                        new StringValue(getText(optionInfo)));
                     } else if ("default".equals(tag)) {
                         paramDefaultMap.put(
-                                       name,
-                                       new StringValue(getText(optionInfo)));
+                               name,
+                               new StringValue(
+                                   getText(optionInfo),
+                                   parseUnit(name,
+                                             paramDefaultUnitMap.get(name))));
                     } else if ("unit".equals(tag)) {
                         paramUnitLongMap.put(name, getText(optionInfo));
                     } else if ("unit_prefix".equals(tag)) {
@@ -816,7 +820,7 @@ public final class DrbdXML extends XML {
                 } else {
                     value = new StringValue(valueS);
                 }
-                nameValueMap.put(name, new StringValue(value));
+                nameValueMap.put(name, value);
             } else if (option.getNodeName().equals("section")) {
                 final String name = getAttribute(option, "name");
                 if ("plugin".equals(name)) {
@@ -1550,8 +1554,6 @@ public final class DrbdXML extends XML {
     public String getOldConfig() {
         return oldConfig;
     }
-<<<<<<< Updated upstream
-=======
 
     private Value parseValue(final String param, final String v) {
         if (v == null) {
@@ -1691,5 +1693,4 @@ public final class DrbdXML extends XML {
         }
         return unitPart;
     }
->>>>>>> Stashed changes
 }

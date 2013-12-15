@@ -652,7 +652,7 @@ public abstract class EditableInfo extends Info {
         Widget.Type type = getFieldType(param);
         Unit[] units = null;
         if (type == Widget.Type.TEXTFIELDWITHUNIT) {
-            units = getUnits();
+            units = getUnits(param);
         }
         if (isCheckBox(param)) {
             type = Widget.Type.CHECKBOX;

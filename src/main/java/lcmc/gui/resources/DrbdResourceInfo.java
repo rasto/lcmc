@@ -160,7 +160,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private static final String SECTION_PROXY_PORTS =
                                  Tools.getString("DrbdResourceInfo.ProxyPorts");
     /** Default DRBD proxy protocol. */
-    private static final Value PROXY_DEFAULT_PROTOCOL = new StringValue("A");
+    private static final Value PROXY_DEFAULT_PROTOCOL = DrbdXML.PROTOCOL_A;
     /** Default DRBD proxy ping timeout. */
     private static final Value PROXY_DEFAULT_PING_TIMEOUT = new StringValue("100");
 
@@ -228,7 +228,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             //    continue;
             //}
             final Value value = getComboBoxValue(param);
-            if (value.equals(getParamDefault(param))) {
+            if (Tools.areEqual(value, getParamDefault(param))) {
                 continue;
             }
             config.append('\t');
@@ -770,13 +770,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Value hostAddress = new StringValue(ha);
             final Value hp =
                      new StringValue(dxml.getVirtualInterfacePort(host.getName(), getName()));
-            if (hostPort != null && !hostPort.equals(hp)) {
+            if (hostPort != null && !Tools.areEqual(hostPort, hp)) {
                 LOG.appWarning("setNetworkParameters: more ports in "
                                + getName() + " " + hp + " " + hostPort);
             }
             hostPort = hp;
             final Value savedAddress = savedHostAddresses.get(host);
-            if (!hostAddress.equals(savedAddress)) {
+            if (!Tools.areEqual(hostAddress, savedAddress)) {
                 if (hostAddress == null || hostAddress.isNothingSelected()) {
                     savedHostAddresses.remove(host);
                 } else {
@@ -792,7 +792,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* set port */
-        if (!hostPort.equals(savedPort)) {
+        if (!Tools.areEqual(hostPort, savedPort)) {
             savedPort = hostPort;
             for (final Host host : getHosts()) {
                 host.getBrowser().getUsedPorts().add(savedPort.getValueForConfig());
@@ -846,7 +846,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             hostOutsidePort = outsidePort;
 
             final Value savedInsideIp = savedInsideIps.get(proxyHost);
-            if (!insideIp.equals(savedInsideIp)) {
+            if (!Tools.areEqual(insideIp, savedInsideIp)) {
                 if (insideIp == null || insideIp.isNothingSelected()) {
                     savedInsideIps.remove(proxyHost);
                 } else {
@@ -861,7 +861,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
 
             final Value savedOutsideIp = savedOutsideIps.get(proxyHost);
-            if (!outsideIp.equals(savedOutsideIp)) {
+            if (!Tools.areEqual(outsideIp, savedOutsideIp)) {
                 if (outsideIp == null || outsideIp.isNothingSelected()) {
                     savedOutsideIps.remove(proxyHost);
                 } else {
@@ -877,7 +877,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         /* set proxy ports */
-        if (!hostInsidePort.equals(savedInsidePort)) {
+        if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
             for (final Host host : getHosts()) {
                 host.getBrowser().getUsedPorts().add(hostInsidePort.getValueForConfig());
@@ -1217,7 +1217,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         final Widget pwi = portComboBox;
-        if (!pwi.equals(savedPort)) {
+        if (!Tools.areEqual(pwi.getValue(), savedPort)) {
             final Widget wizardWi = portComboBoxWizard;
             if (wizardWi == null) {
                 pwi.setValue(savedPort);
@@ -1246,7 +1246,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         final Widget ipwi = insidePortComboBox;
-        if (!ipwi.equals(savedInsidePort)) {
+        if (!Tools.areEqual(ipwi, savedInsidePort)) {
             final Widget wizardWi = insidePortComboBoxWizard;
             if (wizardWi == null) {
                 ipwi.setValue(savedInsidePort);
@@ -1260,7 +1260,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final Host host : outsideIpComboBoxHashClone.keySet()) {
             final Widget wi = outsideIpComboBoxHashClone.get(host);
             final Value ipSaved = savedOutsideIps.get(host);
-            if (!wi.getValue().equals(ipSaved)) {
+            if (!Tools.areEqual(wi.getValue(), ipSaved)) {
                 final Widget wizardWi = outsideIpComboBoxHashWizard.get(host);
                 if (wizardWi == null) {
                     wi.setValue(ipSaved);
@@ -1271,7 +1271,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         }
 
         final Widget opwi = outsidePortComboBox;
-        if (!opwi.equals(savedOutsidePort)) {
+        if (!Tools.areEqual(opwi, savedOutsidePort)) {
             final Widget wizardWi = outsidePortComboBoxWizard;
             if (wizardWi == null) {
                 opwi.setValue(savedOutsidePort);
@@ -1826,7 +1826,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             }
             final Value ipSaved = savedOutsideIps.get(proxyHost);
             final Value value = wi.getValue();
-            if (!ipSaved.equals(value)) {
+            if (!Tools.areEqual(ipSaved, value)) {
                 changed = true;
             }
         }

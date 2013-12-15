@@ -237,7 +237,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Returns units. */
     @Override
-    protected final Unit[] getUnits() {
+    protected final Unit[] getUnits(final String param) {
         return new Unit[]{
                    //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),

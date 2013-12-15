@@ -3975,7 +3975,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns units. */
     @Override
-    protected Unit[] getUnits() {
+    protected Unit[] getUnits(final String param) {
         return new Unit[]{
                    //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
                    new Unit("K", "K", "KiByte", "KiBytes"),

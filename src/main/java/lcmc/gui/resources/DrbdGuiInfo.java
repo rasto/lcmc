@@ -229,63 +229,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                     selectedValue = getParamDefault(param);
                 }
             }
-            String unit = getUnitLong(param);
-            if (unit == null) {
-                unit = "";
-            }
-
-            final int index = unit.indexOf('/');
-            String unitPart = "";
-            if (index > -1) {
-                unitPart = unit.substring(index);
-            }
-            final Widget.Type type = null;
-            Unit[] units;
-            if ("".equals(unit)) {
-                units = new Unit[]{
-                    new Unit("", "", "", ""),
-
-                    new Unit("k",
-                             "K",
-                             "k",
-                             "k"),
-
-                    new Unit("m",
-                             "M",
-                             "m",
-                             "m"),
-
-                    new Unit("g",
-                             "G",
-                             "g",
-                             "g")
-                };
-            } else {
-                units = new Unit[]{
-                    new Unit("", "", "Byte", "Bytes"),
-
-                    new Unit("K",
-                             "k",
-                             "KiByte" + unitPart,
-                             "KiBytes" + unitPart),
-
-                    new Unit("M",
-                             "m",
-                             "MiByte" + unitPart,
-                             "MiBytes" + unitPart),
-
-                    new Unit("G",
-                             "g",
-                             "GiByte" + unitPart,
-                             "GiBytes" + unitPart),
-
-                    new Unit("s",
-                             "s",
-                             "Sector" + unitPart,
-                             "Sectors" + unitPart)
-                };
-            }
-
+            Unit[] units = getUnits(param);
             paramWi = WidgetFactory.createInstance(
                                  Widget.Type.TEXTFIELDWITHUNIT,
                                  selectedValue,
@@ -423,5 +367,18 @@ abstract class DrbdGuiInfo extends EditableInfo {
             }
         }
         return config.toString();
+    }
+
+    @Override
+    protected final Unit[] getUnits(final String param) {
+        String unitLong = getUnitLong(param);
+        final Widget.Type type = null;
+        Unit[] units;
+        final String unitPart = DrbdXML.getUnitPart(unitLong);
+        if ("".equals(unitPart)) {
+            return DrbdXML.getUnits(unitPart);
+        } else {
+            return DrbdXML.getByteUnits(unitPart);
+        }
     }
 }

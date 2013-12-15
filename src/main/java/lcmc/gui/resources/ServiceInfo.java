@@ -2126,7 +2126,7 @@ public class ServiceInfo extends EditableInfo {
                     //wi.setAlwaysEditable(true);
                 } else {
                     wi = new TextfieldWithUnit(defaultValue,
-                                               getUnits(),
+                                               getUnits(param),
                                                regexp,
                                                rightWidth,
                                                Widget.NO_ABBRV,
@@ -6194,7 +6194,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns units. */
     @Override
-    protected final Unit[] getUnits() {
+    protected final Unit[] getUnits(final String param) {
         return CRMXML.getUnits();
     }
 
