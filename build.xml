@@ -340,6 +340,21 @@
 			</classpath>
 		</java>
 	</target>
+
+    <target name="runtest" description="Runs junit Tests" depends="compilejunit">
+        <junit printsummary='true' haltonerror='true' haltonfailure='true' fork='yes' forkmode='once' > 
+            <formatter type='brief' usefile='false'/>
+            <classpath>
+				<pathelement path="${classes.dir}"/>
+            </classpath>
+            <batchtest>
+                <fileset dir="${testjava.dir}">
+                        <include name="**/*Test0.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
 	<target name="man">
 		<copy tofile="${doc.dir}/${man.file}"
 		      file="${doc.dir}/${man.file}.in"
