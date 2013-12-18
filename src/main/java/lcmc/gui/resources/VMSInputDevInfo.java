@@ -311,7 +311,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (isRequired(param) && (newValue.isNothingSelected())) {
+        if (isRequired(param)
+            && (newValue == null || newValue.isNothingSelected())) {
             return false;
         }
         return true;

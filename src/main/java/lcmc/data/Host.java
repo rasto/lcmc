@@ -142,11 +142,11 @@ public final class Host implements Comparable<Host>, Value {
     /** Available crypto modules. */
     private Set<String> cryptoModules = new TreeSet<String>();
     /** Available qemu keymaps. */
-    private Set<String> qemuKeymaps = new TreeSet<String>();
+    private Set<Value> qemuKeymaps = new TreeSet<Value>();
     /** Available libvirt cpu models. */
-    private Set<String> cpuMapModels = new TreeSet<String>();
+    private Set<Value> cpuMapModels = new TreeSet<Value>();
     /** Available libvirt cpu vendors. */
-    private Set<String> cpuMapVendors = new TreeSet<String>();
+    private Set<Value> cpuMapVendors = new TreeSet<Value>();
     /** Mount points that exist in /mnt dir. */
     private Set<String> mountPoints = new TreeSet<String>();
     /** List of block devices of this host. */
@@ -700,17 +700,17 @@ public final class Host implements Comparable<Host>, Value {
     }
 
     /** Returns available qemu keymaps as a list of strings. */
-    public Set<String> getQemuKeymaps() {
+    public Set<Value> getQemuKeymaps() {
         return qemuKeymaps;
     }
 
     /** Returns available libvirt's cpu map models. */
-    public Set<String> getCPUMapModels() {
+    public Set<Value> getCPUMapModels() {
         return cpuMapModels;
     }
 
     /** Returns available libvirt's cpu map vendors. */
-    public Set<String> getCPUMapVendors() {
+    public Set<Value> getCPUMapVendors() {
         return cpuMapVendors;
     }
 
@@ -2128,9 +2128,9 @@ public final class Host implements Comparable<Host>, Value {
                                                  new ArrayList<BlockDevice>();
         final Set<String> newFileSystems = new TreeSet<String>();
         final Set<String> newCryptoModules = new TreeSet<String>();
-        final Set<String> newQemuKeymaps = new TreeSet<String>();
-        final Set<String> newCpuMapModels = new TreeSet<String>();
-        final Set<String> newCpuMapVendors = new TreeSet<String>();
+        final Set<Value> newQemuKeymaps = new TreeSet<Value>();
+        final Set<Value> newCpuMapModels = new TreeSet<Value>();
+        final Set<Value> newCpuMapVendors = new TreeSet<Value>();
         final Set<String> newMountPoints = new TreeSet<String>();
 
         final Map<String, List<String>> newGuiOptions =
@@ -2233,11 +2233,11 @@ public final class Host implements Comparable<Host>, Value {
             } else if ("crypto-info".equals(type)) {
                 newCryptoModules.add(line);
             } else if ("qemu-keymaps-info".equals(type)) {
-                newQemuKeymaps.add(line);
+                newQemuKeymaps.add(new StringValue(line));
             } else if ("cpu-map-model-info".equals(type)) {
-                newCpuMapModels.add(line);
+                newCpuMapModels.add(new StringValue(line));
             } else if ("cpu-map-vendor-info".equals(type)) {
-                newCpuMapVendors.add(line);
+                newCpuMapVendors.add(new StringValue(line));
             } else if ("mount-points-info".equals(type)) {
                 newMountPoints.add(line);
             } else if ("gui-info".equals(type)) {

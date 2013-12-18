@@ -113,18 +113,17 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                               new HashMap<String, Value[]>();
     /** Filesystem types. */
-    private static final String MOUNT_TYPE = "mount";
+    public static final Value MOUNT_TYPE = new StringValue("mount", "Mount");
     /** Filesystem types. */
-    private static final String TEMPLATE_TYPE = "template";
+    public static final Value TEMPLATE_TYPE =
+                                      new StringValue("template", "Template");
 
     /** LXC source dir. */
     private static final String LXC_SOURCE_DIR = "/var/lib/lxc";
 
     static {
         POSSIBLE_VALUES.put(FilesystemData.TYPE,
-                            new Value[]{
-                                 new StringValue(MOUNT_TYPE, "Mount"),
-                                 new StringValue(TEMPLATE_TYPE, "Template")});
+                            new Value[]{MOUNT_TYPE, TEMPLATE_TYPE});
         POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new Value[]{new StringValue("/")});
         PREFERRED_MAP.put(FilesystemData.TYPE, new StringValue("mount"));
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));
@@ -228,7 +227,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
-        final String type = getComboBoxValue(FilesystemData.TYPE).getValueForConfig();
+        final Value type = getComboBoxValue(FilesystemData.TYPE);
         if ((FilesystemData.SOURCE_DIR.equals(param)
               && MOUNT_TYPE.equals(type))
              || (FilesystemData.SOURCE_NAME.equals(param)
@@ -288,12 +287,12 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             if (allParams) {
-                if (getParamDefault(param).equals(value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
                     parameters.put(param, value.getValueForConfig());
                 }
-            } else if (!getParamSaved(param).equals(value)) {
+            } else if (!Tools.areEqual(getParamSaved(param), value)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
@@ -302,7 +301,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             }
         }
         parameters.put(FilesystemData.SAVED_TARGET_DIR, getName());
-        setName(getParamSaved(FilesystemData.TARGET_DIR).getValueForConfig());
+        setName(getParamSavedForConfig(FilesystemData.TARGET_DIR));
         return parameters;
     }
 
@@ -402,11 +401,11 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                 public void run() {
                     for (final String p : sourceDirWi.keySet()) {
                         sourceDirWi.get(p).setVisible(
-                                                MOUNT_TYPE.equals(newValue.getValueForConfig()));
+                                                MOUNT_TYPE.equals(newValue));
                     }
                     for (final String p : sourceNameWi.keySet()) {
                         sourceNameWi.get(p).setVisible(
-                                               TEMPLATE_TYPE.equals(newValue.getValueForConfig()));
+                                               TEMPLATE_TYPE.equals(newValue));
                     }
                 }
             });
@@ -497,7 +496,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             return "new FS...";
         }
         Value saved;
-        final String type = getComboBoxValue(FilesystemData.TYPE).getValueForConfig();
+        final Value type = getComboBoxValue(FilesystemData.TYPE);
 
         if (MOUNT_TYPE.equals(type)) {
             saved = getParamSaved(FilesystemData.SOURCE_DIR);

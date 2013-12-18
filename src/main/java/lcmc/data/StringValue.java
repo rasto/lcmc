@@ -22,7 +22,7 @@ package lcmc.data;
 
 import lcmc.utilities.Unit;
 
-public class StringValue implements Value {
+public class StringValue implements Value, Comparable<Value> {
     /** Internal string, used in configs. */
     private final String valueForConfig;
     /** Value visible in the GUI. */
@@ -174,6 +174,21 @@ public class StringValue implements Value {
         } else {
             return v.getValueForConfig();
         }
+    }
+
+    @Override
+    public int compareTo(final Value other) {
+        String otherValue = null;
+        if (other != null) {
+            otherValue = other.getValueForConfig();
+        }
+        if (otherValue == null) {
+            otherValue = "";
+        }
+        if (valueForConfig == null) {
+            return "".compareTo(otherValue);
+        }
+        return valueForConfig.compareTo(otherValue);
     }
 }
 

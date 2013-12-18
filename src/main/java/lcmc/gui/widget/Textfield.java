@@ -66,15 +66,19 @@ public class Textfield extends GenericWidget<JComponent> {
                                     final String regexp,
                                     final Map<String, String> abbreviations) {
         MTextField tf;
+
+        String valueS;
+        if (value == null) {
+            valueS = null;
+        } else {
+            valueS = value.getValueForConfig();
+        }
+
         if (regexp == null) {
-            if (value == null) {
-                tf = new MTextField(null);
-            } else {
-                tf = new MTextField(value.getValueForConfig());
-            }
+            tf = new MTextField(valueS);
         } else {
             tf = new MTextField(new PatternDocument(regexp, abbreviations),
-                                value.getValueForConfig(),
+                                valueS,
                                 0);
         }
         return tf;

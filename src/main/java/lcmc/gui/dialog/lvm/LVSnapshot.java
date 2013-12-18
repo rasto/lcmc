@@ -44,6 +44,7 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
 import lcmc.data.Value;
 /**
  * This class implements LVM snapshot dialog.
@@ -119,10 +120,10 @@ public final class LVSnapshot extends LV {
         public void run() {
             boolean e = enable;
             if (enable) {
-                final long size = Tools.convertToKilobytes(
-                                                  sizeWi.getStringValue());
-                final long maxSize = Tools.convertToKilobytes(
-                                               maxSizeWi.getStringValue());
+                final long size = VMSXML.convertToKilobytes(
+                                                  sizeWi.getValue());
+                final long maxSize = VMSXML.convertToKilobytes(
+                                               maxSizeWi.getValue());
                 if (size > maxSize) {
                     e = false;
                 } else if (size <= 0) {
@@ -144,10 +145,9 @@ public final class LVSnapshot extends LV {
 
     private void setComboBoxes() {
         final String maxBlockSize = getMaxBlockSize();
-        sizeWi.setValue(new StringValue(Tools.convertKilobytes(Long.toString(
-                                     Long.parseLong(maxBlockSize) / 2))));
-        maxSizeWi.setValue(
-                       new StringValue(Tools.convertKilobytes(maxBlockSize)));
+        sizeWi.setValue(VMSXML.convertKilobytes(Long.toString(
+                                     Long.parseLong(maxBlockSize) / 2)));
+        maxSizeWi.setValue(VMSXML.convertKilobytes(maxBlockSize));
     }
 
     /** Returns the input pane. */
@@ -204,7 +204,7 @@ public final class LVSnapshot extends LV {
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWi = new TextfieldWithUnit(
-                       new StringValue(Tools.convertKilobytes(newBlockSize)),
+                       VMSXML.convertKilobytes(newBlockSize),
                        getUnits(),
                        Widget.NO_REGEXP,
                        250,
@@ -249,7 +249,7 @@ public final class LVSnapshot extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                        new StringValue(Tools.convertKilobytes(maxBlockSize)),
+                        VMSXML.convertKilobytes(maxBlockSize),
                         getUnits(),
                         Widget.NO_REGEXP,
                         250,

@@ -429,7 +429,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 }
             });
         }
-        if (isRequired(param) && newValue.isNothingSelected()) {
+        if (isRequired(param)
+            && (newValue == null || newValue.isNothingSelected())) {
             return false;
         }
         return true;

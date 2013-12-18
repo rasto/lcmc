@@ -51,6 +51,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.Value;
 
 /**
  * This class shows a list of virtual machines.
@@ -202,8 +203,8 @@ public final class VMSInfo extends CategoryInfo {
             final Comparator<Object> c = new Comparator<Object>() {
                 @Override
                 public int compare(final Object s1, final Object s2) {
-                    final long i1 = Tools.convertToKilobytes((String) s1);
-                    final long i2 = Tools.convertToKilobytes((String) s2);
+                    final long i1 = VMSXML.convertToKilobytes((Value) s1);
+                    final long i2 = VMSXML.convertToKilobytes((Value) s2);
                     if (i1 < i2) {
                         return -1;
                     } else if (i1 > i2) {

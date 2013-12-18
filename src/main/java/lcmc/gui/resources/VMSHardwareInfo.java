@@ -238,13 +238,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Returns units. */
     @Override
     protected final Unit[] getUnits(final String param) {
-        return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
-                   new Unit("K", "K", "KiByte", "KiBytes"),
-                   new Unit("M", "M", "MiByte", "MiBytes"),
-                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                   new Unit("T",  "T",  "TiByte",      "TiBytes")
-       };
+        return VMSXML.getUnits();
     }
 
     /** Returns the default unit for the parameter. */
@@ -430,7 +424,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             final Value value = getComboBoxValue(param);
             if (allParams
                 || !getParamSaved(param).equals(value)) {
-                if (getParamDefault(param).equals(value)) {
+                if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
                     parameters.put(param, value.getValueForConfig());

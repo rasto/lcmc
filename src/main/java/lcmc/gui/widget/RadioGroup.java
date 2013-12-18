@@ -95,7 +95,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         componentsHash.clear();
         for (int i = 0; i < items.length; i++) {
             final Value item = items[i];
-            final JRadioButton rb = new JRadioButton(item.getValueForConfig());
+            final JRadioButton rb = new JRadioButton(item.getValueForGui());
             radioGroupHash.put(item.getValueForConfig(), item);
             rb.setActionCommand(item.getValueForConfig());
             group.add(rb);
@@ -178,7 +178,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     protected Value getValueInternal() {
         final Value value = radioGroupValue;
-        if (value.isNothingSelected()) {
+        if (value == null || value.isNothingSelected()) {
             return null;
         }
         return value;

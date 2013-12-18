@@ -740,6 +740,16 @@ public abstract class EditableInfo extends Info {
         return getResource().getValue(param);
     }
 
+    /** Returns saved value of a parameter. */
+    protected String getParamSavedForConfig(final String param) {
+        final Value v = getResource().getValue(param);
+        if (v == null) {
+            return null;
+        } else {
+            return v.getValueForConfig();
+        }
+    }
+
     /** Returns preferred value of a parameter. */
     protected abstract Value getParamPreferred(String param);
 

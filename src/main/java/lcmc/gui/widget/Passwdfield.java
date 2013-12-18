@@ -62,12 +62,18 @@ public final class Passwdfield extends Textfield {
     private JComponent getPasswdField(final Value value,
                                       final String regexp) {
         JPasswordField pf;
-        if (regexp == null) {
-            pf = new JPasswordField(value.getValueForConfig());
+
+        String valueS;
+        if (value == null) {
+            valueS = null;
         } else {
-            pf = new JPasswordField(new PatternDocument(regexp),
-                                    value.getValueForConfig(),
-                                    0);
+            valueS = value.getValueForConfig();
+        }
+
+        if (regexp == null) {
+            pf = new JPasswordField(valueS);
+        } else {
+            pf = new JPasswordField(new PatternDocument(regexp), valueS, 0);
         }
         return pf;
     }

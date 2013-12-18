@@ -253,7 +253,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         final Map<String, String> params = super.getHWParameters(allParams);
-        setName(getParamSaved(SoundData.MODEL).getValueForConfig());
+        setName(getParamSavedForConfig(SoundData.MODEL));
         return params;
     }
 
@@ -302,7 +302,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (isRequired(param) && (newValue.isNothingSelected())) {
+        if (isRequired(param)
+            && (newValue == null || newValue.isNothingSelected())) {
             return false;
         }
         return true;

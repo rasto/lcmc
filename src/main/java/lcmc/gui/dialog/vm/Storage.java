@@ -151,16 +151,23 @@ final class Storage extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
-        vmsdi.getResource().setValue(DiskData.TYPE, new StringValue("file"));
-        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE, new StringValue("IDE Disk"));
-        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hda"));
-        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
-        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
+        vmsdi.getResource().setValue(DiskData.TYPE,
+                                     VMSDiskInfo.FILE_TYPE);
+        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE,
+                                     VMSDiskInfo.BUS_TYPE_IDE);
+        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE,
+                                     new StringValue("hda"));
+        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE,
+                                     new StringValue("raw"));
+        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE,
+                                     new StringValue("default"));
         if ("xen".equals(getVMSVirtualDomainInfo().getWidget(
                         VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
-            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("file"));
+            vmsdi.getResource().setValue(DiskData.DRIVER_NAME,
+                                         new StringValue("file"));
         } else {
-            vmsdi.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("qemu"));
+            vmsdi.getResource().setValue(DiskData.DRIVER_NAME,
+                                         new StringValue("qemu"));
         }
         vmsdi.getResource().setValue(
                      DiskData.SOURCE_FILE,

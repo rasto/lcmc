@@ -136,7 +136,8 @@ final class Filesystem extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsfi.savePreferredValues();
-        vmsfi.getResource().setValue(FilesystemData.TYPE, new StringValue("mount"));
+        vmsfi.getResource().setValue(FilesystemData.TYPE,
+                                     VMSFilesystemInfo.MOUNT_TYPE);
         vmsfi.addWizardParams(
                       optionsPanel,
                       PARAMS,

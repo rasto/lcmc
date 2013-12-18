@@ -478,6 +478,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** This is a map from host to the check box. */
     private final Map<String, Widget> definedOnHostComboBoxHash =
                                           new HashMap<String, Widget>();
+
+    public static final Value BOOT_HD      = new StringValue("hd", "Hard Disk");
+    public static final Value BOOT_NETWORK =
+                                    new StringValue("network", "Network (PXE)");
+    public static final Value BOOT_CDROM   = new StringValue("cdrom", "CD-ROM");
+    public static final Value BOOT_FD      = new StringValue("fd", "Floppy");
+
     static {
         SECTION_MAP.put(VMSXML.VM_PARAM_NAME,          VIRTUAL_SYSTEM_STRING);
         SECTION_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE,   VIRTUAL_SYSTEM_STRING);
@@ -630,8 +637,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         FIELD_TYPES.put(VMSXML.VM_PARAM_PAE, Widget.Type.CHECKBOX);
         FIELD_TYPES.put(VMSXML.VM_PARAM_HAP, Widget.Type.CHECKBOX);
 
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY, new StringValue("512M"));
-        PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY, new StringValue("512M"));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_CURRENTMEMORY,
+                          new StringValue("512", VMSXML.getUnitMiBytes()));
+        PREFERRED_MAP.put(VMSXML.VM_PARAM_MEMORY,
+                          new StringValue("512", VMSXML.getUnitMiBytes()));
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE, TYPE_HVM);
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_ARCH, new StringValue("x86_64"));
         PREFERRED_MAP.put(VMSXML.VM_PARAM_TYPE_MACHINE, new StringValue("pc"));
@@ -645,7 +654,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         PREFERRED_MAP.put(VMSXML.VM_PARAM_EMULATOR, new StringValue("/usr/bin/kvm"));
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_AUTOSTART, null);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VIRSH_OPTIONS, NO_SELECTION_VALUE);
-        DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, new StringValue("hd"));
+        //DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, new StringValue("hd"));
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_BOOT, NO_SELECTION_VALUE);
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_DOMAIN_TYPE, new StringValue(DOMAIN_TYPE_KVM));
         DEFAULTS_MAP.put(VMSXML.VM_PARAM_VCPU, new StringValue("1"));
@@ -665,22 +674,19 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_MEMORY, true);
         HAS_UNIT_PREFIX.put(VMSXML.VM_PARAM_CURRENTMEMORY, true);
+
         // TODO: no virsh command for os-boot
-        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT,
-                            new Value[]{
-                                 new StringValue("hd", "Hard Disk"),
-                                 new StringValue("network", "Network (PXE)"),
-                                 new StringValue("cdrom", "CD-ROM"),
-                                 new StringValue("fd", "Floppy")});
+        POSSIBLE_VALUES.put(
+                      VMSXML.VM_PARAM_BOOT,
+                      new Value[]{BOOT_HD, BOOT_NETWORK, BOOT_CDROM, BOOT_FD});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_BOOT_2,
-                            new Value[]{
-                                    null,
-                                    new StringValue("hd", "Hard Disk"),
-                                    new StringValue("network", "Network (PXE)"),
-                                    new StringValue("cdrom", "CD-ROM"),
-                                    new StringValue("fd", "Floppy")});
-        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER,
-                            new Value[]{});
+                            new Value[]{new StringValue(),
+                                        BOOT_HD,
+                                        BOOT_NETWORK,
+                                        BOOT_CDROM,
+                                        BOOT_FD});
+
+        POSSIBLE_VALUES.put(VMSXML.VM_PARAM_LOADER, new Value[]{});
         POSSIBLE_VALUES.put(VMSXML.VM_PARAM_DOMAIN_TYPE,
                             new Value[]{new StringValue(DOMAIN_TYPE_KVM),
                                         new StringValue(DOMAIN_TYPE_XEN),
@@ -1925,9 +1931,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final VMSXML vmsxml = getBrowser().getVMSXML(h);
                 if (vmsxml != null && value == null) {
                     value = getParamSaved(param); //TODO: unused
-                    final Value savedValue =
-                                  new StringValue(vmsxml.getValue(getDomainName(), param));
-                    if (savedValue.isNothingSelected()) {
+                    Value savedValue;
+                    if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)
+                        || VMSXML.VM_PARAM_MEMORY.equals(param)) {
+                        savedValue = VMSXML.convertKilobytes(
+                                      vmsxml.getValue(getDomainName(), param));
+                    } else {
+                        savedValue = new StringValue(
+                                      vmsxml.getValue(getDomainName(), param));
+                    }
+                    if (savedValue == null || savedValue.isNothingSelected()) {
                         value = getParamDefault(param);
                     } else {
                         value = savedValue;
@@ -3526,26 +3539,27 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (isRequired(param) && (newValue.isNothingSelected())) {
+        if (isRequired(param)
+            && (newValue == null || newValue.isNothingSelected())) {
             return false;
         }
         if (VMSXML.VM_PARAM_MEMORY.equals(param)) {
-            final long mem = Tools.convertToKilobytes(newValue.getValueForConfig());
+            final long mem = VMSXML.convertToKilobytes(newValue);
             if (mem < 4096) {
                 return false;
             }
-            final long curMem = Tools.convertToKilobytes(
-                        getComboBoxValue(VMSXML.VM_PARAM_CURRENTMEMORY).getValueForConfig());
+            final long curMem = VMSXML.convertToKilobytes(
+                            getComboBoxValue(VMSXML.VM_PARAM_CURRENTMEMORY));
             if (mem < curMem) {
                 return false;
             }
         } else if (VMSXML.VM_PARAM_CURRENTMEMORY.equals(param)) {
-            final long curMem = Tools.convertToKilobytes(newValue.getValueForConfig());
+            final long curMem = VMSXML.convertToKilobytes(newValue);
             if (curMem < 4096) {
                 return false;
             }
-            final long mem = Tools.convertToKilobytes(
-                             getComboBoxValue(VMSXML.VM_PARAM_MEMORY).getValueForConfig());
+            final long mem = VMSXML.convertToKilobytes(
+                                 getComboBoxValue(VMSXML.VM_PARAM_MEMORY));
             if (mem < curMem) {
                 getWidget(VMSXML.VM_PARAM_MEMORY, null).setValue(newValue);
             }
@@ -3701,15 +3715,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         } else if (VMSXML.VM_PARAM_VIRSH_OPTIONS.equals(param)) {
             return VIRSH_OPTIONS;
         } else if (VMSXML.VM_PARAM_CPUMATCH_MODEL.equals(param)) {
-            final Set<String> models = new LinkedHashSet<String>();
-            models.add("");
+            final Set<Value> models = new LinkedHashSet<Value>();
+            models.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
                 models.addAll(host.getCPUMapModels());
             }
             return models.toArray(new Value[models.size()]);
         } else if (VMSXML.VM_PARAM_CPUMATCH_VENDOR.equals(param)) {
-            final Set<String> vendors = new LinkedHashSet<String>();
-            vendors.add("");
+            final Set<Value> vendors = new LinkedHashSet<Value>();
+            vendors.add(new StringValue());
             for (final Host host : getBrowser().getClusterHosts()) {
                 vendors.addAll(host.getCPUMapVendors());
             }
@@ -3727,6 +3741,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
+        if (VMSXML.VM_PARAM_NAME.equals(param)) {
+            return true;
+        }
         return false;
     }
 
@@ -3785,7 +3802,19 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         setName(getComboBoxValue(VMSXML.VM_PARAM_NAME).getValueForConfig());
         for (final String param : getParametersFromXML()) {
             final Value value = getComboBoxValue(param);
-            parameters.put(param, value.getValueForConfig());
+            if (value == null) {
+                parameters.put(param, "");
+            } else if (value.getUnit() != null) {
+                parameters.put(param,
+                               Long.toString(VMSXML.convertToKilobytes(value)));
+            } else {
+                final String valueForConfig = value.getValueForConfig();
+                if (valueForConfig == null) {
+                    parameters.put(param, "");
+                } else {
+                    parameters.put(param, valueForConfig);
+                }
+            }
             getResource().setValue(param, value);
         }
         final List<Host> definedOnHosts = new ArrayList<Host>();
@@ -3810,10 +3839,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     }
                 }
             });
-            final String value =
-                definedOnHostComboBoxHash.get(host.getName()).getStringValue();
+            final Value value =
+                definedOnHostComboBoxHash.get(host.getName()).getValue();
             final boolean needConsole = needConsole();
-            if (DEFINED_ON_HOST_TRUE.getValueForConfig().equals(value)) {
+            if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 Node domainNode = null;
                 VMSXML vmsxml = null;
                 if (getResource().isNew()) {
@@ -3975,14 +4004,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns units. */
     @Override
-    protected Unit[] getUnits(final String param) {
-        return new Unit[]{
-                   //new Unit("", "", "KiByte", "KiBytes"), /* default unit */
-                   new Unit("K", "K", "KiByte", "KiBytes"),
-                   new Unit("M", "M", "MiByte", "MiBytes"),
-                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                   new Unit("T",  "T",  "TiByte",      "TiBytes")
-       };
+    protected final Unit[] getUnits(final String param) {
+        return VMSXML.getUnits();
     }
 
     /** Returns the default unit for the parameter. */
@@ -4159,8 +4182,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         final List<Host> definedOn = new ArrayList<Host>();
         for (final Host h : getBrowser().getClusterHosts()) {
             if (getResource().isNew()) {
-                final String value =
-                  definedOnHostComboBoxHash.get(h.getName()).getStringValue();
+                final Value value =
+                        definedOnHostComboBoxHash.get(h.getName()).getValue();
                 if (DEFINED_ON_HOST_TRUE.equals(value)) {
                     definedOn.add(h);
                 }
@@ -5067,17 +5090,17 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
                 continue;
             }
-            final String value =
-                definedOnHostComboBoxHash.get(host.getName()).getStringValue();
+            final Value value =
+                     definedOnHostComboBoxHash.get(host.getName()).getValue();
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
             if ((vmsxml == null
                  || (!getResource().isNew()
                      && !vmsxml.getDomainNames().contains(getDomainName())))
-                && DEFINED_ON_HOST_TRUE.getValueForConfig().equals(value)) {
+                && DEFINED_ON_HOST_TRUE.equals(value)) {
                 changed = true;
             } else if (vmsxml != null
                        && vmsxml.getDomainNames().contains(getDomainName())
-                       && DEFINED_ON_HOST_FALSE.getValueForConfig().equals(value)) {
+                       && DEFINED_ON_HOST_FALSE.equals(value)) {
                 changed = true;
             }
         }
@@ -5460,7 +5483,11 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Return virsh options like -c xen:///. */
     public String getVirshOptions() {
-        return getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS).getValueForConfig();
+        final Value v = getResource().getValue(VMSXML.VM_PARAM_VIRSH_OPTIONS);
+        if (v == null) {
+            return "";
+        }
+        return v.getValueForConfig();
     }
 
     /** Return whether domain type needs "display" section. */

@@ -145,7 +145,8 @@ final class Network extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsii.savePreferredValues();
-        vmsii.getResource().setValue(InterfaceData.TYPE, new StringValue("network"));
+        vmsii.getResource().setValue(InterfaceData.TYPE,
+                                     VMSInterfaceInfo.TYPE_NETWORK);
         vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
         vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, new StringValue());
         vmsii.addWizardParams(

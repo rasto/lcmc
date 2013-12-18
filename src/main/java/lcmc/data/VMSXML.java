@@ -61,6 +61,7 @@ import java.util.concurrent.locks.Lock;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Unit;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -471,7 +472,7 @@ public final class VMSXML extends XML {
             transformer.transform(src, res);
             xml = res.getWriter().toString();
         } catch (final javax.xml.transform.TransformerException e) {
-            e.printStackTrace();
+            LOG.appError("saveDomainXML: " + e.getMessageAndLocation(), e);
             return;
         }
         if (xml != null) {
@@ -552,7 +553,10 @@ public final class VMSXML extends XML {
                                        VM_PARAM_CPUMATCH_FEATURE_POLICY);
         final String features = parametersMap.get(
                                        VM_PARAM_CPUMATCH_FEATURES);
-        if (!"".equals(policy) && !"".equals(features)) {
+        if (policy != null
+            && features != null
+            && !"".equals(policy)
+            && !"".equals(features)) {
             for (final String feature : features.split("\\s+")) {
                 final Element featureNode =
                                   (Element) cpuMatchNode.appendChild(
@@ -670,13 +674,12 @@ public final class VMSXML extends XML {
         /* memory */
         final Node memoryNode = (Element) root.appendChild(
                                                   doc.createElement("memory"));
-        final long mem = Tools.convertToKilobytes(
-                                           parametersMap.get(VM_PARAM_MEMORY));
+        final long mem = Long.parseLong(parametersMap.get(VM_PARAM_MEMORY));
         memoryNode.appendChild(doc.createTextNode(Long.toString(mem)));
         /* current memory */
         final Node curMemoryNode = (Element) root.appendChild(
                                            doc.createElement("currentMemory"));
-        final long curMem = Tools.convertToKilobytes(
+        final long curMem = Long.parseLong(
                                     parametersMap.get(VM_PARAM_CURRENTMEMORY));
         curMemoryNode.appendChild(doc.createTextNode(Long.toString(curMem)));
         /* vcpu */
@@ -834,11 +837,11 @@ public final class VMSXML extends XML {
                     }
                 }
                 String value = parametersMap.get(param);
-                if (VM_PARAM_MEMORY.equals(param)
-                    || VM_PARAM_CURRENTMEMORY.equals(param)) {
-                    value = Long.toString(
-                                        Tools.convertToKilobytes(value));
-                }
+                //if (VM_PARAM_MEMORY.equals(param)
+                //    || VM_PARAM_CURRENTMEMORY.equals(param)) {
+                //    value = Long.toString(
+                //                        Tools.convertToKilobytes(value));
+                //}
                 if (VM_PARAM_CPU_MATCH.equals(param)
                     || VM_PARAM_CLOCK_OFFSET.equals(param)
                     || VM_PARAM_ACPI.equals(param)
@@ -1602,11 +1605,13 @@ public final class VMSXML extends XML {
             } else if (VM_PARAM_CURRENTMEMORY.equals(option.getNodeName())) {
                 parameterValues.put(name,
                                     VM_PARAM_CURRENTMEMORY,
-                                    Tools.convertKilobytes(getText(option)));
+                                    getText(option));
+                                    //Tools.convertKilobytes(getText(option)));
             } else if (VM_PARAM_MEMORY.equals(option.getNodeName())) {
                 parameterValues.put(name,
                                     VM_PARAM_MEMORY,
-                                    Tools.convertKilobytes(getText(option)));
+                                    getText(option));
+                                    //Tools.convertKilobytes(getText(option)));
             } else if ("os".equals(option.getNodeName())) {
                 final NodeList osOptions = option.getChildNodes();
                 int bootOption = 0;
@@ -3196,5 +3201,117 @@ public final class VMSXML extends XML {
 
     public String getConfig() {
         return oldConfig;
+    }
+
+    public static Unit getUnitKiBytes() {
+        return new Unit("K", "K", "KiByte", "KiBytes");
+    }
+
+    public static Unit getUnitMiBytes() {
+        return new Unit("M", "M", "MiByte", "MiBytes");
+    }
+
+    public static Unit getUnitGiBytes() {
+        return new Unit("G", "G", "GiByte", "GiBytes");
+    }
+
+    public static Unit getUnitTiBytes() {
+        return new Unit("T", "T", "TiByte", "TiBytes");
+    }
+
+    public static Unit getUnitPiBytes() {
+        return new Unit("P", "P", "PiByte", "PiBytes");
+    }
+
+    public static Unit[] getUnits() {
+        return new Unit[]{getUnitKiBytes(),
+                          getUnitMiBytes(),
+                          getUnitGiBytes(),
+                          getUnitTiBytes(),
+                          getUnitPiBytes()
+        };
+    }
+
+    /** Converts value in kilobytes. */
+    //TODO: move somewhere else
+    public static Value convertKilobytes(final String kb) {
+        if (!Tools.isNumber(kb)) {
+            return new StringValue(kb, getUnitKiBytes());
+        }
+        final double k = Long.parseLong(kb);
+        if (k == 0) {
+            return new StringValue("0", getUnitKiBytes());
+        }
+        if (k / 1024 != (long) (k / 1024)) {
+            return new StringValue(kb, getUnitKiBytes());
+        }
+        final double m = k / 1024;
+        if (m / 1024 != (long) (m / 1024)) {
+            return new StringValue(Long.toString((long) m), getUnitMiBytes());
+        }
+        final double g = m / 1024;
+        if (g / 1024 != (long) (g / 1024)) {
+            return new StringValue(Long.toString((long) g), getUnitGiBytes());
+        }
+        final double t = g / 1024;
+        if (t / 1024 != (long) (t / 1024)) {
+            return new StringValue(Long.toString((long) t), getUnitTiBytes());
+        }
+        final double p = t / 1024;
+        return new StringValue(Long.toString((long) p), getUnitPiBytes());
+    }
+    ///** Converts value in kilobytes. */
+    //public static String convertKilobytes(final String kb) {
+    //    if (!isNumber(kb)) {
+    //        return kb;
+    //    }
+    //    final double k = Long.parseLong(kb);
+    //    if (k == 0) {
+    //        return "0K";
+    //    }
+    //    if (k / 1024 != (long) (k / 1024)) {
+    //        return kb + "K";
+    //    }
+    //    final double m = k / 1024;
+    //    if (m / 1024 != (long) (m / 1024)) {
+    //        return Long.toString((long) m) + "M";
+    //    }
+    //    final double g = m / 1024;
+    //    if (g / 1024 != (long) (g / 1024)) {
+    //        return Long.toString((long) g) + "G";
+    //    }
+    //    final double t = g / 1024;
+    //    if (t / 1024 != (long) (t / 1024)) {
+    //        return Long.toString((long) t) + "T";
+    //    }
+    //    return Long.toString((long) (t / 1024)) + "P";
+    //}
+
+    /** Converts value with unit to kilobites. */
+    //TODO: move somewhere else
+    public static long convertToKilobytes(final Value value) {
+        final String numS = value.getValueForConfig();
+        if (Tools.isNumber(numS)) {
+            long num = Long.parseLong(numS);
+            final Unit unitObject = value.getUnit();
+            if (unitObject == null) {
+                return -1;
+            }
+            final String unit = unitObject.getShortName();
+            if ("P".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024 * 1024;
+            } else if ("T".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024;
+            } else if ("G".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024;
+            } else if ("M".equalsIgnoreCase(unit)) {
+                num *= 1024;
+            } else if ("K".equalsIgnoreCase(unit)) {
+            } else {
+                return -1;
+            }
+            return num;
+        }
+        return -1;
     }
 }

@@ -2079,56 +2079,6 @@ public final class Tools {
         }
     }
 
-    /** Converts value in kilobytes. */
-    public static String convertKilobytes(final String kb) {
-        if (!isNumber(kb)) {
-            return kb;
-        }
-        final double k = Long.parseLong(kb);
-        if (k == 0) {
-            return "0K";
-        }
-        if (k / 1024 != (long) (k / 1024)) {
-            return kb + "K";
-        }
-        final double m = k / 1024;
-        if (m / 1024 != (long) (m / 1024)) {
-            return Long.toString((long) m) + "M";
-        }
-        final double g = m / 1024;
-        if (g / 1024 != (long) (g / 1024)) {
-            return Long.toString((long) g) + "G";
-        }
-        final double t = g / 1024;
-        if (t / 1024 != (long) (t / 1024)) {
-            return Long.toString((long) t) + "T";
-        }
-        return Long.toString((long) (t / 1024)) + "P";
-    }
-
-    /** Converts value with unit to kilobites. */
-    public static long convertToKilobytes(final String value) {
-        final String[] v = Tools.extractUnit(value);
-        if (v.length == 2 && Tools.isNumber(v[0])) {
-            long num = Long.parseLong(v[0]);
-            final String unit = v[1];
-            if ("P".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024 * 1024;
-            } else if ("T".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024;
-            } else if ("G".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024;
-            } else if ("M".equalsIgnoreCase(unit)) {
-                num *= 1024;
-            } else if ("K".equalsIgnoreCase(unit)) {
-            } else {
-                return -1;
-            }
-            return num;
-        }
-        return -1;
-    }
-
     /** Converts value with units. */
     public static long convertUnits(final String value) {
         final String[] v = Tools.extractUnit(value);

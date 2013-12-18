@@ -140,8 +140,10 @@ final class Display extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsgi.savePreferredValues();
-        vmsgi.getResource().setValue(GraphicsData.TYPE, new StringValue("vnc"));
-        vmsgi.getResource().setValue(GraphicsData.PORT, new StringValue("auto"));
+        vmsgi.getResource().setValue(GraphicsData.TYPE,
+                                     VMSGraphicsInfo.TYPE_VNC);
+        vmsgi.getResource().setValue(GraphicsData.PORT,
+                                     VMSGraphicsInfo.PORT_AUTO);
 
         vmsgi.addWizardParams(
                       optionsPanel,

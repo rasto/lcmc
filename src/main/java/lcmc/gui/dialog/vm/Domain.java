@@ -156,7 +156,8 @@ public final class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT, new StringValue("CD-ROM"));
+        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT,
+                                   VMSVirtualDomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();
         vdi.addWizardParams(
                       optionsPanel,

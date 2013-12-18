@@ -169,13 +169,13 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                                                           items);
 
                 if (itemsChanged) {
-                    final HashSet<String> itemCache = new HashSet<String>();
+                    final HashSet<Value> itemCache = new HashSet<Value>();
                     cb.setSelectedIndex(-1);
                     cb.removeAllItems();
                     for (final Value item : comboList) {
-                        if (!itemCache.contains(item.toString())) {
+                        if (!itemCache.contains(item)) {
                             cb.addItem(item);
-                            itemCache.add(item.toString());
+                            itemCache.add(item);
                         }
                     }
                 }
