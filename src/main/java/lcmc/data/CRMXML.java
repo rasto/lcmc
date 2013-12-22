@@ -3858,7 +3858,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            if (value.getValueForConfig() != null) {
+            if (value != null && value.getValueForConfig() != null) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
@@ -3867,7 +3867,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            if (value.getValueForConfig() != null) {
+            if (value != null && value.getValueForConfig() != null) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
