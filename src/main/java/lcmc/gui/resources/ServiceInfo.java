@@ -2193,13 +2193,15 @@ public class ServiceInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 final Value info = sameAsOperationsWiValue();
-                                if (info != null) {
                                     setOperationsSameAs(info);
                                     sameAsOperationsWi.setEditable();
-                                    sameAsOperationsWi.setToolTipText(
-                                                      info.getValueForConfig());
+                                    if (info == null) {
+                                        sameAsOperationsWi.setToolTipText("");
+                                    } else {
+                                        sameAsOperationsWi.setToolTipText(
+                                                     info.getValueForConfig());
+                                    }
                                     setApplyButtons(CACHED_FIELD, params);
-                                }
                             }
                         });
                 }
