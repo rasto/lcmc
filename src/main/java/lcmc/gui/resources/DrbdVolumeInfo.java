@@ -1434,6 +1434,6 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     public String getValueForConfig() {
-        return getDrbdResourceInfo().getName() + "/" + getName();
+        return getDeviceByRes();
     }
 }
