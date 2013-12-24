@@ -285,38 +285,6 @@ public class Info implements Comparable<Info>, Value {
         return null;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 59 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
-        hash = 59 * hash + (this.getUnit() != null ? this.getUnit().hashCode() : 0);
-        hash = 59 * hash + (this.browser != null ? this.browser.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Value)) {
-            return false;
-        }
-        final Value other = (Value) obj;
-        if ((this.getValueForConfig() == null) ? (other.getValueForConfig() != null) : !this.getValueForConfig().equals(other.getValueForConfig())) {
-            return false;
-        }
-        if (this.getUnit() != other.getUnit() && (this.getUnit() == null || !this.getUnit().equals(other.getUnit()))) {
-            return false;
-        }
-        if (obj instanceof Info) {
-            if (this.browser != ((Info) other).browser && (this.browser == null || !this.browser.equals(((Info) other).browser))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /** Updates the info text. */
     public void updateInfo() {
         final JEditorPane ria = resourceInfoArea;

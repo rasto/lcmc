@@ -29,6 +29,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+import lcmc.data.Value;
 
 /**
  * This class holds info data for a net interface.
@@ -109,35 +110,6 @@ public class NetInfo extends Info {
         return (NetInterface) getResource();
     }
 
-    ///** Returns whether ips equal. */
-    //@Override
-    //public boolean equals(final Object value) {
-    //    if (value == null) {
-    //        return false;
-    //    }
-    //    String vfc = null;
-    //    if (value instanceof lcmc.data.Value) {
-    //        vfc = ((lcmc.data.Value) value).getValueForConfig();
-    //    }
-    //    //if (Tools.isStringClass(value)) {
-    //    //    // TODO: race is here
-    //    //    final NetInterface ni = getNetInterface();
-    //    //    if (value == null) {
-    //    //        return false;
-    //    //    }
-    //    //    if (ni == null) {
-    //    //        return false;
-    //    //    }
-    //    //    final String ip = ni.getIp();
-    //    //    if (ip == null) {
-    //    //        return false;
-    //    //    }
-    //    //    return ip.equals(value.toString());
-    //    //} else {
-    //    //    return toString().equals(value.toString());
-    //    //}
-    //}
-
     /**
      * Whether this interface is localhost.
      */
@@ -149,4 +121,27 @@ public class NetInfo extends Info {
     public final String getValueForConfig() {
         return getNetInterface().getIp();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof Value)) {
+            return false;
+        }
+        final Value other = (Value) obj;
+        if ((this.getValueForConfig() == null) ? (other.getValueForConfig() != null) : !this.getValueForConfig().equals(other.getValueForConfig())) {
+            return false;
+        }
+        return true;
+    }
+
 }
