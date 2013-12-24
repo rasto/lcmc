@@ -71,7 +71,7 @@ public class Configuration extends DialogHost {
     /** Whether the hostname was ok. */
     private volatile boolean hostnameOk = false;
     /** Width of the combo boxes. */
-    private static final int COMBO_BOX_WIDTH = 120;
+    private static final int COMBO_BOX_WIDTH = 180;
     /** DNS timeout. */
     private static final int DNS_TIMEOUT = 5000;
 
