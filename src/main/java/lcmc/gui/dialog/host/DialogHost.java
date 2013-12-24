@@ -227,7 +227,7 @@ public abstract class DialogHost extends WizardDialog {
                                            final MyButton installButton) {
         final List<InstallMethods> methods = new ArrayList<InstallMethods>();
         int i = 1;
-        String defaultValue = null;
+        Value defaultValue = null;
         while (true) {
             final String index = Integer.toString(i);
             final String text =
@@ -256,16 +256,15 @@ public abstract class DialogHost extends WizardDialog {
                 Tools.getString("Dialog.Host.CheckInstallation.InstallMethod")
                 + text, i, method);
             if (text.equals(lastInstalledMethod)) {
-                defaultValue = installMethod.toString();
+                defaultValue = installMethod;
             }
             methods.add(installMethod);
             i++;
         }
         final Widget instMethodWi = WidgetFactory.createInstance(
                        Widget.Type.COMBOBOX,
-                       new StringValue(defaultValue),
-                       (Value[]) methods.toArray(
-                                           new InstallMethods[methods.size()]),
+                       defaultValue,
+                       methods.toArray(new InstallMethods[methods.size()]),
                        Widget.NO_REGEXP,
                        0,    /* width */
                        Widget.NO_ABBRV,
