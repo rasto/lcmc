@@ -232,8 +232,14 @@ public class Configuration extends DialogHost {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        ipCombo[hop].reloadComboBox(new StringValue(getHost().getIp(hop)),
-                                                    items);
+                        final String savedIp = getHost().getIp(hop);
+                        Value defaultIp;
+                        if (savedIp == null && items.length > 0) {
+                            defaultIp = items[0];
+                        } else {
+                            defaultIp = new StringValue(savedIp);
+                        }
+                        ipCombo[hop].reloadComboBox(defaultIp, items);
 
                         if (items.length > 1) {
                             ipCombo[hop].setEnabled(true);
