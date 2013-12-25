@@ -301,6 +301,10 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
             cb.setSelectedItem(new StringValue());
         } else {
             cb.setSelectedItem(item);
+            if (!Tools.areEqual(item, cb.getSelectedItem())) {
+                setAlwaysEditable(true);
+                setText(item.getValueForConfig());
+            }
         }
     }
 

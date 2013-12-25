@@ -1964,7 +1964,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 protocolWi.setValue(PROXY_DEFAULT_PROTOCOL);
                 pingTimeoutWi.setValue(PROXY_DEFAULT_PING_TIMEOUT);
             } else {
-                protocolWi.setValue(dxml.getParamDefault(
+                protocolWi.setValue(dxml.getParamPreferred(
                                                      DrbdXML.PROTOCOL_PARAM));
                 pingTimeoutWi.setValue(dxml.getParamDefault(
                                                  DrbdXML.PING_TIMEOUT_PARAM));

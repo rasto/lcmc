@@ -221,6 +221,13 @@ public final class DrbdXML extends XML {
         PARAM_ACCESS_TYPE.put("rate", ConfigData.AccessType.OP);
     }
 
+    /** Preferred values. */
+    private static final Map<String, Value> PREFERRED_MAP =
+                                                 new HashMap<String, Value>();
+    static {
+        PREFERRED_MAP.put(PROTOCOL_PARAM, PROTOCOL_C);
+    }
+
     /** Yes / true drbd config value. */
     public static final Value CONFIG_YES = new StringValue("yes");
     /** No / false drbd config value. */
@@ -310,7 +317,7 @@ public final class DrbdXML extends XML {
             /* prior 8.4 */
             addParameter("resource",
                          PROTOCOL_PARAM,
-                         PROTOCOL_C,
+                         new StringValue(),
                          PROTOCOLS,
                          true);
         }
@@ -417,8 +424,7 @@ public final class DrbdXML extends XML {
 
     /** Gets preferred value for the parameter. */
     public Value getParamPreferred(final String param) {
-        // TODO:
-        return null;
+        return PREFERRED_MAP.get(param);
     }
 
     /** Returns section in which this param is in. */
