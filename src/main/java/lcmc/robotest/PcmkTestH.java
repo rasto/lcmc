@@ -70,6 +70,8 @@ final class PcmkTestH {
         sleep(500);
         press(KeyEvent.VK_DOWN);
         sleep(500);
+        press(KeyEvent.VK_DOWN);
+        sleep(500);
         press(KeyEvent.VK_ENTER);
         sleep(500);
         if (apply) {
