@@ -467,7 +467,9 @@ final class FilesystemInfo extends ServiceInfo {
     public int getUsed() {
         if (blockDeviceParamWi != null) {
             final Value value = blockDeviceParamWi.getValue();
-            if (value == null || value.isNothingSelected()) {
+            if (value == null
+                || value.isNothingSelected()
+                || !(value instanceof CommonDeviceInterface)) {
                 return -1;
             }
             final CommonDeviceInterface cdi = (CommonDeviceInterface) value;

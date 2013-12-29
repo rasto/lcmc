@@ -300,7 +300,7 @@ final class VirtualDomainInfo extends ServiceInfo {
         final String string;
         final String id = getService().getId();
         final Value configName = getParamSaved(CONFIG_PARAM);
-        if (configName == null) {
+        if (configName == null || configName.getValueForConfig() == null) {
             string = id;
         } else {
             final Matcher m = LIBVIRT_CONF_PATTERN.matcher(configName.getValueForConfig());

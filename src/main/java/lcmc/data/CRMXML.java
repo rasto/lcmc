@@ -1633,7 +1633,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
@@ -1664,7 +1664,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                   Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
@@ -1673,13 +1673,14 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
                 }
             }
-        } else if (value.isNothingSelected() && isGlobalRequired(param)) {
+        } else if ((value == null || value.isNothingSelected())
+                   && isGlobalRequired(param)) {
             correctValue = false;
         }
         return correctValue;
@@ -3705,7 +3706,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_INTEGER.equals(type)) {
             final Pattern p =
                  Pattern.compile("^(-?\\d*|(-|\\+)?" + INFINITY_STRING + ")$");
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;
@@ -3714,7 +3715,7 @@ public final class CRMXML extends XML {
         } else if (PARAM_TYPE_TIME.equals(type)) {
             final Pattern p =
                 Pattern.compile("^-?\\d*(ms|msec|us|usec|s|sec|m|min|h|hr)?$");
-            if (!value.isNothingSelected()) {
+            if (value != null && !value.isNothingSelected()) {
                 final Matcher m = p.matcher(value.getValueForConfig());
                 if (!m.matches()) {
                     correctValue = false;

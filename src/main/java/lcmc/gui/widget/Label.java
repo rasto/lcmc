@@ -60,6 +60,9 @@ public final class Label extends GenericWidget<JComponent> {
 
     /** Returns new MTextField with default value. */
     private JComponent getLabelField(final Value value) {
+        if (value == null || value.isNothingSelected()) {
+            return new JLabel("");
+        }
         return new JLabel(value.getValueForGui());
     }
 

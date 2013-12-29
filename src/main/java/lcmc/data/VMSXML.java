@@ -3290,6 +3290,9 @@ public final class VMSXML extends XML {
     /** Converts value with unit to kilobites. */
     //TODO: move somewhere else
     public static long convertToKilobytes(final Value value) {
+        if (value == null) {
+            return -1;
+        }
         final String numS = value.getValueForConfig();
         if (Tools.isNumber(numS)) {
             long num = Long.parseLong(numS);
