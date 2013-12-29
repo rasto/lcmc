@@ -174,6 +174,8 @@ final class HbConfig extends DialogCluster {
         OPTION_SIZES.put(AUTOJOIN, 80);
         OPTION_SIZES.put(NODE, 300);
     }
+    final Map<String, Value> optionDefaults =
+                                   new HashMap<String, Value>(OPTION_DEFAULTS);
     /** Option values. */
     private final Map<String, Value[]> optionValues =
                                                new HashMap<String, Value[]>();
@@ -274,6 +276,7 @@ final class HbConfig extends DialogCluster {
         /* choices */
         optionValues.put(NODE, new Value[]{new StringValue(config.toString()),
                                            new StringValue()});
+        optionDefaults.put(NODE, new StringValue(config.toString()));
         optionValues.put(CRM, new Value[]{new StringValue("respawn"),
                                           new StringValue("on"),
                                           new StringValue("off")});
@@ -1306,7 +1309,7 @@ final class HbConfig extends DialogCluster {
             }
             final Widget w = WidgetFactory.createInstance(
                                     OPTION_TYPES.get(option),
-                                    OPTION_DEFAULTS.get(option),
+                                    optionDefaults.get(option),
                                     optionValues.get(option),
                                     "^" + OPTION_REGEXPS.get(option) + "\\s*$",
                                     size,
