@@ -31,6 +31,7 @@ import lcmc.data.ClusterStatus;
 import lcmc.data.CRMXML;
 import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
+import lcmc.utilities.Tools;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -128,12 +129,11 @@ final class HbColocationInfo extends EditableInfo
         if (params != null) {
             for (String param : params) {
                 Value value = resourceNode.get(param);
-                if (value == null) {
+                if (value == null || value.isNothingSelected()) {
                     value = getParamDefault(param);
                 }
                 final Value oldValue = getParamSaved(param);
-                if ((value == null && value != oldValue)
-                    || (value != null && !value.equals(oldValue))) {
+                if (!Tools.areEqual(value, oldValue)) {
                     getResource().setValue(param, value);
                     final Widget wi = getWidget(param, null);
                     if (wi != null) {

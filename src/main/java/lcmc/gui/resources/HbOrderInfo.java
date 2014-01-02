@@ -136,12 +136,11 @@ final class HbOrderInfo extends EditableInfo
         if (params != null) {
             for (String param : params) {
                 Value value = resourceNode.get(param);
-                if (value == null) {
+                if (value == null || value.isNothingSelected()) {
                     value = getParamDefault(param);
                 }
                 final Value oldValue = getParamSaved(param);
-                if ((value == null && value != oldValue)
-                    || (value != null && !value.equals(oldValue))) {
+                if (!Tools.areEqual(value, oldValue)) {
                     getResource().setValue(param, value);
                     final Widget wi = getWidget(param, null);
                     if (wi != null) {
