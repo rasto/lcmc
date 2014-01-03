@@ -999,6 +999,13 @@ public final class DrbdVolumeInfo extends EditableInfo
         di.getWidget("1", null).setValueAndWait(
                                             new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, testOnly);
+        di.getResource().setNew(false);
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                di.setApplyButtons(null, di.getParametersFromXML());
+            }
+        });
     }
 
     /** Adds linbit::drbd service in the pacemaker graph. */
@@ -1037,6 +1044,13 @@ public final class DrbdVolumeInfo extends EditableInfo
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();
         ldi.apply(dcHost, testOnly);
+        ldi.getResource().setNew(false);
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ldi.setApplyButtons(null, ldi.getParametersFromXML());
+            }
+        });
     }
 
     /** Starts resolve split brain dialog. */
