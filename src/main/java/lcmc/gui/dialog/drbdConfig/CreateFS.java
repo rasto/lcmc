@@ -328,10 +328,7 @@ final class CreateFS extends DrbdConfig {
         /* Filesystem */
         final JLabel filesystemLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfig.CreateFS.Filesystem"));
-        Value defaultValue = NO_FILESYSTEM_STRING;
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
-            defaultValue = new StringValue("ext3");
-        }
+        final Value defaultValue = NO_FILESYSTEM_STRING;
         final Value[] filesystems =
             getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
                                                                 defaultValue);
@@ -346,6 +343,9 @@ final class CreateFS extends DrbdConfig {
                                      new AccessMode(ConfigData.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
+        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            filesystemW.setValueAndWait(new StringValue("ext3"));
+        }
         inputPane.add(filesystemLabel);
         inputPane.add(filesystemW.getComponent());
         filesystemW.addListeners(new WidgetListener() {
