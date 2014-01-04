@@ -166,9 +166,7 @@ public final class BugReport extends ConfigDialog {
         clusterPane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         for (final Cluster cl : clusters) {
-            final JCheckBox cb = new JCheckBox(cl.getName(),
-                                               cl == cluster
-                                               || clusters.size() == 1);
+            final JCheckBox cb = new JCheckBox(cl.getName(), true);
             cb.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
             clusterCbMap.put(cl, cb);
@@ -234,8 +232,11 @@ public final class BugReport extends ConfigDialog {
                 text.append("\n== ")
                     .append(cl.getName())
                     .append(", br: ")
-                    .append(cl.getBrowser() != null)
-                    .append(" ==\n");
+                    .append(cl.getBrowser() != null);
+                if (cl == cluster) {
+                    text.append(" *");
+                }
+                text.append(" ==\n");
                 for (final Host host : cl.getHosts()) {
                     if (host == null) {
                         text.append("host == null");
