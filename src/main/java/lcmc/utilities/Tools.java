@@ -2031,6 +2031,7 @@ public final class Tools {
      * Returns value unit pair extracting from string. E.g. "10min" becomes 10
      * and "min" pair.
      */
+    @Deprecated
     public static String[] extractUnit(final String time) {
         final String[] o = new String[]{null, null};
         if (time == null) {
@@ -2080,6 +2081,7 @@ public final class Tools {
     }
 
     /** Converts value with units. */
+    @Deprecated
     public static long convertUnits(final String value) {
         final String[] v = Tools.extractUnit(value);
         if (v.length == 2 && Tools.isNumber(v[0])) {
