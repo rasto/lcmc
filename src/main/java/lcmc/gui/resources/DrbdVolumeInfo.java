@@ -643,19 +643,19 @@ public final class DrbdVolumeInfo extends EditableInfo
             final String spString = getSyncedProgress();
             final String bsString = getFirstBlockDevInfo()
                                             .getBlockDevice().getBlockSize();
-            final String rateString =
-                        getDrbdResourceInfo().getResource().getValue("rate").getValueForConfig();
-            if (spString != null && bsString != null && rateString != null) {
+            final Value rateValue =
+                         getDrbdResourceInfo().getResource().getValue("rate");
+            if (spString != null && bsString != null && rateValue != null) {
                 final double sp = Double.parseDouble(spString);
                 final double bs = Double.parseDouble(bsString);
-                final Object[] rateObj = Tools.extractUnit(rateString);
-                double rate = Double.parseDouble((String) rateObj[0]);
-                if ("k".equalsIgnoreCase((String) rateObj[1])) {
-                } else if ("m".equalsIgnoreCase((String) rateObj[1])) {
+                double rate = Double.parseDouble(rateValue.getValueForConfig());
+                final String unit = rateValue.getUnit().getShortName();
+                if ("k".equalsIgnoreCase(unit)) {
+                } else if ("m".equalsIgnoreCase(unit)) {
                     rate *= 1024;
-                } else if ("g".equalsIgnoreCase((String) rateObj[1])) {
+                } else if ("g".equalsIgnoreCase(unit)) {
                     rate *= 1024 * 1024;
-                } else if ("".equalsIgnoreCase((String) rateObj[1])) {
+                } else if ("".equalsIgnoreCase(unit)) {
                     rate /= 1024;
                 } else {
                     rate = 0;
