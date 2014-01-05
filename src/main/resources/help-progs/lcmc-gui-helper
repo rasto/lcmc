@@ -1907,7 +1907,8 @@ sub get_cluster_versions {
 	my $ais_version = "";
 	if (-e $ais_prog) {
 		if (!(_system("/usr/bin/file $ais_prog 2>/dev/null"
-			      ."|grep 'shell script' > /dev/null") >> 8)) {
+			      ."|grep 'shell script' > /dev/null") >> 8)
+			&& -e "/etc/init.d/openais") {
 			$ais_version = "wrapper";
 		}
 		if (!$ais_version) {
