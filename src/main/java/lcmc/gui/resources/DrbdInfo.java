@@ -707,22 +707,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         return;
                     }
 
-                    getBrowser().updateCommonBlockDevices();
-                    final DrbdXML newDrbdXML =
-                        new DrbdXML(getCluster().getHostsArray(),
-                                    getBrowser().getDrbdParameters());
-                    final String configString1 =
-                                           newDrbdXML.getConfig(bd1.getHost());
-                    if (configString1 != null) {
-                        newDrbdXML.update(configString1);
-                    }
-                    final String configString2 =
-                                           newDrbdXML.getConfig(bd2.getHost());
-                    if (configString2 != null) {
-                        newDrbdXML.update(configString2);
-                    }
-                    getBrowser().setDrbdXML(newDrbdXML);
-                    getBrowser().resetFilesystems();
+                    updateDrbdInfo();
                 }
             });
             thread.start();
@@ -1126,5 +1111,26 @@ public final class DrbdInfo extends DrbdGuiInfo {
         proxyHost.setCluster(getCluster());
         final ProxyHostWizard w = new ProxyHostWizard(proxyHost, null);
         w.showDialogs();
+    }
+
+    /** Reset info panel. */
+    @Override
+    public void resetInfoPanel() {
+        super.resetInfoPanel();
+        infoPanel = null;
+    }
+
+    public void updateDrbdInfo() {
+        getBrowser().updateCommonBlockDevices();
+        final DrbdXML newDrbdXML = new DrbdXML(getCluster().getHostsArray(),
+                                               getBrowser().getDrbdParameters());
+        for (final Host host : getCluster().getHosts()) {
+            final String configString = newDrbdXML.getConfig(host);
+            if (configString != null) {
+                newDrbdXML.update(configString);
+            }
+        }
+        getBrowser().setDrbdXML(newDrbdXML);
+        getBrowser().resetFilesystems();
     }
 }

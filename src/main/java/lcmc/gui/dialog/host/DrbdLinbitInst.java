@@ -27,8 +27,10 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.DrbdInfo;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -171,6 +173,17 @@ public class DrbdLinbitInst extends DialogHost {
 
     /** Called after the installation is completed. */
     final void installationDone() {
+        final ClusterBrowser clusterBrowser =
+                                   getHost().getBrowser().getClusterBrowser();
+        if (clusterBrowser != null) {
+            clusterBrowser.getDrbdParameters().clear();
+            final DrbdInfo drbdInfo =
+                                  clusterBrowser.getDrbdGraph().getDrbdInfo();
+            drbdInfo.clearPanelLists();
+            drbdInfo.updateDrbdInfo();
+            drbdInfo.resetInfoPanel();
+            drbdInfo.getInfoPanel();
+        }
         nextDialogObject = new CheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog()
                                       .getPreviousDialog().getPreviousDialog(),

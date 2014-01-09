@@ -24,8 +24,10 @@ package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.DrbdInfo;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.ConvertCmdCallback;
@@ -62,6 +64,17 @@ final class DrbdCommandInst extends DialogHost {
      * components accordingly.
      */
     void checkAnswer(final String ans) {
+        final ClusterBrowser clusterBrowser =
+                                   getHost().getBrowser().getClusterBrowser();
+        if (clusterBrowser != null) {
+            clusterBrowser.getDrbdParameters().clear();
+            final DrbdInfo drbdInfo =
+                                  clusterBrowser.getDrbdGraph().getDrbdInfo();
+            drbdInfo.clearPanelLists();
+            drbdInfo.updateDrbdInfo();
+            drbdInfo.resetInfoPanel();
+            drbdInfo.getInfoPanel();
+        }
         nextDialogObject = new CheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog(),
                    getHost());

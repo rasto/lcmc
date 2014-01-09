@@ -29,6 +29,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.widget.Widget;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.Host;
@@ -48,6 +49,9 @@ import java.awt.event.ActionEvent;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+
 /**
  * An implementation of a dialog where user can enter drbd resource
  * information.
@@ -57,6 +61,8 @@ import lcmc.data.Value;
  *
  */
 public final class Resource extends DrbdConfig {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(Resource.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Wfc timeout option string. */
@@ -138,9 +144,14 @@ public final class Resource extends DrbdConfig {
                     && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
+                final Widget wi = drbdInfo.getWidget(commonP, null);
+                if (wi == null) {
+                    LOG.appError("widget for param: " + commonP + " was not created");
+                    return null;
+                }
                 final Value value = dri.getComboBoxValue(commonP);
                 drbdInfo.getResource().setValue(commonP, value);
-                drbdInfo.getWidget(commonP, null).setValue(value);
+                wi.setValue(value);
             }
         }
         drbdInfo.apply(false);
@@ -229,6 +240,11 @@ public final class Resource extends DrbdConfig {
                     && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
+                final Widget wi = drbdInfo.getWidget(commonP, null);
+                if (wi == null) {
+                    LOG.appError("widget for param: " + commonP + " was not created");
+                    return new JPanel();
+                }
                 /* for the first resource set common options. */
                 final Value commonValue =
                                       drbdInfo.getResource().getValue(commonP);
@@ -236,8 +252,7 @@ public final class Resource extends DrbdConfig {
                     final Value defaultValue =
                                drbdInfo.getParamDefault(commonP);
                     if (Tools.areEqual(defaultValue, commonValue)) {
-                        drbdInfo.getWidget(commonP, null).setValue(
-                                            commonPreferredValue.get(commonP));
+                        wi.setValue(commonPreferredValue.get(commonP));
                         dri.getResource().setValue(
                                             commonP,
                                             commonPreferredValue.get(commonP));

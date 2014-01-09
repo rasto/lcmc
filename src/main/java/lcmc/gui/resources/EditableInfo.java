@@ -1089,7 +1089,9 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Clear panel lists. */
-    protected void clearPanelLists() {
+    public void clearPanelLists() {
+        applyButton = null;
+        oldApplyButton = null;
         advancedPanelList.clear();
         advancedOnlySectionList.clear();
         sectionPanels.clear();
