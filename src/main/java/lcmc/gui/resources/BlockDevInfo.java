@@ -2726,7 +2726,11 @@ public final class BlockDevInfo extends EditableInfo {
      * resource.
      */
     public String getProxyStateForGraph(final boolean testOnly) {
-        final DrbdResourceInfo dri = drbdVolumeInfo.getDrbdResourceInfo();
+        final DrbdVolumeInfo dvi = drbdVolumeInfo;
+        if (dvi == null) {
+            return null;
+        }
+        final DrbdResourceInfo dri = dvi.getDrbdResourceInfo();
         final Host pHost =
                          dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
         if (dri.isProxy(getHost())) {
@@ -2737,7 +2741,7 @@ public final class BlockDevInfo extends EditableInfo {
                     return PROXY_DOWN;
                 }
             } else {
-                if (drbdVolumeInfo.isConnected(testOnly)) {
+                if (dvi.isConnected(testOnly)) {
                     return PROXY_UP;
                 } else {
                     return pHost.getName();
