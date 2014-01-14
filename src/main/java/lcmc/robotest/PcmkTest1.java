@@ -144,7 +144,7 @@ final class PcmkTest1 {
         moveTo("IPaddr2");
         leftClick();
 
-        moveTo("IPv4 address", MComboBox.class);
+        moveTo("IPv4 ", MComboBox.class);
         leftClick();
         sleep(500);
         press(KeyEvent.VK_DOWN);

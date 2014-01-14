@@ -997,7 +997,7 @@ sub get_hb_lib_path {
 
 sub get_crmd_lib_path {
 	my $hb_lib_path = get_hb_lib_path();
-	for ("/usr/libexec/pacemaker", $hb_lib_path) {
+	for ("/usr/lib64/pacemaker", "/usr/libexec/pacemaker", $hb_lib_path) {
 		if (-e "$_/crmd") {
 			return $_;
 		}
@@ -1884,7 +1884,10 @@ sub get_cluster_versions {
 		if (-e $corosync_1_2_5_file) {
 			$cs_version = "1.2.5!";
 		} else {
-			($cs_version) = _exec("$cs_prog -v") =~ /'(\d+\.\d+\.\d+)'/;
+			my ($cs_version_string) = _exec("$cs_prog -v") =~ /('.*?')/;
+			# workaround for opensuse
+			$cs_version_string =~ s/'UNKNOWN'/'2.3.1'/;
+			($cs_version) = $cs_version_string =~ /'(\d+\.\d+\.\d+)'/;
 			if ($cs_version && "1.2.5" eq $cs_version) {
 				# workaround so that corosync 1.2.5 does not fill up
 				# shared momory.
