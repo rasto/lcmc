@@ -58,7 +58,8 @@ public final class DrbdProxy {
      *
      * Return whether there's a valid proxy config.
      */
-    static boolean parse(final String text,
+    static boolean parse(final DrbdXML drbdXML,
+                         final String text,
                          final Map<String, Value> nameValueMap)
     throws Exceptions.DrbdConfigException {
         final StringTokenizer st = new StringTokenizer(text);
@@ -71,7 +72,10 @@ public final class DrbdProxy {
                       "proxy config: unexpected token: " + nextToken + "/'{'");
                 }
                 while (st.hasMoreTokens()) {
-                     final boolean done = parseStatement("", st, nameValueMap);
+                     final boolean done = parseStatement(drbdXML,
+                                                         "",
+                                                         st,
+                                                         nameValueMap);
                      if (done) {
                          return PROXY;
                      }
@@ -90,7 +94,8 @@ public final class DrbdProxy {
      *     zlib level 9;
      * }
      */
-    private static void parsePlugin(final StringTokenizer st,
+    private static void parsePlugin(final DrbdXML drbdXML,
+                                    final StringTokenizer st,
                                     final Map<String, Value> nameValueMap)
     throws Exceptions.DrbdConfigException {
         final String nextToken = st.nextToken();
@@ -99,7 +104,8 @@ public final class DrbdProxy {
               "proxy plugin config: unexpected token: " + nextToken + "/'{'");
         }
         while (st.hasMoreTokens()) {
-            final boolean done = parseStatement(PLUGIN_PREFIX,
+            final boolean done = parseStatement(drbdXML,
+                                                PLUGIN_PREFIX,
                                                 st,
                                                 nameValueMap);
             if (done) {
@@ -115,13 +121,14 @@ public final class DrbdProxy {
      * Return whether the parsing has reached the end of parsing.
      */
     private static boolean parseStatement(
+                                    final DrbdXML drbdXML,
                                     final String prefix,
                                     final StringTokenizer st,
                                     final Map<String, Value> nameValueMap)
     throws Exceptions.DrbdConfigException {
         String nextToken = st.nextToken();
         if ("plugin".equals(nextToken)) {
-            parsePlugin(st, nameValueMap);
+            parsePlugin(drbdXML, st, nameValueMap);
             return !DONE;
         } else if ("}".equals(nextToken)) {
             return DONE;
@@ -149,7 +156,7 @@ public final class DrbdProxy {
                 break;
             }
         }
-        nameValueMap.put(prefix + param, new StringValue(value));
+        nameValueMap.put(prefix + param, drbdXML.parseValue(param, value));
         if (!eos) {
             throw new Exceptions.DrbdConfigException(
                                             "proxy config: statement error");

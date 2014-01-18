@@ -2734,6 +2734,9 @@ public final class BlockDevInfo extends EditableInfo {
         final Host pHost =
                          dri.getProxyHost(getHost(), !DrbdResourceInfo.WIZARD);
         if (dri.isProxy(getHost())) {
+            if (pHost == null) {
+                return "ERROR";
+            }
             if (pHost.isConnected()) {
                 if (pHost.isDrbdProxyUp(dri.getName())) {
                     return PROXY_UP;

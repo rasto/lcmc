@@ -106,6 +106,8 @@ final class DrbdTest1 {
         sleep(500);
         if (proxy) {
             press(KeyEvent.VK_P); /* select first interface to proxy*/
+            sleep(200);
+            press(KeyEvent.VK_DOWN);
         } else {
             press(KeyEvent.VK_E); /* select first interface */
         }

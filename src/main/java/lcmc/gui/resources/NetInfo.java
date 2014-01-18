@@ -118,7 +118,7 @@ public class NetInfo extends Info {
     }
 
     @Override
-    public final String getValueForConfig() {
+    public String getValueForConfig() {
         return getNetInterface().getIp();
     }
 

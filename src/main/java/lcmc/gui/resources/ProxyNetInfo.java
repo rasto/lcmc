@@ -24,6 +24,7 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.Host;
+import lcmc.data.Value;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.
@@ -84,5 +85,17 @@ public final class ProxyNetInfo extends NetInfo {
     /** Return proxy host. */
     public Host getProxyHost() {
         return proxyHost;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public final String getValueForConfig() {
+        return toString();
     }
 }

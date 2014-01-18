@@ -231,7 +231,9 @@ public final class Resource extends DrbdConfig {
         commonPreferredValue.put(CRAM_HMAC_ALG, new StringValue("sha1"));
         commonPreferredValue.put(SHARED_SECRET, new StringValue(getRandomSecret()));
         commonPreferredValue.put(ON_IO_ERROR, new StringValue("detach"));
-        commonPreferredValue.put(PROXY_MEMLIMIT, new StringValue("100M"));
+        commonPreferredValue.put(PROXY_MEMLIMIT,
+                                 new StringValue("100",
+                                                 DrbdXML.getUnitMiBytes("")));
         commonPreferredValue.put(PROXY_PLUGIN_ZLIB, new StringValue("level 9"));
         final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
         if (drbdInfo.getDrbdResources().size() <= 1) {

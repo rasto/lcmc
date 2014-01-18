@@ -1157,7 +1157,7 @@ public final class DrbdXML extends XML {
                     }
                     try {
                         final boolean isProxy =
-                              DrbdProxy.parse(n.getNodeValue(), nameValueMap);
+                          DrbdProxy.parse(this, n.getNodeValue(), nameValueMap);
                         if (!isProxy) {
                             continue;
                         }
@@ -1561,7 +1561,7 @@ public final class DrbdXML extends XML {
         return oldConfig;
     }
 
-    private Value parseValue(final String param, final String v) {
+    public Value parseValue(final String param, final String v) {
         if (v == null) {
             return null;
         }

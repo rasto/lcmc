@@ -1353,17 +1353,17 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
              getParamPanel(Tools.getString("DrbdResourceInfo.HostAddresses"));
         panel.setLayout(new SpringLayout());
         for (final Host host : getHosts()) {
+            final Value haSaved = savedHostAddresses.get(host);
             final Widget wi = WidgetFactory.createInstance(
                            Widget.Type.COMBOBOX,
-                           Widget.NO_DEFAULT,
+                           haSaved,
                            getNetInterfacesWithProxies(host.getBrowser()),
                            Widget.NO_REGEXP,
                            rightWidth,
                            Widget.NO_ABBRV,
                            new AccessMode(ConfigData.AccessType.ADMIN, false),
                            Widget.NO_BUTTON);
-            final Value haSaved = savedHostAddresses.get(host);
-            wi.setValueAndWait(haSaved);
+            //wi.setValueAndWait(haSaved);
             newAddressComboBoxHash.put(host, wi);
 
         }
@@ -1844,7 +1844,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             if (wi == null) {
                 continue;
             }
-            final Value address = new StringValue(getIp(wi.getValue()));
+            final Value address = wi.getValue();
             if (address == null || address.isNothingSelected()) {
                 savedHostAddresses.remove(host);
             } else {
@@ -1868,7 +1868,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final Widget insideWi = insideIpComboBoxHash.get(host);
             if (insideWi != null) {
                 final Value defaultInsideIp = getDefaultInsideIp(host);
-                final Value insideIp = new StringValue(getIp(insideWi.getValue()));
+                final Value insideIp = insideWi.getValue();
                 if (insideIp == null || insideIp.isNothingSelected()) {
                     savedInsideIps.remove(host);
                 } else {
@@ -1879,7 +1879,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
             final Widget outsideWi = outsideIpComboBoxHash.get(host);
             if (outsideWi != null) {
-                final Value outsideIp = new StringValue(getIp(outsideWi.getValue()));
+                final Value outsideIp = outsideWi.getValue();
                 if (outsideIp == null || outsideIp.isNothingSelected()) {
                     savedOutsideIps.remove(host);
                 } else {
@@ -2028,7 +2028,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                             cb = insideIpComboBoxHash;
                         }
                         final Host proxyHost = getProxyHost(host, wizard);
-                        cb.get(proxyHost).setValue(new StringValue(getIp(value.getValueForConfig())));
+                        cb.get(proxyHost).setValue(
+                                            new StringValue(getIp(value)));
                     }
                 }
             });
@@ -2316,7 +2317,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     private Value getDefaultInsideIp(final Host host) {
         final Widget wi = addressComboBoxHash.get(host);
         if (wi != null) {
-            return new StringValue(getIp(wi.getValue()));
+            return wi.getValue();
         }
         return null;
     }
