@@ -170,10 +170,11 @@ public final class SplitBrain extends DrbdConfig {
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
+        final Host[] hostsArray = hosts.toArray(new Host[hosts.size()]);
         hostWi = WidgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
-                                    Widget.NO_DEFAULT,
-                                    hosts.toArray(new Host[hosts.size()]),
+                                    hostsArray[0],
+                                    hostsArray,
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
