@@ -102,6 +102,7 @@ import java.awt.Insets;
 import java.awt.Desktop;
 import java.awt.Container;
 
+import java.awt.MouseInfo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.FileReader;
@@ -1653,17 +1654,13 @@ public final class Tools {
 
             @Override
             public void menuDeselected(final MenuEvent e) {
-                boolean pVisible = false;
-                JPopupMenu p = (JPopupMenu) menu.getParent();
-                while (p != null) {
-                    if (p.isVisible()) {
-                        pVisible = true;
-                        break;
-                    }
-                    p = (JPopupMenu) p.getParent();
-                }
+                final Point mouseLocation =
+                                      MouseInfo.getPointerInfo().getLocation();
+                SwingUtilities.convertPointFromScreen(mouseLocation, sp);
+                boolean inside = sp.getBounds().contains(mouseLocation);
+
                 for (final JDialog otherP : popups) {
-                    if (popup != otherP || pVisible) {
+                    if (popup != otherP || !inside) {
                         /* don't dispose the popup if it was clicked.
                          */
                         otherP.dispose();
