@@ -141,8 +141,6 @@ public final class ProgressIndicatorPanel extends JComponent
     private int oldHeight = getHeight();
     /** Beginning position of the bar. */
     private double barPos = -1;
-    /** Width of the bar. */
-    private double barWidth = 10;
     /** Maximum alpha level. */
     private static final int MAX_ALPHA_LEVEL = 255;
     /** Veil color. */
@@ -309,37 +307,36 @@ public final class ProgressIndicatorPanel extends JComponent
                                   VEIL_COLOR.getGreen(),
                                   VEIL_COLOR.getBlue(),
                                   newAlphaLevel));
-            final int startAtHeight = 22;
+            final int barHeight = 40;
+            final int startAtHeight = getHeight() / 2 - barHeight / 2;
             g2.fillRect(0,
-                        startAtHeight,
+                        20,
                         width,
                         Tools.getGUIData().getTerminalPanelPos()
-                            - startAtHeight);
+                           - 20);
             if (barPos < 0) {
                 barPos = width / 2;
             }
             if (barPos < width) {
-                final int he = Tools.getGUIData().getTerminalPanelPos()
-                                    - startAtHeight;
                 g2.setColor(new Color(VEIL2_COLOR.getRed(),
                                       VEIL2_COLOR.getGreen(),
                                       VEIL2_COLOR.getBlue(),
-                                      (int) (alphaLevel * shield * 0.3)));
+                                      (int) (alphaLevel * shield * 0.5)));
                 if (barPos < width / 2) {
                     g2.fillRect((int) barPos,
                                 startAtHeight,
                                 (int) (width - barPos * 2),
-                                he);
+                                barHeight);
                 } else {
                     g2.fillRect((int) (width  - barPos),
                                 startAtHeight,
                                 (int) (barPos * 2 - width),
-                                he);
+                                barHeight);
                 }
             }
             barPos += 5.0 * 20.0 / FPS;
-            if (barPos >= width / 2 + barWidth / 2) {
-                barPos = width / 2 - barWidth / 2;
+            if (barPos >= width / 2 + getWidth() / 2) {
+                barPos = width / 2 - getWidth() / 2;
             }
 
 
@@ -395,9 +392,6 @@ public final class ProgressIndicatorPanel extends JComponent
                                     * alpha));
                     y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL)
                                     * alpha));
-                    if (bounds.getWidth() > barWidth) {
-                        barWidth = bounds.getWidth() + 30;
-                    }
                 }
             }
             mTextsLock.unlock();
@@ -505,7 +499,6 @@ public final class ProgressIndicatorPanel extends JComponent
                 Thread.yield();
             }
             started = false;
-            barWidth = 10;
             LOG.debug1("run: animator end");
         }
     }
