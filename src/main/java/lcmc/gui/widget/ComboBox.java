@@ -237,7 +237,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Override
     public String getStringValue() {
         final Value v = getValue();
-        if (v == null) {
+        if (v == null || v.isNothingSelected()) {
             return "";
         }
         return v.getValueForConfig();
