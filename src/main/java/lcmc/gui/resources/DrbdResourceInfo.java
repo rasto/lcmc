@@ -855,7 +855,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (infoPanelOk) {
                     final Widget wi = insideIpComboBoxHash.get(proxyHost);
                     if (wi != null) {
-                        wi.setValueAndWait(insideIp);
+                        wi.setValue(insideIp);
                     }
                 }
             }
@@ -870,7 +870,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 if (infoPanelOk) {
                     final Widget wi = outsideIpComboBoxHash.get(proxyHost);
                     if (wi != null) {
-                        wi.setValueAndWait(outsideIp);
+                        wi.setValue(outsideIp);
                     }
                 }
             }
@@ -1692,13 +1692,15 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (hostBrowser == null) {
             throw new RuntimeException("getNetInterfaces: hostBrowser is null");
         }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e =
-                                hostBrowser.getNetInterfacesNode().children();
+        if (hostBrowser.getNetInterfacesNode() != null) {
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e =
+                                 hostBrowser.getNetInterfacesNode().children();
 
-        while (e.hasMoreElements()) {
-            final Info i = (Info) e.nextElement().getUserObject();
-            list.add(i);
+            while (e.hasMoreElements()) {
+                final Info i = (Info) e.nextElement().getUserObject();
+                list.add(i);
+            }
         }
         return list.toArray(new Value[list.size()]);
     }
@@ -2280,6 +2282,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             return null;
         } else if (o instanceof String) {
             return (String) o;
+        } else if (o instanceof StringValue) {
+            return ((StringValue) o).getValueForConfig();
         } else {
             return ((NetInfo) o).getInternalValue();
         }
