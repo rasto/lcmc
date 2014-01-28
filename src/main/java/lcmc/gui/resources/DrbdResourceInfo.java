@@ -835,12 +835,16 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 proxyHost = host;
             }
 
-            if (!Tools.areEqual(insidePort, hostInsidePort)) {
+            if (insidePort != null
+                && hostInsidePort != null
+                && !Tools.areEqual(insidePort, hostInsidePort)) {
                 LOG.appWarning("setProxyParameters: multiple proxy inside ports in " + getName() + " " + insidePort + " " + hostInsidePort);
             }
             hostInsidePort = insidePort;
 
-            if (!Tools.areEqual(outsidePort, hostOutsidePort)) {
+            if (outsidePort != null
+                && hostOutsidePort != null
+                && !Tools.areEqual(outsidePort, hostOutsidePort)) {
                 LOG.appWarning("setProxyParameters: multiple proxy outside ports in " + getName() + " " + outsidePort + " " + hostOutsidePort);
             }
             hostOutsidePort = outsidePort;
