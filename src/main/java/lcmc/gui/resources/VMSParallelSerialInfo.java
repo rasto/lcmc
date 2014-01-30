@@ -538,8 +538,15 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     /** Returns real parameters. */
     @Override
     String[] getRealParametersFromXML() {
-       final List<String> params = PARAMETERS_MAP.get(
-                                    getComboBoxValue(ParallelSerialData.TYPE).getValueForConfig());
+       final Value type = getComboBoxValue(ParallelSerialData.TYPE);
+       String typeS;
+       if (type == null) {
+           typeS = null;
+       } else {
+           typeS = type.getValueForConfig();
+       }
+
+       final List<String> params = PARAMETERS_MAP.get(typeS);
        if (params == null) {
            return PARAMETERS.clone();
        }
