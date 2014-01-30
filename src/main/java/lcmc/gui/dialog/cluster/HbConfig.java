@@ -883,7 +883,9 @@ final class HbConfig extends DialogCluster {
         } else if (UCAST_TYPE.equals(type)) {
             ucastLink1 = (UcastLink) ucastLink1W.getValue();
             ucastLink2 = (UcastLink) ucastLink2W.getValue();
-            if (ucastLink1.getHost() == ucastLink2.getHost()) {
+            if (ucastLink1 == null
+                || ucastLink2 == null
+                || ucastLink1.getHost() == ucastLink2.getHost()) {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
