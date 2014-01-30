@@ -377,11 +377,11 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(VideoData.MODEL_TYPE).getValueForConfig();
+        final Value type = getParamSaved(VideoData.MODEL_TYPE);
         if (type == null) {
             s.append("new video device...");
         } else {
-            s.append(type);
+            s.append(type.getValueForConfig());
         }
         return s.toString();
     }

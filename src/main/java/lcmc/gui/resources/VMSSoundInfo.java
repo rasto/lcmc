@@ -221,8 +221,14 @@ final class VMSSoundInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                parameters.put(SoundData.SAVED_MODEL,
-                               getParamSaved(SoundData.MODEL).getValueForConfig());
+                final Value model = getParamSaved(SoundData.MODEL);
+                String modelS;
+                if (model == null) {
+                    modelS = null;
+                } else {
+                    modelS = model.getValueForConfig();
+                }
+                parameters.put(SoundData.SAVED_MODEL, modelS);
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -350,8 +356,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String model = getParamSaved(SoundData.MODEL).getValueForConfig();
-        if (model == null) {
+        final Value model = getParamSaved(SoundData.MODEL);
+        if (model == null || model.isNothingSelected()) {
             s.append("new sound device...");
         } else {
             s.append(model);

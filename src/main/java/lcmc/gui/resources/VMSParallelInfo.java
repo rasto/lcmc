@@ -106,8 +106,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(ParallelData.TYPE).getValueForConfig();
-        if (type == null) {
+        final Value type = getParamSaved(ParallelData.TYPE);
+        if (type == null || type.isNothingSelected()) {
             s.append("new parallel device...");
         } else {
             s.append(getName());

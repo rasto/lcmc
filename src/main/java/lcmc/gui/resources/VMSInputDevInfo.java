@@ -222,10 +222,22 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                parameters.put(InputDevData.SAVED_TYPE,
-                               getParamSaved(InputDevData.TYPE).getValueForConfig());
-                parameters.put(InputDevData.SAVED_BUS,
-                               getParamSaved(InputDevData.BUS).getValueForConfig());
+                final Value type = getParamSaved(InputDevData.TYPE);
+                if (type == null) {
+                    parameters.put(InputDevData.SAVED_TYPE, null);
+                } else {
+                    parameters.put(InputDevData.SAVED_TYPE,
+                                   type.getValueForConfig());
+                }
+
+                final Value bus = getParamSaved(InputDevData.BUS);
+                if (bus == null) {
+                    parameters.put(InputDevData.SAVED_BUS, null);
+                } else {
+                    parameters.put(InputDevData.SAVED_BUS,
+                                   bus.getValueForConfig());
+                }
+
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -360,17 +372,17 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final String type = getParamSaved(InputDevData.TYPE).getValueForConfig();
-        if (type == null) {
+        final Value type = getParamSaved(InputDevData.TYPE);
+        if (type == null || type.isNothingSelected()) {
             s.append("new input device...");
         } else {
-            s.append(type);
+            s.append(type.getValueForGui());
         }
 
-        final String bus = getParamSaved(InputDevData.BUS).getValueForConfig();
-        if (bus != null) {
+        final Value bus = getParamSaved(InputDevData.BUS);
+        if (bus != null && !bus.isNothingSelected()) {
             s.append(" (");
-            s.append(bus);
+            s.append(bus.getValueForConfig());
             s.append(')');
         }
         return s.toString();

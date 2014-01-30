@@ -324,8 +324,13 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                parameters.put(ParallelSerialData.SAVED_TYPE,
-                               getParamSaved(ParallelSerialData.TYPE).getValueForConfig());
+                final Value type = getParamSaved(ParallelSerialData.TYPE);
+                if (type == null) {
+                    parameters.put(ParallelSerialData.SAVED_TYPE, null);
+                } else {
+                    parameters.put(ParallelSerialData.SAVED_TYPE,
+                                   type.getValueForConfig());
+                }
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -452,7 +457,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         if (ParallelSerialData.SOURCE_PATH.equals(param)) {
             final Value sourceFile =
                                 getParamSaved(ParallelSerialData.SOURCE_PATH);
-            final String regexp = "[^/]$";
+            final String regexp = ".*[^/]$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             final Widget paramWi = WidgetFactory.createInstance(
                                   Widget.Type.TEXTFIELD,
