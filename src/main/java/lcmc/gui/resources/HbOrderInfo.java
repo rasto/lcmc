@@ -436,10 +436,7 @@ final class HbOrderInfo extends EditableInfo
     /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
-        if (CRMXML.SCORE_STRING.equals(param)) {
-            return false;
-        }
-        return true;
+        return !CRMXML.SCORE_STRING.equals(param);
     }
 
     /** Whether the parameter should be enabled. */

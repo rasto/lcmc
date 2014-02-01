@@ -1069,7 +1069,6 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             }
                             if (si.getService().isAvailable()
                                 && runningOnNode) {
-                                continue;
                             } else {
                                 return "not available";
                             }
@@ -1137,7 +1136,6 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                              && si.getService().isAvailable()
                              && (si.getMigratedTo(CRM.LIVE) != null
                                  || si.getMigratedFrom(CRM.LIVE) != null)) {
-                            continue;
                         } else {
                             return "not available";
                         }
@@ -1209,9 +1207,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                               CRM.LIVE);
 
 
-                    if (gr != null && gr.size() > 1) {
-                        continue;
-                    } else {
+                    if (gr == null || gr.size() <= 1) {
                         return "you can remove the group";
                     }
                 }
@@ -1440,10 +1436,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                if (Tools.versionBeforePacemaker(dcHost)) {
-                    return false;
-                }
-                return true;
+                return !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
             public void mouseOut() {

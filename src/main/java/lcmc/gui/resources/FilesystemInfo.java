@@ -117,10 +117,7 @@ final class FilesystemInfo extends ServiceInfo {
             return false;
         }
         final Widget wi = getWidget(FS_RES_PARAM_DEV, null);
-        if (wi == null || wi.getValue() == null) {
-            return false;
-        }
-        return true;
+        return wi != null && wi.getValue() != null;
     }
 
     /** Applies changes to the Filesystem service parameters. */
@@ -193,8 +190,7 @@ final class FilesystemInfo extends ServiceInfo {
                                 if (!(value instanceof Info)) {
                                     return;
                                 }
-                                if (value == null
-                                    || value.isNothingSelected()) {
+                                if (value.isNothingSelected()) {
                                     return;
                                 }
                                 final String selectedValue =
@@ -234,7 +230,7 @@ final class FilesystemInfo extends ServiceInfo {
                 selectedValue = selectedInfo;
             }
             Value defaultValue = null;
-            if (selectedValue == null || selectedValue.isNothingSelected()) {
+            if (selectedValue.isNothingSelected()) {
                 defaultValue = 
                           new StringValue() {
                               @Override

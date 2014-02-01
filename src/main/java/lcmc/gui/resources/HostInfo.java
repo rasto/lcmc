@@ -310,10 +310,7 @@ public final class HostInfo extends Info {
              */
             @Override
             public boolean isEnabled() {
-                if (Tools.versionBeforePacemaker(host)) {
-                    return false;
-                }
-                return true;
+                return !Tools.versionBeforePacemaker(host);
             }
 
             @Override
@@ -580,8 +577,7 @@ public final class HostInfo extends Info {
                     }
                 }
             };
-        if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
+        final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
                     cb.new ClMenuItemCallback(allMigrateFromItem, host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -600,10 +596,8 @@ public final class HostInfo extends Info {
                         }
                     }
                 }
-            };
-            addMouseOverListener(allMigrateFromItem,
-                                 allMigrateFromItemCallback);
-        }
+        };
+        addMouseOverListener(allMigrateFromItem, allMigrateFromItemCallback);
         items.add(allMigrateFromItem);
         /* Stop corosync/openais. */
         final MyMenuItem stopCorosyncItem =

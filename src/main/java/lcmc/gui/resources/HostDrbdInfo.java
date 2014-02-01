@@ -377,10 +377,7 @@ public final class HostDrbdInfo extends Info {
                     if (!host.isConnected()) {
                         return false;
                     }
-                    if (!host.isDrbdProxyRunning()) {
-                        return false;
-                    }
-                    return true;
+                    return host.isDrbdProxyRunning();
                 }
 
                 @Override
@@ -414,10 +411,7 @@ public final class HostDrbdInfo extends Info {
                     if (!host.isConnected()) {
                         return false;
                     }
-                    if (!host.isDrbdProxyRunning()) {
-                        return false;
-                    }
-                    return true;
+                    return host.isDrbdProxyRunning();
                 }
 
                 @Override

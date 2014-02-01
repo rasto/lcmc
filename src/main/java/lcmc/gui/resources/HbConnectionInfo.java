@@ -106,17 +106,14 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns whether one of the services are newly added. */
     public final boolean isNew() {
-        if ((lastServiceInfoRsc != null
-             && lastServiceInfoRsc.getService().isNew())
-            || (lastServiceInfoWithRsc != null
-                && lastServiceInfoWithRsc.getService().isNew())
-            || (lastServiceInfoParent != null
-                && lastServiceInfoParent.getService().isNew())
-            || (lastServiceInfoChild != null
-                && lastServiceInfoChild.getService().isNew())) {
-            return true;
-        }
-        return false;
+        return (lastServiceInfoRsc != null
+                && lastServiceInfoRsc.getService().isNew())
+                || (lastServiceInfoWithRsc != null
+                    && lastServiceInfoWithRsc.getService().isNew())
+                || (lastServiceInfoParent != null
+                    && lastServiceInfoParent.getService().isNew())
+                || (lastServiceInfoChild != null
+                    && lastServiceInfoChild.getService().isNew());
     }
 
     /**
@@ -370,10 +367,7 @@ public class HbConnectionInfo extends EditableInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                if (Tools.versionBeforePacemaker(dcHost)) {
-                    return false;
-                }
-                return true;
+                return !Tools.versionBeforePacemaker(dcHost);
             }
 
             @Override

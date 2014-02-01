@@ -703,10 +703,7 @@ public abstract class EditableInfo extends Info {
                 return true;
             }
             final Matcher m = p.matcher(newValue.getValueForConfig());
-            if (m.matches()) {
-                return true;
-            }
-            return false;
+            return m.matches();
         }
         return true;
     }

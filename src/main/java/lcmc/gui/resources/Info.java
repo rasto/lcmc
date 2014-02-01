@@ -495,9 +495,13 @@ public class Info implements Comparable<Info>, Value {
 
     /** Returns popup object without updating. */
     public void hidePopup() {
+        final JPopupMenu popup0;
         mPopupLock.lock();
-        final JPopupMenu popup0 = popup;
-        mPopupLock.unlock();
+        try {
+            popup0 = popup;
+        } finally {
+            mPopupLock.unlock();
+        }
         if (popup0 != null) {
             Tools.invokeLater(new Runnable() {
                 @Override
