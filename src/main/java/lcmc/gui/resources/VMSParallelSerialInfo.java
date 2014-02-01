@@ -137,10 +137,6 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                         Widget.Type.RADIOGROUP);
     }
 
-    /** Whether the parameter is enabled only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
-                                                        new HashSet<String>();
-
     /** Whether the parameter is required. */
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(
@@ -410,7 +406,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     /** Whether the parameter should be enabled only in advanced mode. */
     @Override
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
+         return false;
     }
 
     /** Returns access type of this parameter. */
@@ -434,11 +430,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                 }
             });
         }
-        if (isRequired(param)
-            && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
 
     /**

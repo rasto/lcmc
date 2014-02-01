@@ -70,9 +70,6 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{InputDevData.TYPE}));
 
-    /** Default name. */
-    private static final Map<String, Value> DEFAULTS_MAP =
-                                                 new HashMap<String, Value>();
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
@@ -133,7 +130,7 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     /** Returns default value for specified parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
+        return null;
     }
 
     /** Returns parameters. */
@@ -323,11 +320,8 @@ final class VMSInputDevInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (isRequired(param)
-            && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
 
     /** Updates parameters. */

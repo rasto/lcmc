@@ -542,13 +542,10 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         if ((DiskData.SOURCE_FILE.equals(param) && FILE_TYPE.equals(type))
             || (DiskData.SOURCE_DEVICE.equals(param)
                 && BLOCK_TYPE.equals(type))) {
-            if (BUS_TYPE_CDROM.equals(getComboBoxValue(DiskData.TARGET_BUS_TYPE))
-                || BUS_TYPE_FLOPPY.equals(getComboBoxValue(
-                                                 DiskData.TARGET_BUS_TYPE))) {
-                return false;
-            } else {
-                return true;
-            }
+            return !BUS_TYPE_CDROM.equals(
+                                    getComboBoxValue(DiskData.TARGET_BUS_TYPE))
+                    && !BUS_TYPE_FLOPPY.equals(getComboBoxValue(
+                                                     DiskData.TARGET_BUS_TYPE));
         }
         return IS_REQUIRED.contains(param);
     }
@@ -882,11 +879,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
             checkOneParam(DiskData.SOURCE_FILE);
             checkOneParam(DiskData.SOURCE_DEVICE);
         }
-        if (isRequired(param)
-            && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
 
     /** Whether the parameter should be enabled. */

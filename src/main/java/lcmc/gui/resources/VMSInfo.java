@@ -51,6 +51,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Collections;
 import lcmc.data.Value;
 
 /**
@@ -65,10 +66,11 @@ public final class VMSInfo extends CategoryInfo {
                                                   new HashMap<String, Color>();
     /** Default widths for columns. */
     private static final Map<Integer, Integer> DEFAULT_WIDTHS =
-                                                new HashMap<Integer, Integer>();
-    static {
-        DEFAULT_WIDTHS.put(4, 80); /* remove button column */
-    }
+            Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
+                    private static final long serialVersionUID = 1L;
+            {
+                put(4, 80); /* remove button column */
+            }});
     /** Creates the new VMSInfo object with name of the category. */
     public VMSInfo(final String name, final Browser browser) {
         super(name, browser);

@@ -80,12 +80,6 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                                  Tools.getDefault("BackIcon"));
-    /** Default units. */
-    private static final Map<String, String> DEFAULT_UNIT =
-                                                new HashMap<String, String>();
-    /** If it has units. */
-    private static final Map<String, Boolean> HAS_UNIT =
-                                                new HashMap<String, Boolean>();
     /** Cache for files. */
     private final Map<String, LinuxFile> linuxFileCache =
                                             new HashMap<String, LinuxFile>();
@@ -232,7 +226,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Returns whether this parameter has a unit prefix. */
     @Override
     protected final boolean hasUnitPrefix(final String param) {
-        return HAS_UNIT.containsKey(param) && HAS_UNIT.get(param);
+        return false;
     }
 
     /** Returns units. */
@@ -243,7 +237,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Returns the default unit for the parameter. */
     protected final String getDefaultUnit(final String param) {
-        return DEFAULT_UNIT.get(param);
+        return null;
     }
 
     /** Returns columns for the table. */
@@ -479,10 +473,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             @Override
             public final boolean isRoot(final File f) {
                 final String path = Tools.getUnixPath(f.toString());
-                if ("/".equals(path)) {
-                    return true;
-                }
-                return false;
+                return "/".equals(path);
             }
 
             @Override
@@ -704,10 +695,10 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (this.getName() != other.getName() && (this.getName() == null || !this.getName().equals(other.getName()))) {
             return false;
         }
-        if (this.vmsVirtualDomainInfo != other.vmsVirtualDomainInfo && (this.vmsVirtualDomainInfo == null || !this.vmsVirtualDomainInfo.equals(other.vmsVirtualDomainInfo))) {
-            return false;
-        }
-        return true;
+        return this.vmsVirtualDomainInfo == other.vmsVirtualDomainInfo
+               || (this.vmsVirtualDomainInfo != null
+                   && this.vmsVirtualDomainInfo.equals(
+                                                  other.vmsVirtualDomainInfo));
     }
 
     @Override

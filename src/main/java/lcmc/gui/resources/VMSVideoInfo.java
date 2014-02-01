@@ -58,9 +58,6 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                                                 VideoData.MODEL_VRAM,
                                                 VideoData.MODEL_HEADS}));
 
-    /** Field type. */
-    private static final Map<String, Widget.Type> FIELD_TYPES =
-                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
@@ -87,9 +84,6 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{VideoData.MODEL_TYPE}));
 
-    /** Default name. */
-    private static final Map<String, Value> DEFAULTS_MAP =
-                                                 new HashMap<String, Value>();
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
@@ -154,7 +148,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Returns default value for specified parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
+        return null;
     }
 
     /** Returns parameters. */
@@ -220,7 +214,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Returns type of the field. */
     @Override
     protected Widget.Type getFieldType(final String param) {
-        return FIELD_TYPES.get(param);
+        return null;
     }
 
     /** Applies the changes. */
@@ -328,11 +322,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (isRequired(param)
-            && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
 
     /** Updates parameters. */

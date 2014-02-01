@@ -100,9 +100,6 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.TYPE}));
 
-    /** Default name. */
-    private static final Map<String, Value> DEFAULTS_MAP =
-                                                 new HashMap<String, Value>();
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
@@ -194,7 +191,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns default value for specified parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
+        return null;
     }
 
     /** Returns parameters. */
@@ -483,11 +480,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 }
             });
         }
-        if (isRequired(param)
-            && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
 
     /** Updates parameters. */

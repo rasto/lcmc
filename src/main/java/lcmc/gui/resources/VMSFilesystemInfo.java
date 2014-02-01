@@ -84,9 +84,6 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
                                        new HashMap<String, Widget.Type>();
-    /** Target devices depending on the target type. */
-    private static final Map<String, String[]> TARGET_DEVICES_MAP =
-                                           new HashMap<String, String[]>();
     static {
         FIELD_TYPES.put(FilesystemData.TYPE, Widget.Type.RADIOGROUP);
         FIELD_TYPES.put(FilesystemData.SOURCE_DIR, Widget.Type.COMBOBOX);
@@ -105,9 +102,6 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Preferred values. */
     private static final Map<String, Value> PREFERRED_MAP =
-                                                 new HashMap<String, Value>();
-    /** Defaults. */
-    private static final Map<String, Value> DEFAULTS_MAP =
                                                  new HashMap<String, Value>();
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
@@ -194,7 +188,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Returns default value for specified parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
+        return null;
     }
 
     /** Returns parameters. */
@@ -410,10 +404,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                 }
             });
         }
-        if (isRequired(param) && (newValue == null || "".equals(newValue.getValueForConfig()))) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !"".equals(newValue.getValueForConfig()));
     }
 
     /** Whether the parameter should be enabled. */

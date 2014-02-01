@@ -113,9 +113,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Preferred values. */
     private static final Map<String, Value> PREFERRED_MAP =
                                                  new HashMap<String, Value>();
-    /** Default values. */
-    private static final Map<String, Value> DEFAULTS_MAP =
-                                                 new HashMap<String, Value>();
+
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
@@ -218,7 +216,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns default value for specified parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
+        return null;
     }
 
     /** Returns parameters. */
@@ -459,10 +457,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
             checkOneParam(InterfaceData.SOURCE_NETWORK);
             checkOneParam(InterfaceData.SOURCE_BRIDGE);
         }
-        if (isRequired(param) && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
     /** Returns combo box for parameter. */
     @Override

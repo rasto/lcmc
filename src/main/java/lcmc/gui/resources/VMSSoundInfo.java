@@ -61,17 +61,10 @@ final class VMSSoundInfo extends VMSHardwareInfo {
         SHORTNAME_MAP.put(SoundData.MODEL, "Model");
     }
 
-    /** Whether the parameter is editable only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
-                                                        new HashSet<String>();
-
     /** Whether the parameter is required. */
     private static final Set<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{SoundData.MODEL}));
 
-    /** Default name. */
-    private static final Map<String, Value> DEFAULTS_MAP =
-                                                 new HashMap<String, Value>();
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
@@ -132,7 +125,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     /** Returns default value for specified parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return DEFAULTS_MAP.get(param);
+        return null;
     }
 
     /** Returns parameters. */
@@ -296,7 +289,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     /** Whether the parameter should be enabled. */
     @Override
     protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
+         return false;
     }
 
     /** Returns access type of this parameter. */
@@ -308,11 +301,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (isRequired(param)
-            && (newValue == null || newValue.isNothingSelected())) {
-            return false;
-        }
-        return true;
+        return !isRequired(param)
+               || (newValue != null && !newValue.isNothingSelected());
     }
 
     /** Updates parameters. */
