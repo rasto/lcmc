@@ -24,17 +24,17 @@ package lcmc.gui.resources;
 import lcmc.data.Value;
 
 /**
- * This interface provides getDevice function for drbd block devices or block
- * devices that don't have drbd over them but are used by crm.
+ * This interface provides getDevice function for DRBD block devices or block
+ * devices that don't have DRBD over them but are used by CRM.
  */
 public interface CommonDeviceInterface extends Value {
     /** Returns the name. */
     String getName();
     /** Returns the device name. */
     String getDevice();
-    /** Sets whether the device is used by crm. */
+    /** Sets whether the device is used by CRM. */
     void setUsedByCRM(ServiceInfo isUsedByCRM);
-    /** Returns whether the device is used by crm. */
+    /** Returns whether the device is used by CRM. */
     boolean isUsedByCRM();
     /** Returns the last created filesystem. */
     String getCreatedFs();

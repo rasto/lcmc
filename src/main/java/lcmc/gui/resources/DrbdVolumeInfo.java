@@ -1234,10 +1234,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     @Override
     protected boolean isInteger(final String param) {
-        if (DRBD_VOL_PARAM_NUMBER.equals(param)) {
-            return true;
-        }
-        return false;
+        return DRBD_VOL_PARAM_NUMBER.equals(param);
     }
 
     /** Returns browser object of this info. */
@@ -1447,6 +1444,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         return getDrbdResourceInfo().getDrbdInfo();
     }
 
+    @Override
     public String getValueForConfig() {
         return getDeviceByRes();
     }

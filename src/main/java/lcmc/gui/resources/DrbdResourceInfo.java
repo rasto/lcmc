@@ -777,7 +777,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             hostPort = hp;
             final Value savedAddress = savedHostAddresses.get(host);
             if (!Tools.areEqual(hostAddress, savedAddress)) {
-                if (hostAddress == null || hostAddress.isNothingSelected()) {
+                if (hostAddress.isNothingSelected()) {
                     savedHostAddresses.remove(host);
                 } else {
                     savedHostAddresses.put(host, hostAddress);
@@ -816,10 +816,10 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
             final HostProxy hostProxy =
                                  dxml.getHostProxy(host.getName(), getName());
             Host proxyHost;
-            Value insideIp = null;
-            Value outsideIp = null;
-            Value insidePort = null;
-            Value outsidePort = null;
+            Value insideIp;
+            Value outsideIp;
+            Value insidePort;
+            Value outsidePort;
             if (hostProxy != null) {
                 insideIp = hostProxy.getInsideIp();
                 outsideIp = hostProxy.getOutsideIp();
@@ -884,7 +884,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostInsidePort, savedInsidePort)) {
             savedInsidePort = hostInsidePort;
             for (final Host host : getHosts()) {
-                host.getBrowser().getUsedPorts().add(hostInsidePort.getValueForConfig());
+                host.getBrowser().getUsedPorts().add(
+                                            hostInsidePort.getValueForConfig());
             }
             if (infoPanelOk) {
                 final Widget wi = insidePortComboBox;
@@ -897,7 +898,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (!Tools.areEqual(hostOutsidePort, savedOutsidePort)) {
             savedOutsidePort = hostOutsidePort;
             for (final Host host : configuredProxyHosts) {
-                host.getBrowser().getUsedProxyPorts().add(hostOutsidePort.getValueForConfig());
+                host.getBrowser().getUsedProxyPorts().add(
+                                          hostOutsidePort.getValueForConfig());
             }
             if (infoPanelOk) {
                 final Widget wi = outsidePortComboBox;
@@ -2370,12 +2372,13 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Return list of DRBD ports for combobox. */
-    List<Value> getPossibleDrbdPorts(int defaultPortInt) {
+    List<Value> getPossibleDrbdPorts(final int defaultPortInt) {
         int i = 0;
         final List<Value> drbdPorts = new ArrayList<Value>();
         drbdPorts.add(null);
+        int defaultPortInt0 = defaultPortInt;
         while (i < 10) {
-            final String port = Integer.toString(defaultPortInt);
+            final String port = Integer.toString(defaultPortInt0);
             boolean contains = false;
             for (final Host host : getHosts()) {
                 if (host.getBrowser().getUsedPorts().contains(port)) {
@@ -2386,7 +2389,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 drbdPorts.add(new StringValue(port));
                 i++;
             }
-            defaultPortInt++;
+            defaultPortInt0++;
         }
         return drbdPorts;
     }

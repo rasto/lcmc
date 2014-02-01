@@ -1855,10 +1855,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                if (Tools.versionBeforePacemaker(dcHost)) {
-                    return false;
-                }
-                return true;
+                return !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
             public void mouseOut() {

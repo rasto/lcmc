@@ -92,8 +92,8 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     @Override
     public boolean isUsedByCRM() {
         boolean is = true;
-        for (int i = 0; i < blockDevices.length; i++) {
-            is = is && blockDevices[i].isUsedByCRM();
+        for (final BlockDevice blockDevice : blockDevices) {
+            is = is && blockDevice.isUsedByCRM();
         }
         return is;
     }

@@ -438,10 +438,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 if (dcHost == null) {
                     return false;
                 }
-                if (Tools.versionBeforePacemaker(dcHost)) {
-                    return false;
-                }
-                return true;
+                return !Tools.versionBeforePacemaker(dcHost);
             }
 
             @Override
@@ -547,10 +544,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                 apply(false);
                             } catch (final Exceptions.DrbdConfigException dce) {
                                 LOG.appError("getInfoPanel: config failed", dce);
-                                return;
                             } catch (final UnknownHostException e) {
                                 LOG.appError("getInfoPanel: config failed", e);
-                                return;
                             } finally {
                                 getBrowser().drbdStatusUnlock();
                             }
@@ -781,26 +776,25 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final BlockDevInfo bdi2 = dvi.getSecondBlockDevInfo();
         final String device = dvi.getDevice();
 
-        if (bdi1 != null) {
-            bdi1.setDrbd(true);
-            bdi1.setDrbdVolumeInfo(dvi);
-            bdi1.getBlockDevice().setDrbdBlockDevice(
-                                    bdi1.getHost().getDrbdBlockDevice(device));
-            bdi1.cleanup();
-            bdi1.resetInfoPanel();
-            bdi1.setInfoPanel(null); /* reload panel */
-            bdi1.getInfoPanel();
-        }
-        if (bdi2 != null) {
-            bdi2.setDrbd(true);
-            bdi2.setDrbdVolumeInfo(dvi);
-            bdi2.getBlockDevice().setDrbdBlockDevice(
-                                    bdi2.getHost().getDrbdBlockDevice(device));
-            bdi2.cleanup();
-            bdi2.resetInfoPanel();
-            bdi2.setInfoPanel(null); /* reload panel */
-            bdi2.getInfoPanel();
-        }
+        bdi1.setDrbd(true);
+        bdi1.setDrbdVolumeInfo(dvi);
+        bdi1.getBlockDevice().setDrbdBlockDevice(
+                bdi1.getHost().getDrbdBlockDevice(device));
+        bdi1.cleanup();
+        bdi1.resetInfoPanel();
+        bdi1.setInfoPanel(null); /* reload panel */
+
+        bdi1.getInfoPanel();
+
+        bdi2.setDrbd(true);
+        bdi2.setDrbdVolumeInfo(dvi);
+        bdi2.getBlockDevice().setDrbdBlockDevice(
+                bdi2.getHost().getDrbdBlockDevice(device));
+        bdi2.cleanup();
+        bdi2.resetInfoPanel();
+        bdi2.setInfoPanel(null); /* reload panel */
+
+        bdi2.getInfoPanel();
 
         final DefaultMutableTreeNode drbdVolumeNode =
                                            new DefaultMutableTreeNode(dvi);

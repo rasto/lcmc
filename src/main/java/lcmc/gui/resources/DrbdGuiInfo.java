@@ -199,10 +199,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
         if (type == null) {
             return false;
         }
-        if (ClusterBrowser.DRBD_RES_BOOL_TYPE_NAME.equals(type)) {
-            return true;
-        }
-        return false;
+        return ClusterBrowser.DRBD_RES_BOOL_TYPE_NAME.equals(type);
     }
 
     /** Returns the type of the parameter (like boolean). */
@@ -356,7 +353,6 @@ abstract class DrbdGuiInfo extends EditableInfo {
 
                 if (inPlugin) {
                     sectionConfig.append("\t\t}\n");
-                    inPlugin = false;
                 }
 
                 if (sectionConfig.length() > 0) {

@@ -2809,9 +2809,6 @@ public final class BlockDevInfo extends EditableInfo {
             return false;
         }
         final String vg = bd.getVolumeGroupOnPhysicalVolume();
-        if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
-            return false;
-        }
-        return true;
+        return getHost().getLogicalVolumesFromVolumeGroup(vg) == null;
     }
 }
