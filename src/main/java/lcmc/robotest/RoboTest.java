@@ -68,7 +68,7 @@ public final class RoboTest {
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Don't move the mosue pointer smothly. */
-    private static final boolean MOVE_MOUSE_FAST = false;
+    private static final boolean MOVE_MOUSE_FAST = true;
     /** Confirm remove variable. */
     static final boolean CONFIRM_REMOVE = true;
     /** Y position of Primitive/Clone/MS radio buttons. */
@@ -1742,9 +1742,11 @@ public final class RoboTest {
         while (c == null && i < 30 && !aborted) {
             c = (Component) findComponent(text, number);
             if (i > 0) {
+                sleepNoFactor(100);
+            } else if (i > 10) {
+                sleepNoFactor(1000);
                 LOG.info("moveTo: cannot find: " + text);
             }
-            sleepNoFactor(1000);
             i++;
         }
         if (aborted) {
@@ -1861,9 +1863,9 @@ public final class RoboTest {
         if (aborted) {
             return false;
         }
-        sleepNoFactor(1000);
+        sleepNoFactor(100);
         Component dialog = getFocusedWindow();
-        for (int i = 0; i < 60; i++) {
+        for (int i = 0; i < 30; i++) {
             if (dialog instanceof JDialog || aborted) {
                 break;
             }
@@ -1890,7 +1892,7 @@ public final class RoboTest {
 
     static void saveAndExit() {
         Tools.save(Tools.getConfigData().getSaveFile(), false);
-        sleepNoFactor(10000);
+        sleepNoFactor(5000);
         System.exit(0);
     }
 
