@@ -51,15 +51,11 @@ final class DrbdTest1 {
         chooseDrbdResource(cluster);
         addDrbdVolume();
         addBlockDevice();
-        sleep(1000);
         addBlockDevice();
-        sleep(20000);
         addMetaData();
         addFileSystem();
-        sleep(5000);
         moveTo(Tools.getString("Dialog.Dialog.Finish"));
         leftClick();
-        sleep(10000);
         checkDRBDTest(drbdTest, 1.1);
         for (int i = 0; i < 2; i++) {
             info("i: " + i);
@@ -73,15 +69,11 @@ final class DrbdTest1 {
                                 final int blockDevY) {
         moveTo(334, blockDevY); /* add drbd resource */
         rightClick();
-        sleep(1000);
         moveTo(Tools.getString("HostBrowser.Drbd.AddDrbdResource"));
-        sleep(1000);
         moveTo(cluster.getHostsArray()[1].getName());
         sleep(2000);
         press(KeyEvent.VK_DOWN);
-        sleep(500);
         press(KeyEvent.VK_ENTER);
-        sleep(10000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("addDrbdResource");
@@ -93,7 +85,6 @@ final class DrbdTest1 {
 
     static void newDrbdResource() {
         drbdNext();
-        sleep(10000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("newDrbdResource");
@@ -103,17 +94,13 @@ final class DrbdTest1 {
                                             final boolean proxy) {
         moveTo("on " + hostName, MComboBox.class); /* interface */
         leftClick();
-        sleep(500);
         if (proxy) {
             press(KeyEvent.VK_P); /* select first interface to proxy*/
-            sleep(200);
             press(KeyEvent.VK_DOWN);
         } else {
             press(KeyEvent.VK_E); /* select first interface */
         }
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(1000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("chooseDrbdResourceInterface");
@@ -126,7 +113,6 @@ final class DrbdTest1 {
                                     !PROXY);
 
         drbdNext();
-        sleep(10000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("chooseDrbdResource");
@@ -134,7 +120,6 @@ final class DrbdTest1 {
 
     static void addDrbdVolume() {
         drbdNext();
-        sleep(10000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("addDrbdVolume");
@@ -142,7 +127,6 @@ final class DrbdTest1 {
 
     static void addBlockDevice() {
         drbdNext();
-        sleep(10000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("addBlockDevice");
@@ -150,7 +134,6 @@ final class DrbdTest1 {
 
     static void addMetaData() {
         drbdNext();
-        sleep(30000);
         moveTo(500, 300);
         rightClick();
         dialogColorTest("addMetaData");
@@ -171,7 +154,6 @@ final class DrbdTest1 {
         rightClick(); /* remove */
         moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
         leftClick();
-        Tools.sleep(10000);
         dialogColorTest("removeDrbdVolume");
         if (really) {
             confirmRemove();
@@ -183,16 +165,13 @@ final class DrbdTest1 {
     static void createPV(final int blockDevX, final int blockDevY) {
         moveTo(blockDevX, blockDevY);
         rightClick();
-        sleep(1000);
         moveTo("Create PV");
         leftClick();
-        sleep(5000);
     }
 
     static void pvRemove(final int blockDevX, final int blockDevY) {
         moveTo(blockDevX, blockDevY);
         rightClick();
-        sleep(3000);
         moveTo("Remove PV");
         leftClick();
     }
@@ -200,10 +179,8 @@ final class DrbdTest1 {
     static void createVG(final Cluster cluster, final int blockDevY) {
         moveTo(334, blockDevY);
         rightClick();
-        sleep(1000);
         moveTo("Create VG");
         leftClick();
-        sleep(2000);
         moveTo(cluster.getHostsArray()[1].getName());
         leftClick();
         moveTo("Create VG"); /* button */
@@ -213,25 +190,20 @@ final class DrbdTest1 {
     static void createVGMulti(final int blockDevY) {
         moveTo(334, blockDevY);
         rightClick();
-        sleep(1000);
         moveTo("Create VG");
         leftClick();
-        sleep(2000);
         moveTo("Create VG"); /* button */
         leftClick();
     }
 
     static void createLV(final Cluster cluster) {
         rightClick();
-        sleep(1000);
         moveTo("Create LV in VG");
         leftClick();
-        sleep(2000);
         moveTo(cluster.getHostsArray()[1].getName());
         leftClick();
         moveTo("Create"); /* button */
         leftClick();
-        sleep(3000);
         moveTo("Close");
         leftClick();
     }
@@ -240,20 +212,16 @@ final class DrbdTest1 {
         rightClick();
         moveTo("Create LV in VG");
         leftClick();
-        sleep(2000);
         moveTo("Create"); /* button */
         leftClick();
-        sleep(3000);
         moveTo("Close");
         leftClick();
     }
 
     static void resizeLV(final Cluster cluster) {
         rightClick();
-        sleep(1000);
         moveTo("Resize LV");
         leftClick();
-        sleep(5000);
         press(KeyEvent.VK_2);
         press(KeyEvent.VK_5);
         press(KeyEvent.VK_2);
@@ -262,17 +230,14 @@ final class DrbdTest1 {
 
         moveTo("Resize");
         leftClick();
-        sleep(3000);
         moveTo("Close");
         leftClick();
     }
 
     static void vgRemove(final Cluster cluster) {
         rightClick();
-        sleep(1000);
         moveTo("Remove VG");
         leftClick();
-        sleep(2000);
         moveTo(cluster.getHostsArray()[1].getName());
         leftClick();
         moveTo("Remove VG"); /* button */
@@ -280,23 +245,17 @@ final class DrbdTest1 {
     }
 
     static void lvRemove() {
-        sleep(5000);
         rightClick();
-        sleep(5000);
         moveTo("Remove LV");
         leftClick();
-        sleep(2000);
         moveTo("Remove"); /* button */
         leftClick();
     }
 
     static void lvRemoveMulti() {
-        sleep(5000);
         rightClick();
-        sleep(5000);
         moveTo("Remove selected LV");
         leftClick();
-        sleep(2000);
         moveTo("Remove"); /* button */
         leftClick();
     }

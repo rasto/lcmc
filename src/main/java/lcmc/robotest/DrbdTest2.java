@@ -51,7 +51,6 @@ final class DrbdTest2 {
 
             moveTo(Tools.getString("Dialog.Dialog.Cancel"));
             leftClick();
-            sleep(2000);
         }
 
         info(drbdTest + "/2");
@@ -60,7 +59,6 @@ final class DrbdTest2 {
 
         moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
-        sleep(20000);
 
         info(drbdTest + "/3");
         addDrbdResource(cluster, blockDevY);
@@ -69,18 +67,15 @@ final class DrbdTest2 {
 
         moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
-        sleep(10000);
 
         info(drbdTest + "/4");
         addDrbdResource(cluster, blockDevY);
         chooseDrbdResource(cluster);
         addDrbdVolume();
         addBlockDevice();
-        sleep(20000);
 
         moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
-        sleep(10000);
 
         info(drbdTest + "/5");
         addDrbdResource(cluster, blockDevY);
@@ -88,13 +83,11 @@ final class DrbdTest2 {
         addDrbdVolume();
         addBlockDevice();
         addBlockDevice();
-        sleep(20000);
         checkDRBDTest(drbdTest, 1);
 
         moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         confirmRemove();
-        sleep(60000);
 
         info(drbdTest + "/6");
         addDrbdResource(cluster, blockDevY);
@@ -102,13 +95,11 @@ final class DrbdTest2 {
         addDrbdVolume();
         addBlockDevice();
         addBlockDevice();
-        sleep(20000);
         addMetaData();
 
         moveTo(Tools.getString("Dialog.Dialog.Cancel"));
         leftClick();
         confirmRemove();
-        sleep(20000);
 
         info(drbdTest + "/7");
         addDrbdResource(cluster, blockDevY);
@@ -116,18 +107,13 @@ final class DrbdTest2 {
         addDrbdVolume();
         addBlockDevice();
         addBlockDevice();
-        sleep(20000);
         addMetaData();
         addFileSystem();
         checkDRBDTest(drbdTest, 1.1);
-        sleep(10000);
 
         moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        sleep(2000);
         leftClick();
-        sleep(20000);
         confirmRemove();
-        sleep(20000);
 
         info(drbdTest + "/8");
         addDrbdResource(cluster, blockDevY);
@@ -135,12 +121,10 @@ final class DrbdTest2 {
         addDrbdVolume();
         addBlockDevice();
         addBlockDevice();
-        sleep(20000);
         addMetaData();
         addFileSystem();
         moveTo(Tools.getString("Dialog.Dialog.Finish"));
         leftClick();
-        sleep(10000);
         checkDRBDTest(drbdTest, 1.1);
 
         for (int i = 0; i < 3; i++) {
