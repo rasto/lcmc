@@ -454,11 +454,7 @@ public final class DrbdXML extends XML {
         //}
 
         if (value == null || value.isNothingSelected()) {
-            if (isRequired(param)) {
-                correctValue = false;
-            } else {
-                correctValue = true;
-            }
+            correctValue = !isRequired(param);
         } else if ("boolean".equals(type)) {
             if (!value.equals(CONFIG_YES)
                 && !value.equals(CONFIG_NO)) {
@@ -554,9 +550,9 @@ public final class DrbdXML extends XML {
                               final boolean required) {
         addParameter(section, param, defaultValue, required);
         final List<Value> l = new ArrayList<Value>();
-        for (int i = 0; i < items.length; i++) {
-            if (!l.contains(items[i])) {
-                l.add(items[i]);
+        for (Value item : items) {
+            if (!l.contains(item)) {
+                l.add(item);
             }
         }
         paramItemsMap.put(param, l);

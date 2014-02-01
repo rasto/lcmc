@@ -203,18 +203,17 @@ public final class MainMenu extends JPanel implements ActionListener {
         menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels =
                                         UIManager.getInstalledLookAndFeels();
-        for (int i = 0; i < lookAndFeels.length; i++) {
-            final String className = lookAndFeels[i].getClassName();
+        for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+            final String className = lookAndFeel.getClassName();
             final String classNamePart =
-                        className.substring(className.lastIndexOf('.') + 1);
-
+                    className.substring(className.lastIndexOf('.') + 1);
             LOOK_AND_FEEL_MAP.put(classNamePart, className);
             addMenuItem(classNamePart,
-                        menuLookAndFeel,
-                        0,
-                        0,
-                        lookAndFeelActionListener(),
-                        null);
+                    menuLookAndFeel,
+                    0,
+                    0,
+                    lookAndFeelActionListener(),
+                    null);
         }
         submenu.add(menuLookAndFeel);
         menuBar.add(submenu);

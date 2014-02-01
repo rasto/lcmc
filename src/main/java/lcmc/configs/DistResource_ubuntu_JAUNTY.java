@@ -37,7 +37,7 @@ public final class DistResource_ubuntu_JAUNTY
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "ubuntu-JAUNTY"},
         {"distributiondir",    "ubuntu-jaunty-server"},
 

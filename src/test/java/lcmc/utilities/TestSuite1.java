@@ -106,12 +106,12 @@ public final class TestSuite1 {
     }
 
     //private static PrintStream realOut = System.out;
-    private static PrintStream realOut = new PrintStream(
+    private static final PrintStream realOut = new PrintStream(
                                     new FileOutputStream(FileDescriptor.out));
 
     private static StringBuilder stdout = new StringBuilder();
 
-    private static OutputStream out = new OutputStream() {
+    private static final OutputStream out = new OutputStream() {
          @Override
          public void write(final int b) throws IOException {
              stdout.append(String.valueOf((char) b));

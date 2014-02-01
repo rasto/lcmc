@@ -48,8 +48,6 @@ import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -69,9 +67,6 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     private final JTextField textFieldPart;
     /** Combo box with units. */
     private final MComboBox<Unit> unitComboBox;
-    /** Pattern that matches value and unit. */
-    private static final Pattern UNIT_PATTERN =
-                                             Pattern.compile("^(\\d+)(\\D*)$");
     /** Whether the unit combo box should be enabled. */
     private boolean unitEnabled = true;
 
@@ -363,11 +358,11 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                                      final Unit[] items) {
         Unit selectedUnit = null;
         if (items != null) {
-            for (int i = 0; i < items.length; i++) {
-                if (items[i].equals(selectedValue)) {
-                    selectedUnit = items[i];
+            for (Unit item : items) {
+                if (item.equals(selectedValue)) {
+                    selectedUnit = item;
                 }
-                comboList.add(items[i]);
+                comboList.add(item);
             }
             if (selectedUnit == null && selectedValue != null) {
                 comboList.add(selectedValue);

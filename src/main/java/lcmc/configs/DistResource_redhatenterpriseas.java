@@ -37,7 +37,7 @@ public final class DistResource_redhatenterpriseas
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "redhatenterpriseas"},
         {"arch:i686", "i686"},
         {"distribution", "redhatenterpriseas"},

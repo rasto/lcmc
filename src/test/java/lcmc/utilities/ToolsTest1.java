@@ -20,7 +20,6 @@ import lcmc.Exceptions;
 import lcmc.data.Host;
 import mockit.Deencapsulation;
 
-
 public final class ToolsTest1 extends TestCase {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ToolsTest1.class);
@@ -603,6 +602,7 @@ public final class ToolsTest1 extends TestCase {
     @Test
     public void testEnumToStringArray() {
         assertNull(Tools.enumToStringArray(null));
+        @SuppressWarnings("UseOfObsoleteCollectionType")
         final String[] testString = Tools.enumToStringArray(
                 new Vector<String>(Arrays.asList("a", "b", "c")).elements());
         Assert.assertArrayEquals(new String[]{"a", "b", "c"}, testString);

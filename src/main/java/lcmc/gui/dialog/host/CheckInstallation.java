@@ -292,6 +292,7 @@ final class CheckInstallation extends DialogHost {
             drbdOk = true;
             Tools.invokeLater(new Runnable() {
                 @Override
+                @SuppressWarnings("DeadBranch")
                 public void run() {
                     drbdLabel.setText(": " + ans.trim());
                     if (getHost().isDrbdUpgradeAvailable(ans.trim())) {

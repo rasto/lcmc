@@ -35,7 +35,7 @@ public final class DistResource_fedora_17 extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "fedora-17"},
 
         /* Corosync/Pacemaker clusterlabs */

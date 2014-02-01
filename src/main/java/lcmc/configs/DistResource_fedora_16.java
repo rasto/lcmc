@@ -36,7 +36,7 @@ public final class DistResource_fedora_16 extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "fedora-16"},
 
         {"Heartbeat.deleteFromRc",

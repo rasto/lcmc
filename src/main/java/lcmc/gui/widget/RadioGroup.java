@@ -93,8 +93,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         final JPanel radioPanel = new JPanel(new GridLayout(1, 1));
         mComponentsWriteLock.lock();
         componentsHash.clear();
-        for (int i = 0; i < items.length; i++) {
-            final Value item = items[i];
+        for (Value item : items) {
             final JRadioButton rb = new JRadioButton(item.getValueForGui());
             radioGroupHash.put(item.getValueForConfig(), item);
             rb.setActionCommand(item.getValueForConfig());
@@ -111,10 +110,12 @@ public final class RadioGroup extends GenericWidget<JComponent> {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     mComponentsReadLock.lock();
-                    final Value item =
-                                    radioGroupHash.get(e.getActionCommand());
-                    mComponentsReadLock.unlock();
-                    radioGroupValue = item;
+                    try {
+                        radioGroupValue =
+                                radioGroupHash.get(e.getActionCommand());
+                    } finally {
+                        mComponentsReadLock.unlock();
+                    }
                 }
             });
         }
@@ -131,9 +132,13 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     public void setEnabled(final String s, final boolean enabled) {
         final boolean accessible =
                    Tools.getConfigData().isAccessible(getEnableAccessMode());
+        final JComponent c;
         mComponentsReadLock.lock();
-        final JComponent c = componentsHash.get(s);
-        mComponentsReadLock.unlock();
+        try {
+            c = componentsHash.get(s);
+        } finally {
+            mComponentsReadLock.unlock();
+        }
         if (c != null) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
@@ -153,9 +158,13 @@ public final class RadioGroup extends GenericWidget<JComponent> {
      * by specified string. This works only with RADIOGROUP in a moment.
      */
     public void setVisible(final String s, final boolean visible) {
+        final JComponent c;
         mComponentsReadLock.lock();
-        final JComponent c = componentsHash.get(s);
-        mComponentsReadLock.unlock();
+        try {
+            c = componentsHash.get(s);
+        } finally {
+            mComponentsReadLock.unlock();
+        }
         if (c != null) {
             c.setVisible(visible);
         }
@@ -219,10 +228,13 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item != null) {
+            final JRadioButton rb;
             mComponentsReadLock.lock();
-            final JRadioButton rb =
-                            (JRadioButton) componentsHash.get(item.getValueForConfig());
-            mComponentsReadLock.unlock();
+            try {
+                rb = (JRadioButton) componentsHash.get(item.getValueForConfig());
+            } finally {
+                mComponentsReadLock.unlock();
+            }
             if (rb != null) {
                 rb.setSelected(true);
             }

@@ -304,9 +304,13 @@ public abstract class ResourceGraph {
                                 Thread.currentThread().interrupt();
                             }
                             mTestOnlyFlag.lock();
-                            testOnlyFlag = !testOnlyFlag;
-                            final boolean testOnlyFlagLast = testOnlyFlag;
-                            mTestOnlyFlag.unlock();
+                            final boolean testOnlyFlagLast;
+                            try {
+                                testOnlyFlag = !testOnlyFlag;
+                                testOnlyFlagLast = testOnlyFlag;
+                            } finally {
+                                mTestOnlyFlag.unlock();
+                            }
                             repaint();
                             int sleep = 300;
                             if (testOnlyFlag) {
@@ -328,12 +332,18 @@ public abstract class ResourceGraph {
                                 if (testAnimationList.isEmpty()) {
                                     mTestAnimationListLock.unlock();
                                     mTestOnlyFlag.lock();
-                                    testOnlyFlag = false;
-                                    mTestOnlyFlag.unlock();
+                                    try {
+                                        testOnlyFlag = false;
+                                    } finally {
+                                        mTestOnlyFlag.unlock();
+                                    }
                                     repaint();
                                     mTestAnimationThreadLock.lock();
-                                    testAnimationThread = null;
-                                    mTestAnimationThreadLock.unlock();
+                                    try {
+                                        testAnimationThread = null;
+                                    } finally {
+                                        mTestAnimationThreadLock.unlock();
+                                    }
                                     break FOREVER;
                                 }
                                 mTestAnimationListLock.unlock();

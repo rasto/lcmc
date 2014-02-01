@@ -38,7 +38,7 @@ public final class DistResource_ubuntu_DAPPER
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "ubuntu-DAPPER"},
         {"distributiondir",    "ubuntu-dapper-server"},
 

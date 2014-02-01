@@ -37,7 +37,7 @@ public final class DistResource_ubuntu_LUCID
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "ubuntu-LUCID"},
         {"distributiondir",    "ubuntu-lucid"},
     };

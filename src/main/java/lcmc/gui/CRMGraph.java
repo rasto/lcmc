@@ -518,9 +518,13 @@ public final class CRMGraph extends ResourceGraph {
 
     /** Reverse the edge. */
     void reverse(final HbConnectionInfo hbConnectionInfo) {
+        final Edge e;
         mHbConnectionReadLock.lock();
-        final Edge e = hbconnectionToEdgeMap.get(hbConnectionInfo);
-        mHbConnectionReadLock.unlock();
+        try {
+            e = hbconnectionToEdgeMap.get(hbConnectionInfo);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (e != null && edgeIsColocationList.contains(e)) {
             e.reverse();
         }
@@ -541,10 +545,7 @@ public final class CRMGraph extends ResourceGraph {
             edge = getGraph().findEdge(v, vP);
         }
         unlockGraph();
-        if (edge != null && edgeIsColocationList.contains(edge)) {
-            return true;
-        }
-        return false;
+        return edge != null && edgeIsColocationList.contains(edge);
     }
 
     /** Returns whether these two services are ordered. */
@@ -562,10 +563,7 @@ public final class CRMGraph extends ResourceGraph {
             edge = getGraph().findEdge(v, vP);
         }
         unlockGraph();
-        if (edge != null && edgeIsOrderList.contains(edge)) {
-            return true;
-        }
-        return false;
+        return edge != null && edgeIsOrderList.contains(edge);
     }
 
     /** Adds colocation constraint from parent to the service. */
@@ -652,31 +650,37 @@ public final class CRMGraph extends ResourceGraph {
     /** Removes items from order list. */
     public void clearKeepOrderList() {
         mHbConnectionReadLock.lock();
-        lockGraph();
-        for (final Edge edge : getGraph().getEdges()) {
-            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-            if (hbci != null && !hbci.isNew()) {
-                /* don't remove the new ones. */
-                keepEdgeIsOrderList.remove(edge);
+        try {
+            lockGraph();
+            for (final Edge edge : getGraph().getEdges()) {
+                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+                if (hbci != null && !hbci.isNew()) {
+                    /* don't remove the new ones. */
+                    keepEdgeIsOrderList.remove(edge);
+                }
             }
+            unlockGraph();
+        } finally {
+            mHbConnectionReadLock.unlock();
         }
-        unlockGraph();
-        mHbConnectionReadLock.unlock();
     }
 
     /** Removes items from colocation list. */
     public void clearKeepColocationList() {
         mHbConnectionReadLock.lock();
-        lockGraph();
-        for (final Edge edge : getGraph().getEdges()) {
-            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-            if (hbci != null && !hbci.isNew()) {
-                /* don't remove the new ones. */
-                keepEdgeIsColocationList.remove(edge);
+        try {
+            lockGraph();
+            for (final Edge edge : getGraph().getEdges()) {
+                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+                if (hbci != null && !hbci.isNew()) {
+                    /* don't remove the new ones. */
+                    keepEdgeIsColocationList.remove(edge);
+                }
             }
+            unlockGraph();
+        } finally {
+            mHbConnectionReadLock.unlock();
         }
-        unlockGraph();
-        mHbConnectionReadLock.unlock();
     }
 
     /** Returns label for service vertex. */
@@ -753,7 +757,7 @@ public final class CRMGraph extends ResourceGraph {
     protected void handlePopupVertex(final Vertex v,
                                      final List<Vertex> pickedV,
                                      final Point2D pos) {
-        Info info = null;
+        Info info;
         if (pickedV.size() > 1) {
             info = multiSelectionInfo;
         } else if (vertexToHostMap.containsKey(v)) {
@@ -825,9 +829,13 @@ public final class CRMGraph extends ResourceGraph {
     /** Handles right click on the edge and creates popup menu. */
     @Override
     protected void handlePopupEdge(final Edge edge, final Point2D pos) {
+        final HbConnectionInfo info;
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo info = edgeToHbconnectionMap.get(edge);
-        mHbConnectionReadLock.unlock();
+        try {
+            info = edgeToHbconnectionMap.get(edge);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (info != null) {
             final JPopupMenu p = info.getPopup();
             info.updateMenus(pos);
@@ -938,9 +946,13 @@ public final class CRMGraph extends ResourceGraph {
         }
         final StringBuilder s = new StringBuilder(100);
         s.append(siP.toString());
+        final HbConnectionInfo hbci;
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-        mHbConnectionReadLock.unlock();
+        try {
+            hbci = edgeToHbconnectionMap.get(edge);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (edgeIsOrder && hbci != null && !hbci.isOrdScoreNull(null, null)) {
             s.append(" is started before ");
         } else {
@@ -1034,9 +1046,13 @@ public final class CRMGraph extends ResourceGraph {
         if (s2 == null) {
             return "";
         }
+        final HbConnectionInfo hbci;
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-        mHbConnectionReadLock.unlock();
+        try {
+            hbci = edgeToHbconnectionMap.get(e);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (hbci == null) {
             return "";
         }
@@ -1067,9 +1083,7 @@ public final class CRMGraph extends ResourceGraph {
             && colSType == HbConnectionInfo.ColScoreType.IS_NULL) {
             colScore = "0";
         }
-        if (edgeIsOrder
-            && hbci != null
-            && hbci.isOrdScoreNull(null, null)) {
+        if (edgeIsOrder && hbci.isOrdScoreNull(null, null)) {
                 ordScore = "0";
         }
 
@@ -1154,9 +1168,13 @@ public final class CRMGraph extends ResourceGraph {
     /** Returns paint of the edge. */
     @Override
     protected Paint getEdgeDrawPaint(final Edge e) {
+        final HbConnectionInfo hbci;
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-        mHbConnectionReadLock.unlock();
+        try {
+            hbci = edgeToHbconnectionMap.get(e);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (hbci != null && hbci.isNew()) {
             return Tools.getDefaultColor("ResourceGraph.EdgeDrawPaintNew");
         } else if (edgeIsOrderList.contains(e)
@@ -1173,9 +1191,13 @@ public final class CRMGraph extends ResourceGraph {
     /** Returns paint of the picked edge. */
     @Override
     protected Paint getEdgePickedPaint(final Edge e) {
+        final HbConnectionInfo hbci;
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-        mHbConnectionReadLock.unlock();
+        try {
+            hbci = edgeToHbconnectionMap.get(e);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (hbci != null && hbci.isNew()) {
             return Tools.getDefaultColor("ResourceGraph.EdgePickedPaintNew");
         } else if (edgeIsOrderList.contains(e)
@@ -1229,18 +1251,26 @@ public final class CRMGraph extends ResourceGraph {
                 continue;
             }
             if (!keepEdgeIsOrderList.contains(e)) {
+                final HbConnectionInfo hbci;
                 mHbConnectionReadLock.lock();
-                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-                mHbConnectionReadLock.unlock();
+                try {
+                    hbci = edgeToHbconnectionMap.get(e);
+                } finally {
+                    mHbConnectionReadLock.unlock();
+                }
                 if (hbci != null) {
                     hbci.removeOrders();
                 }
             }
 
             if (!keepEdgeIsColocationList.contains(e)) {
+                final HbConnectionInfo hbci;
                 mHbConnectionReadLock.lock();
-                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-                mHbConnectionReadLock.unlock();
+                try {
+                    hbci = edgeToHbconnectionMap.get(e);
+                } finally {
+                    mHbConnectionReadLock.unlock();
+                }
                 if (hbci != null) {
                     hbci.removeColocations();
                 }
@@ -1409,8 +1439,11 @@ public final class CRMGraph extends ResourceGraph {
             vipl.add(v);
         }
         mVertexIsPresentListLock.lock();
-        vertexIsPresentList = vipl;
-        mVertexIsPresentListLock.unlock();
+        try {
+            vertexIsPresentList = vipl;
+        } finally {
+            mVertexIsPresentListLock.unlock();
+        }
     }
 
     ///** Set vertex as present. */
@@ -1483,9 +1516,13 @@ public final class CRMGraph extends ResourceGraph {
     @Override
     protected boolean showEdgeArrow(final Edge e) {
         if (edgeIsOrderList.contains(e)) {
+            final HbConnectionInfo hbci;
             mHbConnectionReadLock.lock();
-            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-            mHbConnectionReadLock.unlock();
+            try {
+                hbci = edgeToHbconnectionMap.get(e);
+            } finally {
+                mHbConnectionReadLock.unlock();
+            }
             return hbci != null && !hbci.isOrderTwoDirections();
         }
         return false;
@@ -1495,9 +1532,13 @@ public final class CRMGraph extends ResourceGraph {
     @Override
     protected boolean showHollowArrow(final Edge e) {
         if (edgeIsOrderList.contains(e)) {
+            final HbConnectionInfo hbci;
             mHbConnectionReadLock.lock();
-            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-            mHbConnectionReadLock.unlock();
+            try {
+                hbci = edgeToHbconnectionMap.get(e);
+            } finally {
+                mHbConnectionReadLock.unlock();
+            }
             return hbci != null && hbci.isOrdScoreNull(null, null);
         }
         return false;
@@ -1517,9 +1558,13 @@ public final class CRMGraph extends ResourceGraph {
     /** Is called after an edge was pressed. */
     @Override
     protected void oneEdgePressed(final Edge e) {
+        final HbConnectionInfo hbci;
         mHbConnectionReadLock.lock();
-        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
-        mHbConnectionReadLock.unlock();
+        try {
+            hbci = edgeToHbconnectionMap.get(e);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (hbci != null) {
             getClusterBrowser().setRightComponentInView(hbci);
         }
@@ -1531,9 +1576,13 @@ public final class CRMGraph extends ResourceGraph {
                                  final boolean testOnly) {
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
+        final Edge edge;
         mHbConnectionReadLock.lock();
-        final Edge edge = hbconnectionToEdgeMap.get(hbci);
-        mHbConnectionReadLock.unlock();
+        try {
+            edge = hbconnectionToEdgeMap.get(hbci);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (edgeIsOrderList.contains(edge)) {
             siC.removeOrder(siP, dcHost, testOnly);
         }
@@ -1578,9 +1627,13 @@ public final class CRMGraph extends ResourceGraph {
         }
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
+        final Edge edge;
         mHbConnectionReadLock.lock();
-        final Edge edge = hbconnectionToEdgeMap.get(hbci);
-        mHbConnectionReadLock.unlock();
+        try {
+            edge = hbconnectionToEdgeMap.get(hbci);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         if (edgeIsOrderList.contains(edge)) {
             if (!testOnly) {
                 edgeIsOrderList.remove(edge);
@@ -1620,9 +1673,13 @@ public final class CRMGraph extends ResourceGraph {
             siWithRsc.addOrder(siRsc, dcHost, testOnly);
         }
         if (testOnly) {
+            final Edge edge;
             mHbConnectionReadLock.lock();
-            final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-            mHbConnectionReadLock.unlock();
+            try {
+                edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+            } finally {
+                mHbConnectionReadLock.unlock();
+            }
             addExistingTestEdge(edge);
         }
     }
@@ -1633,13 +1690,16 @@ public final class CRMGraph extends ResourceGraph {
                                  final boolean testOnly) {
         final ServiceInfo siRsc = hbci.getLastServiceInfoRsc();
         final ServiceInfo siWithRsc = hbci.getLastServiceInfoWithRsc();
+        final Edge edge;
         mHbConnectionReadLock.lock();
-        final Edge edge = hbconnectionToEdgeMap.get(hbci);
-        if (edge == null) {
+        try {
+            edge = hbconnectionToEdgeMap.get(hbci);
+            if (edge == null) {
+                return;
+            }
+        } finally {
             mHbConnectionReadLock.unlock();
-            return;
         }
-        mHbConnectionReadLock.unlock();
         if (edgeIsColocationList.contains(edge)) {
             if (!testOnly) {
                 edgeIsColocationList.remove(edge);
@@ -1675,26 +1735,38 @@ public final class CRMGraph extends ResourceGraph {
             siP.addColocation(siC, dcHost, testOnly);
         }
         if (testOnly) {
+            final Edge edge;
             mHbConnectionReadLock.lock();
-            final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-            mHbConnectionReadLock.unlock();
+            try {
+                edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+            } finally {
+                mHbConnectionReadLock.unlock();
+            }
             addExistingTestEdge(edge);
         }
     }
 
     /** Returns whether this hb connection is order. */
     public boolean isOrder(final HbConnectionInfo hbConnectionInfo) {
+        final Edge edge;
         mHbConnectionReadLock.lock();
-        final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-        mHbConnectionReadLock.unlock();
+        try {
+            edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         return edgeIsOrderList.contains(edge);
     }
 
     /** Returns whether this hb connection is colocation. */
     public boolean isColocation(final HbConnectionInfo hbConnectionInfo) {
+        final Edge edge;
         mHbConnectionReadLock.lock();
-        final Edge edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
-        mHbConnectionReadLock.unlock();
+        try {
+            edge = hbconnectionToEdgeMap.get(hbConnectionInfo);
+        } finally {
+            mHbConnectionReadLock.unlock();
+        }
         return edgeIsColocationList.contains(edge);
     }
 

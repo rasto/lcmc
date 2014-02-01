@@ -36,7 +36,7 @@ public final class DistResource_redhat extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "redhat"},
         {"distribution", "redhat"},
         {"version:Red Hat Enterprise Linux ES release 4 (Nahant Update 2)", "4_Nahant_2"},

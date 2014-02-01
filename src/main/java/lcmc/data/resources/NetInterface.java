@@ -109,11 +109,7 @@ public final class NetInterface extends Resource implements Value {
             this.cidr = null;
             this.networkIp = null;
         }
-        if (cols.length > 4 && "bridge".equals(cols[4])) {
-            this.bridge = true;
-        } else {
-            this.bridge = false;
-        }
+        this.bridge = cols.length > 4 && "bridge".equals(cols[4]);
         setName(iface);
     }
 

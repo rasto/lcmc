@@ -24,7 +24,6 @@ import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import lcmc.gui.widget.Widget;
 import static lcmc.robotest.RoboTest.*;
 import static lcmc.robotest.DrbdTest1.*;
 import lcmc.utilities.Tools;

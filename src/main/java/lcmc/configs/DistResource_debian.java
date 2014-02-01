@@ -36,7 +36,7 @@ public final class DistResource_debian extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",             "debian"},
         //{"distribution",        "debian"},
         {"version:3*",          "3"},

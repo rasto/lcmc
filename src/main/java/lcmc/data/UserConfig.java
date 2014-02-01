@@ -51,6 +51,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 
 /**
  * This class parses xml from user configs and creates data objects,
@@ -60,6 +62,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * @version $Id$
  */
 public final class UserConfig extends XML {
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(XML.class);
     /** Host name attribute string. */
     private static final String HOST_NAME_ATTR = "name";
     /** Host ssh port attribute string. */
@@ -91,7 +95,7 @@ public final class UserConfig extends XML {
         try {
              db = dbf.newDocumentBuilder();
         } catch (ParserConfigurationException pce) {
-             assert false;
+             LOG.appError("saveXML: can't save: ", pce);
         }
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(

@@ -41,6 +41,8 @@ import javax.swing.text.DefaultStyledDocument;
 public final class PatternDocument extends DefaultStyledDocument {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Logger. */
+    private static final Logger LOG = LoggerFactory.getLogger(PatternDocument.class);
     /** Pattern object that the document should match. */
     private final Pattern pattern;
     /** Abbreviations, from one character to the string, e.g. when user presses
@@ -89,7 +91,7 @@ public final class PatternDocument extends DefaultStyledDocument {
                 super.insertString(offs, s, a);
             }
         } catch (BadLocationException e) {
-            return;
+            LOG.appError("insertString: bad location exception", e);
         }
     }
 

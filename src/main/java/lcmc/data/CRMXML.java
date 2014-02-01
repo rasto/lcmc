@@ -988,60 +988,60 @@ public final class CRMXML extends XML {
         String provider = null;
         String serviceName = null;
         final boolean masterSlave = false; /* is probably m/s ...*/
-        for (int i = 0; i < lines.length; i++) {
-            final Matcher cm = cp.matcher(lines[i]);
+        for (String line : lines) {
+            final Matcher cm = cp.matcher(line);
             if (cm.matches()) {
                 resourceClass = cm.group(1);
                 continue;
             }
-            final Matcher pm = pp.matcher(lines[i]);
+            final Matcher pm = pp.matcher(line);
             if (pm.matches()) {
                 provider = pm.group(1);
                 continue;
             }
-            final Matcher sm = sp.matcher(lines[i]);
+            final Matcher sm = sp.matcher(line);
             if (sm.matches()) {
                 serviceName = sm.group(1);
             }
             if (serviceName != null) {
-                xml.append(lines[i]);
+                xml.append(line);
                 xml.append('\n');
                 if ("drbddisk".equals(serviceName)) {
                     drbddiskPresent0 = true;
                 } else if ("drbd".equals(serviceName)
-                           && "linbit".equals(provider)) {
+                        && "linbit".equals(provider)) {
                     linbitDrbdPresent0 = true;
                 }
                 ResourceAgent ra;
                 if ("drbddisk".equals(serviceName)
-                    && ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
+                        && ResourceAgent.HEARTBEAT_CLASS.equals(resourceClass)) {
                     ra = hbDrbddisk;
                     ra.setMetaDataLoaded(true);
                     setLSBResourceAgent(serviceName, resourceClass, ra);
                 } else if ("drbd".equals(serviceName)
-                           && ResourceAgent.OCF_CLASS.equals(resourceClass)
-                           && "linbit".equals(provider)) {
+                        && ResourceAgent.OCF_CLASS.equals(resourceClass)
+                        && "linbit".equals(provider)) {
                     ra = hbLinbitDrbd;
                 } else {
                     ra = new ResourceAgent(serviceName,
-                                           provider,
-                                           resourceClass);
+                            provider,
+                            resourceClass);
                     if (IGNORE_DEFAULTS_FOR.contains(serviceName)) {
                         ra.setIgnoreDefaults(true);
                     }
                     if (ResourceAgent.SERVICE_CLASSES.contains(resourceClass)
-                        || ResourceAgent.HEARTBEAT_CLASS.equals(
-                                                            resourceClass)) {
+                            || ResourceAgent.HEARTBEAT_CLASS.equals(
+                                    resourceClass)) {
                         ra.setMetaDataLoaded(true);
                         setLSBResourceAgent(serviceName, resourceClass, ra);
                     }
                 }
                 serviceToResourceAgentMap.put(serviceName,
-                                              provider,
-                                              resourceClass,
-                                              ra);
+                        provider,
+                        resourceClass,
+                        ra);
                 List<ResourceAgent> raList =
-                                        classToServicesMap.get(resourceClass);
+                        classToServicesMap.get(resourceClass);
                 if (raList == null) {
                     raList = new ArrayList<ResourceAgent>();
                     classToServicesMap.put(resourceClass, raList);
@@ -1097,44 +1097,40 @@ public final class CRMXML extends XML {
         String serviceName = null;
         boolean nextRA = false;
         boolean masterSlave = false; /* is probably m/s ...*/
-        for (int i = 0; i < lines.length; i++) {
+        for (String line : lines) {
             /*
             <resource-agent name="AudibleAlarm">
-             ...
+            ...
             </resource-agent>
-            */
-            final Matcher pm = pp.matcher(lines[i]);
+             */
+            final Matcher pm = pp.matcher(line);
             if (pm.matches()) {
                 provider = pm.group(1);
                 continue;
             }
-            final Matcher mm = mp.matcher(lines[i]);
+            final Matcher mm = mp.matcher(line);
             if (mm.matches()) {
-                if ("".equals(mm.group(1))) {
-                    masterSlave = false;
-                } else {
-                    masterSlave = true;
-                }
+                masterSlave = !"".equals(mm.group(1));
                 continue;
             }
-            final Matcher sm = sp.matcher(lines[i]);
+            final Matcher sm = sp.matcher(line);
             if (sm.matches()) {
                 serviceName = sm.group(1);
                 continue;
             }
-            final Matcher m = bp.matcher(lines[i]);
+            final Matcher m = bp.matcher(line);
             if (m.matches()) {
                 nextRA = true;
             }
             if (nextRA) {
-                xml.append(lines[i]);
+                xml.append(line);
                 xml.append('\n');
-                final Matcher m2 = ep.matcher(lines[i]);
+                final Matcher m2 = ep.matcher(line);
                 if (m2.matches()) {
                     parseMetaData(serviceName,
-                                  provider,
-                                  xml.toString(),
-                                  masterSlave);
+                            provider,
+                            xml.toString(),
+                            masterSlave);
                     serviceName = null;
                     nextRA = false;
                     xml.delete(0, xml.length());
@@ -3408,13 +3404,13 @@ public final class CRMXML extends XML {
                         resHostToLocIdMap.put(rsc,
                                               node.toLowerCase(Locale.US),
                                               locId);
-                    }
-                    if (score != null) {
-                        hostScoreMap.put(node.toLowerCase(Locale.US),
-                                         new HostLocation(score,
-                                                          "eq",
-                                                          null,
-                                                          role));
+                        if (score != null) {
+                            hostScoreMap.put(node.toLowerCase(Locale.US),
+                                             new HostLocation(score,
+                                                              "eq",
+                                                              null,
+                                                              role));
+                       }
                     }
                     locs.add(locId);
                     final Node ruleNode = getChildNode(constraintNode,
@@ -4150,17 +4146,18 @@ public final class CRMXML extends XML {
             }
             final List<String> oRscIds = oRscSet.getRscIds();
             mRscIdsReadLock.lock();
-            if (rscIds.isEmpty()) {
-                mRscIdsReadLock.unlock();
-                return false;
-            }
-            for (final String rscId : rscIds) {
-                if (!oRscIds.contains(rscId)) {
-                    mRscIdsReadLock.unlock();
+            try {
+                if (rscIds.isEmpty()) {
                     return false;
                 }
+                for (final String rscId : rscIds) {
+                    if (!oRscIds.contains(rscId)) {
+                        return false;
+                    }
+                }
+            } finally {
+                mRscIdsReadLock.unlock();
             }
-            mRscIdsReadLock.unlock();
             return true;
         }
 
@@ -4382,11 +4379,8 @@ public final class CRMXML extends XML {
 
         /** Returns whether it is an empty connection. */
         public boolean isEmpty() {
-            if ((rscSet1 == null || rscSet1.isRscIdsEmpty())
-                && (rscSet2 == null || rscSet2.isRscIdsEmpty())) {
-                return true;
-            }
-            return false;
+            return (rscSet1 == null || rscSet1.isRscIdsEmpty())
+                    && (rscSet2 == null || rscSet2.isRscIdsEmpty());
         }
 
         /** Returns connection position. */

@@ -36,7 +36,7 @@ public final class DistResource_fedora_13 extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "fedora-13"},
 
         /* directory capturing regexp on the website from the kernel version */

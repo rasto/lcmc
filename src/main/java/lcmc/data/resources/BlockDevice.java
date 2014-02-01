@@ -56,7 +56,7 @@ public final class BlockDevice extends Resource {
     /** Disk UUID. */
     private String diskUuid;
     /** Disk ID. */
-    private Set<String> diskIds = new HashSet<String>();
+    private final Set<String> diskIds = new HashSet<String>();
     /** Where is this block device mounted if it is at all. */
     private String mountedOn;
     /** Filesytem type. */
@@ -387,10 +387,7 @@ public final class BlockDevice extends Resource {
         if (diskState == null) {
             return false;
         }
-        if ("Diskless".equals(diskState)) {
-            return false;
-        }
-        return true;
+        return !"Diskless".equals(diskState);
     }
 
     /** Returns whether this block device is diskless. */
@@ -401,10 +398,7 @@ public final class BlockDevice extends Resource {
         if (diskState == null) {
             return true;
         }
-        if ("Diskless".equals(diskState)) {
-            return true;
-        }
-        return false;
+        return "Diskless".equals(diskState);
     }
 
     /**
@@ -424,10 +418,7 @@ public final class BlockDevice extends Resource {
 
     /** Returns whether the device is connected or is waiting for connection. */
     public boolean isConnectedOrWF() {
-        if (isWFConnection() || isConnected()) {
-            return true;
-        }
-        return false;
+        return isWFConnection() || isConnected();
     }
 
     /** Returns whether this device is waiting for connection. */
@@ -435,10 +426,7 @@ public final class BlockDevice extends Resource {
         if (connectionState == null) {
             return false;
         }
-        if ("WFConnection".equals(connectionState)) {
-            return true;
-        }
-        return false;
+        return "WFConnection".equals(connectionState);
     }
 
     /** Returns whether this device is primary. */
@@ -446,10 +434,7 @@ public final class BlockDevice extends Resource {
         if (nodeState == null) {
             return false;
         }
-        if ("Primary".equals(nodeState)) {
-            return true;
-        }
-        return false;
+        return "Primary".equals(nodeState);
     }
 
     /** Returns whether this device is secondary. */
@@ -457,10 +442,7 @@ public final class BlockDevice extends Resource {
         if (nodeState == null) {
             return false;
         }
-        if ("Secondary".equals(nodeState)) {
-            return true;
-        }
-        return false;
+        return "Secondary".equals(nodeState);
     }
 
     /** Returns the boolean value of the specified flag. */
@@ -494,11 +476,8 @@ public final class BlockDevice extends Resource {
         if (nodeState == null) {
             return false;
         }
-        if ("VerifyS".equals(connectionState)
-            || "VerifyT".equals(connectionState)) {
-            return true;
-        }
-        return false;
+        return "VerifyS".equals(connectionState)
+                || "VerifyT".equals(connectionState);
     }
 
 
@@ -510,10 +489,7 @@ public final class BlockDevice extends Resource {
         if (connectionState == null) {
             return false;
         }
-        if ("SyncSource".equals(connectionState)) {
-            return true;
-        }
-        return false;
+        return "SyncSource".equals(connectionState);
     }
 
     /** Returns true if this node is target for the data, otherwise false. */
@@ -521,10 +497,7 @@ public final class BlockDevice extends Resource {
         if (connectionState == null) {
             return false;
         }
-        if ("SyncTarget".equals(connectionState)) {
-            return true;
-        }
-        return false;
+        return "SyncTarget".equals(connectionState);
     }
 
     /** Sets this block device to be in a split-brain situation. */
@@ -572,10 +545,7 @@ public final class BlockDevice extends Resource {
 
     /** Returns whether the block device is swap. */
     public boolean isSwap() {
-        if (fsType != null && "swap".equals(fsType)) {
-            return true;
-        }
-        return false;
+        return fsType != null && "swap".equals(fsType);
     }
 
     /** Returns disk uuid. */

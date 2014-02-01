@@ -37,7 +37,7 @@ public final class DistResource_openfiler_2
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "openfiler-2"},
     };
 }

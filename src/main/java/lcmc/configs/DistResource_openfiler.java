@@ -36,7 +36,7 @@ public final class DistResource_openfiler extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",                       "openfiler"},
         {"version:Openfiler NSA 2.3",     "2"},
 

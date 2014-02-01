@@ -84,7 +84,7 @@ public final class ClustersPanel extends JPanel {
     /** Previously selected tab. */
     private ClusterTab prevSelected = null;
 
-    private Map<ClusterTab, JLabel> clusterTabLabels =
+    private final Map<ClusterTab, JLabel> clusterTabLabels =
                                             new HashMap<ClusterTab, JLabel>();
     /** Width of the tab border. */
     private static final int TAB_BORDER_WIDTH = 3;

@@ -135,7 +135,7 @@ public final class Tools {
     /** Release version. */
     private static String release = null;
     /** Image icon cache. */
-    private static Map<String, ImageIcon> imageIcons =
+    private static final Map<String, ImageIcon> imageIcons =
                                               new HashMap<String, ImageIcon>();
     /** Resource bundle. */
     private static ResourceBundle resource = null;
@@ -147,7 +147,7 @@ public final class Tools {
     /** Gui data object. */
     private static GUIData guiData;
     /** Drbd gui xml object. */
-    private static UserConfig userConfig = new UserConfig();
+    private static final UserConfig userConfig = new UserConfig();
     /** Default dialog panel width. */
     private static final int DIALOG_PANEL_WIDTH = 400;
     /** Default dialog panel height. */
@@ -415,7 +415,7 @@ public final class Tools {
     public static boolean isIp(final String ipString) {
         boolean wasValid = true;
         // Inet4Address ip;
-        Pattern pattern = null;
+        Pattern pattern;
         final String ipPattern =
                 "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})";
         if (ipString == null || "".equals(ipString)) {
@@ -469,12 +469,12 @@ public final class Tools {
      */
     public static String loadFile(final String filename,
                                       final boolean showError) {
-        BufferedReader in = null;
+        BufferedReader in;
         final StringBuilder content = new StringBuilder("");
         //Tools.startProgressIndicator(Tools.getString("Tools.Loading"));
         try {
             in = new BufferedReader(new FileReader(filename));
-            String line = "";
+            String line;
             while ((line = in.readLine()) != null) {
                 content.append(line);
             }
@@ -486,12 +486,10 @@ public final class Tools {
             }
             return null;
         }
-        if (in != null)  {
-            try {
-                in.close();
-            } catch (IOException ex) {
-                LOG.appError("loadFile: could not close: " + filename, ex);
-            }
+        try {
+            in.close();
+        } catch (IOException ex) {
+            LOG.appError("loadFile: could not close: " + filename, ex);
         }
         return content.toString();
     }
@@ -1173,10 +1171,7 @@ public final class Tools {
      * @return true if object is of string class
      */
     public static boolean isStringClass(final Object o) {
-        if (o == null || o instanceof String) {
-            return true;
-        }
-        return false;
+        return o == null || o instanceof String;
     }
 
     /** Escapes for config file. */
@@ -2116,7 +2111,7 @@ public final class Tools {
             final DefaultTableColumnModel colModel =
                             (DefaultTableColumnModel) table.getColumnModel();
             final TableColumn col = colModel.getColumn(vColIndex);
-            int width = 0;
+            int width;
             TableCellRenderer renderer = col.getHeaderRenderer();
 
             if (renderer == null) {

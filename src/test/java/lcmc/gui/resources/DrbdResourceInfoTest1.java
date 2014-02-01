@@ -51,7 +51,7 @@ public final class DrbdResourceInfoTest1 extends TestCase {
         final ClusterBrowser b =
                 TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
         final DrbdResourceInfo r1 = new DrbdResourceInfo("name", null, b);
-        assertFalse("equal name null", r1.equals(null));
+        assertFalse("equal name null", r1.getName() == null);
     }
 
     @Test

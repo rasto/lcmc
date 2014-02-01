@@ -36,7 +36,7 @@ public final class DistResource_fedora_14 extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "fedora-14"},
         /* Heartbeat/Pacemaker native */
         {"HbPmInst.install.text.1",

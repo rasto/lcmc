@@ -20,7 +20,6 @@
 
 package lcmc.gui.widget;
 
-import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.data.ConfigData;
@@ -147,7 +146,7 @@ implements Widget {
         }
     }
 
-    
+
     protected final void addComponent(final T newComp, final int width) {
         if (fieldButton == null) {
             component = newComp;
@@ -367,6 +366,7 @@ implements Widget {
     }
 
     /** Returns whether component is editable or not. */
+    @Override
     abstract public boolean isEditable();
 
     /** Sets item/value in the component and waits till it is set. */

@@ -36,7 +36,7 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"DrbdMC.Title",
          "Linux Cluster Management Console"},
 

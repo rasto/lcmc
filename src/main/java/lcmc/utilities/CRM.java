@@ -498,10 +498,7 @@ public final class CRM {
     /** Adds group to the cib. */
     public static void addGroup(final Host host,
                                 final String args) {
-        if (args == null) {
-            /* does nothing, group is added with the first resource. */
-            return;
-        }
+        /* does nothing, group is added with the first resource. */
     }
 
     /**

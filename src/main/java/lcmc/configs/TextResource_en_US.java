@@ -37,7 +37,7 @@ public final class TextResource_en_US extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         /* here is nothing and it should be so */
     };
 }

@@ -37,7 +37,7 @@ public final class DistResource_redhatenterpriseserver_5
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         /* distribution name that is used in the download url */
         {"distributiondir", "rhel5"},
 

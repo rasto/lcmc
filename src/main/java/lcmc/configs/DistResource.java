@@ -39,7 +39,7 @@ public final class DistResource extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "no"},
         {"arch:i686", "i[3-6]86"}, // convert arch to arch in the drbd download file
         {"arch:x86_64", "x86_64"}, // convert arch to arch in the drbd download file

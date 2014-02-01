@@ -37,7 +37,7 @@ public final class DistResource_ubuntu_KARMIC
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "ubuntu-KARMIC"},
         {"distributiondir",    "ubuntu-karmic-server"},
 

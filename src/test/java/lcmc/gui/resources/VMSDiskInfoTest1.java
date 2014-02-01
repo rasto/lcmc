@@ -3,8 +3,6 @@ package lcmc.gui.resources;
 import junit.framework.TestCase;
 import lcmc.utilities.TestSuite1;
 import lcmc.data.VMSXML.DiskData;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;

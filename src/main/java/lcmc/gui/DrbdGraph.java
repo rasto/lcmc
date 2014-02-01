@@ -261,7 +261,7 @@ public final class DrbdGraph extends ResourceGraph {
                          == prevBdi.getDrbdVolumeInfo().getDrbdResourceInfo()) {
                 devYPos -= 6;
             }
-            Point2D pos = null; // getSavedPosition(bdi);
+            Point2D pos; // TODO: getSavedPosition(bdi);
                 pos = new Point2D.Double(
                     hostXPos + BD_X_OFFSET + VERTEX_SIZE_BD / 2,
                     devYPos);
@@ -564,7 +564,7 @@ public final class DrbdGraph extends ResourceGraph {
     protected void handlePopupVertex(final Vertex v,
                                      final List<Vertex> pickedV,
                                      final Point2D pos) {
-        Info info = null;
+        Info info;
         if (pickedV.size() > 1) {
             info = multiSelectionInfo;
         } else if (isVertexBlockDevice(v)) {

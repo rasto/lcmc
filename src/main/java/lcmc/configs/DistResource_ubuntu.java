@@ -36,7 +36,7 @@ public final class DistResource_ubuntu extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
         {"version:squeeze/sid/10.04",     "LUCID"},

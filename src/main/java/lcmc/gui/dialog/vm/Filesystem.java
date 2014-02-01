@@ -35,7 +35,6 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import lcmc.data.StringValue;
 
 /**
  * An implementation of a dialog where user can enter a new domain.

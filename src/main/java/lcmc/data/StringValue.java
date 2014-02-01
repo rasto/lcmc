@@ -114,10 +114,7 @@ public class StringValue implements Value, Comparable<Value> {
         if (nv == null && valueForConfig == null) {
             return true;
         }
-        if (nv != null && (nv.equals(valueForConfig))) {
-            return true;
-        }
-        return false;
+        return nv != null && (nv.equals(valueForConfig));
     }
 
     @Override

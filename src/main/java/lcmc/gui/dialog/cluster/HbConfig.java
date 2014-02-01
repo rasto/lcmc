@@ -212,7 +212,7 @@ final class HbConfig extends DialogCluster {
     /** Add address button. */
     private MyButton addButton;
     /** Array with /etc/ha.d/ha.cf configs from all hosts. */
-    private String[] configs;
+    private final String[] configs;
     /** Status panel. */
     private JPanel statusPanel;
     /** Check box that allows to edit a new config are see the existing
@@ -468,7 +468,7 @@ final class HbConfig extends DialogCluster {
             final Matcher serialM = serialP.matcher(line);
             final Matcher dopdM = dopdP.matcher(line);
             final Matcher mgmtdM = mgmtdP.matcher(line);
-            String type       = typeW.getStringValue();
+            String type;
             String iface      = "";
             String addr       = "";
             String serial     = "";
@@ -497,7 +497,6 @@ final class HbConfig extends DialogCluster {
                     final Matcher m = optionPatterns.get(option).matcher(line);
                     if (m.matches()) {
                         opValues.put(option, m.group(1).trim());
-                        continue;
                     }
                 }
                 continue;
@@ -1410,10 +1409,7 @@ final class HbConfig extends DialogCluster {
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
             final Matcher m = p.matcher(value);
-            if (m.matches()) {
-                return true;
-            }
-            return false;
+            return m.matches();
         }
         return true;
     }

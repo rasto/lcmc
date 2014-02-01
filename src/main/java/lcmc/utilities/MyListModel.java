@@ -46,7 +46,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         super();
     }
 
-    public FilterField getFilterField() {
+    FilterField getFilterField() {
         return filterField;
     }
 

@@ -37,7 +37,7 @@ public final class DistResource_ubuntu_INTREPID
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "ubuntu-INTREPID"},
         {"distributiondir",    "ubuntu-inrepid-server"},
 

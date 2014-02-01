@@ -63,9 +63,9 @@ public class Configuration extends DialogHost {
     /** Maximum hops. */
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
     /** Hostname fields. */
-    private Widget[] hostnameField = new Widget[MAX_HOPS];
+    private final Widget[] hostnameField = new Widget[MAX_HOPS];
     /** Ip fields. */
-    private Widget[] ipCombo = new Widget[MAX_HOPS];
+    private final Widget[] ipCombo = new Widget[MAX_HOPS];
     /** Hostnames. */
     private String[] hostnames = new String[MAX_HOPS];
     /** Whether the hostname was ok. */
@@ -308,10 +308,6 @@ public class Configuration extends DialogHost {
                         progressBarDone();
                         getHost().setHostname(
                                 Tools.join(",", hostnames, getHops()));
-                        String name = getHost().getName();
-                        if (name == null || "null".equals(name)) {
-                            name = "";
-                        }
                         enableComponents();
                         if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
                             Tools.sleep(1000);
@@ -326,10 +322,6 @@ public class Configuration extends DialogHost {
                 public void run() {
                     getHost().setHostname(
                                        Tools.join(",", hostnames, getHops()));
-                    String name = getHost().getName();
-                    if (name == null || "null".equals(name)) {
-                        name = "";
-                    }
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {

@@ -36,7 +36,7 @@ public final class DistResource_suse extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "suse"},
         {"version:SUSE LINUX Enterprise Server 9 (i586)", "SLES9"}, // detected
         //{"version:SUSE LINUX Enterprise Server 10 (i586)", "SLES10"}, // detected

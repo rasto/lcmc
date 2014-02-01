@@ -58,7 +58,7 @@ public final class Http {
             return;
         }
 
-        HttpURLConnection conn = null;
+        HttpURLConnection conn;
         try {
             conn = (HttpURLConnection) url.openConnection();
         } catch (IOException ex) {
@@ -117,7 +117,6 @@ public final class Http {
             input.close();
         } catch (IOException ex) {
             LOG.appWarning("post: error reading: " + ex.getMessage());
-            return;
         }
     }
 

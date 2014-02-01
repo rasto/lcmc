@@ -1033,7 +1033,7 @@ public final class ClusterBrowser extends Browser {
                    },
 
                    new NewOutputCallback() {
-                       private StringBuffer outputBuffer =
+                       private final StringBuffer outputBuffer =
                                                         new StringBuffer(300);
                        @Override
                        public void output(final String output) {
@@ -1365,7 +1365,7 @@ public final class ClusterBrowser extends Browser {
 
                  new NewOutputCallback() {
                      //TODO: check this buffer's size
-                     private StringBuffer clusterStatusOutput =
+                     private final StringBuffer clusterStatusOutput =
                                                         new StringBuffer(300);
                      @Override
                      public void output(final String output) {
@@ -1717,11 +1717,9 @@ public final class ClusterBrowser extends Browser {
                     networksNode.removeAllChildren();
                 }
             });
-            for (int i = 0; i < networks.length; i++) {
+            for (Network network : networks) {
                 resource = new DefaultMutableTreeNode(
-                                    new NetworkInfo(networks[i].getName(),
-                                                    networks[i],
-                                                    this));
+                             new NetworkInfo(network.getName(), network, this));
                 setNode(resource);
                 addNode(networksNode, resource);
             }
@@ -2226,10 +2224,7 @@ public final class ClusterBrowser extends Browser {
             } else {
                 h = menuHost;
             }
-            if (Tools.versionBeforePacemaker(h)) {
-                return false;
-            }
-            return true;
+            return !Tools.versionBeforePacemaker(h);
         }
 
         /** Mouse out, stops animation. */

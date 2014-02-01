@@ -81,7 +81,6 @@ public final class ClusterBrowserTest1 extends TestCase {
                     /* userHome + "/testdir/pacemaker/shell/regression", */
                     userHome + "/testdir/pacemaker/pengine/test10"}) {
             final File dir = new File(dirName);
-            assertFalse(dir == null);
             if (dir.listFiles() == null) {
                 continue;
             }

@@ -37,7 +37,7 @@ public final class DistResource_ubuntu_HARDY
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support",            "ubuntu-HARDY"},
         {"distributiondir",    "ubuntu-hardy-server"},
 

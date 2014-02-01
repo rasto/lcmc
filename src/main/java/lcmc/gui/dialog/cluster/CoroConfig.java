@@ -109,7 +109,7 @@ final class CoroConfig extends DialogCluster {
     /** Add address button. */
     private MyButton addButton;
     /** Array with corosync.conf or openais.conf configs from all hosts. */
-    private String[] configs;
+    private final String[] configs;
     /** Status panel. */
     private JPanel statusPanel;
     /** Check box that allows to edit a new config are see the existing

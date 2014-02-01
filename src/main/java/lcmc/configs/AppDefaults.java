@@ -53,7 +53,7 @@ public final class AppDefaults extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         /*
          * defaults for development
          */

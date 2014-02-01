@@ -36,7 +36,7 @@ public final class DistResource_fedora extends java.util.ListResourceBundle {
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
         {"Support", "fedora"},
         {"distribution", "redhat"},
         {"version:Fedora release 10*", "10"},

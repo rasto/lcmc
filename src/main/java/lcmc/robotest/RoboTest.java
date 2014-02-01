@@ -110,7 +110,7 @@ public final class RoboTest {
     public enum Type {
         PCMK("pcmk"), DRBD("drbd"), VM("vm"), GUI("gui");
 
-        private String testName;
+        private final String testName;
 
         private Type(final String name) {
             testName = "start" + name + "test";
@@ -1150,10 +1150,7 @@ public final class RoboTest {
 
     /** Returns maybe true. */
     static boolean maybe() {
-        if (Math.random() < 0.5) {
-            return true;
-        }
-        return false;
+        return Math.random() < 0.5;
     }
 
     /** Create dummy resource. */
@@ -1693,6 +1690,7 @@ public final class RoboTest {
                                               0);
         if (tree == null) {
             info("can't find the tree");
+            return;
         }
         for (int i = 0; i < tree.getRowCount(); i++) {
             final String item =

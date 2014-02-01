@@ -430,11 +430,15 @@ public final class VMSXML extends XML {
 
     /** Returns xml node of the specified domain. */
     public Node getDomainNode(final String domainName) {
+        final Document document;
         mXMLDocumentReadLock.lock();
-        final Document document = xmlDocument;
-        mXMLDocumentReadLock.unlock();
+        try {
+            document = xmlDocument;
+        } finally {
+            mXMLDocumentReadLock.unlock();
+        }
         final XPath xpath = XPathFactory.newInstance().newXPath();
-        Node domainNode = null;
+        Node domainNode;
         try {
             final String path = "//vms/vm[@name='"
                                 + domainName
@@ -463,7 +467,7 @@ public final class VMSXML extends XML {
     private void saveDomainXML(final String configName,
                                final Node node,
                                final String defineCommand) {
-        String xml = null;
+        String xml;
         try {
             final Transformer transformer =
                             TransformerFactory.newInstance().newTransformer();
@@ -920,7 +924,7 @@ public final class VMSXML extends XML {
         }
 
         String tag;
-        String parent = null;
+        String parent;
         final int i = tag0.indexOf(':');
         Element pNode;
         if (i > 0) {
@@ -975,7 +979,7 @@ public final class VMSXML extends XML {
         }
 
         String tag;
-        String parent = null;
+        String parent;
         final int i = tag0.indexOf(':');
         Element pNode;
         if (i > 0) {
@@ -1066,7 +1070,6 @@ public final class VMSXML extends XML {
             }
         } catch (final javax.xml.xpath.XPathExpressionException e) {
             LOG.appError("modifyXML: could not evaluate: ", e);
-            return;
         }
     }
 

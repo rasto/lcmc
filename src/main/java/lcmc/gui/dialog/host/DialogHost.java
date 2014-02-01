@@ -39,7 +39,6 @@ import lcmc.utilities.WidgetListener;
 import javax.swing.JPanel;
 import java.util.List;
 import java.util.ArrayList;
-import lcmc.data.StringValue;
 import lcmc.data.Value;
 
 /**

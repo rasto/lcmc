@@ -224,9 +224,13 @@ public final class SSH {
 
     /** Cancels the creating of connection to the sshd. */
     public void cancelConnection() {
+        final ConnectionThread ct;
         mConnectionThreadLock.lock();
-        final ConnectionThread ct = connectionThread;
-        mConnectionThreadLock.unlock();
+        try {
+            ct = connectionThread;
+        } finally {
+            mConnectionThreadLock.unlock();
+        }
         if (ct != null) {
             ct.cancel();
         }
@@ -377,9 +381,13 @@ public final class SSH {
                 return new SSHOutput("", 0);
             }
             try {
+                final Session thisSession;
                 mSessionLock.lock();
-                final Session thisSession = sess;
-                mSessionLock.unlock();
+                try {
+                    thisSession = sess;
+                } finally {
+                    mSessionLock.unlock();
+                }
                 if (thisSession == null) {
                     return new SSHOutput("", 130);
                 }
@@ -576,10 +584,14 @@ public final class SSH {
         /** Cancel the session. */
         public void cancel() {
             cancelIt = true;
+            final Session thisSession;
             mSessionLock.lock();
-            final Session thisSession = sess;
-            sess = null;
-            mSessionLock.unlock();
+            try {
+                thisSession = sess;
+                sess = null;
+            } finally {
+                mSessionLock.unlock();
+            }
             if (thisSession != null) {
                 thisSession.close();
             }
@@ -642,7 +654,7 @@ public final class SSH {
             // if previous command has finished successfully.
             final String[] commands = command.split(";;;");
             final StringBuilder ans = new StringBuilder("");
-            for (int i = 0; i < commands.length; i++) {
+            for (String command1 : commands) {
                 final Boolean[] cancelTimeout = new Boolean[1];
                 cancelTimeout[0] = false;
                 final Thread tt = new Thread(new Runnable() {
@@ -651,7 +663,7 @@ public final class SSH {
                         Tools.sleep(Tools.getDefaultInt("SSH.ConnectTimeout"));
                         if (!cancelTimeout[0]) {
                             LOG.debug1("exec: " + host.getName()
-                                       + ": open ssh session: timeout");
+                                    + ": open ssh session: timeout");
                             cancelTimeout[0] = true;
                             conn.dmcCancel();
                         }
@@ -660,7 +672,7 @@ public final class SSH {
                 tt.start();
                 try {
                     /* it may hang here if we lost connection, so it will be
-                     * interrupted after a timeout. */
+                    * interrupted after a timeout. */
                     final Session newSession = conn.openSession();
                     mSessionLock.lock();
                     try {
@@ -684,18 +696,15 @@ public final class SSH {
                     }
                     break;
                 }
-                commands[i].trim();
+                final String cmd = command1.trim();
                 //Tools.commandLock();
                 if (commandVisible && outputVisible) {
-                    final String consoleCommand = host.replaceVars(commands[i],
-                                                                   true);
+                    final String consoleCommand = host.replaceVars(cmd, true);
                     host.getTerminalPanel().addCommand(
                             consoleCommand.replaceAll(DistResource.SUDO, " "));
                 }
-                final SSHOutput ret = execOneCommand(commands[i],
-                                                     outputVisible);
+                final SSHOutput ret = execOneCommand(cmd, outputVisible);
                 ans.append(ret.getOutput());
-
                 final int exitCode = ret.getExitCode();
                 // don't execute after error
                 if (exitCode != 0) {
@@ -892,7 +901,7 @@ public final class SSH {
      * This ServerHostKeyVerifier asks the user on how to proceed if a key
      * cannot befound in the in-memory database.
      */
-    class AdvancedVerifier implements ServerHostKeyVerifier {
+    private class AdvancedVerifier implements ServerHostKeyVerifier {
         /** Verifies the keys. */
         @Override
         public boolean verifyServerHostKey(final String hostname,
@@ -1000,7 +1009,7 @@ public final class SSH {
      * The logic that one has to implement if "keyboard-interactive"
      * autentication shall be supported.
      */
-    class InteractiveLogic implements InteractiveCallback {
+    private class InteractiveLogic implements InteractiveCallback {
         /** Prompt count. */
         private int promptCount = 0;
         /** To show error only once.  */
@@ -1075,7 +1084,7 @@ public final class SSH {
     }
 
     /** Connection class that can cancel it's connection during openSession. */
-    static class MyConnection extends Connection {
+    private static class MyConnection extends Connection {
         /** Creates new MyConnection object. */
         MyConnection(final String hostname, final int port) {
             super(hostname, port);
@@ -1114,9 +1123,9 @@ public final class SSH {
      * The SSH-2 connection is established in this thread.
      * If we would not use a separate thread (e.g., put this code in
      * the event handler of the "Login" button) then the GUI would not
-     * be reponsive (missing window repaints if you move the window etc.)
+     * be responsive (missing window repaints if you move the window etc.)
      */
-    class ConnectionThread extends Thread {
+    private class ConnectionThread extends Thread {
         /** Username with which it will be connected. */
         private final String username;
         /** Hostname of the host to which it will be connect. */

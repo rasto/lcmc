@@ -49,26 +49,20 @@ public class MyButtonCellRenderer extends MyButton
             return this;
         }
         final MyButton button = (MyButton) value;
-        if (button == null) {
-            setText("");
-            getModel().setPressed(false);
-            getModel().setArmed(false);
-            getModel().setRollover(false);
+
+        if (button.getModel().isPressed()) {
+            setOpaque(true);
         } else {
-            if (button.getModel().isPressed()) {
-                setOpaque(true);
-            } else {
-                setOpaque(button.isOpaque());
-            }
-            setText(button.getText());
-            setIcon(button.getIcon());
-            setMargin(button.getInsets());
-            setFont(button.getFont());
-            setIconTextGap(button.getIconTextGap());
-            getModel().setPressed(button.getModel().isPressed());
-            getModel().setArmed(button.getModel().isArmed());
-            getModel().setRollover(button.getModel().isRollover());
+            setOpaque(button.isOpaque());
         }
+        setText(button.getText());
+        setIcon(button.getIcon());
+        setMargin(button.getInsets());
+        setFont(button.getFont());
+        setIconTextGap(button.getIconTextGap());
+        getModel().setPressed(button.getModel().isPressed());
+        getModel().setArmed(button.getModel().isArmed());
+        getModel().setRollover(button.getModel().isRollover());
 
         final int al = getColumnAlignment(column);
         setHorizontalAlignment(al);

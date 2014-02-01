@@ -1864,7 +1864,7 @@ public final class Host implements Comparable<Host>, Value {
                              }
                          },
                          new NewOutputCallback() {
-                             private StringBuffer outputBuffer =
+                             private final StringBuffer outputBuffer =
                                                         new StringBuffer(300);
                              @Override
                              public void output(final String output) {
@@ -3083,10 +3083,7 @@ public final class Host implements Comparable<Host>, Value {
 
     /** Returns whether pacemaker is started by corosync. */
     public boolean isPcmkStartedByCorosync() {
-        if (pcmkServiceVersion == 0) {
-            return true;
-        }
-        return false;
+        return pcmkServiceVersion == 0;
     }
 
     /** Sets libvirt version. */

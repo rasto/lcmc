@@ -37,7 +37,7 @@ public final class DistResource_suse_OPENSUSE13_1
     }
 
     /** Contents. */
-    private static Object[][] contents = {
+    private static final Object[][] contents = {
 
         {"distributiondir", "sles11"},
         {"Support", "suse-OPENSUSE13_1"},
