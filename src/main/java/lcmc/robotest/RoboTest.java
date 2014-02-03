@@ -1769,6 +1769,14 @@ public final class RoboTest {
         final Point2D endP = n.getLocationOnScreen();
         final int endX = (int) endP.getX() + 15;
         final int endY = (int) endP.getY() + c.getHeight() / 2;
+        int tries = 0;
+        while (!n.isEnabled() && tries < 30) {
+            Tools.sleep(1000);
+            tries++;
+            if (tries == 30) {
+                LOG.appWarning("moveTo: component disabled " + text);
+            }
+        }
         moveToAbs(endX, endY);
     }
 
