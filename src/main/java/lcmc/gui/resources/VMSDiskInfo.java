@@ -932,6 +932,14 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
         //checkResourceFieldsChanged(null, getParametersFromXML());
         setApplyButtons(null, getRealParametersFromXML());
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                if (tablePanel != null) {
+                    tablePanel.setVisible(true);
+                }
+            }
+        });
     }
 
     /** Returns combo box for parameter. */
