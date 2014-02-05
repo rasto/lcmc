@@ -325,7 +325,7 @@ final class HbColocationInfo extends EditableInfo
         boolean changed = true;
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            if (!value.equals(getParamSaved(param))) {
+            if (!Tools.areEqual(value, getParamSaved(param))) {
                 changed = true;
             }
             attrs.put(param, value.getValueForConfig());
