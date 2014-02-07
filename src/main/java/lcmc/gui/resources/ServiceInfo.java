@@ -1546,9 +1546,8 @@ public class ServiceInfo extends EditableInfo {
      */
     protected void addCloneFields(final JPanel optionsPanel,
                                   final int leftWidth,
-                                  final int rightWidth) {
-        final CloneInfo ci = getCloneInfo();
-
+                                  final int rightWidth,
+                                  final CloneInfo ci) {
         final String[] params = ci.getParametersFromXML();
         final Info savedMAIdRef = ci.getSavedMetaAttrInfoRef();
         ci.getResource().setValue(GUI_ID, new StringValue(ci.getService().getId()));
@@ -2895,7 +2894,8 @@ public class ServiceInfo extends EditableInfo {
             /* add clone fields */
             addCloneFields(optionsPanel,
                            ClusterBrowser.SERVICE_LABEL_WIDTH,
-                           ClusterBrowser.SERVICE_FIELD_WIDTH);
+                           ClusterBrowser.SERVICE_FIELD_WIDTH,
+                           ci);
         }
         getResource().setValue(GUI_ID, new StringValue(getService().getId()));
 
