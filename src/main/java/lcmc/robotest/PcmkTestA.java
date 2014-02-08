@@ -53,30 +53,20 @@ final class PcmkTestA {
             checkTest("testA", 1);
             /* group with dummy resources */
             moveTo(gx, gy);
-            sleep(1000);
             rightClick(); /* popup */
-            sleep(1000);
             moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
             leftClick();
-            sleep(3000);
             /* create dummy */
             moveTo(gx + 46, gy + 11);
             rightClick(); /* group popup */
-            sleep(2000);
             moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-            sleep(1000);
             moveTo("OCF Resource Agents");
-            sleep(1000);
             typeDummy();
-            sleep(300);
             setTimeouts(true);
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(6000);
             leftClick();
-            sleep(6000);
             checkTest("testA", 2);
             stopResource(gx, gy);
-            sleep(6000);
             checkTest("testA", 3);
 
             /* copy/paste */
@@ -89,7 +79,6 @@ final class PcmkTestA {
             moveTo(gx + 10 , gy + 90);
             leftClick();
             moveTo(Tools.getString("Browser.ApplyGroup"));
-            sleep(4000);
             leftClick();
             checkTest("testA", 4);
 

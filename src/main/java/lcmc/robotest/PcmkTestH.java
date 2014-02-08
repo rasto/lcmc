@@ -47,39 +47,23 @@ final class PcmkTestH {
                                    final boolean apply) {
         moveTo(x, y);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("Stonith Devices");
-        sleep(2000);
         press(KeyEvent.VK_I);
-        sleep(200);
         press(KeyEvent.VK_P);
-        sleep(200);
         press(KeyEvent.VK_M);
-        sleep(200);
         press(KeyEvent.VK_I);
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(200);
         moveTo("Target Role", MComboBox.class);
-        sleep(2000);
         leftClick(); /* pull down */
         press(KeyEvent.VK_DOWN);
-        sleep(500);
         press(KeyEvent.VK_DOWN);
-        sleep(500);
         press(KeyEvent.VK_DOWN);
-        sleep(500);
         press(KeyEvent.VK_ENTER);
-        sleep(500);
         if (apply) {
-            sleep(2000);
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(4000);
             leftClick();
-            sleep(2000);
         }
     }
 
@@ -95,10 +79,8 @@ final class PcmkTestH {
             }
             checkTest("testH", 1);
             /* create ipmi res */
-            sleep(5000);
             chooseIpmi(ipmiX, ipmiY, true);
             checkTest("testH", 3);
-            sleep(5000);
             /* copy/paste */
             moveTo(ipmiX + 10 , ipmiY + 10);
             leftClick();
@@ -109,7 +91,6 @@ final class PcmkTestH {
             moveTo(ipmiX + 10 , ipmiY + 90);
             leftClick();
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(4000);
             leftClick();
             checkTest("testH", 4);
 

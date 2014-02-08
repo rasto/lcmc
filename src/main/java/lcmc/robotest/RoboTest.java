@@ -150,7 +150,7 @@ public final class RoboTest {
             return false;
         }
         if (prevP != null
-            && prevP.getX() - p.getX() > 200
+            && prevP.getX() - p.getX() > 300
             && p.getY() - prevP.getY() > 200) {
             prevP = null;
             info("test aborted");
@@ -920,44 +920,30 @@ public final class RoboTest {
 
     /** Stop everything. */
     static void stopEverything() {
-        sleep(10000);
         moveTo(Tools.getString("Browser.AdvancedMode"));
-        sleep(2000);
         leftClick();
-        sleep(2000);
         moveTo(700, 520);
         rightClick(); /* popup */
-        sleep(3000);
         moveTo(Tools.getString("ClusterBrowser.Hb.StopAllServices"));
-        sleep(3000);
         leftClick();
+        Tools.sleep(500);
         moveTo(Tools.getString("Browser.AdvancedMode")); /* not advanced */
-        sleep(2000);
         leftClick();
-        sleep(2000);
     }
 
     /** Remove everything. */
     static void removeEverything() {
-        sleep(10000);
         moveTo(Tools.getString("Browser.AdvancedMode"));
-        sleep(2000);
         leftClick();
-        sleep(2000);
         moveTo(700, 520);
         rightClick(); /* popup */
-        sleep(3000);
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveAllServices"));
-        sleep(3000);
         leftClick();
         dialogColorTest("remove everything");
         confirmRemove();
-        sleep(3000);
         leftClick();
         moveTo(Tools.getString("Browser.AdvancedMode")); /* not advanced */
-        sleep(2000);
         leftClick();
-        sleep(2000);
     }
 
     /** Enable stonith if it is enabled. */
@@ -971,7 +957,6 @@ public final class RoboTest {
             leftClick(); /* enable stonith */
             moveTo(Tools.getString("Browser.CommitResources"));
         }
-        sleep(2000);
         leftClick();
     }
 
@@ -1001,7 +986,6 @@ public final class RoboTest {
         }
         if (apply) {
             moveTo(Tools.getString("Browser.CommitResources"));
-            sleep(2000);
             leftClick();
         }
     }
@@ -1011,26 +995,19 @@ public final class RoboTest {
         moveScrollBar(true);
 
         moveTo("on ", MComboBox.class);
-        sleep(1000);
         leftClick();
-        sleep(1000);
         leftClick();
         for (final int ev : events) {
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyPress(KeyEvent.VK_SHIFT);
-                sleep(400);
             }
             press(ev);
-            sleep(400);
             if (ev == KeyEvent.VK_PLUS) {
                 robot.keyRelease(KeyEvent.VK_SHIFT);
-                sleep(400);
             }
         }
         moveTo(Tools.getString("Browser.ApplyResource"));
-        sleep(4000);
         leftClick();
-        sleep(2000);
 
         moveScrollBar(false);
 
@@ -1039,83 +1016,56 @@ public final class RoboTest {
     /** Choose dummy resource. */
     static void typeDummy() {
         press(KeyEvent.VK_D);
-        sleep(200);
         press(KeyEvent.VK_U);
-        sleep(200);
         press(KeyEvent.VK_M);
-        sleep(200);
         press(KeyEvent.VK_M);
-        sleep(200);
         press(KeyEvent.VK_Y);
-        sleep(200);
         press(KeyEvent.VK_ENTER); /* choose dummy */
     }
 
     /** Sets start timeout. */
     static void setTimeouts(final boolean migrateTimeouts) {
-        sleep(3000);
         moveScrollBar(true);
         moveTo("Start / Timeout", MTextField.class);
         leftClick();
-        sleep(2000);
         press(KeyEvent.VK_2);
-        sleep(2000);
         press(KeyEvent.VK_0);
-        sleep(2000);
         press(KeyEvent.VK_0);
-        sleep(5000);
 
         moveTo("Stop / Timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_1);
-        sleep(200);
         press(KeyEvent.VK_9);
-        sleep(200);
         press(KeyEvent.VK_2);
-        sleep(5000);
 
         moveTo("Monitor / Timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_1);
-        sleep(200);
         press(KeyEvent.VK_5);
-        sleep(200);
         press(KeyEvent.VK_4);
-        sleep(5000);
 
         moveTo("Monitor / Interval", MTextField.class);
         leftClick();
         press(KeyEvent.VK_1);
-        sleep(200);
         press(KeyEvent.VK_2);
-        sleep(200);
         press(KeyEvent.VK_1);
-        sleep(5000);
         if (migrateTimeouts) {
             moveTo("Reload / Timeout", MTextField.class);
             leftClick();
             press(KeyEvent.VK_BACK_SPACE);
-            sleep(200);
             press(KeyEvent.VK_BACK_SPACE);
-            sleep(5000);
 
             moveTo("Migrate_to / Timeout", MTextField.class);
             leftClick();
             press(KeyEvent.VK_1);
-            sleep(200);
             press(KeyEvent.VK_2);
-            sleep(200);
             press(KeyEvent.VK_3);
-            sleep(5000);
 
             moveTo("Migrate_from / T", MTextField.class);
             leftClick();
             press(KeyEvent.VK_1);
-            sleep(200);
             press(KeyEvent.VK_2);
-            sleep(200);
             press(KeyEvent.VK_2);
-            sleep(5000);
         }
 
         moveScrollBar(false);
@@ -1160,24 +1110,18 @@ public final class RoboTest {
                             final boolean apply) {
         moveTo(x, y);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        sleep(1000);
         moveTo("Filesystem + Linbit:DRBD");
         moveTo("OCF Resource Agents");
-        sleep(2000);
         typeDummy();
         if (apply) {
-            sleep(2000);
             setTimeouts(true);
             if (clone) {
                 moveTo(893, CLONE_RADIO_Y);
                 leftClick(); /* clone */
             }
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(4000);
             leftClick();
-            sleep(2000);
         }
     }
 
@@ -1187,7 +1131,6 @@ public final class RoboTest {
                                final boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
         leftClick();
         if (confirm == CONFIRM_REMOVE) {
@@ -1199,7 +1142,6 @@ public final class RoboTest {
     static void removeGroup(final int x, final int y) {
         moveTo(x + 20, y);
         rightClick();
-        sleep(10000);
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
         leftClick();
         confirmRemove();
@@ -1211,7 +1153,6 @@ public final class RoboTest {
                                   final boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
-        sleep(1000);
         moveTo(Tools.getString("ConstraintPHInfo.Remove"));
         leftClick();
         if (confirm) {
@@ -1221,120 +1162,89 @@ public final class RoboTest {
 
     /** Confirms remove dialog. */
     static void confirmRemove() {
-        sleep(1000);
         dialogColorTest("confirm remove");
         press(KeyEvent.VK_TAB);
-        sleep(500);
         press(KeyEvent.VK_TAB);
-        sleep(500);
         press(KeyEvent.VK_SPACE);
-        sleep(500);
     }
 
     /** Stops resource. */
     static void stopResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(2000);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
-        sleep(6000); /* ptest */
         leftClick(); /* stop */
     }
 
     /** Stops group. */
     static void stopGroup() {
         rightClick(); /* popup */
-        sleep(3000);
         moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
-        sleep(10000); /* ptest */
         leftClick(); /* stop */
     }
 
     /** Removes target role. */
     static void resetStartStopResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(1000);
         leftClick(); /* select */
 
         moveTo("Target Role", MComboBox.class);
-        sleep(2000);
         leftClick(); /* pull down */
         press(KeyEvent.VK_DOWN);
-        sleep(500);
         press(KeyEvent.VK_UP);
-        sleep(500);
         press(KeyEvent.VK_UP);
-        sleep(500);
         leftClick();
         moveTo(Tools.getString("Browser.ApplyResource"));
-        sleep(6000); /* ptest */
         leftClick();
     }
 
     /** Starts resource. */
     static void startResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(1000);
         rightClick(); /* popup */
         moveTo("^" + Tools.getString("ClusterBrowser.Hb.StartResource") + "$");
-        sleep(6000);
         leftClick();
     }
 
     /** Migrate resource. */
     static void migrateResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(1000);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.MigrateFromResource"));
-        sleep(6000); /* ptest */
         leftClick(); /* stop */
     }
 
     /** Unmigrate resource. */
     static void unmigrateResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(6000);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.UnmigrateResource"));
-        sleep(12000); /* ptest */
         leftClick(); /* stop */
     }
 
     /** Unmanage resource. */
     static void unmanageResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(1000);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.UnmanageResource"));
-        sleep(6000); /* ptest */
         leftClick(); /* stop */
     }
 
     /** Manage resource. */
     static void manageResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
-        sleep(1000);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.ManageResource"));
-        sleep(6000); /* ptest */
         leftClick(); /* stop */
     }
 
     /** Adds constraint from vertex. */
     static void addConstraint(final int number) {
         rightClick();
-        sleep(5000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddStartBefore"));
-        sleep(1000);
         leftClick();
         for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
-            sleep(500);
         }
         press(KeyEvent.VK_ENTER);
     }
@@ -1345,22 +1255,15 @@ public final class RoboTest {
                                        final int number) {
         moveTo(x + 20, y + 5);
         rightClick();
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddStartBefore"));
-        sleep(500);
         leftClick();
         press(KeyEvent.VK_TAB);
-        sleep(200);
         press(KeyEvent.VK_SPACE); /* disable colocation */
-        sleep(200);
         press(KeyEvent.VK_TAB);
-        sleep(200);
         press(KeyEvent.VK_TAB); /* list */
-        sleep(200);
 
         for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
-            sleep(200);
         }
         press(KeyEvent.VK_ENTER);
     }
@@ -1371,22 +1274,15 @@ public final class RoboTest {
                                             final int number) {
         moveTo(x + 20, y + 5);
         rightClick();
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddStartBefore"));
-        sleep(500);
         leftClick();
         press(KeyEvent.VK_TAB);
-        sleep(200);
         press(KeyEvent.VK_TAB);
-        sleep(200);
         press(KeyEvent.VK_SPACE); /* disable order */
-        sleep(200);
         press(KeyEvent.VK_TAB); /* list */
-        sleep(200);
 
         for (int i = 0; i < number; i++) {
             press(KeyEvent.VK_DOWN);
-            sleep(200);
         }
         press(KeyEvent.VK_ENTER);
     }
@@ -1394,57 +1290,42 @@ public final class RoboTest {
     /** Removes constraint. */
     static void removeConstraint(final int popX, final int popY) {
         moveTo(popX, popY);
-        sleep(10000);
         rightClick(); /* constraint popup */
-        sleep(2000);
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveEdge"));
-        sleep(6000); /* ptest */
         leftClick(); /* remove ord */
     }
 
     /** Removes order. */
     static void removeOrder(final int popX, final int popY) {
         moveTo(popX, popY);
-        sleep(1000);
         rightClick(); /* constraint popup */
-        sleep(1000);
         final String s = Tools.getString("ClusterBrowser.Hb.RemoveOrder");
         moveTo(s.substring(0, s.length() - 2));
-        sleep(6000); /* ptest */
         leftClick(); /* remove ord */
     }
 
     /** Adds order. */
     static void addOrder(final int popX, final int popY) {
         moveTo(popX, popY);
-        sleep(1000);
         rightClick(); /* constraint popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddOrder"));
-        sleep(6000); /* ptest */
         leftClick(); /* add ord */
     }
 
     /** Removes colocation. */
     static void removeColocation(final int popX, final int popY) {
         moveTo(popX, popY);
-        sleep(1000);
         rightClick(); /* constraint popup */
-        sleep(1000);
         moveTo(
             Tools.getString("ClusterBrowser.Hb.RemoveColocation").substring(1));
-        sleep(6000); /* ptest */
         leftClick(); /* remove col */
     }
 
     /** Adds colocation. */
     static void addColocation(final int popX, final int popY) {
         moveTo(popX, popY);
-        sleep(1000);
         rightClick(); /* constraint popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddColocation").substring(1));
-        sleep(6000); /* ptest */
         leftClick(); /* add col */
     }
 

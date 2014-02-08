@@ -50,9 +50,7 @@ final class PcmkTest8 {
                 info("test8 i: " + i);
             }
             //checkTest("test7", 1);
-            sleep(5000);
             chooseDummy(dummy1X, dummy1Y, false, true);
-            sleep(5000);
             moveTo(550, 202);
             leftPress(); /* move the reosurce */
             moveTo(300, 202);

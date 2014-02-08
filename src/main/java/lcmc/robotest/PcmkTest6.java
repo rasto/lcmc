@@ -55,9 +55,7 @@ final class PcmkTest6 {
         /* placeholders */
         moveTo(ph1X, ph1Y);
         rightClick();
-        sleep(2000);
         moveTo("Placeholder (AND)");
-        sleep(2000);
         leftClick();
 
         chooseDummy(dummy1X, dummy1Y, false, true);
@@ -69,15 +67,10 @@ final class PcmkTest6 {
             }
             moveTo(ph1X, ph1Y);
             addConstraint(1);
-            if (!aborted) {
-                sleepNoFactor(2000);
-            }
             removeConstraint(dum1PopX, dum1PopY);
         }
         stopEverything();
-        sleepNoFactor(20000);
         removeEverything();
-        sleepNoFactor(20000);
         resetTerminalAreas();
     }
 }

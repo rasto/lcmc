@@ -82,16 +82,12 @@ final class PcmkTest4 {
         for (int i = 0; i < count; i++) {
             moveTo(ph1X, ph1Y);
             rightClick();
-            sleep(2000);
             moveTo("Placeholder (AND)");
-            sleep(2000);
             leftClick();
 
             moveTo(ph2X, ph2Y);
             rightClick();
-            sleep(1000);
             moveTo("Placeholder (AND)");
-            sleep(1000);
             leftClick();
             checkTest("test4", 2);
 
@@ -125,7 +121,6 @@ final class PcmkTest4 {
 
         }
         moveTo(Tools.getString("Browser.ApplyResource"));
-        sleep(2000);
         leftClick();
 
         checkTest("test4", 3);
@@ -134,6 +129,5 @@ final class PcmkTest4 {
         removeEverything();
         removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
         removePlaceHolder(ph2X, ph2Y, !CONFIRM_REMOVE);
-        sleep(40000);
     }
 }
