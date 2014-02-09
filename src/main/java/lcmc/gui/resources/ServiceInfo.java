@@ -2699,6 +2699,11 @@ public class ServiceInfo extends EditableInfo {
             p.add(new JLabel(Tools.getString("ServiceInfo.LoadingMetaData")));
             return p;
         }
+        if (getService().isRemoved()) {
+            final JPanel p = new JPanel();
+            p.add(new JLabel(IS_BEING_REMOVED_STRING));
+            return p;
+        }
         if (getBrowser().getCRMXML() == null
             || getBrowser().getClusterStatus() == null) {
             return new JPanel();
