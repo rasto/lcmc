@@ -56,6 +56,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lcmc.data.Value;
+import lcmc.utilities.ComponentWithTest;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -371,24 +372,24 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override
-            public final void mouseOut() {
+            public final void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText("");
+                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public final void mouseOver() {
+            public final void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                getApplyButton().setToolTipText(
+                component.setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                component.setToolTipBackground(Tools.getDefaultColor(
                                     "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -396,7 +397,7 @@ public class HbConnectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation(getApplyButton(),
+                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
                                                               startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
@@ -405,7 +406,7 @@ public class HbConnectionInfo extends EditableInfo {
                     clStatus.setPtestData(null);
                     apply(dcHost, true);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                    getApplyButton().setToolTipText(ptestData.getToolTip());
+                    component.setToolTipText(ptestData.getToolTip());
                     clStatus.setPtestData(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();
@@ -564,7 +565,7 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
-                  getBrowser().new ClMenuItemCallback(removeEdgeItem, null) {
+                  getBrowser().new ClMenuItemCallback(null) {
             @Override
             public final boolean isEnabled() {
                 return super.isEnabled() && !isNew();
@@ -630,7 +631,7 @@ public class HbConnectionInfo extends EditableInfo {
         };
 
         final ClusterBrowser.ClMenuItemCallback removeOrderCallback =
-                 getBrowser().new ClMenuItemCallback(removeOrderItem, null) {
+                 getBrowser().new ClMenuItemCallback(null) {
             @Override
             public final boolean isEnabled() {
                 return super.isEnabled() && !isNew();
@@ -711,7 +712,7 @@ public class HbConnectionInfo extends EditableInfo {
         };
 
         final ClusterBrowser.ClMenuItemCallback removeColocationCallback =
-            getBrowser().new ClMenuItemCallback(removeColocationItem, null) {
+                                   getBrowser().new ClMenuItemCallback(null) {
 
             @Override
             public final boolean isEnabled() {

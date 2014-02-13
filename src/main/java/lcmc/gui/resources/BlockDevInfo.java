@@ -77,6 +77,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -1026,25 +1027,25 @@ public final class BlockDevInfo extends EditableInfo {
             }
 
             @Override
-            public void mouseOut() {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
                 final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
-                drbdGraph.stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText("");
+                drbdGraph.stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public void mouseOver() {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                getApplyButton().setToolTipText(Tools.getString(
+                component.setToolTipText(Tools.getString(
                                          "ClusterBrowser.StartingDRBDtest"));
-                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                component.setToolTipBackground(Tools.getDefaultColor(
                                   "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -1053,7 +1054,8 @@ public final class BlockDevInfo extends EditableInfo {
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
                 final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
-                drbdGraph.startTestAnimation(getApplyButton(), startTestLatch);
+                drbdGraph.startTestAnimation((JComponent) component,
+                                             startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 thisClass.setDRBDtestData(null);
                 apply(true);
@@ -1068,7 +1070,7 @@ public final class BlockDevInfo extends EditableInfo {
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
-                    getApplyButton().setToolTipText(dtd.getToolTip());
+                    component.setToolTipText(dtd.getToolTip());
                     thisClass.setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
                     LOG.appError("getInfoPanelBD: config failed", dce);
@@ -1823,7 +1825,7 @@ public final class BlockDevInfo extends EditableInfo {
         final ClusterBrowser wi = getBrowser().getClusterBrowser();
         if (wi != null) {
             final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
-                            wi.new DRBDMenuItemCallback(attachMenu, getHost()) {
+                                       wi.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     if (isDiskless(false)) {
@@ -1892,8 +1894,7 @@ public final class BlockDevInfo extends EditableInfo {
             };
         if (wi != null) {
             final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-                               wi.new DRBDMenuItemCallback(connectMenu,
-                                                           getHost()) {
+                                       wi.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     if (isConnectedOrWF(false)) {

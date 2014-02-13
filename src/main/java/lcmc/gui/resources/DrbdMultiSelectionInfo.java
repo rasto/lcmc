@@ -60,6 +60,7 @@ import lcmc.data.Value;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
+import lcmc.utilities.ComponentWithTest;
 
 /**
  * This class provides menus for block device and host multi selection.
@@ -178,8 +179,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             };
         items.add(adjustAllItem);
         final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
-               getBrowser().new DRBDMenuItemCallback(adjustAllItem,
-                                                     getBrowser().getDCHost()) {
+               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
@@ -220,8 +220,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             };
         items.add(upAllItem);
         final ClusterBrowser.DRBDMenuItemCallback upAllItemCallback =
-             getBrowser().new DRBDMenuItemCallback(upAllItem,
-                                                   getBrowser().getDCHost()) {
+             getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host host) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
@@ -760,8 +759,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.DRBDMenuItemCallback detachItemCallback =
-              getBrowser().new DRBDMenuItemCallback(detachMenu,
-                                                    getBrowser().getDCHost()) {
+              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
@@ -838,8 +836,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
-             getBrowser().new DRBDMenuItemCallback(attachMenu,
-                                                   getBrowser().getDCHost()) {
+             getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
@@ -915,8 +912,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-              getBrowser().new DRBDMenuItemCallback(connectMenu,
-                                                    getBrowser().getDCHost()) {
+              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
@@ -1005,8 +1001,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.DRBDMenuItemCallback disconnectItemCallback =
-              getBrowser().new DRBDMenuItemCallback(disconnectMenu,
-                                                    getBrowser().getDCHost()) {
+              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
@@ -1858,24 +1853,24 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 return !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
-            public void mouseOut() {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText("");
+                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public void mouseOver() {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                getApplyButton().setToolTipText(
+                component.setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                component.setToolTipBackground(Tools.getDefaultColor(
                                    "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -1883,7 +1878,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation(getApplyButton(),
+                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
                                                               startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
@@ -1892,7 +1887,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     cs.setPtestData(null);
                     apply(dcHost, CRM.TESTONLY);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                    getApplyButton().setToolTipText(ptestData.getToolTip());
+                    component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestData(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();

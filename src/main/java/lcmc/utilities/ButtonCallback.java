@@ -34,9 +34,9 @@ public interface ButtonCallback {
     /**
      * On mouse over.
      */
-    void mouseOver();
+    void mouseOver(final ComponentWithTest component);
     /**
      * On mouse out.
      */
-    void mouseOut();
+    void mouseOut(final ComponentWithTest component);
 }

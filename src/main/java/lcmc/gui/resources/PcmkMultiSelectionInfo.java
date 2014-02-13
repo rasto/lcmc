@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import lcmc.data.Value;
+import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -153,7 +154,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             };
         final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
                                    getBrowser().new ClMenuItemCallback(
-                                       standbyItem, getBrowser().getDCHost()) {
+                                                    getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
@@ -213,7 +214,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             };
         final ClusterBrowser.ClMenuItemCallback onlineItemCallback =
                                    getBrowser().new ClMenuItemCallback(
-                                       onlineItem, getBrowser().getDCHost()) {
+                                                    getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
@@ -299,7 +300,6 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             };
         final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
                     getBrowser().new ClMenuItemCallback(
-                                                    stopCorosyncItem,
                                                     getBrowser().getDCHost()) {
             @Override
             public void action(final Host dchost) {
@@ -355,8 +355,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
              }
          };
         final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
-                getBrowser().new ClMenuItemCallback(stopHeartbeatItem,
-                                                    getBrowser().getDCHost()) {
+                getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
@@ -428,8 +427,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
-                getBrowser().new ClMenuItemCallback(startCorosyncItem,
-                                                    getBrowser().getDCHost()) {
+                getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 //TODO
@@ -488,8 +486,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
               }
           };
         final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
-                getBrowser().new ClMenuItemCallback(startOpenaisItem,
-                                                    getBrowser().getDCHost()) {
+                getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host host) {
                 //TODO
@@ -539,8 +536,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
-                getBrowser().new ClMenuItemCallback(startHeartbeatItem,
-                                                    getBrowser().getDCHost()) {
+                getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host host) {
                 //TODO
@@ -593,8 +589,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
-                getBrowser().new ClMenuItemCallback(startPcmkItem,
-                                                    getBrowser().getDCHost()) {
+                getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host host) {
                 //TODO
@@ -697,7 +692,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback startItemCallback =
-                    getBrowser().new ClMenuItemCallback(startMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
@@ -769,7 +764,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback stopItemCallback =
-                    getBrowser().new ClMenuItemCallback(stopMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
@@ -921,7 +916,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback manageItemCallback =
-                  getBrowser().new ClMenuItemCallback(manageMenuItem, null) {
+                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
@@ -996,7 +991,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback unmanageItemCallback =
-                  getBrowser().new ClMenuItemCallback(unmanageMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
@@ -1091,7 +1086,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
-               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     for (final ServiceInfo si : selectedServiceInfos) {
@@ -1158,7 +1153,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback unmigrateItemCallback =
-               getBrowser().new ClMenuItemCallback(unmigrateMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
@@ -1240,7 +1235,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
-                getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
 
             public boolean isEnabled() {
@@ -1439,24 +1434,24 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 return !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
-            public void mouseOut() {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText("");
+                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public void mouseOver() {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                getApplyButton().setToolTipText(
+                component.setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                component.setToolTipBackground(Tools.getDefaultColor(
                                    "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -1464,7 +1459,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation(getApplyButton(),
+                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
                                                               startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
@@ -1474,7 +1469,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     apply(dcHost, CRM.TESTONLY);
                     final PtestData ptestData =
                                         new PtestData(CRM.getPtest(dcHost));
-                    getApplyButton().setToolTipText(ptestData.getToolTip());
+                    component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestData(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();

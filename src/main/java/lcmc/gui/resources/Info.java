@@ -78,6 +78,7 @@ import java.util.Collections;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 import lcmc.data.Value;
+import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -717,12 +718,12 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Adds mouse over listener. */
-    protected final void addMouseOverListener(final Component c,
+    protected final void addMouseOverListener(final ComponentWithTest c,
                                               final ButtonCallback bc) {
         if (bc == null) {
             return;
         }
-        c.addMouseListener(new MouseListener() {
+        ((Component) c).addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 /* do nothing */
@@ -730,11 +731,11 @@ public class Info implements Comparable<Info>, Value {
 
             @Override
             public void mouseEntered(final MouseEvent e) {
-                if (c.isShowing() && c.isEnabled()) {
+                if (((Component) c).isShowing() && ((Component) c).isEnabled()) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            bc.mouseOver();
+                            bc.mouseOver(c);
                         }
                     });
                     thread.start();
@@ -746,7 +747,7 @@ public class Info implements Comparable<Info>, Value {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        bc.mouseOut();
+                        bc.mouseOut(c);
                     }
                 });
                 t.start();

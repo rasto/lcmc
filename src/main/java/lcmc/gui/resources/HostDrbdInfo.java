@@ -460,8 +460,7 @@ public final class HostDrbdInfo extends Info {
         final ClusterBrowser cb = getBrowser().getClusterBrowser();
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
-                            cb.new DRBDMenuItemCallback(adjustAllItem,
-                                                        getHost()) {
+                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.adjust(getHost(), DRBD.ALL, null, true);
@@ -495,8 +494,7 @@ public final class HostDrbdInfo extends Info {
         items.add(upAllItem);
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback upAllItemCallback =
-                            cb.new DRBDMenuItemCallback(upAllItem,
-                                                        getHost()) {
+                                      cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.up(getHost(), DRBD.ALL, null, true);
@@ -609,8 +607,7 @@ public final class HostDrbdInfo extends Info {
         items.add(connectAllItem);
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback connectAllItemCallback =
-                            cb.new DRBDMenuItemCallback(connectAllItem,
-                                                        getHost()) {
+                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.connect(getHost(), DRBD.ALL, null, true);
@@ -646,8 +643,7 @@ public final class HostDrbdInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback
                     disconnectAllItemCallback =
-                            cb.new DRBDMenuItemCallback(disconnectAllItem,
-                                                        getHost()) {
+                                      cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.disconnect(getHost(), DRBD.ALL, null, true);
@@ -683,8 +679,7 @@ public final class HostDrbdInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback
                     attachAllItemCallback =
-                            cb.new DRBDMenuItemCallback(attachAllItem,
-                                                        getHost()) {
+                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.attach(getHost(), DRBD.ALL, null, true);
@@ -720,8 +715,7 @@ public final class HostDrbdInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback
                     detachAllItemCallback =
-                            cb.new DRBDMenuItemCallback(detachAllItem,
-                                                        getHost()) {
+                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.detach(getHost(), DRBD.ALL, null, true);
@@ -761,8 +755,7 @@ public final class HostDrbdInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback
                     setAllPrimaryItemCallback =
-                            cb.new DRBDMenuItemCallback(setAllPrimaryItem,
-                                                        getHost()) {
+                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.setPrimary(getHost(), DRBD.ALL, null, true);
@@ -798,8 +791,7 @@ public final class HostDrbdInfo extends Info {
         if (cb != null) {
             final ClusterBrowser.DRBDMenuItemCallback
                     setAllSecondaryItemCallback =
-                            cb.new DRBDMenuItemCallback(setAllSecondaryItem,
-                                                        getHost()) {
+                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
                     DRBD.setSecondary(getHost(), DRBD.ALL, null, true);

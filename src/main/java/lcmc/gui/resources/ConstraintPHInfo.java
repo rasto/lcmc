@@ -393,7 +393,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             }
         };
         final ClusterBrowser.ClMenuItemCallback removeItemCallback =
-                getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public boolean isEnabled() {
                 return super.isEnabled() && !getService().isNew();

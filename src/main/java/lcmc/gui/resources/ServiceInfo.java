@@ -93,6 +93,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -2738,25 +2739,24 @@ public class ServiceInfo extends EditableInfo {
                 return true;
             }
             @Override
-            public final void mouseOut() {
+            public final void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation(
-                                                             getApplyButton());
-                getApplyButton().setToolTipText("");
+                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public final void mouseOver() {
+            public final void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                getApplyButton().setToolTipText(
+                component.setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                component.setToolTipBackground(Tools.getDefaultColor(
                                    "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -2764,9 +2764,8 @@ public class ServiceInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation(
-                                                               getApplyButton(),
-                                                               startTestLatch);
+                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
+                                                              startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
                 try {
@@ -2774,7 +2773,7 @@ public class ServiceInfo extends EditableInfo {
                     cs.setPtestData(null);
                     apply(dcHost, true);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
-                    getApplyButton().setToolTipText(ptestData.getToolTip());
+                    component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestData(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();
@@ -4745,7 +4744,7 @@ public class ServiceInfo extends EditableInfo {
         };
         dlm.addElement(mmi);
         final ClusterBrowser.ClMenuItemCallback mmiCallback =
-            getBrowser().new ClMenuItemCallback(list, null) {
+                       getBrowser().new ClMenuItemCallback(null) {
                            @Override
                            public void action(final Host dcHost) {
                                addServicePanel(asi,
@@ -5264,7 +5263,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback startItemCallback =
-                   getBrowser().new ClMenuItemCallback(startMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 startResource(dcHost, true); /* testOnly */
@@ -5300,7 +5299,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback stopItemCallback =
-                    getBrowser().new ClMenuItemCallback(stopMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 stopResource(dcHost, true); /* testOnly */
@@ -5357,7 +5356,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback upItemCallback =
-                    getBrowser().new ClMenuItemCallback(upMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 upResource(dcHost, true); /* testOnly */
@@ -5414,7 +5413,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback downItemCallback =
-                    getBrowser().new ClMenuItemCallback(downMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 downResource(dcHost, true); /* testOnly */
@@ -5504,7 +5503,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback manageItemCallback =
-                  getBrowser().new ClMenuItemCallback(manageMenuItem, null) {
+                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 setManaged(!isManaged(false),
@@ -5567,7 +5566,7 @@ public class ServiceInfo extends EditableInfo {
             };
             final ServiceInfo thisClass = this;
             final ClusterBrowser.ClMenuItemCallback removeItemCallback =
-                    getBrowser().new ClMenuItemCallback(removeMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public final boolean isEnabled() {
                     return super.isEnabled() && !getService().isNew();
@@ -5720,7 +5719,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
-               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     migrateFromResource(dcHost, hostName, true); /* testOnly */
@@ -5765,7 +5764,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback unmigrateItemCallback =
-               getBrowser().new ClMenuItemCallback(unmigrateMenuItem, null) {
+                                    getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 unmigrateResource(dcHost, true); /* testOnly */
@@ -5847,7 +5846,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
-                 getBrowser().new ClMenuItemCallback(migrateMenuItem, null) {
+                                     getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     migrateResource(hostName, dcHost, true); /* testOnly */
@@ -5917,8 +5916,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback forceMigrateItemCallback =
-                 getBrowser().new ClMenuItemCallback(forceMigrateMenuItem,
-                                                     null) {
+                                     getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     forceMigrateResource(hostName, dcHost, true); /* testOnly */
