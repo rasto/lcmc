@@ -55,42 +55,30 @@ final class PcmkTest3 {
             /* filesystem/drbd */
             moveTo(577, 205);
             rightClick(); /* popup */
-            sleep(1000);
             moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-            sleep(1000);
             moveTo("Filesystem + Linbit:DRBD");
             leftClick(); /* choose fs */
 
             moveTo("block device", MComboBox.class); /* choose drbd */
             leftClick();
-            sleep(2000);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo("mount point", MComboBox.class);
             leftClick();
-            sleep(2000);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo("filesystem type", MComboBox.class);
             leftClick();
-            sleep(2000);
             press(KeyEvent.VK_E);
-            sleep(200);
             press(KeyEvent.VK_E);
-            sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo(Tools.getString("Browser.ApplyResource"));
             leftClick();
-            sleep(2000);
             checkTest(testName, 2);
             checkNumberOfVertices(testName, 4);
             stopEverything();
@@ -101,9 +89,7 @@ final class PcmkTest3 {
             /* filesystem/drbd - with name */
             moveTo(577, 205);
             rightClick(); /* popup */
-            sleep(1000);
             moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-            sleep(1000);
             moveTo("Filesystem + Linbit:DRBD");
             leftClick(); /* choose fs */
 
@@ -111,40 +97,28 @@ final class PcmkTest3 {
             moveTo("Name", MTextField.class);
             leftClick();
             press(KeyEvent.VK_X);
-            sleep(200);
             press(KeyEvent.VK_Y);
-            sleep(200);
 
             moveTo("block device", MComboBox.class); /* choose drbd */
             leftClick();
-            sleep(2000);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo("mount point", MComboBox.class);
             leftClick();
-            sleep(2000);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_DOWN);
-            sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo("filesystem type", MComboBox.class);
             leftClick();
-            sleep(2000);
             press(KeyEvent.VK_E);
-            sleep(200);
             press(KeyEvent.VK_E);
-            sleep(200);
             press(KeyEvent.VK_ENTER);
 
             moveTo(Tools.getString("Browser.ApplyResource"));
             leftClick();
-            sleep(2000);
             checkTest(testName, 5);
             checkNumberOfVertices(testName, 4);
             stopEverything();

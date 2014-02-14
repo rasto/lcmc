@@ -54,36 +54,22 @@ final class PcmkTestC {
             /** Add m/s Stateful resource */
             moveTo(statefulX, statefulY);
             rightClick(); /* popup */
-            sleep(1000);
             moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-            sleep(1000);
             moveTo("Filesystem + Linbit:DRBD");
-            sleep(1000);
             moveTo("OCF Resource Agents");
-            sleep(1000);
 
             press(KeyEvent.VK_S);
-            sleep(200);
             press(KeyEvent.VK_T);
-            sleep(200);
             press(KeyEvent.VK_A);
-            sleep(200);
             press(KeyEvent.VK_T);
-            sleep(200);
             press(KeyEvent.VK_E);
-            sleep(200);
             press(KeyEvent.VK_F);
-            sleep(200);
             press(KeyEvent.VK_ENTER); /* choose Stateful */
-            sleep(1000);
 
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(1000);
             leftClick();
-            sleep(4000);
             stopResource(statefulX, statefulY);
             checkTest(testName, 2);
-            sleep(5000);
             /* copy/paste */
             moveTo(statefulX, statefulY);
             leftClick();
@@ -94,7 +80,6 @@ final class PcmkTestC {
             moveTo(245, statefulY + 90);
             leftClick();
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(4000);
             leftClick();
             checkTest(testName, 4);
 

@@ -48,17 +48,12 @@ final class PcmkTestE {
                 info("testE I: " + i);
             }
             moveTo(300 , HOST_Y); /* host */
-            sleep(2000);
             rightClick();
-            sleep(9000);
             moveTo(Tools.getString("HostBrowser.HostWizard"));
-            sleep(2000);
             leftClick();
             sleep(30000);
             moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-            sleep(2000);
             leftClick();
-            sleep(2000);
         }
     }
 }

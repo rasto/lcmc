@@ -70,6 +70,7 @@ import javax.swing.text.Document;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JLabel;
+import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -314,24 +315,24 @@ public final class HostInfo extends Info {
             }
 
             @Override
-            public void mouseOut() {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
-                crmg.stopTestAnimation(crmConfigureCommitButton);
-                crmConfigureCommitButton.setToolTipText("");
+                crmg.stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public void mouseOver() {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                crmConfigureCommitButton.setToolTipText(
+                component.setToolTipText(
                                         ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                crmConfigureCommitButton.setToolTipBackground(
+                component.setToolTipBackground(
                             Tools.getDefaultColor(
                                     "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
@@ -340,7 +341,7 @@ public final class HostInfo extends Info {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                crmg.startTestAnimation(crmConfigureCommitButton,
+                crmg.startTestAnimation((JComponent) component,
                                         startTestLatch);
                 final Host dcHost =
                                   getBrowser().getClusterBrowser().getDCHost();
@@ -352,8 +353,7 @@ public final class HostInfo extends Info {
                     CRM.crmConfigureCommit(host, ta.getText(), true);
                     final PtestData ptestData =
                                            new PtestData(CRM.getPtest(dcHost));
-                    crmConfigureCommitButton.setToolTipText(
-                                                        ptestData.getToolTip());
+                    component.setToolTipText(ptestData.getToolTip());
                     clStatus.setPtestData(ptestData);
                 } finally {
                     getBrowser().getClusterBrowser().ptestLockRelease();
@@ -516,7 +516,7 @@ public final class HostInfo extends Info {
         final ClusterBrowser cb = getBrowser().getClusterBrowser();
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
-                              cb.new ClMenuItemCallback(standbyItem, host) {
+                                              cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     if (isStandby(false)) {
@@ -578,7 +578,7 @@ public final class HostInfo extends Info {
                 }
             };
         final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
-                    cb.new ClMenuItemCallback(allMigrateFromItem, host) {
+                                              cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     for (final ServiceInfo si
@@ -666,7 +666,7 @@ public final class HostInfo extends Info {
             };
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
-                            cb.new ClMenuItemCallback(stopCorosyncItem, host) {
+                                              cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     if (!isStandby(false)) {
@@ -717,7 +717,7 @@ public final class HostInfo extends Info {
             };
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
-                            cb.new ClMenuItemCallback(stopHeartbeatItem, host) {
+                                              cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     if (!isStandby(false)) {
@@ -776,7 +776,7 @@ public final class HostInfo extends Info {
             };
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
-                            cb.new ClMenuItemCallback(startCorosyncItem, host) {
+                                              cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host host) {
                     //TODO
@@ -828,7 +828,7 @@ public final class HostInfo extends Info {
             };
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
-                            cb.new ClMenuItemCallback(startOpenaisItem, host) {
+                                              cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host host) {
                     //TODO
@@ -878,7 +878,7 @@ public final class HostInfo extends Info {
             };
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
-                          cb.new ClMenuItemCallback(startHeartbeatItem, host) {
+                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host host) {
                     //TODO
@@ -927,7 +927,7 @@ public final class HostInfo extends Info {
             };
         if (cb != null) {
             final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
-                         cb.new ClMenuItemCallback(startPcmkItem, host) {
+                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host host) {
                     //TODO

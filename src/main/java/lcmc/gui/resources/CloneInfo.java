@@ -667,7 +667,7 @@ final class CloneInfo extends ServiceInfo {
                     }
                 };
             final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
-               getBrowser().new ClMenuItemCallback(migrateFromMenuItem, null) {
+               getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     if (getService().isMaster()) {

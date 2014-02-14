@@ -69,6 +69,7 @@ import javax.swing.ImageIcon;
 import lcmc.EditClusterDialog;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -442,24 +443,24 @@ public final class DrbdInfo extends DrbdGuiInfo {
             }
 
             @Override
-            public void mouseOut() {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getDrbdGraph().stopTestAnimation(getApplyButton());
-                getApplyButton().setToolTipText("");
+                getBrowser().getDrbdGraph().stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
             }
 
             @Override
-            public void mouseOver() {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
                 mouseStillOver = true;
-                getApplyButton().setToolTipText(
+                component.setToolTipText(
                        Tools.getString("ClusterBrowser.StartingDRBDtest"));
-                getApplyButton().setToolTipBackground(Tools.getDefaultColor(
+                component.setToolTipBackground(Tools.getDefaultColor(
                                 "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
@@ -467,7 +468,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getDrbdGraph().startTestAnimation(getApplyButton(),
+                getBrowser().getDrbdGraph().startTestAnimation((JComponent) component,
                                                                startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
@@ -480,7 +481,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
-                    getApplyButton().setToolTipText(dtd.getToolTip());
+                    component.setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
                 } catch (Exceptions.DrbdConfigException dce) {
                     LOG.appError("getInfoPanel: config failed", dce);

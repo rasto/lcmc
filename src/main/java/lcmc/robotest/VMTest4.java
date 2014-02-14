@@ -51,7 +51,6 @@ final class VMTest4 {
                 info(vmTest + " I: " + i);
             }
             moveTo("Add New Virtual Machine"); /* new VM */
-            sleep(500);
             leftClick();
             sleep(1000);
             moveTo("Domain name", MTextField.class);
@@ -65,13 +64,11 @@ final class VMTest4 {
             }
             boolean ok = false;
             for (int error = 0; error < 5; error++) {
-                sleep(100);
                 press(KeyEvent.VK_X);
                 if (!isColor((int) p.getX(),
                              (int) p.getY(),
                              new Color(255, 100, 100),
                              false)) {
-                    sleepNoFactor(1000);
                     ok = true;
                     break;
                 }
@@ -81,9 +78,7 @@ final class VMTest4 {
                 break;
             }
             moveTo("Cancel"); /* cancel */
-            sleep(500);
             leftClick();
-            sleep(1000);
         }
     }
 }

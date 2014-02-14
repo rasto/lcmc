@@ -52,13 +52,10 @@ final class PcmkTest7 {
             }
             checkTest("test7", 1);
             /* create dummy */
-            sleep(5000);
             chooseDummy(dummy1X, dummy1Y, false, true);
             checkTest("test7", 2);
-            sleep(5000);
             stopResource(dummy1X, dummy1Y);
             checkTest("test7", 3);
-            sleep(5000);
             /* copy/paste */
             moveTo(dummy1X + 10 , dummy1Y + 10);
             leftClick();
@@ -69,7 +66,6 @@ final class PcmkTest7 {
             moveTo(dummy1X + 10 , dummy1Y + 90);
             leftClick();
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(4000);
             leftClick();
             checkTest("test7", 4);
 

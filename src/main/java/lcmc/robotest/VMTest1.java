@@ -60,7 +60,7 @@ final class VMTest1 {
         slowFactor = 0.1f;
         aborted = false;
         String name = "dmc";
-        final int count2 = 3;
+        final int count2 = 1;
         for (int j = 0; j < count; j++) {
             checkVMTest(vmTest, 1, name);
             name += "i";
@@ -71,84 +71,54 @@ final class VMTest1 {
         for (int j = 0; j < count; j++) {
             moveToMenu("VMs (KVM");
             rightClick();
-            sleep(2000);
             moveTo("Add New Virtual Machine");
             leftClick();
-            sleep(10000);
             dialogColorTest("new domain");
             moveTo("Domain name", MTextField.class); /* domain name */
             leftClick();
             press(KeyEvent.VK_D);
-            sleep(200);
             press(KeyEvent.VK_M);
-            sleep(200);
             press(KeyEvent.VK_C);
-            sleep(200);
             for (int k = 0; k < j; k++) {
                 press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
-                sleep(200);
             }
             /* type */
             moveTo("Domain Type", MComboBox.class);
             leftClick();
-            sleep(1000);
             if ("lxc".equals(type)) {
                 press(KeyEvent.VK_DOWN);
-                sleep(1000);
                 press(KeyEvent.VK_DOWN);
-                sleep(1000);
                 press(KeyEvent.VK_DOWN);
-                sleep(1000);
                 press(KeyEvent.VK_ENTER);
-                sleep(3000);
             }
 
             /* next */
             moveTo("Next");
             leftClick();
-            sleep(2000);
 
             if ("lxc".equals(type)) {
                 /* filesystem */
                 dialogColorTest("filesystem");
                 moveTo("Source Dir", MComboBox.class);
-                sleep(2000);
                 leftClick();
-                sleep(2000);
                 press(KeyEvent.VK_END);
-                sleep(200);
                 press(KeyEvent.VK_DOWN);
-                sleep(200);
                 press(KeyEvent.VK_DOWN);
-                sleep(200);
                 press(KeyEvent.VK_ENTER);
-                sleep(200);
                 press(KeyEvent.VK_SLASH);
-                sleep(200);
                 press(KeyEvent.VK_D);
-                sleep(200);
                 press(KeyEvent.VK_M);
-                sleep(200);
                 press(KeyEvent.VK_C);
-                sleep(200);
                 for (int k = 0; k < j; k++) {
                     press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
-                    sleep(200);
                 }
                 press(KeyEvent.VK_SLASH);
-                sleep(200);
                 press(KeyEvent.VK_R);
-                sleep(200);
                 press(KeyEvent.VK_O);
-                sleep(200);
                 press(KeyEvent.VK_O);
-                sleep(200);
                 press(KeyEvent.VK_T);
-                sleep(200);
                 press(KeyEvent.VK_F);
-                sleep(200);
                 press(KeyEvent.VK_S);
-                sleep(2000);
                 moveTo("Next");
                 leftClick();
             } else {
@@ -156,132 +126,97 @@ final class VMTest1 {
                 dialogColorTest("source file");
 
                 moveTo("File", MComboBox.class);
-                sleep(2000);
                 leftClick();
-                sleep(2000);
                 press(KeyEvent.VK_END);
-                sleep(200);
                 press(KeyEvent.VK_T);
-                sleep(200);
                 press(KeyEvent.VK_E);
-                sleep(200);
                 press(KeyEvent.VK_S);
-                sleep(200);
                 press(KeyEvent.VK_T);
-                sleep(2000);
                 for (int i = 0; i < count2; i++) {
                     moveTo("Disk/block device");
                     leftClick();
-                    sleep(1000);
                     moveTo("Image file");
                     leftClick();
-                    sleep(1000);
                 }
 
                 moveTo("Next");
                 leftClick();
-                sleep(5000);
                 dialogColorTest("disk image");
                 moveTo("Next");
                 leftClick();
             }
-            sleep(5000);
             dialogColorTest("network");
             for (int i = 0; i < count2; i++) {
                 moveTo("bridge");
                 leftClick();
-                sleep(1000);
                 moveTo("network");
                 leftClick();
-                sleep(1000);
             }
             moveTo("Next");
             leftClick();
-            sleep(10000);
             if (!"lxc".equals(type)) {
                 dialogColorTest("display");
                 for (int i = 0; i < count2; i++) {
                     moveTo("sdl"); /* sdl */
                     leftClick();
-                    sleep(1000);
                     moveTo("vnc"); /* vnc */
                     leftClick();
-                    sleep(1000);
                 }
                 moveTo("Next");
                 leftClick();
-                sleep(20000);
             }
             dialogColorTest("create config");
 
-            sleep(10000);
             moveTo("Create Config");
-            sleep(4000);
             leftClick();
             checkVMTest(vmTest, 2, name);
-            sleep(8000);
-
 
             final String firstHost = cluster.getHostsArray()[0].getName();
             final String secondHost = cluster.getHostsArray()[1].getName();
             if (cluster.getHosts().size() > 1) {
-                for (int i = 0; i < 3; i++) {
-                    /* two hosts */
-                    moveTo(firstHost, JCheckBox.class); /* deselect first */
-                    leftClick();
-                    sleep(10000);
-                    moveTo("Create Config");
-                    sleep(2000);
-                    leftClick();
-                    checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
-                    checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
+                /* two hosts */
+                moveTo(firstHost, JCheckBox.class); /* deselect first */
+                leftClick();
+                moveTo("Create Config");
+                leftClick();
+                checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
+                checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
 
-                    moveTo(firstHost, JCheckBox.class); /* select first */
-                    sleep(1000);
-                    leftClick();
-                    sleep(1000);
-                    moveTo(secondHost, JCheckBox.class); /* deselect second */
-                    sleep(1000);
-                    leftClick();
-                    sleep(10000);
-                    moveTo("Create Config");
-                    sleep(2000);
-                    leftClick();
-                    checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
-                    checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
+                moveTo(firstHost, JCheckBox.class); /* select first */
+                leftClick();
+                moveTo(secondHost, JCheckBox.class); /* deselect second */
+                leftClick();
+                moveTo("Create Config");
+                leftClick();
+                checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
+                checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
 
-                    moveTo(secondHost, JCheckBox.class); /* select second */
-                    leftClick();
-                    sleep(10000);
-                    moveTo("Create Config");
-                    sleep(4000);
-                    leftClick();
-                    checkVMTest(vmTest, 2, name);
-                }
+                moveTo(secondHost, JCheckBox.class); /* select second */
+                leftClick();
+                moveTo("Create Config");
+                leftClick();
+                checkVMTest(vmTest, 2, name);
             }
 
-            sleepNoFactor(2000);
             moveTo("Finish"); /* finish */
             leftClick();
-            sleepNoFactor(5000);
 
             moveTo("Number of CPUs", MTextField.class);
-            sleep(1000);
             leftClick();
-            sleep(500);
+            Tools.sleep(500);
             press(KeyEvent.VK_BACK_SPACE);
-            sleep(500);
             press(KeyEvent.VK_2);
-            sleep(500);
             moveTo("Apply");
-            sleep(1000);
             leftClick();
-            sleep(1000);
             checkVMTest(vmTest, 3, name);
 
             if (j  == 0) {
                 for (int i = 0; i < count2; i++) {
                     /* remove net interface */
+                    moveToMenu("VMs (");
+                    leftClick();
+                    press(KeyEvent.VK_RIGHT);
+
                     moveToMenu("dmc");
                     leftClick();
                     moveToMenu("default (:");
@@ -294,16 +229,13 @@ final class VMTest1 {
                     /* add net interface */
                     moveToMenu("dmc");
                     rightClick();
-                    sleep(1000);
                     moveTo("Add Hardware");
-                    sleep(1000);
                     moveTo("New Disk");
                     moveTo("New Network Interface");
                     leftClick();
-                    sleep(2000);
+                    Tools.sleep(500);
                     moveTo("network");
                     leftClick();
-                    sleep(2000);
                     moveTo("Apply");
                     leftClick();
                     checkVMTest(vmTest, 3, name);
@@ -313,17 +245,18 @@ final class VMTest1 {
 
             if (j  == 0 && !"lxc".equals(type)) {
                 /* add disk */
+                moveToMenu("VMs (");
+                leftClick();
+                press(KeyEvent.VK_RIGHT);
+
                 moveToMenu("dmc");
                 rightClick();
-                sleep(2000);
                 moveTo("Add Hardware");
-                sleep(1000);
                 moveTo("New Disk");
                 leftClick();
-                sleep(2000);
+                Tools.sleep(500);
                 moveTo("Disk/block device");
                 leftClick();
-                sleep(2000);
                 moveTo("Device", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
@@ -351,15 +284,12 @@ final class VMTest1 {
                 /* add disk /virtio */
                 moveToMenu("dmc");
                 rightClick();
-                sleep(2000);
                 moveTo("Add Hardware");
-                sleep(1000);
                 moveTo("New Disk");
                 leftClick();
-                sleep(2000);
+                Tools.sleep(500);
                 moveTo("Disk/block device");
                 leftClick();
-                sleep(2000);
                 moveTo("Device", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_SLASH);
@@ -398,26 +328,17 @@ final class VMTest1 {
                 /* disk readonly */
                 moveToMenu("hda (IDE"); /* popup */
                 leftClick();
-                sleep(1000);
                 moveTo("Readonly", JCheckBox.class);
-                sleep(1000);
                 leftClick();
-                sleep(1000);
                 moveTo("Apply"); /* apply */
-                sleep(1000);
                 leftClick();
                 checkVMTest(vmTest, 3.1, name);
-                sleep(1000);
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 moveTo("Readonly", JCheckBox.class);
-                sleep(1000);
                 leftClick();
 
-                sleep(1000);
                 moveTo("VM Host Overview"); /* host overview */
-                sleep(1000);
                 leftClick();
-                sleep(1000);
 
                 moveTo("Apply"); /* host apply */
                 leftClick();
@@ -431,18 +352,15 @@ final class VMTest1 {
             name += "i";
         }
 
-        sleepNoFactor(5000);
         for (int j = 0; j < count; j++) {
             moveToMenu("dmc");
             rightClick();
-            sleep(1000);
             moveTo("Remove Domain");
             leftClick();
-            sleepNoFactor(2000);
             dialogColorTest("remove VM");
             confirmRemove();
             leftClick();
-            sleepNoFactor(5000);
+            Tools.sleep(500);
         }
     }
 }

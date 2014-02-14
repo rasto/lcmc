@@ -66,11 +66,9 @@ final class DrbdTest4 {
                 moveTo("DRBD Resource", MComboBox.class);
                 leftClick();
                 press(KeyEvent.VK_DOWN); /* drbd: r0 */
-                sleep(200);
                 press(KeyEvent.VK_ENTER);
 
                 drbdNext();
-                sleep(10000);
 
                 //addDrbdVolume();
             }
@@ -78,7 +76,6 @@ final class DrbdTest4 {
 
             addBlockDevice();
             addBlockDevice();
-            sleep(20000);
             if (offset == 0) {
                 checkDRBDTest(drbdTest, 1.1);
             } else {
@@ -88,10 +85,8 @@ final class DrbdTest4 {
 
             addMetaData();
             addFileSystem();
-            sleep(20000);
             moveTo(Tools.getString("Dialog.Dialog.Finish")); /* fs */
             leftClick();
-            sleep(10000);
 
             if (offset == 0) {
                 checkDRBDTest(drbdTest, 1);
@@ -102,37 +97,26 @@ final class DrbdTest4 {
 
         moveTo(480, 152); /* select r0 */
         leftClick();
-        sleep(2000);
         leftClick();
 
         moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol b */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Fence peer", MComboBox.class);
         leftClick();
-        sleep(2000);
         press(KeyEvent.VK_DOWN);
-        sleep(200);
         press(KeyEvent.VK_DOWN); /* select dopd */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_9);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.1); /* 2.1 */
 
@@ -140,82 +124,57 @@ final class DrbdTest4 {
         /* common */
         moveTo(500, 342); /* select background */
         leftClick();
-        sleep(2000);
         leftClick();
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_3);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
-        sleep(10000);
         checkDRBDTest(drbdTest, 2.11); /* 2.11 */
         moveTo("Wfc timeout", MTextField.class);
-        sleep(6000);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_0);
-        sleep(2000);
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
 
         /* resource */
         moveTo(480, 152); /* select r0 */
         leftClick();
-        sleep(2000);
         leftClick();
 
         moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol c */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Fence peer", MComboBox.class);
         leftClick();
-        sleep(2000);
         press(KeyEvent.VK_DOWN);
-        sleep(200);
         press(KeyEvent.VK_UP); /* deselect dopd */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_5);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_0);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 

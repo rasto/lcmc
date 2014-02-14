@@ -2198,17 +2198,13 @@ public final class ClusterBrowser extends Browser {
 
     /** Callback to service menu items, that show ptest results in tooltips. */
     public abstract class ClMenuItemCallback implements ButtonCallback {
-        /** Menu component on which this callback works. */
-        private final ComponentWithTest component;
         /** Host if over a menu item that belongs to a host. */
         private final Host menuHost;
         /** Whether the mouse is still over. */
         private volatile boolean mouseStillOver = false;
 
         /** Creates new ClMenuItemCallback object. */
-        public ClMenuItemCallback(final ComponentWithTest component,
-                                  final Host menuHost) {
-            this.component = component;
+        public ClMenuItemCallback(final Host menuHost) {
             this.menuHost = menuHost;
         }
 
@@ -2229,7 +2225,7 @@ public final class ClusterBrowser extends Browser {
 
         /** Mouse out, stops animation. */
         @Override
-        public final void mouseOut() {
+        public final void mouseOut(final ComponentWithTest component) {
             if (isEnabled()) {
                 mouseStillOver = false;
                 crmGraph.stopTestAnimation((JComponent) component);
@@ -2239,7 +2235,7 @@ public final class ClusterBrowser extends Browser {
 
         /** Mouse over, starts animation, calls action() and sets tooltip. */
         @Override
-        public final void mouseOver() {
+        public final void mouseOver(final ComponentWithTest component) {
             if (isEnabled()) {
                 mouseStillOver = true;
                 component.setToolTipText(STARTING_PTEST_TOOLTIP);
@@ -2280,17 +2276,13 @@ public final class ClusterBrowser extends Browser {
 
     /** Callback to service menu items, that show ptest results in tooltips. */
     public abstract class DRBDMenuItemCallback implements ButtonCallback {
-        /** Menu component on which this callback works. */
-        private final ComponentWithTest component;
         /** Host if over a menu item that belongs to a host. */
         private final Host menuHost;
         /** Whether the mouse is still over. */
         private volatile boolean mouseStillOver = false;
 
         /** Creates new DRBDMenuItemCallback object. */
-        public DRBDMenuItemCallback(final ComponentWithTest component,
-                                    final Host menuHost) {
-            this.component = component;
+        public DRBDMenuItemCallback(final Host menuHost) {
             this.menuHost = menuHost;
         }
 
@@ -2302,7 +2294,7 @@ public final class ClusterBrowser extends Browser {
 
         /** Mouse out, stops animation. */
         @Override
-        public final void mouseOut() {
+        public final void mouseOut(final ComponentWithTest component) {
             if (!isEnabled()) {
                 return;
             }
@@ -2313,7 +2305,7 @@ public final class ClusterBrowser extends Browser {
 
         /** Mouse over, starts animation, calls action() and sets tooltip. */
         @Override
-        public final void mouseOver() {
+        public final void mouseOver(final ComponentWithTest component) {
             if (!isEnabled()) {
                 return;
             }

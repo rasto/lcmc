@@ -1442,7 +1442,7 @@ public final class Tools {
                 prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
-                        callbackHash.get(item).mouseOut();
+                        callbackHash.get(item).mouseOut(item);
                         list.clearSelection();
                     }
                 }
@@ -1459,7 +1459,7 @@ public final class Tools {
                 prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
-                        callbackHash.get(item).mouseOut();
+                        callbackHash.get(item).mouseOut(item);
                     }
                 }
                 final Thread thread = new Thread(new Runnable() {
@@ -1517,7 +1517,7 @@ public final class Tools {
                                 final ButtonCallback bc =
                                                     callbackHash.get(lastItem);
                                 if (bc != null) {
-                                    bc.mouseOut();
+                                    bc.mouseOut(lastItem);
                                 }
                             }
                             if (index >= 0) {
@@ -1525,7 +1525,7 @@ public final class Tools {
                                 final ButtonCallback bc =
                                                         callbackHash.get(item);
                                 if (bc != null) {
-                                    bc.mouseOver();
+                                    bc.mouseOver(item);
                                 }
                             }
                         }

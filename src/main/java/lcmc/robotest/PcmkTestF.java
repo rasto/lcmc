@@ -54,12 +54,9 @@ final class PcmkTestF {
         checkTest(testName, 1);
         /* group with dummy resources */
         moveTo(gx, gy);
-        sleep(1000);
         rightClick(); /* popup */
-        sleep(1000);
         moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
         leftClick(); /* choose group */
-        sleep(1000);
         moveTo("Clone");
         leftClick(); /* clone */
 
@@ -70,44 +67,30 @@ final class PcmkTestF {
             /* create dummy */
             moveToMenu("Group (1)");
             rightClick(); /* group popup */
-            sleep(2000);
             moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-            sleep(2000);
             moveTo("OCF Resource Agents");
-            sleep(1000);
             typeDummy();
-            sleep(300);
             setTimeouts(true);
             if (type == 1) {
                 moveTo(Tools.getString("Browser.ApplyResource"));
-                sleep(6000);
                 leftClick();
-                sleep(6000);
             }
         }
         if (type != 1) {
             moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(6000);
             leftClick();
-            sleep(6000);
         }
         checkTest(testName, 2);
         /* set resource stickiness */
         moveTo("Resource Stickiness", MComboBox.class);
         leftClick();
-        sleep(1000);
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(200);
         press(KeyEvent.VK_2);
-        sleep(1000);
         moveTo(Tools.getString("Browser.ApplyResource"));
-        sleep(6000);
         leftClick();
-        sleep(6000);
         checkTest(testName, 3);
 
         stopResource(gx, gy);
-        sleep(6000);
         checkTest(testName, 4);
         removeResource(gx, gy, CONFIRM_REMOVE);
         resetTerminalAreas();

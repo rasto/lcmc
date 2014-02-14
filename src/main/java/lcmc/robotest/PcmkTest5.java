@@ -59,9 +59,7 @@ final class PcmkTest5 {
         /* placeholders */
         moveTo(ph1X, ph1Y);
         rightClick();
-        sleep(2000);
         moveTo("Placeholder (AND)");
-        sleep(2000);
         leftClick();
 
         chooseDummy(dummy1X, dummy1Y, false, true);
@@ -70,17 +68,13 @@ final class PcmkTest5 {
 
         moveTo(dummy2X, dummy2Y);
         addConstraint(2);
-        sleep(20000);
         checkTest("test5", 2);
         moveTo(ph1X, ph1Y);
         addConstraint(1);
 
         moveTo(ph1X, ph1Y);
-        sleep(2000);
         leftClick();
-        sleep(2000);
         moveTo(Tools.getString("Browser.ApplyResource"));
-        sleep(2000);
         leftClick();
         checkTest("test5", 2.1);
 
@@ -112,7 +106,6 @@ final class PcmkTest5 {
         removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
         removeResource(dummy2X, dummy2Y, CONFIRM_REMOVE);
         removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
-        sleep(5000);
         checkTest("test5", 1);
     }
 }
