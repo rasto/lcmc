@@ -27,6 +27,7 @@
         </loadproperties> 
 	
 	<property name="main-class"  value="lcmc.LCMC"/>
+	<property name="main-class-applet" value="lcmc.LCMCApplet"/>
 	<tstamp/>
 	
 	<target name="clean">
@@ -426,5 +427,15 @@
 			 classname="net.sf.launch4j.ant.Launch4jTask"
 			 classpath="misc/launch4j/launch4j.jar"/>
 		<launch4j configFile="${scripts.dir}/${launch4j.conf}"/>
+	</target>
+	<target name="applet" depends="jar">
+		<mkdir dir="${jar.dir}"/>
+		<jar destfile="${jar.dir}/${ant.project.name}-applet.jar"
+		     basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Main-Class" value="${main-class-applet}"/>
+				<attribute name="Permissions" value="all-permissions"/>
+			</manifest>
+		</jar>
 	</target>
 </project>
