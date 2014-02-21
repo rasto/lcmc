@@ -342,7 +342,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         if (!testOnly) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Modify device xml. */

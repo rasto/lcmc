@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.gui.widget.Check;
 
 /**
  * This class describes a connection between two heartbeat services.
@@ -285,22 +286,25 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
 
     /** Check order and colocation constraints. */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        boolean oneIsNew = false;
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
         mConstraintPHLock.lock();
         try {
             for (final ConstraintPHInfo cphi : constraintPHInfos) {
                 if (cphi.getService().isNew()
                     && !getBrowser().getCRMGraph().getChildrenAndParents(
-                                                             cphi).isEmpty()) {
-                    oneIsNew = true;
+                                                            cphi).isEmpty()) {
+                    changed.add("new placeholder");
                 }
             }
         } finally {
             mConstraintPHLock.unlock();
         }
-        return super.checkResourceFieldsChanged(param, params) || oneIsNew;
+        final Check check = new Check(incorrect, changed);
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Return list of popup items. */

@@ -99,7 +99,7 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.PARALLEL_TABLE);
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        checkResourceFields(null, getParametersFromXML());
     }
 
     /** Returns string representation. */

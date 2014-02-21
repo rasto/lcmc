@@ -158,7 +158,7 @@ final class BlockDev extends DrbdConfig {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(
-                    blockDevInfo.checkResourceFieldsCorrect(null, params));
+                   blockDevInfo.checkResourceFields(null, params).isCorrect());
             }
         });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {

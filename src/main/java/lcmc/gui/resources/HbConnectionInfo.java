@@ -56,6 +56,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 /**
@@ -273,48 +274,21 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Check order and colocation constraints. */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        boolean correct = true;
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
         mConstraintsReadLock.lock();
+        final Check check = new Check(new ArrayList<String>(), 
+                                      new ArrayList<String>());
         try {
             for (final HbConstraintInterface c : constraints) {
-                final boolean cor = c.checkResourceFieldsCorrect(
-                                                      param,
-                                                      c.getParametersFromXML(),
-                                                      true);
-                if (!cor) {
-                    correct = false;
-                    break;
-                }
+                check.addCheck(c.checkResourceFields(param,
+                                                     c.getParametersFromXML(),
+                                                     true));
             }
         } finally {
             mConstraintsReadLock.unlock();
         }
-        return correct;
-    }
-
-    /** Check order and colocation constraints. */
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        boolean changed = false;
-        mConstraintsReadLock.lock();
-        try {
-            for (final HbConstraintInterface c : constraints) {
-                final boolean chg = c.checkResourceFieldsChanged(
-                                                  param,
-                                                  c.getParametersFromXML(),
-                                                  true);
-                if (chg) {
-                    changed = true;
-                    break;
-                }
-            }
-        } finally {
-            mConstraintsReadLock.unlock();
-        }
-        return changed;
+        return check;
     }
 
     /** Returns panal with user visible info. */

@@ -60,6 +60,7 @@ import java.awt.FlowLayout;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -543,12 +544,10 @@ public abstract class EditableInfo extends Info {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean c;
-                boolean ch = false;
+                final Check check;
                 if (realParamWi == null) {
                     Tools.waitForSwing();
-                    ch = checkResourceFieldsChanged(param, params);
-                    c = checkResourceFieldsCorrect(param, params);
+                    check = checkResourceFields(param, params);
                 } else {
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -563,24 +562,24 @@ public abstract class EditableInfo extends Info {
                         }
                     });
                     Tools.waitForSwing();
-                    c = checkResourceFieldsCorrect(param, params);
+                    check = checkResourceFields(param, params);
                 }
-                final boolean check = c;
-                final boolean changed = ch;
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (thisApplyButton == applyButton) {
-                            thisApplyButton.setEnabled(
-                                  !isDialogStarted()
-                                  && check
-                                  && (changed || getResource().isNew()));
-                        } else {
-                            /* wizard button */
-                            thisApplyButton.setEnabled(check);
+                            /* not a wizard button */
+                            if (isDialogStarted()) {
+                                check.addIncorrect("dialog started");
+                            }
+                            
                         }
+                        if (getResource().isNew()) {
+                            check.addChanged("new resource");
+                        }
+                        thisApplyButton.setEnabled(check);
                         if (revertButton != null) {
-                            revertButton.setEnabled(changed);
+                            revertButton.setEnabledChanged(check);
                         }
                         final String toolTip = getToolTipText(param, paramWi);
                         paramWi.setToolTipText(toolTip);
@@ -815,41 +814,29 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param,
                                       final String[] params) {
-        final boolean ch = checkResourceFieldsChanged(param, params);
-        final boolean cor = checkResourceFieldsCorrect(param, params);
+        final Check check = checkResourceFields(param, params);
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
                 final Resource r = getResource();
                 if (ab != null) {
-                    ab.setEnabled((ch || (r != null && r.isNew())) && cor);
+                    if (r != null && r.isNew()) {
+                        check.addChanged("new resource");
+                    }
+                    ab.setEnabled(check);
                 }
                 final MyButton rb = getRevertButton();
                 if (rb != null) {
-                    rb.setEnabled(ch);
+                    rb.setEnabledChanged(check);
                 }
             }
         });
     }
 
-    ///**
-    // * Can be called from dialog box, where it does not need to check if
-    // * fields have changed.
-    // */
-    //public boolean checkResourceFields(final String param,
-    //                                   final String[] params) {
-    //    final boolean cor = checkResourceFieldsCorrect(param, params);
-    //    final boolean changed = checkResourceFieldsChanged(param, params);
-    //    if (cor) {
-    //        return changed;
-    //    }
-    //    return cor;
-    //}
-
     /** Checks one parameter. */
     protected void checkOneParam(final String param) {
-        checkResourceFieldsCorrect(param, new String[]{param});
+        checkResourceFields(param, new String[]{param});
     }
 
     /**
@@ -858,20 +845,28 @@ public abstract class EditableInfo extends Info {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
+    Check checkResourceFields(final String param, final String[] params) {
         /* check if values are correct */
-        boolean correctValue = true;
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
         if (params != null) {
             for (final String otherParam : params) {
                 final Widget wi = getWidget(otherParam, null);
                 if (wi == null) {
                     continue;
                 }
-                Value newValue;
-                final Value o = wi.getValue();
-                newValue = o;
+                Value newValue = wi.getValue();
 
+                /* check if value has changed */
+                Value oldValue = getParamSaved(otherParam);
+                if (oldValue == null) {
+                    oldValue = getParamDefault(otherParam);
+                }
+                if (!Tools.areEqual(newValue, oldValue)) {
+                    changed.add(otherParam);
+                }
+
+                /* check correctness */
                 if (param == null || otherParam.equals(param)
                     || !paramCorrectValueMap.containsKey(param)) {
                     final Widget wizardWi = getWidget(otherParam,
@@ -917,46 +912,18 @@ public abstract class EditableInfo extends Info {
                         if (wizardWi != null) {
                             wizardWi.wrongValue();
                         }
-                        correctValue = false;
+                        incorrect.add(otherParam + ": wrong value");
                     }
                     setCheckParamCache(otherParam, check);
                 } else {
-                    correctValue = correctValue && checkParamCache(otherParam);
-                }
-            }
-        }
-        return correctValue;
-    }
-
-    /**
-     * Returns whetherrs the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params) {
-        /* check if something is different from saved values */
-        boolean changedValue = false;
-        if (params != null) {
-            for (String otherParam : params) {
-                final Widget wi = getWidget(otherParam, null);
-                if (wi == null) {
-                    continue;
-                }
-                final Value newValue = wi.getValue();
-
-                /* check if value has changed */
-                Value oldValue = getParamSaved(otherParam);
-                if (oldValue == null) {
-                    oldValue = getParamDefault(otherParam);
-                }
-                if (!Tools.areEqual(newValue, oldValue)) {
-                    changedValue = true;
+                    if (!checkParamCache(otherParam)) {
+                        incorrect.add(otherParam + ": wrong value");
+                    }
                 }
                 wi.processAccessMode();
             }
         }
-        return changedValue;
+        return new Check(incorrect, changed);
     }
 
     /** Return JLabel object for the combobox. */

@@ -69,6 +69,7 @@ import javax.swing.ImageIcon;
 import lcmc.EditClusterDialog;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -850,54 +851,30 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * otherwise all parameters will be checked.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        boolean changed = false;
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        final Check check = new Check(incorrect, changed);
         for (final DrbdResourceInfo dri : getDrbdResources()) {
-            if (dri.checkResourceFieldsChanged(param,
-                                               dri.getParametersFromXML(),
-                                               true)) {
-                changed = true;
-            }
+            check.addCheck(dri.checkResourceFields(param,
+                                                   dri.getParametersFromXML(),
+                                                   true));
         }
-        return super.checkResourceFieldsChanged(param, params) || changed;
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    //TODO: dead code?
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromDrbdInfo) {
-        boolean correct = true;
-        for (final DrbdResourceInfo dri : getDrbdResources()) {
-            if (!dri.checkResourceFieldsCorrect(param,
-                                                dri.getParametersFromXML(),
-                                                true)) {
-                correct = false;
-            }
-        }
-        return super.checkResourceFieldsCorrect(param, params) && correct;
-    }
-
-    /** Returns true if all fields are correct. */
-    @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
         if (getBrowser().getDrbdResHash().isEmpty()) {
             getBrowser().putDrbdResHash();
-            return false;
+            incorrect.add("no resources inside");
+        } else {
+            getBrowser().putDrbdResHash();
         }
-        getBrowser().putDrbdResHash();
+
         final DrbdXML dxml = getBrowser().getDrbdXML();
         if (dxml != null && dxml.isDrbdDisabled()) {
-            return false;
+            incorrect.add("DRBD is disabled");
         }
-        return super.checkResourceFieldsCorrect(param, params);
+
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Revert all values. */

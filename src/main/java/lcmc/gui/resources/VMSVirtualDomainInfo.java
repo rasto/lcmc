@@ -90,6 +90,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -3916,10 +3917,10 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                         if (domainNode != null) {
                             for (final VMSHardwareInfo hi
                                                    : allModifiedHWP.keySet()) {
-                               if (hi.checkResourceFieldsChanged(
+                               if (hi.checkResourceFields(
                                             null,
                                             hi.getRealParametersFromXML(),
-                                            true)) {
+                                            true).isChanged()) {
                                     hi.modifyXML(
                                         vmsxml,
                                         domainNode,
@@ -5166,57 +5167,16 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
      * have changed.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
         final DefaultMutableTreeNode thisNode = getNode();
+        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<String>();
         if (thisNode == null) {
-            return false;
+            incorrect.add("missing node");
+            return new Check(incorrect, changed);
         }
-        boolean changed = false;
-        for (final Host host : getBrowser().getClusterHosts()) {
-            if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
-                continue;
-            }
-            final Value value =
-                     definedOnHostComboBoxHash.get(host.getName()).getValue();
-            final VMSXML vmsxml = getBrowser().getVMSXML(host);
-            if ((vmsxml == null
-                 || (!getResource().isNew()
-                     && !vmsxml.getDomainNames().contains(getDomainName())))
-                && DEFINED_ON_HOST_TRUE.equals(value)) {
-                changed = true;
-            } else if (vmsxml != null
-                       && vmsxml.getDomainNames().contains(getDomainName())
-                       && DEFINED_ON_HOST_FALSE.equals(value)) {
-                changed = true;
-            }
-        }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
-        while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node = eee.nextElement();
-            final VMSHardwareInfo vmshi =
-                            (VMSHardwareInfo) node.getUserObject();
-            if (vmshi.checkResourceFieldsChanged(
-                                             null,
-                                             vmshi.getRealParametersFromXML(),
-                                             true)) {
-                changed = true;
-            }
-        }
-        final boolean ch = super.checkResourceFieldsChanged(param, params)
-                           || changed;
-        return ch;
-    }
 
-    /** Returns whether all the parameters are correct. */
-    @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        final DefaultMutableTreeNode thisNode = getNode();
-        if (thisNode == null) {
-            return false;
-        }
         boolean cor = false;
         for (final Host host : getBrowser().getClusterHosts()) {
             if (!definedOnHostComboBoxHash.containsKey(host.getName())) {
@@ -5226,8 +5186,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final Widget wizardHostWi = definedOnHostComboBoxHash.get(
                                            WIZARD_HOST_PREFIX + host.getName());
             final Value value = hostWi.getValue();
-            Value savedValue;
             final VMSXML vmsxml = getBrowser().getVMSXML(host);
+            Value savedValue;
             if (vmsxml != null
                 && vmsxml.getDomainNames().contains(getDomainName())) {
                 savedValue = DEFINED_ON_HOST_TRUE;
@@ -5241,26 +5201,38 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             if (DEFINED_ON_HOST_TRUE.equals(value)) {
                 cor = true; /* at least one */
             }
+
+            if ((vmsxml == null
+                 || (!getResource().isNew()
+                     && !vmsxml.getDomainNames().contains(getDomainName())))
+                && DEFINED_ON_HOST_TRUE.equals(value)) {
+                changed.add("host");
+            } else if (vmsxml != null
+                       && vmsxml.getDomainNames().contains(getDomainName())
+                       && DEFINED_ON_HOST_FALSE.equals(value)) {
+                changed.add("host");
+            }
         }
         if (!cor) {
             for (final String key : definedOnHostComboBoxHash.keySet()) {
                 definedOnHostComboBoxHash.get(key).wrongValue();
             }
+            incorrect.add("no host");
         }
         @SuppressWarnings("unchecked")
         final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
+        final Check check = new Check(incorrect, changed);
+        check.addCheck(super.checkResourceFields(param, params));
         while (eee.hasMoreElements()) {
             final DefaultMutableTreeNode node = eee.nextElement();
             final VMSHardwareInfo vmshi =
                             (VMSHardwareInfo) node.getUserObject();
-            if (!vmshi.checkResourceFieldsCorrect(
+            check.addCheck(vmshi.checkResourceFields(
                                               null,
                                               vmshi.getRealParametersFromXML(),
-                                              true)) {
-                cor = false;
-            }
+                                              true)); 
         }
-        return super.checkResourceFieldsCorrect(null, params) && cor;
+        return check;
     }
 
     /** Returns combo box for parameter. */
@@ -5528,10 +5500,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             final DefaultMutableTreeNode node = eee.nextElement();
             final VMSHardwareInfo vmshi =
                             (VMSHardwareInfo) node.getUserObject();
-            if (vmshi.checkResourceFieldsChanged(
-                                             null,
-                                             vmshi.getRealParametersFromXML(),
-                                             true)) {
+            if (vmshi.checkResourceFields(null,
+                                          vmshi.getRealParametersFromXML(),
+                                          true).isChanged()) {
                 vmshi.revert();
             }
         }

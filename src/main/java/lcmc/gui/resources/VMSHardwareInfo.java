@@ -62,6 +62,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import org.w3c.dom.Node;
 
 import lcmc.utilities.Logger;
@@ -611,18 +612,18 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * have changed. Don't check the invisible for the type parameters.
      */
     @Override
-    public final boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
+    public final Check checkResourceFields(final String param,
+                                           final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /**
      * Returns whether the specified parameter or any of the parameters
      * have changed. Don't check the invisible for the type parameters.
      */
-    final boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromDomain) {
+    final Check checkResourceFields(final String param,
+                                    final String[] params,
+                                    final boolean fromDomain) {
         final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
         if (!fromDomain && vdi != null && params.length != 1) {
             vdi.setApplyButtons(null, vdi.getParametersFromXML());
@@ -634,38 +635,13 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         } else {
             parameters = getRealParametersFromXML();
         }
-        return super.checkResourceFieldsChanged(param, parameters);
-    }
-
-    /** Returns whether all the parameters are correct. */
-    @Override
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
-    }
-
-    /** Returns whether all the parameters are correct. */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromDomain) {
-        final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
-        if (!fromDomain && vdi != null && params.length != 1) {
-            vdi.setApplyButtons(null, vdi.getParametersFromXML());
-        }
-        String[] parameters;
-        if (params == null || params.length == 1) {
-            /* just one param */
-            parameters = params;
-        } else {
-            parameters = getRealParametersFromXML();
-        }
-        return super.checkResourceFieldsCorrect(param, parameters);
+        return super.checkResourceFields(param, parameters);
     }
 
     /** Checks one parameter. */
     @Override
     protected final void checkOneParam(final String param) {
-        checkResourceFieldsCorrect(param, new String[]{param}, true);
+        checkResourceFields(param, new String[]{param}, true);
     }
 
     /** Returns parameters. */

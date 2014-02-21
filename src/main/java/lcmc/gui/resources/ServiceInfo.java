@@ -81,7 +81,6 @@ import javax.swing.BoxLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.SpringLayout;
 import javax.swing.AbstractButton;
@@ -93,6 +92,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -334,137 +334,17 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false, false, false);
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo,
-                                       final boolean fromCloneInfo,
-                                       final boolean fromGroupInfo) {
-        final Value idV = getComboBoxValue(GUI_ID);
-        if (idV == null) {
-            return true;
-        }
-        final String id = idV.getValueForConfig();
-        final CloneInfo ci = getCloneInfo();
-        if (!fromCloneInfo && ci != null) {
-            return ci.checkResourceFieldsCorrect(param,
-                                                 ci.getParametersFromXML(),
-                                                 fromServicesInfo);
-        }
-        final GroupInfo gi = getGroupInfo();
-        if (!fromGroupInfo && gi != null) {
-            if (!gi.checkResourceFieldsCorrect(param,
-                                               gi.getParametersFromXML(),
-                                               fromServicesInfo,
-                                               fromCloneInfo)) {
-                return false;
-            }
-        }
-        if (!fromGroupInfo && gi != null) {
-            if (!fromServicesInfo) {
-                gi.setApplyButtons(null, gi.getParametersFromXML());
-            }
-        }
-        if (getService().isOrphaned()) {
-            return false;
-        }
-        /* Allow it only for resources that are in LRM. */
-        final ServiceInfo si =
-                getBrowser().getServiceInfoFromId(getService().getName(), id);
-        if (si != null && si != this && !si.getService().isOrphaned()) {
-            return false;
-        }
-
-        if (!super.checkResourceFieldsCorrect(param, params)) {
-            return false;
-        }
-        if (ci == null) {
-            boolean on = false;
-            for (Host host : getBrowser().getClusterHosts()) {
-                final HostInfo hi = host.getBrowser().getHostInfo();
-                /* at least one "eq" */
-                final Widget wi = scoreComboBoxHash.get(hi);
-                if (wi != null) {
-                    final JLabel label = wi.getLabel();
-                    if (label != null) {
-                        final String op = getOpFromLabel(hi.getName(),
-                                                         label.getText());
-                        if (wi.getValue() == null || "eq".equals(op)) {
-                            on = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!on) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Returns whether the specified parameter or any of the parameters
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false, false, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false, false, false);
     }
 
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params,
-                                              final boolean fromServicesInfo,
-                                              final boolean fromCloneInfo,
-                                              final boolean fromGroupInfo) {
-        final Value idV = getComboBoxValue(GUI_ID);
-        String id = null;
-        if (idV != null) {
-            id = getComboBoxValue(GUI_ID).getValueForConfig();
-        }
-        final CloneInfo ci = getCloneInfo();
-        if (!fromCloneInfo && ci != null) {
-            return ci.checkResourceFieldsChanged(param,
-                                                 ci.getParametersFromXML(),
-                                                 fromServicesInfo);
-        }
-        final GroupInfo gi = getGroupInfo();
-        if (!fromGroupInfo && gi != null) {
-            if (!fromServicesInfo) {
-                gi.setApplyButtons(null, gi.getParametersFromXML());
-            }
-        }
-        if (id == null) {
-            return false;
-        }
-        boolean changed = false;
-        if (super.checkResourceFieldsChanged(param, params)) {
-            changed = true;
-        }
-        boolean allMetaAttrsAreDefaultValues = true;
+    private boolean areAllMetaAttrsAreDefaultValues(final String[] params) {
         if (params != null) {
             for (String otherParam : params) {
                 if (isMetaAttr(otherParam)) {
@@ -475,23 +355,142 @@ public class ServiceInfo extends EditableInfo {
                     final Value newValue = wi.getValue();
                     final Value defaultValue = getParamDefault(otherParam);
                     if (!Tools.areEqual(newValue, defaultValue)) {
-                        allMetaAttrsAreDefaultValues = false;
+                        return false;
                     }
                 }
             }
         }
+        return true;
+    }
+
+    private void oldStyleResourcesHideFields(final String[] params) {
+        /* in old style resources don't show all the textfields */
+        boolean visible = false;
+        Widget wi = null;
+        for (int i = params.length - 1; i >= 0; i--) {
+            final Widget prevWi = getWidget(params[i], null);
+            if (prevWi == null) {
+                continue;
+            }
+            if (!visible && !prevWi.getStringValue().isEmpty()) {
+                visible = true;
+            }
+            if (wi != null && wi.getComponent().isVisible() != visible) {
+                final boolean v = visible;
+                final Widget c = wi;
+                c.setVisible(v);
+            }
+            wi = prevWi;
+        }
+    }
+
+    private boolean checkSameAsMetaAttrsFieldsChanged(final String[] params) {
+        final Value info = sameAsMetaAttrsWiValue();
+        final boolean defaultValues =
+                info != null
+                && META_ATTRS_DEFAULT_VALUES.equals(info);
+        final boolean nothingSelected =
+                  info == null || info.isNothingSelected();
+        if (!nothingSelected
+            && !defaultValues
+            && info != savedMetaAttrInfoRef) {
+            sameAsMetaAttrsWi.processAccessMode();
+            return true;
+        } else {
+            if ((nothingSelected || defaultValues)
+                && savedMetaAttrInfoRef != null) {
+                sameAsMetaAttrsWi.processAccessMode();
+                return true;
+            }
+            final boolean allMetaAttrsAreDefaultValues =
+                                       areAllMetaAttrsAreDefaultValues(params);
+            if (savedMetaAttrInfoRef == null
+                && defaultValues != allMetaAttrsAreDefaultValues) {
+                if (allMetaAttrsAreDefaultValues) {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
+                        @Override
+                        public void run() {
+                            sameAsMetaAttrsWi.setValueNoListeners(
+                                               META_ATTRS_DEFAULT_VALUES);
+                        }
+                    });
+                } else {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
+                        @Override
+                        public void run() {
+                            sameAsMetaAttrsWi.setValueNoListeners(null);
+                        }
+                    });
+                }
+            }
+        }
+        sameAsMetaAttrsWi.processAccessMode();
+        return false;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public Check checkResourceFields(final String param,
+                                     final String[] params,
+                                     final boolean fromServicesInfo,
+                                     final boolean fromCloneInfo,
+                                     final boolean fromGroupInfo) {
+        final Value idV = getComboBoxValue(GUI_ID);
+        String id = null;
+        if (idV != null) {
+            id = getComboBoxValue(GUI_ID).getValueForConfig();
+        }
+        final CloneInfo ci = getCloneInfo();
+        if (!fromCloneInfo && ci != null) {
+            return ci.checkResourceFields(param,
+                                          ci.getParametersFromXML(),
+                                          fromServicesInfo);
+        }
+
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+
+        final Check check = new Check(incorrect, changed);
+        final GroupInfo gi = getGroupInfo();
+        if (!fromGroupInfo && gi != null) {
+            final Check groupCheck = gi.checkResourceFields(
+                                                      param,
+                                                      gi.getParametersFromXML(),
+                                                      fromServicesInfo,
+                                                      fromCloneInfo);
+            check.addCheck(groupCheck);
+            if (!fromServicesInfo) {
+                gi.setApplyButtons(null, gi.getParametersFromXML());
+            }
+        }
+        check.addCheck(super.checkResourceFields(param, params));
+        if (getService().isOrphaned()) {
+            incorrect.add("resource is orphaned");
+        }
         final String heartbeatId = getService().getHeartbeatId();
+        /* Allow it only for resources that are in LRM. */
+        ServiceInfo si = null;
+        if (id != null) {
+            si = getBrowser().getServiceInfoFromId(getService().getName(),
+                                                   id);
+        }
+        if (si != null && si != this && !si.getService().isOrphaned()) {
+            incorrect.add("not in LRM");
+        }
         if (ConfigData.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
-                changed = true;
+                changed.add("new resource");
             } else if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
                 || heartbeatId.equals(id)) {
-                if (checkHostLocationsFieldsChanged()
-                    || checkOperationFieldsChanged()) {
-                    changed = true;
+                if (ci == null) {
+                    check.addCheck(checkHostLocationsFields());
                 }
-            } else {
-                changed = true;
+                check.addCheck(checkOperationFields());
             }
         } else if (ConfigData.PM_CLONE_SET_NAME.equals(getName())
                    || ConfigData.PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
@@ -501,13 +500,12 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 prefix = Service.CL_ID_PREFIX;
             }
-            if (heartbeatId.equals(prefix + id)
-                || heartbeatId.equals(id)) {
-                if (checkHostLocationsFieldsChanged()) {
-                    changed = true;
+            if (heartbeatId != null
+                && (heartbeatId.equals(prefix + id)
+                    || heartbeatId.equals(id))) {
+                if (ci == null) {
+                    check.addCheck(checkHostLocationsFields());
                 }
-            } else {
-                changed = true;
             }
         } else {
             if (heartbeatId == null) {
@@ -518,83 +516,29 @@ public class ServiceInfo extends EditableInfo {
                                           + getService().getName()
                                           + "_" + id)
                        || heartbeatId.equals(id)) {
-                if (checkHostLocationsFieldsChanged()
-                    || checkOperationFieldsChanged()) {
-                    changed = true;
+                if (ci == null) {
+                    check.addCheck(checkHostLocationsFields());
                 }
-            } else {
-                changed = true;
+                check.addCheck(checkOperationFields());
             }
         }
         final String cl = getService().getResourceClass();
         if (cl != null && (cl.equals(ResourceAgent.HEARTBEAT_CLASS)
                            || ResourceAgent.SERVICE_CLASSES.contains(cl))) {
-            /* in old style resources don't show all the textfields */
-            boolean visible = false;
-            Widget wi = null;
-            for (int i = params.length - 1; i >= 0; i--) {
-                final Widget prevWi = getWidget(params[i], null);
-                if (prevWi == null) {
-                    continue;
-                }
-                if (!visible && !prevWi.getStringValue().isEmpty()) {
-                    visible = true;
-                }
-                if (wi != null && wi.getComponent().isVisible() != visible) {
-                    final boolean v = visible;
-                    final Widget c = wi;
-                    c.setVisible(v);
-                }
-                wi = prevWi;
-            }
+            oldStyleResourcesHideFields(params);
         }
 
         /* id-refs */
         if (sameAsMetaAttrsWi != null) {
-            final Value info = sameAsMetaAttrsWiValue();
-            final boolean defaultValues =
-                    info != null
-                    && META_ATTRS_DEFAULT_VALUES.equals(info);
-            final boolean nothingSelected =
-                      info == null || info.isNothingSelected();
-            if (!nothingSelected
-                && !defaultValues
-                && info != savedMetaAttrInfoRef) {
-                changed = true;
-            } else {
-                if ((nothingSelected || defaultValues)
-                    && savedMetaAttrInfoRef != null) {
-                    changed = true;
-                }
-                if (savedMetaAttrInfoRef == null
-                    && defaultValues != allMetaAttrsAreDefaultValues) {
-                    if (allMetaAttrsAreDefaultValues) {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                          new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsMetaAttrsWi.setValueNoListeners(
-                                                   META_ATTRS_DEFAULT_VALUES);
-                            }
-                        });
-                    } else {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                          new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsMetaAttrsWi.setValueNoListeners(null);
-                            }
-                        });
-                    }
-                }
+            if (checkSameAsMetaAttrsFieldsChanged(params)) {
+                changed.add("meta attributes");
             }
-            sameAsMetaAttrsWi.processAccessMode();
         }
         if (!fromServicesInfo) {
             final ServicesInfo sis = getBrowser().getServicesInfo();
             sis.setApplyButtons(null, sis.getParametersFromXML());
         }
-        return changed;
+        return check;
     }
 
     /** Returns operation default for parameter. */
@@ -1345,8 +1289,8 @@ public class ServiceInfo extends EditableInfo {
     /**
      * Returns thrue if an operation field changed.
      */
-    private boolean checkOperationFieldsChanged() {
-        boolean changed = false;
+    private Check checkOperationFields() {
+        final List<String> changed = new ArrayList<String>(); // no check
         boolean allAreDefaultValues = true;
         mSavedOperationsLock.lock();
         for (final String op : getResourceAgent().getOperationNames()) {
@@ -1372,10 +1316,10 @@ public class ServiceInfo extends EditableInfo {
                     final Value savedOp = savedOperation.get(op, param);
                     if (savedOp == null) {
                         if (!Tools.areEqual(value, defaultValue)) {
-                            changed = true;
+                            changed.add(param);
                         }
                     } else if (!Tools.areEqual(value, savedOp)) {
-                        changed = true;
+                        changed.add(param);
                     }
                     wi.setBackground(defaultValue, savedOp, false);
                 } else {
@@ -1385,7 +1329,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final Value savedOp = savedOperation.get(op, param);
                     if (!Tools.areEqual(value, savedOp)) {
-                        changed = true;
+                        changed.add(param);
                     }
                     wi.setBackground(defaultValue, savedOp, false);
                 }
@@ -1401,11 +1345,11 @@ public class ServiceInfo extends EditableInfo {
             if (!nothingSelected
                 && !defaultValues
                 && info != savedOperationIdRef) {
-                changed = true;
+                changed.add("operation id ref");
             } else {
                 if ((nothingSelected || defaultValues)
                     && savedOperationIdRef != null) {
-                    changed = true;
+                    changed.add("operation id ref");
                 }
                 if (savedOperationIdRef == null
                     && defaultValues != allAreDefaultValues) {
@@ -1432,14 +1376,17 @@ public class ServiceInfo extends EditableInfo {
             sameAsOperationsWi.processAccessMode();
         }
         mSavedOperationsLock.unlock();
-        return changed;
+        final List<String> incorrect = new ArrayList<String>(); // no check
+        return new Check(incorrect, changed);
     }
 
     /**
      * Returns true if some of the scores have changed.
      */
-    private boolean checkHostLocationsFieldsChanged() {
-        boolean changed = false;
+    private Check checkHostLocationsFields() {
+        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<String>();
+        boolean hostLocationFound = false;
         for (Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final Widget wi = scoreComboBoxHash.get(hi);
@@ -1458,13 +1405,19 @@ public class ServiceInfo extends EditableInfo {
                 continue;
             }
             String labelText = null;
-            if (wi.getLabel() != null) {
-                labelText = wi.getLabel().getText();
+            final JLabel label = wi.getLabel();
+            if (label != null) {
+                labelText = label.getText();
+                final String op = getOpFromLabel(hi.getName(),
+                                                 label.getText());
+                if (wi.getValue() == null || "eq".equals(op)) {
+                    hostLocationFound = true;
+                }
             }
             if (!Tools.areEqual(hsSaved, wi.getValue())
                 || (!Tools.areEqual(opSavedLabel, labelText)
                     && (hsSaved != null  && !hsSaved.isNothingSelected()))) {
-                changed = true;
+                changed.add("host location");
             }
             wi.setBackground(getHostLocationLabel(host.getName(), "eq"),
                              null,
@@ -1472,15 +1425,18 @@ public class ServiceInfo extends EditableInfo {
                              hsSaved,
                              false);
         }
+        if (!hostLocationFound) {
+            incorrect.add("no host location found");
+        }
         /* ping */
         final Widget pwi = pingComboBox;
         if (pwi != null) {
             if (!Tools.areEqual(savedPingOperation, pwi.getValue())) {
-                changed = true;
+                changed.add("ping operation");
             }
             pwi.setBackground(null, savedPingOperation, false);
         }
-        return changed;
+        return new Check(incorrect, changed);
     }
 
     /**
@@ -6232,7 +6188,7 @@ public class ServiceInfo extends EditableInfo {
                     if (migratedFrom != null) {
                         final List<String> runningOnNodes =
                                                    getRunningOnNodes(testOnly);
-                        boolean alreadyThere = false;
+                        boolean alreadyThere;
                         if (runningOnNodes == null) {
                             alreadyThere = true;
                         } else  {

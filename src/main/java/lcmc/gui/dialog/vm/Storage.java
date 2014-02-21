@@ -130,9 +130,10 @@ final class Storage extends VMConfig {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsdi.checkResourceFieldsCorrect(
-                                            null,
-                                            vmsdi.getRealParametersFromXML());
+                final boolean enable = vmsdi.checkResourceFields(
+                                              null,
+                                              vmsdi.getRealParametersFromXML())
+                                            .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });

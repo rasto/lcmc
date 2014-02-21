@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.swing.JPanel;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -276,41 +277,19 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Check the fields. */
     @Override
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
+    Check checkResourceFields(final String param, final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /** Check the fields. */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo) {
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromServicesInfo) {
         if (fromServicesInfo) {
-            return super.checkResourceFieldsChanged(param, params);
+            return super.checkResourceFields(param, params);
         } else {
             final ServicesInfo ssi = getBrowser().getServicesInfo();
-            return ssi.checkResourceFieldsChanged(param,
-                                                  ssi.getParametersFromXML());
-        }
-    }
-
-    /** Check the fields. */
-    @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
-    }
-
-    /** Check the fields. */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo) {
-        if (fromServicesInfo) {
-            return super.checkResourceFieldsCorrect(param, params);
-        } else {
-            final ServicesInfo ssi = getBrowser().getServicesInfo();
-            return ssi.checkResourceFieldsCorrect(param,
-                                                  ssi.getParametersFromXML());
+            return ssi.checkResourceFields(param, ssi.getParametersFromXML());
         }
     }
 }

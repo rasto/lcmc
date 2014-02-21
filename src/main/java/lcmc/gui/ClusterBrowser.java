@@ -2591,23 +2591,22 @@ public final class ClusterBrowser extends Browser {
 
     /** Checks all fields in the application. */
     public void checkAccessOfEverything() {
-        servicesInfo.checkResourceFieldsChanged(
-                                         null,
+        servicesInfo.checkResourceFields(null,
                                          servicesInfo.getParametersFromXML());
         servicesInfo.updateAdvancedPanels();
         rscDefaultsInfo.updateAdvancedPanels();
         Tools.getGUIData().updateGlobalItems();
         for (final ServiceInfo si : getExistingServiceList(null)) {
-            si.checkResourceFieldsChanged(null, si.getParametersFromXML());
+            si.checkResourceFields(null, si.getParametersFromXML());
             si.updateAdvancedPanels();
         }
 
-        drbdGraph.getDrbdInfo().checkResourceFieldsChanged(
+        drbdGraph.getDrbdInfo().checkResourceFields(
                                 null,
                                 drbdGraph.getDrbdInfo().getParametersFromXML());
         drbdGraph.getDrbdInfo().updateAdvancedPanels();
         for (final DrbdResourceInfo dri : getDrbdResHashValues()) {
-            dri.checkResourceFieldsChanged(null, dri.getParametersFromXML());
+            dri.checkResourceFields(null, dri.getParametersFromXML());
             dri.updateAdvancedPanels();
             dri.updateAllVolumes();
         }
@@ -2619,9 +2618,7 @@ public final class ClusterBrowser extends Browser {
                 final DefaultMutableTreeNode node = e.nextElement();
                 final VMSVirtualDomainInfo vmsvdi =
                                   (VMSVirtualDomainInfo) node.getUserObject();
-                vmsvdi.checkResourceFieldsChanged(
-                                                null,
-                                                vmsvdi.getParametersFromXML());
+                vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
                 vmsvdi.updateAdvancedPanels();
                 @SuppressWarnings("unchecked")
                 final Enumeration<DefaultMutableTreeNode> ce = node.children();
@@ -2629,16 +2626,15 @@ public final class ClusterBrowser extends Browser {
                     final DefaultMutableTreeNode cnode = ce.nextElement();
                     final VMSHardwareInfo vmshi =
                                   (VMSHardwareInfo) cnode.getUserObject();
-                    vmshi.checkResourceFieldsChanged(
-                                                null,
-                                                vmshi.getParametersFromXML());
+                    vmshi.checkResourceFields(null,
+                                              vmshi.getParametersFromXML());
                     vmshi.updateAdvancedPanels();
                 }
             }
         }
 
         for (final HbConnectionInfo hbci : crmGraph.getAllHbConnections()) {
-            hbci.checkResourceFieldsChanged(null, hbci.getParametersFromXML());
+            hbci.checkResourceFields(null, hbci.getParametersFromXML());
             hbci.updateAdvancedPanels();
         }
 

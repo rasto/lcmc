@@ -38,6 +38,7 @@ import java.awt.MouseInfo;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import lcmc.gui.widget.Check;
 
 /**
  * This class creates a button with any gradient colors.
@@ -290,5 +291,21 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Make it a mini button. */
     public final void miniButton() {
         Tools.makeMiniButton(this);
+    }
+
+    public final void setEnabled(final Check check) {
+        setEnabled(check.isChanged() && check.isCorrect());
+        setToolTipText(check.getToolTip());
+    }
+
+    /** For revert buttons. */
+    public final void setEnabledChanged(final Check check) {
+        setEnabled(check.isChanged());
+        setToolTipText(check.getToolTip());
+    }
+
+    public final void setEnabledCorrect(final Check check) {
+        setEnabled(check.isCorrect());
+        setToolTipText(check.getToolTip());
     }
 }

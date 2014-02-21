@@ -60,6 +60,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.MyButton;
 
 import lcmc.utilities.Logger;
@@ -382,17 +383,13 @@ public final class GroupInfo extends ServiceInfo {
             getBrowser().reload(getNode(), false);
         }
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.checkResourceFieldsCorrect(null,
-                                                 child.getParametersFromXML(),
-                                                 false,
-                                                 false,
-                                                 true)
-                && child.checkResourceFieldsChanged(
-                                                null,
-                                                child.getParametersFromXML(),
-                                                false,
-                                                false,
-                                                true)) {
+            final Check childCheck = 
+                child.checkResourceFields(null,
+                                          child.getParametersFromXML(),
+                                          false,
+                                          false,
+                                          true);
+            if (childCheck.isCorrect() && childCheck.isChanged()) {
                 child.apply(dcHost, testOnly);
             }
         }
@@ -1059,76 +1056,43 @@ public final class GroupInfo extends ServiceInfo {
      * cannot by applied.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false, false);
     }
 
     /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If group does not have any services, its changes
-     * cannot by applied.
+     * Returns whether all the parameters are correct. If param is null,
+     * all paremeters will be checked, otherwise only the param, but other
+     * parameters will be checked only in the cache. This is good if only
+     * one value is changed and we don't want to check everything.
      */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo,
-                                       final boolean fromCloneInfo) {
-        boolean changed = super.checkResourceFieldsChanged(param,
-                                                           params,
-                                                           fromServicesInfo,
-                                                           fromCloneInfo,
-                                                           true);
-        for (final ServiceInfo child : getGroupServices()) {
-            if (child.checkResourceFieldsChanged(null,
-                                                 child.getParametersFromXML(),
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromServicesInfo,
+                              final boolean fromCloneInfo) {
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        final Check check = new Check(incorrect, changed);
+        check.addCheck(super.checkResourceFields(param,
+                                                 params,
                                                  fromServicesInfo,
                                                  fromCloneInfo,
-                                                 true)) {
-                changed = true;
-            }
-        }
-        return changed;
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false, false);
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo,
-                                       final boolean fromCloneInfo) {
-        boolean cor = super.checkResourceFieldsCorrect(param,
-                                                       params,
-                                                       fromServicesInfo,
-                                                       fromCloneInfo,
-                                                       true);
+                                                 true));
         boolean hasSevices = false;
         for (final ServiceInfo child : getGroupServices()) {
-            if (!child.checkResourceFieldsCorrect(null,
+            check.addCheck(child.checkResourceFields(
+                                                  null,
                                                   child.getParametersFromXML(),
                                                   fromServicesInfo,
                                                   fromCloneInfo,
-                                                  true)) {
-                cor = false;
-            }
+                                                  true));
             hasSevices = true;
         }
-        return cor && hasSevices;
+        if (!hasSevices) {
+            incorrect.add("no services");
+        }
+        return check;
     }
 
     /** Update menus with positions and calles their update methods. */
@@ -1180,11 +1144,11 @@ public final class GroupInfo extends ServiceInfo {
     public void revert() {
         super.revert();
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.checkResourceFieldsChanged(null,
-                                                 child.getParametersFromXML(),
-                                                 true,
-                                                 false,
-                                                 false)) {
+            if (child.checkResourceFields(null,
+                                          child.getParametersFromXML(),
+                                          true,
+                                          false,
+                                          false).isChanged()) {
                 child.revert();
             }
         }

@@ -129,7 +129,8 @@ final class InstallationDisk extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        final boolean enable = vmsdi.checkResourceFieldsCorrect(null, PARAMS);
+        final boolean enable = vmsdi.checkResourceFields(null, PARAMS)
+                                    .isCorrect();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {

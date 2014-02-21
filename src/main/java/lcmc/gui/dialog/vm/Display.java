@@ -118,9 +118,10 @@ final class Display extends VMConfig {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsgi.checkResourceFieldsCorrect(
-                                            null,
-                                            vmsgi.getRealParametersFromXML());
+                final boolean enable = vmsgi.checkResourceFields(
+                                               null,
+                                               vmsgi.getRealParametersFromXML())
+                                            .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });

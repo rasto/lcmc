@@ -71,6 +71,7 @@ import javax.swing.JDialog;
 import lcmc.EditClusterDialog;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -298,16 +299,13 @@ public final class ServicesInfo extends EditableInfo {
             rdi.storeComboBoxValues(rdiParams);
         }
         for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (si.checkResourceFieldsCorrect(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)
-                && si.checkResourceFieldsChanged(null,
-                                                 si.getParametersFromXML(),
-                                                 true,
-                                                 false,
-                                                 false)) {
+            final Check check = si.checkResourceFields(
+                                                      null,
+                                                      si.getParametersFromXML(),
+                                                      true,
+                                                      false,
+                                                      false);
+            if (check.isCorrect() && check.isChanged()) {
                 si.apply(dcHost, testOnly);
             }
         }
@@ -1899,63 +1897,28 @@ public final class ServicesInfo extends EditableInfo {
 
     /**
      * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
+     * all parameters will be checked, otherwise only the param, but other
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
-        boolean ret = true;
-        if (!rdi.checkResourceFieldsCorrect(param,
-                                            rdi.getParametersFromXML(),
-                                            true)) {
-            ret = false;
-        }
-        if (!super.checkResourceFieldsCorrect(param, params)) {
-            ret = false;
-        }
+        final Check check = new Check(new ArrayList<String>(),
+                                      new ArrayList<String>());
+        check.addCheck(rdi.checkResourceFields(param,
+                                               rdi.getParametersFromXML(),
+                                               true));
+        check.addCheck(super.checkResourceFields(param, params));
         for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (!si.checkResourceFieldsCorrect(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
-                ret = false;
-            }
+            check.addCheck(si.checkResourceFields(null,
+                                                  si.getParametersFromXML(),
+                                                  true,
+                                                  false,
+                                                  false));
         }
-        return ret;
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        boolean changed = false;
-        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
-        if (super.checkResourceFieldsChanged(param, params)) {
-            changed = true;
-        }
-        if (rdi.checkResourceFieldsChanged(param,
-                                           rdi.getParametersFromXML(),
-                                           true)) {
-            changed = true;
-        }
-        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (si.checkResourceFieldsChanged(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
-                changed = true;
-            }
-        }
-        return changed;
+        return check;
     }
 
     /** Revert all values. */
@@ -1965,11 +1928,11 @@ public final class ServicesInfo extends EditableInfo {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         rdi.revert();
         for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (si.checkResourceFieldsChanged(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
+            if (si.checkResourceFields(null,
+                                       si.getParametersFromXML(),
+                                       true,
+                                       false,
+                                       false).isChanged()) {
                 si.revert();
             }
         }

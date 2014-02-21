@@ -21,6 +21,8 @@
  */
 package lcmc.gui.resources;
 
+import java.util.ArrayList;
+import java.util.List;
 import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 import lcmc.data.AccessMode;
@@ -35,6 +37,7 @@ import lcmc.gui.Browser;
 import java.util.Map;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -110,14 +113,18 @@ final class FilesystemInfo extends ServiceInfo {
      * one value is changed and we don't want to check everything.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        final boolean ret = super.checkResourceFieldsCorrect(param, params);
-        if (!ret) {
-            return false;
-        }
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
         final Widget wi = getWidget(FS_RES_PARAM_DEV, null);
-        return wi != null && wi.getValue() != null;
+        final List<String> incorrect = new ArrayList<String>();
+
+        if (wi == null || wi.getValue() == null) {
+            incorrect.add(FS_RES_PARAM_DEV);
+        }
+
+        final Check check = new Check(incorrect, new ArrayList<String>());
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Applies changes to the Filesystem service parameters. */

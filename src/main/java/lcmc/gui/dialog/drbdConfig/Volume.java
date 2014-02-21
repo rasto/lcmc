@@ -101,10 +101,8 @@ public final class Volume extends DrbdConfig {
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        final boolean ch =
-                  getDrbdVolumeInfo().checkResourceFieldsChanged(null, PARAMS);
         final boolean cor =
-                  getDrbdVolumeInfo().checkResourceFieldsCorrect(null, PARAMS);
+            getDrbdVolumeInfo().checkResourceFields(null, PARAMS).isCorrect();
         if (cor) {
             enableComponents();
         } else {

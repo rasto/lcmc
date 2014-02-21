@@ -744,7 +744,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         if (!testOnly) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Modify device xml. */
@@ -930,7 +930,6 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.DISK_TABLE);
-        //checkResourceFieldsChanged(null, getParametersFromXML());
         setApplyButtons(null, getRealParametersFromXML());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override

@@ -194,8 +194,7 @@ public final class Resource extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
+        final boolean cor = dri.checkResourceFields(null, PARAMS).isCorrect();
         if (cor) {
             enableComponents();
         } else {

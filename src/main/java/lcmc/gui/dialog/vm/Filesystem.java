@@ -114,9 +114,10 @@ final class Filesystem extends VMConfig {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsfi.checkResourceFieldsCorrect(
-                                            null,
-                                            vmsfi.getRealParametersFromXML());
+                final boolean enable = vmsfi.checkResourceFields(
+                                              null,
+                                              vmsfi.getRealParametersFromXML())
+                                            .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });

@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 /**
  * Object that holds a colocation constraint information.
@@ -483,9 +484,8 @@ final class HbColocationInfo extends EditableInfo
      * connection with this constraint.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
+    Check checkResourceFields(final String param, final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /**
@@ -493,38 +493,13 @@ final class HbColocationInfo extends EditableInfo
      * connection with this constraint.
      */
     @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params,
-                                              final boolean fromUp) {
+    public Check checkResourceFields(final String param,
+                                     final String[] params,
+                                     final boolean fromUp) {
         if (fromUp) {
-            return super.checkResourceFieldsCorrect(param, params);
+            return super.checkResourceFields(param, params);
         } else {
-            return connectionInfo.checkResourceFieldsCorrect(param, null);
-        }
-    }
-
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
-    @Override
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
-    }
-
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params,
-                                              final boolean fromUp) {
-        if (fromUp) {
-            return super.checkResourceFieldsChanged(param, params);
-        } else {
-            return connectionInfo.checkResourceFieldsChanged(param, null);
+            return connectionInfo.checkResourceFields(param, null);
         }
     }
 }

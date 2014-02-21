@@ -76,6 +76,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -946,48 +947,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * otherwise all parameters will be checked.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromDrbdInfo) {
-        boolean changed = false;
-        for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            if (dvi.checkResourceFieldsChanged(param,
-                                               dvi.getParametersFromXML(),
-                                               fromDrbdInfo,
-                                               true)) {
-                changed = true;
-            }
-        }
-        if (checkHostAddressesFieldsChanged()) {
-            changed = true;
-        }
-
-        if (isSectionEnabled(SECTION_PROXY) && checkProxyFieldsChanged()) {
-            changed = true;
-        }
-        return super.checkResourceFieldsChanged(param, params) || changed;
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /** Check whether it's a valid port. */
@@ -1002,8 +964,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /** Check port. */
     private boolean checkPortCorrect() {
         /* port */
-        final String port = portComboBox.getStringValue();
         final Widget pwi = portComboBox;
+        if (pwi == null) {
+            return false;
+        }
+        final String port = pwi.getStringValue();
         final Widget pwizardWi = portComboBoxWizard;
         boolean correct = true;
         if (checkPort(port)) {
@@ -1052,6 +1017,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                           final Widget pWizardWi,
                                           final Value savedPort) {
         /* proxy ports */
+        if (pwi == null) {
+            return false;
+        }
         final Value port = pwi.getValue();
         boolean correct = true;
         if (checkPort(port.getValueForConfig())) {
@@ -1145,55 +1113,64 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromDrbdInfo) {
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromDrbdInfo) {
         final DrbdInfo di = getDrbdInfo();
-        boolean correct = true;
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
         final DrbdXML dxml = getBrowser().getDrbdXML();
+        final Check check = new Check(incorrect, changed);
         if (dxml != null && dxml.isDrbdDisabled()) {
-            correct = false;
+            incorrect.add("DRBD is disabled");
         }
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
-            if (!dvi.checkResourceFieldsCorrect(param,
-                                                dvi.getParametersFromXML(),
-                                                fromDrbdInfo,
-                                                true)) {
-                correct = false;
-            }
+            check.addCheck(dvi.checkResourceFields(param,
+                                                   dvi.getParametersFromXML(),
+                                                   fromDrbdInfo,
+                                                   true));
         }
 
         if (!checkPortCorrect()) {
-            correct = false;
+            incorrect.add("port");
         }
 
         if (!checkAddressCorrect()) {
-            correct = false;
+            incorrect.add("address");
+        }
+
+        if (checkHostAddressesFieldsChanged()) {
+            changed.add("host address");
         }
 
         if (isSectionEnabled(SECTION_PROXY)) {
             if (!checkProxyPortCorrect(insidePortComboBox,
                                        insidePortComboBoxWizard,
                                        savedInsidePort)) {
-                correct = false;
+                incorrect.add("proxy inside port");
             }
 
             if (!checkProxyPortCorrect(outsidePortComboBox,
                                        outsidePortComboBoxWizard,
                                        savedOutsidePort)) {
-                correct = false;
+                incorrect.add("proxy outside port");
             }
 
             if (!checkProxyInsideIpCorrect()) {
-                correct = false;
+                incorrect.add("proxy inside IP");
             }
 
             if (!checkProxyOutsideIpCorrect()) {
-                correct = false;
+                incorrect.add("proxy outside IP");
+            }
+
+            if (checkProxyFieldsChanged()) {
+                changed.add("proxy");
             }
         }
 
-        return super.checkResourceFieldsCorrect(param, params) && correct;
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Revert all values. */
@@ -1320,8 +1297,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                 if (bdi != null) {
-                    bdi.checkResourceFieldsChanged(null,
-                                                   bdi.getParametersFromXML());
+                    bdi.checkResourceFields(
+                            null,
+                            bdi.getParametersFromXML()).isChanged();
                     bdi.updateAdvancedPanels();
                 }
             }

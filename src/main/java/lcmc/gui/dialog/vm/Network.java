@@ -124,9 +124,10 @@ final class Network extends VMConfig {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsii.checkResourceFieldsCorrect(
-                                            null,
-                                            vmsii.getRealParametersFromXML());
+                final boolean enable = vmsii.checkResourceFields(
+                                              null,
+                                              vmsii.getRealParametersFromXML())
+                                            .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });

@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.ArrayList;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
+import lcmc.utilities.MyButton;
 
 
 /**
@@ -123,6 +125,7 @@ public class NewHost extends DialogHost {
         final boolean pf = (ps.length() > 0);
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
+        final List<String> incorrect = new ArrayList<String>();
         if (hf && uf) {
             if (hc != uc) {
                 uf = false;
@@ -159,6 +162,7 @@ public class NewHost extends DialogHost {
             });
         } else {
             hostField.wrongValue();
+            incorrect.add("host");
         }
 
         if (uf) {
@@ -181,6 +185,7 @@ public class NewHost extends DialogHost {
             });
         } else {
             usernameField.wrongValue();
+            incorrect.add("username");
         }
 
         if (pf) {
@@ -194,6 +199,7 @@ public class NewHost extends DialogHost {
             });
         } else {
             sshPortField.wrongValue();
+            incorrect.add("SSH port");
         }
 
         final boolean hostF = hf;
@@ -202,8 +208,9 @@ public class NewHost extends DialogHost {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final JComponent btn : nextButtons()) {
-                    btn.setEnabled(hostF && userF && sshPortF);
+                for (final MyButton btn : nextButtons()) {
+                    btn.setEnabledCorrect(new Check(incorrect,
+                                          new ArrayList<String>()));
                 }
             }
         });
@@ -412,7 +419,7 @@ public class NewHost extends DialogHost {
     }
 
     /** Buttons that are enabled/disabled during checks. */
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton())};
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{buttonClass(nextButton())};
     }
 }

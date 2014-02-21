@@ -77,6 +77,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -2634,9 +2635,9 @@ public final class BlockDevInfo extends EditableInfo {
      * otherwise all parameters will be checked.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false, false, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false, false, false);
     }
 
     /**
@@ -2644,12 +2645,11 @@ public final class BlockDevInfo extends EditableInfo {
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
-    boolean checkResourceFieldsChanged(
-                                   final String param,
-                                   final String[] params,
-                                   final boolean fromDrbdInfo,
-                                   final boolean fromDrbdResourceInfo,
-                                   final boolean fromDrbdVolumeInfo) {
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromDrbdInfo,
+                              final boolean fromDrbdResourceInfo,
+                              final boolean fromDrbdVolumeInfo) {
         final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
         if (dvi != null
             && !fromDrbdVolumeInfo
@@ -2657,38 +2657,14 @@ public final class BlockDevInfo extends EditableInfo {
             && !fromDrbdInfo) {
             dvi.setApplyButtons(null, dvi.getParametersFromXML());
         }
-        return super.checkResourceFieldsChanged(param, params);
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false, false, false);
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromDrbdInfo,
-                                       final boolean fromDrbdResourceInfo,
-                                       final boolean fromDrbdVolumeInfo) {
-        boolean correct = true;
         final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
+        final List<String> incorrect = new ArrayList<String>();
         if (dxml != null && dxml.isDrbdDisabled()) {
-            correct = false;
+            incorrect.add("drbd is disabled");
         }
-        return super.checkResourceFieldsCorrect(param, params) && correct;
+        final Check check = new Check(incorrect, new ArrayList<String>());
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Returns whether this block device is a volume group in LVM. */

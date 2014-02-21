@@ -27,6 +27,7 @@ import lcmc.data.resources.Service;
 import lcmc.gui.widget.Widget;
 import java.util.Map;
 import javax.swing.JPanel;
+import lcmc.gui.widget.Check;
 
 /**
  * Interface for either order or colocation constraint.
@@ -50,16 +51,10 @@ public interface HbConstraintInterface {
     /**
      * Check which fields are correct and return true if all are.
      */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromUp);
-    /**
-     * Check which fields have changed and sets fancy colors and returns true
-     * if at least one field have changed.
-     */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromUp);
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromUp);
+
     /** Applies the changes after apply button was pressed. */
     void apply(final Host dcHost, final boolean testOnly);
     /** Revert all values. */

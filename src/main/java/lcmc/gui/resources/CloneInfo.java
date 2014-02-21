@@ -52,6 +52,7 @@ import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 
 /**
@@ -430,61 +431,34 @@ final class CloneInfo extends ServiceInfo {
 
     /** In clone resource check its containing service. */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /** In clone resource check its containing service. */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo) {
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromServicesInfo) {
         final ServiceInfo cs = containedService;
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        final Check check = new Check(incorrect, changed);
+        check.addCheck(super.checkResourceFields(param,
+                                                 params,
+                                                 fromServicesInfo,
+                                                 true,
+                                                 false));
         if (cs == null) {
-            return false;
+            incorrect.add("no service inside");
+        } else {
+            check.addCheck(cs.checkResourceFields(param,
+                                                  cs.getParametersFromXML(),
+                                                  fromServicesInfo,
+                                                  true,
+                                                  false));
         }
-        final boolean cor = super.checkResourceFieldsCorrect(param,
-                                                             params,
-                                                             fromServicesInfo,
-                                                             true,
-                                                             false);
-        final boolean ccor = cs.checkResourceFieldsCorrect(
-                                  param,
-                                  cs.getParametersFromXML(),
-                                  fromServicesInfo,
-                                  true,
-                                  false);
-        return cor && ccor;
-    }
-
-    /** In clone resource check its containing service. */
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
-    }
-
-    /** In clone resource check its containing service. */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo) {
-        final ServiceInfo cs = containedService;
-        if (cs == null) {
-            return false;
-        }
-        final boolean ch = super.checkResourceFieldsChanged(param,
-                                                            params,
-                                                            fromServicesInfo,
-                                                            true,
-                                                            false);
-
-        final boolean cch = cs.checkResourceFieldsChanged(
-                                  param,
-                                  cs.getParametersFromXML(),
-                                  fromServicesInfo,
-                                  true,
-                                  false);
-        return ch || cch;
+        return check;
     }
 
     /** Returns whether service is started. */

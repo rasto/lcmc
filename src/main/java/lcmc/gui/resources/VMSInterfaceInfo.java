@@ -399,7 +399,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         if (!testOnly) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Returns data for the table. */
@@ -521,7 +521,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.INTERFACES_TABLE);
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        checkResourceFields(null, getParametersFromXML());
     }
 
     /** Returns string representation. */
