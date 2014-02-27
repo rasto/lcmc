@@ -65,43 +65,36 @@ final class DrbdTest8 {
             moveTo(700, 450);
             leftClick();
             robot.mouseWheel(70);
+            moveTo(700, 450);
+            leftClick();
 
             moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
                    MComboBox.class); /* outside */
             leftClick();
-            sleep(500);
             press(KeyEvent.VK_E);
-            sleep(500);
             press(KeyEvent.VK_ENTER);
 
             moveTo(MComboBox.class, 8); /* outside */
             leftClick();
-            sleep(500);
             press(KeyEvent.VK_E);
-            sleep(500);
             press(KeyEvent.VK_ENTER);
 
             drbdNext();
-            sleep(10000);
             dialogColorTest("chooseDrbdResource");
 
             addDrbdVolume();
             addBlockDevice();
             addBlockDevice();
-            sleep(20000);
 
             if (offset == 0) {
                 checkDRBDTest(drbdTest, 1.1);
             } else {
                 checkDRBDTest(drbdTest, 1.2);
             }
-            sleep(10000);
             addMetaData();
             addFileSystem();
-            sleep(10000);
             moveTo(Tools.getString("Dialog.Dialog.Finish"));
             leftClick();
-            sleep(10000);
 
             offset += 40;
         }
@@ -130,49 +123,37 @@ final class DrbdTest8 {
         leftClick();
 
         moveTo(900, 300);
+        Tools.sleep(1000);
         robot.mouseWheel(100);
+        Tools.sleep(1000);
 
         moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_DOWN); /* protocol b */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Fence peer", MComboBox.class);
         leftClick();
-        sleep(2000);
         press(KeyEvent.VK_DOWN);
-        sleep(200);
         press(KeyEvent.VK_DOWN); /* select dopd */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
         Tools.getGUIData().expandTerminalSplitPane(1);
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_9);
-        sleep(2000);
 
         moveTo("Max buffers", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_5);
-        sleep(1000);
         moveTo("Max buffers", MComboBox.class); /* Unit */
         leftClick();
-        sleep(1000);
         press(KeyEvent.VK_DOWN);
-        sleep(1000);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveScrollBar(true);
-        sleep(5000);
         final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
             if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
@@ -184,18 +165,13 @@ final class DrbdTest8 {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
         leftClick();
-        sleep(1000);
         press(KeyEvent.VK_DOWN);
-        sleep(1000);
         press(KeyEvent.VK_ENTER);
-        sleep(1000);
 
         moveScrollBar(false);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.1); /* 2.1 */
 
@@ -203,92 +179,64 @@ final class DrbdTest8 {
         /* common */
         moveTo(500, 342); /* select background */
         leftClick();
-        sleep(2000);
         leftClick();
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_3);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
-        sleep(10000);
         checkDRBDTest(drbdTest, 2.11); /* 2.11 */
         moveTo("Wfc timeout", MTextField.class);
-        sleep(6000);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_0);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
 
         /* resource */
         moveTo(480, 152); /* select r0 */
         leftClick();
-        sleep(2000);
         leftClick();
 
         moveTo(900, 300);
+        Tools.sleep(1000);
         robot.mouseWheel(100);
+        Tools.sleep(1000);
 
         moveTo("Protocol", MComboBox.class);
         leftClick();
         press(KeyEvent.VK_UP); /* protocol a */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Fence peer", MComboBox.class);
         leftClick();
-        sleep(2000);
         press(KeyEvent.VK_DOWN);
-        sleep(200);
         press(KeyEvent.VK_UP); /* deselect dopd */
-        sleep(200);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_5);
-        sleep(2000);
 
         moveTo("Max buffers", MTextField.class);
         leftClick();
-        sleep(1000);
         leftClick();
-        sleep(1000);
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_2);
-        sleep(500);
         press(KeyEvent.VK_0);
-        sleep(500);
         press(KeyEvent.VK_4);
-        sleep(500);
         press(KeyEvent.VK_8);
-        sleep(500);
         moveTo("Max buffers", MComboBox.class); /* Unit */
         leftClick();
-        sleep(1000);
         press(KeyEvent.VK_UP);
-        sleep(1000);
         press(KeyEvent.VK_ENTER);
-        sleep(2000);
 
         moveScrollBar(true);
         try {
@@ -301,30 +249,22 @@ final class DrbdTest8 {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
         leftClick();
-        sleep(1000);
         press(KeyEvent.VK_UP);
-        sleep(1000);
         press(KeyEvent.VK_ENTER);
-        sleep(1000);
 
         moveScrollBar(false);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick(); /* apply/disables tooltip */
-        sleep(2000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);
-        sleep(1000);
         press(KeyEvent.VK_0);
-        sleep(2000);
 
         moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        sleep(6000); /* test */
         leftClick();
         checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
