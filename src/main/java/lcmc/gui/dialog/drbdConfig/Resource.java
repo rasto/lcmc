@@ -154,8 +154,6 @@ public final class Resource extends DrbdConfig {
                 wi.setValue(value);
             }
         }
-        drbdInfo.apply(false);
-        dri.apply(false);
         return new Volume(this, getDrbdVolumeInfo());
     }
 

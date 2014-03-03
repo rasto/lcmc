@@ -80,21 +80,25 @@ public final class Check {
         }
         return false;
     }
-
     public String getToolTip() {
         if (toolTipCache == null) {
             final StringBuilder tt = new StringBuilder();
             tt.append("<html>")
-              .append("incorrect: ")
-              .append(Tools.join(" ", incorrectFields))
-              .append("<br>changed: ")
-              .append(Tools.join(" ", changedFields))
+              .append(getToolTipInside())
               .append("</html>");
-            for (final Check subCheck : subChecks) {
-                tt.append(subCheck.getToolTip());
-            }
             toolTipCache = tt.toString();
         }
         return toolTipCache;
+    }
+
+    public StringBuilder getToolTipInside() {
+        final StringBuilder tt = new StringBuilder()
+                                 .append(Tools.join(" ", incorrectFields))
+                                 .append("<br>changed: ")
+                                 .append(Tools.join(" ", changedFields));
+        for (final Check subCheck : subChecks) {
+            tt.append("<br>").append(subCheck.getToolTipInside());
+        }
+        return tt;
     }
 }

@@ -74,7 +74,6 @@ final class BlockDev extends DrbdConfig {
     @Override
     protected void finishDialog() {
         Tools.waitForSwing();
-        blockDevInfo.apply(false);
     }
 
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */
@@ -103,8 +102,16 @@ final class BlockDev extends DrbdConfig {
             final BlockDevInfo oBdi =
                     getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
             try {
-                // TODO: check this
                 final boolean testOnly = false;
+
+                /* apply */
+                getDrbdVolumeInfo().getDrbdInfo().apply(testOnly);
+                getDrbdVolumeInfo().getDrbdResourceInfo().apply(testOnly);
+                getDrbdVolumeInfo().apply(testOnly);
+                blockDevInfo.apply(testOnly);
+                oBdi.apply(testOnly);
+
+                /* create config */
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
                                                     .createDrbdConfig(false);
                 final String gi1 = getGI(blockDevInfo);
@@ -145,13 +152,11 @@ final class BlockDev extends DrbdConfig {
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        enableComponents();
 
         final String[] params = blockDevInfo.getParametersFromXML();
         Tools.invokeLater(new Runnable() {
@@ -161,6 +166,7 @@ final class BlockDev extends DrbdConfig {
                    blockDevInfo.checkResourceFields(null, params).isCorrect());
             }
         });
+        enableComponents();
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }

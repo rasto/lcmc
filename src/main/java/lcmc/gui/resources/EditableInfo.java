@@ -567,17 +567,19 @@ public abstract class EditableInfo extends Info {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        if (getResource().isNew()) {
+                            check.addChanged("new resource");
+                        }
                         if (thisApplyButton == applyButton) {
                             /* not a wizard button */
                             if (isDialogStarted()) {
                                 check.addIncorrect("dialog started");
                             }
-                            
+                            thisApplyButton.setEnabled(check);
+                        } else {
+                            /* wizard button */
+                            thisApplyButton.setEnabledCorrect(check);
                         }
-                        if (getResource().isNew()) {
-                            check.addChanged("new resource");
-                        }
-                        thisApplyButton.setEnabled(check);
                         if (revertButton != null) {
                             revertButton.setEnabledChanged(check);
                         }
@@ -867,8 +869,10 @@ public abstract class EditableInfo extends Info {
                 }
 
                 /* check correctness */
+                final Boolean correctValueCache =
+                                              paramCorrectValueMap.get(param);
                 if (param == null || otherParam.equals(param)
-                    || !paramCorrectValueMap.containsKey(param)) {
+                    || correctValueCache == null) {
                     final Widget wizardWi = getWidget(otherParam,
                                                       Widget.WIZARD_PREFIX);
                     final String enable = isEnabled(otherParam);
@@ -916,7 +920,7 @@ public abstract class EditableInfo extends Info {
                     }
                     setCheckParamCache(otherParam, check);
                 } else {
-                    if (!checkParamCache(otherParam)) {
+                    if (!correctValueCache) {
                         incorrect.add(otherParam + ": wrong value");
                     }
                 }

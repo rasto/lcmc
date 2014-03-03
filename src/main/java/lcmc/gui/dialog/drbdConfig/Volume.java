@@ -61,7 +61,6 @@ public final class Volume extends DrbdConfig {
     @Override
     public WizardDialog nextDialog() {
         Tools.waitForSwing();
-        getDrbdVolumeInfo().apply(false);
         return new BlockDev(this,
                             getDrbdVolumeInfo(),
                             getDrbdVolumeInfo().getFirstBlockDevInfo());
@@ -91,24 +90,12 @@ public final class Volume extends DrbdConfig {
         getDrbdVolumeInfo().waitForInfoPanel();
     }
 
-    /** Inits dialog. */
-    @Override
-    protected void initDialogBeforeVisible() {
-        super.initDialogBeforeVisible();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-    }
-
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        final boolean cor =
-            getDrbdVolumeInfo().checkResourceFields(null, PARAMS).isCorrect();
-        if (cor) {
-            enableComponents();
-        } else {
-            /* don't enable */
-            enableComponents(new JComponent[]{buttonClass(nextButton())});
-        }
+        buttonClass(nextButton()).setEnabled(
+           getDrbdVolumeInfo().checkResourceFields(null, PARAMS).isCorrect());
+        enableComponents();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
