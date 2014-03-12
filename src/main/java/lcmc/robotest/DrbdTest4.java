@@ -135,6 +135,7 @@ final class DrbdTest4 {
         leftClick(); /* apply/disables tooltip */
         leftClick();
         checkDRBDTest(drbdTest, 2.11); /* 2.11 */
+        Tools.sleep(10000);
         moveTo("Wfc timeout", MTextField.class);
         leftClick();
         press(KeyEvent.VK_BACK_SPACE);

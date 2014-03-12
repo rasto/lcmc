@@ -74,9 +74,9 @@ final class DrbdTest1 {
         sleep(2000);
         press(KeyEvent.VK_DOWN);
         press(KeyEvent.VK_ENTER);
+        dialogColorTest("addDrbdResource");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("addDrbdResource");
     }
 
     static void drbdNext() {
@@ -85,9 +85,9 @@ final class DrbdTest1 {
 
     static void newDrbdResource() {
         drbdNext();
+        dialogColorTest("newDrbdResource");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("newDrbdResource");
     }
 
     static void chooseDrbdResourceInterface(final String hostName,
@@ -101,9 +101,9 @@ final class DrbdTest1 {
             press(KeyEvent.VK_E); /* select first interface */
         }
         press(KeyEvent.VK_ENTER);
+        dialogColorTest("chooseDrbdResourceInterface");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("chooseDrbdResourceInterface");
     }
 
     static void chooseDrbdResource(final Cluster cluster) {
@@ -113,37 +113,37 @@ final class DrbdTest1 {
                                     !PROXY);
 
         drbdNext();
+        dialogColorTest("chooseDrbdResource");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("chooseDrbdResource");
     }
 
     static void addDrbdVolume() {
         drbdNext();
+        dialogColorTest("addDrbdVolume");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("addDrbdVolume");
     }
 
     static void addBlockDevice() {
         drbdNext();
+        dialogColorTest("addBlockDevice");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("addBlockDevice");
     }
 
     static void addMetaData() {
         drbdNext();
+        dialogColorTest("addMetaData");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("addMetaData");
     }
 
     static void addFileSystem() {
         /* do nothing. */
+        dialogColorTest("addFileSystem");
         moveTo(500, 300);
         rightClick();
-        dialogColorTest("addFileSystem");
     }
 
     static void removeDrbdVolume(final boolean really) {
