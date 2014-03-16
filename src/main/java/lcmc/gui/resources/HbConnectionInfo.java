@@ -41,10 +41,11 @@ import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SpringLayout;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -67,7 +68,7 @@ public class HbConnectionInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** Constraints. */
-    private final List<HbConstraintInterface> constraints =
+    private final Collection<HbConstraintInterface> constraints =
                                    new ArrayList<HbConstraintInterface>();
     /** constraints lock. */
     private final ReadWriteLock mConstraintsLock = new ReentrantReadWriteLock();
@@ -93,9 +94,9 @@ public class HbConnectionInfo extends EditableInfo {
                                MINUS_INFINITY,
                                IS_NULL,
                                NEGATIVE,
-                               POSITIVE };
+                               POSITIVE }
 
-    /** Prepares a new <code>HbConnectionInfo</code> object. */
+    /** Prepares a new {@code HbConnectionInfo} object. */
     public HbConnectionInfo(final Browser browser) {
         super("HbConnectionInfo", browser);
     }
@@ -253,7 +254,7 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             });
         }
-        final List<HbConstraintInterface> constraintsCopy
+        final Collection<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
         mConstraintsReadLock.lock();
         try {
@@ -295,7 +296,6 @@ public class HbConnectionInfo extends EditableInfo {
     protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
-        final int rows = 3;
         final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
@@ -315,6 +315,7 @@ public class HbConnectionInfo extends EditableInfo {
                         ClusterBrowser.SERVICE_LABEL_WIDTH,
                         ClusterBrowser.SERVICE_FIELD_WIDTH,
                         height);
+        final int rows = 3;
         SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
                                         1, 1,        /* initX, initY */
                                         1, 1);       /* xPad, yPad */
@@ -331,22 +332,18 @@ public class HbConnectionInfo extends EditableInfo {
         if (infoPanel != null) {
             return infoPanel;
         }
-        final HbConnectionInfo thisClass = this;
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
 
             /** Whether the whole thing should be enabled. */
             @Override
-            public final boolean isEnabled() {
+            public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
-                if (dcHost == null) {
-                    return false;
-                }
-                return !Tools.versionBeforePacemaker(dcHost);
+                return dcHost != null && !Tools.versionBeforePacemaker(dcHost);
             }
 
             @Override
-            public final void mouseOut(final ComponentWithTest component) {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
@@ -356,7 +353,7 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override
-            public final void mouseOver(final ComponentWithTest component) {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
@@ -389,17 +386,17 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
         initApplyButton(buttonCallback);
-        for (final String col : colocationIds.keySet()) {
-            colocationIds.get(col).setApplyButton(getApplyButton());
-            colocationIds.get(col).setRevertButton(getRevertButton());
+        for (final Map.Entry<String, HbColocationInfo> colocationEntry : colocationIds.entrySet()) {
+            colocationEntry.getValue().setApplyButton(getApplyButton());
+            colocationEntry.getValue().setRevertButton(getRevertButton());
         }
-        for (final String ord : orderIds.keySet()) {
-            orderIds.get(ord).setApplyButton(getApplyButton());
-            orderIds.get(ord).setRevertButton(getRevertButton());
+        for (final Map.Entry<String, HbOrderInfo> orderEntry : orderIds.entrySet()) {
+            orderEntry.getValue().setApplyButton(getApplyButton());
+            orderEntry.getValue().setRevertButton(getRevertButton());
         }
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
@@ -409,17 +406,17 @@ public class HbConnectionInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
 
         /* params */
-        EditableInfo firstConstraint = null;
         mConstraintsReadLock.lock();
+        EditableInfo firstConstraint = null;
         try {
             for (final HbConstraintInterface c : constraints) {
                 if (firstConstraint == null) {
@@ -484,7 +481,7 @@ public class HbConnectionInfo extends EditableInfo {
 
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         if (firstConstraint != null) {
         newPanel.add(firstConstraint.getMoreOptionsPanel(
@@ -523,7 +520,7 @@ public class HbConnectionInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public final String enablePredicate() {
+            public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -531,17 +528,17 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override
-            public final void action() {
+            public void action() {
                 getBrowser().getCRMGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
                                                       testOnly);
             }
         };
-        final ClusterBrowser.ClMenuItemCallback removeEdgeCallback =
+        final ButtonCallback removeEdgeCallback =
                   getBrowser().new ClMenuItemCallback(null) {
             @Override
-            public final boolean isEnabled() {
+            public boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
             @Override
@@ -570,12 +567,12 @@ public class HbConnectionInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public final boolean predicate() {
+            public boolean predicate() {
                 return getBrowser().getCRMGraph().isOrder(thisClass);
             }
 
             @Override
-            public final String enablePredicate() {
+            public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -583,7 +580,7 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override
-            public final void action() {
+            public void action() {
                 if (this.getText().equals(Tools.getString(
                                        "ClusterBrowser.Hb.RemoveOrder"))) {
                     getBrowser().getCRMGraph().removeOrder(
@@ -604,10 +601,10 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
 
-        final ClusterBrowser.ClMenuItemCallback removeOrderCallback =
+        final ButtonCallback removeOrderCallback =
                  getBrowser().new ClMenuItemCallback(null) {
             @Override
-            public final boolean isEnabled() {
+            public boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
             @Override
@@ -650,12 +647,12 @@ public class HbConnectionInfo extends EditableInfo {
             private static final long serialVersionUID = 1L;
 
             @Override
-            public final boolean predicate() {
+            public boolean predicate() {
                 return getBrowser().getCRMGraph().isColocation(thisClass);
             }
 
             @Override
-            public final String enablePredicate() {
+            public String enablePredicate() {
                 if (getBrowser().clStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
@@ -663,7 +660,7 @@ public class HbConnectionInfo extends EditableInfo {
             }
 
             @Override
-            public final void action() {
+            public void action() {
                 if (this.getText().equals(Tools.getString(
                                   "ClusterBrowser.Hb.RemoveColocation"))) {
                     getBrowser().getCRMGraph().removeColocation(
@@ -685,15 +682,15 @@ public class HbConnectionInfo extends EditableInfo {
             }
         };
 
-        final ClusterBrowser.ClMenuItemCallback removeColocationCallback =
+        final ButtonCallback removeColocationCallback =
                                    getBrowser().new ClMenuItemCallback(null) {
 
             @Override
-            public final boolean isEnabled() {
+            public boolean isEnabled() {
                 return super.isEnabled() && !isNew();
             }
             @Override
-            public final void action(final Host dcHost) {
+            public void action(final Host dcHost) {
                 if (!isNew()) {
                     if (getBrowser().getCRMGraph().isColocation(thisClass)) {
                         getBrowser().getCRMGraph().removeColocation(thisClass,
@@ -720,10 +717,10 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Removes colocations or orders. */
     private void removeOrdersOrColocations(final boolean isOrder) {
-        final List<HbConstraintInterface> constraintsToRemove =
+        final Collection<HbConstraintInterface> constraintsToRemove =
                                     new ArrayList<HbConstraintInterface>();
-        boolean changed = false;
         mConstraintsWriteLock.lock();
+        boolean changed = false;
         try {
             for (final HbConstraintInterface c : constraints) {
                 if (c.isOrder() == isOrder) {
@@ -762,7 +759,6 @@ public class HbConnectionInfo extends EditableInfo {
     public final void addOrder(final String ordId,
                          final ServiceInfo serviceInfoParent,
                          final ServiceInfo serviceInfoChild) {
-        final ClusterStatus clStatus = getBrowser().getClusterStatus();
         lastServiceInfoParent = serviceInfoParent;
         lastServiceInfoChild = serviceInfoChild;
         if (ordId == null) {
@@ -799,7 +795,6 @@ public class HbConnectionInfo extends EditableInfo {
     public final void addColocation(final String colId,
                               final ServiceInfo serviceInfoRsc,
                               final ServiceInfo serviceInfoWithRsc) {
-        final ClusterStatus clStatus = getBrowser().getClusterStatus();
         lastServiceInfoRsc = serviceInfoRsc;
         lastServiceInfoWithRsc = serviceInfoWithRsc;
         if (colId == null) {
@@ -841,8 +836,8 @@ public class HbConnectionInfo extends EditableInfo {
         int score = 0;
         boolean plusInf = false;
         boolean minusInf = false;
-        for (final String colId : colocationIds.keySet()) {
-            final HbColocationInfo hbci = colocationIds.get(colId);
+        for (final Map.Entry<String, HbColocationInfo> colocationEntry : colocationIds.entrySet()) {
+            final HbColocationInfo hbci = colocationEntry.getValue();
             if (hbci == null) {
                 continue;
             }
@@ -882,8 +877,8 @@ public class HbConnectionInfo extends EditableInfo {
             return false;
         }
         int score = 0;
-        for (final String ordId : orderIds.keySet()) {
-            final HbOrderInfo hoi = orderIds.get(ordId);
+        for (final Map.Entry<String, HbOrderInfo> orderEntry : orderIds.entrySet()) {
+            final HbOrderInfo hoi = orderEntry.getValue();
             if (hoi == null) {
                 continue;
             }
@@ -960,7 +955,7 @@ public class HbConnectionInfo extends EditableInfo {
         try {
             for (final HbConstraintInterface c : constraints) {
                 if (!c.isOrder()) {
-                    ServiceInfo rsc2 = ((HbColocationInfo) c).getRscInfo2();
+                    ServiceInfo rsc2 = c.getRscInfo2();
                     final GroupInfo gi = rsc2.getGroupInfo();
                     if (gi != null) {
                         rsc2 = gi;
@@ -981,10 +976,10 @@ public class HbConnectionInfo extends EditableInfo {
      * directions.
      */
     private boolean isTwoDirections(final boolean isOrder) {
-        ServiceInfo allRsc1 = null;
-        ServiceInfo allRsc2 = null;
         mConstraintsReadLock.lock();
         try {
+            ServiceInfo allRsc1 = null;
+            ServiceInfo allRsc2 = null;
             for (final HbConstraintInterface c : constraints) {
                 if (c.isOrder() == isOrder) {
                     ServiceInfo rsc1 = c.getRscInfo1();
@@ -1064,7 +1059,7 @@ public class HbConnectionInfo extends EditableInfo {
     @Override
     public final void revert() {
         super.revert();
-        final List<HbConstraintInterface> constraintsCopy
+        final Collection<HbConstraintInterface> constraintsCopy
                                     = new ArrayList<HbConstraintInterface>();
         mConstraintsReadLock.lock();
         try {

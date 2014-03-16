@@ -50,7 +50,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
-    /** Prepares a new <code>ResourceAgentClassInfo</code> object. */
+    /** Prepares a new {@code ResourceAgentClassInfo} object. */
     public ResourceAgentClassInfo(final String name, final Browser browser) {
         super(name, browser);
         for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
@@ -103,7 +103,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Returns back button. */
     @Override
     protected JComponent getBackButton() {
-        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,
+        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING,
                                                              0,
                                                              0));
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);

@@ -32,7 +32,7 @@ import java.util.Locale;
  * This class holds the information about available resource agent classes.
  */
 public final class AvailableServicesInfo extends HbCategoryInfo {
-    /** Prepares a new <code>AvailableServicesInfo</code> object. */
+    /** Prepares a new {@code AvailableServicesInfo} object. */
     public AvailableServicesInfo(final String name, final Browser browser) {
         super(name, browser);
     }

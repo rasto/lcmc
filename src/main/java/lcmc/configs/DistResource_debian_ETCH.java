@@ -23,12 +23,13 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for debian verson 4 (etch).
  */
 public final class DistResource_debian_ETCH
-                                    extends java.util.ListResourceBundle {
+                                    extends ListResourceBundle {
 
     /** Get contents. */
     @Override

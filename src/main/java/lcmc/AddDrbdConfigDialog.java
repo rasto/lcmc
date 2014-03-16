@@ -60,7 +60,7 @@ public final class AddDrbdConfigDialog {
     /** The second block device. */
     private final BlockDevInfo blockDevInfo2;
 
-    /** Prepares new <code>AddDrbdConfigDialog</code> object. */
+    /** Prepares new {@code AddDrbdConfigDialog} object. */
     public AddDrbdConfigDialog(final DrbdInfo drbdInfo,
                                final BlockDevInfo blockDevInfo1,
                                final BlockDevInfo blockDevInfo2) {

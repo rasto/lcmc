@@ -34,21 +34,22 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.MutableAttributeSet;
 
 import javax.swing.event.CaretListener;
 import javax.swing.event.CaretEvent;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.DefaultCaret;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Dimension;
 
 import javax.swing.plaf.TextUI;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -196,7 +197,7 @@ public final class TerminalPanel extends JScrollPane {
     }
 
 
-    /** Prepares a new <code>TerminalPanel</code> object. */
+    /** Prepares a new {@code TerminalPanel} object. */
     public TerminalPanel(final Host host) {
         super();
         this.host = host;
@@ -224,7 +225,7 @@ public final class TerminalPanel extends JScrollPane {
                                 Tools.getConfigData().scaled(14));
         terminalArea = new JTextPane();
         terminalArea.setStyledDocument(new MyDocument());
-        final DefaultCaret caret = new DefaultCaret() {
+        final Caret caret = new DefaultCaret() {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -243,8 +244,8 @@ public final class TerminalPanel extends JScrollPane {
                 /* painting cursor. If it is not visible it is out of focus, we
                  * make it barely visible. */
                 try {
-                    TextUI mapper = getComponent().getUI();
-                    Rectangle r = mapper.modelToView(getComponent(),
+                    final TextUI mapper = getComponent().getUI();
+                    final Rectangle r = mapper.modelToView(getComponent(),
                                                      getDot(),
                                                      getDotBias());
                     if (r == null) {
@@ -262,7 +263,7 @@ public final class TerminalPanel extends JScrollPane {
                                    8,
                                    r.height);
                     }
-                } catch (BadLocationException e) {
+                } catch (final BadLocationException e) {
                     LOG.appError("paint: drawing of cursor failed", e);
                 }
             }
@@ -316,7 +317,7 @@ public final class TerminalPanel extends JScrollPane {
     }
 
     /** Returns terminal output color. */
-    private Color getColorFromString(final String s) {
+    private Color getColorFromString(final CharSequence s) {
         /* "]" default color */
         if ("[".equals(s)) {
             return null;
@@ -340,7 +341,7 @@ public final class TerminalPanel extends JScrollPane {
     }
 
     /** Get char count. */
-    private int getCharCount(final String s) {
+    private int getCharCount(final CharSequence s) {
         final Pattern p1 = Pattern.compile("^\\[(\\d+)$");
         final Matcher m1 = p1.matcher(s);
         if (m1.matches()) {
@@ -404,7 +405,7 @@ public final class TerminalPanel extends JScrollPane {
                                                  " ",
                                                  colorAS);
                                 maxPos++;
-                            } catch (javax.swing.text.BadLocationException e1) {
+                            } catch (final BadLocationException e1) {
                                 LOG.appError("append: terminalPanel pos: "
                                              + pos, e1);
                             }
@@ -421,7 +422,7 @@ public final class TerminalPanel extends JScrollPane {
                     try {
                         commandOffset = pos - 1;
                         doc.removeForced(pos, 1);
-                    } catch (javax.swing.text.BadLocationException e) {
+                    } catch (final BadLocationException e) {
                         LOG.appError("append: terminalPanel pos: " + pos, e);
                     }
                 }
@@ -429,7 +430,7 @@ public final class TerminalPanel extends JScrollPane {
                     doc.insertString(pos,
                                      s,
                                      colorAS);
-                } catch (javax.swing.text.BadLocationException e1) {
+                } catch (final BadLocationException e1) {
                     LOG.appError("append: terminalPanel pos: " + pos, e1);
                 }
                 pos++;
@@ -456,22 +457,22 @@ public final class TerminalPanel extends JScrollPane {
         if (!host.isConnected()) {
             return;
         }
-        if (!"".equals(command)) {
+        if (command != null && !command.isEmpty()) {
             Tools.startProgressIndicator(hostName, "Executing command");
         }
         host.execCommandRaw(command,
              new ExecCallback() {
                  @Override
-                 public void done(final String ans) {
-                     if (!"".equals(command)) {
+                 public void done(final String answer) {
+                     if (command != null && !command.isEmpty()) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
                      }
                  }
 
                  @Override
-                 public void doneError(final String ans, final int exitCode) {
-                     if (!"".equals(command)) {
+                 public void doneError(final String answer, final int errorCode) {
+                     if (command != null && !command.isEmpty()) {
                         Tools.stopProgressIndicator(hostName,
                                                     "Executing command");
                      }
@@ -495,7 +496,7 @@ public final class TerminalPanel extends JScrollPane {
     /** Returns a prompt. */
     private String prompt() {
         if (host.isConnected()) {
-            return "[" + host.getUserAtHost() + ":~#] ";
+            return '[' + host.getUserAtHost() + ":~#] ";
         } else {
             return "# ";
         }
@@ -593,7 +594,7 @@ public final class TerminalPanel extends JScrollPane {
          * in the string. */
         @Override
         public void insertString(int offs,
-                                 final String s,
+                                 final String str,
                                  final AttributeSet a)
             throws BadLocationException {
             mPosLock.lock();
@@ -603,37 +604,37 @@ public final class TerminalPanel extends JScrollPane {
             }
             if (userCommand) {
                 if (editEnabled) {
-                    if (s.charAt(s.length() - 1) == '\n') {
+                    if (str.charAt(str.length() - 1) == '\n') {
                         final int end = terminalArea.getDocument().getLength();
                         super.insertString(end, "\n", commandColor);
                         final String command =
                                 (getText(commandOffset,
-                                         end - commandOffset) + s).trim();
+                                         end - commandOffset) + str).trim();
                         prevLine = end + 1;
                         pos = end;
                         maxPos = end;
                         execCommand(command);
                     } else {
-                        super.insertString(offs, s, commandColor);
+                        super.insertString(offs, str, commandColor);
                     }
                 }
-                for (final String cheat : CHEATS_MAP.keySet()) {
-                    int cheatPos = CHEATS_MAP.get(cheat);
-                    if (s.equals(cheat.substring(cheatPos, cheatPos + 1))) {
+                for (final Map.Entry<String, Integer> cheatEntry : CHEATS_MAP.entrySet()) {
+                    int cheatPos = cheatEntry.getValue();
+                    if (str.equals(cheatEntry.getKey().substring(cheatPos, cheatPos + 1))) {
                         cheatPos++;
-                        CHEATS_MAP.put(cheat, cheatPos);
-                        if (cheatPos == cheat.length()) {
+                        CHEATS_MAP.put(cheatEntry.getKey(), cheatPos);
+                        if (cheatPos == cheatEntry.getKey().length()) {
                             for (final String ch : CHEATS_MAP.keySet()) {
                                 CHEATS_MAP.put(ch, 0);
                             }
-                            startCheat(cheat);
+                            startCheat(cheatEntry.getKey());
                         }
                     } else {
-                        CHEATS_MAP.put(cheat, 0);
+                        CHEATS_MAP.put(cheatEntry.getKey(), 0);
                     }
                 }
             } else {
-                super.insertString(offs, s, a);
+                super.insertString(offs, str, a);
             }
             mPosLock.unlock();
         }
@@ -645,10 +646,10 @@ public final class TerminalPanel extends JScrollPane {
             mPosLock.lock();
             try {
                 if (offs >= commandOffset) {
-                    for (final String cheat : CHEATS_MAP.keySet()) {
-                        final int cheatPos = CHEATS_MAP.get(cheat);
+                    for (final Map.Entry<String, Integer> cheatEntry : CHEATS_MAP.entrySet()) {
+                        final int cheatPos = cheatEntry.getValue();
                         if (cheatPos > 0) {
-                            CHEATS_MAP.put(cheat, cheatPos - 1);
+                            CHEATS_MAP.put(cheatEntry.getKey(), cheatPos - 1);
                         }
                     }
                     if (editEnabled) {
@@ -693,7 +694,6 @@ public final class TerminalPanel extends JScrollPane {
                 @Override
                 public void run() {
                     LOG.info("startCheat: allocate mem");
-                    Byte[] b = new Byte[1024000];
                     LOG.info("startCheat: allocate mem done");
 
                     System.gc();
@@ -755,8 +755,8 @@ public final class TerminalPanel extends JScrollPane {
                     mPosLock.unlock();
                 }
                 return;
-            } catch (BadLocationException e) {
-                continue;
+            } catch (final BadLocationException e) {
+                LOG.appWarning("resetTerminalArea: " + e);
             }
         }
     }

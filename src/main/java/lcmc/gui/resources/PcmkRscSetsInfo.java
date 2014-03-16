@@ -33,14 +33,15 @@ import lcmc.utilities.CRM;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import java.util.List;
+
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.gui.widget.Check;
@@ -51,17 +52,17 @@ import lcmc.gui.widget.Check;
  */
 final class PcmkRscSetsInfo extends HbConnectionInfo {
     /** Placeholders. */
-    private final Set<ConstraintPHInfo> constraintPHInfos =
+    private final Collection<ConstraintPHInfo> constraintPHInfos =
                                           new LinkedHashSet<ConstraintPHInfo>();
     /** constraints lock. */
     private final Lock mConstraintPHLock = new ReentrantLock();
 
-    /** Prepares a new <code>PcmkRscSetsInfo</code> object. */
+    /** Prepares a new {@code PcmkRscSetsInfo} object. */
     PcmkRscSetsInfo(final Browser browser) {
         super(browser);
     }
 
-    /** Prepares a new <code>PcmkRscSetsInfo</code> object. */
+    /** Prepares a new {@code PcmkRscSetsInfo} object. */
     PcmkRscSetsInfo(final Browser browser, final ConstraintPHInfo cphi) {
         this(browser);
         mConstraintPHLock.lock();
@@ -105,7 +106,6 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
-        final int rows = 1;
         final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
@@ -113,6 +113,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                         ClusterBrowser.SERVICE_LABEL_WIDTH,
                         ClusterBrowser.SERVICE_FIELD_WIDTH,
                         height);
+        final int rows = 1;
         SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
                                         1, 1,        /* initX, initY */
                                         1, 1);       /* xPad, yPad */
@@ -156,9 +157,9 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         final List<ConstraintPHInfo> allCphis =
                                             new ArrayList<ConstraintPHInfo>();
         if (idToInfoHash != null) {
-            for (final String id : idToInfoHash.keySet()) {
+            for (final Map.Entry<String, ServiceInfo> phEntry : idToInfoHash.entrySet()) {
                 final ConstraintPHInfo cphi =
-                                   (ConstraintPHInfo) idToInfoHash.get(id);
+                                   (ConstraintPHInfo) phEntry.getValue();
                 allCphis.add(cphi);
             }
         }
@@ -169,8 +170,6 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     @Override
     void apply(final Host dcHost, final boolean testOnly) {
         super.apply(dcHost, testOnly);
-        final Map<String, ServiceInfo> idToInfoHash =
-             getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
         mConstraintPHLock.lock();
         final Map<ServiceInfo, ServiceInfo> parentToChild =
@@ -196,7 +195,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                 }
             }
         }
-        final List<CRMXML.RscSet> rscSetsCol = new ArrayList<CRMXML.RscSet>();
+        final Collection<CRMXML.RscSet> rscSetsCol = new ArrayList<CRMXML.RscSet>();
         final List<CRMXML.RscSet> rscSetsOrd = new ArrayList<CRMXML.RscSet>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
             if (cphi.getService().isNew()) {
@@ -213,12 +212,11 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                 rscSetsCol.add(sets.get(0)); /* col1 */
                 rscSetsOrd.add(0, sets.get(3)); /* ord2 */
                 ConstraintPHInfo parent = cphi;
-                if (parentToChild.containsKey((ServiceInfo) parent)) {
+                if (parentToChild.containsKey(parent)) {
                     List<CRMXML.RscSet> childSets = null;
-                    while (parentToChild.containsKey((ServiceInfo) parent)) {
+                    while (parentToChild.containsKey(parent)) {
                         final ConstraintPHInfo child =
-                            (ConstraintPHInfo) parentToChild.get((
-                                                        ServiceInfo) parent);
+                            (ConstraintPHInfo) parentToChild.get(parent);
                         if (child.getService().isNew()) {
                             //child.apply(dcHost, testOnly);
                             childSets =
@@ -254,7 +252,6 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                                       new LinkedHashMap<String, String>();
         attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
         String colId = null;
-        String ordId = null;
         final Map<CRMXML.RscSet, Map<String, String>> rscSetsColAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
         for (final CRMXML.RscSet colSet : rscSetsCol) {
@@ -265,6 +262,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         }
         final Map<CRMXML.RscSet, Map<String, String>> rscSetsOrdAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
+        String ordId = null;
         for (final CRMXML.RscSet ordSet : rscSetsOrd) {
             if (ordId == null && ordSet != null) {
                 ordId = ordSet.getId();
@@ -310,8 +308,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     /** Return list of popup items. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = super.createPopup();
         // TODO: make submenus for all cphis
-        return items;
+        return super.createPopup();
     }
 }

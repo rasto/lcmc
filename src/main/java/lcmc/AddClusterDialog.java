@@ -44,8 +44,6 @@ public final class AddClusterDialog {
     /** Logger. */
     private static final Logger LOG =
                               LoggerFactory.getLogger(AddClusterDialog.class);
-    /** All clusters object. */
-    private Clusters clusters;
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
 
@@ -115,6 +113,6 @@ public final class AddClusterDialog {
 
     /** Returns the clusters. */
     Clusters getClusters() {
-        return clusters;
+        return null;
     }
 }

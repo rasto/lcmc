@@ -60,8 +60,6 @@ public final class BugReport extends ConfigDialog {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(BugReport.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
     /** Cluster. Can be null, if unknown. */
     private final Cluster cluster;
@@ -85,7 +83,7 @@ public final class BugReport extends ConfigDialog {
     public static final Cluster UNKNOWN_CLUSTER = null;
     public static final String NO_ERROR_TEXT = null;
 
-    /** Prepares a new <code>BugReport</code> object. */
+    /** Prepares a new {@code BugReport} object. */
     public BugReport(final Cluster cluster, final String errorText) {
         super();
         this.cluster = cluster;
@@ -106,8 +104,8 @@ public final class BugReport extends ConfigDialog {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final String name : configCbMap.keySet()) {
-                    configCbMap.get(name).setEnabled(enable);
+                for (final Map.Entry<String, JCheckBox> configEntry : configCbMap.entrySet()) {
+                    configEntry.getValue().setEnabled(enable);
                 }
             }
         });
@@ -140,7 +138,7 @@ public final class BugReport extends ConfigDialog {
     /** Returns panel with config checkboxes. */
     private JComponent getConfigPane() {
         final List<String> config = getConfigChoices();
-        final JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         pane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         for (final String name : config) {
@@ -160,8 +158,8 @@ public final class BugReport extends ConfigDialog {
     }
 
     /** Returns panel with checkboxes. */
-    private JComponent getClustersPane(final Set<Cluster> clusters) {
-        final JPanel clusterPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    private JComponent getClustersPane(final Iterable<Cluster> clusters) {
+        final JPanel clusterPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         clusterPane.setBorder(Tools.getBorder("Clusters"));
         clusterPane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
@@ -190,7 +188,7 @@ public final class BugReport extends ConfigDialog {
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         pane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         textArea.setEditable(true);
@@ -221,12 +219,12 @@ public final class BugReport extends ConfigDialog {
         final int i = allOldText.indexOf(GENERATED_DELIM);
         String oldText = "email: anonymous\nerror description:\n"
                          + (errorText == null ? "" : errorText)
-                         + "\n";
+                         + '\n';
         if (i > 0) {
             oldText = allOldText.substring(0, i - 1);
         }
         final StringBuffer text = new StringBuffer();
-        text.append(oldText).append("\n").append(GENERATED_DELIM);
+        text.append(oldText).append('\n').append(GENERATED_DELIM);
         for (final Cluster cl : clusters) {
             if (clusterCbMap.get(cl).isSelected()) {
                 text.append("\n== ")
@@ -334,7 +332,6 @@ public final class BugReport extends ConfigDialog {
         return new String[]{cancelButton(), sendReportButton()};
     }
 
-    /** @see ConfigDialog#checkAnswer() */
     @Override
     protected ConfigDialog checkAnswer() {
         if (isPressedButton(sendReportButton())) {
@@ -344,7 +341,6 @@ public final class BugReport extends ConfigDialog {
         return null;
     }
 
-    /** @see ConfigDialog#getIcons() */
     @Override
     protected ImageIcon[] getIcons() {
         return new ImageIcon[]{WizardDialog.CANCEL_ICON, WizardDialog.FINISH_ICON};

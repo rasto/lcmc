@@ -138,7 +138,7 @@ public final class HostInfo extends Info {
     private volatile boolean crmInfo = false;
     /** whether crm show is in progress. */
     private volatile boolean crmShowInProgress = true;
-    /** Prepares a new <code>HostInfo</code> object. */
+    /** Prepares a new {@code HostInfo} object. */
     public HostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
         this.host = host;
@@ -211,8 +211,8 @@ public final class HostInfo extends Info {
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override
-                public void done(final String ans) {
-                    ta.setText(ans);
+                public void done(final String answer) {
+                    ta.setText(answer);
                     Tools.invokeLater(new Runnable() {
                     @Override
                         public void run() {
@@ -224,9 +224,9 @@ public final class HostInfo extends Info {
                 }
 
                 @Override
-                public void doneError(final String ans, final int exitCode) {
-                    ta.setText(ans);
-                    LOG.sshError(host, "", ans, "", exitCode);
+                public void doneError(final String answer, final int errorCode) {
+                    ta.setText(answer);
+                    LOG.sshError(host, "", answer, "", errorCode);
                     Tools.invokeLater(new Runnable() {
                     @Override
                         public void run() {
@@ -288,17 +288,17 @@ public final class HostInfo extends Info {
             }
 
             @Override
-            public void changedUpdate(final DocumentEvent documentEvent) {
+            public void changedUpdate(final DocumentEvent e) {
                 update();
             }
 
             @Override
-            public void insertUpdate(final DocumentEvent documentEvent) {
+            public void insertUpdate(final DocumentEvent e) {
                 update();
             }
 
             @Override
-            public void removeUpdate(final DocumentEvent documentEvent) {
+            public void removeUpdate(final DocumentEvent e) {
                 update();
             }
         });
@@ -388,7 +388,7 @@ public final class HostInfo extends Info {
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
@@ -398,7 +398,7 @@ public final class HostInfo extends Info {
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         final JPanel p = new JPanel(new SpringLayout());
         p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
@@ -452,7 +452,6 @@ public final class HostInfo extends Info {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
         /* host wizard */
         final MyMenuItem hostWizardItem =
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
@@ -463,11 +462,6 @@ public final class HostInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public String enablePredicate() {
-                    return null;
-                }
-
-                @Override
                 public void action() {
                     final EditHostDialog dialog = new EditHostDialog(host);
                     dialog.showDialogs();
@@ -476,7 +470,7 @@ public final class HostInfo extends Info {
         items.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */
-        final HostInfo thisClass = this;
+        final boolean testOnly = false;
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
                            HOST_STANDBY_ICON,
@@ -515,7 +509,7 @@ public final class HostInfo extends Info {
             };
         final ClusterBrowser cb = getBrowser().getClusterBrowser();
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
+            final ButtonCallback standbyItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -538,11 +532,6 @@ public final class HostInfo extends Info {
                            new AccessMode(ConfigData.AccessType.OP, false),
                            new AccessMode(ConfigData.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean predicate() {
-                    return true;
-                }
 
                 @Override
                 public String enablePredicate() {
@@ -577,7 +566,7 @@ public final class HostInfo extends Info {
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
+        final ButtonCallback allMigrateFromItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -641,31 +630,31 @@ public final class HostInfo extends Info {
                          Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
                          Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
                          Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
-                        final Host host = getHost();
-                        host.setCommLayerStopping(true);
-                        if (!host.isPcmkStartedByCorosync()
-                            && host.isPcmkInit()
-                            && host.isPcmkRunning()) {
+                        final Host thisHost = getHost();
+                        thisHost.setCommLayerStopping(true);
+                        if (!thisHost.isPcmkStartedByCorosync()
+                            && thisHost.isPcmkInit()
+                            && thisHost.isPcmkRunning()) {
                             if (getHost().isCsRunning()
                                 && !getHost().isAisRunning()) {
-                                Corosync.stopCorosyncWithPcmk(host);
+                                Corosync.stopCorosyncWithPcmk(thisHost);
                             } else {
-                                Openais.stopOpenaisWithPcmk(host);
+                                Openais.stopOpenaisWithPcmk(thisHost);
                             }
                         } else {
                             if (getHost().isCsRunning()
                                 && !getHost().isAisRunning()) {
-                                Corosync.stopCorosync(host);
+                                Corosync.stopCorosync(thisHost);
                             } else {
-                                Openais.stopOpenais(host);
+                                Openais.stopOpenais(thisHost);
                             }
                         }
-                        updateClusterView(host);
+                        updateClusterView(thisHost);
                     }
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
+            final ButtonCallback stopCorosyncItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -716,7 +705,7 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
+            final ButtonCallback stopHeartbeatItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -775,10 +764,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
+            final ButtonCallback startCorosyncItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -827,10 +816,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
+            final ButtonCallback startOpenaisItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -877,10 +866,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
+            final ButtonCallback startHeartbeatItemCallback =
                                                cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -926,10 +915,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
+            final ButtonCallback startPcmkItemCallback =
                                                cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -938,18 +927,13 @@ public final class HostInfo extends Info {
         }
         items.add(startPcmkItem);
         /* change host color */
-        final MyMenuItem changeHostColorItem =
+        final UpdatableItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
                            "",
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -966,7 +950,7 @@ public final class HostInfo extends Info {
         items.add(changeHostColorItem);
 
         /* view logs */
-        final MyMenuItem viewLogsItem =
+        final UpdatableItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            "",
@@ -984,13 +968,13 @@ public final class HostInfo extends Info {
 
                 @Override
                 public void action() {
-                    HostLogs l = new HostLogs(host);
+                    final HostLogs l = new HostLogs(host);
                     l.showDialog();
                 }
             };
         items.add(viewLogsItem);
         /* advacend options */
-        final MyMenu hostAdvancedSubmenu = new MyMenu(
+        final UpdatableItem hostAdvancedSubmenu = new MyMenu(
                         Tools.getString("HostBrowser.AdvancedSubmenu"),
                         new AccessMode(ConfigData.AccessType.OP, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
@@ -1013,7 +997,7 @@ public final class HostInfo extends Info {
         items.add(hostAdvancedSubmenu);
 
         /* remove host from gui */
-        final MyMenuItem removeHostItem =
+        final UpdatableItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
                            Tools.getString("HostBrowser.RemoveHost"),
@@ -1089,10 +1073,7 @@ public final class HostInfo extends Info {
     /** Returns whether this host is in stand by. */
     public boolean isStandby(final boolean testOnly) {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
-        if (b == null) {
-            return false;
-        }
-        return b.isStandby(host, testOnly);
+        return b != null && b.isStandby(host, testOnly);
     }
 
     /** Returns cluster status. */

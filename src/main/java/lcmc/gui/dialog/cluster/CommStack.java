@@ -60,12 +60,10 @@ final class CommStack extends DialogCluster {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(CommStack.class);
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
     private Widget chooseStackCombo;
 
-    /** Prepares a new <code>CommStack</code> object. */
+    /** Prepares a new {@code CommStack} object. */
     CommStack(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }
@@ -109,29 +107,29 @@ final class CommStack extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         final ExecCommandThread[] infoThreads =
                                         new ExecCommandThread[hosts.length];
-        int i = 0;
         getProgressBar().start(10000);
+        int i = 0;
         for (final Host host : hosts) {
             infoThreads[i] = host.execCommand(
                              "Cluster.Init.getInstallationInfo",
                              getProgressBar(),
                              new ExecCallback() {
                                  @Override
-                                 public void done(final String ans) {
+                                 public void done(final String answer) {
                                      //drbdLoaded[index] = true;
                                      for (final String line
-                                                    : ans.split("\\r?\\n")) {
+                                                    : answer.split("\\r?\\n")) {
                                          host.parseInstallationInfo(line);
                                      }
                                  }
                                  @Override
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
+                                 public void doneError(final String answer,
+                                                       final int errorCode) {
                                      skipButtonSetEnabled(false);
                                      LOG.error("initDialogAfterVisible: "
                                              + host.getName()
                                              + ": could not get install info: "
-                                             + ans);
+                                             + answer);
                                  }
                              },
                              null,   /* ConvertCmdCallback */
@@ -143,7 +141,7 @@ final class CommStack extends DialogCluster {
             /* wait for all of them */
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -270,7 +268,7 @@ final class CommStack extends DialogCluster {
                                                    0, 0,  // initX, initY
                                                    0, 0); // xPad, yPad
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(inputPane);
         panel.add(Box.createVerticalStrut(100));
 

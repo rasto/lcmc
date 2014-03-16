@@ -39,10 +39,13 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.Browser;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.Set;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
@@ -66,8 +69,6 @@ import lcmc.utilities.LoggerFactory;
 public final class LVResize extends LV {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Description LVM resize. */
     private static final String DESCRIPTION =
                    "Resize the LVM volume. You can make it bigger, but not"
@@ -94,12 +95,6 @@ public final class LVResize extends LV {
     public LVResize(final BlockDevInfo blockDevInfo) {
         super(null);
         this.blockDevInfo = blockDevInfo;
-    }
-
-    /** Finishes the dialog and sets the information. */
-    @Override
-    protected void finishDialog() {
-        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
@@ -157,14 +152,14 @@ public final class LVResize extends LV {
             } else if (!oBDI.getBlockDevice().isAttached()) {
                 printErrorAndRetry(
                         "Not resizing. DRBD resource is not attached on "
-                        + oBDI.getHost() + ".");
+                        + oBDI.getHost() + '.');
                 sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
             } else if (!blockDevInfo.getBlockDevice().isAttached()) {
                 printErrorAndRetry(
                         "Not resizing. DRBD resource is not attached on "
-                        + blockDevInfo.getHost() + ".");
+                        + blockDevInfo.getHost() + '.');
                 sizeWi.setEnabled(false);
                 resizeButton.setEnabled(false);
                 return false;
@@ -323,42 +318,39 @@ public final class LVResize extends LV {
 
         pane.add(inputPane);
         final JPanel hostsPane = new JPanel(
-                        new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+                        new FlowLayout(FlowLayout.LEADING));
         final Cluster cluster = blockDevInfo.getHost().getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
         final Host host = blockDevInfo.getHost();
         final String lv = blockDevInfo.getBlockDevice().getLogicalVolume();
-        for (final Host h : hostCheckBoxes.keySet()) {
-            final Set<String> allLVS = h.getAllLogicalVolumes();
-            hostCheckBoxes.get(h).addItemListener(
-                        new ItemListener() {
-                            @Override
-                            public void itemStateChanged(final ItemEvent e) {
-                                enableResizeButton(true);
-                            }
-                        });
-            if (host == h) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(true);
-            } else if (blockDevInfo.getBlockDevice().isDrbd()
-                       && blockDevInfo.getOtherBlockDevInfo().getHost()
-                          == h) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(true);
+        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+            final Set<String> allLVS = hostEntry.getKey().getAllLogicalVolumes();
+            hostEntry.getValue().addItemListener(
+                    new ItemListener() {
+                        @Override
+                        public void itemStateChanged(final ItemEvent e) {
+                            enableResizeButton(true);
+                        }
+                    });
+            if (host == hostEntry.getKey()
+                || blockDevInfo.getBlockDevice().isDrbd()
+                && blockDevInfo.getOtherBlockDevInfo().getHost()
+                   == hostEntry.getKey()) {
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(true);
             } else if (!blockDevInfo.getBlockDevice().isDrbd()
                        && !allLVS.contains(lv)) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(false);
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(false);
             } else {
-                hostCheckBoxes.get(h).setEnabled(true);
-                hostCheckBoxes.get(h).setSelected(false);
+                hostEntry.getValue().setEnabled(true);
+                hostEntry.getValue().setSelected(false);
             }
-            hostsPane.add(hostCheckBoxes.get(h));
+            hostsPane.add(hostEntry.getValue());
         }
-        final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
-                                                               hostsPane);
-        sp.setPreferredSize(new java.awt.Dimension(0, 45));
+        final JScrollPane sp = new JScrollPane(hostsPane);
+        sp.setPreferredSize(new Dimension(0, 45));
         pane.add(sp);
         pane.add(getProgressBarPane(null));
         pane.add(getAnswerPane(""));
@@ -377,33 +369,33 @@ public final class LVResize extends LV {
                                        false);
         if (ret) {
             answerPaneSetText("Logical volume was successfully resized on "
-                              + blockDevInfo.getHost() + ".");
+                              + blockDevInfo.getHost() + '.');
             /* resize lvm volume on the other node. */
             final String lvm = blockDevInfo.getBlockDevice().getName();
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
             boolean resizingFailed = false;
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (h == blockDevInfo.getHost()
-                    || !hostCheckBoxes.get(h).isSelected()) {
+            for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                if (hostEntry.getKey() == blockDevInfo.getHost()
+                    || !hostEntry.getValue().isSelected()) {
                     continue;
                 }
-                for (final BlockDevice b : h.getBlockDevices()) {
+                for (final BlockDevice b : hostEntry.getKey().getBlockDevices()) {
                     if (lvm.equals(b.getName())
                         || (oBDI != null && oBDI.getBlockDevice() == b)) {
                         /* drbd or selected other host */
-                        final boolean oRet = LVM.resize(h,
+                        final boolean oRet = LVM.resize(hostEntry.getKey(),
                                                         b.getName(),
                                                         size,
                                                         false);
                         if (oRet) {
                             answerPaneAddText("Logical volume was successfully"
                                               + " resized on "
-                                              + h.getName() + ".");
+                                              + hostEntry.getKey().getName() + '.');
                         } else {
                             answerPaneAddTextError("Resizing of "
                                                    + b.getName()
                                                    + " on host "
-                                                   + h.getName()
+                                                   + hostEntry.getKey().getName()
                                                    + " failed.");
                             resizingFailed = true;
                         }
@@ -451,17 +443,17 @@ public final class LVResize extends LV {
             final String lvm =
                         blockDevInfo.getBlockDevice().getName();
             if (hostCheckBoxes != null) {
-                for (final Host h : hostCheckBoxes.keySet()) {
-                    if (blockDevInfo.getHost() == h) {
+                for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                    if (blockDevInfo.getHost() == hostEntry.getKey()) {
                         continue;
                     }
-                    if (hostCheckBoxes.get(h).isSelected()) {
-                        for (final BlockDevice b : h.getBlockDevices()) {
+                    if (hostEntry.getValue().isSelected()) {
+                        for (final BlockDevice b : hostEntry.getKey().getBlockDevices()) {
                             if (lvm.equals(b.getName())
                                 || (oBDI != null
                                     && oBDI.getBlockDevice() == b)) {
                                 final long oFree =
-                                 h.getFreeInVolumeGroup(b.getVolumeGroup())
+                                        hostEntry.getKey().getFreeInVolumeGroup(b.getVolumeGroup())
                                  / 1024;
                                 final long oTaken = Long.parseLong(
                                                          b.getBlockSize());
@@ -475,7 +467,7 @@ public final class LVResize extends LV {
                 }
             }
             maxBlockSize = Long.toString(max);
-        } catch (final Exception e) {
+        } catch (final NumberFormatException e) {
             LOG.appWarning("getMaxBlockSize: could not get max size");
             /* ignore */
         }

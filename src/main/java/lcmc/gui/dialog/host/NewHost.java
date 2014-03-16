@@ -55,8 +55,6 @@ import lcmc.utilities.MyButton;
  *
  */
 public class NewHost extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** hostField can be ip or hostname with or without domainname. */
     private Widget hostField;
     /** User name field. */
@@ -78,7 +76,7 @@ public class NewHost extends DialogHost {
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
 
-    /** Prepares a new <code>NewHost</code> object. */
+    /** Prepares a new {@code NewHost} object. */
     public NewHost(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -120,9 +118,9 @@ public class NewHost extends DialogHost {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();
-        boolean hf = (hs.length() > 0);
-        boolean uf = (us.length() > 0);
-        final boolean pf = (ps.length() > 0);
+        boolean hf = (!hs.isEmpty());
+        boolean uf = (!us.isEmpty());
+        final boolean pf = (!ps.isEmpty());
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
         final List<String> incorrect = new ArrayList<String>();
@@ -202,9 +200,6 @@ public class NewHost extends DialogHost {
             incorrect.add("SSH port");
         }
 
-        final boolean hostF = hf;
-        final boolean userF = hf;
-        final boolean sshPortF = pf;
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -245,7 +240,7 @@ public class NewHost extends DialogHost {
     @Override
     protected final void initDialogAfterVisible() {
         enableComponents();
-        checkFields((Widget) null);
+        checkFields(null);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -281,14 +276,14 @@ public class NewHost extends DialogHost {
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Host.NewHost.EnterHost"));
         inputPane.add(hostLabel);
-        final String regexp = "^[,\\w.-]+$";
         final String hostname = getHost().getHostname();
-        String hn;
+        final String hn;
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
             hn = getHost().getHostnameEntered();
         } else {
             hn = hostname;
         }
+        final String regexp = "^[,\\w.-]+$";
         hostField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
                                        new StringValue(hn),
@@ -414,7 +409,7 @@ public class NewHost extends DialogHost {
         SpringUtilities.makeCompactGrid(inputPane, 2, 4,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
-        p.add(inputPane, BorderLayout.SOUTH);
+        p.add(inputPane, BorderLayout.PAGE_END);
         return p;
     }
 

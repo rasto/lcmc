@@ -43,8 +43,6 @@ import javax.swing.JComponent;
  *
  */
 final class ProxyInst extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Drbd volume info. */
@@ -52,7 +50,7 @@ final class ProxyInst extends DialogHost {
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
-    /** Prepares a new <code>ProxyInst</code> object. */
+    /** Prepares a new {@code ProxyInst} object. */
     ProxyInst(final WizardDialog previousDialog,
               final Host host,
               final DrbdVolumeInfo drbdVolumeInfo,
@@ -116,16 +114,17 @@ final class ProxyInst extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans, installMethod);
+                             public void done(final String answer) {
+                                checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(Tools.getString(
                                          "Dialog.Host.ProxyInst.InstError"),
-                                                    ans,
-                                                    exitCode);
+                                         answer,
+                                         errorCode
+                                 );
                              }
                          },
                          new ConvertCmdCallback() {

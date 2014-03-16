@@ -26,15 +26,17 @@ import lcmc.utilities.Tools;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.CategoryInfo;
 
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import javax.swing.JSplitPane;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.JPanel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import java.awt.Color;
@@ -90,9 +92,6 @@ public class Browser {
     /** Color of the status backgrounds. */
     public static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Color of the extra panel with advanced options. */
-    static final Color EXTRA_PANEL_BACKGROUND =
-                    Tools.getDefaultColor("ViewPanel.Status.Background");
     /** DRBD test lock. */
     private final Lock mDRBDtestLock = new ReentrantLock();
 
@@ -134,7 +133,7 @@ public class Browser {
     }
 
     /** Reloads the node. */
-    public final void reloadAndWait(final DefaultMutableTreeNode node,
+    public final void reloadAndWait(final TreeNode node,
                                     final boolean select) {
         final JTree t = tree;
         DefaultMutableTreeNode oldN = null;
@@ -153,7 +152,7 @@ public class Browser {
     }
 
     /** Reloads the node. */
-    public final void reload(final DefaultMutableTreeNode node,
+    public final void reload(final TreeNode node,
                              final boolean select) {
         final JTree t = tree;
         DefaultMutableTreeNode oldN = null;
@@ -181,7 +180,7 @@ public class Browser {
         }
     }
     /** Sets the node change for the node. */
-    public final void nodeChangedAndWait(final DefaultMutableTreeNode node) {
+    public final void nodeChangedAndWait(final TreeNode node) {
         treeModel.nodeChanged(node);
     }
 
@@ -193,7 +192,7 @@ public class Browser {
             public void run() {
                 try {
                     treeModel.nodeChanged(node);
-                } catch (Exception e) {
+                } catch (final RuntimeException e) {
                     LOG.appError("nodeChangedAndWait: " + node.getUserObject()
                                  + " node changed error:\n"
                                  + stacktrace + "\n\n", e);
@@ -203,7 +202,7 @@ public class Browser {
     }
 
     /** Adds the node to the top level. */
-    protected final void topAdd(final DefaultMutableTreeNode node) {
+    protected final void topAdd(final MutableTreeNode node) {
         Tools.isSwingThread();
         treeTop.add(node);
     }
@@ -244,10 +243,9 @@ public class Browser {
             final int maxWidth = ClusterBrowser.SERVICE_LABEL_WIDTH
                                  + ClusterBrowser.SERVICE_FIELD_WIDTH
                                  + 36;
-            final Dimension d = iPanel.getPreferredSize();
             iPanel.setMinimumSize(new Dimension(maxWidth, 0));
             iPanel.setMaximumSize(new Dimension(maxWidth,
-                                                (int) Short.MAX_VALUE));
+                                  Integer.MAX_VALUE));
             if (infoPanelSplitPane != null) {
                 if (!disabledDuringLoad) {
                     final int loc = infoPanelSplitPane.getDividerLocation();
@@ -261,7 +259,7 @@ public class Browser {
                                     new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                                    gView,
                                                    iPanel);
-            newSplitPane.setResizeWeight(1);
+            newSplitPane.setResizeWeight(1.0);
             newSplitPane.setOneTouchExpandable(true);
             infoPanelSplitPane = newSplitPane;
             infoPanelSplitPane.repaint();
@@ -270,7 +268,7 @@ public class Browser {
     }
 
     /** Returns cell rendererer for tree. */
-    final CellRenderer getCellRenderer() {
+    final TreeCellRenderer getCellRenderer() {
         return new CellRenderer();
     }
 
@@ -284,11 +282,11 @@ public class Browser {
             super();
             setBackgroundNonSelectionColor(PANEL_BACKGROUND);
             setBackgroundSelectionColor(
-                        Tools.getDefaultColor("ViewPanel.Status.Background"));
+                    Tools.getDefaultColor("ViewPanel.Status.Background"));
             setTextNonSelectionColor(
-                        Tools.getDefaultColor("ViewPanel.Foreground"));
+                    Tools.getDefaultColor("ViewPanel.Foreground"));
             setTextSelectionColor(
-                        Tools.getDefaultColor("ViewPanel.Status.Foreground"));
+                    Tools.getDefaultColor("ViewPanel.Status.Foreground"));
         }
 
         /**
@@ -308,20 +306,20 @@ public class Browser {
                             tree, value, sel,
                             expanded, leaf, row,
                             hasFocus);
-            final Info i =
+            final Info info =
                     (Info) ((DefaultMutableTreeNode) value).getUserObject();
-            if (i == null) {
+            if (info == null) {
                 return this;
             }
             if (leaf) {
-                final ImageIcon icon = i.getMenuIcon(false);
+                final ImageIcon icon = info.getMenuIcon(false);
                 if (icon != null) {
                     setIcon(icon);
                 }
                 setToolTipText("");
             } else {
                 setToolTipText("");
-                ImageIcon icon = i.getCategoryIcon(false);
+                ImageIcon icon = info.getCategoryIcon(false);
                 if (icon == null) {
                     icon = CATEGORY_ICON;
                 }
@@ -356,7 +354,7 @@ public class Browser {
 
     /** Add node. */
     public final void addNode(final DefaultMutableTreeNode node,
-                              final DefaultMutableTreeNode child) {
+                              final MutableTreeNode child) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {

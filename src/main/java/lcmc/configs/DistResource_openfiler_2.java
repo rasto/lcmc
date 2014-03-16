@@ -23,12 +23,13 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for openfiler NSA 2.
  */
 public final class DistResource_openfiler_2
-                                    extends java.util.ListResourceBundle {
+                                    extends ListResourceBundle {
 
     /** Get contents. */
     @Override

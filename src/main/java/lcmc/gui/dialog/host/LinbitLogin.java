@@ -47,8 +47,6 @@ import lcmc.data.StringValue;
  *
  */
 public class LinbitLogin extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Field with user name. */
     private Widget downloadUserField;
     /** Field with password. */
@@ -58,7 +56,7 @@ public class LinbitLogin extends DialogHost {
     /** Width of the check boxes. */
     private static final int CHECKBOX_WIDTH = 120;
 
-    /** Prepares a new <code>LinbitLogin</code> object. */
+    /** Prepares a new {@code LinbitLogin} object. */
     public LinbitLogin(final WizardDialog previousDialog,
                        final Host host) {
         super(previousDialog, host);
@@ -88,9 +86,8 @@ public class LinbitLogin extends DialogHost {
             @Override
             public void run() {
                 boolean v =
-                    (downloadUserField.getStringValue().trim().length() > 0);
-                v = v && (downloadPasswordField.getStringValue().trim().length()
-                         > 0);
+                    (!downloadUserField.getStringValue().trim().isEmpty());
+                v = v && (!downloadPasswordField.getStringValue().trim().isEmpty());
                 buttonClass(nextButton()).setEnabled(v);
             }
         });
@@ -103,9 +100,8 @@ public class LinbitLogin extends DialogHost {
             @Override
             public void run() {
                 boolean v =
-                    (downloadUserField.getStringValue().trim().length() > 0);
-                v = v && (downloadPasswordField.getStringValue().trim().length()
-                         > 0);
+                    (!downloadUserField.getStringValue().trim().isEmpty());
+                v = v && (!downloadPasswordField.getStringValue().trim().isEmpty());
                 buttonClass(nextButton()).setEnabled(v);
             }
         });
@@ -221,7 +217,7 @@ public class LinbitLogin extends DialogHost {
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
 
-        p.add(inputPane, BorderLayout.SOUTH);
+        p.add(inputPane, BorderLayout.PAGE_END);
         return p;
     }
 }

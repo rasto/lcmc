@@ -46,12 +46,10 @@ import java.awt.event.ActionEvent;
  * @version $Id$
  */
 final class Finish extends VMConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
 
-    /** Prepares a new <code>Finish</code> object. */
+    /** Prepares a new {@code Finish} object. */
     Finish(final WizardDialog previousDialog,
            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -109,7 +107,7 @@ final class Finish extends VMConfig {
             return inputPane;
         }
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         final MyButton createConfigBtn = new MyButton("Create Config");
         createConfigBtn.setBackgroundColor(
                                  Tools.getDefaultColor("ConfigDialog.Button"));
@@ -138,7 +136,7 @@ final class Finish extends VMConfig {
             }
         });
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vdi.waitForInfoPanel();
         optionsPanel.add(vdi.getDefinedOnHostsPanel(Widget.WIZARD_PREFIX,

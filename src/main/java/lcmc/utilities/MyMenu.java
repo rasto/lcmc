@@ -29,7 +29,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import java.awt.Component;
 import java.awt.geom.Point2D;
-import java.util.List;
+import java.util.Collection;
 import java.util.ArrayList;
 
 /**
@@ -42,16 +42,13 @@ public class MyMenu extends JMenu implements UpdatableItem {
     private Point2D pos = null;
     /** Access Type for this component to become enabled. */
     private final AccessMode enableAccessMode;
-    /** Access Type for this component to become visible. */
-    private final AccessMode visibleAccessMode; // TODO: not implemented
 
-    /** Prepares a new <code>MyMenu</code> object. */
+    /** Prepares a new {@code MyMenu} object. */
     public MyMenu(final String text,
                   final AccessMode enableAccessMode,
                   final AccessMode visibleAccessMode) {
         super(text);
         this.enableAccessMode = enableAccessMode;
-        this.visibleAccessMode = visibleAccessMode;
         setOpaque(false);
         setEnabled(false);
     }
@@ -81,11 +78,6 @@ public class MyMenu extends JMenu implements UpdatableItem {
         return null;
     }
 
-    /** Returns whether the item should be visible or not. */
-    boolean visiblePredicate() {
-        return true;
-    }
-
     //@Override
     //public void update() {
     //    Tools.invokeAndWait(new Runnable() {
@@ -102,7 +94,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
      */
     @Override
     public void updateAndWait() {
-        final List<Component> copy = new ArrayList<Component>();
+        final Collection<Component> copy = new ArrayList<Component>();
         for (final Component m : getMenuComponents()) {
             copy.add(m);
         }
@@ -147,7 +139,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Cleanup. */
     @Override
     public final void cleanup() {
-        for (final java.awt.Component m : getMenuComponents()) {
+        for (final Component m : getMenuComponents()) {
             if (m instanceof UpdatableItem) {
                 ((UpdatableItem) m).cleanup();
             } else if (m instanceof JScrollPane) {
@@ -162,9 +154,9 @@ public class MyMenu extends JMenu implements UpdatableItem {
         for (int i = 0; i < getItemCount(); i++) {
             final JMenuItem item = getItem(i);
             if (item instanceof MyMenuItem) {
-                ((MyMenuItem) item).cleanup();
+                ((UpdatableItem) item).cleanup();
             } else if (item instanceof MyMenu) {
-                ((MyMenu) item).removeAll();
+                item.removeAll();
             }
         }
         super.removeAll();

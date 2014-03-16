@@ -48,10 +48,10 @@ final class DrbdTest8 {
     /** DRBD Test 8 / proxy. */
     static void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
-        final String drbdTest = "drbd-test8";
         slowFactor = 0.2f;
         aborted = false;
         int offset = 0;
+        final String drbdTest = "drbd-test8";
         for (int i = 0; i < 2; i++) {
             addDrbdResource(cluster, blockDevY + offset);
             if (i == 1 && cluster.getHostsArray()[0].hasVolumes()) {
@@ -161,7 +161,7 @@ final class DrbdTest8 {
             } else {
                 moveTo("after", MComboBox.class);
             }
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
         leftClick();
@@ -245,7 +245,7 @@ final class DrbdTest8 {
             } else {
                 moveTo("after", MComboBox.class);
             }
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
         leftClick();

@@ -43,11 +43,11 @@ final class PcmkTestG {
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
-        final int gx = 235;
-        final int gy = 207;
         disableStonith();
         checkTest("testG", 1);
         /* group with dummy resources */
+        final int gx = 235;
+        final int gy = 207;
         moveTo(gx, gy);
         sleep(1000);
         rightClick(); /* popup */

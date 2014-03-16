@@ -45,8 +45,6 @@ import java.awt.Dimension;
  *
  */
 final class Finish extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Add another host button. */
     private MyButton addAnotherHostButton;
     /** Configure cluster button. */
@@ -66,7 +64,7 @@ final class Finish extends DialogHost {
     /** Next dialog. */
     private WizardDialog nextDialog = null;
     /**
-     * Prepares a new <code>Finish</code> object.
+     * Prepares a new {@code Finish} object.
      */
     Finish(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);

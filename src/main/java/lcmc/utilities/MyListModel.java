@@ -26,6 +26,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -37,14 +38,10 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    private final List<E> items = new ArrayList<E>();
+    private final Collection<E> items = new ArrayList<E>();
     private final List<E> filteredItems = new ArrayList<E>();
     private static final String START_TEXT = "type to search...";
     private final FilterField filterField = new FilterField(START_TEXT);
-    /** Prepares a new <code>MyListModel</code> object. */
-    public MyListModel() {
-        super();
-    }
 
     FilterField getFilterField() {
         return filterField;
@@ -75,10 +72,9 @@ public final class MyListModel<E> extends AbstractListModel<E> {
         if (START_TEXT.equals(filter)) {
             filter = "";
         }
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).toString().toLowerCase(Locale.US).indexOf(
-                                        filter.toLowerCase(Locale.US)) >= 0) {
-                filteredItems.add(items.get(i));
+        for (final E item : items) {
+            if (item.toString().toLowerCase(Locale.US).contains(filter.toLowerCase(Locale.US))) {
+                filteredItems.add(item);
             }
         }
         fireContentsChanged(this, 0, getSize());

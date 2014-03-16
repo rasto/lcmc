@@ -55,8 +55,6 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public class DrbdAvailFiles extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Combo box with drbd versions. */
@@ -66,7 +64,7 @@ public class DrbdAvailFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /** Prepares a new <code>DrbdAvailFiles</code> object. */
+    /** Prepares a new {@code DrbdAvailFiles} object. */
     public DrbdAvailFiles(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -114,10 +112,10 @@ public class DrbdAvailFiles extends DialogHost {
                           null, /* ProgresBar */
                           new ExecCallback() {
                             @Override
-                            public void done(final String ans) {
+                            public void done(final String answer) {
                                 String defaultValue =
                                             getHost().getDrbdBuildToInstall();
-                                final String[] items = ans.split("\\r?\\n");
+                                final String[] items = answer.split("\\r?\\n");
                                 boolean found = false;
                                 for (final String item : items) {
                                     if (item.equals(defaultValue)) {
@@ -150,16 +148,16 @@ public class DrbdAvailFiles extends DialogHost {
                             }
 
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         printErrorAndRetry(
                                          Tools.getString(
                                          "Dialog.Host.DrbdAvailFiles.NoBuilds"),
-                                         ans,
-                                         exitCode);
+                                                answer,
+                                                errorCode);
                                     }
                                 });
                             }
@@ -176,10 +174,10 @@ public class DrbdAvailFiles extends DialogHost {
                       null, /* ProgresBar */
                       new ExecCallback() {
                         @Override
-                        public void done(final String ans) {
+                        public void done(final String answer) {
                             final List<String> files = new ArrayList<String>(
                                                         Arrays.asList(
-                                                         ans.split("\\r?\\n")));
+                                                         answer.split("\\r?\\n")));
                             if (files.size() >= 2) {
                                 if (files.size() > 4) {
                                     /* remove the virtual package. */
@@ -209,16 +207,16 @@ public class DrbdAvailFiles extends DialogHost {
                         }
 
                         @Override
-                        public void doneError(final String ans,
-                                                        final int exitCode) {
+                        public void doneError(final String answer,
+                                              final int errorCode) {
                             Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     printErrorAndRetry(
                                      Tools.getString(
                                       "Dialog.Host.DrbdAvailFiles.NoBuilds"),
-                                     ans,
-                                     exitCode);
+                                            answer,
+                                            errorCode);
                                 }
                             });
                         }

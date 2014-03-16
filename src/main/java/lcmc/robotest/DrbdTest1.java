@@ -43,7 +43,6 @@ final class DrbdTest1 {
     }
 
     static void start(final Cluster cluster, final int blockDevY) {
-        final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
 
@@ -56,6 +55,7 @@ final class DrbdTest1 {
         addFileSystem();
         moveTo(Tools.getString("Dialog.Dialog.Finish"));
         leftClick();
+        final String drbdTest = "drbd-test1";
         checkDRBDTest(drbdTest, 1.1);
         for (int i = 0; i < 2; i++) {
             info("i: " + i);

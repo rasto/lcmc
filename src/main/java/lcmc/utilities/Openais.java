@@ -148,7 +148,7 @@ public final class Openais {
 
     /** Reloads openais daemons on all nodes. */
     public static void reloadOpenaises(final Host[] hosts) {
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             reloadOpenais(host);
         }
     }

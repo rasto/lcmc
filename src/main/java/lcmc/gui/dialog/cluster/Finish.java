@@ -39,14 +39,12 @@ import javax.swing.JCheckBox;
  *
  */
 final class Finish extends DialogCluster {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Save checkbox. */
     private final JCheckBox saveCB = new JCheckBox(
                                   Tools.getString("Dialog.Cluster.Finish.Save"),
                                   true);
 
-    /** Prepares a new <code>Finish</code> object. */
+    /** Prepares a new {@code Finish} object. */
     Finish(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }

@@ -45,8 +45,6 @@ import lcmc.data.StringValue;
  * @version $Id$
  */
 final class InstallationDisk extends VMConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
     /** Configuration options of the new domain. */
@@ -72,7 +70,7 @@ final class InstallationDisk extends VMConfig {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>InstallationDisk</code> object. */
+    /** Prepares a new {@code InstallationDisk} object. */
     InstallationDisk(final WizardDialog previousDialog,
                      final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -146,10 +144,10 @@ final class InstallationDisk extends VMConfig {
             return inputPane;
         }
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
         vmsdi.getResource().setValue(DiskData.TYPE, VMSDiskInfo.FILE_TYPE);

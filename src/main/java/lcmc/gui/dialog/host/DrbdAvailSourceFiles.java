@@ -52,8 +52,6 @@ import javax.swing.SpringLayout;
  * @version $Id$
  */
 final class DrbdAvailSourceFiles extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Combo box with drbd tarballs. */
@@ -61,7 +59,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /** Prepares a new <code>DrbdAvailSourceFiles</code> object. */
+    /** Prepares a new {@code DrbdAvailSourceFiles} object. */
     DrbdAvailSourceFiles(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -91,12 +89,12 @@ final class DrbdAvailSourceFiles extends DialogHost {
               null, /* ProgresBar */
               new ExecCallback() {
                 @Override
-                public void done(final String ans) {
-                    if ("".equals(ans)) {
+                public void done(final String answer) {
+                    if (answer != null && answer.isEmpty()) {
                         doneError(null, 1);
                         return;
                     }
-                    final String[] versions = ans.split("\\r?\\n");
+                    final String[] versions = answer.split("\\r?\\n");
                     if (versions.length == 0) {
                         doneError(null, 1);
                         return;
@@ -131,16 +129,16 @@ final class DrbdAvailSourceFiles extends DialogHost {
                 }
 
                 @Override
-                public void doneError(final String ans,
-                                                final int exitCode) {
+                public void doneError(final String answer,
+                                      final int errorCode) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBarDoneError();
                             printErrorAndRetry(Tools.getString(
                                    "Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
-                                               ans,
-                                               exitCode);
+                                    answer,
+                                    errorCode);
                         }
                     });
                 }

@@ -26,8 +26,6 @@ package lcmc;
  * Encompassing class for all custom exceptions.
  */
 public final class Exceptions {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
     /** This class cannot be instantiated. */
     private Exceptions() {
@@ -40,7 +38,7 @@ public final class Exceptions {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
-        /** Prepares a new <code>DrbdConfigException</code> object. */
+        /** Prepares a new {@code DrbdConfigException} object. */
         public DrbdConfigException(final String msg) {
             super(msg);
         }
@@ -53,12 +51,12 @@ public final class Exceptions {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
-        /** Prepares a new <code>IllegalVersionException</code> object. */
+        /** Prepares a new {@code IllegalVersionException} object. */
         public IllegalVersionException(final String v1) {
             super("illegal version: " + v1);
         }
 
-        /** Prepares a new <code>IllegalVersionException</code> object. */
+        /** Prepares a new {@code IllegalVersionException} object. */
         public IllegalVersionException(final String v1,
                                        final String v2) {
             super("illegal version: " + v1 + ", " + v2);

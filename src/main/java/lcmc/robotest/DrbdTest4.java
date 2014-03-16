@@ -45,17 +45,15 @@ final class DrbdTest4 {
     }
 
     static void start(final Cluster cluster, final int blockDevY) {
-        final String drbdTest = "drbd-test4";
         /* Two drbds. */
         slowFactor = 0.2f;
         aborted = false;
-        int offset = 0;
-        int protocolY = 552;
-        int correctionY = 0;
         if (!cluster.getHostsArray()[0].hasVolumes()) {
-            protocolY = 352;
-            correctionY = 30;
+            final int protocolY = 352;
+            final int correctionY = 30;
         }
+        final String drbdTest = "drbd-test4";
+        int offset = 0;
         for (int i = 0; i < 2; i++) {
             addDrbdResource(cluster, blockDevY + offset);
             if (i == 0) {

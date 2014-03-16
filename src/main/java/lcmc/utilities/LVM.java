@@ -24,9 +24,10 @@ package lcmc.utilities;
 
 import lcmc.data.Host;
 import lcmc.configs.DistResource;
+
+import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * This class provides LVM commands.
@@ -66,7 +67,7 @@ public final class LVM {
                                  null, /* exec callback */
                                  outputVisible,
                                  Tools.getString("LVM.ExecutingCommand")
-                                 + " "
+                                 + ' '
                                  + command.replaceAll(DistResource.SUDO, " ")
                                  + "...",
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
@@ -153,7 +154,7 @@ public final class LVM {
     /** Create a volume group. */
     public static boolean vgCreate(final Host host,
                                    final String vgName,
-                                   final List<String> pvNames,
+                                   final Collection<String> pvNames,
                                    final boolean testOnly) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(PV_NAMES_PH, Tools.join(" ", pvNames));

@@ -56,28 +56,17 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
 
-    /** Prepares a new <code>AvailableServiceInfo</code> object. */
+    /** Prepares a new {@code AvailableServiceInfo} object. */
     public AvailableServiceInfo(final ResourceAgent resourceAgent,
                                 final Browser browser) {
         super(resourceAgent.getName(), browser);
         this.resourceAgent = resourceAgent;
     }
 
-    /** Returns heartbeat service class. */
-    ResourceAgent getResourceAgent() {
-        return resourceAgent;
-    }
-
     /** Returns icon for this menu category. */
     @Override
     public ImageIcon getMenuIcon(final boolean testOnly) {
         return AVAIL_SERVICES_ICON;
-    }
-
-    /** Returns type of the info text. text/plain or text/html. */
-    @Override
-    protected String getInfoType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns the info about the service. */
@@ -136,10 +125,10 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
                 }
             }
         });
-        buttonPanel.add(overviewButton, BorderLayout.WEST);
+        buttonPanel.add(overviewButton, BorderLayout.LINE_START);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         return buttonPanel;
     }
 
@@ -147,7 +136,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final MyMenuItem addServiceMenu = new MyMenuItem(
+        final UpdatableItem addServiceMenu = new MyMenuItem(
                         Tools.getString("ClusterBrowser.AddServiceToCluster"),
                         null,
                         null,

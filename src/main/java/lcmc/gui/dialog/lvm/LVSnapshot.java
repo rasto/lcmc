@@ -53,8 +53,6 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public final class LVSnapshot extends LV {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** LV Snapshot timeout. */
     private static final int SNAPSHOT_TIMEOUT = 5000;
     /** Block device info object. */
@@ -70,12 +68,6 @@ public final class LVSnapshot extends LV {
     public LVSnapshot(final BlockDevInfo blockDevInfo) {
         super(null);
         this.blockDevInfo = blockDevInfo;
-    }
-
-    /** Finishes the dialog and sets the information. */
-    @Override
-    protected void finishDialog() {
-        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
@@ -293,7 +285,7 @@ public final class LVSnapshot extends LV {
             answerPaneSetText("Logical volume "
                               + lvName
                               + " was successfully created on "
-                              + volumeGroup + ".");
+                              + volumeGroup + '.');
         } else {
             answerPaneSetTextError("Creating of logical volume "
                                    + lvName

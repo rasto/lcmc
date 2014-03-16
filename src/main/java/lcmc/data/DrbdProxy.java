@@ -150,7 +150,7 @@ public final class DrbdProxy {
             if (value == null) {
                 value = nextToken;
             } else {
-                value += " " + nextToken;
+                value += ' ' + nextToken;
             }
             if (eos) {
                 break;

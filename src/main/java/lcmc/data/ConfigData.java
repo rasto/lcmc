@@ -50,8 +50,7 @@ public final class ConfigData {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(ConfigData.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
+
     /** access type. */
     public static enum AccessType { RO, OP, ADMIN, GOD, NEVER };
     /** Read only operating mode. */
@@ -187,7 +186,7 @@ public final class ConfigData {
     private boolean checkSwing = false;
 
     /**
-     * Prepares a new <code>ConfigData</code> object and creates new hosts
+     * Prepares a new {@code ConfigData} object and creates new hosts
      * and clusters objects.
      */
     public ConfigData() {
@@ -261,7 +260,7 @@ public final class ConfigData {
 
     /** Return whether host exists in the hosts. */
     public boolean existsHost(final Host host) {
-        return hosts.existsHost(host);
+        return hosts.isHostInHosts(host);
     }
 
     /** Adds host object to the hosts object. */
@@ -276,7 +275,7 @@ public final class ConfigData {
 
     /** Return whether cluster exists in the clusters. */
     public boolean existsCluster(final Cluster cluster) {
-        return clusters.existsCluster(cluster);
+        return clusters.isClusterInClusters(cluster);
     }
 
     /** Adds cluster object to the clusters object. */
@@ -332,7 +331,7 @@ public final class ConfigData {
         if (knownHostFile.exists()) {
             try {
                 knownHosts.addHostkeys(knownHostFile);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.appError("setKnownHostPath: known host file does not exist", "", e);
             }
         }

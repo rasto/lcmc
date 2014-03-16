@@ -42,17 +42,15 @@ import javax.swing.SpringLayout;
  *
  */
 public class Devices extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>Devices</code> object. */
+    /** Prepares a new {@code Devices} object. */
     public Devices(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
     /** Checks the answer and makes it visible to the user. */
     final void checkAnswer(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
+        if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             progressBarDoneError();
             answerPaneSetTextError(Tools.getString(
                                             "Dialog.Host.Devices.CheckError"));
@@ -98,17 +96,17 @@ public class Devices extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans);
+                             public void done(final String answer) {
+                                 checkAnswer(answer);
                              }
 
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(Tools.getString(
                                             "Dialog.Host.Devices.CheckError"),
-                                                    ans,
-                                                    exitCode);
+                                         answer,
+                                         errorCode);
                              }
                          },
                          null, /* ConvertCmdCallback */

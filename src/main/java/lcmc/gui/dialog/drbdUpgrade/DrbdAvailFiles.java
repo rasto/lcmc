@@ -34,10 +34,8 @@ import lcmc.gui.dialog.WizardDialog;
  *
  */
 final class DrbdAvailFiles extends lcmc.gui.dialog.host.DrbdAvailFiles {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>DrbdAvailFiles</code> object. */
+    /** Prepares a new {@code DrbdAvailFiles} object. */
     DrbdAvailFiles(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }

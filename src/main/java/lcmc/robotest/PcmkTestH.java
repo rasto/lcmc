@@ -70,9 +70,9 @@ final class PcmkTestH {
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
+        disableStonith();
         final int ipmiX = 235;
         final int ipmiY = 207;
-        disableStonith();
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info("testH I: " + i);

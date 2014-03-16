@@ -88,12 +88,6 @@ abstract class XML {
         }
     }
 
-    /** Returns CDATA section. */
-    final String getCDATA(final Node node) {
-        final Node n = getChildNode(node, "#cdata-section");
-        return n.getNodeValue();
-    }
-
     /** Returns text in the node. */
     final String getText(final Node node) {
         final Node ch = getChildNode(node, "#text");
@@ -116,26 +110,23 @@ abstract class XML {
             DocumentBuilderFactory.newInstance();
         if (factory == null
             || xml.isEmpty()
-            || xml.equals("no resources defined!")) {
+            || "no resources defined!".equals(xml)) {
             return null;
         }
-        Document document;
+        final Document document;
         try {
             final DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(new ByteArrayInputStream(xml.getBytes()));
-        } catch (SAXException sxe) {
+        } catch (final SAXException sxe) {
             // Error generated during parsing)
-            Exception  x = sxe;
-            if (sxe.getException() != null) {
-                x = sxe.getException();
-            }
             LOG.appWarning("getXMLDocument: could not parse: " + xml);
+            sxe.printStackTrace();
             return null;
-        } catch (ParserConfigurationException pce) {
+        } catch (final ParserConfigurationException pce) {
             // Parser with specified options can't be built
             pce.printStackTrace();
             return null;
-        } catch (IOException ioe) {
+        } catch (final IOException ioe) {
             // I/O error
             ioe.printStackTrace();
             return null;

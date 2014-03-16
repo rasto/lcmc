@@ -38,8 +38,6 @@ import javax.swing.JComponent;
  *
  */
 public final class ConfirmDialog extends ConfigDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** user defined dialog description. */
     private final String description;
     /** user defined dialog title. */
@@ -49,7 +47,7 @@ public final class ConfirmDialog extends ConfigDialog {
     /** user defined no button text. */
     private final String noButton;
 
-    /** Prepares a new <code>ConfirmDialog</code> object. */
+    /** Prepares a new {@code ConfirmDialog} object. */
     public ConfirmDialog(final String title,
                          final String description,
                          final String yesButton,

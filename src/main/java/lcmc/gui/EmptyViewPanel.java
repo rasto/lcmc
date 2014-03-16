@@ -54,7 +54,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Browser. */
-    private final EmptyBrowser browser;
+    private final transient EmptyBrowser browser;
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -70,34 +70,33 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Logo panel for card layout. */
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
     /**
-     * Prepares a new <code>ClusterViewPanel</code> object.
+     * Prepares a new {@code ClusterViewPanel} object.
      */
     EmptyViewPanel() {
         super();
         browser = new EmptyBrowser();
         Tools.getGUIData().setEmptyBrowser(browser);
-        browser.setEmptyViewPanel(this);
         browser.initHosts();
 
         final JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setMinimumSize(new Dimension(0, 110));
         buttonPanel.setPreferredSize(new Dimension(0, 110));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 110));
+        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 110));
         buttonPanel.setBackground(STATUS_BACKGROUND);
-        add(buttonPanel, BorderLayout.NORTH);
+        add(buttonPanel, BorderLayout.PAGE_START);
         final JPanel logoPanel = new JPanel(new CardLayout());
-        logoPanel.setBackground(java.awt.Color.WHITE);
+        logoPanel.setBackground(Color.WHITE);
         final ImageIcon logoImage = Tools.createImageIcon("startpage_head.jpg");
 
         final JLabel logo = new JLabel(logoImage);
-        final JPanel lPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        lPanel.setBackground(java.awt.Color.WHITE);
+        final JPanel lPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+        lPanel.setBackground(Color.WHITE);
         lPanel.add(logo);
         logoPanel.add(lPanel, LOGO_PANEL_STRING);
         final JPanel smallButtonPanel = new JPanel();
         smallButtonPanel.setBackground(STATUS_BACKGROUND);
         smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel,
-                                   BoxLayout.Y_AXIS));
+                BoxLayout.PAGE_AXIS));
         buttonPanel.add(smallButtonPanel);
         /* add new host button */
         final MyButton addHostButton = new MyButton(
@@ -123,7 +122,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         Tools.getGUIData().registerAddHostButton(addHostButton);
         buttonPanel.add(addHostButton);
         createEmptyView();
-        add(logoPanel, BorderLayout.SOUTH);
+        add(logoPanel, BorderLayout.PAGE_END);
         Tools.getGUIData().registerAllHostsUpdate(this);
         Tools.getGUIData().allHostsUpdate();
 
@@ -141,7 +140,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                     new Runnable() {
                         @Override
                         public void run() {
-                            AddClusterDialog acd = new AddClusterDialog();
+                            final AddClusterDialog acd = new AddClusterDialog();
                             acd.showDialogs();
                         }
                     });

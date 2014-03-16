@@ -33,14 +33,15 @@ import lcmc.utilities.MyButton;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
@@ -99,14 +100,14 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter is editable only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
                                                 InterfaceData.MAC_ADDRESS,
                                                 InterfaceData.TARGET_DEV,
                                                 InterfaceData.MODEL_TYPE}));
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{
                                                 InterfaceData.TYPE }));
 
@@ -186,8 +187,6 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     private String generateMacAddress() {
-        final Map<String, InterfaceData> interfaces =
-                                    getVMSVirtualDomainInfo().getInterfaces();
         String mac;
         LOOP: while (true) {
             mac = Tools.generateVMMacAddress();
@@ -302,7 +301,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns the regexp of the parameter. */
     @Override
     protected String getParamRegexp(final String param) {
-        if (VMSXML.InterfaceData.MAC_ADDRESS.equals(param)) {
+        if (InterfaceData.MAC_ADDRESS.equals(param)) {
             return "^((([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2})|generate)?$";
         }
         return null;
@@ -448,11 +447,11 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (InterfaceData.TYPE.equals(param)) {
-            for (final String p : sourceNetworkWi.keySet()) {
-                sourceNetworkWi.get(p).setVisible(TYPE_NETWORK.equals(newValue));
+            for (final Map.Entry<String, Widget> entry : sourceNetworkWi.entrySet()) {
+                entry.getValue().setVisible(TYPE_NETWORK.equals(newValue));
             }
-            for (final String p : sourceBridgeWi.keySet()) {
-                sourceBridgeWi.get(p).setVisible(TYPE_BRIDGE.equals(newValue));
+            for (final Map.Entry<String, Widget> entry : sourceBridgeWi.entrySet()) {
+                entry.getValue().setVisible(TYPE_BRIDGE.equals(newValue));
             }
             checkOneParam(InterfaceData.SOURCE_NETWORK);
             checkOneParam(InterfaceData.SOURCE_BRIDGE);
@@ -528,7 +527,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        Value source;
+        final Value source;
         if (TYPE_NETWORK.equals(getParamSaved(InterfaceData.TYPE))) {
             source = getParamSaved(InterfaceData.SOURCE_NETWORK);
         } else {

@@ -47,7 +47,7 @@ public final class AddHostDialog {
     /** The host object. */
     private final Host host;
 
-    /** Prepares a new <code>EditHostDialog</code> object. */
+    /** Prepares a new {@code EditHostDialog} object. */
     public AddHostDialog(final Host host) {
         this.host = host;
     }

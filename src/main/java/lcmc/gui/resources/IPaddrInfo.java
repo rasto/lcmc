@@ -91,14 +91,14 @@ final class IPaddrInfo extends ServiceInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
-        Widget paramWi;
+        final Widget paramWi;
         if ("ip".equals(param)) {
             /* get networks */
             Value ip = getPreviouslySelected(param, prefix);
             if (ip == null) {
                 ip = getParamSaved(param);
             }
-            Value defaultValue;
+            final Value defaultValue;
             if (ip.isNothingSelected()) {
                 defaultValue = new StringValue(
                         ip.getValueForConfig(),

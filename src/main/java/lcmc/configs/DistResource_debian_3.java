@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for debian version 3.
  */
-public final class DistResource_debian_3 extends java.util.ListResourceBundle {
+public final class DistResource_debian_3 extends ListResourceBundle {
 
     /** Get contents. */
     @Override

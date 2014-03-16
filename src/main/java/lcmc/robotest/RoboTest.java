@@ -28,6 +28,8 @@ import lcmc.configs.AppDefaults;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.resources.Info;
+
+import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -168,7 +170,7 @@ public final class RoboTest {
     public static void restoreMouse() {
         try {
             robot = new Robot(SCREEN_DEVICE);
-        } catch (final java.awt.AWTException e) {
+        } catch (final AWTException e) {
             robot = null;
             LOG.appWarning("restoreMouse: robot error");
         }
@@ -216,7 +218,7 @@ public final class RoboTest {
                 Robot rbt = null;
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
-                } catch (final java.awt.AWTException e) {
+                } catch (final AWTException e) {
                     LOG.appWarning("startClicker0: robot error");
                 }
                 if (rbt == null) {
@@ -269,7 +271,7 @@ public final class RoboTest {
                 Robot rbt = null;
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
-                } catch (final java.awt.AWTException e) {
+                } catch (final AWTException e) {
                     LOG.appWarning("startMover: robot error");
                 }
                 if (rbt == null) {
@@ -286,8 +288,8 @@ public final class RoboTest {
                 final Point2D endP = getAppPosition();
                 final int endX = (int) endP.getX();
                 final int endY = (int) endP.getY();
-                int destX = origX;
-                int destY = origY;
+                final int destX = origX;
+                final int destY = origY;
                 info("test started");
                 final long startTime = System.currentTimeMillis();
                 int i = 1;
@@ -362,7 +364,7 @@ public final class RoboTest {
                 robot = null;
                 try {
                     robot = new Robot(SCREEN_DEVICE);
-                } catch (final java.awt.AWTException e) {
+                } catch (final AWTException e) {
                     robot = null;
                     LOG.appWarning("startTest: robot error");
                 }
@@ -805,7 +807,7 @@ public final class RoboTest {
                     } else if (index == '2') {
                         /* VMs */
                         int i = 1;
-                        String testIndex = "1";
+                        final String testIndex = "1";
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
@@ -820,7 +822,7 @@ public final class RoboTest {
                     } else if (index == '3') {
                         /* VMs */
                         int i = 1;
-                        String testIndex = "1";
+                        final String testIndex = "1";
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
@@ -1202,7 +1204,7 @@ public final class RoboTest {
     static void startResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
-        moveTo("^" + Tools.getString("ClusterBrowser.Hb.StartResource") + "$");
+        moveTo('^' + Tools.getString("ClusterBrowser.Hb.StartResource") + '$');
         leftClick();
     }
 
@@ -1488,7 +1490,7 @@ public final class RoboTest {
             findInside(Tools.getGUIData().getMainFrame(),
                        Class.forName("javax.swing.JScrollPane$ScrollBar"),
                        res);
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             Tools.printStackTrace("can't find the scrollbar");
             return;
         }
@@ -1621,7 +1623,7 @@ public final class RoboTest {
         Component c = null;
         int i = 0;
         while (c == null && i < 30 && !aborted) {
-            c = (Component) findComponent(text, number);
+            c = findComponent(text, number);
             if (i > 0) {
                 sleepNoFactor(100);
             } else if (i > 10) {
@@ -1637,7 +1639,7 @@ public final class RoboTest {
             Tools.printStackTrace("can't find: " + text);
             return;
         }
-        Component n;
+        final Component n;
         if (clazz == null) {
             n = c;
         } else {
@@ -1681,12 +1683,12 @@ public final class RoboTest {
             final int x = (int) p.getX();
             final int y = (int) p.getY();
             int directionX = 0;
-            int directionY = 0;
             if (x < destX) {
                 directionX = 1;
             } else if (x > destX) {
                 directionX = -1;
             }
+            int directionY = 0;
             if (y < destY) {
                 directionY = 1;
             } else if (y > destY) {
@@ -1712,7 +1714,7 @@ public final class RoboTest {
         Robot rbt = null;
         try {
             rbt = new Robot(SCREEN_DEVICE);
-        } catch (final java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appWarning("registerMovement: robot error");
         }
         if (rbt == null) {
@@ -1796,7 +1798,7 @@ public final class RoboTest {
     public static void info(final String text) {
         if (cluster != null) {
             for (final Host h : cluster.getHosts()) {
-                h.getTerminalPanel().addCommandOutput(text + "\n");
+                h.getTerminalPanel().addCommandOutput(text + '\n');
             }
         }
         LOG.info(text);
@@ -1853,7 +1855,7 @@ public final class RoboTest {
     static Container findComponent(final String text,
                                    final Container component,
                                    final Integer[] number) {
-        String quotedText;
+        final String quotedText;
         if (text.contains("*") || text.contains("$") || text.contains("^")) {
             quotedText = text;
         } else {

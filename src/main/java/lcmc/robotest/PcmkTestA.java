@@ -20,11 +20,9 @@
 
 package lcmc.robotest;
 
+import lcmc.utilities.Tools;
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -32,8 +30,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class PcmkTestA {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTestA.class);
 
     /** Private constructor, cannot be instantiated. */
     private PcmkTestA() {
@@ -43,9 +39,9 @@ final class PcmkTestA {
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
+        disableStonith();
         final int gx = 235;
         final int gy = 207;
-        disableStonith();
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info("testA I: " + i);

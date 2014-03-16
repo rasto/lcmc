@@ -34,10 +34,8 @@ import lcmc.gui.dialog.WizardDialog;
  *
  */
 final class LinbitLogin extends lcmc.gui.dialog.host.LinbitLogin {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>LinbitLogin</code> object. */
+    /** Prepares a new {@code LinbitLogin} object. */
     LinbitLogin(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }

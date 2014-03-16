@@ -34,7 +34,7 @@ import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.DRBD;
-import javax.swing.ImageIcon;
+
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -48,13 +48,14 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Color;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import lcmc.data.Value;
 import lcmc.gui.dialog.lvm.LVCreate;
@@ -72,20 +73,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private static final String LV_CREATE_MENU_ITEM =
                             Tools.getString("DrbdMultiSelectionInfo.LVCreate");
 
-    /** Prepares a new <code>DrbdMultiSelectionInfo</code> object. */
+    /** Prepares a new {@code DrbdMultiSelectionInfo} object. */
     public DrbdMultiSelectionInfo(final List<Info> selectedInfos,
                                   final Browser browser) {
         super("selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
-    /** @see EditableInfo#getMenuIcon() */
-    @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
-    }
-
-    /** @see EditableInfo#getInfoType() */
     @Override
     protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
@@ -97,7 +91,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         final StringBuilder s = new StringBuilder(80);
         s.append(Tools.getString("DrbdMultiSelectionInfo.Selection"));
         for (final Info si : selectedInfos) {
-            s.append(si.toString());
+            s.append(si);
             s.append("<br />");
         }
         return s.toString();
@@ -106,9 +100,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     /** Create menu items for selected hosts. */
     private void createSelectedHostsPopup(
                                     final List<HostDrbdInfo> selectedHostInfos,
-                                    final List<UpdatableItem> items) {
+                                    final Collection<UpdatableItem> items) {
         /* load drbd */
-        final MyMenuItem loadItem =
+        final UpdatableItem loadItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.LoadDrbd"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.LoadDrbd"),
@@ -178,7 +172,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         items.add(adjustAllItem);
-        final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
+        final ButtonCallback adjustAllItemCallback =
                getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
@@ -219,10 +213,10 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         items.add(upAllItem);
-        final ClusterBrowser.DRBDMenuItemCallback upAllItemCallback =
+        final ButtonCallback upAllItemCallback =
              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
                     DRBD.up(hi.getHost(), DRBD.ALL, null, CRM.TESTONLY);
                 }
@@ -231,7 +225,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         addMouseOverListener(upAllItem, upAllItemCallback);
 
         /* stop drbd proxy with init script */
-        final MyMenuItem stopProxyItem =
+        final UpdatableItem stopProxyItem =
             new MyMenuItem(
                         Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
                         null,
@@ -264,7 +258,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(stopProxyItem);
 
         /* start drbd proxy with init script */
-        final MyMenuItem startProxyItem =
+        final UpdatableItem startProxyItem =
             new MyMenuItem(
                       Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
                       null,
@@ -297,7 +291,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(startProxyItem);
 
         /* change host color */
-        final MyMenuItem changeHostColorItem =
+        final UpdatableItem changeHostColorItem =
             new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.ChangeHostColor"),
                     null,
@@ -305,11 +299,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     new AccessMode(ConfigData.AccessType.RO, false),
                     new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -330,8 +319,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'PV create' menu item. */
-    private MyMenuItem getPVCreateItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getPVCreateItem(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.PVCreate"),
                     null,
@@ -353,14 +342,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
                 /* at least one must be true */
-                final Set<Host> hosts = new HashSet<Host>();
+                final Collection<Host> hosts = new HashSet<Host>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.canCreatePV()
                         && (!bdi.getBlockDevice().isDrbd()
@@ -384,8 +368,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'PV remove' menu item. */
-    private MyMenuItem getPVRemoveItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getPVRemoveItem(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.PVRemove"),
                     null,
@@ -408,13 +392,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
-                final Set<Host> hosts = new HashSet<Host>();
+                final Collection<Host> hosts = new HashSet<Host>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.canRemovePV()
                         && (!bdi.getBlockDevice().isDrbd()
@@ -438,7 +417,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'vg create' menu item. */
-    private MyMenuItem getVGCreateItem(
+    private UpdatableItem getVGCreateItem(
                               final List<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                   Tools.getString("DrbdMultiSelectionInfo.VGCreate"),
@@ -451,13 +430,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public boolean visiblePredicate() {
                 /* all of them must be true */
-                BlockDevice bd;
 
                 if (selectedBlockDevInfos.isEmpty()) {
                     return false;
                 }
 
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    final BlockDevice bd;
                     if (bdi.getBlockDevice().isDrbd()) {
                         if (!bdi.getBlockDevice().isPrimary()) {
                             return false;
@@ -475,11 +454,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
                 return true;
-            }
-
-            @Override
-            public String enablePredicate() {
-                return null;
             }
 
             @Override
@@ -501,8 +475,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'vg remove' menu item. */
-    private MyMenuItem getVGRemoveItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getVGRemoveItem(
+                              final Collection<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                   Tools.getString("DrbdMultiSelectionInfo.VGRemove"),
                   null,
@@ -525,11 +499,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
                 return false;
-            }
-
-            @Override
-            public String enablePredicate() {
-                return null;
             }
 
             @Override
@@ -556,11 +525,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'lv create' menu item. */
-    private List<MyMenuItem> getLVCreateItems(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private Collection<MyMenuItem> getLVCreateItems(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         final Map<String, Set<BlockDevInfo>> vgs =
                                 new LinkedHashMap<String, Set<BlockDevInfo>>();
-        final List<MyMenuItem> mis = new ArrayList<MyMenuItem>();
+        final Collection<MyMenuItem> mis = new ArrayList<MyMenuItem>();
         for (final BlockDevInfo bdi : selectedBlockDevInfos) {
             final String vgName = bdi.getVGName();
             Set<BlockDevInfo> bdis = vgs.get(vgName);
@@ -592,18 +561,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     for (final BlockDevInfo bdi : bdis) {
                         final String vg = bdi.getVGName();
                         if (vg != null
-                            && !"".equals(vg)
+                            && !vg.isEmpty()
                             && bdi.getHost().getVolumeGroupNames()
                                             .contains(vg)) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    return null;
                 }
 
                 @Override
@@ -635,8 +599,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'LV remove' menu item. */
-    private MyMenuItem getLVRemoveItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getLVRemoveItem(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.LVRemove"),
                     null,
@@ -644,11 +608,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     new AccessMode(ConfigData.AccessType.OP, false),
                     new AccessMode(ConfigData.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return true;
-            }
 
             @Override
             public boolean visiblePredicate() {
@@ -661,14 +620,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
-                final Set<Host> selectedHosts = new HashSet<Host>();
-                final List<String> bdNames = new ArrayList<String>();
+                final Collection<Host> selectedHosts = new HashSet<Host>();
+                final Collection<String> bdNames = new ArrayList<String>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     bdNames.add(bdi.getName());
                     selectedHosts.add(bdi.getHost());
@@ -698,7 +652,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     /** Create menu items for selected block devices. */
     private void createSelectedBlockDevPopup(
                                  final List<BlockDevInfo> selectedBlockDevInfos,
-                                 final List<UpdatableItem> items) {
+                                 final Collection<UpdatableItem> items) {
         /* detach */
         final MyMenuItem detachMenu =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Detach"),
@@ -758,7 +712,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback detachItemCallback =
+        final ButtonCallback detachItemCallback =
               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
@@ -835,7 +789,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
+        final ButtonCallback attachItemCallback =
              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
@@ -911,10 +865,10 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
+        final ButtonCallback connectItemCallback =
               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
                         && (Tools.getConfigData().isAdvancedMode()
@@ -1000,10 +954,10 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback disconnectItemCallback =
+        final ButtonCallback disconnectItemCallback =
               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
                         && bdi.isConnectedOrWF(CRM.LIVE)
@@ -1024,7 +978,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(disconnectMenu);
 
         /* set primary */
-        final MyMenuItem setPrimaryItem =
+        final UpdatableItem setPrimaryItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.SetPrimary"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.SetPrimary"),
@@ -1090,7 +1044,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(setPrimaryItem);
 
         /* set secondary */
-        final MyMenuItem setSecondaryItem =
+        final UpdatableItem setSecondaryItem =
             new MyMenuItem(
                         Tools.getString("DrbdMultiSelectionInfo.SetSecondary"),
                         null,
@@ -1145,7 +1099,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(setSecondaryItem);
 
         /* force primary */
-        final MyMenuItem forcePrimaryItem =
+        final UpdatableItem forcePrimaryItem =
             new MyMenuItem(
                         Tools.getString("DrbdMultiSelectionInfo.ForcePrimary"),
                         null,
@@ -1212,7 +1166,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(forcePrimaryItem);
 
         /* invalidate */
-        final MyMenuItem invalidateItem =
+        final UpdatableItem invalidateItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Invalidate"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.Invalidate"),
@@ -1278,7 +1232,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(invalidateItem);
 
         /* resume */
-        final MyMenuItem resumeSyncItem =
+        final UpdatableItem resumeSyncItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ResumeSync"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.ResumeSync"),
@@ -1334,7 +1288,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(resumeSyncItem);
 
         /* pause sync */
-        final MyMenuItem pauseSyncItem =
+        final UpdatableItem pauseSyncItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.PauseSync"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.PauseSync"),
@@ -1385,7 +1339,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(pauseSyncItem);
 
         /* resize */
-        final MyMenuItem resizeItem =
+        final UpdatableItem resizeItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Resize"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.Resize"),
@@ -1441,7 +1395,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(resizeItem);
 
         /* discard my data */
-        final MyMenuItem discardDataItem =
+        final UpdatableItem discardDataItem =
             new MyMenuItem(
                          Tools.getString("DrbdMultiSelectionInfo.DiscardData"),
                          null,
@@ -1508,7 +1462,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(discardDataItem);
 
         /* proxy down */
-        final MyMenuItem proxyDownItem =
+        final UpdatableItem proxyDownItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
@@ -1562,7 +1516,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    final Set<Host> hosts = new HashSet<Host>();
+                    final Collection<Host> hosts = new HashSet<Host>();
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
@@ -1588,7 +1542,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(proxyDownItem);
 
         /* proxy up */
-        final MyMenuItem proxyUpItem =
+        final UpdatableItem proxyUpItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
@@ -1642,7 +1596,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    final Set<Host> hosts = new HashSet<Host>();
+                    final Collection<Host> hosts = new HashSet<Host>();
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
@@ -1704,138 +1658,106 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         return items;
     }
 
-    /** @see EditableInfo#getBrowser() */
     @Override
     protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** @see EditableInfo#getGraphicalView() */
     @Override
     public JPanel getGraphicalView() {
         return getBrowser().getDrbdGraph().getGraphPanel();
     }
 
-    /** @see EditableInfo#isEnabledOnlyInAdvancedMode() */
     @Override
     protected boolean isEnabledOnlyInAdvancedMode(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#getAccessType() */
     @Override
     protected ConfigData.AccessType getAccessType(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getSection()
-     */
     @Override
     protected String getSection(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#isRequired() */
     @Override
     protected boolean isRequired(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isAdvanced() */
     @Override
     protected boolean isAdvanced(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isEnabled() */
     @Override
     protected String isEnabled(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#isInteger() */
     @Override
     protected boolean isInteger(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isLabel() */
     @Override
     protected boolean isLabel(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isTimeType() */
     @Override
     protected boolean isTimeType(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isCheckBox() */
     @Override
     protected boolean isCheckBox(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#getParamType() */
     @Override
     protected String getParamType(final String param) {
         return null;
     }
 
-
-    /** @see EditableInfo#getParametersFromXML() */
     @Override
     public String[] getParametersFromXML() {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamPossibleChoices()
-     */
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#checkParam() */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         return true;
     }
 
-    /** @see EditableInfo#getParamDefault() */
     @Override
     public Value getParamDefault(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamPreferred()
-     */
     @Override
     protected Value getParamPreferred(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamShortDesc()
-     */
     @Override
     protected String getParamShortDesc(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamLongDesc()
-     */
     @Override
     protected String getParamLongDesc(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#getInfoPanel() */
     @Override
     public JComponent getInfoPanel() {
         final boolean abExisted = getApplyButton() != null;
@@ -1847,10 +1769,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
-                if (dcHost == null) {
-                    return false;
-                }
-                return !Tools.versionBeforePacemaker(dcHost);
+                return dcHost != null && !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
             public void mouseOut(final ComponentWithTest component) {
@@ -1935,7 +1854,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
@@ -1944,14 +1863,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         final AbstractButton serviceMenu = getActionsButton();
-        buttonPanel.add(serviceMenu, BorderLayout.EAST);
+        buttonPanel.add(serviceMenu, BorderLayout.LINE_END);
 
         /* apply button */
         addApplyButton(buttonPanel);
@@ -1968,7 +1887,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         mainPanel.add(super.getInfoPanel());
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
                                   ClusterBrowser.SERVICE_LABEL_WIDTH

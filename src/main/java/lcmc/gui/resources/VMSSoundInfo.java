@@ -32,13 +32,14 @@ import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
@@ -62,7 +63,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{SoundData.MODEL}));
 
     /** Possible values. */
@@ -215,7 +216,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Value model = getParamSaved(SoundData.MODEL);
-                String modelS;
+                final String modelS;
                 if (model == null) {
                     modelS = null;
                 } else {

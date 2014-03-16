@@ -21,7 +21,6 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Devices;
 import lcmc.gui.resources.DrbdVolumeInfo;
@@ -35,8 +34,6 @@ import javax.swing.JComponent;
  *
  */
 final class DevicesProxy extends Devices {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -44,7 +41,7 @@ final class DevicesProxy extends Devices {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>Devices</code> object. */
+    /** Prepares a new {@code Devices} object. */
     DevicesProxy(final WizardDialog previousDialog,
                  final Host host,
                  final DrbdVolumeInfo drbdVolumeInfo,
@@ -83,24 +80,6 @@ final class DevicesProxy extends Devices {
         }
     }
 
-
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.Devices.Title in TextResources.
-     */
-    @Override
-    protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.Host.Devices.Title");
-    }
-
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.Devices.Description in TextResources.
-     */
-    @Override
-    protected String getDescription() {
-        return Tools.getString("Dialog.Host.Devices.Description");
-    }
 
     /** Buttons that are enabled/disabled during checks. */
     @Override

@@ -29,6 +29,7 @@ import lcmc.utilities.MyButton;
 import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -43,7 +44,7 @@ public final class Passwdfield extends Textfield {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>Passwdfield</code> object. */
+    /** Prepares a new {@code Passwdfield} object. */
     public Passwdfield(final Value selectedValue,
                        final String regexp,
                        final int width,
@@ -61,15 +62,15 @@ public final class Passwdfield extends Textfield {
     /** Returns new JPasswordField with default value. */
     private JComponent getPasswdField(final Value value,
                                       final String regexp) {
-        JPasswordField pf;
 
-        String valueS;
+        final String valueS;
         if (value == null) {
             valueS = null;
         } else {
             valueS = value.getValueForConfig();
         }
 
+        final JPasswordField pf;
         if (regexp == null) {
             pf = new JPasswordField(valueS);
         } else {
@@ -92,24 +93,24 @@ public final class Passwdfield extends Textfield {
     /** Sets item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
-        ((JPasswordField) getInternalComponent()).setText(item.getValueForConfig());
+        ((JTextComponent) getInternalComponent()).setText(item.getValueForConfig());
     }
 
     /** Returns document object of the component. */
     @Override
     public Document getDocument() {
-        return ((JPasswordField) getInternalComponent()).getDocument();
+        return ((JTextComponent) getInternalComponent()).getDocument();
     }
 
     /** Requests focus if applicable. */
     @Override
     public void requestFocus() {
-        ((JPasswordField) getInternalComponent()).requestFocus();
+        getInternalComponent().requestFocus();
     }
 
     /** Selects the whole text in the widget if applicable. */
     @Override
     public void selectAll() {
-        ((JPasswordField) getInternalComponent()).selectAll();
+        ((JTextComponent) getInternalComponent()).selectAll();
     }
 }

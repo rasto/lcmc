@@ -120,7 +120,7 @@ public final class DrbdGraph extends ResourceGraph {
     /** Maximum vertical position. */
     private static final int MAX_Y_POS = 2600;
 
-    /** Prepares a new <code>DrbdGraph</code> object. */
+    /** Prepares a new {@code DrbdGraph} object. */
     public DrbdGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
     }
@@ -157,7 +157,7 @@ public final class DrbdGraph extends ResourceGraph {
             putInfoToVertex(hostDrbdInfo, v);
             vertexToHostMap.put(v, hostDrbdInfo);
             hostToVertexMap.put(hostDrbdInfo, v);
-            putVertexToInfo(v, (Info) hostDrbdInfo);
+            putVertexToInfo(v, hostDrbdInfo);
             Point2D hostPos = getSavedPosition(hostDrbdInfo);
 
             if (hostPos == null) {
@@ -234,7 +234,7 @@ public final class DrbdGraph extends ResourceGraph {
                 somethingChanged();
                 bdiToVertexMap.put(bdi, bdv);
                 blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
-                putVertexToInfo(bdv, (Info) bdi);
+                putVertexToInfo(bdv, bdi);
                 putInfoToVertex(bdi, bdv);
                 vertexToHostMap.put(bdv, hostDrbdInfo);
                 vertexList.add(bdv);
@@ -261,10 +261,9 @@ public final class DrbdGraph extends ResourceGraph {
                          == prevBdi.getDrbdVolumeInfo().getDrbdResourceInfo()) {
                 devYPos -= 6;
             }
-            Point2D pos; // TODO: getSavedPosition(bdi);
-                pos = new Point2D.Double(
+            final Point2D pos = new Point2D.Double(
                     hostXPos + BD_X_OFFSET + VERTEX_SIZE_BD / 2,
-                    devYPos);
+                    devYPos); // TODO: getSavedPosition(bdi);
             devYPos += BD_STEP_Y;
             getVertexLocations().put(bdv, pos);
             putVertexLocations();
@@ -564,14 +563,14 @@ public final class DrbdGraph extends ResourceGraph {
     protected void handlePopupVertex(final Vertex v,
                                      final List<Vertex> pickedV,
                                      final Point2D pos) {
-        Info info;
+        final Info info;
         if (pickedV.size() > 1) {
             info = multiSelectionInfo;
         } else if (isVertexBlockDevice(v)) {
             info = getInfo(v);
         } else {
             /* host */
-            info = (HostDrbdInfo) getInfo(v);
+            info = getInfo(v);
         }
         if (info != null) {
             final JPopupMenu p = info.getPopup();

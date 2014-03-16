@@ -47,8 +47,6 @@ import java.awt.event.ActionEvent;
  *
  */
 final class CheckInstallation extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Drbd label. */
@@ -80,7 +78,7 @@ final class CheckInstallation extends DialogHost {
     private boolean drbdOk = false;
 
 
-    /** Prepares a new <code>CheckInstallation</code> object. */
+    /** Prepares a new {@code CheckInstallation} object. */
     CheckInstallation(final WizardDialog previousDialog,
                       final Host host) {
         super(previousDialog, host);
@@ -116,12 +114,12 @@ final class CheckInstallation extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkDrbd(ans);
+                             public void done(final String answer) {
+                                 checkDrbd(answer);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  checkDrbd(""); /* not installed */
                              }
                          },
@@ -132,7 +130,7 @@ final class CheckInstallation extends DialogHost {
 
     /** Checks if drbd installation was ok. */
     void checkDrbd(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
+        if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             DRBD_LABEL.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.DrbdNotInstalled"));
             DRBD_ICON.setIcon(NOT_INSTALLED_ICON);

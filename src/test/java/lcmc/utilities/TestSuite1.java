@@ -274,7 +274,7 @@ public final class TestSuite1 {
             return null;
         }
         host.getSSH().setPasswords(ID_DSA_KEY, ID_RSA_KEY, PASSWORD);
-        host.setIp(ip);
+        host.setIpAddress(ip);
         host.setIps(0, new String[]{ip});
         return host;
     }

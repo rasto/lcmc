@@ -34,8 +34,6 @@ import lcmc.data.StringValue;
  */
 public final class DrbdVolume extends Resource
 implements ClusterBlockDeviceInterface {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** DRBD device. */
     private String device;
     /** Whether the config for this volume was already written at least once.
@@ -43,7 +41,7 @@ implements ClusterBlockDeviceInterface {
     private boolean commited = false;
 
     /**
-     * Prepares a new <code>DrbdVolume</code> object.
+     * Prepares a new {@code DrbdVolume} object.
      */
     public DrbdVolume(final String name) {
         super(name);

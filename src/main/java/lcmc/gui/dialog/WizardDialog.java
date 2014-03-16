@@ -50,8 +50,6 @@ import java.awt.Container;
  *
  */
 public abstract class WizardDialog extends ConfigDialog {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Previous dialog object. A dialog that will be displayed after
      * clicking on the back button */
     private WizardDialog previousDialog;
@@ -70,7 +68,7 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Progress bar. */
     private ProgressBar progressBar = null;
 
-    /** Prepares a new <code>WizardDialog</code> object. */
+    /** Prepares a new {@code WizardDialog} object. */
     protected WizardDialog(final WizardDialog previousDialog) {
         super();
         this.previousDialog = previousDialog;
@@ -126,11 +124,6 @@ public abstract class WizardDialog extends ConfigDialog {
         return isPressedButton(cancelButton());
     }
 
-    /** Returns true if Retry button was pressed. */
-    final boolean isPressedRetryButton() {
-        return isPressedButton(retryButton());
-    }
-
     /** Returns true if Finish button was pressed. */
     public final boolean isPressedFinishButton() {
         return isPressedButton(finishButton());
@@ -144,12 +137,11 @@ public abstract class WizardDialog extends ConfigDialog {
      */
     @Override
     protected final String[] buttons() {
-        final String[] btns = {retryButton(), // this one is hidden.
-                               backButton(),
-                               nextButton(),
-                               finishButton(),
-                               cancelButton()};
-        return btns;
+        return new String[]{retryButton(), // this one is hidden.
+                            backButton(),
+                            nextButton(),
+                            finishButton(),
+                            cancelButton()};
     }
 
     /**
@@ -190,13 +182,12 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Returns icons for the buttons. */
     @Override
     protected final ImageIcon[] getIcons() {
-        final ImageIcon[] icons = {null,
-                                   BACK_ICON,
-                                   NEXT_ICON,
-                                   FINISH_ICON,
-                                   CANCEL_ICON
+        return new ImageIcon[]{null,
+                               BACK_ICON,
+                               NEXT_ICON,
+                               FINISH_ICON,
+                               CANCEL_ICON
                              };
-        return icons;
     }
 
     /** Returns default button, none by default. */
@@ -277,7 +268,7 @@ public abstract class WizardDialog extends ConfigDialog {
     protected void initDialogBeforeVisible() {
         /* align buttons to the right */
         final FlowLayout layout = new FlowLayout();
-        layout.setAlignment(FlowLayout.RIGHT);
+        layout.setAlignment(FlowLayout.TRAILING);
 
         if (buttonClass(cancelButton()) != null) {
             buttonClass(cancelButton()).getParent().setLayout(layout);
@@ -381,8 +372,8 @@ public abstract class WizardDialog extends ConfigDialog {
                                          final String ans,
                                          final int exitCode) {
         if (ans != null) {
-            text += "\n" + Tools.getString("Dialog.Dialog.PrintErrorAndRetry")
-                 + exitCode + "\n" + ans;
+            text += '\n' + Tools.getString("Dialog.Dialog.PrintErrorAndRetry")
+                 + exitCode + '\n' + ans;
         }
         answerPaneSetTextError(text);
         addRetryButton();
@@ -441,7 +432,7 @@ public abstract class WizardDialog extends ConfigDialog {
         // setInitialValue destroys layout, so once
         // again...
         final FlowLayout layout = new FlowLayout();
-        layout.setAlignment(FlowLayout.RIGHT);
+        layout.setAlignment(FlowLayout.TRAILING);
 
         if (buttonClass(cancelButton()) != null) {
             Tools.invokeLater(new Runnable() {
@@ -477,20 +468,6 @@ public abstract class WizardDialog extends ConfigDialog {
                 @Override
                 public void run() {
                     rb.setVisible(false);
-                }
-            });
-        }
-    }
-
-    /** Presses the retry button. */
-    final void pressRetryButton() {
-        final MyButton rb = buttonClass(retryButton());
-
-        if (rb != null && rb.isVisible() && rb.isEnabled()) {
-            Tools.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    rb.pressButton();
                 }
             });
         }

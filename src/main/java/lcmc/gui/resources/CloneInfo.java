@@ -31,11 +31,6 @@ import lcmc.data.CRMXML;
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.data.HostLocation;
-import lcmc.utilities.CRM;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +48,12 @@ import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.data.Value;
 import lcmc.gui.widget.Check;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 
 /**
@@ -118,7 +119,7 @@ final class CloneInfo extends ServiceInfo {
     @Override
     public JComponent getInfoPanel() {
         final ServiceInfo cs = containedService;
-        JComponent panel;
+        final JComponent panel;
         if (cs == null) {
             panel = new JPanel();
         } else {
@@ -206,7 +207,6 @@ final class CloneInfo extends ServiceInfo {
     List<String> getRunningOnNodes(final boolean testOnly) {
         final ServiceInfo cs = containedService;
         if (cs != null) {
-            final ClusterStatus clStatus = getBrowser().getClusterStatus();
             if (getService().isMaster()) {
                 return cs.getMasterOnNodes(testOnly);
             } else {
@@ -292,7 +292,7 @@ final class CloneInfo extends ServiceInfo {
                                               null,
                                               Color.BLACK));
                     } else {
-                        texts.add(new Subtext("   " + si.toString(),
+                        texts.add(new Subtext("   " + si,
                                               null,
                                               Color.BLACK));
                     }
@@ -302,7 +302,6 @@ final class CloneInfo extends ServiceInfo {
         if (getBrowser().allHostsDown()) {
             return texts.toArray(new Subtext[texts.size()]);
         }
-        final Host dcHost = getBrowser().getDCHost();
         final List<String> runningOnNodes = getRunningOnNodes(testOnly);
         if (runningOnNodes != null && !runningOnNodes.isEmpty()) {
             if (cs != null && cs.getResourceAgent().isLinbitDrbd()) {
@@ -316,7 +315,7 @@ final class CloneInfo extends ServiceInfo {
                     getBrowser().getCluster().getHostColors(runningOnNodes);
             int i = 0;
             for (final String n : runningOnNodes) {
-                Color color;
+                final Color color;
                 if (i < colors.size()) {
                     color = colors.get(i);
                 } else {
@@ -335,14 +334,14 @@ final class CloneInfo extends ServiceInfo {
             if (slaveOnNodes != null && !slaveOnNodes.isEmpty()) {
                 final List<Color> colors =
                         getBrowser().getCluster().getHostColors(slaveOnNodes);
-                int i = 0;
                 if (cs != null && cs.getResourceAgent().isLinbitDrbd()) {
                     texts.add(new Subtext("secondary on:", null, Color.BLACK));
                 } else {
                     texts.add(new Subtext("slave on:", null, Color.BLACK));
                 }
+                int i = 0;
                 for (final String n : slaveOnNodes) {
-                    Color color;
+                    final Color color;
                     if (i < colors.size()) {
                         color = colors.get(i);
                     } else {
@@ -363,8 +362,8 @@ final class CloneInfo extends ServiceInfo {
                 texts.add(new Subtext("stopped", nColor, Color.BLACK));
             } else {
                 texts.add(new Subtext("not running on:", nColor, Color.BLACK));
-                for (final String n : notRunningOnNodes.keySet()) {
-                    final String hostName = notRunningOnNodes.get(n);
+                for (final Map.Entry<String, String> notRunningEntry : notRunningOnNodes.entrySet()) {
+                    final String hostName = notRunningEntry.getValue();
                     Color color = nColor;
                     if (failedOnHost(hostName, testOnly)) {
                         color = null;
@@ -469,10 +468,7 @@ final class CloneInfo extends ServiceInfo {
             return super.isStarted(testOnly);
         } else {
             final ServiceInfo cs = containedService;
-            if (cs != null) {
-                return cs.isStarted(testOnly) && super.isStarted(testOnly);
-            }
-            return false;
+            return cs != null && cs.isStarted(testOnly) && super.isStarted(testOnly);
         }
     }
 
@@ -484,11 +480,7 @@ final class CloneInfo extends ServiceInfo {
             return super.isEnslaved(testOnly);
         } else {
             final ServiceInfo cs = containedService;
-            if (cs != null) {
-                return cs.isEnslaved(testOnly)
-                       || super.isEnslaved(testOnly);
-            }
-            return false;
+            return cs != null && (cs.isEnslaved(testOnly) || super.isEnslaved(testOnly));
         }
     }
 
@@ -500,10 +492,7 @@ final class CloneInfo extends ServiceInfo {
             return super.isStopped(testOnly);
         } else {
             final ServiceInfo cs = containedService;
-            if (cs != null) {
-                return cs.isStopped(testOnly) || super.isStopped(testOnly);
-            }
-            return false;
+            return cs != null && (cs.isStopped(testOnly) || super.isStopped(testOnly));
         }
     }
 
@@ -515,10 +504,7 @@ final class CloneInfo extends ServiceInfo {
             return super.isManaged(testOnly);
         } else {
             final ServiceInfo cs = containedService;
-            if (cs != null) {
-                return cs.isManaged(testOnly);
-            }
-            return false;
+            return cs != null && cs.isManaged(testOnly);
         }
     }
 
@@ -535,7 +521,7 @@ final class CloneInfo extends ServiceInfo {
                      i < getBrowser().getClusterHosts().length; i++) {
                     CRM.cleanupResource(dcHost,
                                         cs.getHeartbeatId(testOnly)
-                                        + ":" + Integer.toString(i),
+                                        + ':' + Integer.toString(i),
                                         getBrowser().getClusterHosts(),
                                         testOnly);
                 }
@@ -569,19 +555,18 @@ final class CloneInfo extends ServiceInfo {
             return;
         }
         final boolean testOnly = false;
-        final ServiceInfo thisClass = this;
         for (final Host host : getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateFromMenuItem =
                new MyMenuItem(Tools.getString(
                                    "ClusterBrowser.Hb.MigrateFromResource")
-                                   + " " + hostName + " (stop)",
+                                   + ' ' + hostName + " (stop)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                               Tools.getString(
                                    "ClusterBrowser.Hb.MigrateFromResource")
-                                   + " " + hostName + " (stop) (offline)",
+                                   + ' ' + hostName + " (stop) (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
                               new AccessMode(ConfigData.AccessType.OP, false),
@@ -640,7 +625,7 @@ final class CloneInfo extends ServiceInfo {
                         }
                     }
                 };
-            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+            final ButtonCallback migrateItemCallback =
                getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
@@ -697,7 +682,7 @@ final class CloneInfo extends ServiceInfo {
                                                  "eq",
                                                  null,
                                                  role);
-        String action;
+        final String action;
         if (getMigratedFrom(testOnly) == null) {
             action = "migration";
         } else {
@@ -743,18 +728,13 @@ final class CloneInfo extends ServiceInfo {
         if (cs == null) {
             return items;
         }
-        final MyMenu csMenu = new MyMenu(
+        final UpdatableItem csMenu = new MyMenu(
                                      cs.toString(),
                                      new AccessMode(ConfigData.AccessType.RO,
                                                     false),
                                      new AccessMode(ConfigData.AccessType.RO,
                                                     false)) {
             private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                return null;
-            }
 
             @Override
             public void updateAndWait() {
@@ -770,7 +750,7 @@ final class CloneInfo extends ServiceInfo {
                 super.updateAndWait();
             }
         };
-        items.add((UpdatableItem) csMenu);
+        items.add(csMenu);
         return items;
     }
 
@@ -778,10 +758,7 @@ final class CloneInfo extends ServiceInfo {
     @Override
     boolean isInfoPanelOk() {
         final ServiceInfo cs = containedService;
-        if (cs != null) {
-            return cs.isInfoPanelOk();
-        }
-        return false;
+        return cs != null && cs.isInfoPanelOk();
     }
 
     /** Update menus with positions and calles their update methods. */
@@ -799,13 +776,13 @@ final class CloneInfo extends ServiceInfo {
     protected String getSection(final String param) {
         final ServiceInfo cs = containedService;
         if (cs != null) {
-            String name;
+            final String name;
             if (getService().isMaster()) {
                 name = MASTER_SLAVE_TYPE_STRING.getValueForConfig();
             } else {
                 name = CLONE_TYPE_STRING.getValueForConfig();
             }
-            return name + " " + super.getSection(param);
+            return name + ' ' + super.getSection(param);
         }
         return super.getSection(param);
     }

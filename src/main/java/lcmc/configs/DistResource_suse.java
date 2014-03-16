@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for all suses.
  */
-public final class DistResource_suse extends java.util.ListResourceBundle {
+public final class DistResource_suse extends ListResourceBundle {
 
     /** Get contents. */
     @Override

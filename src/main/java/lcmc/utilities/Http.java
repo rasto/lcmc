@@ -50,18 +50,18 @@ public final class Http {
     }
 
     public static void post(final String from, final String exception) {
-        URL url;
+        final URL url;
         try {
             url = new URL(URL_STRING);
-        } catch (MalformedURLException ex) {
+        } catch (final MalformedURLException ex) {
             LOG.appWarning("post: malformed URL: " + ex.getMessage());
             return;
         }
 
-        HttpURLConnection conn;
+        final HttpURLConnection conn;
         try {
             conn = (HttpURLConnection) url.openConnection();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.appWarning("post: could not connect: " + ex.getMessage());
             return;
         }
@@ -72,14 +72,14 @@ public final class Http {
 
         try {
             conn.setRequestMethod("POST");
-        } catch (ProtocolException ex) {
+        } catch (final ProtocolException ex) {
             LOG.appWarning("post: protocol error: " + ex.getMessage());
             return;
         }
 
         try {
             conn.connect();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.appWarning("post: connection error: " + ex.getMessage());
             return;
         }
@@ -88,7 +88,7 @@ public final class Http {
 
         try {
             output = new DataOutputStream(conn.getOutputStream());
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.appWarning("post: error opening for writing: " + ex.getMessage());
         }
         //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -101,21 +101,21 @@ public final class Http {
             output.writeBytes(getPostParams(params));
             output.flush();
             output.close();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.appWarning("post: error writing: " + ex.getMessage());
             return;
         }
 
         /* Response */
-        String str = null;
         try {
             final BufferedReader input = new BufferedReader(
                                   new InputStreamReader(conn.getInputStream()));
+            String str;
             while (null != ((str = input.readLine()))) {
                 LOG.info("post: " + str);
             }
             input.close();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.appWarning("post: error reading: " + ex.getMessage());
         }
     }
@@ -125,7 +125,7 @@ public final class Http {
         String postParams = "";
         String delim = "";
         for (final Map.Entry<String, String> entry : params.entrySet()) {
-            postParams += delim + entry.getKey() + "="
+            postParams += delim + entry.getKey() + '='
                         + URLEncoder.encode(entry.getValue(), ENCODING);
             delim = "&";
         }

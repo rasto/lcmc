@@ -35,7 +35,7 @@ public final class NetworkInfo extends Info {
     private static final ImageIcon NETWORK_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.NetworkIcon"));
-    /** Prepares a new <code>NetworkInfo</code> object. */
+    /** Prepares a new {@code NetworkInfo} object. */
     public NetworkInfo(final String name,
                        final Network network,
                        final Browser browser) {
@@ -46,11 +46,10 @@ public final class NetworkInfo extends Info {
     /** Returns network info. */
     @Override
     String getInfo() {
-        final String ret = "Network: " + getNetwork().getName()
+        return "Network: " + getNetwork().getName()
                            + "\n IPs: " + getNetwork().getIps()
                            + "\nCIDR: " + getNetwork().getCidr()
-                           + "\n";
-        return ret;
+                           + '\n';
     }
 
     /** Returns network resource object. */

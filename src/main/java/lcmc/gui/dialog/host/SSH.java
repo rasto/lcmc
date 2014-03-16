@@ -46,17 +46,14 @@ import lcmc.utilities.LoggerFactory;
 public class SSH extends DialogHost {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>SSH</code> object. */
+    /** Prepares a new {@code SSH} object. */
     public SSH(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
 
     /** Connects to all hosts. */
     private String connectHost() {
-        final String res = null;
         final SSHGui sshGui = new SSHGui(getDialogPanel(),
                                          getHost(),
                                          getProgressBar());
@@ -89,14 +86,14 @@ public class SSH extends DialogHost {
                                  public void run() {
                                     printErrorAndRetry(Tools.getString(
                                                 "Dialog.Host.SSH.NotConnected")
-                                                + "\n" + errorText);
+                                                + '\n' + errorText);
                                  }
                              });
                          }
                       });
         getProgressBar().setCancelEnabled(true);
 
-        return res;
+        return null;
     }
 
     /** Returns the next dialog. Devices */
@@ -148,7 +145,7 @@ public class SSH extends DialogHost {
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         //final JPanel pane = new JPanel(new SpringLayout());
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         pane.add(getProgressBarPane(
                     new CancelCallback() {
                         @Override

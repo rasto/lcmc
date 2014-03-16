@@ -23,10 +23,10 @@ package lcmc.utilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -47,9 +47,9 @@ public final class Logger {
     /** Name of the class. */
     private final String className;
     /** Map with all warnings, so that they don't appear more than once. */
-    private final Set<String> appWarningHash = new HashSet<String>();
+    private final Collection<String> appWarningHash = new HashSet<String>();
     /** Map with all errors, so that they don't appear more than once. */
-    private final Set<String> appErrorHash = new HashSet<String>();
+    private final Collection<String> appErrorHash = new HashSet<String>();
     /** String that starts error messages. */
     private static final String ERROR_STRING      = "ERROR   : ";
     /** String that starts info messages. */
@@ -173,10 +173,10 @@ public final class Logger {
             onHost.append(host.getName());
         }
         appWarning(Tools.getString("Tools.sshError.command")
-                   + " '" + command + "'" + onHost.toString() + "\n"
+                   + " '" + command + '\'' + onHost + '\n'
                    + Tools.getString("Tools.sshError.returned")
-                   + " " + exitCode + "\n"
-                   + ans + "\n"
+                   + ' ' + exitCode + '\n'
+                   + ans + '\n'
                    + stacktrace);
     }
 

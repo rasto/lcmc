@@ -123,7 +123,7 @@ final class DrbdTest5 {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 moveToGraph("vg0" + i + "/lvol0");
-                LOG.info("start: remove lv " + i + " " + j);
+                LOG.info("start: remove lv " + i + ' ' + j);
                 lvRemove();
                 sleepNoFactor(10000);
             }

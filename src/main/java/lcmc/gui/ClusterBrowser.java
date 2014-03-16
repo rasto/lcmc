@@ -71,24 +71,16 @@ import lcmc.utilities.ButtonCallback;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.TreeMap;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
-import java.util.Locale;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.keyvalue.MultiKey;
@@ -255,7 +247,7 @@ public final class ClusterBrowser extends Browser {
     /** Name of the boolean type in drbd. */
     public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
     /** String array with all hb classes. */
-    public static final List<String> HB_CLASSES = new ArrayList<String>();
+    public static final Collection<String> HB_CLASSES = new ArrayList<String>();
     static {
         HB_CLASSES.add(ResourceAgent.OCF_CLASS);
         HB_CLASSES.add(ResourceAgent.HEARTBEAT_CLASS);
@@ -308,7 +300,7 @@ public final class ClusterBrowser extends Browser {
                                                   HB_OP_META_DATA,
                                                   HB_OP_VALIDATE_ALL};
     /** Operations that should not have default values. */
-    public static final List<String> HB_OP_IGNORE_DEFAULT =
+    public static final Collection<String> HB_OP_IGNORE_DEFAULT =
                                                       new ArrayList<String>();
     static {
         HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
@@ -350,7 +342,7 @@ public final class ClusterBrowser extends Browser {
     public static final String UNKNOWN_CLUSTER_STATUS_STRING =
                                                      "unknown cluster status";
     /** Default operation parameters. */
-    private static final List<String> DEFAULT_OP_PARAMS =
+    private static final Collection<String> DEFAULT_OP_PARAMS =
                                        new ArrayList<String>(
                                                Arrays.asList(HB_PAR_TIMEOUT,
                                                              HB_PAR_INTERVAL));
@@ -359,7 +351,7 @@ public final class ClusterBrowser extends Browser {
     /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4. */
     private static final Pattern BY_RES_PATTERN =
                     Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
-    /** Prepares a new <code>CusterBrowser</code> object. */
+    /** Prepares a new {@code CusterBrowser} object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
         this.cluster = cluster;
@@ -427,7 +419,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** CRM operation parameters for one operations. */
-    public List<String> getCRMOperationParams(final String op) {
+    public Collection<String> getCRMOperationParams(final String op) {
         final List<String> params = crmOperationParams.get(op);
         if (params == null) {
             return DEFAULT_OP_PARAMS;
@@ -489,7 +481,7 @@ public final class ClusterBrowser extends Browser {
         }
 
         final Host[] hosts = getClusterHosts();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             host.saveGraphPositions(positions);
         }
     }
@@ -508,7 +500,7 @@ public final class ClusterBrowser extends Browser {
     public boolean allHostsDown() {
        boolean hostsDown = true;
        final Host[] hosts = cluster.getHostsArray();
-       for (Host host : hosts) {
+       for (final Host host : hosts) {
            if (host.isClStatus()) {
                hostsDown = false;
                break;
@@ -520,8 +512,9 @@ public final class ClusterBrowser extends Browser {
     /** Returns whether there is at least one drbddisk resource. */
     public boolean atLeastOneDrbddisk() {
         mHeartbeatIdToServiceLock();
-        for (final String id : heartbeatIdToServiceInfo.keySet()) {
-            final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
+        for (final Map.Entry<String, ServiceInfo>serviceInfoEntry
+                           : heartbeatIdToServiceInfo.entrySet()) {
+            final ServiceInfo si = serviceInfoEntry.getValue();
             if (si.getResourceAgent().isDrbddisk()) {
                 mHeartbeatIdToServiceUnlock();
                 return true;
@@ -534,8 +527,9 @@ public final class ClusterBrowser extends Browser {
     /** Returns whether there is at least one drbddisk resource. */
     public boolean isOneLinbitDrbd() {
         mHeartbeatIdToServiceLock();
-        for (final String id : heartbeatIdToServiceInfo.keySet()) {
-            final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
+        for (final Map.Entry<String, ServiceInfo> serviceInfoEntry
+                                      : heartbeatIdToServiceInfo.entrySet()) {
+            final ServiceInfo si = serviceInfoEntry.getValue();
             if (si.getResourceAgent().isLinbitDrbd()) {
                 mHeartbeatIdToServiceUnlock();
                 return true;
@@ -645,7 +639,6 @@ public final class ClusterBrowser extends Browser {
         LOG.debug1("start: update cluster resources");
         this.commonFileSystems = commonFileSystems.clone();
         this.commonMountPoints = commonMountPoints.clone();
-        DefaultMutableTreeNode resource;
 
         /* cluster hosts */
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -654,9 +647,9 @@ public final class ClusterBrowser extends Browser {
                 clusterHostsNode.removeAllChildren();
             }
         });
-        for (Host clusterHost : clusterHosts) {
+        for (final Host clusterHost : clusterHosts) {
             final HostBrowser hostBrowser = clusterHost.getBrowser();
-            resource = hostBrowser.getTreeTop();
+            final DefaultMutableTreeNode resource = hostBrowser.getTreeTop();
             setNode(resource);
             addNode(clusterHostsNode, resource);
             crmGraph.addHost(hostBrowser.getHostInfo());
@@ -711,7 +704,6 @@ public final class ClusterBrowser extends Browser {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Host firstHost = null;
                 final Host[] hosts = cluster.getHostsArray();
                 Tools.invokeAndWait(new Runnable() {
                     @Override
@@ -723,6 +715,7 @@ public final class ClusterBrowser extends Browser {
                     }
                 });
                 int notConnectedCount = 0;
+                Host firstHost = null;
                 do { /* wait here until a host is connected. */
                     boolean notConnected = true;
                     for (final Host host : hosts) {
@@ -741,7 +734,7 @@ public final class ClusterBrowser extends Browser {
                     if (firstHost == null) {
                         try {
                             Thread.sleep(30000);
-                        } catch (InterruptedException ex) {
+                        } catch (final InterruptedException ex) {
                             Thread.currentThread().interrupt();
                         }
                         final boolean ok =
@@ -764,9 +757,8 @@ public final class ClusterBrowser extends Browser {
                 crmXML = new CRMXML(firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXML);
                 initOperations();
-                final DrbdXML newDrbdXML = new DrbdXML(cluster.getHostsArray(),
+                drbdXML = new DrbdXML(cluster.getHostsArray(),
                                                        drbdParameters);
-                drbdXML = newDrbdXML;
                 /* available services */
                 final String clusterName = getCluster().getName();
                 Tools.startProgressIndicator(clusterName,
@@ -844,7 +836,6 @@ public final class ClusterBrowser extends Browser {
     }
 
     public void updateServerStatus(final Host host) {
-        final String hostName = host.getName();
         Tools.invokeAndWait(new Runnable() {
             @Override
             public void run() {
@@ -886,7 +877,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Updates VMs info. */
-    public void periodicalVMSUpdate(final List<Host> hosts) {
+    public void periodicalVMSUpdate(final Iterable<Host> hosts) {
         boolean updated = false;
         for (final Host host : hosts) {
             final VMSXML newVMSXML = new VMSXML(host);
@@ -948,10 +939,10 @@ public final class ClusterBrowser extends Browser {
     public void stopDrbdStatus() {
         drbdStatusCanceled = true;
         final Host[] hosts = cluster.getHostsArray();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             host.stopDrbdStatus();
         }
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             host.waitOnDrbdStatus();
         }
     }
@@ -970,7 +961,7 @@ public final class ClusterBrowser extends Browser {
             public void run() {
                 try {
                     firstTime.await();
-                } catch (InterruptedException ignored) {
+                } catch (final InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
                 Tools.invokeLater(new Runnable() {
@@ -1003,7 +994,7 @@ public final class ClusterBrowser extends Browser {
                        }
 
                        @Override
-                       public void doneError(final String ans,
+                       public void doneError(final String answer,
                                              final int exitCode) {
                            firstTime.countDown();
                            LOG.debug1("startDrbdStatus: failed: " + host.getName() + " exit code: " + exitCode);
@@ -1124,7 +1115,7 @@ public final class ClusterBrowser extends Browser {
             while (!host.isConnected() || !host.isDrbdLoaded()) {
                 try {
                     Thread.sleep(10000);
-                } catch (InterruptedException ex) {
+                } catch (final InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
             }
@@ -1157,7 +1148,7 @@ public final class ClusterBrowser extends Browser {
     /** Returns true if hb status on all hosts failed. */
     public boolean clStatusFailed() {
         final Host[] hosts = cluster.getHostsArray();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             if (host.isClStatus()) {
                 return false;
             }
@@ -1168,7 +1159,7 @@ public final class ClusterBrowser extends Browser {
     /** Sets hb status (failed / not failed for every node). */
     void setClStatus() {
         final Host[] hosts = cluster.getHostsArray();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             final String online = clusterStatus.isOnlineNode(host.getName());
             if ("yes".equals(online)) {
                 setClStatus(host, true);
@@ -1292,13 +1283,12 @@ public final class ClusterBrowser extends Browser {
         final CountDownLatch firstTime = new CountDownLatch(1);
         final String clusterName = getCluster().getName();
         startClStatusProgressIndicator(clusterName);
-        final boolean testOnly = false;
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     firstTime.await();
-                } catch (InterruptedException ignored) {
+                } catch (final InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
                 if (clStatusFailed()) {
@@ -1318,12 +1308,13 @@ public final class ClusterBrowser extends Browser {
         });
         thread.start();
         clStatusCanceled = false;
+        final boolean testOnly = false;
         while (true) {
             final Host host = getDCHost();
             if (host == null) {
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException ex) {
+                } catch (final InterruptedException ex) {
                     Thread.currentThread().interrupt();
                 }
                 continue;
@@ -1333,7 +1324,7 @@ public final class ClusterBrowser extends Browser {
             host.execClStatusCommand(
                  new ExecCallback() {
                      @Override
-                     public void done(final String ans) {
+                     public void done(final String answer) {
                          final String online =
                                     clusterStatus.isOnlineNode(host.getName());
                          setClStatus(host, "yes".equals(online));
@@ -1341,7 +1332,7 @@ public final class ClusterBrowser extends Browser {
                      }
 
                      @Override
-                     public void doneError(final String ans,
+                     public void doneError(final String answer,
                                            final int exitCode) {
                          if (firstTime.getCount() == 1) {
                              LOG.debug2("startClStatus: status failed: "
@@ -1382,7 +1373,7 @@ public final class ClusterBrowser extends Browser {
             }
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException ex) {
+            } catch (final InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -1404,7 +1395,7 @@ public final class ClusterBrowser extends Browser {
                     @SuppressWarnings("unchecked")
                     final Enumeration<DefaultMutableTreeNode> e =
                                              commonBlockDevicesNode.children();
-                    final List<DefaultMutableTreeNode> nodesToRemove =
+                    final Collection<DefaultMutableTreeNode> nodesToRemove =
                                        new ArrayList<DefaultMutableTreeNode>();
                     while (e.hasMoreElements()) {
                         final DefaultMutableTreeNode node = e.nextElement();
@@ -1420,11 +1411,11 @@ public final class ClusterBrowser extends Browser {
                     }
 
                     /* remove nodes */
-                    for (DefaultMutableTreeNode node : nodesToRemove) {
+                    for (final DefaultMutableTreeNode node : nodesToRemove) {
                         node.removeFromParent();
                     }
                     /* block devices */
-                    for (String device : bd) {
+                    for (final String device : bd) {
                         /* add new block devices */
                         final DefaultMutableTreeNode resource =
                             new DefaultMutableTreeNode(
@@ -1447,7 +1438,6 @@ public final class ClusterBrowser extends Browser {
 
     /** Updates available services. */
     private void updateAvailableServices() {
-        DefaultMutableTreeNode resource;
         LOG.debug("updateAvailableServices: start");
         Tools.invokeLater(new Runnable() {
             @Override
@@ -1465,7 +1455,7 @@ public final class ClusterBrowser extends Browser {
                 final AvailableServiceInfo asi =
                                             new AvailableServiceInfo(ra, this);
                 availableServiceMap.put(ra, asi);
-                resource = new DefaultMutableTreeNode(asi);
+                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(asi);
                 setNode(resource);
                 addNode(classNode, resource);
             }
@@ -1477,20 +1467,20 @@ public final class ClusterBrowser extends Browser {
     /** Updates VM nodes. */
     public void updateVMS() {
         LOG.debug1("updateVMS: status update");
-        final Set<String> domainNames = new TreeSet<String>();
+        final Collection<String> domainNames = new TreeSet<String>();
         for (final Host host : getClusterHosts()) {
             final VMSXML vxml = getVMSXML(host);
             if (vxml != null) {
                 domainNames.addAll(vxml.getDomainNames());
             }
         }
-        final List<DefaultMutableTreeNode> nodesToRemove =
+        final Collection<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        boolean nodeChanged = false;
-        final List<VMSVirtualDomainInfo> currentVMSVDIs =
+        final Collection<VMSVirtualDomainInfo> currentVMSVDIs =
                                         new ArrayList<VMSVirtualDomainInfo>();
 
         mVMSUpdateLock.lock();
+        boolean nodeChanged = false;
         if (vmsNode != null) {
             @SuppressWarnings("unchecked")
             final Enumeration<DefaultMutableTreeNode> ee = vmsNode.children();
@@ -1589,15 +1579,15 @@ public final class ClusterBrowser extends Browser {
     /** Updates drbd resources. */
     public void updateDrbdResources() {
         Tools.isSwingThread();
-        final boolean testOnly = false;
         final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
-        boolean atLeastOneAdded = false;
         drbdStatusLock();
         final DrbdXML dxml = drbdXML;
         if (dxml == null) {
             drbdStatusUnlock();
             return;
         }
+        final boolean testOnly = false;
+        boolean atLeastOneAdded = false;
         for (final Object k : dxml.getResourceDeviceMap().keySet()) {
             final String resName = (String) ((MultiKey) k).getKey(0);
             final String volumeNr = (String) ((MultiKey) k).getKey(1);
@@ -1605,12 +1595,12 @@ public final class ClusterBrowser extends Browser {
             final Map<String, String> hostDiskMap =
                                                 dxml.getHostDiskMap(resName,
                                                                     volumeNr);
-            BlockDevInfo bd1 = null;
-            BlockDevInfo bd2 = null;
             if (hostDiskMap == null) {
                 continue;
             }
-            for (String hostName : hostDiskMap.keySet()) {
+            BlockDevInfo bd1 = null;
+            BlockDevInfo bd2 = null;
+            for (final String hostName : hostDiskMap.keySet()) {
                 if (!cluster.contains(hostName)) {
                     continue;
                 }
@@ -1709,7 +1699,6 @@ public final class ClusterBrowser extends Browser {
     /** Updates networks. */
     private void updateNetworks() {
         if (networksNode != null) {
-            DefaultMutableTreeNode resource;
             final Network[] networks = cluster.getCommonNetworks();
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
@@ -1717,9 +1706,9 @@ public final class ClusterBrowser extends Browser {
                     networksNode.removeAllChildren();
                 }
             });
-            for (Network network : networks) {
-                resource = new DefaultMutableTreeNode(
-                             new NetworkInfo(network.getName(), network, this));
+            for (final Network network : networks) {
+                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(
+                        new NetworkInfo(network.getName(), network, this));
                 setNode(resource);
                 addNode(networksNode, resource);
             }
@@ -1772,7 +1761,6 @@ public final class ClusterBrowser extends Browser {
      * TODO: document what's going on.
      */
     public Host getDCHost() {
-        Host dcHost = null;
         String dc = null;
         final ClusterStatus cl = clusterStatus;
         if (cl != null) {
@@ -1781,7 +1769,8 @@ public final class ClusterBrowser extends Browser {
         final List<Host> hosts = new ArrayList<Host>();
         int lastHostIndex = 0;
         int i = 0;
-        for (Host host : getClusterHosts()) {
+        Host dcHost = null;
+        for (final Host host : getClusterHosts()) {
             if (host == lastDcHost) {
                 lastHostIndex = i;
             }
@@ -2011,14 +2000,14 @@ public final class ClusterBrowser extends Browser {
             } else if (si.getResourceAgent().isStonith())  {
                 pmId = Service.STONITH_ID_PREFIX
                        + si.getService().getName()
-                       + "_";
+                       + '_';
             } else {
-                pmId = Service.RES_ID_PREFIX + si.getService().getName() + "_";
+                pmId = Service.RES_ID_PREFIX + si.getService().getName() + '_';
             }
-            String newPmId;
+            final String newPmId;
             if (id == null) {
                 /* first time, no pm id is set */
-                newPmId = pmId + "1";
+                newPmId = pmId + '1';
                 si.getService().setId("1");
             } else {
                 newPmId = pmId + id;
@@ -2042,7 +2031,7 @@ public final class ClusterBrowser extends Browser {
      */
     public void resetFilesystems() {
         mHeartbeatIdToServiceLock();
-        for (String hbId : heartbeatIdToServiceInfo.keySet()) {
+        for (final String hbId : heartbeatIdToServiceInfo.keySet()) {
             final ServiceInfo si = heartbeatIdToServiceInfo.get(hbId);
             if (si.getName().equals("Filesystem")) {
                 si.setInfoPanel(null);
@@ -2063,10 +2052,10 @@ public final class ClusterBrowser extends Browser {
         try {
             final Map<String, ServiceInfo> idToInfoHash =
                                      nameToServiceInfoHash.get(serviceName);
-            int index = 2;
             if (idToInfoHash != null) {
+                int index = 2;
                 while (idToInfoHash.containsKey(newId)) {
-                    newId = id + "_" + index;
+                    newId = id + '_' + index;
                     index++;
                 }
             }
@@ -2090,7 +2079,7 @@ public final class ClusterBrowser extends Browser {
         String csPmId = null;
         final ServiceInfo cs = serviceInfo.getContainedService();
         if (cs != null) {
-            csPmId = cs.getService().getName() + "_" + cs.getService().getId();
+            csPmId = cs.getService().getName() + '_' + cs.getService().getId();
         }
         if (idToInfoHash == null) {
             idToInfoHash = new TreeMap<String, ServiceInfo>(
@@ -2106,12 +2095,12 @@ public final class ClusterBrowser extends Browser {
             if (service.getId() == null) {
                 int index = 0;
                 for (final String id : idToInfoHash.keySet()) {
-                    Pattern p;
+                    final Pattern p;
                     if (csPmId == null) {
                         p = Pattern.compile("^(\\d+)$");
                     } else {
                         /* ms */
-                        p = Pattern.compile("^" + csPmId + "_(\\d+)$");
+                        p = Pattern.compile('^' + csPmId + "_(\\d+)$");
                         if (csPmId.equals(id)) {
                             index++;
                         }
@@ -2124,7 +2113,7 @@ public final class ClusterBrowser extends Browser {
                             if (i > index) {
                                 index = i;
                             }
-                        } catch (NumberFormatException nfe) {
+                        } catch (final NumberFormatException nfe) {
                             LOG.appWarning("addNameToServiceInfoHash: could not parse: " + m.group(1));
                         }
                     }
@@ -2138,7 +2127,7 @@ public final class ClusterBrowser extends Browser {
                         service.setIdAndCrmId(csPmId);
                     } else {
                         service.setIdAndCrmId(csPmId
-                                      + "_"
+                                      + '_'
                                       + Integer.toString(index + 1));
                     }
                 }
@@ -2191,7 +2180,7 @@ public final class ClusterBrowser extends Browser {
     /** Starts heartbeats on all nodes. */
     void startHeartbeats() {
         final Host[] hosts = cluster.getHostsArray();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             Heartbeat.startHeartbeat(host);
         }
     }
@@ -2214,7 +2203,7 @@ public final class ClusterBrowser extends Browser {
             if (clusterStatus == null) {
                 return false;
             }
-            Host h;
+            final Host h;
             if (menuHost == null) {
                 h = getDCHost();
             } else {
@@ -2253,7 +2242,7 @@ public final class ClusterBrowser extends Browser {
                 ptestLockAcquire();
                 try {
                     clusterStatus.setPtestData(null);
-                    Host h;
+                    final Host h;
                     if (menuHost == null) {
                         h = getDCHost();
                     } else {
@@ -2353,10 +2342,10 @@ public final class ClusterBrowser extends Browser {
      * The defaultValue is stored as the first item in the array.
      */
     public Value[] getCommonFileSystems(final Value defaultValue) {
-        Value[] cfs =  new Value[commonFileSystems.length + 2];
+        final Value[] cfs =  new Value[commonFileSystems.length + 2];
         cfs[0] = defaultValue;
         int i = 1;
-        for (String cf : commonFileSystems) {
+        for (final String cf : commonFileSystems) {
             cfs[i] = new StringValue(cf);
             i++;
         }
@@ -2435,12 +2424,12 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns common blockdevices node from the menu. */
-    public DefaultMutableTreeNode getCommonBlockDevicesNode() {
+    public TreeNode getCommonBlockDevicesNode() {
         return commonBlockDevicesNode;
     }
 
     /** Returns cluster hosts node from the menu. */
-    public DefaultMutableTreeNode getClusterHostsNode() {
+    public TreeNode getClusterHostsNode() {
         return clusterHostsNode;
     }
 
@@ -2450,7 +2439,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns services node from the menu. */
-    public DefaultMutableTreeNode getNetworksNode() {
+    public TreeNode getNetworksNode() {
         return networksNode;
     }
 
@@ -2473,14 +2462,14 @@ public final class ClusterBrowser extends Browser {
      * /dev/drbd/by-res/r0/0
      * /dev/drbd0
      */
-    public DrbdVolumeInfo getDrbdVolumeFromDev(final String dev) {
+    public DrbdVolumeInfo getDrbdVolumeFromDev(final CharSequence dev) {
         if (dev == null) {
             return null;
         }
         final Matcher m = BY_RES_PATTERN.matcher(dev);
         if (m.matches()) {
             final String res = m.group(1);
-            String vol;
+            final String vol;
             if (m.groupCount() > 2) {
                 vol = m.group(2);
             } else {
@@ -2510,8 +2499,8 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns (shallow) copy of all drbdresource info objects. */
-    public List<DrbdResourceInfo> getDrbdResHashValues() {
-        final List<DrbdResourceInfo> values =
+    public Iterable<DrbdResourceInfo> getDrbdResHashValues() {
+        final Iterable<DrbdResourceInfo> values =
                    new ArrayList<DrbdResourceInfo>(getDrbdResHash().values());
         putDrbdResHash();
         return values;
@@ -2523,8 +2512,8 @@ public final class ClusterBrowser extends Browser {
         for (final String name : nameToServiceInfoHash.keySet()) {
             final Map<String, ServiceInfo> idToInfoHash =
                                              nameToServiceInfoHash.get(name);
-            for (final String id : idToInfoHash.keySet()) {
-                final ServiceInfo si = idToInfoHash.get(id);
+            for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
+                final ServiceInfo si = serviceEntry.getValue();
                 if (si != exceptThisOne) {
                     si.reloadComboBoxes();
                 }
@@ -2647,7 +2636,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Returns when at least one resource in the list of resources can be
         promoted. */
-    public boolean isOneMaster(final List<String> rscs) {
+    public boolean isOneMaster(final Iterable<String> rscs) {
         for (final String id : rscs) {
             mHeartbeatIdToServiceLock();
             final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
@@ -2663,14 +2652,14 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Updates host hardware info on all cluster hosts immediately. */
-    public void updateHWInfo(boolean updateLVM) {
+    public void updateHWInfo(final boolean updateLVM) {
         for (final Host h : getClusterHosts()) {
             updateHWInfo(h, updateLVM);
         }
     }
 
     /** Updates host hardware info immediately. */
-    public void updateHWInfo(final Host host, boolean updateLVM) {
+    public void updateHWInfo(final Host host, final boolean updateLVM) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                        new ResourceGraph[]{drbdGraph, crmGraph},
@@ -2712,7 +2701,7 @@ public final class ClusterBrowser extends Browser {
 
     /** Return name of the classes in the menu. */
     public static String getClassMenu(final String cl) {
-        final String name = ClusterBrowser.HB_CLASS_MENU.get(cl);
+        final String name = HB_CLASS_MENU.get(cl);
         if (name == null) {
             return Tools.ucfirst(cl) + " scripts";
         }

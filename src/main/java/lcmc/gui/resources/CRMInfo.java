@@ -35,7 +35,7 @@ public final class CRMInfo extends HbCategoryInfo {
     private static final ImageIcon CRM_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
-    /** Prepares a new <code>ServicesInfo</code> object. */
+    /** Prepares a new {@code ServicesInfo} object. */
     public CRMInfo(final String name, final Browser browser) {
         super(name, browser);
     }
@@ -44,12 +44,6 @@ public final class CRMInfo extends HbCategoryInfo {
     @Override
     public ImageIcon getCategoryIcon(final boolean testOnly) {
         return CRM_ICON;
-    }
-
-    /** Returns type of the info text. text/plain or text/html. */
-    @Override
-    protected String getInfoType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns editable info panel for global crm config. */

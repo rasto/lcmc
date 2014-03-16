@@ -61,8 +61,6 @@ public final class SplitBrain extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(SplitBrain.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Combo box with host that has more recent data. */
     private Widget hostWi;
     /** Resolve split brain button. */
@@ -71,7 +69,7 @@ public final class SplitBrain extends DrbdConfig {
     /** Width of the combo box. */
     private static final int COMBOBOX_WIDTH = 160;
 
-    /** Prepares a new <code>SplitBrain</code> object. */
+    /** Prepares a new {@code SplitBrain} object. */
     public SplitBrain(final WizardDialog previousDialog,
                final DrbdVolumeInfo dvi) {
         super(previousDialog, dvi);
@@ -86,8 +84,8 @@ public final class SplitBrain extends DrbdConfig {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Host hostPri;
-                Host hostSec;
+                final Host hostPri;
+                final Host hostSec;
                 if (h.equals(h1.getName())) {
                     hostPri = h1;
                     hostSec = h2;

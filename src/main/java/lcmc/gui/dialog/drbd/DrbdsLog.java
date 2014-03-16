@@ -37,10 +37,8 @@ import java.util.LinkedHashMap;
  * @version $Id$
  */
 public final class DrbdsLog extends HostLogs {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>DrbdsLog</code> object. */
+    /** Prepares a new {@code DrbdsLog} object. */
     public DrbdsLog(final Host host) {
         super(host);
     }

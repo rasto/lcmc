@@ -23,12 +23,13 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for opensuse 13.1.
  */
 public final class DistResource_suse_OPENSUSE13_1
-                                    extends java.util.ListResourceBundle {
+                                    extends ListResourceBundle {
 
     /** Get contents. */
     @Override

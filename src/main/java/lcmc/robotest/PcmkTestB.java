@@ -43,10 +43,10 @@ final class PcmkTestB {
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
-        final int dummy1X = 235;
-        final int dummy1Y = 207;
         disableStonith();
         final String testName = "testB";
+        final int dummy1X = 235;
+        final int dummy1Y = 207;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);

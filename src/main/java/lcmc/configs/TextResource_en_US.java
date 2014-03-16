@@ -23,12 +23,13 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are english texts. That are different than default texts. Probably
  * nothing.
  */
-public final class TextResource_en_US extends java.util.ListResourceBundle {
+public final class TextResource_en_US extends ListResourceBundle {
 
     /** Get contents. */
     @Override

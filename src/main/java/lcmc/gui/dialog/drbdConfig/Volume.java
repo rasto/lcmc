@@ -24,8 +24,6 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 
@@ -46,12 +44,10 @@ import java.awt.Dimension;
  *
  */
 public final class Volume extends DrbdConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
     /** Configuration options of the drbd volume. */
     private static final String[] PARAMS = {"number", "device"};
-    /** Prepares a new <code>Volume</code> object. */
+    /** Prepares a new {@code Volume} object. */
     public Volume(final WizardDialog previousDialog,
                   final DrbdVolumeInfo dvi) {
         super(previousDialog, dvi);
@@ -86,7 +82,6 @@ public final class Volume extends DrbdConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         getDrbdVolumeInfo().waitForInfoPanel();
     }
 
@@ -110,13 +105,11 @@ public final class Volume extends DrbdConfig {
     /** Returns input pane where user can configure a drbd volume. */
     @Override
     protected JComponent getInputPane() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final DrbdInfo drbdInfo = dri.getDrbdInfo();
         final JPanel inputPane = new JPanel();
-        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
+        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         getDrbdVolumeInfo().addWizardParams(

@@ -23,12 +23,13 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for ubuntu intrepid.
  */
 public final class DistResource_ubuntu_INTREPID
-                                        extends java.util.ListResourceBundle {
+                                        extends ListResourceBundle {
 
     /** Get contents. */
     @Override

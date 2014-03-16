@@ -48,7 +48,7 @@ public final class AddVMConfigDialog {
     /** VMS virtual domain info object. */
     private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
 
-    /** Prepares new <code>AddVMConfigDialog</code> object. */
+    /** Prepares new {@code AddVMConfigDialog} object. */
     public AddVMConfigDialog(final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }

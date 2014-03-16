@@ -36,8 +36,6 @@ import javax.swing.JScrollPane;
  * @version $Id$
  */
 public final class About extends ConfigDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
     /** Inits the dialog and enables all the components. */
     @Override

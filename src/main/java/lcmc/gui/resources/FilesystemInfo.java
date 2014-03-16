@@ -142,7 +142,7 @@ final class FilesystemInfo extends ServiceInfo {
             waitForInfoPanel();
             final String dir = getComboBoxValue("directory").getValueForConfig();
             boolean confirm = false; /* confirm only once */
-            for (Host host : getBrowser().getClusterHosts()) {
+            for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd =
                         DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
                 final SSH.SSHOutput ret =
@@ -202,9 +202,9 @@ final class FilesystemInfo extends ServiceInfo {
                                 }
                                 final String selectedValue =
                                                   getParamSaved("fstype").getValueForConfig();
-                                String createdFs;
+                                final String createdFs;
                                 if (selectedValue == null
-                                    || "".equals(selectedValue)) {
+                                    || selectedValue.isEmpty()) {
                                     final CommonDeviceInterface cdi =
                                              (CommonDeviceInterface) value;
                                     createdFs = cdi.getCreatedFs();
@@ -212,7 +212,7 @@ final class FilesystemInfo extends ServiceInfo {
                                     createdFs = selectedValue;
                                 }
                                 if (createdFs != null
-                                    && !"".equals(createdFs)) {
+                                    && !createdFs.isEmpty()) {
                                     fstypeParamWi.setValue(new StringValue(createdFs));
                                 }
                             }
@@ -225,7 +225,7 @@ final class FilesystemInfo extends ServiceInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
-        Widget paramWi;
+        final Widget paramWi;
         if (FS_RES_PARAM_DEV.equals(param)) {
             Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
@@ -299,7 +299,7 @@ final class FilesystemInfo extends ServiceInfo {
             paramWi.setEditable(false);
         } else if ("directory".equals(param)) {
             final String[] cmp = getBrowser().getCommonMountPoints();
-            Value[] items = new Value[cmp.length + 1];
+            final Value[] items = new Value[cmp.length + 1];
             final Value defaultValue = new StringValue() {
                               @Override
                               public String getNothingSelected() {
@@ -360,7 +360,7 @@ final class FilesystemInfo extends ServiceInfo {
             s.delete(0, s.length());
             s.append("Filesystem / Drbd");
         }
-        if (id == null || "".equals(id)) {
+        if (id == null || id.isEmpty()) {
             id = Tools.getString(
                         "ClusterBrowser.ClusterBlockDevice.Unconfigured");
         }
@@ -410,12 +410,7 @@ final class FilesystemInfo extends ServiceInfo {
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
         }
-        boolean oldDrbddisk;
-        if (getDrbddiskInfo() == null) {
-            oldDrbddisk = drbddiskIsPreferred;
-        } else {
-            oldDrbddisk = true;
-        }
+        final boolean oldDrbddisk = getDrbddiskInfo() != null || drbddiskIsPreferred;
         if (oldDvi != null) {
             if (oldDrbddisk) {
                 oldDvi.removeDrbdDisk(this, dcHost, testOnly);
@@ -493,7 +488,7 @@ final class FilesystemInfo extends ServiceInfo {
         final DrbdVolumeInfo selectedInfo =
                                 getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
-        Value selectedValue;
+        final Value selectedValue;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);
         } else {

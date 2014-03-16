@@ -22,10 +22,11 @@
 
 package lcmc.utilities;
 
+import javax.swing.AbstractButton;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
-import javax.swing.SwingConstants;
 import java.awt.Color;
 
 /**
@@ -68,7 +69,7 @@ public class MyButtonCellRenderer extends MyButton
         setHorizontalAlignment(al);
         final Object v = table.getValueAt(row, 0);
         if (v instanceof MyButton) {
-            final String key = ((MyButton) v).getText();
+            final String key = ((AbstractButton) v).getText();
             final Color bg = getRowColor(key);
             setBackgroundColor(bg);
             //setToolTipText(button.getText());

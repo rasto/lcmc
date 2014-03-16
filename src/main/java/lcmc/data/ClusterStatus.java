@@ -70,7 +70,7 @@ public final class ClusterStatus {
     private final Host host;
 
     /**
-     * Prepares a new <code>ClusterStatus</code> object.
+     * Prepares a new {@code ClusterStatus} object.
      * Gets and parses metadata from pengine and crmd.
      */
     public ClusterStatus(final Host host, final CRMXML crmXML) {
@@ -186,35 +186,9 @@ public final class ClusterStatus {
         }
     }
 
-    /** Returns all clone resources. */
-    String[] getAllClones() {
-        final Map<String, String> cloneToResource =
-                                             cibQueryMap.getCloneToResource();
-        return cloneToResource.keySet().toArray(
-                                          new String[cloneToResource.size()]);
-    }
-
     /** Returns whether clone is a master / slave resource. */
     public boolean isMaster(final String pmId) {
         return cibQueryMap.getMasterList().contains(pmId);
-    }
-
-    /** Returns resource belonging to the specified clone. */
-    String getCloneResource(final String clone) {
-        return cibQueryMap.getCloneToResource().get(clone);
-    }
-
-    /** Returns list of all resources. */
-    String[] getAllResources() {
-        final Map<String, Map<String, String>> parametersMap =
-                                                   cibQueryMap.getParameters();
-        return parametersMap.keySet().toArray(
-                                            new String[parametersMap.size()]);
-    }
-
-    /** Returns clone id. */
-    String getResourceFromClone(final String cloneId) {
-        return cibQueryMap.getCloneToResource().get(cloneId);
     }
 
     /** Returns whether the id is of the clone set. */
@@ -233,10 +207,7 @@ public final class ClusterStatus {
                                  final boolean testOnly) {
         final Set<String> inLRMList =
                cibQueryMap.getInLRM().get(hostName.toLowerCase(Locale.US));
-        if (inLRMList == null) {
-            return false;
-        }
-        return inLRMList.contains(rscId);
+        return inLRMList != null && inLRMList.contains(rscId);
     }
 
     /** Returns whether the res is orphaned. */
@@ -295,9 +266,9 @@ public final class ClusterStatus {
     }
 
     /** Returns heartbeat ids of all resource locations. */
-    public List<String> getLocationIds(final String rsc,
+    public Iterable<String> getLocationIds(final String rsc,
                                        final boolean testOnly) {
-        List<String> locs;
+        final List<String> locs;
         if (testOnly && ptestData != null) {
             locs = shadowCibQueryMap.getLocationsId().get(rsc);
         } else {
@@ -314,7 +285,7 @@ public final class ClusterStatus {
     public HostLocation getScore(final String hbId,
                                  final String onHost,
                                  final boolean testOnly) {
-        Map<String, HostLocation> hostToScoreMap;
+        final Map<String, HostLocation> hostToScoreMap;
         if (testOnly && ptestData != null) {
             hostToScoreMap = shadowCibQueryMap.getLocation().get(hbId);
         } else {
@@ -329,26 +300,13 @@ public final class ClusterStatus {
     /** Returns ping location object for resource. */
     public HostLocation getPingScore(final String hbId,
                                      final boolean testOnly) {
-        HostLocation hostLocation;
+        final HostLocation hostLocation;
         if (testOnly && ptestData != null) {
             hostLocation = shadowCibQueryMap.getPingLocation().get(hbId);
         } else {
             hostLocation = cibQueryMap.getPingLocation().get(hbId);
         }
         return hostLocation;
-    }
-
-    /**
-     * Returns score from location id.
-     * TODO: not used?
-     */
-    HostLocation getHostLocationFromId(final String locationId,
-                                       final boolean testOnly) {
-        if (testOnly && ptestData != null) {
-            return shadowCibQueryMap.getLocationMap().get(locationId);
-        } else {
-            return cibQueryMap.getLocationMap().get(locationId);
-        }
     }
 
     /** Returns location id for specified resource and host. */
@@ -431,10 +389,7 @@ public final class ClusterStatus {
             return true;
         }
         final ResStatus resStatus = resStateMap.get(hbId);
-        if (resStatus == null) {
-            return true;
-        }
-        return resStatus.isManaged();
+        return resStatus == null || resStatus.isManaged();
     }
 
 
@@ -505,11 +460,11 @@ public final class ClusterStatus {
     public Map<String, String> getAllocationScores(final String crmId,
                                                    final boolean testOnly) {
         if (resStateMap == null) {
-            return Collections.<String, String>emptyMap();
+            return Collections.emptyMap();
         }
         final ResStatus resStatus = resStateMap.get(crmId);
         if (resStatus == null) {
-            return Collections.<String, String>emptyMap();
+            return Collections.emptyMap();
         }
         return resStatus.getAllocationScores();
     }
@@ -666,7 +621,7 @@ public final class ClusterStatus {
                     data.add(line);
                 }
             } else {
-                LOG.appWarning("parseStatus: error parsing heartbeat status, line not ok: " + line + "\n" + status);
+                LOG.appWarning("parseStatus: error parsing heartbeat status, line not ok: " + line + '\n' + status);
             }
         }
         return updated;

@@ -31,14 +31,12 @@ package lcmc.data.resources;
  *
  */
 public final class DrbdResource extends Resource {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Whether the config for this resource was already written at least once.
      */
     private boolean commited = false;
 
     /**
-     * Prepares a new <code>DrbdResource</code> object.
+     * Prepares a new {@code DrbdResource} object.
      */
     public DrbdResource(final String name) {
         super(name);

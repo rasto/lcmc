@@ -24,11 +24,12 @@ package lcmc.configs;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are default values for application.
  */
-public final class AppDefaults extends java.util.ListResourceBundle {
+public final class AppDefaults extends ListResourceBundle {
     /** Darker background color. */
     public static final Color BACKGROUND_DARKER = new Color(63, 155, 241);
 
@@ -117,10 +118,10 @@ public final class AppDefaults extends java.util.ListResourceBundle {
 
         {"MainMenu.DrbdGuiFiles.Extension",     "lcmc"},
         {"MainMenu.DrbdGuiFiles.Default",       System.getProperty("user.home")
-                                                + "/"
+                                                + '/'
                                                 + "lcmc-conf.lcmc"},
         {"MainMenu.DrbdGuiFiles.Old",       System.getProperty("user.home")
-                                                + "/"
+                                                + '/'
                                                 + "drbd-gui.drbdg"},
 
         /*

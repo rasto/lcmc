@@ -23,12 +23,13 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for rhel version 5.
  */
 public final class DistResource_redhatenterpriseserver_5
-                                        extends java.util.ListResourceBundle {
+                                        extends ListResourceBundle {
 
     /** Get contents. */
     @Override

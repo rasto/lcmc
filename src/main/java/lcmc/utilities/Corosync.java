@@ -171,7 +171,7 @@ public final class Corosync {
 
     /** Reloads Corosync daemons on all nodes. */
     public static void reloadCorosyncs(final Host[] hosts) {
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             reloadCorosync(host);
         }
     }

@@ -44,9 +44,9 @@ public final class ClusterViewPanel extends ViewPanel
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
-    private final Cluster cluster;
+    private final transient Cluster cluster;
 
-    /** Prepares a new <code>ClusterViewPanel</code> object. */
+    /** Prepares a new {@code ClusterViewPanel} object. */
     ClusterViewPanel(final Cluster cluster) {
         super();
         this.cluster = cluster;
@@ -54,7 +54,7 @@ public final class ClusterViewPanel extends ViewPanel
         getTree(cluster.getBrowser());
         cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
-        add(Box.createVerticalStrut(4), BorderLayout.NORTH);
+        add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);
 
         allHostsUpdate();
         Tools.getGUIData().registerAllHostsUpdate(this);
@@ -67,11 +67,6 @@ public final class ClusterViewPanel extends ViewPanel
                                                 cluster.getHostsArray(),
                                                 cluster.getCommonFileSystems(),
                                                 cluster.getCommonMountPoints());
-    }
-
-    /** Refreshes the cluster data in the view. */
-    void refresh() {
-        cluster.getBrowser().getTreeModel().reload();
     }
 
     /** Gets cluster object. */

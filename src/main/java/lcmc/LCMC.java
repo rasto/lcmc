@@ -177,16 +177,16 @@ public final class LCMC extends JPanel {
     }
     /** Create the GUI and show it. */
     protected static void createAndShowGUI(final Container mainFrame) {
-        final java.util.List<Object> buttonGradient = Arrays.asList(
+        final List<Object> buttonGradient = Arrays.asList(
           new Object[]{
-               new Float(.5f),
-               new Float(1f),
+               0.5f,
+               1.0f,
                new ColorUIResource(0xFFFFFF),
                new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                new ColorUIResource(ClusterBrowser.BUTTON_PANEL_BACKGROUND)});
-        final java.util.List<Object> checkboxGradient = Arrays.asList(
-          new Object[]{new Float(.3f),
-                       new Float(0f),
+        final List<Object> checkboxGradient = Arrays.asList(
+          new Object[]{0.3f,
+                       0.0f,
                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                        new ColorUIResource(0xFFFFFF)});
@@ -344,17 +344,16 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(final Thread t,
-                                              final Throwable ex) {
-                    System.out.println(ex.toString());
-                    System.out.println(Tools.getStackTrace(ex));
+                                              final Throwable e) {
+                    System.out.println(e);
+                    System.out.println(Tools.getStackTrace(e));
                     if (!uncaughtException
                         && Tools.getGUIData().getMainFrame() != null) {
                         uncaughtException = true;
-                        LOG.appError("", ex.toString(), ex);
+                        LOG.appError("", e.toString(), e);
                     }
                 }
             });
-        float fps = ConfigData.DEFAULT_ANIM_FPS;
         final Options options = new Options();
 
         options.addOption("h", HELP_OP, false, "print this help");
@@ -570,7 +569,7 @@ public final class LCMC extends JPanel {
                 final int scale = Integer.parseInt(scaleOp);
                 Tools.getConfigData().setScale(scale);
                 Tools.resizeFonts(scale);
-            } catch (java.lang.NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 LOG.appWarning("initApp: cannot parse scale: " + scaleOp);
             }
 
@@ -615,6 +614,7 @@ public final class LCMC extends JPanel {
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
+            float fps = ConfigData.DEFAULT_ANIM_FPS;
             if (cmd.hasOption(SLOW_OP)) {
                 fps /= 2;
             }
@@ -634,12 +634,12 @@ public final class LCMC extends JPanel {
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
                 parseClusterOptions(cmd);
             }
-        } catch (ParseException exp) {
+        } catch (final ParseException exp) {
             System.out.println("ERROR: " + exp.getMessage());
             System.exit(1);
         }
         LOG.debug1("initApp: max mem: "
-                   + Runtime.getRuntime().maxMemory() / 1024 / 1024 + "m");
+                   + Runtime.getRuntime().maxMemory() / 1024 / 1024 + 'm');
         return autoArgs;
     }
 
@@ -672,13 +672,13 @@ public final class LCMC extends JPanel {
                 }
                 hostsOptions = new ArrayList<HostOptions>();
                 for (final String hostNameEntered : hostNames) {
-                    String hostName;
+                    final String hostName;
                     String port = null;
                     if (hostNameEntered.indexOf(':') > 0) {
                         final String[] he = hostNameEntered.split(":");
                         hostName = he[0];
                         port = he[1];
-                        if ("".equals(port) || !Tools.isNumber(port)) {
+                        if (port != null && port.isEmpty() || !Tools.isNumber(port)) {
                             throw new ParseException(
                                     "could not parse " + HOST_OP + " option");
                         }
@@ -728,37 +728,37 @@ public final class LCMC extends JPanel {
                 }
             } else if (PCMKTEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
+                if (index != null && !index.isEmpty()) {
                     Tools.getConfigData().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
                 }
             } else if (DRBDTEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
+                if (index != null && !index.isEmpty()) {
                     Tools.getConfigData().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
                 }
             } else if (VMTEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
+                if (index != null && !index.isEmpty()) {
                     Tools.getConfigData().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
                 }
             } else if (GUITEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
+                if (index != null && !index.isEmpty()) {
                     Tools.getConfigData().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
                 }
             }
         }
-        for (final String cn : clusters.keySet()) {
-            for (final HostOptions hostOptions : clusters.get(cn)) {
+        for (final Map.Entry<String, List<HostOptions>> clusterEntry : clusters.entrySet()) {
+            for (final HostOptions hostOptions : clusterEntry.getValue()) {
                 if (hostsOptions.size() < 1
-                    || (hostsOptions.size() == 1
-                        && !Tools.getConfigData().isOneHostCluster())) {
+                    || hostsOptions.size() == 1
+                        && !Tools.getConfigData().isOneHostCluster()) {
                     throw new ParseException("not enough hosts for cluster: "
-                                             + cn);
+                                             + clusterEntry.getKey());
                 }
             }
         }
@@ -773,7 +773,7 @@ public final class LCMC extends JPanel {
     public static void main(final String[] args) {
         Tools.init();
         final JFrame mainFrame = new JFrame(
-               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+               Tools.getString("DrbdMC.Title") + ' ' + Tools.getRelease());
         final List<Image> il = new ArrayList<Image>();
         for (final String iconS : new String[]{"LCMC.AppIcon32",
                                                "LCMC.AppIcon48",
@@ -791,7 +791,7 @@ public final class LCMC extends JPanel {
             @Override
             public void run() {
                 createMainFrame(mainFrame);
-                createAndShowGUI((Container) mainFrame);
+                createAndShowGUI(mainFrame);
             }
         });
         //final Thread t = new Thread(new Runnable() {

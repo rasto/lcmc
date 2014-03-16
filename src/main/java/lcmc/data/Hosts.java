@@ -39,8 +39,6 @@ import lcmc.utilities.LoggerFactory;
 public final class Hosts {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Hosts.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Hosts set. */
     private final Set<Host> hosts = new LinkedHashSet<Host>();
 
@@ -63,7 +61,7 @@ public final class Hosts {
     }
 
     /** Returns true if host is in the hosts or false if it is not. */
-    boolean existsHost(final Host host) {
+    boolean isHostInHosts(final Host host) {
         return hosts.contains(host);
     }
 

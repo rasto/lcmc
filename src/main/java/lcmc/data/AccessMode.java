@@ -30,8 +30,6 @@ package lcmc.data;
  *
  */
 public final class AccessMode {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Access type. */
     private final ConfigData.AccessType accessType;
     /** Whether it is advanced mode or not. */
@@ -39,7 +37,7 @@ public final class AccessMode {
     /** Advanced mode. */
     public static final boolean ADVANCED = true;
 
-    /** Prepares a new <code>AccessMode</code> object. */
+    /** Prepares a new {@code AccessMode} object. */
     public AccessMode(final ConfigData.AccessType accessType,
                       final boolean advancedMode) {
         this.accessType = accessType;

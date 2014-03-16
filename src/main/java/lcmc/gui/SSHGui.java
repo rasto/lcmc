@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.BorderLayout;
@@ -44,6 +45,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.Font;
 
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,10 +72,11 @@ public final class SSHGui {
     /** Default length of fields. */
     private static final int DEFAULT_FIELD_LENGTH = 20;
 
-    /** Prepares a new <code>SSHGui</code> object. */
+    /** Prepares a new {@code SSHGui} object. */
     public SSHGui(final Container rootPane,
                   final Host host,
                   final ProgressBar progressBar) {
+        super();
         this.rootPane = rootPane;
         this.host = host;
         this.progressBar = progressBar;
@@ -101,7 +104,7 @@ public final class SSHGui {
                                        final String underText,
                                        final String defaultValue,
                                        final boolean isPassword) {
-        EnterSomethingDialog esd;
+        final EnterSomethingDialog esd;
         if (rootPane instanceof JDialog) {
             esd = new EnterSomethingDialog((JDialog) rootPane, title,
                     content, underText, defaultValue, isPassword);
@@ -135,7 +138,7 @@ public final class SSHGui {
         /** User answer. */
         private String answer;
 
-        /** Prepares a new <code>EnterSomethingDialog</code> object. */
+        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final Container parent,
                              final String title,
                              final String content,
@@ -149,7 +152,7 @@ public final class SSHGui {
                  isPasswordA);
         }
 
-        /** Prepares a new <code>EnterSomethingDialog</code> object. */
+        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final JDialog parent,
                              final String title,
                              final String[] content,
@@ -161,7 +164,7 @@ public final class SSHGui {
             setLocationRelativeTo(parent);
         }
 
-        /** Prepares a new <code>EnterSomethingDialog</code> object. */
+        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final Frame parent,
                              final String title,
                              final String[] content,
@@ -173,7 +176,7 @@ public final class SSHGui {
             setLocationRelativeTo(parent);
         }
 
-        /** Prepares a new <code>EnterSomethingDialog</code> object. */
+        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final JApplet parent,
                              final String title,
                              final String[] content,
@@ -212,14 +215,14 @@ public final class SSHGui {
             final JPanel pan = new JPanel();
             pan.setBorder(new LineBorder(
                    Tools.getDefaultColor("ConfigDialog.Background.Light"), 5));
-            pan.setBackground(java.awt.Color.WHITE);
-            pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
+            pan.setBackground(Color.WHITE);
+            pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
             if (host != null && host.getName() != null) {
                 pan.add(new JLabel("host: " + host.getName()));
             }
 
             for (final String el : content) {
-                if ((el == null) || (el.isEmpty())) {
+                if (el == null || el.isEmpty()) {
                     continue;
                 }
                 final JLabel contentLabel = new JLabel(el);
@@ -243,7 +246,7 @@ public final class SSHGui {
                 pan.add(answerField);
             }
 
-            final KeyAdapter kl = new KeyAdapter() {
+            final KeyListener kl = new KeyAdapter() {
                 @Override
                 public void keyTyped(final KeyEvent e) {
                     if (e.getKeyChar() == '\n') {
@@ -263,7 +266,7 @@ public final class SSHGui {
                 final int style = Font.ITALIC;
                 final int size = font.getSize();
                 l.setFont(new Font(name, style, size - 3));
-                l.setForeground(java.awt.Color.GRAY);
+                l.setForeground(Color.GRAY);
                 pan.add(l);
             }
             setResizable(false);

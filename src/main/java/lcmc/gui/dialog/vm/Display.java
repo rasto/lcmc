@@ -44,8 +44,6 @@ import java.awt.Dimension;
  * @version $Id$
  */
 final class Display extends VMConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
     /** Configuration options of the new domain. */
@@ -61,7 +59,7 @@ final class Display extends VMConfig {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>Display</code> object. */
+    /** Prepares a new {@code Display} object. */
     Display(final WizardDialog previousDialog,
             final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -134,10 +132,10 @@ final class Display extends VMConfig {
             return inputPane;
         }
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsgi.savePreferredValues();
         vmsgi.getResource().setValue(GraphicsData.TYPE,

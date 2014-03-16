@@ -39,8 +39,6 @@ import lcmc.utilities.LoggerFactory;
 public class Service extends Resource {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Service.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Id is crmId whithout name of the service. */
     private String id = null;
     /** Heartbeat id of this service. */
@@ -80,7 +78,7 @@ public class Service extends Resource {
     private static final String GROUP_NAME = ConfigData.PM_GROUP_NAME;
 
     /**
-     * Prepares a new <code>Service</code> object.
+     * Prepares a new {@code Service} object.
      *
      * @param name
      *          name of this service.
@@ -131,10 +129,10 @@ public class Service extends Resource {
                 id = crmId;
             }
         } else {
-            if (crmId.startsWith(RES_ID_PREFIX + getName() + "_")) {
+            if (crmId.startsWith(RES_ID_PREFIX + getName() + '_')) {
                 id = crmId.substring((RES_ID_PREFIX + getName()).length()
                                            + 1);
-            } else if (crmId.startsWith(STONITH_ID_PREFIX + getName() + "_")) {
+            } else if (crmId.startsWith(STONITH_ID_PREFIX + getName() + '_')) {
                 id = crmId.substring((STONITH_ID_PREFIX + getName()).length()
                                            + 1);
             } else {
@@ -172,14 +170,14 @@ public class Service extends Resource {
                 return MS_ID_PREFIX + id;
             }
         } else {
-            if (id.startsWith(RES_ID_PREFIX + getName() + "_")) {
+            if (id.startsWith(RES_ID_PREFIX + getName() + '_')) {
                 return id;
-            } else if (id.startsWith(STONITH_ID_PREFIX + getName() + "_")) {
+            } else if (id.startsWith(STONITH_ID_PREFIX + getName() + '_')) {
                 return id;
             } else if (stonith) {
-                return STONITH_ID_PREFIX + getName() + "_" + id;
+                return STONITH_ID_PREFIX + getName() + '_' + id;
             } else {
-                return RES_ID_PREFIX + getName() + "_" + id;
+                return RES_ID_PREFIX + getName() + '_' + id;
             }
         }
     }

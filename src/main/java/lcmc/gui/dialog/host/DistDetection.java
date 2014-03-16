@@ -39,10 +39,8 @@ import javax.swing.JComponent;
  *
  */
 final class DistDetection extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>DistDetection</code> object. */
+    /** Prepares a new {@code DistDetection} object. */
     DistDetection(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -59,7 +57,7 @@ final class DistDetection extends DialogHost {
                                           getHost().getArch());
         final String answerText = "\nversion: " + getHost().getDetectedInfo()
                         + " (support file: "
-                        + support + ")";
+                        + support + ')';
         answerPaneSetText(answerText);
     }
 

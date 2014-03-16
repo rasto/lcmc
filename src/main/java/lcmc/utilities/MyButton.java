@@ -22,22 +22,26 @@
 
 package lcmc.utilities;
 
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JToolTip;
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.MouseInfo;
+import java.awt.Paint;
 import java.awt.RenderingHints;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
-import javax.swing.JToolTip;
+import java.awt.Robot;
+import java.awt.Shape;
 import java.awt.geom.Point2D;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.event.ActionEvent;
-import java.awt.MouseInfo;
-import java.awt.Robot;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
+
 import lcmc.gui.widget.Check;
 
 /**
@@ -51,8 +55,6 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Default background color. */
     private static final Color DEFAULT_COLOR =
                            Tools.getDefaultColor("DefaultButton.Background");
-    /** First color in the gradient. */
-    private Color color1 = Color.WHITE;
     /** Second color in the gradient. */
     private Color color2 = DEFAULT_COLOR;
     /** Robot to move a mouse a little if a tooltip has changed. */
@@ -65,13 +67,13 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 
-    /** Prepares a new <code>MyButton</code> object. */
+    /** Prepares a new {@code MyButton} object. */
     public MyButton() {
         super();
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appError("MyButton: robot error");
         }
         robot = r;
@@ -79,7 +81,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /**
-     * Prepares a new <code>MyButton</code> object.
+     * Prepares a new {@code MyButton} object.
      *
      * @param text
      *          text in the button
@@ -89,7 +91,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appError("MyButton: robot error");
         }
         robot = r;
@@ -97,19 +99,19 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /**
-     * Prepares a new <code>MyButton</code> object.
+     * Prepares a new {@code MyButton} object.
      *
      * @param text
      *          text in the button
      * @param icon
      *          icon in the button
      */
-    public MyButton(final String text, final ImageIcon icon) {
+    public MyButton(final String text, final Icon icon) {
         super(text, icon);
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appError("MyButton: robot error");
         }
         robot = r;
@@ -117,7 +119,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /**
-     * Prepares a new <code>MyButton</code> object.
+     * Prepares a new {@code MyButton} object.
      *
      * @param text
      *          text in the button
@@ -127,13 +129,13 @@ public class MyButton extends JButton implements ComponentWithTest {
      *          tool tip in the button
      */
     public MyButton(final String text,
-                    final ImageIcon icon,
+                    final Icon icon,
                     final String toolTipText) {
         this(text, icon);
         super.setToolTipText(toolTipText);
     }
     /**
-     * Prepares a new <code>MyButton</code> object.
+     * Prepares a new {@code MyButton} object.
      *
      * @param c1
      *          color 1 in the gradient
@@ -145,13 +147,12 @@ public class MyButton extends JButton implements ComponentWithTest {
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appError("MyButton: robot error");
         }
         robot = r;
 
-        this.color1 = c1;
-        this.color2 = c2;
+        color2 = c2;
         setContentAreaFilled(false);  // *
     }
 
@@ -173,12 +174,12 @@ public class MyButton extends JButton implements ComponentWithTest {
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
     @Override
-    public final void setToolTipText(String toolTipText) {
-        if (toolTipText == null || "".equals(toolTipText)) {
-            toolTipText = getText(); /* can't be "" */
+    public final void setToolTipText(String text) {
+        if (text == null || text.isEmpty()) {
+            text = getText(); /* can't be "" */
         }
         if (toolTip != null && robot != null && toolTip.isShowing()) {
-            super.setToolTipText(toolTipText);
+            super.setToolTipText(text);
             final GraphicsDevice[] devices =
                     GraphicsEnvironment.getLocalGraphicsEnvironment()
                                        .getScreenDevices();
@@ -202,22 +203,10 @@ public class MyButton extends JButton implements ComponentWithTest {
             robot.mouseMove((int) p.getX() + xOffset,
                             (int) p.getY());
         } else {
-            super.setToolTipText(toolTipText);
+            super.setToolTipText(text);
         }
     }
 
-
-    /** Sets color 1 in the gradient. */
-    final void setColor1(final Color c1) {
-        this.color1 = c1;
-        repaint();
-    }
-
-    /** Sets color 2 in the gradient. */
-    final void setColor2(final Color c2) {
-        this.color2 = c2;
-        repaint();
-    }
 
     /** Sets background of the button. */
     public final void setBackgroundColor(final Color c) {
@@ -254,27 +243,25 @@ public class MyButton extends JButton implements ComponentWithTest {
         }
         setContentAreaFilled(false);  // *
 
-        GradientPaint gp1, gp2;
-        Rectangle2D.Float rf1, rf2;
         final Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
-        gp2 = new GradientPaint(1.0f,
-                                0.0f,
-                                Tools.brighterColor(getBackground(), 1.1),
-                                1.0f,
-                                (float) getHeight() * 0.3f,
-                                Tools.brighterColor(getBackground(), 1.2));
-        gp1 = new GradientPaint(1.0f,
-                                (float) getHeight(),
-                                Tools.brighterColor(getBackground(), 0.85),
-                                1.0f,
-                                (float) getHeight() * 0.3f,
-                                Tools.brighterColor(getBackground(), 1.2));
-        rf2 = new Rectangle2D.Float(0.0f, 0.0f, (float) getWidth(),
-            (float) getHeight());
-        rf1 = new Rectangle2D.Float(3.0f, (float) getHeight() * 0.5f,
-            (float) getWidth() - 6, (float) (getHeight() * 0.5 - 3));
+        final Paint gp2 = new GradientPaint(1.0f,
+                0.0f,
+                Tools.brighterColor(getBackground(), 1.1),
+                1.0f,
+                getHeight() * 0.3f,
+                Tools.brighterColor(getBackground(), 1.2));
+        final Paint gp1 = new GradientPaint(1.0f,
+                getHeight(),
+                Tools.brighterColor(getBackground(), 0.85),
+                1.0f,
+                getHeight() * 0.3f,
+                Tools.brighterColor(getBackground(), 1.2));
+        final Shape rf2 = new Rectangle2D.Float(0.0f, 0.0f, getWidth(),
+                getHeight());
+        final Shape rf1 = new Rectangle2D.Float(3.0f, getHeight() * 0.5f,
+                (float) getWidth() - 6, (float) (getHeight() * 0.5 - 3));
         g2.setPaint(gp2);
         g2.fill(rf2);
         g2.setPaint(gp1);

@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for all openfilers.
  */
-public final class DistResource_openfiler extends java.util.ListResourceBundle {
+public final class DistResource_openfiler extends ListResourceBundle {
 
     /** Get contents. */
     @Override

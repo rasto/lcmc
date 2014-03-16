@@ -45,6 +45,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
@@ -61,8 +62,6 @@ import java.util.ArrayList;
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Array of unit objects. */
-    private final Unit[] units;
     /** Text field in widget with units. */
     private final JTextField textFieldPart;
     /** Combo box with units. */
@@ -70,7 +69,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Whether the unit combo box should be enabled. */
     private boolean unitEnabled = true;
 
-    /** Prepares a new <code>TextfieldWithUnit</code> object. */
+    /** Prepares a new {@code TextfieldWithUnit} object. */
     public TextfieldWithUnit(final Value selectedValue,
                              final Unit[] units,
                              final String regexp,
@@ -81,12 +80,11 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         super(regexp,
               enableAccessMode,
               fieldButton);
-        this.units = units;
         final JPanel newComp = new JPanel();
         newComp.setLayout(new SpringLayout());
 
-        String number;
-        Unit unit;
+        final String number;
+        final Unit unit;
         if (selectedValue == null) {
             number = null;
             unit = null;
@@ -113,7 +111,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         textFieldPart.setMinimumSize(textFieldPart.getPreferredSize());
         textFieldPart.setMaximumSize(textFieldPart.getPreferredSize());
 
-        unitComboBox.setPreferredSize(new Dimension(width / 3 * 2,
+        unitComboBox.setPreferredSize(new Dimension(width / 3 << 1,
                                                     WIDGET_HEIGHT));
         unitComboBox.setMinimumSize(unitComboBox.getPreferredSize());
         unitComboBox.setMaximumSize(unitComboBox.getPreferredSize());
@@ -123,7 +121,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     private JComponent getTextField(final String value,
                                     final String regexp,
                                     final Map<String, String> abbreviations) {
-        MTextField tf;
+        final MTextField tf;
         if (regexp == null) {
             tf = new MTextField(value);
         } else {
@@ -163,7 +161,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         editor.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(final FocusEvent e) {
-                Value v = getValue();
+                final Value v = getValue();
                 if (v.isNothingSelected()) {
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -203,8 +201,8 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Value getValueInternal() {
-        String text = textFieldPart.getText();
-        final Unit unit = ((Unit) unitComboBox.getSelectedItem());
+        final String text = textFieldPart.getText();
+        final Unit unit = (Unit) unitComboBox.getSelectedItem();
         if (unit != null) {
             if (unit.isPlural() == "1".equals(text)) {
                 unit.setPlural(!"1".equals(text));
@@ -212,7 +210,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
             }
             final boolean accessible =
                      Tools.getConfigData().isAccessible(getEnableAccessMode());
-            if (text == null || "".equals(text)) {
+            if (text == null || text.isEmpty()) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
@@ -242,7 +240,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 }
             }
         }
-        if (text == null || "".equals(text)) {
+        if (text == null || text.isEmpty()) {
             return new StringValue();
         } else {
             return new StringValue(text, unit);
@@ -297,10 +295,10 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     /** Add item listener to the component. */
     @Override
-    public void addListeners(final WidgetListener wl) {
-        super.addListeners(wl);
-        addDocumentListener(textFieldPart.getDocument(), wl);
-        unitComboBox.addItemListener(getItemListener(wl));
+    public void addListeners(final WidgetListener widgetListener) {
+        super.addListeners(widgetListener);
+        addDocumentListener(textFieldPart.getDocument(), widgetListener);
+        unitComboBox.addItemListener(getItemListener(widgetListener));
     }
 
     @Override
@@ -353,12 +351,12 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         }
     }
 
-    private static Unit addItems(final List<Unit> comboList,
+    private static Unit addItems(final Collection<Unit> comboList,
                                      final Unit selectedValue,
                                      final Unit[] items) {
         Unit selectedUnit = null;
         if (items != null) {
-            for (Unit item : items) {
+            for (final Unit item : items) {
                 if (item.equals(selectedValue)) {
                     selectedUnit = item;
                 }

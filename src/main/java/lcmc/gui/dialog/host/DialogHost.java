@@ -27,19 +27,19 @@ import lcmc.data.Host;
 import lcmc.data.AccessMode;
 import lcmc.data.ConfigData;
 import lcmc.utilities.CancelCallback;
+import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.Unit;
-import lcmc.utilities.WidgetListener;
 
 import javax.swing.JPanel;
 import java.util.List;
 import java.util.ArrayList;
 import lcmc.data.Value;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.WidgetListener;
 
 /**
  * DialogHost.
@@ -48,15 +48,13 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public abstract class DialogHost extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Host for which is this dialog. */
     private final Host host;
     /** Thread in which a command can be executed. */
     private ExecCommandThread commandThread = null;
 
-    /** Prepares a new <code>DialogHost</code> object. */
-    public DialogHost(final WizardDialog previousDialog, final Host host) {
+    /** Prepares a new {@code DialogHost} object. */
+    protected DialogHost(final WizardDialog previousDialog, final Host host) {
         super(previousDialog);
         this.host = host;
     }
@@ -125,7 +123,7 @@ public abstract class DialogHost extends WizardDialog {
         s.append(getHostDialogTitle());
         if (host != null
             && !host.getName().isEmpty()
-            && !host.getName().equals("unknown")) {
+            && !"unknown".equals(host.getName())) {
 
             s.append(" (");
             s.append(host.getName());
@@ -146,12 +144,6 @@ public abstract class DialogHost extends WizardDialog {
         /** Method string. */
         private final String method;
 
-        /** Creates new InstallMethods object. */
-        public InstallMethods(final String name, final int index) {
-            this(name, index, "");
-        }
-
-        /** Creates new InstallMethods object. */
         public InstallMethods(final String name,
                               final int index,
                               final String method) {
@@ -223,7 +215,7 @@ public abstract class DialogHost extends WizardDialog {
                                            final boolean staging,
                                            final String lastInstalledMethod,
                                            final String autoOption,
-                                           final MyButton installButton) {
+                                           final ComponentWithTest installButton) {
         final List<InstallMethods> methods = new ArrayList<InstallMethods>();
         int i = 1;
         Value defaultValue = null;

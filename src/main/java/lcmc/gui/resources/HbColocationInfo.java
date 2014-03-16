@@ -53,7 +53,7 @@ final class HbColocationInfo extends EditableInfo
     /** Connection that keeps this constraint. */
     private final HbConnectionInfo connectionInfo;
 
-    /** Prepares a new <code>HbColocationInfo</code> object. */
+    /** Prepares a new {@code HbColocationInfo} object. */
     HbColocationInfo(final HbConnectionInfo connectionInfo,
                      final ServiceInfo serviceInfoRsc,
                      final ServiceInfo serviceInfoWithRsc,
@@ -98,8 +98,8 @@ final class HbColocationInfo extends EditableInfo
         } else if (serviceInfoRsc.isConstraintPH()
                    || serviceInfoWithRsc.isConstraintPH()) {
             /* rsc set edge */
-            ConstraintPHInfo cphi;
-            CRMXML.RscSet rscSet;
+            final ConstraintPHInfo cphi;
+            final CRMXML.RscSet rscSet;
             if (serviceInfoRsc.isConstraintPH()) {
                 cphi = (ConstraintPHInfo) serviceInfoRsc;
                 rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
@@ -113,8 +113,6 @@ final class HbColocationInfo extends EditableInfo
             final CRMXML.ColocationData colocationData =
                             clStatus.getColocationData(colId);
             if (colocationData != null) {
-                final String rsc = colocationData.getRsc();
-                final String withRsc = colocationData.getWithRsc();
                 final String score = colocationData.getScore();
                 final String rscRole = colocationData.getRscRole();
                 final String withRscRole = colocationData.getWithRscRole();
@@ -128,7 +126,7 @@ final class HbColocationInfo extends EditableInfo
 
         final String[] params = getParametersFromXML();
         if (params != null) {
-            for (String param : params) {
+            for (final String param : params) {
                 Value value = resourceNode.get(param);
                 if (value == null || value.isNothingSelected()) {
                     value = getParamDefault(param);
@@ -216,8 +214,8 @@ final class HbColocationInfo extends EditableInfo
 
     /** Returns when at least one resource in rsc set can be promoted. */
     private boolean isRscSetMaster() {
-        ConstraintPHInfo cphi;
-        CRMXML.RscSet rscSet;
+        final ConstraintPHInfo cphi;
+        final CRMXML.RscSet rscSet;
         if (serviceInfoRsc.isConstraintPH()) {
             cphi = (ConstraintPHInfo) serviceInfoRsc;
             rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
@@ -225,10 +223,7 @@ final class HbColocationInfo extends EditableInfo
             cphi = (ConstraintPHInfo) serviceInfoWithRsc;
             rscSet = cphi.getRscSetConnectionDataCol().getRscSet2();
         }
-        if (rscSet == null) {
-            return false;
-        }
-        return getBrowser().isOneMaster(rscSet.getRscIds());
+        return rscSet != null && getBrowser().isOneMaster(rscSet.getRscIds());
     }
 
 
@@ -352,8 +347,8 @@ final class HbColocationInfo extends EditableInfo
             } else if (serviceInfoRsc.isConstraintPH()
                        || serviceInfoWithRsc.isConstraintPH()) {
                 /* edge */
-                ConstraintPHInfo cphi;
-                CRMXML.RscSet rscSet;
+                final ConstraintPHInfo cphi;
+                final CRMXML.RscSet rscSet;
                 if (serviceInfoRsc.isConstraintPH()) {
                     cphi = (ConstraintPHInfo) serviceInfoRsc;
                     rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();

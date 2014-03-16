@@ -38,7 +38,7 @@ public final class FSInfo extends Info {
     /** File system icon. */
     private static final ImageIcon FS_ICON = Tools.createImageIcon(
                                Tools.getDefault("HostBrowser.FileSystemIcon"));
-    /** Prepares a new <code>FSInfo</code> object. */
+    /** Prepares a new {@code FSInfo} object. */
     public FSInfo(final String name, final Browser browser) {
         super(name, browser);
     }
@@ -87,7 +87,6 @@ public final class FSInfo extends Info {
             }
         };
         final Thread thread = new Thread(runnable);
-        thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
 }

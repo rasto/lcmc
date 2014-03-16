@@ -37,8 +37,6 @@ import lcmc.data.Value;
  *
  */
 public class Resource {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Name of the resource. */
     private String name = null;
     /** Map from parameter name to the saved value. */
@@ -57,7 +55,7 @@ public class Resource {
     /** Whether the resource is newly allocated. */
     private boolean newResource = false;
     /**
-     * Prepares a new <code>Resource</code> object.
+     * Prepares a new {@code Resource} object.
      *
      * If called whith this constructor the name must be set later.
      */
@@ -67,7 +65,7 @@ public class Resource {
     }
 
     /**
-     * Prepares a new <code>Resource</code> object.
+     * Prepares a new {@code Resource} object.
      *
      * @param name
      *          name of this resource.

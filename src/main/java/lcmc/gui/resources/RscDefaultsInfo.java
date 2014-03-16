@@ -49,7 +49,7 @@ public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG =
                               LoggerFactory.getLogger(RscDefaultsInfo.class);
     /**
-     * Prepares a new <code>RscDefaultsInfo</code> object and creates
+     * Prepares a new {@code RscDefaultsInfo} object and creates
      * new rsc defaults object.
      */
     public RscDefaultsInfo(final String name,
@@ -76,9 +76,8 @@ public final class RscDefaultsInfo extends EditableInfo {
         }
         /* Attributes */
         final String[] params = getParametersFromXML();
-        final ClusterStatus cs = getBrowser().getClusterStatus();
         if (params != null) {
-            for (String param : params) {
+            for (final String param : params) {
                 Value value = new StringValue(resourceNode.get(param));
                 final Value defaultValue = getParamDefault(param);
                 if (value.isNothingSelected()) {
@@ -227,11 +226,6 @@ public final class RscDefaultsInfo extends EditableInfo {
     protected boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsRequired(param);
-    }
-
-    /** Returns true if the specified parameter is meta attribute. */
-    protected boolean isMetaAttr(final String param) {
-        return true;
     }
 
     /** Returns true if the specified parameter is integer. */

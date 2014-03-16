@@ -21,12 +21,11 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
+import lcmc.data.ResourceAgent;
+import lcmc.gui.Browser;
 
 import java.util.Map;
-import lcmc.data.StringValue;
 
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
@@ -44,15 +43,6 @@ final class DrbddiskInfo extends ServiceInfo {
     /** Creates new DrbddiskInfo object. */
     DrbddiskInfo(final String name,
                  final ResourceAgent ra,
-                 final String resourceName,
-                 final Browser browser) {
-        super(name, ra, browser);
-        getResource().setValue("1", new StringValue(resourceName));
-    }
-
-    /** Creates new DrbddiskInfo object. */
-    DrbddiskInfo(final String name,
-                 final ResourceAgent ra,
                  final String hbId,
                  final Map<String, String> resourceNode,
                  final Browser browser) {
@@ -62,17 +52,12 @@ final class DrbddiskInfo extends ServiceInfo {
     /** Returns string representation of the drbddisk service. */
     @Override
     public String toString() {
-        return getName() + " (" + getParamSaved("1") + ")";
+        return getName() + " (" + getParamSaved("1") + ')';
     }
 
     /** Returns resource name / parameter "1". */
     String getResourceName() {
         return getParamSaved("1").getValueForConfig();
-    }
-
-    /** Sets resource name / parameter "1". TODO: not used? */
-    void setResourceName(final String resourceName) {
-        getResource().setValue("1", new StringValue(resourceName));
     }
 
     /** Removes the drbddisk service. */

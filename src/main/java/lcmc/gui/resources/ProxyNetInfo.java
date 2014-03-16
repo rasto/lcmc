@@ -24,20 +24,17 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.Host;
-import lcmc.data.Value;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.
  */
 public final class ProxyNetInfo extends NetInfo {
-    /** Proxy is on the same host as the DRBD block device. */
-    static final Host SAME_HOST = null;
     /** Proxy host. */
     private final Host proxyHost;
     /** Prefix in the host address field indicating a proxy address. */
     public static final String PROXY_PREFIX = "proxy: ";
 
-    /** Prepares a new <code>NetProxyInfo</code> object. */
+    /** Prepares a new {@code NetProxyInfo} object. */
     public ProxyNetInfo(final NetInfo netInfo,
                         final Browser browser,
                         final Host proxyHost) {
@@ -45,7 +42,7 @@ public final class ProxyNetInfo extends NetInfo {
         this.proxyHost = proxyHost;
     }
 
-    /** Prepares a new <code>NetProxyInfo</code> object. */
+    /** Prepares a new {@code NetProxyInfo} object. */
     public ProxyNetInfo(final String name,
                         final NetInterface netInterface,
                         final Browser browser,
@@ -95,7 +92,7 @@ public final class ProxyNetInfo extends NetInfo {
     }
 
     @Override
-    public final String getValueForConfig() {
+    public String getValueForConfig() {
         return toString();
     }
 }

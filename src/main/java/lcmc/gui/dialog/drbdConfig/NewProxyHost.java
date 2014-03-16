@@ -35,8 +35,6 @@ import lcmc.utilities.MyButton;
  *
  */
 public final class NewProxyHost extends NewHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -45,7 +43,7 @@ public final class NewProxyHost extends NewHost {
     private WizardDialog nextDialogObject = null;
 
 
-    /** Prepares a new <code>NewProxyHost</code> object. */
+    /** Prepares a new {@code NewProxyHost} object. */
     public NewProxyHost(final WizardDialog previousDialog,
                         final Host host,
                         final DrbdVolumeInfo drbdVolumeInfo,

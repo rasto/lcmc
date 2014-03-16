@@ -38,16 +38,17 @@ import lcmc.data.Cluster;
 import lcmc.data.AccessMode;
 import lcmc.data.ConfigData;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -61,7 +62,7 @@ import lcmc.data.Value;
 /** Create LV dialog. */
 public final class LVCreate extends LV {
     /** Block device info object. */
-    private final Set<Host> selectedHosts = new LinkedHashSet<Host>();
+    private final Collection<Host> selectedHosts = new LinkedHashSet<Host>();
     /** Create button. */
     private final MyButton createButton = new MyButton("Create");
     /** Name of the logical volume. */
@@ -75,7 +76,7 @@ public final class LVCreate extends LV {
     /** Checkboxes with all hosts in the cluster. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     /** Selected block device. */
-    private final Set<BlockDevice> selectedBlockDevices =
+    private final Collection<BlockDevice> selectedBlockDevices =
                                              new LinkedHashSet<BlockDevice>();
 
     /** Description create LV. */
@@ -94,19 +95,13 @@ public final class LVCreate extends LV {
     }
 
     /** Create new LVCreate object. */
-    public LVCreate(final Set<BlockDevInfo> sbdis, final String volumeGroup) {
+    public LVCreate(final Iterable<BlockDevInfo> sbdis, final String volumeGroup) {
         super(null);
         this.volumeGroup = volumeGroup;
         for (final BlockDevInfo bdi : sbdis) {
             selectedHosts.add(bdi.getHost());
             selectedBlockDevices.add(bdi.getBlockDevice());
         }
-    }
-
-    /** Finishes the dialog and sets the information. */
-    @Override
-    protected void finishDialog() {
-        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
@@ -164,14 +159,14 @@ public final class LVCreate extends LV {
                 sizeWi.setBackground(new StringValue(), new StringValue(), true);
             }
             boolean lvNameCorrect = true;
-            if ("".equals(lvNameWi.getStringValue())) {
+            if (lvNameWi.getStringValue() != null && lvNameWi.getStringValue().isEmpty()) {
                 lvNameCorrect = false;
             } else if (hostCheckBoxes != null) {
-                for (final Host h : hostCheckBoxes.keySet()) {
-                    if (hostCheckBoxes.get(h).isSelected()) {
+                for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                    if (hostEntry.getValue().isSelected()) {
                         final Set<String> lvs =
-                            h.getLogicalVolumesFromVolumeGroup(
-                                                          volumeGroup);
+                                hostEntry.getKey().getLogicalVolumesFromVolumeGroup(
+                                        volumeGroup);
                         if (lvs != null
                             && lvs.contains(
                                     lvNameWi.getStringValue())) {
@@ -204,8 +199,7 @@ public final class LVCreate extends LV {
         inputPane.add(new JLabel(volumeGroup));
         inputPane.add(new JLabel());
         /* find next free logical volume name */
-        String defaultName;
-        final Set<String> logicalVolumes = new LinkedHashSet<String>();
+        final Collection<String> logicalVolumes = new LinkedHashSet<String>();
         for (final Host h : selectedHosts) {
             final Set<String> hvgs =
                                 h.getLogicalVolumesFromVolumeGroup(volumeGroup);
@@ -214,6 +208,7 @@ public final class LVCreate extends LV {
             }
         }
         int i = 0;
+        String defaultName;
         while (true) {
             defaultName = "lvol" + i;
             if (!logicalVolumes.contains(defaultName)) {
@@ -273,12 +268,12 @@ public final class LVCreate extends LV {
                         getProgressBar().start(CREATE_TIMEOUT
                                                * hostCheckBoxes.size());
                         boolean oneFailed = false;
-                        for (final Host h : hostCheckBoxes.keySet()) {
-                            if (hostCheckBoxes.get(h).isSelected()) {
+                        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                            if (hostEntry.getValue().isSelected()) {
                                 final boolean ret = lvCreate(
-                                                      h,
-                                                      lvNameWi.getStringValue(),
-                                                      sizeWi.getStringValue());
+                                        hostEntry.getKey(),
+                                        lvNameWi.getStringValue(),
+                                        sizeWi.getStringValue());
                                 if (!ret) {
                                     oneFailed = true;
                                 }
@@ -291,7 +286,6 @@ public final class LVCreate extends LV {
                         }
                         final String maxBlockSize = getMaxBlockSize(
                                                       getSelectedHostCbs());
-                        final long maxSize = Long.parseLong(maxBlockSize);
                         maxSizeWi.setValue(VMSXML.convertKilobytes(
                                                                maxBlockSize));
                         enableComponents();
@@ -334,32 +328,30 @@ public final class LVCreate extends LV {
                                                    1, 1); /* xPad, yPad */
 
         pane.add(inputPane);
-        final JPanel hostsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel hostsPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         final Cluster cluster = selectedHosts.iterator().next().getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
-        for (final Host h : hostCheckBoxes.keySet()) {
-            hostCheckBoxes.get(h).addItemListener(
-                        new ItemListener() {
-                            @Override
-                            public void itemStateChanged(final ItemEvent e) {
-                                checkButtons();
-                            }
-                        });
-            if (selectedHosts.contains(h)) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(true);
-            } else if (isOneBdDrbd(selectedBlockDevices)) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(false);
-            } else if (!h.getVolumeGroupNames().contains(volumeGroup)) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(false);
+        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+            hostEntry.getValue().addItemListener(
+                    new ItemListener() {
+                        @Override
+                        public void itemStateChanged(final ItemEvent e) {
+                            checkButtons();
+                        }
+                    });
+            if (selectedHosts.contains(hostEntry.getKey())) {
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(true);
+            } else if (isOneBdDrbd(selectedBlockDevices)
+                       || !hostEntry.getKey().getVolumeGroupNames().contains(volumeGroup)) {
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(false);
             } else {
-                hostCheckBoxes.get(h).setEnabled(true);
-                hostCheckBoxes.get(h).setSelected(false);
+                hostEntry.getValue().setEnabled(true);
+                hostEntry.getValue().setSelected(false);
             }
-            hostsPane.add(hostCheckBoxes.get(h));
+            hostsPane.add(hostEntry.getValue());
         }
         final JScrollPane sp = new JScrollPane(hostsPane);
         sp.setPreferredSize(new Dimension(0, 45));
@@ -387,7 +379,7 @@ public final class LVCreate extends LV {
                               + lvName
                               + " was successfully created in "
                               + volumeGroup
-                              + " on " + host.getName() + ".");
+                              + " on " + host.getName() + '.');
         } else {
             answerPaneAddTextError("Creating of logical volume "
                                    + lvName
@@ -397,7 +389,7 @@ public final class LVCreate extends LV {
     }
 
     /** Returns maximum block size available in the group. */
-    private String getMaxBlockSize(final Set<Host> hosts) {
+    private String getMaxBlockSize(final Iterable<Host> hosts) {
         long free = -1;
         if (hosts != null) {
             for (final Host h : hosts) {
@@ -411,7 +403,7 @@ public final class LVCreate extends LV {
         return Long.toString(free);
     }
 
-    protected boolean isOneBdDrbd(final Set<BlockDevice> bds) {
+    protected boolean isOneBdDrbd(final Iterable<BlockDevice> bds) {
         for (final BlockDevice bd : bds) {
             if (bd.isDrbd()) {
                 return true;
@@ -420,8 +412,8 @@ public final class LVCreate extends LV {
         return false;
     }
 
-    private Set<Host> getSelectedHostCbs() {
-        final Set<Host> hosts = new HashSet<Host>();
+    private Iterable<Host> getSelectedHostCbs() {
+        final Collection<Host> hosts = new HashSet<Host>();
         if (hostCheckBoxes == null) {
             return hosts;
         }

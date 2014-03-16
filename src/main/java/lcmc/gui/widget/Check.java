@@ -21,6 +21,7 @@
 package lcmc.gui.widget;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import lcmc.utilities.Tools;
 
@@ -29,13 +30,14 @@ import lcmc.utilities.Tools;
  */
 public final class Check {
     private String toolTipCache = null;
-    private final List<Check> subChecks = new ArrayList<Check>();
+    private final Collection<Check> subChecks = new ArrayList<Check>();
     private final List<String> incorrectFields;
     private final List<String> changedFields;
 
-    /** Prepares new <code>Check</code> object. */
+    /** Prepares new {@code Check} object. */
     public Check(final List<String> incorrectFields,
                  final List<String> changedFields) {
+        super();
         this.incorrectFields = incorrectFields;
         this.changedFields = changedFields;
     }
@@ -91,7 +93,7 @@ public final class Check {
         return toolTipCache;
     }
 
-    public StringBuilder getToolTipInside() {
+    public CharSequence getToolTipInside() {
         final StringBuilder tt = new StringBuilder()
                                  .append(Tools.join(" ", incorrectFields))
                                  .append("<br>changed: ")

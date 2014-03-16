@@ -24,7 +24,6 @@ package lcmc.utilities;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.AttributeSet;
-import java.util.regex.Pattern;
 // import java.util.regex.Matcher;
 import java.util.Map;
 
@@ -43,54 +42,49 @@ public final class PatternDocument extends DefaultStyledDocument {
     private static final long serialVersionUID = 1L;
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PatternDocument.class);
-    /** Pattern object that the document should match. */
-    private final Pattern pattern;
     /** Abbreviations, from one character to the string, e.g. when user presses
      * i, the word infinity will be written. */
     private final Map<String, String> abbreviations;
 
     /**
-     * Prepares a new <code>PatternDocument</code> object.
+     * Prepares a new {@code PatternDocument} object.
      *
      * @param regexp
      *          regexp that the document should match
      */
     public PatternDocument(final String regexp) {
         super();
-        pattern = Pattern.compile(regexp);
         abbreviations = null;
     }
 
-    /** Prepares a new <code>PatternDocument</code> object. */
+    /** Prepares a new {@code PatternDocument} object. */
     public PatternDocument(final String regexp,
                            final Map<String, String> abbreviations) {
         super();
-        pattern = Pattern.compile(regexp);
         this.abbreviations = abbreviations;
     }
 
 
     /** Inserts the string if the resulting string matches the pattern. */
     @Override
-    public void insertString(final int offs, String s, final AttributeSet a)
-    throws BadLocationException {
+    public void insertString(final int offs, String str, final AttributeSet a) {
         try {
             final String text = getText(0, getLength());
-            String texta;
-            if (abbreviations != null && abbreviations.containsKey(s)) {
-                s = abbreviations.get(s);
+            if (abbreviations != null && abbreviations.containsKey(str)) {
+                str = abbreviations.get(str);
             }
-            if (text.length() > 0) {
-                texta = ((offs >= 0) ? text.substring(0, offs) : "")
-                        + s
-                        + text.substring(offs);
+            final String texta;
+            if (text.isEmpty()) {
+                texta = str;
             } else {
-                texta = s;
+                texta = ((offs >= 0) ? text.substring(0, offs) : "")
+                        + str
+                        + text.substring(offs);
             }
             if (matches(texta)) {
-                super.insertString(offs, s, a);
+                super.insertString(offs, str, a);
             }
-        } catch (BadLocationException e) {
+        } catch (final BadLocationException e) {
             LOG.appError("insertString: bad location exception", e);
         }
     }

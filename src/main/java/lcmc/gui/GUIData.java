@@ -31,22 +31,24 @@ import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.AllHostsUpdatable;
 
-import javax.swing.JFrame;
 import javax.swing.JApplet;
-import javax.swing.JRootPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JComponent;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JSplitPane;
+import javax.swing.RootPaneContainer;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.awt.Component;
 import java.awt.Container;
-import java.util.Map;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
-
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -90,7 +92,7 @@ public final class GUIData  {
     private final Lock mAddClusterButtonListWriteLock =
                                         mAddClusterButtonListLock.writeLock();
     /** 'Add Cluster' buttons. */
-    private final List<JComponent> addClusterButtonList =
+    private final Collection<JComponent> addClusterButtonList =
                                                    new ArrayList<JComponent>();
     /** 'Add Host" buttons list lock. */
     private final ReadWriteLock mAddHostButtonListLock =
@@ -102,7 +104,7 @@ public final class GUIData  {
     private final Lock mAddHostButtonListWriteLock =
                                         mAddHostButtonListLock.writeLock();
     /** 'Add Host' buttons. */
-    private final List<JComponent> addHostButtonList =
+    private final Collection<JComponent> addHostButtonList =
                                                    new ArrayList<JComponent>();
     /** Components that can be made visible in the god mode. */
     private final Map<JComponent, AccessMode> visibleInAccessType =
@@ -115,7 +117,7 @@ public final class GUIData  {
      * List of components that have allHostsUpdate method that must be called
      * when a host is added.
      */
-    private final List<AllHostsUpdatable> allHostsUpdateList =
+    private final Collection<AllHostsUpdatable> allHostsUpdateList =
                                             new ArrayList<AllHostsUpdatable>();
     /** Selected components for copy/paste. */
     private List<Info> selectedComponents = null;
@@ -137,19 +139,15 @@ public final class GUIData  {
 
     /** Returns content pane of the main frame. */
     public Container getMainFrameContentPane() {
-        if (mainFrame instanceof JApplet) {
-            return ((JApplet) mainFrame).getContentPane();
-        } else {
-            return ((JFrame) mainFrame).getContentPane();
-        }
+        return ((RootPaneContainer) mainFrame).getContentPane();
     }
 
     /** Gets root pane of the main frame of this application. */
     public JRootPane getMainFrameRootPane() {
         if (mainFrame instanceof JFrame) {
-            return ((JFrame) mainFrame).getRootPane();
+            return ((RootPaneContainer) mainFrame).getRootPane();
         } else if (mainFrame instanceof JApplet) {
-            return ((JApplet) mainFrame).getRootPane();
+            return ((RootPaneContainer) mainFrame).getRootPane();
         }
         return null;
     }
@@ -267,16 +265,6 @@ public final class GUIData  {
         this.clustersPanel = clustersPanel;
     }
 
-    /** Repaints hosts and clusters panels. */
-    void repaintWithNewData() {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                clustersPanel.repaintTabs();
-            }
-        });
-    }
-
     /** Adds tab with new cluster to the clusters panel. */
     public void addClusterTab(final Cluster cluster) {
         clustersPanel.addTab(cluster);
@@ -347,16 +335,6 @@ public final class GUIData  {
         }
     }
 
-    /** Removes the 'Add Cluster' button from the list. */
-    void unregisterAddClusterButton(final JComponent addClusterButton) {
-        mAddClusterButtonListWriteLock.lock();
-        try {
-            addClusterButtonList.remove(addClusterButton);
-        } finally {
-            mAddClusterButtonListWriteLock.unlock();
-        }
-    }
-
     /**
      * Checks 'Add Cluster' buttons and menu items and enables them, if there
      * are enough hosts to make cluster.
@@ -382,7 +360,7 @@ public final class GUIData  {
             public void run() {
                 mAddClusterButtonListReadLock.lock();
                 try {
-                    for (JComponent addClusterButton : addClusterButtonList) {
+                    for (final JComponent addClusterButton : addClusterButtonList) {
                         addClusterButton.setEnabled(enable);
                     }
                 } finally {
@@ -399,7 +377,7 @@ public final class GUIData  {
             public void run() {
                 mAddHostButtonListReadLock.lock();
                 try {
-                    for (JComponent addHostButton : addHostButtonList) {
+                    for (final JComponent addHostButton : addHostButtonList) {
                         addHostButton.setEnabled(enable);
                     }
                 } finally {
@@ -443,13 +421,15 @@ public final class GUIData  {
 
     /** Updates access of the item according of their access type. */
     void updateGlobalItems() {
-        for (final JComponent c : visibleInAccessType.keySet()) {
-            c.setVisible(Tools.getConfigData().isAccessible(
-                                                visibleInAccessType.get(c)));
+        for (final Map.Entry<JComponent, AccessMode> accessEntry
+                                                      : visibleInAccessType.entrySet()) {
+            accessEntry.getKey().setVisible(Tools.getConfigData().isAccessible(
+                    accessEntry.getValue()));
         }
-        for (final JComponent c : enabledInAccessType.keySet()) {
-            c.setEnabled(Tools.getConfigData().isAccessible(
-                                                enabledInAccessType.get(c)));
+        for (final Map.Entry<JComponent, AccessMode> enabledEntry
+                                                      : enabledInAccessType.entrySet()) {
+            enabledEntry.getKey().setEnabled(Tools.getConfigData().isAccessible(
+                    enabledEntry.getValue()));
         }
     }
 

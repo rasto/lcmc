@@ -34,14 +34,15 @@ import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
@@ -66,28 +67,32 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                            new HashMap<String, List<String>>();
     static {
         PARAMETERS_MAP.put("dev", Arrays.asList(
-                                new String[]{ParallelSerialData.TYPE,
-                                             ParallelSerialData.SOURCE_PATH,
-                                             ParallelSerialData.TARGET_PORT}));
-        PARAMETERS_MAP.put("file", Arrays.asList(
-                               new String[]{ParallelSerialData.TYPE,
-                                            ParallelSerialData.SOURCE_PATH,
-                                            ParallelSerialData.TARGET_PORT}));
+                                              ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+
+        PARAMETERS_MAP.put("file", Arrays.asList(ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+
         PARAMETERS_MAP.put("null", Arrays.asList(
-                                new String[]{ParallelSerialData.TYPE,
-                                             ParallelSerialData.TARGET_PORT}));
+                                              ParallelSerialData.TYPE,
+                                              ParallelSerialData.TARGET_PORT));
+
         PARAMETERS_MAP.put("pipe", Arrays.asList(
-                               new String[]{ParallelSerialData.TYPE,
-                                            ParallelSerialData.SOURCE_PATH,
-                                            ParallelSerialData.TARGET_PORT}));
+                                              ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+
         PARAMETERS_MAP.put("pty", Arrays.asList(
-                               new String[]{ParallelSerialData.TYPE,
-                                            ParallelSerialData.TARGET_PORT}));
+                                              ParallelSerialData.TYPE,
+                                              ParallelSerialData.TARGET_PORT));
+
         PARAMETERS_MAP.put("stdio", Arrays.asList(
-                              new String[]{ParallelSerialData.TYPE,
-                                           ParallelSerialData.TARGET_PORT}));
+                                              ParallelSerialData.TYPE,
+                                              ParallelSerialData.TARGET_PORT));
+
         PARAMETERS_MAP.put("tcp", Arrays.asList(
-                                new String[]{
                                    ParallelSerialData.TYPE,
                                    ParallelSerialData.SOURCE_MODE, /* one or
                                                                      another */
@@ -96,24 +101,24 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                                    ParallelSerialData.CONNECT_SOURCE_HOST,
                                    ParallelSerialData.CONNECT_SOURCE_SERVICE,
                                    ParallelSerialData.PROTOCOL_TYPE,
-                                   ParallelSerialData.TARGET_PORT}));
+                                   ParallelSerialData.TARGET_PORT));
+
         PARAMETERS_MAP.put("udp", Arrays.asList(
-                                new String[]{
-                                   ParallelSerialData.TYPE,
-                                   ParallelSerialData.BIND_SOURCE_HOST,
-                                   ParallelSerialData.BIND_SOURCE_SERVICE,
-                                   ParallelSerialData.CONNECT_SOURCE_HOST,
-                                   ParallelSerialData.CONNECT_SOURCE_SERVICE,
-                                   ParallelSerialData.TARGET_PORT}));
+                                     ParallelSerialData.TYPE,
+                                     ParallelSerialData.BIND_SOURCE_HOST,
+                                     ParallelSerialData.BIND_SOURCE_SERVICE,
+                                     ParallelSerialData.CONNECT_SOURCE_HOST,
+                                     ParallelSerialData.CONNECT_SOURCE_SERVICE,
+                                     ParallelSerialData.TARGET_PORT));
 
         PARAMETERS_MAP.put("unix", Arrays.asList(
-                               new String[]{ParallelSerialData.TYPE,
-                                            ParallelSerialData.SOURCE_MODE,
-                                            ParallelSerialData.SOURCE_PATH,
-                                            ParallelSerialData.TARGET_PORT}));
-        PARAMETERS_MAP.put("vc", Arrays.asList(
-                             new String[]{ParallelSerialData.TYPE,
-                                          ParallelSerialData.TARGET_PORT}));
+                                              ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_MODE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+
+        PARAMETERS_MAP.put("vc", Arrays.asList(ParallelSerialData.TYPE,
+                                               ParallelSerialData.TARGET_PORT));
     }
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
@@ -138,7 +143,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(
                       Arrays.asList(new String[]{ParallelSerialData.TYPE}));
 
@@ -368,12 +373,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
         if (params == null) {
             return parameters;
         }
-        Value type = null;
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            if (ParallelSerialData.TYPE.equals(param)) {
-                type = value;
-            }
             if (allParams || !Tools.areEqual(getParamSaved(param), value)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
@@ -423,9 +424,9 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    for (final String param : PARAMETERS) {
-                        getWidget(param, null).setVisible(
-                             PARAMETERS_MAP.get(newValue.getValueForConfig()).contains(param));
+                    for (final String thisParam : PARAMETERS) {
+                        getWidget(thisParam, null).setVisible(
+                             PARAMETERS_MAP.get(newValue.getValueForConfig()).contains(thisParam));
                     }
                 }
             });
@@ -477,8 +478,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
                         @Override
                         public void run() {
                             final String oldDir = paramWi.getStringValue();
-                            String directory;
-                            if (oldDir == null || "".equals(oldDir)) {
+                            final String directory;
+                            if (oldDir == null || oldDir.isEmpty()) {
                                 final String type = getComboBoxValue(
                                                       ParallelSerialData.TYPE).getValueForConfig();
                                 if ("dev".equals(type)) {
@@ -512,12 +513,6 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     /** Returns "add new" button. */
     protected abstract MyButton getNewBtn0(final VMSVirtualDomainInfo vdi);
 
-    /** Modify device xml. */
-    @Override
-    protected abstract void modifyXML(final VMSXML vmsxml,
-                                      final Node node,
-                                      final String domainName,
-                                      final Map<String, String> params);
     /** Return table name that appears on the screen. */
     protected abstract String getTableScreenName();
     /** Return table name. */
@@ -532,7 +527,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     @Override
     String[] getRealParametersFromXML() {
        final Value type = getComboBoxValue(ParallelSerialData.TYPE);
-       String typeS;
+       final String typeS;
        if (type == null) {
            typeS = null;
        } else {

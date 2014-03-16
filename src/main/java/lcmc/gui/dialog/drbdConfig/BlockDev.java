@@ -55,12 +55,10 @@ import lcmc.utilities.LoggerFactory;
 final class BlockDev extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** This block device. */
     private final BlockDevInfo blockDevInfo;
 
-    /** Prepares a new <code>BlockDev</code> object. */
+    /** Prepares a new {@code BlockDev} object. */
     BlockDev(final WizardDialog previousDialog,
              final DrbdVolumeInfo dli,
              final BlockDevInfo blockDevInfo) {
@@ -79,12 +77,11 @@ final class BlockDev extends DrbdConfig {
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */
     private String getGI(final BlockDevInfo bdi) {
         final boolean testOnly = false;
-        final String gi = DRBD.getGI(
+        return DRBD.getGI(
                        bdi.getHost(),
                        bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                        bdi.getDrbdVolumeInfo().getName(),
                        testOnly);
-        return gi;
     }
 
     /**
@@ -125,9 +122,9 @@ final class BlockDev extends DrbdConfig {
                 browser.reloadAllComboBoxes(null);
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 Tools.getGUIData().getMainFrame().requestFocus();
-            } catch (Exceptions.DrbdConfigException dce) {
+            } catch (final Exceptions.DrbdConfigException dce) {
                 LOG.appError("nextDialog: config failed", dce);
-            } catch (UnknownHostException e) {
+            } catch (final UnknownHostException e) {
                 LOG.appError("nextDialog: config failed", e);
             }
             return new CreateMD(this, getDrbdVolumeInfo());
@@ -177,7 +174,7 @@ final class BlockDev extends DrbdConfig {
     protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final String[] params = blockDevInfo.getParametersFromXML();

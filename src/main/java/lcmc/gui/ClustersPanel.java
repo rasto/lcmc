@@ -23,11 +23,11 @@
 
 package lcmc.gui;
 
-import lcmc.data.Clusters;
 import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
+import javax.swing.BorderFactory;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -35,6 +35,7 @@ import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.UIManager;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 
 import java.awt.GridLayout;
@@ -89,7 +90,7 @@ public final class ClustersPanel extends JPanel {
     /** Width of the tab border. */
     private static final int TAB_BORDER_WIDTH = 3;
 
-    /** Prepares a new <code>ClustersPanel</code> object. */
+    /** Prepares a new {@code ClustersPanel} object. */
     ClustersPanel() {
         super(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
@@ -116,7 +117,7 @@ public final class ClustersPanel extends JPanel {
 
         addClustersTab(CLUSTERS_LABEL);
         add(tabbedPane);
-        this.setBorder(javax.swing.BorderFactory.createLineBorder(
+        setBorder(BorderFactory.createLineBorder(
                         Tools.getDefaultColor("ClustersPanel.Background"),
                         TAB_BORDER_WIDTH));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -126,9 +127,9 @@ public final class ClustersPanel extends JPanel {
            the cluster tab. TODO: is this comment right? */
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
-            public void stateChanged(final ChangeEvent evt) {
+            public void stateChanged(final ChangeEvent e) {
                 final ClusterTab source = prevSelected;
-                final JTabbedPane prevSource = (JTabbedPane) evt.getSource();
+                final JTabbedPane prevSource = (JTabbedPane) e.getSource();
                 prevSelected = (ClusterTab) prevSource.getSelectedComponent();
                 String sourceName = null;
                 if (source != null) {
@@ -142,8 +143,6 @@ public final class ClustersPanel extends JPanel {
                 final ClusterTab clusterTab = getClusterTab();
                 if (clusterTab != null) {
                     final Cluster cluster = clusterTab.getCluster();
-                    final int danglingHostsCount =
-                                    Tools.getConfigData().danglingHostsCount();
                     if (cluster != null) {
                         refresh();
                     }
@@ -212,15 +211,15 @@ public final class ClustersPanel extends JPanel {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 0;
+        gbc.weightx = 0.0;
         tabPanel.add(iconLabel, gbc);
 
         gbc.gridx++;
-        gbc.weightx = 1;
+        gbc.weightx = 1.0;
         tabPanel.add(lblTitle, gbc);
 
         gbc.gridx++;
-        gbc.weightx = 0;
+        gbc.weightx = 0.0;
         tabPanel.add(clusterButton, gbc);
 
         tabPane.setTabComponentAt(index, tabPanel);
@@ -270,22 +269,11 @@ public final class ClustersPanel extends JPanel {
 
     /** Renames selected added tab. */
     void renameSelectedTab(final String newName) {
-        final JLabel l = clusterTabLabels.get(getClusterTab());
-        if (l != null) {
-            l.setText(newName);
+        final JLabel label = clusterTabLabels.get(getClusterTab());
+        if (label != null) {
+            label.setText(newName);
         }
         refresh();
-    }
-
-    /** Adds all cluster tabs, e.g. after loading of configuration. */
-    private void addAllTabs() {
-        final Clusters clusters = Tools.getConfigData().getClusters();
-        addClustersTab(CLUSTERS_LABEL);
-        if (clusters != null) {
-            for (final Cluster cluster : clusters.getClusterSet()) {
-                addTab(cluster);
-            }
-        }
     }
 
     /** Refreshes the view. */
@@ -293,13 +281,6 @@ public final class ClustersPanel extends JPanel {
         tabbedPane.invalidate();
         tabbedPane.validate();
         tabbedPane.repaint();
-    }
-
-    /** Removes all tabs and adds them back, also a way to repaint them. */
-    void repaintTabs() {
-        clusterTabLabels.clear();
-        tabbedPane.removeAll();
-        addAllTabs();
     }
 
     /** Return cluster tab, that is in the JScrollPane. */
@@ -313,8 +294,7 @@ public final class ClustersPanel extends JPanel {
     }
 
     /** This class is used to override the tab look. */
-    static class MyTabbedPaneUI
-                        extends javax.swing.plaf.basic.BasicTabbedPaneUI {
+    static class MyTabbedPaneUI extends BasicTabbedPaneUI {
         /** Sets insets. */
         @Override
         protected final Insets getContentBorderInsets(final int tabPlacement) {

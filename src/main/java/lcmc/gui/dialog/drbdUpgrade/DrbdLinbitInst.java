@@ -33,10 +33,8 @@ import lcmc.gui.dialog.WizardDialog;
  *
  */
 final class DrbdLinbitInst extends lcmc.gui.dialog.host.DrbdLinbitInst {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>DrbdLinbitInst</code> object. */
+    /** Prepares a new {@code DrbdLinbitInst} object. */
     DrbdLinbitInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }

@@ -71,7 +71,7 @@ public final class ProxyHostInfo extends Info {
     /** Not connectable. */
     private static final String NOT_CONNECTABLE_STRING =
                                Tools.getString("ProxyHostInfo.NotConnectable");
-    /** Prepares a new <code>ProxyHostInfo</code> object. */
+    /** Prepares a new {@code ProxyHostInfo} object. */
     public ProxyHostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
         this.host = host;
@@ -114,14 +114,14 @@ public final class ProxyHostInfo extends Info {
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override
-                public void done(final String ans) {
-                    ta.setText(ans);
+                public void done(final String answer) {
+                    ta.setText(answer);
                 }
 
                 @Override
-                public void doneError(final String ans, final int exitCode) {
+                public void doneError(final String answer, final int errorCode) {
                     ta.setText("error");
-                    LOG.sshError(host, "", ans, stacktrace, exitCode);
+                    LOG.sshError(host, "", answer, stacktrace, errorCode);
                 }
 
             };
@@ -141,7 +141,7 @@ public final class ProxyHostInfo extends Info {
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
@@ -154,7 +154,7 @@ public final class ProxyHostInfo extends Info {
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         final JPanel p = new JPanel(new SpringLayout());
         p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
@@ -216,7 +216,7 @@ public final class ProxyHostInfo extends Info {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* connect */
-        final MyMenuItem connectItem =
+        final UpdatableItem connectItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Connect"),
                            null,
                            Tools.getString("HostDrbdInfo.Connect"),
@@ -266,11 +266,6 @@ public final class ProxyHostInfo extends Info {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public String enablePredicate() {
-                    return null;
-                }
-
-                @Override
                 public void action() {
                     final ProxyHostWizard dialog = new ProxyHostWizard(host,
                                                                        null);
@@ -282,7 +277,7 @@ public final class ProxyHostInfo extends Info {
         final boolean testOnly = false;
 
         /* proxy start/stop */
-        final MyMenuItem proxyItem =
+        final UpdatableItem proxyItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
                            null,
                            getMenuToolTip("DRBD.stopProxy", ""),
@@ -321,7 +316,7 @@ public final class ProxyHostInfo extends Info {
         items.add(proxyItem);
 
         /* all proxy connections up */
-        final MyMenuItem allProxyUpItem =
+        final UpdatableItem allProxyUpItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                            null,
                            getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
@@ -333,18 +328,7 @@ public final class ProxyHostInfo extends Info {
 
                 @Override
                 public boolean visiblePredicate() {
-                    if (!host.isConnected()) {
-                        return false;
-                    }
-                    if (!host.isDrbdProxyRunning()) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    return null;
+                    return host.isConnected() && host.isDrbdProxyRunning();
                 }
 
                 @Override
@@ -356,7 +340,7 @@ public final class ProxyHostInfo extends Info {
         items.add(allProxyUpItem);
 
         /* all proxy connections down */
-        final MyMenuItem allProxyDownItem =
+        final UpdatableItem allProxyDownItem =
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                            null,
                            getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
@@ -368,18 +352,7 @@ public final class ProxyHostInfo extends Info {
 
                 @Override
                 public boolean visiblePredicate() {
-                    if (!host.isConnected()) {
-                        return false;
-                    }
-                    if (!host.isDrbdProxyRunning()) {
-                        return false;
-                    }
-                    return true;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    return null;
+                    return host.isConnected() && host.isDrbdProxyRunning();
                 }
 
                 @Override
@@ -391,7 +364,7 @@ public final class ProxyHostInfo extends Info {
         items.add(allProxyDownItem);
 
         /* view logs */
-        final MyMenuItem viewLogsItem =
+        final UpdatableItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            Tools.getString("HostBrowser.Drbd.ViewLogs"),
@@ -409,14 +382,14 @@ public final class ProxyHostInfo extends Info {
 
                 @Override
                 public void action() {
-                    DrbdsLog l = new DrbdsLog(host);
+                    final DrbdsLog l = new DrbdsLog(host);
                     l.showDialog();
                 }
             };
         items.add(viewLogsItem);
 
         /* remove host from gui */
-        final MyMenuItem removeHostItem =
+        final UpdatableItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
                            Tools.getString("HostBrowser.RemoveHost"),

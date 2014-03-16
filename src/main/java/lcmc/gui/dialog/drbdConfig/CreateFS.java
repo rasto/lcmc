@@ -61,8 +61,6 @@ import lcmc.utilities.LoggerFactory;
 final class CreateFS extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Pull down menu with hosts (or no host). */
     private Widget hostW;
     /** Pull down menu with file systems. */
@@ -87,7 +85,7 @@ final class CreateFS extends DrbdConfig {
     /** Skip sync true. */
     private static final Value SKIP_SYNC_TRUE = new StringValue("true");
 
-    /** Prepares a new <code>CreateFS</code> object. */
+    /** Prepares a new {@code CreateFS} object. */
     CreateFS(final WizardDialog previousDialog,
              final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, drbdVolumeInfo);
@@ -123,21 +121,6 @@ final class CreateFS extends DrbdConfig {
         }
     }
 
-    /** Returns the secondary block device. */
-    protected BlockDevInfo getSecondaryBD() {
-        final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
-        final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
-        final String h = hostW.getStringValue();
-        if (h.equals(bdi1.getHost().getName())) {
-            return bdi2;
-        } else if (h.equals(bdi2.getHost().getName())) {
-            return bdi1;
-        } else {
-            LOG.appError("getSecondaryBD: unknown host: " + h);
-            return null;
-        }
-    }
-
     /** Creates the file system. */
     protected void createFilesystem() {
         final Runnable runnable = new Runnable() {
@@ -153,8 +136,7 @@ final class CreateFS extends DrbdConfig {
                         makeFsButton.setEnabled(false);
                     }
                 });
-                BlockDevInfo bdiPri = getPrimaryBD();
-                BlockDevInfo bdiSec = getSecondaryBD();
+                final BlockDevInfo bdiPri = getPrimaryBD();
                 final boolean testOnly = false;
                 if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
                     bdiPri.skipInitialFullSync(testOnly);
@@ -414,7 +396,7 @@ final class CreateFS extends DrbdConfig {
                                 bdi1.getHost().getDrbdVersion(), "8.3.2") >= 0
                    && Tools.compareVersions(
                                 bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("skipSyncAvailable: " + e.getMessage(), e);
             return false;
         }

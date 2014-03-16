@@ -63,7 +63,7 @@ final class HbOrderInfo extends EditableInfo
     public static final String NOT_AVAIL_FOR_PCMK_VERSION =
                     Tools.getString("HbOrderInfo.NotAvailableForThisVersion");
 
-    /** Prepares a new <code>HbOrderInfo</code> object. */
+    /** Prepares a new {@code HbOrderInfo} object. */
     HbOrderInfo(final HbConnectionInfo connectionInfo,
                 final ServiceInfo serviceInfoParent,
                 final ServiceInfo serviceInfoChild,
@@ -106,8 +106,8 @@ final class HbOrderInfo extends EditableInfo
         } else if (serviceInfoParent.isConstraintPH()
                    || serviceInfoChild.isConstraintPH()) {
             /* rsc set edge */
-            ConstraintPHInfo cphi;
-            CRMXML.RscSet rscSet;
+            final ConstraintPHInfo cphi;
+            final CRMXML.RscSet rscSet;
             if (serviceInfoParent.isConstraintPH()) {
                 cphi = (ConstraintPHInfo) serviceInfoParent;
                 rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -135,7 +135,7 @@ final class HbOrderInfo extends EditableInfo
 
         final String[] params = getParametersFromXML();
         if (params != null) {
-            for (String param : params) {
+            for (final String param : params) {
                 Value value = resourceNode.get(param);
                 if (value == null || value.isNothingSelected()) {
                     value = getParamDefault(param);
@@ -222,8 +222,8 @@ final class HbOrderInfo extends EditableInfo
 
     /** Returns when at least one resource in rsc set can be promoted. */
     private boolean isRscSetMaster() {
-        ConstraintPHInfo cphi;
-        CRMXML.RscSet rscSet;
+        final ConstraintPHInfo cphi;
+        final CRMXML.RscSet rscSet;
         if (serviceInfoParent.isConstraintPH()) {
             cphi = (ConstraintPHInfo) serviceInfoParent;
             rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -337,7 +337,6 @@ final class HbOrderInfo extends EditableInfo
             final String ordId = getService().getHeartbeatId();
             if (serviceInfoParent == null || serviceInfoChild == null) {
                 /* rsc set order */
-                final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 final PcmkRscSetsInfo prsi = (PcmkRscSetsInfo) connectionInfo;
                 CRM.setRscSet(dcHost,
                               null,
@@ -354,8 +353,8 @@ final class HbOrderInfo extends EditableInfo
                               testOnly);
             } else if (serviceInfoParent.isConstraintPH()
                        || serviceInfoChild.isConstraintPH()) {
-                ConstraintPHInfo cphi;
-                CRMXML.RscSet rscSet;
+                final ConstraintPHInfo cphi;
+                final CRMXML.RscSet rscSet;
                 if (serviceInfoParent.isConstraintPH()) {
                     cphi = (ConstraintPHInfo) serviceInfoParent;
                     rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -450,7 +449,7 @@ final class HbOrderInfo extends EditableInfo
                 if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {
                     return NOT_AVAIL_FOR_PCMK_VERSION;
                 }
-            } catch (Exceptions.IllegalVersionException e) {
+            } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("isEnabled: unkonwn version: " + pmV);
                 /* enable it, if version check doesn't work */
             }

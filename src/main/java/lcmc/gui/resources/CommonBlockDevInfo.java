@@ -37,7 +37,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     /** block devices of this common block device on all nodes. */
     private final BlockDevice[] blockDevices;
 
-    /** Prepares a new <code>CommonBlockDevInfo</code> object. */
+    /** Prepares a new {@code CommonBlockDevInfo} object. */
     public CommonBlockDevInfo(final String name,
                               final BlockDevice[] blockDevices,
                               final Browser browser) {
@@ -61,7 +61,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     /** Returns info for this block device. */
     @Override
     String getInfo() {
-        return "Device    : " + getCommonBlockDevice().getName() + "\n";
+        return "Device    : " + getCommonBlockDevice().getName() + '\n';
     }
 
     /**
@@ -71,7 +71,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     @Override
     public String toString() {
         String name = getName();
-        if (name == null || "".equals(name)) {
+        if (name == null || name.isEmpty()) {
             name = Tools.getString("ClusterBrowser.CommonBlockDevUnconfigured");
         }
         return name;
@@ -80,7 +80,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     /** Sets this block device on all nodes ass used by crm. */
     @Override
     public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
-        for (BlockDevice bd : blockDevices) {
+        for (final BlockDevice bd : blockDevices) {
             bd.setUsedByCRM(isUsedByCRM != null);
         }
     }
@@ -113,7 +113,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     @Override
     public int getUsed() {
         int used = -1;
-        for (BlockDevice bd : blockDevices) {
+        for (final BlockDevice bd : blockDevices) {
             if (bd.getUsed() > used) {
                 used = bd.getUsed();
             }

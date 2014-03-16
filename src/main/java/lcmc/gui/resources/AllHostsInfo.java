@@ -47,11 +47,12 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.Map;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -92,7 +93,7 @@ public final class AllHostsInfo extends Info {
     /** Main panel. */
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     /** Constraints. */
-    private final GridBagConstraints c = new GridBagConstraints();
+    private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
     /** Cluster icon. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                    Tools.getDefault("ClusterTab.ClusterIcon"));
@@ -134,9 +135,9 @@ public final class AllHostsInfo extends Info {
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                final List<Cluster> selectedRunningClusters =
+                final Collection<Cluster> selectedRunningClusters =
                                               new ArrayList<Cluster>();
-                final List<Cluster> selectedClusters = new ArrayList<Cluster>();
+                final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
                 final List<String> clusterNames = new ArrayList<String>();
                 final Set<Cluster> clusters =
                            Tools.getConfigData().getClusters().getClusterSet();
@@ -215,12 +216,12 @@ public final class AllHostsInfo extends Info {
             return infoPanel;
         }
         infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
 
         infoPanel.setBackground(Browser.PANEL_BACKGROUND);
-        c.gridx = 0;
-        c.gridy = 0;
-        c.insets = new Insets(3, 3, 0, 0);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(3, 3, 0, 0);
 
         mainPanel.setBackground(Browser.PANEL_BACKGROUND);
         mainPanel.setBackground(Color.WHITE);
@@ -232,7 +233,7 @@ public final class AllHostsInfo extends Info {
                            new JPanel(new BorderLayout());
             bPanel.setMaximumSize(new Dimension(10000, 60));
             final JPanel markedPanel = new JPanel(
-                                        new FlowLayout(FlowLayout.LEFT));
+                                        new FlowLayout(FlowLayout.LEADING));
             markedPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
             /* start marked clusters */
             loadMarkedClustersBtn.setEnabled(false);
@@ -247,7 +248,7 @@ public final class AllHostsInfo extends Info {
 
             bPanel.add(markedPanel, BorderLayout.CENTER);
             /* actions menu */
-            bPanel.add(getActionsButton(), BorderLayout.EAST);
+            bPanel.add(getActionsButton(), BorderLayout.LINE_END);
             infoPanel.add(bPanel);
             for (final Cluster cluster : clusters) {
                 addClusterBox(cluster);
@@ -301,7 +302,7 @@ public final class AllHostsInfo extends Info {
             }
         }
 
-        final JPanel mPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel mPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
         mPanel.add(mainPanel);
         mPanel.setBackground(Color.WHITE);
         final JScrollPane clustersPane =
@@ -320,11 +321,11 @@ public final class AllHostsInfo extends Info {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            for (final Cluster cl : allLoadButtons.keySet()) {
-                                if (cl.getClusterTab() == null
+                            for (final Map.Entry<Cluster, MyButton> clusterEntry : allLoadButtons.entrySet()) {
+                                if (clusterEntry.getKey().getClusterTab() == null
                                     && Tools.getConfigData().getAutoClusters()
-                                                    .contains(cl.getName())) {
-                                    allLoadButtons.get(cl).pressButton();
+                                                    .contains(clusterEntry.getKey().getName())) {
+                                    clusterEntry.getValue().pressButton();
                                 }
                             }
                         }
@@ -340,7 +341,7 @@ public final class AllHostsInfo extends Info {
     public void addClusterBox(final Cluster cluster) {
         final JPanel label = new JPanel();
         label.setBackground(Browser.PANEL_BACKGROUND);
-        label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
+        label.setLayout(new BoxLayout(label, BoxLayout.PAGE_AXIS));
         label.add(new JLabel(cluster.getName()));
         for (final Host h : cluster.getHosts()) {
             final StringBuilder hostLabel = new StringBuilder();
@@ -379,12 +380,12 @@ public final class AllHostsInfo extends Info {
         startPanel.add(left, BorderLayout.LINE_START);
         final MyButton loadClusterBtn = loadClusterButton(cluster, markWi);
         startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        mainPanel.add(startPanel, c);
-        c.gridx++;
-        if (c.gridx > 2) {
-            c.gridx = 0;
-            c.gridy++;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        mainPanel.add(startPanel, gridBagConstraints);
+        gridBagConstraints.gridx++;
+        if (gridBagConstraints.gridx > 2) {
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
         }
     }
 
@@ -408,7 +409,7 @@ public final class AllHostsInfo extends Info {
                                 loadClusterBtn.setEnabled(false);
                             }
                         });
-                        List<Cluster> selectedClusters =
+                        final Collection<Cluster> selectedClusters =
                                                  new ArrayList<Cluster>();
                         selectedClusters.add(cluster);
                         Tools.startClusters(selectedClusters);
@@ -438,10 +439,10 @@ public final class AllHostsInfo extends Info {
     public void addQuickClusterBox() {
         final JPanel label = new JPanel();
         label.setBackground(Browser.PANEL_BACKGROUND);
-        label.setLayout(new BoxLayout(label, BoxLayout.Y_AXIS));
+        label.setLayout(new BoxLayout(label, BoxLayout.PAGE_AXIS));
         final JTextField clusterTF = new MTextField(CLUSTER_NAME_PH);
         label.add(clusterTF);
-        final List<JTextField> hostsTF = new ArrayList<JTextField>();
+        final Collection<JTextField> hostsTF = new ArrayList<JTextField>();
         for (int i = 1; i < 3; i++) {
             final JTextField nl = new MTextField("node" + i + "...", 15);
             nl.setToolTipText("<html><b>enter the node name or ip</b><br>node"
@@ -468,22 +469,22 @@ public final class AllHostsInfo extends Info {
         startPanel.add(left, BorderLayout.LINE_START);
         final MyButton loadClusterBtn = quickClusterButton(clusterTF, hostsTF);
         startPanel.add(loadClusterBtn, BorderLayout.LINE_END);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        if (c.gridx != 0) {
-            c.gridx = 0;
-            c.gridy++;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        if (gridBagConstraints.gridx != 0) {
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
         }
-        mainPanel.add(startPanel, c);
-        c.gridx++;
-        if (c.gridx > 2) {
-            c.gridx = 0;
-            c.gridy++;
+        mainPanel.add(startPanel, gridBagConstraints);
+        gridBagConstraints.gridx++;
+        if (gridBagConstraints.gridx > 2) {
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy++;
         }
     }
 
     /** Return quick connect button. */
     private MyButton quickClusterButton(final JTextField clusterTF,
-                                        final List<JTextField> hostsTF) {
+                                        final Iterable<JTextField> hostsTF) {
         /* Quick cluster button */
         final MyButton quickClusterBtn = new MyButton(
                            Tools.getString("EmptyBrowser.LoadClusterButton"));
@@ -497,9 +498,8 @@ public final class AllHostsInfo extends Info {
                     @Override
                     public void run() {
                         final String clusterName = clusterTF.getText();
-                        final List<String> hostNames = new ArrayList<String>();
                         final Cluster cluster = new Cluster();
-                        String newClusterName;
+                        final String newClusterName;
                         if (CLUSTER_NAME_PH.equals(clusterName)) {
                             newClusterName = DEFAULT_CLUSTER_NAME;
                         } else {
@@ -509,7 +509,7 @@ public final class AllHostsInfo extends Info {
                                            Tools.getConfigData().getClusters();
                         if (clusters.isClusterName(newClusterName)) {
                             cluster.setName(clusters.getNextClusterName(
-                                                       newClusterName + " "));
+                                                       newClusterName + ' '));
                         } else {
                             cluster.setName(newClusterName);
                         }
@@ -520,7 +520,6 @@ public final class AllHostsInfo extends Info {
                             final String entered = hostTF.getText();
                             String hostName;
                             String username = null;
-                            String port = null;
                             final int a = entered.indexOf('@');
                             if (a > 0) {
                                 username = entered.substring(0, a);
@@ -530,6 +529,7 @@ public final class AllHostsInfo extends Info {
                                 hostName = entered;
                             }
                             final int p = hostName.indexOf(':');
+                            String port = null;
                             if (p > 0) {
                                 port = hostName.substring(
                                                 p + 1, hostName.length());
@@ -555,7 +555,7 @@ public final class AllHostsInfo extends Info {
                             Tools.getGUIData().allHostsUpdate();
                         }
                         Tools.getConfigData().addClusterToClusters(cluster);
-                        List<Cluster> selectedClusters =
+                        final Collection<Cluster> selectedClusters =
                                                  new ArrayList<Cluster>();
                         selectedClusters.add(cluster);
                         Tools.startClusters(selectedClusters);
@@ -659,15 +659,15 @@ public final class AllHostsInfo extends Info {
                 loadMarkedClustersBtn.setEnabled(false);
             }
         });
-        final List<Cluster> selectedClusters = new ArrayList<Cluster>();
-        for (final Cluster cluster : allCheckboxes.keySet()) {
-            if (cluster.getClusterTab() == null) {
-                final JCheckBox wi = allCheckboxes.get(cluster);
+        final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
+        for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allCheckboxes.entrySet()) {
+            if (checkBoxEntry.getKey().getClusterTab() == null) {
+                final JCheckBox wi = checkBoxEntry.getValue();
                 if (wi.isSelected()) {
-                    selectedClusters.add(cluster);
-                    setConnected(cluster);
-                } else if (cluster.getClusterTab() == null) {
-                    final MyButton loadButton = allLoadButtons.get(cluster);
+                    selectedClusters.add(checkBoxEntry.getKey());
+                    setConnected(checkBoxEntry.getKey());
+                } else if (checkBoxEntry.getKey().getClusterTab() == null) {
+                    final MyButton loadButton = allLoadButtons.get(checkBoxEntry.getKey());
                     if (loadButton != null) {
                         Tools.invokeLater(new Runnable() {
                             @Override
@@ -683,9 +683,9 @@ public final class AllHostsInfo extends Info {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final Cluster cluster : allCheckboxes.keySet()) {
-                    if (selectedClusters.contains(cluster)) {
-                        allCheckboxes.get(cluster).setSelected(false);
+                for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allCheckboxes.entrySet()) {
+                    if (selectedClusters.contains(checkBoxEntry.getKey())) {
+                        checkBoxEntry.getValue().setSelected(false);
                     }
                 }
             }
@@ -693,14 +693,14 @@ public final class AllHostsInfo extends Info {
     }
 
     /** Stops marked clusters. */
-    private void unloadMarkedClusters(final Set<Cluster> clusters) {
+    private void unloadMarkedClusters(final Iterable<Cluster> clusters) {
         Tools.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 unloadMarkedClustersBtn.setEnabled(false);
             }
         });
-        final List<Cluster> selectedClusters = new ArrayList<Cluster>();
+        final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
         for (final Cluster cluster : clusters) {
             if (cluster.getClusterTab() != null) {
                 final JCheckBox wi = allCheckboxes.get(cluster);
@@ -724,11 +724,9 @@ public final class AllHostsInfo extends Info {
     private void allCheckboxesListener(final JCheckBox wi) {
         int rc = 0;
         int nrc = 0;
-        int ac = 0;
-        for (final Cluster cluster : allCheckboxes.keySet()) {
-            ac++;
-            if (allCheckboxes.get(cluster).isSelected()) {
-                if (cluster.getClusterTab() == null) {
+        for (final Map.Entry<Cluster, JCheckBox> checkBoxEntry : allCheckboxes.entrySet()) {
+            if (checkBoxEntry.getValue().isSelected()) {
+                if (checkBoxEntry.getKey().getClusterTab() == null) {
                     /* not running */
                     nrc++;
                 } else {
@@ -738,7 +736,6 @@ public final class AllHostsInfo extends Info {
         }
         final int runningCount = rc;
         final int notRunningCount = nrc;
-        final int allCount = ac;
         if (wi.isSelected()) {
             /* disable all start cluster buttons */
             Tools.invokeLater(new Runnable() {
@@ -810,11 +807,6 @@ public final class AllHostsInfo extends Info {
                            new AccessMode(ConfigData.AccessType.RO, false),
                            new AccessMode(ConfigData.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {

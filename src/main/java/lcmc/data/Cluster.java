@@ -30,14 +30,14 @@ import lcmc.data.resources.Network;
 import lcmc.utilities.Tools;
 import lcmc.Exceptions;
 
-import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-
 import java.awt.Color;
 import java.awt.Window;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -53,8 +53,6 @@ import lcmc.utilities.LoggerFactory;
 public final class Cluster implements Comparable<Cluster> {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Name of the cluster. */
     private String name = null;
     /** Hosts that belong to this cluster. */
@@ -81,19 +79,19 @@ public final class Cluster implements Comparable<Cluster> {
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
 
 
-    /** Prepares a new <code>Cluster</code> object. */
+    /** Prepares a new {@code Cluster} object. */
     public Cluster() {
         /* do nothing */
     }
 
-    /** Prepares a new <code>Cluster</code> object. */
+    /** Prepares a new {@code Cluster} object. */
     public Cluster(final String name) {
         this.name = name;
     }
 
     /** Creates a new cluster browser object. */
     public void createClusterBrowser() {
-        LOG.debug1("createClusterBrowser: " + getName());
+        LOG.debug1("createClusterBrowser: " + name);
         clusterBrowser = new ClusterBrowser(this);
     }
 
@@ -109,7 +107,7 @@ public final class Cluster implements Comparable<Cluster> {
 
     /** Removes the cluster. */
     public void removeCluster() {
-        LOG.debug1("removeCluster: " + getName());
+        LOG.debug1("removeCluster: " + name);
         final ClusterBrowser cb = clusterBrowser;
         if (cb != null) {
             cb.stopServerStatus();
@@ -144,7 +142,7 @@ public final class Cluster implements Comparable<Cluster> {
     /** Returns names of the hosts in this cluster. */
     public String[] getHostNames() {
         final List<String> hostNames = new ArrayList<String>();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             hostNames.add(host.getName());
         }
         return hostNames.toArray(new String[hostNames.size()]);
@@ -181,16 +179,16 @@ public final class Cluster implements Comparable<Cluster> {
      * drbd are not returned.
      */
     public List<String> getCommonBlockDevices() {
-        List<String> blockDevicesNamesIntersection = null;
+        List<String> namesIntersection = null;
 
         for (final Host host : hosts) {
-            blockDevicesNamesIntersection =
+            namesIntersection =
                                 host.getBlockDevicesNamesIntersection(
-                                                blockDevicesNamesIntersection);
+                                                namesIntersection);
         }
 
         final List<String> commonBlockDevices = new ArrayList<String>();
-        for (final String i : blockDevicesNamesIntersection) {
+        for (final String i : namesIntersection) {
             commonBlockDevices.add(i);
         }
         return commonBlockDevices;
@@ -225,14 +223,14 @@ public final class Cluster implements Comparable<Cluster> {
         }
 
         final List<Network> commonNetworks = new ArrayList<Network>();
-        for (final String netIp : networksIntersection.keySet()) {
+        for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
             final List<String> ips = new ArrayList<String>();
             for (final Host host : hosts) {
-                ips.addAll(host.getIpsFromNetwork(netIp));
+                ips.addAll(host.getIpsFromNetwork(stringIntegerEntry.getKey()));
             }
-            final Integer cidr = networksIntersection.get(netIp);
+            final Integer cidr = stringIntegerEntry.getValue();
             final Network network =
-                            new Network(netIp,
+                            new Network(stringIntegerEntry.getKey(),
                                         ips.toArray(new String[ips.size()]),
                                         cidr);
             commonNetworks.add(network);
@@ -263,7 +261,7 @@ public final class Cluster implements Comparable<Cluster> {
     }
 
     /** Returns the color for graph for the specified host. */
-    public List<Color> getHostColors(final List<String> nodes) {
+    public List<Color> getHostColors(final Collection<String> nodes) {
         final List<Color> colors = new ArrayList<Color>();
         if (nodes == null || nodes.isEmpty()) {
             colors.add(Tools.getDefaultColor("CRMGraph.FillPaintStopped"));
@@ -302,7 +300,7 @@ public final class Cluster implements Comparable<Cluster> {
         String dsaKey = null;
         String rsaKey = null;
         String pwd = null;
-        for (final Host host : getHosts()) {
+        for (final Host host : hosts) {
             host.setIsLoading();
             if (host.isConnected()) {
                 host.setLoadingDone();
@@ -354,7 +352,7 @@ public final class Cluster implements Comparable<Cluster> {
                 } else if (Tools.compareVersions(version, minVersion) < 0) {
                     minVersion = version;
                 }
-            } catch (Exceptions.IllegalVersionException e) {
+            } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("getMinLibvirtVersion: " + e.getMessage(), e);
             }
         }
@@ -394,8 +392,8 @@ public final class Cluster implements Comparable<Cluster> {
 
     /** Compares ignoring case. */
     @Override
-    public int compareTo(final Cluster c) {
-        return Tools.compareNames(getName(), c.getName());
+    public int compareTo(final Cluster o) {
+        return Tools.compareNames(name, o.name);
     }
 
     /** Return whether the cluster tab is closable. */

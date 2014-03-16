@@ -23,13 +23,14 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for ubuntu dapper.
  * TODO: It is not possible to install heartbeat-2 from here.
  */
 public final class DistResource_ubuntu_DAPPER
-                                        extends java.util.ListResourceBundle {
+                                        extends ListResourceBundle {
 
     /** Get contents. */
     @Override

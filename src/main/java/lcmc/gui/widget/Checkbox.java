@@ -27,12 +27,14 @@ import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.text.Document;
-import javax.swing.JCheckBox;
 
 
 import java.awt.Color;
+import java.awt.ItemSelectable;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 
@@ -56,7 +58,7 @@ public class Checkbox extends GenericWidget<JComponent> {
     /** Name for the 'false' value. */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
 
-    /** Prepares a new <code>Checkbox</code> object. */
+    /** Prepares a new {@code Checkbox} object. */
     public Checkbox(final Value selectedValue,
                     final Value[] items,
                     final String regexp,
@@ -104,7 +106,7 @@ public class Checkbox extends GenericWidget<JComponent> {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Value getValueInternal() {
-        Value value;
+        final Value value;
         final JCheckBox cbox = (JCheckBox) getInternalComponent();
         if (cbox.getSelectedObjects() == null) {
             value = checkBoxFalse;
@@ -127,7 +129,7 @@ public class Checkbox extends GenericWidget<JComponent> {
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item != null) {
-            ((JCheckBox) getInternalComponent()).setSelected(item.equals(checkBoxTrue));
+            ((AbstractButton) getInternalComponent()).setSelected(item.equals(checkBoxTrue));
         }
     }
 
@@ -141,7 +143,7 @@ public class Checkbox extends GenericWidget<JComponent> {
     @Override
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
-        ((JCheckBox) getInternalComponent()).addItemListener(getItemListener(wl));
+        ((ItemSelectable) getInternalComponent()).addItemListener(getItemListener(wl));
     }
 
     @Override
@@ -173,8 +175,8 @@ public class Checkbox extends GenericWidget<JComponent> {
     public void cleanup() {
         getWidgetListeners().clear();
         for (final ItemListener il
-                            : ((JCheckBox) getInternalComponent()).getItemListeners()) {
-            ((JCheckBox) getInternalComponent()).removeItemListener(il);
+                            : ((AbstractButton) getInternalComponent()).getItemListeners()) {
+            ((ItemSelectable) getInternalComponent()).removeItemListener(il);
         }
     }
 
@@ -184,13 +186,12 @@ public class Checkbox extends GenericWidget<JComponent> {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 if (wl.isEnabled()) {
-                    Value v;
-                    if (((JCheckBox) e.getItem()).isSelected()) {
-                        v = checkBoxTrue;
+                    final Value value;
+                    if (((AbstractButton) e.getItem()).isSelected()) {
+                        value = checkBoxTrue;
                     } else {
-                        v = checkBoxFalse;
+                        value = checkBoxFalse;
                     }
-                    final Value value = v;
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {

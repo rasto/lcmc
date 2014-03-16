@@ -43,9 +43,9 @@ final class PcmkTest7 {
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
+        disableStonith();
         final int dummy1X = 235;
         final int dummy1Y = 207;
-        disableStonith();
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info("test7 I: " + i);

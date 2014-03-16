@@ -42,27 +42,27 @@ final class PcmkTest2 {
     static void start() {
         slowFactor = 0.6f;
         aborted = false;
-        final int dummy1X = 235;
-        final int dummy1Y = 207;
-        final int dummy2X = 545;
-        final int dummy2Y = 207;
-        final int dummy3X = 235;
-        final int dummy3Y = 342;
-        final int dummy4X = 545;
-        final int dummy4Y = 342;
-        final int phX = 445;
-        final int phY = 342;
 
         disableStonith();
         checkTest("test2", 1);
         /* create 4 dummies */
+        final int dummy1X = 235;
+        final int dummy1Y = 207;
         chooseDummy(dummy1X, dummy1Y, false, true);
+        final int dummy2X = 545;
+        final int dummy2Y = 207;
         chooseDummy(dummy2X, dummy2Y, false, true);
+        final int dummy3X = 235;
+        final int dummy3Y = 342;
         chooseDummy(dummy3X, dummy3Y, false, true);
+        final int dummy4X = 545;
+        final int dummy4Y = 342;
         chooseDummy(dummy4X, dummy4Y, false, true);
         checkTest("test2", 2);
 
         /* placeholder */
+        final int phX = 445;
+        final int phY = 342;
         moveTo(phX, phY);
         rightClick();
         moveTo("Placeholder (AND)");

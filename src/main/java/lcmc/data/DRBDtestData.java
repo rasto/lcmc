@@ -36,8 +36,6 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  *
  */
 public final class DRBDtestData {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Tool tip. */
     private final String toolTip;
     /** Pattern for dry run output: drbdsetup 0 disconnect. */
@@ -56,10 +54,10 @@ public final class DRBDtestData {
     private final MultiKeyMap<String, Integer> disklessHash =
                                             new MultiKeyMap<String, Integer>();
 
-    /** Prepares a new <code>DRBDtestData</code> object. */
+    /** Prepares a new {@code DRBDtestData} object. */
     public DRBDtestData(final Map<Host, String> testOutput) {
         if (testOutput == null) {
-            this.toolTip = null;
+            toolTip = null;
             return;
         }
         final StringBuilder sb = new StringBuilder(300);
@@ -67,11 +65,11 @@ public final class DRBDtestData {
         sb.append(Tools.getString("DRBDtestData.ToolTip"));
         sb.append("</b><br>");
         boolean isToolTip = false;
-        for (final Host host : testOutput.keySet()) {
+        for (final Map.Entry<Host, String> hostStringEntry : testOutput.entrySet()) {
             sb.append("<b>");
-            sb.append(host.getName());
+            sb.append(hostStringEntry.getKey().getName());
             sb.append("</b><br>");
-            final String raw = testOutput.get(host);
+            final String raw = hostStringEntry.getValue();
             if (raw == null) {
                 continue;
             }
@@ -81,17 +79,17 @@ public final class DRBDtestData {
                     final String resOrVol = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
-                        disconnectedHash.put(host.getName(), resOrVol, 1);
+                        disconnectedHash.put(hostStringEntry.getKey().getName(), resOrVol, 1);
                     } else if ("net".equals(action)) {
-                        connectedHash.put(host.getName(),
+                        connectedHash.put(hostStringEntry.getKey().getName(),
                                           "/dev/drbd" + resOrVol,
                                           1);
                     } else if ("detach".equals(action)) {
-                        disklessHash.put(host.getName(),
+                        disklessHash.put(hostStringEntry.getKey().getName(),
                                          "/dev/drbd" + resOrVol,
                                          1);
                     } else if ("disk".equals(action)) {
-                        attachedHash.put(host.getName(),
+                        attachedHash.put(hostStringEntry.getKey().getName(),
                                          "/dev/drbd" + resOrVol,
                                          1);
                     }
@@ -110,7 +108,7 @@ public final class DRBDtestData {
             sb.append(Tools.getString("DRBDtestData.NoToolTip"));
         }
         sb.append("</html>");
-        this.toolTip = sb.toString();
+        toolTip = sb.toString();
     }
 
     /** Returns tooltip. */

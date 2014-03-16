@@ -21,7 +21,6 @@
  */
 package lcmc.gui.resources;
 
-import java.awt.Component;
 import lcmc.data.Host;
 import lcmc.data.resources.Service;
 import lcmc.gui.widget.Widget;
@@ -61,13 +60,7 @@ public interface HbConstraintInterface {
     void revert();
     /** Returns data object of this info. */
     Service getService();
-    /** Adds field with left and right component to the specified panel. */
-    void addField(final JPanel panel,
-                  final Component left,
-                  final Component right,
-                  final int leftWidth,
-                  final int rightWidth,
-                  final int height);
+
     /** Adds label and field to the specified panel. */
     void addLabelField(final JPanel panel,
                        final String left,

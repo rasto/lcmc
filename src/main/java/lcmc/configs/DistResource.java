@@ -25,11 +25,12 @@ package lcmc.configs;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ArrayList;
+import java.util.ListResourceBundle;
 
 /**
  * Here are common commands for all linuxes.
  */
-public final class DistResource extends java.util.ListResourceBundle {
+public final class DistResource extends ListResourceBundle {
     /** Sudo placeholder. */
     public static final String SUDO = "@DMCSUDO@";
     /** Get contents. */
@@ -70,10 +71,10 @@ public final class DistResource extends java.util.ListResourceBundle {
          "/sbin/drbdadm help 2>/dev/null | grep 'Version: '|sed 's/^Version: //'|sed 's/ .*//'|grep ."},
 
         {"HbCheck.version",
-         DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions"},
+         SUDO + "@GUI-HELPER@ get-cluster-versions"},
 
         {"ProxyCheck.version",
-         DistResource.SUDO + "drbd-proxy-ctl -c version 2>/dev/null"
+         SUDO + "drbd-proxy-ctl -c version 2>/dev/null"
          + "|sed 's/.* \\([0-9.]\\+\\),.*/\\1/'"},
         /* DrbdAvailableVersions returns available versions of drbd in the download area. One
          * version per line.
@@ -305,9 +306,9 @@ public final class DistResource extends java.util.ListResourceBundle {
          "EDITOR=\"echo '@CONFIG@'|cat>\" " + SUDO + "crm configure edit"},
 
         {"OpenAIS.getAisConfig",
-         DistResource.SUDO + "cat /etc/ais/openais.conf"},
+         SUDO + "cat /etc/ais/openais.conf"},
         {"Corosync.getAisConfig",
-         DistResource.SUDO + "cat /etc/corosync/corosync.conf"},
+         SUDO + "cat /etc/corosync/corosync.conf"},
 
         {"Cluster.Init.getInstallationInfo",
          SUDO + "@GUI-HELPER@ installation-info"},
@@ -567,7 +568,7 @@ public final class DistResource extends java.util.ListResourceBundle {
 
         {"ocf:linbit:drbd.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(
-              "drbdconf")))},
+                 "drbdconf")))},
 
         {"ocf:heartbeat:eDir88.params",
          Collections.unmodifiableList(new ArrayList<String>(Arrays.asList(

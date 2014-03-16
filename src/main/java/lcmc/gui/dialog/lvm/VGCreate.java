@@ -36,21 +36,19 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.LVM;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -63,7 +61,7 @@ import lcmc.data.StringValue;
 public final class VGCreate extends LV {
     private final Host host;
     /** Selected block device, can be null. */
-    private final List<BlockDevInfo> selectedBlockDevInfos =
+    private final Collection<BlockDevInfo> selectedBlockDevInfos =
                                                  new ArrayList<BlockDevInfo>();
     private final MyButton createButton = new MyButton("Create VG");
     private Widget vgNameWi;
@@ -89,16 +87,10 @@ public final class VGCreate extends LV {
     }
 
     /** Create new VGCreate object. */
-    public VGCreate(final Host host, final List<BlockDevInfo> sbdis) {
+    public VGCreate(final Host host, final Collection<BlockDevInfo> sbdis) {
         super(null);
         this.host = host;
         selectedBlockDevInfos.addAll(sbdis);
-    }
-
-    /** Finishes the dialog and sets the information. */
-    @Override
-    protected void finishDialog() {
-        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
@@ -131,8 +123,8 @@ public final class VGCreate extends LV {
     /** Enables and disabled buttons. */
     protected void checkButtons() {
         boolean enable = true;
-        for (final Host h : hostCheckBoxes.keySet()) {
-            if (hostCheckBoxes.get(h).isSelected() && !hostHasPVS(h)) {
+        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+            if (hostEntry.getValue().isSelected() && !hostHasPVS(hostEntry.getKey())) {
                 enable = false;
                 break;
             }
@@ -144,13 +136,13 @@ public final class VGCreate extends LV {
     private void enableCreateButton(boolean enable) {
         if (enable) {
             boolean vgNameCorrect = true;
-            if ("".equals(vgNameWi.getStringValue())) {
+            if (vgNameWi.getStringValue() != null && vgNameWi.getStringValue().isEmpty()) {
                 vgNameCorrect = false;
             } else if (hostCheckBoxes != null) {
-                for (final Host h : hostCheckBoxes.keySet()) {
-                    if (hostCheckBoxes.get(h).isSelected()) {
+                for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                    if (hostEntry.getValue().isSelected()) {
                         final Set<String> vgs =
-                            h.getVolumeGroupNames();
+                                hostEntry.getKey().getVolumeGroupNames();
                         if (vgs != null && vgs.contains(
                                         vgNameWi.getStringValue())) {
                             vgNameCorrect = false;
@@ -171,7 +163,7 @@ public final class VGCreate extends LV {
 
     /** Returns array of volume group checkboxes. */
     private Map<String, JCheckBox> getPVCheckBoxes(
-                                               final Set<String> selectedPVs) {
+                                               final Collection<String> selectedPVs) {
         final Map<String, JCheckBox> components =
                                         new LinkedHashMap<String, JCheckBox>();
         for (final BlockDevice pv : host.getPhysicalVolumes()) {
@@ -192,14 +184,13 @@ public final class VGCreate extends LV {
         for (final BlockDevice bd : host.getPhysicalVolumes()) {
             oPVS.put(bd.getName(), bd);
         }
-        final Set<String> pvs = pvCheckBoxes.keySet();
         int selected = 0;
-        for (final String pv : pvs) {
-            if (!pvCheckBoxes.get(pv).isSelected()) {
+        for (final Map.Entry<String, JCheckBox> pvEntry : pvCheckBoxes.entrySet()) {
+            if (!pvEntry.getValue().isSelected()) {
                 continue;
             }
             selected++;
-            final BlockDevice opv = oPVS.get(pv);
+            final BlockDevice opv = oPVS.get(pvEntry.getKey());
             if (opv == null) {
                 return false;
             }
@@ -253,9 +244,9 @@ public final class VGCreate extends LV {
 
         pane.add(inputPane);
         /* Volume groups. */
-        final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        final Set<String> selectedPVs = new HashSet<String>();
-        final Set<Host> selectedHosts = new HashSet<Host>();
+        final JPanel pvsPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        final Collection<String> selectedPVs = new HashSet<String>();
+        final Collection<Host> selectedHosts = new HashSet<Host>();
         for (final BlockDevInfo sbdi : selectedBlockDevInfos) {
             if (sbdi.getBlockDevice().isDrbd()) {
                 selectedPVs.add(sbdi.getBlockDevice()
@@ -267,37 +258,37 @@ public final class VGCreate extends LV {
         }
         pvCheckBoxes = getPVCheckBoxes(selectedPVs);
         pvsPane.add(new JLabel("Select physical volumes: "));
-        for (final String pvName : pvCheckBoxes.keySet()) {
-            pvCheckBoxes.get(pvName).addItemListener(
-                                            new ItemChangeListener(true));
-            pvsPane.add(pvCheckBoxes.get(pvName));
+        for (final Map.Entry<String, JCheckBox> pvEntry : pvCheckBoxes.entrySet()) {
+            pvEntry.getValue().addItemListener(
+                    new ItemChangeListener(true));
+            pvsPane.add(pvEntry.getValue());
         }
         final JScrollPane pvSP = new JScrollPane(pvsPane);
         pvSP.setPreferredSize(new Dimension(0, 45));
         pane.add(pvSP);
 
         final JPanel hostsPane = new JPanel(
-                                        new FlowLayout(FlowLayout.LEFT));
+                                        new FlowLayout(FlowLayout.LEADING));
         final Cluster cluster = host.getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
-        for (final Host h : hostCheckBoxes.keySet()) {
-            hostCheckBoxes.get(h).addItemListener(
-                                            new ItemChangeListener(true));
-            if (host == h) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(true);
+        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+            hostEntry.getValue().addItemListener(
+                    new ItemChangeListener(true));
+            if (host == hostEntry.getKey()) {
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(true);
             } else if (isOneDrbd(selectedBlockDevInfos)) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(false);
-            } else if (hostHasPVS(h)) {
-                hostCheckBoxes.get(h).setEnabled(true);
-                hostCheckBoxes.get(h).setSelected(selectedHosts.contains(h));
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(false);
+            } else if (hostHasPVS(hostEntry.getKey())) {
+                hostEntry.getValue().setEnabled(true);
+                hostEntry.getValue().setSelected(selectedHosts.contains(hostEntry.getKey()));
             } else {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(false);
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(false);
             }
-            hostsPane.add(hostCheckBoxes.get(h));
+            hostsPane.add(hostEntry.getValue());
         }
         final JScrollPane sp = new JScrollPane(hostsPane);
         sp.setPreferredSize(new Dimension(0, 45));
@@ -329,28 +320,6 @@ public final class VGCreate extends LV {
         }
     }
 
-    /** Size combo box action listener. */
-    private class SizeDocumentListener implements DocumentListener {
-        private void check() {
-            checkButtons();
-        }
-
-        @Override
-        public void insertUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void removeUpdate(final DocumentEvent e) {
-            check();
-        }
-
-        @Override
-        public void changedUpdate(final DocumentEvent e) {
-            check();
-        }
-    }
-
     /** Create action listener. */
     private class CreateActionListener implements ActionListener {
         @Override
@@ -374,16 +343,16 @@ public final class VGCreate extends LV {
             getProgressBar().start(CREATE_TIMEOUT
                                    * hostCheckBoxes.size());
             boolean oneFailed = false;
-            for (final Host h : hostCheckBoxes.keySet()) {
-                if (hostCheckBoxes.get(h).isSelected()) {
-                    final List<String> pvNames = new ArrayList<String>();
-                    for (final String pv : pvCheckBoxes.keySet()) {
-                        if (pvCheckBoxes.get(pv).isSelected()) {
-                            pvNames.add(pv);
+            for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                if (hostEntry.getValue().isSelected()) {
+                    final Collection<String> pvNames = new ArrayList<String>();
+                    for (final Map.Entry<String, JCheckBox> pvEntry : pvCheckBoxes.entrySet()) {
+                        if (pvEntry.getValue().isSelected()) {
+                            pvNames.add(pvEntry.getKey());
                         }
                     }
                     final boolean ret =
-                        vgCreate(h, vgNameWi.getStringValue(), pvNames);
+                        vgCreate(hostEntry.getKey(), vgNameWi.getStringValue(), pvNames);
                     if (!ret) {
                         oneFailed = true;
                     }
@@ -418,7 +387,7 @@ public final class VGCreate extends LV {
     /** Create VG. */
     private boolean vgCreate(final Host host,
                              final String vgName,
-                             final List<String> pvNames) {
+                             final Collection<String> pvNames) {
         for (final String pv : pvNames) {
             final BlockDevInfo bdi =
                 host.getBrowser().getDrbdGraph().findBlockDevInfo(
@@ -434,7 +403,7 @@ public final class VGCreate extends LV {
             answerPaneAddText("Volume group "
                               + vgName
                               + " was successfully created "
-                              + " on " + host.getName() + ".");
+                              + " on " + host.getName() + '.');
         } else {
             answerPaneAddTextError("Creating of volume group "
                                    + vgName

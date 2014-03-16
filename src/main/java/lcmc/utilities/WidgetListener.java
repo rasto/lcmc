@@ -24,8 +24,6 @@ import lcmc.data.Value;
 import lcmc.data.StringValue;
 
 public abstract class WidgetListener {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Whether it is enabled or not. */
     private boolean enabled = true;
 

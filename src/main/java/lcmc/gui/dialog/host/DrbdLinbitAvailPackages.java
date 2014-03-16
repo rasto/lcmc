@@ -64,8 +64,6 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                       LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Combo box with distributions. */
     private Widget drbdDistCombo = null;
     /** Combo box with available kernel versions for this distribution. */
@@ -86,7 +84,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     /** Height of the choice boxes. */
     private static final int CHOICE_BOX_HEIGHT = 30;
 
-    /** Prepares a new <code>DrbdLinbitAvailPackages</code> object. */
+    /** Prepares a new {@code DrbdLinbitAvailPackages} object. */
     public DrbdLinbitAvailPackages(final WizardDialog previousDialog,
                                    final Host host) {
         super(previousDialog, host);
@@ -106,8 +104,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           null, /* ProgressBar */
                           new ExecCallback() {
                             @Override
-                            public void done(final String ans) {
-                                final String[] items = ans.split(NEWLINE);
+                            public void done(final String answer) {
+                                final String[] items = answer.split(NEWLINE);
                                 /* all drbd versions are stored in form
                                  * {version1,version2,...}. This will be
                                  * later expanded by shell. */
@@ -116,12 +114,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 availDistributions();
                             }
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 printErrorAndRetry(Tools.getString(
                               "Dialog.Host.DrbdLinbitAvailPackages.NoVersions"),
-                                                   ans,
-                                                   exitCode);
+                                        answer,
+                                        errorCode);
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -144,9 +142,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           null, /* ProgressBar */
                           new ExecCallback() {
                             @Override
-                            public void done(String ans) {
-                                ans = NO_MATCH_STRING + "\n" + ans;
-                                final String[] items = ans.split(NEWLINE);
+                            public void done(String answer) {
+                                answer = NO_MATCH_STRING + '\n' + answer;
+                                final String[] items = answer.split(NEWLINE);
                                 drbdDistItems = Arrays.asList(items);
                                 Tools.invokeLater(new Runnable() {
                                     @Override
@@ -161,12 +159,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 availKernels();
                             }
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 printErrorAndRetry(Tools.getString(
                          "Dialog.Host.DrbdLinbitAvailPackages.NoDistributions"),
-                                                   ans,
-                                                   exitCode);
+                                        answer,
+                                        errorCode);
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -195,9 +193,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           null, /* ProgressBar */
                           new ExecCallback() {
                             @Override
-                            public void done(String ans) {
-                                ans = NO_MATCH_STRING + "\n" + ans;
-                                final String[] items = ans.split(NEWLINE);
+                            public void done(String answer) {
+                                answer = NO_MATCH_STRING + '\n' + answer;
+                                final String[] items = answer.split(NEWLINE);
                                 drbdKernelDirItems = Arrays.asList(items);
                                 Tools.invokeLater(new Runnable() {
                                     @Override
@@ -213,13 +211,13 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
 
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 LOG.debug("doneError:");
                                 printErrorAndRetry(
                Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoKernels"),
-                                   ans,
-                                   exitCode);
+                                        answer,
+                                        errorCode);
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -253,9 +251,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           null, /* ProgressBar */
                           new ExecCallback() {
                             @Override
-                            public void done(String ans) {
-                                ans = NO_MATCH_STRING + "\n" + ans;
-                                final String[] items = ans.split(NEWLINE);
+                            public void done(String answer) {
+                                answer = NO_MATCH_STRING + '\n' + answer;
+                                final String[] items = answer.split(NEWLINE);
                                 drbdArchItems = Arrays.asList(items);
                                 Tools.invokeLater(new Runnable() {
                                     @Override
@@ -274,12 +272,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
 
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 printErrorAndRetry(Tools.getString(
                                  "Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
-                                                   ans,
-                                                   exitCode);
+                                        answer,
+                                        errorCode);
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -296,18 +294,18 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           null, /* ProgressBar */
                           new ExecCallback() {
                             @Override
-                            public void done(final String ans) {
-                                allDone(ans);
+                            public void done(final String answer) {
+                                allDone(answer);
                             }
 
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 printErrorAndRetry(
                                     Tools.getString(
                                  "Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
-                                    ans,
-                                    exitCode);
+                                        answer,
+                                        errorCode);
                             }
                           },
                           null,   /* ConvertCmdCallback */
@@ -357,7 +355,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             answerPaneSetText(
                     Tools.getString(
                         "Dialog.Host.DrbdLinbitAvailPackages.AvailVersions")
-                    + " " + Tools.join(", ", versions));
+                    + ' ' + Tools.join(", ", versions));
             if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
                 Tools.sleep(1000);
                 pressNextButton();
@@ -411,7 +409,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     /** Returns the pane with all combo boxes. */
     protected final JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
         final int maxX = (int) pane.getMaximumSize().getWidth();
         pane.setMaximumSize(new Dimension(maxX, CHOICE_BOX_HEIGHT));
 
@@ -508,7 +506,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     @Override
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        final JPanel labelP = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel labelP = new JPanel(new FlowLayout(FlowLayout.LEADING));
         labelP.setPreferredSize(new Dimension(0, 0));
         labelP.add(new JLabel(
             Tools.getString(

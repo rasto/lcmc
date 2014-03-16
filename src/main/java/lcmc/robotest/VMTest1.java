@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.swing.JCheckBox;
 import lcmc.data.Cluster;
@@ -60,14 +61,14 @@ final class VMTest1 {
         slowFactor = 0.1f;
         aborted = false;
         String name = "dmc";
-        final int count2 = 1;
         for (int j = 0; j < count; j++) {
             checkVMTest(vmTest, 1, name);
             name += "i";
         }
         name = "dmc";
-        final List<String> names = new ArrayList<String>();
+        final Collection<String> names = new ArrayList<String>();
 
+        final int count2 = 1;
         for (int j = 0; j < count; j++) {
             moveToMenu("VMs (KVM");
             rightClick();

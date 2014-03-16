@@ -21,7 +21,6 @@
  */
 package lcmc.gui.resources;
 
-import java.util.Collections;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
@@ -41,13 +40,15 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.MyListModel;
 import lcmc.utilities.ButtonCallback;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
-import java.awt.Color;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import javax.swing.JDialog;
 import javax.swing.ImageIcon;
@@ -89,7 +90,7 @@ public final class GroupInfo extends ServiceInfo {
     /** Applies the the whole group if for example an order has changed. */
     void applyWhole(final Host dcHost,
                     final boolean createGroup,
-                    final List<String> newOrder,
+                    final Iterable<String> newOrder,
                     final boolean testOnly) {
         final String[] params = getParametersFromXML();
         if (!testOnly) {
@@ -108,12 +109,12 @@ public final class GroupInfo extends ServiceInfo {
 
         final Map<String, String> groupMetaArgs =
                                         new LinkedHashMap<String, String>();
-        for (String param : params) {
+        for (final String param : params) {
             if (GUI_ID.equals(param)
                 || PCMK_ID.equals(param)) {
                 continue;
             }
-            Value value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (Tools.areEqual(value, getParamDefault(param))) {
                 continue;
             }
@@ -189,7 +190,7 @@ public final class GroupInfo extends ServiceInfo {
             final String[] cloneParams = ci.getParametersFromXML();
             master = ci.getService().isMaster();
             cloneMetaAttrsRefIds = ci.getMetaAttrsRefId();
-            for (String param : cloneParams) {
+            for (final String param : cloneParams) {
                 if (GUI_ID.equals(param)
                     || PCMK_ID.equals(param)) {
                     continue;
@@ -318,7 +319,7 @@ public final class GroupInfo extends ServiceInfo {
                                       colAttrsList,
                                       ordAttrsList,
                                       testOnly);
-            final List<String> newOrder = new ArrayList<String>();
+            final Collection<String> newOrder = new ArrayList<String>();
             for (final ServiceInfo child : getGroupServices()) {
                 newOrder.add(child.getHeartbeatId(testOnly));
             }
@@ -331,7 +332,7 @@ public final class GroupInfo extends ServiceInfo {
         } else {
             final Map<String, String> groupMetaArgs =
                                             new LinkedHashMap<String, String>();
-            for (String param : params) {
+            for (final String param : params) {
                 if (GUI_ID.equals(param)
                     || PCMK_ID.equals(param)) {
                     continue;
@@ -400,7 +401,7 @@ public final class GroupInfo extends ServiceInfo {
     }
 
     /** Returns the list of services that can be added to the group. */
-    List<ResourceAgent> getAddGroupServiceList(final String cl) {
+    Iterable<ResourceAgent> getAddGroupServiceList(final String cl) {
         return getBrowser().getCRMXML().getServices(cl);
     }
 
@@ -446,7 +447,7 @@ public final class GroupInfo extends ServiceInfo {
     /** Adds service to this group and creates new service info object. */
     ServiceInfo addGroupServicePanel(final ResourceAgent newRA,
                               final boolean reloadNode) {
-        ServiceInfo newServiceInfo;
+        final ServiceInfo newServiceInfo;
 
         final String name = newRA.getName();
         if (newRA.isFilesystem()) {
@@ -573,10 +574,9 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns items for the group popup. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final boolean testOnly = false;
         final GroupInfo thisGroupInfo = this;
         /* add group service */
-        final MyMenu addGroupServiceMenuItem = new MyMenu(
+        final UpdatableItem addGroupServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService"),
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
@@ -595,7 +595,7 @@ public final class GroupInfo extends ServiceInfo {
             public void updateAndWait() {
                 Tools.isSwingThread();
                 removeAll();
-                final List<JDialog> popups = new ArrayList<JDialog>();
+                final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
@@ -603,7 +603,7 @@ public final class GroupInfo extends ServiceInfo {
                                                   false),
                                    new AccessMode(ConfigData.AccessType.OP,
                                                   false));
-                    MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
+                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : getAddGroupServiceList(cl)) {
                         final MyMenuItem mmi =
                             new MyMenuItem(
@@ -659,7 +659,7 @@ public final class GroupInfo extends ServiceInfo {
             }
         };
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        items.add((UpdatableItem) addGroupServiceMenuItem);
+        items.add(addGroupServiceMenuItem);
         for (final UpdatableItem item : super.createPopup()) {
             items.add(item);
         }
@@ -667,22 +667,17 @@ public final class GroupInfo extends ServiceInfo {
         /* group services */
         if (!Tools.getConfigData().isSlow()) {
             for (final ServiceInfo child : getGroupServices()) {
-                final MyMenu groupServicesMenu = new MyMenu(
+                final UpdatableItem groupServicesMenu = new MyMenu(
                         child.toString(),
                         new AccessMode(ConfigData.AccessType.RO, false),
                         new AccessMode(ConfigData.AccessType.RO, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
-                    public String enablePredicate() {
-                        return null;
-                    }
-
-                    @Override
                     public void updateAndWait() {
                         Tools.isSwingThread();
                         removeAll();
-                        final List<UpdatableItem> serviceMenus =
+                        final Collection<UpdatableItem> serviceMenus =
                                         new ArrayList<UpdatableItem>();
                         for (final UpdatableItem u : child.createPopup()) {
                             serviceMenus.add(u);
@@ -694,7 +689,7 @@ public final class GroupInfo extends ServiceInfo {
                         super.updateAndWait();
                     }
                 };
-                items.add((UpdatableItem) groupServicesMenu);
+                items.add(groupServicesMenu);
             }
         }
         return items;
@@ -720,13 +715,13 @@ public final class GroupInfo extends ServiceInfo {
             if (!first) {
                 services.append(", ");
             }
-            services.append(child.toString());
+            services.append(child);
             first = false;
         }
 
         desc  = desc.replaceAll(
                             "@GROUP@",
-                            "'" + Matcher.quoteReplacement(toString()) + "'");
+                '\'' + Matcher.quoteReplacement(toString()) + '\'');
         desc  = desc.replaceAll("@SERVICES@",
                                 Matcher.quoteReplacement(services.toString()));
         if (Tools.confirmDialog(
@@ -756,7 +751,7 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
                                       final boolean testOnly) {
-        final List<ServiceInfo> children = new ArrayList<ServiceInfo>();
+        final Collection<ServiceInfo> children = new ArrayList<ServiceInfo>();
         if (!testOnly) {
             for (final ServiceInfo child : getGroupServices()) {
                 child.getService().setRemoved(true);
@@ -816,7 +811,7 @@ public final class GroupInfo extends ServiceInfo {
         final List<String> hostNames = getRunningOnNodes(testOnly);
         final StringBuilder sb = new StringBuilder(220);
         sb.append("<b>");
-        sb.append(toString());
+        sb.append(this);
         if (hostNames == null || hostNames.isEmpty()) {
             sb.append(" not running");
         } else if (hostNames.size() == 1) {
@@ -876,7 +871,6 @@ public final class GroupInfo extends ServiceInfo {
     public Subtext[] getSubtextsForGraph(final boolean testOnly) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         Subtext prevSubtext = null;
-        final Host dcHost = getBrowser().getDCHost();
 
         for (final ServiceInfo child : getGroupServices()) {
             final Subtext[] subtexts = child.getSubtextsForGraph(testOnly);
@@ -889,7 +883,7 @@ public final class GroupInfo extends ServiceInfo {
                 || !sSubtext.getSubtext().equals(
                                       prevSubtext.getSubtext())) {
                 texts.add(new Subtext(sSubtext.getSubtext()
-                                      + ":",
+                                      + ':',
                                       sSubtext.getColor(),
                                       Color.BLACK));
                 prevSubtext = sSubtext;
@@ -944,7 +938,7 @@ public final class GroupInfo extends ServiceInfo {
             }
             texts.add(new Subtext("   "
                                   + constraintLeft
-                                  + child.toString()
+                                  + child
                                   + unmanaged
                                   + migrated
                                   + constraint,
@@ -1113,18 +1107,18 @@ public final class GroupInfo extends ServiceInfo {
                         final MyListModel<MyMenuItem> dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList<MyMenuItem> list,
-                        final JCheckBox colocationCB,
-                        final JCheckBox orderCB,
+                        final JCheckBox colocationWi,
+                        final JCheckBox orderWi,
                         final List<JDialog> popups,
                         final boolean testOnly) {
         for (final ServiceInfo child : getGroupServices()) {
-            asi.addExistingServiceMenuItem("         " + child.toString(),
+            asi.addExistingServiceMenuItem("         " + child,
                                            child,
                                            dlm,
                                            callbackHash,
                                            list,
-                                           colocationCB,
-                                           orderCB,
+                    colocationWi,
+                                           orderWi,
                                            popups,
                                            testOnly);
         }

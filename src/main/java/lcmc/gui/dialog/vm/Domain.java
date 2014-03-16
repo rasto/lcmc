@@ -45,8 +45,6 @@ import java.awt.Dimension;
  *
  */
 public final class Domain extends VMConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
     private Widget domainNameWi;
@@ -67,7 +65,7 @@ public final class Domain extends VMConfig {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>Domain</code> object. */
+    /** Prepares a new {@code Domain} object. */
     public Domain(final WizardDialog previousDialog,
                   final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -148,10 +146,10 @@ public final class Domain extends VMConfig {
             return inputPane;
         }
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT,

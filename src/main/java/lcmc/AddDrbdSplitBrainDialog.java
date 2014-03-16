@@ -48,7 +48,7 @@ public final class AddDrbdSplitBrainDialog {
     /** Drbd resource info object. */
     private final DrbdVolumeInfo dvi;
 
-    /** Prepares a new <code>AddDrbdSplitBrainDialog</code> object. */
+    /** Prepares a new {@code AddDrbdSplitBrainDialog} object. */
     public AddDrbdSplitBrainDialog(final DrbdVolumeInfo dvi) {
         this.dvi = dvi;
     }

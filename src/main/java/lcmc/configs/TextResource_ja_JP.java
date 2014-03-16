@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are japanese texts.
  */
-public final class TextResource_ja_JP extends java.util.ListResourceBundle {
+public final class TextResource_ja_JP extends ListResourceBundle {
 
     /** Get contents. */
     @Override

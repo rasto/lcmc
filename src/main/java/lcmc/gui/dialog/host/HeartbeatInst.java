@@ -43,12 +43,10 @@ import javax.swing.JComponent;
  *
  */
 final class HeartbeatInst extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>HeartbeatInst</code> object. */
+    /** Prepares a new {@code HeartbeatInst} object. */
     HeartbeatInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -109,16 +107,16 @@ final class HeartbeatInst extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans, installMethod);
+                             public void done(final String answer) {
+                                 checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(Tools.getString(
                                          "Dialog.Host.HeartbeatInst.InstError"),
-                                                    ans,
-                                                    exitCode);
+                                         answer,
+                                         errorCode);
                              }
                          },
                          new ConvertCmdCallback() {

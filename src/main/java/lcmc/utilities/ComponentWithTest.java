@@ -29,7 +29,7 @@ import java.awt.Color;
  */
 public interface ComponentWithTest {
     /** Sets background of the tool tip. */
-    void setToolTipBackground(final Color background);
+    void setToolTipBackground(final Color toolTipBackground);
     /** Sets tooltip text. */
-    void setToolTipText(final String toolTipText);
+    void setToolTipText(final String text);
 }

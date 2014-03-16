@@ -33,15 +33,17 @@ import lcmc.utilities.MyButton;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
@@ -93,11 +95,11 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     private static final Map<String, Value> PREFERRED_VALUES =
                                                  new HashMap<String, Value>();
     /** Whether the parameter is editable only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.KEYMAP}));
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.TYPE}));
 
     /** Possible values. */
@@ -459,23 +461,23 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
-                    for (final String p : listenWi.keySet()) {
-                        listenWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : passwdWi.keySet()) {
-                        passwdWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : passwdWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : keymapWi.keySet()) {
-                        keymapWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : keymapWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : portWi.keySet()) {
-                        portWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : portWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : displayWi.keySet()) {
-                        displayWi.get(p).setVisible(sdl);
+                    for (final Map.Entry<String, Widget> entry : displayWi.entrySet()) {
+                        entry.getValue().setVisible(sdl);
                     }
-                    for (final String p : xauthWi.keySet()) {
-                        xauthWi.get(p).setVisible(sdl);
+                    for (final Map.Entry<String, Widget> entry : xauthWi.entrySet()) {
+                        entry.getValue().setVisible(sdl);
                     }
                 }
             });

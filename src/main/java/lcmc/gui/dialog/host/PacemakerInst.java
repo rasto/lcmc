@@ -43,12 +43,10 @@ import javax.swing.JComponent;
  *
  */
 final class PacemakerInst extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>PacemakerInst</code> object. */
+    /** Prepares a new {@code PacemakerInst} object. */
     PacemakerInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -132,17 +130,17 @@ final class PacemakerInst extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans, installMethod);
+                             public void done(final String answer) {
+                                 checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(
                                         Tools.getString(
                                          "Dialog.Host.PacemakerInst.InstError"),
-                                        ans,
-                                        exitCode);
+                                         answer,
+                                         errorCode);
                              }
                          },
                          new ConvertCmdCallback() {

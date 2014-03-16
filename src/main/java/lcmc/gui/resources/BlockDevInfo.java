@@ -60,12 +60,7 @@ import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
@@ -185,7 +180,7 @@ public final class BlockDevInfo extends EditableInfo {
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
 
     /**
-     * Prepares a new <code>BlockDevInfo</code> object.
+     * Prepares a new {@code BlockDevInfo} object.
      *
      * @param name
      *      name that will be shown in the tree
@@ -316,8 +311,8 @@ public final class BlockDevInfo extends EditableInfo {
             }
         }
         /* volume groups */
-        String selectedLV = null;
         if (vg != null) {
+            String selectedLV = null;
             if (bd.isVolumeGroupOnPhysicalVolume()) {
                 tt.append("<b>")
                   .append("    ")
@@ -333,7 +328,7 @@ public final class BlockDevInfo extends EditableInfo {
             if (lvs != null) {
                 for (final String lv : lvs) {
                     tt.append("        ").append(tab);
-                    final String lvName = "/dev/" + vg + "/" + lv;
+                    final String lvName = "/dev/" + vg + '/' + lv;
                     if (lvName.equals(selectedLV)) {
                         if (bd.isDrbd()) {
                             tt.append(lv).append('\n');
@@ -443,17 +438,17 @@ public final class BlockDevInfo extends EditableInfo {
             throw new Exceptions.DrbdConfigException(
                                     "Drbd device not defined for host "
                                     + getHost().getName()
-                                    + " (" + resource + ")");
+                                    + " (" + resource + ')');
         }
         if (getBlockDevice().getName() == null) {
             throw new Exceptions.DrbdConfigException(
                                     "Block device not defined for host "
                                     + getHost().getName()
-                                    + " (" + resource + ")");
+                                    + " (" + resource + ')');
         }
 
         final StringBuilder config = new StringBuilder(120);
-        String tabs;
+        final String tabs;
         if (volumesAvailable) {
             tabs = "\t\t\t";
         } else {
@@ -507,10 +502,9 @@ public final class BlockDevInfo extends EditableInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
-        Widget paramWi;
+        final Widget paramWi;
         if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            final Widget gwi = super.createWidget(param, prefix, width);
-            paramWi = gwi;
+            paramWi = super.createWidget(param, prefix, width);
             //Tools.invokeLater(new Runnable() {
             //    @Override
             //    public void run() {
@@ -532,14 +526,14 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns true if a paramter is correct. */
     @Override
-    protected boolean checkParam(final String param, Value value) {
+    protected boolean checkParam(final String param, final Value newValue) {
         boolean ret = true;
-        if (value.isNothingSelected() && isRequired(param)) {
+        if (newValue.isNothingSelected() && isRequired(param)) {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
             if (infoPanel != null) {
                 if (!getHost().isServerStatusLatch()) {
-                    final boolean internal = "internal".equals(value.getValueForConfig());
+                    final boolean internal = "internal".equals(newValue.getValueForConfig());
                     final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
                     final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
                                                   Widget.WIZARD_PREFIX);
@@ -568,13 +562,13 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
-            if (getBrowser().getUsedPorts().contains(value.getValueForConfig())
-                && !value.equals(getBlockDevice().getValue(param))) {
+            if (getBrowser().getUsedPorts().contains(newValue.getValueForConfig())
+                && !newValue.equals(getBlockDevice().getValue(param))) {
                 ret = false;
             }
             final Pattern p = Pattern.compile(".*\\D.*");
-            final Matcher m = p.matcher(value.getValueForConfig());
-            if (m.matches() && !DRBD_MD_TYPE_FLEXIBLE.equals(value)) {
+            final Matcher m = p.matcher(newValue.getValueForConfig());
+            if (m.matches() && !DRBD_MD_TYPE_FLEXIBLE.equals(newValue)) {
                 ret = false;
             }
         }
@@ -673,7 +667,7 @@ public final class BlockDevInfo extends EditableInfo {
             return blockDevices;
         } else if (DRBD_MD_INDEX_PARAM.equals(param)) {
 
-            Value dmdiValue = getBlockDevice().getValue(DRBD_MD_INDEX_PARAM);
+            final Value dmdiValue = getBlockDevice().getValue(DRBD_MD_INDEX_PARAM);
 
             String defaultMetaDiskIndex;
             if (dmdiValue == null) {
@@ -687,7 +681,6 @@ public final class BlockDevInfo extends EditableInfo {
                          Tools.getString("HostBrowser.MetaDisk.Internal");
             }
 
-            Value[] indeces = new Value[11];
             int index = 0;
             if (defaultMetaDiskIndex == null) {
                 defaultMetaDiskIndex = DRBD_MD_TYPE_FLEXIBLE.getValueForConfig();
@@ -698,6 +691,7 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             }
 
+            final Value[] indeces = new Value[11];
             indeces[0] = DRBD_MD_TYPE_FLEXIBLE;
             for (int i = 1; i < 11; i++) {
                 indeces[i] = new StringValue(Integer.toString(index));
@@ -737,7 +731,7 @@ public final class BlockDevInfo extends EditableInfo {
     protected Value[] getAvailableBlockDevicesForMetaDisk(
                                final Value defaultValue,
                                final String serviceName,
-                               final Set<BlockDevInfo> blockDevInfos) {
+                               final Iterable<BlockDevInfo> blockDevInfos) {
         final List<Value> list = new ArrayList<Value>();
         final Value savedMetaDisk = getBlockDevice().getValue(DRBD_MD_PARAM);
 
@@ -846,7 +840,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Initialize a physical volume. */
     public boolean pvCreate(final boolean testOnly) {
-        String device;
+        final String device;
         if (getBlockDevice().isDrbd()) {
             device = drbdVolumeInfo.getDevice();
         } else {
@@ -861,7 +855,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Remove a physical volume. */
     public boolean pvRemove(final boolean testOnly) {
-        String device;
+        final String device;
         if (getBlockDevice().isDrbd()) {
             device = drbdVolumeInfo.getDevice();
         } else {
@@ -1073,9 +1067,9 @@ public final class BlockDevInfo extends EditableInfo {
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
                     thisClass.setDRBDtestData(dtd);
-                } catch (Exceptions.DrbdConfigException dce) {
+                } catch (final Exceptions.DrbdConfigException dce) {
                     LOG.appError("getInfoPanelBD: config failed", dce);
-                } catch (UnknownHostException e) {
+                } catch (final UnknownHostException e) {
                     LOG.appError("getInfoPanelBD: config failed", e);
                 } finally {
                     getBrowser().drbdtestLockRelease();
@@ -1087,7 +1081,7 @@ public final class BlockDevInfo extends EditableInfo {
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
@@ -1097,11 +1091,11 @@ public final class BlockDevInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         if (getBlockDevice().isDrbd()) {
             final String[] params = getParametersFromXML();
 
@@ -1135,9 +1129,9 @@ public final class BlockDevInfo extends EditableInfo {
                                     DRBD.adjustApply(h, DRBD.ALL, null, false);
                                 }
                                 apply(false);
-                            } catch (Exceptions.DrbdConfigException e) {
+                            } catch (final Exceptions.DrbdConfigException e) {
                                 LOG.appError("getInfoPanelBD: config failed", e);
-                            } catch (UnknownHostException e) {
+                            } catch (final UnknownHostException e) {
                                 LOG.appError("getInfoPanelBD: config failed", e);
                             } finally {
                                 getBrowser().getClusterBrowser()
@@ -1179,7 +1173,7 @@ public final class BlockDevInfo extends EditableInfo {
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
@@ -1259,7 +1253,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'PV create' menu item. */
-    private MyMenuItem getPVCreateItem() {
+    private UpdatableItem getPVCreateItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(PV_CREATE_MENU_ITEM,
                               null,
@@ -1298,7 +1292,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'PV remove' menu item. */
-    private MyMenuItem getPVRemoveItem() {
+    private UpdatableItem getPVRemoveItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(PV_REMOVE_MENU_ITEM,
                               null,
@@ -1337,7 +1331,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'vg create' menu item. */
-    private MyMenuItem getVGCreateItem() {
+    private UpdatableItem getVGCreateItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(
                           VG_CREATE_MENU_ITEM,
@@ -1349,7 +1343,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public boolean visiblePredicate() {
-                BlockDevice bd;
+                final BlockDevice bd;
                 if (getBlockDevice().isDrbd()) {
                     if (!getBlockDevice().isPrimary()) {
                         return false;
@@ -1387,7 +1381,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'VG remove' menu item. */
-    private MyMenuItem getVGRemoveItem() {
+    private UpdatableItem getVGRemoveItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(VG_REMOVE_MENU_ITEM,
                               null,
@@ -1398,7 +1392,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public boolean visiblePredicate() {
-                BlockDevice bd;
+                final BlockDevice bd;
                 if (getBlockDevice().isDrbd()) {
                     if (!getBlockDevice().isPrimary()) {
                         return false;
@@ -1415,7 +1409,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
-                String vg;
+                final String vg;
                 final BlockDevice bd = getBlockDevice();
                 final BlockDevice drbdBD = bd.getDrbdBlockDevice();
                 if (drbdBD == null) {
@@ -1446,7 +1440,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     public String getVGName() {
-        BlockDevice bd;
+        final BlockDevice bd;
         if (getBlockDevice().isDrbd()) {
             bd = getBlockDevice().getDrbdBlockDevice();
             if (bd == null) {
@@ -1466,7 +1460,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'lv create' menu item. */
-    private MyMenuItem getLVCreateItem() {
+    private UpdatableItem getLVCreateItem() {
         String name = LV_CREATE_MENU_ITEM;
         final String vgName = getVGName();
         if (vgName != null) {
@@ -1523,7 +1517,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'LV remove' menu item. */
-    private MyMenuItem getLVRemoveItem() {
+    private UpdatableItem getLVRemoveItem() {
         return new MyMenuItem(LV_REMOVE_MENU_ITEM,
                               null,
                               LV_REMOVE_MENU_DESCRIPTION,
@@ -1567,7 +1561,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'LV remove' menu item. */
-    private MyMenuItem getLVResizeItem() {
+    private UpdatableItem getLVResizeItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(LV_RESIZE_MENU_ITEM,
                               null,
@@ -1602,7 +1596,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns 'LV snapshot' menu item. */
-    private MyMenuItem getLVSnapshotItem() {
+    private UpdatableItem getLVSnapshotItem() {
         final BlockDevInfo thisBDI = this;
         return new MyMenuItem(LV_SNAPSHOT_MENU_ITEM,
                               null,
@@ -1643,7 +1637,7 @@ public final class BlockDevInfo extends EditableInfo {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final BlockDevInfo thisClass = this;
         final boolean testOnly = false;
-        final MyMenu repMenuItem = new MyMenu(
+        final UpdatableItem repMenuItem = new MyMenu(
                         Tools.getString("HostBrowser.Drbd.AddDrbdResource"),
                         new AccessMode(ConfigData.AccessType.ADMIN, false),
                         new AccessMode(ConfigData.AccessType.OP, false)) {
@@ -1680,9 +1674,9 @@ public final class BlockDevInfo extends EditableInfo {
             @Override
             public void updateAndWait() {
                 super.updateAndWait();
-                Cluster cluster = getHost().getCluster();
-                Host[] otherHosts = cluster.getHostsArray();
-                final List<MyMenu> hostMenus = new ArrayList<MyMenu>();
+                final Cluster cluster = getHost().getCluster();
+                final Host[] otherHosts = cluster.getHostsArray();
+                final Collection<MyMenu> hostMenus = new ArrayList<MyMenu>();
                 for (final Host oHost : otherHosts) {
                     if (oHost == getHost()) {
                         continue;
@@ -1722,9 +1716,9 @@ public final class BlockDevInfo extends EditableInfo {
                         public void updateAndWait() {
                             super.updateAndWait();
                             removeAll();
-                            Set<BlockDevInfo> blockDevInfos =
+                            final Set<BlockDevInfo> blockDevInfos =
                                         oHost.getBrowser().getBlockDevInfos();
-                            List<BlockDevInfo> blockDevInfosS =
+                            final List<BlockDevInfo> blockDevInfosS =
                                                 new ArrayList<BlockDevInfo>();
                             for (final BlockDevInfo oBdi : blockDevInfos) {
                                 if (oBdi.getName().equals(
@@ -1825,7 +1819,7 @@ public final class BlockDevInfo extends EditableInfo {
             };
         final ClusterBrowser wi = getBrowser().getClusterBrowser();
         if (wi != null) {
-            final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
+            final ButtonCallback attachItemCallback =
                                        wi.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
@@ -1894,7 +1888,7 @@ public final class BlockDevInfo extends EditableInfo {
                 }
             };
         if (wi != null) {
-            final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
+            final ButtonCallback connectItemCallback =
                                        wi.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
@@ -1910,7 +1904,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(connectMenu);
 
         /* set primary */
-        final MyMenuItem setPrimaryItem =
+        final UpdatableItem setPrimaryItem =
             new MyMenuItem(Tools.getString(
                                   "HostBrowser.Drbd.SetPrimaryOtherSecondary"),
                            null,
@@ -1955,7 +1949,7 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    BlockDevInfo oBdi = getOtherBlockDevInfo();
+                    final BlockDevInfo oBdi = getOtherBlockDevInfo();
                     if (oBdi != null && oBdi.getBlockDevice().isPrimary()
                         && !"yes".equals(
                             drbdVolumeInfo.getDrbdResourceInfo().getParamSaved(
@@ -1968,7 +1962,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(setPrimaryItem);
 
         /* set secondary */
-        final MyMenuItem setSecondaryItem =
+        final UpdatableItem setSecondaryItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetSecondary"),
                            null,
                            Tools.getString(
@@ -2006,7 +2000,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(setSecondaryItem);
 
         /* force primary */
-        final MyMenuItem forcePrimaryItem =
+        final UpdatableItem forcePrimaryItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                            null,
                            Tools.getString("HostBrowser.Drbd.ForcePrimary"),
@@ -2039,7 +2033,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(forcePrimaryItem);
 
         /* invalidate */
-        final MyMenuItem invalidateItem =
+        final UpdatableItem invalidateItem =
             new MyMenuItem(
                    Tools.getString("HostBrowser.Drbd.Invalidate"),
                    null,
@@ -2081,7 +2075,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(invalidateItem);
 
         /* resume / pause sync */
-        final MyMenuItem resumeSyncItem =
+        final UpdatableItem resumeSyncItem =
             new MyMenuItem(
                        Tools.getString("HostBrowser.Drbd.ResumeSync"),
                        null,
@@ -2133,7 +2127,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(resumeSyncItem);
 
         /* resize */
-        final MyMenuItem resizeItem =
+        final UpdatableItem resizeItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.Resize"),
                            null,
                            Tools.getString("HostBrowser.Drbd.Resize.ToolTip"),
@@ -2169,7 +2163,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(resizeItem);
 
         /* discard my data */
-        final MyMenuItem discardDataItem =
+        final UpdatableItem discardDataItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.DiscardData"),
                            null,
                            Tools.getString(
@@ -2215,7 +2209,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(discardDataItem);
 
         /* proxy up/down */
-        final MyMenuItem proxyItem =
+        final UpdatableItem proxyItem =
             new MyMenuItem(Tools.getString("BlockDevInfo.Drbd.ProxyDown"),
                            null,
                            getMenuToolTip("DRBD.proxyDown"),
@@ -2304,7 +2298,7 @@ public final class BlockDevInfo extends EditableInfo {
         items.add(proxyItem);
 
         /* view log */
-        final MyMenuItem viewDrbdLogItem =
+        final UpdatableItem viewDrbdLogItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewDrbdLog"),
                            LOGFILE_ICON,
                            null,
@@ -2324,8 +2318,8 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    String device = getDrbdVolumeInfo().getDevice();
-                    DrbdLog l = new DrbdLog(getHost(), device);
+                    final String device = getDrbdVolumeInfo().getDevice();
+                    final DrbdLog l = new DrbdLog(getHost(), device);
                     l.showDialog();
                 }
             };
@@ -2368,7 +2362,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns text that appears in the corner of the drbd graph. */
     public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
-         String vg;
+         final String vg;
          if (isLVM()) {
              vg = getBlockDevice().getVolumeGroup();
          } else {
@@ -2514,10 +2508,8 @@ public final class BlockDevInfo extends EditableInfo {
         if (o == this) {
             return 0;
         }
-        String name;
-        String oName;
+        final String name;
         int volume = 0;
-        int oVolume = 0;
         final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
         if (getBlockDevice().isDrbd() && dvi != null) {
             name = dvi.getDrbdResourceInfo().getName();
@@ -2530,6 +2522,8 @@ public final class BlockDevInfo extends EditableInfo {
         }
         final BlockDevInfo obdi = (BlockDevInfo) o;
         final DrbdVolumeInfo odvi = obdi.getDrbdVolumeInfo();
+        final String oName;
+        int oVolume = 0;
         if (obdi.getBlockDevice().isDrbd() && odvi != null) {
             oName = odvi.getDrbdResourceInfo().getName();
             final String v = odvi.getName();
@@ -2537,7 +2531,7 @@ public final class BlockDevInfo extends EditableInfo {
                 oVolume = Integer.parseInt(v);
             }
         } else {
-            oName = ((BlockDevInfo) o).getName();
+            oName = o.getName();
         }
         /* drbds up */
         if (getBlockDevice().isDrbd()
@@ -2753,7 +2747,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Whether PV can be removed from this BD. */
     boolean canRemovePV() {
-        BlockDevice bd;
+        final BlockDevice bd;
         if (getBlockDevice().isDrbd()) {
             if (!getBlockDevice().isPrimary()) {
                 return false;
@@ -2770,7 +2764,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Whether VG can be removed. */
     boolean canRemoveVG() {
-        BlockDevice bd;
+        final BlockDevice bd;
         if (getBlockDevice().isDrbd()) {
             if (!getBlockDevice().isPrimary()) {
                 return false;

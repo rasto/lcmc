@@ -24,6 +24,8 @@ package lcmc.utilities;
 
 import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
+
+import java.awt.AWTException;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -57,7 +59,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Text of the item. */
     private String text1;
     /** Icon of the item. */
-    private ImageIcon icon1;
+    private final ImageIcon icon1;
     /** Short decription of the item for tool tip. */
     private String shortDesc1;
     /** Alternate text of the item. */
@@ -85,7 +87,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private String origToolTipText = "";
 
     /**
-     * Prepares a new <code>MyMenuItem</code> object with icon but without
+     * Prepares a new {@code MyMenuItem} object with icon but without
      * tooltip.
      *
      * @param text
@@ -93,13 +95,13 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * @param icon
      *          icon of the item
      */
-    public MyMenuItem(final String text,
-                      final ImageIcon icon,
-                      final AccessMode enableAccessMode,
-                      final AccessMode visibleAccessMode) {
+    protected MyMenuItem(final String text,
+                         final ImageIcon icon,
+                         final AccessMode enableAccessMode,
+                         final AccessMode visibleAccessMode) {
         super(text);
-        this.text1 = text;
-        this.icon1 = icon;
+        text1 = text;
+        icon1 = icon;
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         toolTip = createToolTip();
@@ -109,7 +111,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appError("MyMenuItem: robot error");
         }
         robot = r;
@@ -120,7 +122,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
 
     /**
-     * Prepares a new <code>MyMenuItem</code> object.
+     * Prepares a new {@code MyMenuItem} object.
      *
      * @param text
      *          text of the item
@@ -129,23 +131,23 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * @param shortDesc
      *          short description for the tool tip of the item
      */
-    public MyMenuItem(final String text,
-                      final ImageIcon icon,
-                      final String shortDesc,
-                      final AccessMode enableAccessMode,
-                      final AccessMode visibleAccessMode) {
+    protected MyMenuItem(final String text,
+                         final ImageIcon icon,
+                         final String shortDesc,
+                         final AccessMode enableAccessMode,
+                         final AccessMode visibleAccessMode) {
         super(text);
-        if (shortDesc != null && !"".equals(shortDesc)) {
+        if (shortDesc != null && !shortDesc.isEmpty()) {
             toolTip = createToolTip();
             toolTip.setTipText(shortDesc);
         }
         setNormalFont();
-        this.text1 = text;
-        this.icon1 = icon;
+        text1 = text;
+        icon1 = icon;
         if (shortDesc == null) {
-            this.shortDesc1 = "";
+            shortDesc1 = "";
         } else {
-            this.shortDesc1 = shortDesc;
+            shortDesc1 = shortDesc;
         }
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
@@ -153,7 +155,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appError("MyMenuItem: robot error");
         }
         robot = r;
@@ -163,7 +165,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /**
-     * Prepares a new <code>MyMenuItem</code> object. The alternate item is
+     * Prepares a new {@code MyMenuItem} object. The alternate item is
      * selected if predicate() returns false.
      *
      * @param text1a
@@ -179,14 +181,14 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * @param shortDesc2
      *          short description for the tool tip of the alternate item
      */
-    public MyMenuItem(final String text1a,
-                      final ImageIcon icon1a,
-                      final String shortDesc1a,
-                      final String text2,
-                      final ImageIcon icon2,
-                      final String shortDesc2,
-                      final AccessMode enableAccessMode,
-                      final AccessMode visibleAccessMode) {
+    protected MyMenuItem(final String text1a,
+                         final ImageIcon icon1a,
+                         final String shortDesc1a,
+                         final String text2,
+                         final ImageIcon icon2,
+                         final String shortDesc2,
+                         final AccessMode enableAccessMode,
+                         final AccessMode visibleAccessMode) {
         this(text1a, icon1a, shortDesc1a, enableAccessMode, visibleAccessMode);
         this.text2 = text2;
         this.icon2 = icon2;
@@ -340,7 +342,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      */
     @Override
     public void actionPerformed(final ActionEvent e) {
-        LOG.debug1("actionPerformed: ACTION: " + e.getSource().toString());
+        LOG.debug1("actionPerformed: ACTION: " + e.getSource());
         final Thread thread = new Thread(
             new Runnable() {
                 @Override
@@ -394,12 +396,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
     @Override
-    public final void setToolTipText(final String toolTipText) {
-        if (toolTip == null || toolTipText == null) {
+    public final void setToolTipText(final String text) {
+        if (toolTip == null || text == null) {
             return;
         }
-        origToolTipText = toolTipText;
-        setToolTipText0(toolTipText);
+        origToolTipText = text;
+        setToolTipText0(text);
     }
 
     /** Wiggle the mouse. */
@@ -437,7 +439,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         if (toolTip == null) {
             return;
         }
-        if ("".equals(toolTipText)) {
+        if (toolTipText != null && toolTipText.isEmpty()) {
             toolTipText = text1;
         }
         toolTip.setTipText(toolTipText);
@@ -469,8 +471,4 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.text1 = text1;
     }
 
-    /** Set text2. */
-    public final void setText2(final String text2) {
-        this.text2 = text2;
-    }
 }

@@ -56,8 +56,6 @@ final class CheckInstallation extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                             LoggerFactory.getLogger(CheckInstallation.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
@@ -130,7 +128,7 @@ final class CheckInstallation extends DialogHost {
     /** Label of pacemaker that can be with corosync or openais. */
     private final JLabel pmJLabel = new JLabel("Pcmk/Corosync");
 
-    /** Prepares a new <code>CheckInstallation</code> object. */
+    /** Prepares a new {@code CheckInstallation} object. */
     CheckInstallation(final WizardDialog previousDialog,
                       final Host host) {
         super(previousDialog, host);
@@ -255,13 +253,12 @@ final class CheckInstallation extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkDrbd(ans);
+                             public void done(final String answer) {
+                                 checkDrbd(answer);
                              }
                              @Override
-                             public void doneError(
-                                                         final String ans,
-                                                         final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  checkDrbd(""); // not installed
                              }
                          },
@@ -274,7 +271,7 @@ final class CheckInstallation extends DialogHost {
      * Checks whether drbd is installed and starts heartbeat/pacemaker check.
      */
     void checkDrbd(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
+        if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -319,13 +316,13 @@ final class CheckInstallation extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 LOG.debug2("done: ans: " + ans);
-                                 checkAisHbPm(ans);
+                             public void done(final String answer) {
+                                 LOG.debug2("done: ans: " + answer);
+                                 checkAisHbPm(answer);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  done("");
                              }
                          },
@@ -343,7 +340,7 @@ final class CheckInstallation extends DialogHost {
         getHost().setOpenaisVersion(null);
         getHost().setHeartbeatVersion(null);
         getHost().setCorosyncVersion(null);
-        if (!"".equals(ans) && !"\n".equals(ans)) {
+        if (ans != null && !ans.isEmpty() && !"\n".equals(ans)) {
             for (final String line : ans.split("\n")) {
                 getHost().parseInstallationInfo(line);
             }
@@ -387,7 +384,7 @@ final class CheckInstallation extends DialogHost {
             });
         } else {
             hbPmOk = true;
-            String text;
+            final String text;
             if ("2.1.3".equals(hbVersion)
                 && "sles10".equals(getHost().getDistVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
@@ -396,7 +393,6 @@ final class CheckInstallation extends DialogHost {
             } else {
                 text = hbVersion;
             }
-            final String hbVersionText = text;
             getHost().setHeartbeatVersion(hbVersion);
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -405,11 +401,11 @@ final class CheckInstallation extends DialogHost {
                         || getHost().getHeartbeatVersion().equals(
                                             getHost().getPacemakerVersion())) {
                         hbPmJLabel.setText("Heartbeat");
-                        hbPmLabel.setText(": " + hbVersionText);
+                        hbPmLabel.setText(": " + text);
                     } else {
                         hbPmLabel.setText(": "
                                           + getHost().getPacemakerVersion()
-                                          + "/" + hbVersionText);
+                                          + '/' + text);
                     }
                     hbPmIcon.setIcon(INSTALLED_ICON);
                 }
@@ -432,8 +428,8 @@ final class CheckInstallation extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    String coroAisVersion = "no";
                     pmIcon.setIcon(INSTALLED_ICON);
+                    String coroAisVersion = "no";
                     if (corosyncVersion != null) {
                         pmJLabel.setText("Pcmk/Corosync");
                         coroAisVersion = corosyncVersion;
@@ -443,7 +439,7 @@ final class CheckInstallation extends DialogHost {
                     }
                     pmJLabel.repaint();
                     pmLabel.setText(": "
-                                       + getHost().getPacemakerVersion() + "/"
+                                       + getHost().getPacemakerVersion() + '/'
                                        + coroAisVersion);
                 }
             });

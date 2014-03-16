@@ -49,9 +49,9 @@ public final class MainPanel extends JPanel {
     /** Whether the terminal was already expanded at least once. */
     private boolean expandingDone = false;
     /** Expanding flag mutex. */
-    private final Lock mExpanding = new ReentrantLock();
+    private final transient Lock mExpanding = new ReentrantLock();
 
-    /** Prepares a new <code>MainPanel</code> object. */
+    /** Prepares a new {@code MainPanel} object. */
     public MainPanel() {
         super(new BorderLayout());
         // TODO: not new Host() but null
@@ -62,7 +62,7 @@ public final class MainPanel extends JPanel {
         Tools.getGUIData().setTerminalSplitPane(splitPane);
 
         splitPane.setContinuousLayout(true);
-        splitPane.setResizeWeight(1);
+        splitPane.setResizeWeight(1.0);
         splitPane.setOneTouchExpandable(true);
 
         splitPane.addHierarchyListener(new HierarchyListener() {

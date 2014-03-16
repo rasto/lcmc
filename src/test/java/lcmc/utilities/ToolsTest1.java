@@ -185,7 +185,7 @@ public final class ToolsTest1 extends TestCase {
         assertFalse(Tools.isIp("false.0.0.1"));
 
         for (final Host host : TestSuite1.getHosts()) {
-            assertTrue(Tools.isIp(host.getIp()));
+            assertTrue(Tools.isIp(host.getIpAddress()));
             assertFalse(Tools.isIp(host.getHostname()));
         }
     }
@@ -1249,7 +1249,7 @@ public final class ToolsTest1 extends TestCase {
             fail();
         }
         for (final Host host : TestSuite1.getHosts()) {
-            assertFalse(Tools.isLocalIp(host.getIp()));
+            assertFalse(Tools.isLocalIp(host.getIpAddress()));
         }
     }
 

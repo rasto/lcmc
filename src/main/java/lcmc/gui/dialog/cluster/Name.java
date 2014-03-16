@@ -47,14 +47,12 @@ import lcmc.data.StringValue;
  *
  */
 public final class Name extends DialogCluster {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Name field. */
     private Widget nameField;
     /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
 
-    /** Prepares a new <code>Name</code> object. */
+    /** Prepares a new {@code Name} object. */
     public Name(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }
@@ -76,7 +74,7 @@ public final class Name extends DialogCluster {
     protected void checkFields(final Widget field) {
         final String name = nameField.getStringValue().trim();
         boolean v = true;
-        if (name.length() == 0) {
+        if (name.isEmpty()) {
             v = false;
         } else {
             for (final Cluster c
@@ -187,7 +185,7 @@ public final class Name extends DialogCluster {
         SpringUtilities.makeCompactGrid(pane, 1, 2,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad
-        p.add(pane, BorderLayout.SOUTH);
+        p.add(pane, BorderLayout.PAGE_END);
         return p;
     }
 }

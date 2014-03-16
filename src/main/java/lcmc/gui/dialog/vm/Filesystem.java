@@ -43,8 +43,6 @@ import java.awt.Dimension;
  * @version $Id$
  */
 final class Filesystem extends VMConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
     /** Configuration options of the new domain. */
@@ -57,7 +55,7 @@ final class Filesystem extends VMConfig {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>Filesystem</code> object. */
+    /** Prepares a new {@code Filesystem} object. */
     Filesystem(final WizardDialog previousDialog,
                final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -130,10 +128,10 @@ final class Filesystem extends VMConfig {
             return inputPane;
         }
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsfi.savePreferredValues();
         vmsfi.getResource().setValue(FilesystemData.TYPE,

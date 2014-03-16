@@ -25,7 +25,6 @@ package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
 import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.Info;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
@@ -56,8 +55,6 @@ import lcmc.data.Value;
  *
  */
 public final class Start extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** DRBD resource pulldown menu. */
     private Widget drbdResourceWi;
     /** Width of the combo boxes. */
@@ -71,7 +68,7 @@ public final class Start extends WizardDialog {
     /** DRBD resource info object. */
     private DrbdResourceInfo drbdResourceInfo;
 
-    /** Prepares a new <code>Start</code> object. */
+    /** Prepares a new {@code Start} object. */
     public Start(final WizardDialog previousDialog,
                  final DrbdInfo drbdInfo,
                  final BlockDevInfo blockDevInfo1,
@@ -86,9 +83,9 @@ public final class Start extends WizardDialog {
     @Override
     public WizardDialog nextDialog() {
         boolean newResource = false;
-        final Info i = (Info) drbdResourceWi.getValue();
+        final Value i = drbdResourceWi.getValue();
         if (i == null || i.isNothingSelected()) {
-            final List<BlockDevInfo> bdis =
+            final Iterable<BlockDevInfo> bdis =
                     new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
                                                               blockDevInfo2));
             drbdResourceInfo = drbdInfo.getNewDrbdResource(

@@ -32,12 +32,10 @@ import lcmc.data.Host;
  * @version $Id$
  */
 public class HostLogs extends Logs {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Host from which we get the log/logs. */
     private final Host host;
 
-    /** Prepares a new <code>HostLogs</code> object. */
+    /** Prepares a new {@code HostLogs} object. */
     public HostLogs(final Host host) {
         super();
         this.host = host;
@@ -55,21 +53,12 @@ public class HostLogs extends Logs {
     }
 
     /**
-     * Returns a command name from the DistResource that gets the drbd log file.
-     * "HostLogs.hbLog"
-     */
-    @Override
-    protected String logFileCommand() {
-        return "Logs.hbLog";
-    }
-
-    /**
      * Gets the title of the dialog, defined as Dialog.Logs.Title in
      * TextResources.
      */
     @Override
     protected final String getDialogTitle() {
         return Tools.getString("Dialog.HostLogs.Title") + " ("
-               + host.getName() + ")";
+               + host.getName() + ')';
     }
 }

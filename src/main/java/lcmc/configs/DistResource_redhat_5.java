@@ -22,11 +22,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for centos verson 5.
  */
-public final class DistResource_redhat_5 extends java.util.ListResourceBundle {
+public final class DistResource_redhat_5 extends ListResourceBundle {
 
     /** Get contents. */
     @Override

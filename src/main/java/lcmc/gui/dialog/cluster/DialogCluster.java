@@ -33,12 +33,10 @@ import lcmc.gui.dialog.WizardDialog;
  * @version $Id$
  */
 public abstract class DialogCluster extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Cluster object. */
     private final Cluster cluster;
 
-    /** Prepares a new <code>DialogCluster</code> object. */
+    /** Prepares a new {@code DialogCluster} object. */
     DialogCluster(final WizardDialog previousDialog,
                   final Cluster cluster) {
         super(previousDialog);
