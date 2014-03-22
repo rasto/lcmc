@@ -385,14 +385,6 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void apply(final boolean testOnly) {
         if (!testOnly) {
             final String[] params = getParametersFromXML();
-            Tools.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getApplyButton().setToolTipText("");
-                }
-            });
             storeComboBoxValues(params);
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -529,6 +521,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                 public void run() {
                                     getApplyButton().setEnabled(false);
                                     getRevertButton().setEnabled(false);
+                                    getApplyButton().setToolTipText("");
                                 }
                             });
                             getBrowser().drbdStatusLock();
