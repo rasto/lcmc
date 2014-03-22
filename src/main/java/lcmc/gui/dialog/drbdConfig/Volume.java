@@ -85,18 +85,25 @@ public final class Volume extends DrbdConfig {
         getDrbdVolumeInfo().waitForInfoPanel();
     }
 
+    @Override
+    protected void initDialogBeforeVisible() {
+        super.initDialogBeforeVisible();
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+    }
+
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        buttonClass(nextButton()).setEnabled(
-           getDrbdVolumeInfo().checkResourceFields(null, PARAMS).isCorrect());
+        final boolean correct = getDrbdVolumeInfo().checkResourceFields(
+                                                         null,
+                                                         PARAMS).isCorrect();
+        if (correct) {
+            enableComponents();
+        } else {
+            /* don't enable */
+            enableComponents(new JComponent[]{buttonClass(nextButton())});
+        }
         enableComponents();
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeDefaultButton(buttonClass(nextButton()));
-            }
-        });
         if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
