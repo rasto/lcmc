@@ -210,8 +210,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -250,7 +250,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
         checkResourceFields(null, params);
@@ -370,8 +370,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Removes this video device without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();

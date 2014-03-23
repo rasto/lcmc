@@ -125,7 +125,7 @@ final class CreateMD extends DrbdConfig {
                     if ("internal".equals(drbdMetaDisk)) {
                         drbdMetaDisk = bdis[index].getName();
                     }
-                    final boolean testOnly = false;
+                    final Application.RunMode runMode = Application.RunMode.LIVE;
                     if (destroyData) {
                         DRBD.createMDDestroyData(
                                     bdis[index].getHost(),
@@ -134,7 +134,7 @@ final class CreateMD extends DrbdConfig {
                                     getDrbdVolumeInfo().getName(),
                                     drbdMetaDisk,
                                     execCallback,
-                                    testOnly);
+                                    runMode);
                     } else {
                         DRBD.createMD(bdis[index].getHost(),
                                       getDrbdVolumeInfo().getDrbdResourceInfo()
@@ -142,7 +142,7 @@ final class CreateMD extends DrbdConfig {
                                       getDrbdVolumeInfo().getName(),
                                       drbdMetaDisk,
                                       execCallback,
-                                      testOnly);
+                                      runMode);
                     }
                 }
             });
@@ -200,27 +200,27 @@ final class CreateMD extends DrbdConfig {
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final String clusterName = bdi1.getHost().getCluster().getName();
         Tools.startProgressIndicator(clusterName, "scanning block devices...");
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
             DRBD.proxyUp(bdi1.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                          null,
-                         testOnly);
+                         runMode);
         }
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi2.getHost())) {
             DRBD.proxyUp(bdi2.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                          null,
-                         testOnly);
+                         runMode);
         }
         DRBD.adjustApply(bdi1.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
-                    testOnly);
+                    runMode);
         DRBD.adjustApply(bdi2.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
-                    testOnly);
+                    runMode);
         final String device = getDrbdVolumeInfo().getDevice();
         final ClusterBrowser browser =
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();

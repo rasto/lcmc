@@ -2145,7 +2145,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(false);
+                                apply(Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -3374,7 +3374,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             @Override
                             public void action() {
                                 hidePopup();
-                                removeMyself(false);
+                                removeMyself(Application.RunMode.LIVE);
                             }
         };
         items.add(removeMenuItem);
@@ -3383,7 +3383,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns service icon in the menu. It can be started or stopped. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null && vmsxml.isRunning(getDomainName())) {
@@ -3395,14 +3395,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns category icon. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
-        return getMenuIcon(testOnly);
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
+        return getMenuIcon(runMode);
     }
 
     /** Adds vnc viewer menu items. */
     void addVncViewersToTheMenu(final Collection<UpdatableItem> items,
                                 final Host host) {
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final VMSVirtualDomainInfo thisClass = this;
         if (Tools.getApplication().isTightvnc()) {
             /* tight vnc test menu */
@@ -3807,8 +3807,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     }
 
     /** Applies the changes. */
-    public void apply(final boolean testOnly) {
-        if (testOnly) {
+    public void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -3977,7 +3977,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             parameters,
                             getVirshOptions());
         getResource().setNew(false);
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
         getBrowser().periodicalVMSUpdate(getBrowser().getClusterHosts());
@@ -4818,7 +4818,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 @Override
                 public void run() {
                     if (HEADER_DEFAULT_WIDTHS.containsKey(column)) {
-                        removeMyself(false);
+                        removeMyself(Application.RunMode.LIVE);
                     } else {
                         getBrowser().getVMSInfo().selectMyself();
                     }
@@ -4838,7 +4838,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (DISK_DEFAULT_WIDTHS.containsKey(column)) {
-                            vdi.removeMyself(false);
+                            vdi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vdi.selectMyself();
                         }
@@ -4859,7 +4859,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (FILESYSTEM_DEFAULT_WIDTHS.containsKey(column)) {
-                            vfi.removeMyself(false);
+                            vfi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vfi.selectMyself();
                         }
@@ -4880,7 +4880,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (INTERFACES_DEFAULT_WIDTHS.containsKey(column)) {
-                            vii.removeMyself(false);
+                            vii.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vii.selectMyself();
                         }
@@ -4901,7 +4901,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (INPUTDEVS_DEFAULT_WIDTHS.containsKey(column)) {
-                            vidi.removeMyself(false);
+                            vidi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vidi.selectMyself();
                         }
@@ -4922,7 +4922,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (GRAPHICS_DEFAULT_WIDTHS.containsKey(column)) {
-                            vgi.removeMyself(false);
+                            vgi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vgi.selectMyself();
                         }
@@ -4943,7 +4943,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (SOUND_DEFAULT_WIDTHS.containsKey(column)) {
-                            vsi.removeMyself(false);
+                            vsi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vsi.selectMyself();
                         }
@@ -4964,7 +4964,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (SERIAL_DEFAULT_WIDTHS.containsKey(column)) {
-                            vsi.removeMyself(false);
+                            vsi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vsi.selectMyself();
                         }
@@ -4985,7 +4985,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (PARALLEL_DEFAULT_WIDTHS.containsKey(column)) {
-                            vpi.removeMyself(false);
+                            vpi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vpi.selectMyself();
                         }
@@ -5006,7 +5006,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                     @Override
                     public void run() {
                         if (VIDEO_DEFAULT_WIDTHS.containsKey(column)) {
-                            vvi.removeMyself(false);
+                            vvi.removeMyself(Application.RunMode.LIVE);
                         } else {
                             vvi.selectMyself();
                         }
@@ -5230,9 +5230,9 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Removes this domain. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (getResource().isNew()) {
-            super.removeMyself(testOnly);
+            super.removeMyself(runMode);
             getResource().setNew(false);
             removeNode();
             return;
@@ -5250,13 +5250,13 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                desc,
                Tools.getString("VMSVirtualDomainInfo.confirmRemove.Yes"),
                Tools.getString("VMSVirtualDomainInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
             getResource().setNew(false);
         }
     }
 
     /** Removes this virtual domain without confirmation dialog. */
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null

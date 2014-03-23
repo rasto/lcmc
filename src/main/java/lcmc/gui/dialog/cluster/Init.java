@@ -664,13 +664,14 @@ public class Init extends DialogCluster {
                                                       index).setVisible(false);
                                         }
                                     });
-                                    final boolean testOnly = false;
-                                    DRBD.load(host, testOnly);
+                                    final Application.RunMode runMode =
+                                                       Application.RunMode.LIVE;
+                                    DRBD.load(host, runMode);
                                     if (host.isDrbdUpgraded()) {
                                         DRBD.adjustApply(host,
                                                     DRBD.ALL,
                                                     null,
-                                                    testOnly);
+                                                    runMode);
                                     }
                                     checkCluster(false);
                                 }

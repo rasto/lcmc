@@ -26,6 +26,7 @@ import lcmc.data.resources.Service;
 import lcmc.gui.widget.Widget;
 import java.util.Map;
 import javax.swing.JPanel;
+import lcmc.data.Application;
 import lcmc.gui.widget.Check;
 
 /**
@@ -55,7 +56,7 @@ public interface HbConstraintInterface {
                               final boolean fromUp);
 
     /** Applies the changes after apply button was pressed. */
-    void apply(final Host dcHost, final boolean testOnly);
+    void apply(final Host dcHost, final Application.RunMode runMode);
     /** Revert all values. */
     void revert();
     /** Returns data object of this info. */

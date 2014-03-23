@@ -38,6 +38,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.Application;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -123,7 +124,7 @@ final class Finish extends VMConfig {
                                 createConfigBtn.setEnabled(false);
                             }
                         });
-                        vdi.apply(false);
+                        vdi.apply(Application.RunMode.LIVE);
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {

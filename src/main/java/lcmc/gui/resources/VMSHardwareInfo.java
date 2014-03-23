@@ -151,7 +151,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(false);
+                                apply(Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -346,7 +346,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             @Override
             public void action() {
                 hidePopup();
-                removeMyself(false);
+                removeMyself(Application.RunMode.LIVE);
             }
         };
         addMouseOverListener(removeMenuItem, null);
@@ -356,9 +356,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Removes this hardware from the libvirt with confirmation dialog. */
     @Override
-    public final void removeMyself(final boolean testOnly) {
+    public final void removeMyself(final Application.RunMode runMode) {
         if (getResource().isNew()) {
-            super.removeMyself(testOnly);
+            super.removeMyself(runMode);
             getResource().setNew(false);
             removeNode();
             return;
@@ -372,16 +372,16 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                desc,
                Tools.getString("VMSHardwareInfo.confirmRemove.Yes"),
                Tools.getString("VMSHardwareInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
             getResource().setNew(false);
         }
     }
 
     /** Removes this disk without confirmation dialog. */
-    protected abstract void removeMyselfNoConfirm(final boolean testOnly);
+    protected abstract void removeMyselfNoConfirm(final Application.RunMode runMode);
 
     /** Applies the changes. */
-    abstract void apply(final boolean testOnly);
+    abstract void apply(final Application.RunMode runMode);
 
     /** Adds disk table with only this disk to the main panel. */
     protected abstract void addHardwareTable(final JPanel mainPanel);

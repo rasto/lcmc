@@ -34,6 +34,7 @@ import lcmc.utilities.SSH;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
+import lcmc.data.Application;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
@@ -70,7 +71,7 @@ final class ProxyInst extends DialogHost {
                                         getHost(),
                                         drbdVolumeInfo,
                                         origDialog);
-        DRBD.startProxy(getHost(), DRBD.LIVE);
+        DRBD.startProxy(getHost(), Application.RunMode.LIVE);
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.ProxyInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});

@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import lcmc.data.Application;
 import lcmc.data.StringValue;
 
 /**
@@ -80,7 +81,7 @@ final class InstallationDisk extends VMConfig {
     @Override
     public WizardDialog nextDialog() {
         if (skipButtonIsSelected()) {
-            vmsdi.removeMyself(true);
+            vmsdi.removeMyself(Application.RunMode.TEST);
         }
         if (nextDialogObject == null) {
             nextDialogObject = new Storage(this, getVMSVirtualDomainInfo());

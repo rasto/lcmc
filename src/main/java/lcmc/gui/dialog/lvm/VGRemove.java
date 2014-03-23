@@ -53,6 +53,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import lcmc.data.Application;
 
 /**
  * This class implements VG Remove dialog.
@@ -295,7 +296,7 @@ public final class VGRemove extends LV {
     /** Remove VG. */
     private boolean vgRemove(final Host host,
                              final String vgName) {
-        final boolean ret = LVM.vgRemove(host, vgName, false);
+        final boolean ret = LVM.vgRemove(host, vgName, Application.RunMode.LIVE);
         if (ret) {
             answerPaneAddText("Volume group "
                               + vgName

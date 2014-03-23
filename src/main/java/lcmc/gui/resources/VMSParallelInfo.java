@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import lcmc.data.Application;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
 
@@ -117,8 +118,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
 
     /** Removes this parallel device without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();

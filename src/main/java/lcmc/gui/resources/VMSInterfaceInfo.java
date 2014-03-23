@@ -166,7 +166,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns service icon in the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return NetInfo.NET_I_ICON;
     }
 
@@ -355,8 +355,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -395,7 +395,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getRealParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
         checkResourceFields(null, params);
@@ -555,8 +555,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Removes this interface without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();

@@ -100,6 +100,7 @@ import org.apache.commons.collections15.TransformerUtils;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.data.Application;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -178,9 +179,9 @@ public abstract class ResourceGraph {
     private volatile boolean changed = false;
 
     /** Whether only test or real thing should show. */
-    private volatile boolean testOnlyFlag = false;
-    /** This mutex is for protecting the testOnlyFlag. */
-    private final Lock mTestOnlyFlag = new ReentrantLock();
+    private volatile Application.RunMode runModeFlag = Application.RunMode.LIVE;
+    /** This mutex is for protecting the runModeFlag. */
+    private final Lock mRunModeFlag = new ReentrantLock();
     /** Test animation thread. */
     private volatile Thread testAnimationThread = null;
     /** This mutex is for protecting the test animation thread. */
@@ -281,9 +282,9 @@ public abstract class ResourceGraph {
     public final void startTestAnimation(final JComponent component,
                                          final CountDownLatch startTestLatch) {
         mTestAnimationListLock.lock();
-        mTestOnlyFlag.lock();
-        testOnlyFlag = false;
-        mTestOnlyFlag.unlock();
+        mRunModeFlag.lock();
+        runModeFlag = Application.RunMode.LIVE;
+        mRunModeFlag.unlock();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -303,25 +304,30 @@ public abstract class ResourceGraph {
                             } catch (final InterruptedException ignored) {
                                 Thread.currentThread().interrupt();
                             }
-                            mTestOnlyFlag.lock();
-                            final boolean testOnlyFlagLast;
+                            mRunModeFlag.lock();
+                            final Application.RunMode runModeFlagLast;
                             try {
-                                testOnlyFlag = !testOnlyFlag;
-                                testOnlyFlagLast = testOnlyFlag;
+                                /* invert run mode */
+                                if (Application.isTest(runModeFlag)) {
+                                    runModeFlag = Application.RunMode.LIVE;
+                                } else {
+                                    runModeFlag = Application.RunMode.TEST;
+                                }
+                                runModeFlagLast = runModeFlag;
                             } finally {
-                                mTestOnlyFlag.unlock();
+                                mRunModeFlag.unlock();
                             }
                             repaint();
                             int sleep = 300;
-                            if (testOnlyFlag) {
+                            if (Application.isTest(runModeFlag)) {
                                 sleep = 1200;
                             }
                             for (int s = 0; s < sleep; s += animInterval) {
-                                mTestOnlyFlag.lock();
-                                if (testOnlyFlag == testOnlyFlagLast) {
-                                    mTestOnlyFlag.unlock();
+                                mRunModeFlag.lock();
+                                if (runModeFlag == runModeFlagLast) {
+                                    mRunModeFlag.unlock();
                                 } else {
-                                    mTestOnlyFlag.unlock();
+                                    mRunModeFlag.unlock();
                                     repaint();
                                 }
                                 if (!component.isShowing()) {
@@ -331,11 +337,11 @@ public abstract class ResourceGraph {
 
                                 if (testAnimationList.isEmpty()) {
                                     mTestAnimationListLock.unlock();
-                                    mTestOnlyFlag.lock();
+                                    mRunModeFlag.lock();
                                     try {
-                                        testOnlyFlag = false;
+                                        runModeFlag = Application.RunMode.LIVE;
                                     } finally {
-                                        mTestOnlyFlag.unlock();
+                                        mRunModeFlag.unlock();
                                     }
                                     repaint();
                                     mTestAnimationThreadLock.lock();
@@ -736,7 +742,7 @@ public abstract class ResourceGraph {
 
     /** Returns label for vertex v. */
     protected abstract String getMainText(final Vertex v,
-                                          final boolean testOnly);
+                                          final Application.RunMode runMode);
 
     /** Returns label for edge e. */
     protected abstract String getLabelForEdgeStringer(Edge e);
@@ -1311,8 +1317,8 @@ public abstract class ResourceGraph {
 
     /** Returns an icon for vertex. */
     protected abstract List<ImageIcon> getIconsForVertex(
-                                                      final Vertex v,
-                                                      final boolean testOnly);
+                                          final Vertex v,
+                                          final Application.RunMode runMode);
 
     /** This method draws in the host vertex. */
     protected final void drawInsideVertex(final Graphics2D g2d,
@@ -1367,9 +1373,9 @@ public abstract class ResourceGraph {
 
             /* icons */
             final List<ImageIcon> icons =
-                                   getIconsForVertex((Vertex) v, isTestOnly());
+                                   getIconsForVertex((Vertex) v, getRunMode());
             /* main text */
-            final String mainText = getMainText((Vertex) v, isTestOnly());
+            final String mainText = getMainText((Vertex) v, getRunMode());
             TextLayout mainTextLayout = null;
             if (mainText != null && !mainText.isEmpty()) {
                 mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
@@ -1385,7 +1391,7 @@ public abstract class ResourceGraph {
             }
 
             /* icon text */
-            final String iconText = getIconText((Vertex) v, isTestOnly());
+            final String iconText = getIconText((Vertex) v, getRunMode());
             int iconTextWidth = 0;
             TextLayout iconTextLayout = null;
             if (iconText != null && !iconText.isEmpty()) {
@@ -1396,7 +1402,7 @@ public abstract class ResourceGraph {
 
             /* right corner text */
             final Subtext rightCornerText = getRightCornerText((Vertex) v,
-                                                               isTestOnly());
+                                                               getRunMode());
             TextLayout rightCornerTextLayout = null;
             if (rightCornerText != null && !rightCornerText.equals("")) {
                 rightCornerTextLayout = getVertexTextLayout(
@@ -1412,7 +1418,7 @@ public abstract class ResourceGraph {
             }
 
             /* subtext */
-            final Subtext[] subtexts = getSubtexts((Vertex) v, isTestOnly());
+            final Subtext[] subtexts = getSubtexts((Vertex) v, getRunMode());
             TextLayout[] subtextLayouts = null;
             if (subtexts != null) {
                 subtextLayouts = new TextLayout[subtexts.length];
@@ -1436,7 +1442,7 @@ public abstract class ResourceGraph {
             }
             final int oldShapeWidth = getVertexWidth((Vertex) v);
             final int oldShapeHeight = getVertexHeight((Vertex) v);
-            if (isTestOnlyAnimation()) {
+            if (isRunModeTestAnimation()) {
                 if (oldShapeWidth > shapeWidth) {
                     shapeWidth = oldShapeWidth;
                 }
@@ -1590,15 +1596,15 @@ public abstract class ResourceGraph {
 
     /** Small text that appears above the icon. */
     protected abstract String getIconText(final Vertex v,
-                                          final boolean testOnly);
+                                          final Application.RunMode runMode);
 
     /** Small text that appears in the right corner. */
     protected abstract Subtext getRightCornerText(final Vertex v,
-                                                  final boolean testOnly);
+                                                  final Application.RunMode runMode);
 
     /** Small text that appears down. */
     protected abstract Subtext[] getSubtexts(final Vertex v,
-                                             final boolean testOnly);
+                                             final Application.RunMode runMode);
     /** Returns positions of the vertices (by value). */
     final void getPositions(final Map<String, Point2D> positions) {
         mGraphLock.lock();
@@ -1703,18 +1709,18 @@ public abstract class ResourceGraph {
         changed = true;
     }
 
-    /** Returns if it is testOnly. */
-    protected final boolean isTestOnly() {
-        mTestOnlyFlag.lock();
+    /** Return the run mode. */
+    protected final Application.RunMode getRunMode() {
+        mRunModeFlag.lock();
         try {
-            return testOnlyFlag;
+            return runModeFlag;
         } finally {
-            mTestOnlyFlag.unlock();
+            mRunModeFlag.unlock();
         }
     }
 
     /** Returns if it test animation is running. */
-    protected final boolean isTestOnlyAnimation() {
+    protected final boolean isRunModeTestAnimation() {
         mTestAnimationListLock.lock();
         try {
             return !testAnimationList.isEmpty();

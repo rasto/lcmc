@@ -156,7 +156,7 @@ public final class VMSInfo extends CategoryInfo {
                 public void run() {
                     if (DEFAULT_WIDTHS.containsKey(column)) {
                         /* remove button */
-                        vmsvdi.removeMyself(false);
+                        vmsvdi.removeMyself(Application.RunMode.LIVE);
                     } else {
                         vmsvdi.selectMyself();
                     }

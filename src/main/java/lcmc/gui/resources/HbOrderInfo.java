@@ -316,7 +316,7 @@ final class HbOrderInfo extends EditableInfo
 
     /** Applies changes to the order parameters. */
     @Override
-    public void apply(final Host dcHost, final boolean testOnly) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = false;
@@ -344,9 +344,9 @@ final class HbOrderInfo extends EditableInfo
                                                     null,
                                                     null,
                                                     false,
-                                                    testOnly),
+                                                    runMode),
                               attrs,
-                              testOnly);
+                              runMode);
             } else if (serviceInfoParent.isConstraintPH()
                        || serviceInfoChild.isConstraintPH()) {
                 final ConstraintPHInfo cphi;
@@ -370,18 +370,18 @@ final class HbOrderInfo extends EditableInfo
                                                     rscSet,
                                                     attrs,
                                                     false,
-                                                    testOnly),
+                                                    runMode),
                               prsi.getOrderAttributes(ordId),
-                              testOnly);
+                              runMode);
             } else {
                 CRM.addOrder(dcHost,
                              ordId,
-                             serviceInfoParent.getHeartbeatId(testOnly),
-                             serviceInfoChild.getHeartbeatId(testOnly),
+                             serviceInfoParent.getHeartbeatId(runMode),
+                             serviceInfoChild.getHeartbeatId(runMode),
                              attrs,
-                             testOnly);
+                             runMode);
             }
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 storeComboBoxValues(params);
             }
         }

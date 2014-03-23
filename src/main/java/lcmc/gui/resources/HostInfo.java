@@ -146,7 +146,7 @@ public final class HostInfo extends Info {
 
     /** Returns a host icon for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         final Cluster cl = host.getCluster();
         if (cl != null) {
             return HostBrowser.HOST_IN_CLUSTER_ICON_RIGHT_SMALL;
@@ -162,13 +162,13 @@ public final class HostInfo extends Info {
 
     /** Returns a host icon for the category in the menu. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
     /** Returns tooltip for the host. */
     @Override
-    public String getToolTipForGraph(final boolean testOnly) {
+    public String getToolTipForGraph(final Application.RunMode runMode) {
         return getBrowser().getHostToolTip(host);
     }
 
@@ -344,7 +344,7 @@ public final class HostInfo extends Info {
                     final ClusterStatus clStatus =
                             getBrowser().getClusterBrowser().getClusterStatus();
                     clStatus.setPtestData(null);
-                    CRM.crmConfigureCommit(host, ta.getText(), true);
+                    CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.TEST);
                     final PtestData ptestData =
                                            new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
@@ -368,7 +368,7 @@ public final class HostInfo extends Info {
                             try {
                                 CRM.crmConfigureCommit(host,
                                                        ta.getText(),
-                                                       false);
+                                                       Application.RunMode.LIVE);
                             } finally {
                                 getBrowser().getClusterBrowser()
                                                     .clStatusUnlock();
@@ -464,7 +464,7 @@ public final class HostInfo extends Info {
         items.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
                            HOST_STANDBY_ICON,
@@ -479,7 +479,7 @@ public final class HostInfo extends Info {
 
                 @Override
                 public boolean predicate() {
-                    return !isStandby(testOnly);
+                    return !isStandby(runMode);
                 }
 
                 @Override
@@ -494,10 +494,10 @@ public final class HostInfo extends Info {
                 public void action() {
                     final Host dcHost =
                                   getBrowser().getClusterBrowser().getDCHost();
-                    if (isStandby(testOnly)) {
-                        CRM.standByOff(dcHost, host, testOnly);
+                    if (isStandby(runMode)) {
+                        CRM.standByOff(dcHost, host, runMode);
                     } else {
-                        CRM.standByOn(dcHost, host, testOnly);
+                        CRM.standByOn(dcHost, host, runMode);
                     }
                 }
             };
@@ -507,10 +507,10 @@ public final class HostInfo extends Info {
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
-                    if (isStandby(false)) {
-                        CRM.standByOff(dcHost, host, true);
+                    if (isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOff(dcHost, host, Application.RunMode.TEST);
                     } else {
-                        CRM.standByOn(dcHost, host, true);
+                        CRM.standByOn(dcHost, host, Application.RunMode.TEST);
                     }
                 }
             };
@@ -547,14 +547,14 @@ public final class HostInfo extends Info {
                             && si.getGroupInfo() == null
                             && si.getCloneInfo() == null) {
                             final List<String> runningOnNodes =
-                                                   si.getRunningOnNodes(false);
+                                  si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
                                                         getHost().getName())) {
                                 final Host dcHost = getHost();
                                 si.migrateFromResource(dcHost,
                                                        getHost().getName(),
-                                                       false);
+                                                       Application.RunMode.LIVE);
                             }
                         }
                     }
@@ -568,13 +568,13 @@ public final class HostInfo extends Info {
                             : cb.getExistingServiceList(null)) {
                         if (!si.isConstraintPH() && si.getGroupInfo() == null) {
                             final List<String> runningOnNodes =
-                                                   si.getRunningOnNodes(false);
+                                                   si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
                                                         host.getName())) {
                                 si.migrateFromResource(dcHost,
                                                        host.getName(),
-                                                       true);
+                                                       Application.RunMode.TEST);
                             }
                         }
                     }
@@ -652,8 +652,8 @@ public final class HostInfo extends Info {
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
-                    if (!isStandby(false)) {
-                        CRM.standByOn(dcHost, host, true);
+                    if (!isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, host, Application.RunMode.TEST);
                     }
                 }
             };
@@ -703,8 +703,8 @@ public final class HostInfo extends Info {
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
-                    if (!isStandby(false)) {
-                        CRM.standByOn(dcHost, host, true);
+                    if (!isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, host, Application.RunMode.TEST);
                     }
                 }
             };
@@ -1042,7 +1042,7 @@ public final class HostInfo extends Info {
     /**
      * Returns subtexts that appears in the host vertex in the cluster graph.
      */
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
@@ -1057,7 +1057,7 @@ public final class HostInfo extends Info {
     }
 
     /** Returns text that appears above the icon in the graph. */
-    public String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final Application.RunMode runMode) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
         }
@@ -1065,9 +1065,9 @@ public final class HostInfo extends Info {
     }
 
     /** Returns whether this host is in stand by. */
-    public boolean isStandby(final boolean testOnly) {
+    public boolean isStandby(final Application.RunMode runMode) {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
-        return b != null && b.isStandby(host, testOnly);
+        return b != null && b.isStandby(host, runMode);
     }
 
     /** Returns cluster status. */
@@ -1080,7 +1080,7 @@ public final class HostInfo extends Info {
     }
 
     /** Returns text that appears in the corner of the graph. */
-    public Subtext getRightCornerTextForGraph(final boolean testOnly) {
+    public Subtext getRightCornerTextForGraph(final Application.RunMode runMode) {
         if (getHost().isCommLayerStopping()) {
             return STOPPING_SUBTEXT;
         } else if (getHost().isCommLayerStarting()) {
@@ -1092,7 +1092,7 @@ public final class HostInfo extends Info {
         if (cs != null && cs.isFencedNode(host.getName())) {
             return FENCED_SUBTEXT;
         } else if (getHost().isClStatus()) {
-            if (isStandby(testOnly)) {
+            if (isStandby(runMode)) {
                 return STANDBY_SUBTEXT;
             } else {
                 return ONLINE_SUBTEXT;

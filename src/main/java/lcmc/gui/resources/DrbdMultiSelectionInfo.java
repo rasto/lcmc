@@ -123,7 +123,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.load(hi.getHost(), CRM.LIVE);
+                        DRBD.load(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -159,7 +159,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         DRBD.adjustApply(hi.getHost(),
                                          DRBD.ALL,
                                          null,
-                                         CRM.LIVE);
+                                         Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -176,7 +176,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     DRBD.adjustApply(hi.getHost(),
                                      DRBD.ALL,
                                      null,
-                                     CRM.TESTONLY);
+                                     Application.RunMode.TEST);
                 }
             }
         };
@@ -204,7 +204,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.up(hi.getHost(), DRBD.ALL, null, CRM.LIVE);
+                        DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -214,7 +214,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.up(hi.getHost(), DRBD.ALL, null, CRM.TESTONLY);
+                    DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             }
         };
@@ -243,7 +243,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.stopProxy(hi.getHost(), CRM.LIVE);
+                        DRBD.stopProxy(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -276,7 +276,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.startProxy(hi.getHost(), CRM.LIVE);
+                        DRBD.startProxy(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -345,7 +345,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     if (bdi.canCreatePV()
                         && (!bdi.getBlockDevice().isDrbd()
                             || bdi.getBlockDevice().isPrimary())) {
-                        final boolean ret = bdi.pvCreate(DRBD.LIVE);
+                        final boolean ret = bdi.pvCreate(Application.RunMode.LIVE);
                         if (!ret) {
                             Tools.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVCreate.Failed",
@@ -394,7 +394,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     if (bdi.canRemovePV()
                         && (!bdi.getBlockDevice().isDrbd()
                             || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
-                        final boolean ret = bdi.pvRemove(DRBD.LIVE);
+                        final boolean ret = bdi.pvRemove(Application.RunMode.LIVE);
                         if (!ret) {
                             Tools.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVRemove.Failed",
@@ -635,7 +635,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             "DrbdMultiSelectionInfo.LVRemove.Confirm.Cancel")
                         )) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                        bdi.lvRemove(CRM.LIVE);
+                        bdi.lvRemove(Application.RunMode.LIVE);
                     }
                     for (final Host h : selectedHosts) {
                         getBrowser().updateHWInfo(h, Host.UPDATE_LVM);
@@ -665,7 +665,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.isDiskless(CRM.LIVE)) {
+                        if (!bdi.isDiskless(Application.RunMode.LIVE)) {
                             oneAttached = true;
                         }
                     }
@@ -702,8 +702,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
-                            && !bdi.isDiskless(CRM.LIVE)) {
-                            bdi.detach(CRM.LIVE);
+                            && !bdi.isDiskless(Application.RunMode.LIVE)) {
+                            bdi.detach(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -717,8 +717,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
-                        && !bdi.isDiskless(CRM.LIVE)) {
-                        bdi.detach(CRM.TESTONLY);
+                        && !bdi.isDiskless(Application.RunMode.LIVE)) {
+                        bdi.detach(Application.RunMode.TEST);
                     }
                 }
             }
@@ -742,7 +742,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (bdi.isDiskless(CRM.LIVE)) {
+                        if (bdi.isDiskless(Application.RunMode.LIVE)) {
                             oneDetached = true;
                         }
                     }
@@ -779,8 +779,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
-                            && bdi.isDiskless(CRM.LIVE)) {
-                            bdi.attach(CRM.LIVE);
+                            && bdi.isDiskless(Application.RunMode.LIVE)) {
+                            bdi.attach(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -794,8 +794,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
-                        && bdi.isDiskless(CRM.LIVE)) {
-                        bdi.attach(CRM.TESTONLY);
+                        && bdi.isDiskless(Application.RunMode.LIVE)) {
+                        bdi.attach(Application.RunMode.TEST);
                     }
                 }
             }
@@ -819,7 +819,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (!bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             oneDisconnected = true;
                         }
                     }
@@ -837,7 +837,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
-                        if (bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             continue;
                         }
                         connectable = true;
@@ -855,8 +855,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (bdi.getBlockDevice().isDrbd()
                             && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
-                            && !bdi.isConnectedOrWF(CRM.LIVE)) {
-                            bdi.connect(CRM.LIVE);
+                            && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
+                            bdi.connect(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -869,8 +869,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     if (bdi.getBlockDevice().isDrbd()
                         && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
-                        && !bdi.isConnectedOrWF(CRM.LIVE)) {
-                        bdi.connect(CRM.TESTONLY);
+                        && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
+                        bdi.connect(Application.RunMode.TEST);
                     }
                 }
             }
@@ -894,7 +894,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             oneConnected = true;
                         }
                     }
@@ -920,7 +920,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                     && bdi.getBlockDevice().isSyncSource()))) {
                             continue;
                         }
-                        if (!bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (!bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             continue;
                         }
                         disconnectable = true;
@@ -936,7 +936,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && bdi.isConnectedOrWF(CRM.LIVE)
+                            && bdi.isConnectedOrWF(Application.RunMode.LIVE)
                             && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && (!bdi.getBlockDevice().isSyncing()
@@ -945,7 +945,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                    || (bdi.getOtherBlockDevInfo()
                                           .getBlockDevice().isPrimary()
                                        && bdi.getBlockDevice().isSyncTarget()))) {
-                            bdi.disconnect(CRM.LIVE);
+                            bdi.disconnect(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -956,7 +956,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && bdi.isConnectedOrWF(CRM.LIVE)
+                        && bdi.isConnectedOrWF(Application.RunMode.LIVE)
                         && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && (!bdi.getBlockDevice().isSyncing()
@@ -965,7 +965,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                || (bdi.getOtherBlockDevInfo()
                                       .getBlockDevice().isPrimary()
                                    && bdi.getBlockDevice().isSyncTarget()))) {
-                        bdi.disconnect(CRM.TESTONLY);
+                        bdi.disconnect(Application.RunMode.TEST);
                     }
                 }
             }
@@ -1032,7 +1032,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                 && !bdi.allowTwoPrimaries()) {
                                 continue;
                             }
-                            bdi.setPrimary(CRM.LIVE);
+                            bdi.setPrimary(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1087,7 +1087,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && bdi.getBlockDevice().isPrimary()
                             && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
-                            bdi.setSecondary(CRM.LIVE);
+                            bdi.setSecondary(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1154,7 +1154,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                 && !bdi.allowTwoPrimaries()) {
                                 continue;
                             }
-                            bdi.forcePrimary(CRM.LIVE);
+                            bdi.forcePrimary(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1220,7 +1220,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                                    bdi.getOtherBlockDevInfo())
                             && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
-                            bdi.invalidateBD(CRM.LIVE);
+                            bdi.invalidateBD(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1276,7 +1276,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && bdi.getBlockDevice().isSyncing()
                             && !bdi.getBlockDevice().isSyncTarget()
                             && !bdi.getBlockDevice().isSyncSource()) {
-                            bdi.resumeSync(CRM.LIVE);
+                            bdi.resumeSync(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1327,7 +1327,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (bdi.getBlockDevice().isDrbd()
                             && (bdi.getBlockDevice().isSyncTarget()
                                 || bdi.getBlockDevice().isSyncSource())) {
-                            bdi.pauseSync(CRM.LIVE);
+                            bdi.pauseSync(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1383,7 +1383,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && !selectedBlockDevInfos.contains(
                                                    bdi.getOtherBlockDevInfo())
                             && !bdi.getBlockDevice().isSyncing()) {
-                            bdi.resizeDrbd(CRM.LIVE);
+                            bdi.resizeDrbd(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1450,7 +1450,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.getBlockDevice().isPrimary()) {
-                            bdi.discardData(CRM.LIVE);
+                            bdi.discardData(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1526,7 +1526,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             DRBD.proxyDown(pHost,
                                            dri.getName(),
                                            bdi.getDrbdVolumeInfo().getName(),
-                                           CRM.LIVE);
+                                           Application.RunMode.LIVE);
                             hosts.add(pHost);
                         }
                     }
@@ -1606,7 +1606,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             DRBD.proxyUp(pHost,
                                          dri.getName(),
                                          bdi.getDrbdVolumeInfo().getName(),
-                                         CRM.LIVE);
+                                         Application.RunMode.LIVE);
                             hosts.add(pHost);
                         }
                     }
@@ -1800,7 +1800,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     cs.setPtestData(null);
-                    apply(dcHost, CRM.TESTONLY);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestData(ptestData);
@@ -1821,7 +1821,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), CRM.LIVE);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -1899,6 +1899,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
      * Apply the changes to the drbd parameters.
      * not implemented
      */
-    void apply(final Host dcHost, final boolean testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
     }
 }

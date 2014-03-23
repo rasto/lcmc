@@ -239,8 +239,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Applies the changes to the constraints. */
-    void apply(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -261,9 +261,9 @@ public class HbConnectionInfo extends EditableInfo {
             mConstraintsReadLock.unlock();
         }
         for (final HbConstraintInterface c : constraintsCopy) {
-            c.apply(dcHost, testOnly);
+            c.apply(dcHost, runMode);
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setApplyButtons(null, null);
             getBrowser().setRightComponentInView(this);
         }
@@ -371,7 +371,7 @@ public class HbConnectionInfo extends EditableInfo {
                 try {
                     final ClusterStatus clStatus = getBrowser().getClusterStatus();
                     clStatus.setPtestData(null);
-                    apply(dcHost, true);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
                     clStatus.setPtestData(ptestData);
@@ -439,7 +439,7 @@ public class HbConnectionInfo extends EditableInfo {
                         @Override
                         public void run() {
                             getBrowser().clStatusLock();
-                            apply(getBrowser().getDCHost(), false);
+                            apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                             getBrowser().clStatusUnlock();
                         }
                     });
@@ -505,7 +505,7 @@ public class HbConnectionInfo extends EditableInfo {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         final HbConnectionInfo thisClass = this;
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
 
         final MyMenuItem removeEdgeItem = new MyMenuItem(
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
@@ -528,7 +528,7 @@ public class HbConnectionInfo extends EditableInfo {
                 getBrowser().getCRMGraph().removeConnection(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
-                                                      testOnly);
+                                                      runMode);
             }
         };
         final ButtonCallback removeEdgeCallback =
@@ -542,7 +542,7 @@ public class HbConnectionInfo extends EditableInfo {
                 if (!isNew()) {
                     getBrowser().getCRMGraph().removeConnection(thisClass,
                                                                 dcHost,
-                                                                true);
+                                                                Application.RunMode.TEST);
                 }
             }
         };
@@ -582,7 +582,7 @@ public class HbConnectionInfo extends EditableInfo {
                     getBrowser().getCRMGraph().removeOrder(
                                                      thisClass,
                                                      getBrowser().getDCHost(),
-                                                     testOnly);
+                                                     runMode);
                 } else {
                     /* there is colocation constraint so let's get the
                      * endpoints from it. */
@@ -592,7 +592,7 @@ public class HbConnectionInfo extends EditableInfo {
                     getBrowser().getCRMGraph().addOrder(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
-                                                      testOnly);
+                                                      runMode);
                 }
             }
         };
@@ -609,7 +609,7 @@ public class HbConnectionInfo extends EditableInfo {
                     if (getBrowser().getCRMGraph().isOrder(thisClass)) {
                         getBrowser().getCRMGraph().removeOrder(thisClass,
                                                                dcHost,
-                                                               true);
+                                                               Application.RunMode.TEST);
                     } else {
                         /* there is colocation constraint so let's get the
                          * endpoints from it. */
@@ -618,7 +618,7 @@ public class HbConnectionInfo extends EditableInfo {
                                  getLastServiceInfoWithRsc());
                         getBrowser().getCRMGraph().addOrder(thisClass,
                                                             dcHost,
-                                                            true);
+                                                            Application.RunMode.TEST);
                     }
                 }
             }
@@ -662,7 +662,7 @@ public class HbConnectionInfo extends EditableInfo {
                     getBrowser().getCRMGraph().removeColocation(
                                                    thisClass,
                                                    getBrowser().getDCHost(),
-                                                   testOnly);
+                                                   runMode);
                 } else {
                     /* add colocation */
                     /* there is order constraint so let's get the endpoints
@@ -673,7 +673,7 @@ public class HbConnectionInfo extends EditableInfo {
                     getBrowser().getCRMGraph().addColocation(
                                                       thisClass,
                                                       getBrowser().getDCHost(),
-                                                      testOnly);
+                                                      runMode);
                 }
             }
         };
@@ -691,7 +691,7 @@ public class HbConnectionInfo extends EditableInfo {
                     if (getBrowser().getCRMGraph().isColocation(thisClass)) {
                         getBrowser().getCRMGraph().removeColocation(thisClass,
                                                                     dcHost,
-                                                                    true);
+                                                                    Application.RunMode.TEST);
                     } else {
                         /* add colocation */
                         /* there is order constraint so let's get the endpoints
@@ -701,7 +701,7 @@ public class HbConnectionInfo extends EditableInfo {
                                       getLastServiceInfoChild());
                         getBrowser().getCRMGraph().addColocation(thisClass,
                                                                  dcHost,
-                                                                 true);
+                                                                 Application.RunMode.TEST);
                     }
                 }
             }

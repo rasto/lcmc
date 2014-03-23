@@ -59,6 +59,14 @@ public final class Application {
         GOD,
         NEVER
     }
+    /**
+     * Run mode. TEST does shows changes in the GUI, but does not change the
+     * cluster
+     */
+    public enum RunMode {
+        LIVE,
+        TEST
+    }
     /** Read only operating mode. */
     public static final String OP_MODE_RO =
                                         Tools.getString("Application.OpMode.RO");
@@ -746,5 +754,19 @@ public final class Application {
     /** Set whether to check swing threads. Testing only. */
     public void setCheckSwing(final boolean checkSwing) {
         this.checkSwing = checkSwing;
+    }
+
+    /**
+     * Return whether the run mode is "live" run mode.
+     */
+    public static boolean isLive(final RunMode runMode) {
+        return RunMode.LIVE == runMode;
+    }
+
+    /**
+     * Return whether the run mode is "test" run mode.
+     */
+    public static boolean isTest(final RunMode runMode) {
+        return RunMode.TEST == runMode;
     }
 }

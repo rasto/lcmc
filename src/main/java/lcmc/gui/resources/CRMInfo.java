@@ -26,6 +26,7 @@ import lcmc.gui.Browser;
 import lcmc.utilities.Tools;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import lcmc.data.Application;
 
 /**
  * This class holds data that describe the crm as whole.
@@ -42,7 +43,7 @@ public final class CRMInfo extends HbCategoryInfo {
 
     /** Returns icon for the heartbeat menu item. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return CRM_ICON;
     }
 

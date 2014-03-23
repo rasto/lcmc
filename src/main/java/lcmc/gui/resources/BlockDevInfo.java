@@ -217,11 +217,11 @@ public final class BlockDevInfo extends EditableInfo {
      * TODO: check this
      */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         getBlockDevice().setValue(DRBD_MD_PARAM, null);
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
-        super.removeMyself(testOnly);
-        if (!testOnly) {
+        super.removeMyself(runMode);
+        if (Application.isLive(runMode)) {
             removeNode();
         }
         infoPanel = null;
@@ -234,7 +234,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns block device icon for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
@@ -355,7 +355,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns tool tip for this block device. */
     @Override
-    public String getToolTipForGraph(final boolean testOnly) {
+    public String getToolTipForGraph(final Application.RunMode runMode) {
         final StringBuilder tt = new StringBuilder(60);
 
         final BlockDevice bd = getBlockDevice();
@@ -743,103 +743,103 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** DRBD attach. */
-    void attach(final boolean testOnly) {
+    void attach(final Application.RunMode runMode) {
         DRBD.attach(getHost(),
                     drbdVolumeInfo.getDrbdResourceInfo().getName(),
                     drbdVolumeInfo.getName(),
-                    testOnly);
+                    runMode);
     }
 
     /** DRBD detach. */
-    void detach(final boolean testOnly) {
+    void detach(final Application.RunMode runMode) {
         DRBD.detach(getHost(),
                     drbdVolumeInfo.getDrbdResourceInfo().getName(),
                     drbdVolumeInfo.getName(),
-                    testOnly);
+                    runMode);
     }
 
     /** DRBD connect. */
-    void connect(final boolean testOnly) {
+    void connect(final Application.RunMode runMode) {
         DRBD.connect(getHost(),
                      drbdVolumeInfo.getDrbdResourceInfo().getName(),
                      null,
-                     testOnly);
+                     runMode);
     }
 
     /** DRBD disconnect. */
-    void disconnect(final boolean testOnly) {
+    void disconnect(final Application.RunMode runMode) {
         DRBD.disconnect(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
                         null,
-                        testOnly);
+                        runMode);
     }
 
     /** DRBD pause sync. */
-    void pauseSync(final boolean testOnly) {
+    void pauseSync(final Application.RunMode runMode) {
         DRBD.pauseSync(getHost(),
                        drbdVolumeInfo.getDrbdResourceInfo().getName(),
                        drbdVolumeInfo.getName(),
-                       testOnly);
+                       runMode);
     }
 
     /** DRBD resume sync. */
-    void resumeSync(final boolean testOnly) {
+    void resumeSync(final Application.RunMode runMode) {
         DRBD.resumeSync(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
                         drbdVolumeInfo.getName(),
-                        testOnly);
+                        runMode);
     }
 
     /** DRBD up command. */
-    void drbdUp(final boolean testOnly) {
+    void drbdUp(final Application.RunMode runMode) {
         DRBD.up(getHost(),
                 drbdVolumeInfo.getDrbdResourceInfo().getName(),
                 drbdVolumeInfo.getName(),
-                testOnly);
+                runMode);
     }
 
     /** Sets this drbd block device to the primary state. */
-    void setPrimary(final boolean testOnly) {
+    void setPrimary(final Application.RunMode runMode) {
         DRBD.setPrimary(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
                         drbdVolumeInfo.getName(),
-                        testOnly);
+                        runMode);
     }
 
     /** Sets this drbd block device to the secondary state. */
-    public void setSecondary(final boolean testOnly) {
+    public void setSecondary(final Application.RunMode runMode) {
         DRBD.setSecondary(getHost(),
                           drbdVolumeInfo.getDrbdResourceInfo().getName(),
                           drbdVolumeInfo.getName(),
-                          testOnly);
+                          runMode);
     }
 
     /** Initializes drbd block device. */
-    void initDrbd(final boolean testOnly) {
+    void initDrbd(final Application.RunMode runMode) {
         DRBD.initDrbd(getHost(),
                       drbdVolumeInfo.getDrbdResourceInfo().getName(),
                       drbdVolumeInfo.getName(),
-                      testOnly);
+                      runMode);
     }
 
     /** Make filesystem. */
      public void makeFilesystem(final String filesystem,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         DRBD.makeFilesystem(getHost(),
                             getDrbdVolumeInfo().getDevice(),
                             filesystem,
-                            testOnly);
+                            runMode);
     }
 
     /** Initialize a physical volume. */
-    public boolean pvCreate(final boolean testOnly) {
+    public boolean pvCreate(final Application.RunMode runMode) {
         final String device;
         if (getBlockDevice().isDrbd()) {
             device = drbdVolumeInfo.getDevice();
         } else {
             device = getBlockDevice().getName();
         }
-        final boolean ret = LVM.pvCreate(getHost(), device, testOnly);
+        final boolean ret = LVM.pvCreate(getHost(), device, runMode);
         if (ret) {
             getBlockDevice().setVolumeGroupOnPhysicalVolume("");
         }
@@ -847,14 +847,14 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Remove a physical volume. */
-    public boolean pvRemove(final boolean testOnly) {
+    public boolean pvRemove(final Application.RunMode runMode) {
         final String device;
         if (getBlockDevice().isDrbd()) {
             device = drbdVolumeInfo.getDevice();
         } else {
             device = getBlockDevice().getName();
         }
-        final boolean ret = LVM.pvRemove(getHost(), device, testOnly);
+        final boolean ret = LVM.pvRemove(getHost(), device, runMode);
         if (ret) {
             if (getBlockDevice().isDrbd()) {
                 getBlockDevice().getDrbdBlockDevice()
@@ -867,65 +867,65 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Remove a logical volume. */
-    public boolean lvRemove(final boolean testOnly) {
+    public boolean lvRemove(final Application.RunMode runMode) {
         final String device = getBlockDevice().getName();
-        return LVM.lvRemove(getHost(), device, testOnly);
+        return LVM.lvRemove(getHost(), device, runMode);
     }
 
     /** Make snapshot. */
     public boolean lvSnapshot(final String snapshotName,
                               final String size,
-                              final boolean testOnly) {
+                              final Application.RunMode runMode) {
         final String device = getBlockDevice().getName();
-        return LVM.lvSnapshot(getHost(), snapshotName, device, size, testOnly);
+        return LVM.lvSnapshot(getHost(), snapshotName, device, size, runMode);
     }
 
     /** Skip initial full sync. */
-    public void skipInitialFullSync(final boolean testOnly) {
+    public void skipInitialFullSync(final Application.RunMode runMode) {
         DRBD.skipInitialFullSync(getHost(),
                                  drbdVolumeInfo.getDrbdResourceInfo().getName(),
                                  drbdVolumeInfo.getName(),
-                                 testOnly);
+                                 runMode);
     }
 
     /** Force primary. */
-    public void forcePrimary(final boolean testOnly) {
+    public void forcePrimary(final Application.RunMode runMode) {
         DRBD.forcePrimary(getHost(),
                           drbdVolumeInfo.getDrbdResourceInfo().getName(),
                           drbdVolumeInfo.getName(),
-                          testOnly);
+                          runMode);
     }
 
     /** Invalidate the block device. */
-    void invalidateBD(final boolean testOnly) {
+    void invalidateBD(final Application.RunMode runMode) {
         DRBD.invalidate(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
                         drbdVolumeInfo.getName(),
-                        testOnly);
+                        runMode);
     }
 
     /** Discard the data. */
-    void discardData(final boolean testOnly) {
+    void discardData(final Application.RunMode runMode) {
         DRBD.discardData(getHost(),
                          drbdVolumeInfo.getDrbdResourceInfo().getName(),
                          null,
-                         testOnly);
+                         runMode);
     }
 
     /** Start on-line verification. */
-    void verify(final boolean testOnly) {
+    void verify(final Application.RunMode runMode) {
         DRBD.verify(getHost(),
                     drbdVolumeInfo.getDrbdResourceInfo().getName(),
                     drbdVolumeInfo.getName(),
-                    testOnly);
+                    runMode);
     }
 
     /** Resize DRBD. */
-    public boolean resizeDrbd(final boolean testOnly) {
+    public boolean resizeDrbd(final Application.RunMode runMode) {
         return DRBD.resize(getHost(),
                            drbdVolumeInfo.getDrbdResourceInfo().getName(),
                            drbdVolumeInfo.getName(),
-                           testOnly);
+                           runMode);
     }
 
     /** Returns the graphical view. */
@@ -963,8 +963,8 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Apply all fields. */
-    public void apply(final boolean testOnly) {
-        if (!testOnly) {
+    public void apply(final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
                 @Override
@@ -1046,15 +1046,18 @@ public final class BlockDevInfo extends EditableInfo {
                                              startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 thisClass.setDRBDtestData(null);
-                apply(true);
+                apply(Application.RunMode.TEST);
                 final Map<Host, String> testOutput =
                                          new LinkedHashMap<Host, String>();
                 try {
                     getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
-                                                                          true);
+                                                      Application.RunMode.TEST);
                     for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
-                        DRBD.adjustApply(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h,
+                                         DRBD.ALL,
+                                         null,
+                                         Application.RunMode.TEST);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -1116,12 +1119,15 @@ public final class BlockDevInfo extends EditableInfo {
                             getBrowser().getClusterBrowser().drbdStatusLock();
                             try {
                                 getBrowser().getDrbdGraph().getDrbdInfo()
-                                              .createDrbdConfig(false);
+                                      .createDrbdConfig(Application.RunMode.LIVE);
                                 for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
-                                    DRBD.adjustApply(h, DRBD.ALL, null, false);
+                                    DRBD.adjustApply(h,
+                                                     DRBD.ALL,
+                                                     null,
+                                                     Application.RunMode.LIVE);
                                 }
-                                apply(false);
+                                apply(Application.RunMode.LIVE);
                             } catch (final Exceptions.DrbdConfigException e) {
                                 LOG.appError("getInfoPanelBD: config failed", e);
                             } catch (final UnknownHostException e) {
@@ -1217,7 +1223,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns 'add drbd resource' menu item. */
     private MyMenuItem addDrbdResourceMenuItem(final BlockDevInfo oBdi,
-                                               final boolean testOnly) {
+                                               final Application.RunMode runMode) {
         final BlockDevInfo thisClass = this;
         return new MyMenuItem(oBdi.toString(),
                               null,
@@ -1240,7 +1246,7 @@ public final class BlockDevInfo extends EditableInfo {
                 drbdInfo.addDrbdVolume(thisClass,
                                        oBdi,
                                        true,
-                                       testOnly);
+                                       runMode);
             }
         };
     }
@@ -1271,7 +1277,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void action() {
-                final boolean ret = thisBDI.pvCreate(DRBD.LIVE);
+                final boolean ret = thisBDI.pvCreate(Application.RunMode.LIVE);
                 if (!ret) {
                     Tools.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVCreate.Failed",
@@ -1310,7 +1316,7 @@ public final class BlockDevInfo extends EditableInfo {
 
             @Override
             public void action() {
-                final boolean ret = thisBDI.pvRemove(false);
+                final boolean ret = thisBDI.pvRemove(Application.RunMode.LIVE);
                 if (!ret) {
                     Tools.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVRemove.Failed",
@@ -1543,7 +1549,7 @@ public final class BlockDevInfo extends EditableInfo {
                         "Remove logical volume and DESTROY all the data on it?",
                         "Remove",
                         "Cancel")) {
-                    final boolean ret = lvRemove(false);
+                    final boolean ret = lvRemove(Application.RunMode.LIVE);
                     final Host host = getHost();
                     getBrowser().getClusterBrowser().updateHWInfo(
                                                         host,
@@ -1629,7 +1635,7 @@ public final class BlockDevInfo extends EditableInfo {
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final BlockDevInfo thisClass = this;
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final UpdatableItem repMenuItem = new MyMenu(
                         Tools.getString("HostBrowser.Drbd.AddDrbdResource"),
                         new AccessMode(Application.AccessType.ADMIN, false),
@@ -1726,7 +1732,7 @@ public final class BlockDevInfo extends EditableInfo {
                                 if (oBdi.getDrbdVolumeInfo() == null
                                     && oBdi.getBlockDevice().isAvailable()) {
                                     add(addDrbdResourceMenuItem(oBdi,
-                                                                testOnly));
+                                                                runMode));
                                 }
                                 if (oBdi.getName().equals(
                                             getBlockDevice().getName())) {
@@ -1804,9 +1810,9 @@ public final class BlockDevInfo extends EditableInfo {
                 public void action() {
                     if (this.getText().equals(
                                 Tools.getString("HostBrowser.Drbd.Attach"))) {
-                        attach(testOnly);
+                        attach(runMode);
                     } else {
-                        detach(testOnly);
+                        detach(runMode);
                     }
                 }
             };
@@ -1816,10 +1822,10 @@ public final class BlockDevInfo extends EditableInfo {
                                        wi.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
-                    if (isDiskless(false)) {
-                        attach(true);
+                    if (isDiskless(Application.RunMode.LIVE)) {
+                        attach(Application.RunMode.TEST);
                     } else {
-                        detach(true);
+                        detach(Application.RunMode.TEST);
                     }
                 }
             };
@@ -1841,7 +1847,7 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public boolean predicate() {
-                    return isConnectedOrWF(testOnly);
+                    return isConnectedOrWF(runMode);
                 }
 
                 @Override
@@ -1874,9 +1880,9 @@ public final class BlockDevInfo extends EditableInfo {
                 public void action() {
                     if (this.getText().equals(
                             Tools.getString("HostBrowser.Drbd.Connect"))) {
-                        connect(testOnly);
+                        connect(runMode);
                     } else {
-                        disconnect(testOnly);
+                        disconnect(runMode);
                     }
                 }
             };
@@ -1885,10 +1891,10 @@ public final class BlockDevInfo extends EditableInfo {
                                        wi.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host host) {
-                    if (isConnectedOrWF(false)) {
-                        disconnect(true);
+                    if (isConnectedOrWF(Application.RunMode.LIVE)) {
+                        disconnect(Application.RunMode.TEST);
                     } else {
-                        connect(true);
+                        connect(Application.RunMode.TEST);
                     }
                 }
             };
@@ -1947,9 +1953,9 @@ public final class BlockDevInfo extends EditableInfo {
                         && !"yes".equals(
                             drbdVolumeInfo.getDrbdResourceInfo().getParamSaved(
                                     ALLOW_TWO_PRIMARIES).getValueForConfig())) {
-                        oBdi.setSecondary(testOnly);
+                        oBdi.setSecondary(runMode);
                     }
-                    setPrimary(testOnly);
+                    setPrimary(runMode);
                 }
             };
         items.add(setPrimaryItem);
@@ -1986,7 +1992,7 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    setSecondary(testOnly);
+                    setSecondary(runMode);
                 }
             };
         //enableMenu(setSecondaryItem, false);
@@ -2020,7 +2026,7 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    forcePrimary(testOnly);
+                    forcePrimary(runMode);
                 }
             };
         items.add(forcePrimaryItem);
@@ -2062,7 +2068,7 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    invalidateBD(testOnly);
+                    invalidateBD(runMode);
                 }
             };
         items.add(invalidateItem);
@@ -2111,9 +2117,9 @@ public final class BlockDevInfo extends EditableInfo {
                 public void action() {
                     if (this.getText().equals(
                             Tools.getString("HostBrowser.Drbd.ResumeSync"))) {
-                        resumeSync(testOnly);
+                        resumeSync(runMode);
                     } else {
-                        pauseSync(testOnly);
+                        pauseSync(runMode);
                     }
                 }
             };
@@ -2150,7 +2156,7 @@ public final class BlockDevInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    resizeDrbd(testOnly);
+                    resizeDrbd(runMode);
                 }
             };
         items.add(resizeItem);
@@ -2182,7 +2188,7 @@ public final class BlockDevInfo extends EditableInfo {
                     if (getBlockDevice().isSyncing()) {
                         return DrbdVolumeInfo.IS_SYNCING_STRING;
                     }
-                    //if (isConnected(testOnly)) { // ? TODO: check this
+                    //if (isConnected(runMode)) { // ? TODO: check this
                     //    return "is connected";
                     //}
                     if (getBlockDevice().isPrimary()) {
@@ -2190,13 +2196,13 @@ public final class BlockDevInfo extends EditableInfo {
                     }
                     return null;
                     //return !getBlockDevice().isSyncing()
-                    //       && !isConnected(testOnly)
+                    //       && !isConnected(runMode)
                     //       && !getBlockDevice().isPrimary();
                 }
 
                 @Override
                 public void action() {
-                    discardData(testOnly);
+                    discardData(runMode);
                 }
             };
         items.add(discardDataItem);
@@ -2277,13 +2283,13 @@ public final class BlockDevInfo extends EditableInfo {
                                 pHost,
                                 drbdVolumeInfo.getDrbdResourceInfo().getName(),
                                 drbdVolumeInfo.getName(),
-                                testOnly);
+                                runMode);
                     } else {
                         DRBD.proxyUp(
                                 pHost,
                                 drbdVolumeInfo.getDrbdResourceInfo().getName(),
                                 drbdVolumeInfo.getName(),
-                                testOnly);
+                                runMode);
                     }
                     getBrowser().getClusterBrowser().updateProxyHWInfo(pHost);
                 }
@@ -2332,7 +2338,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns text that appears above the icon. */
-    public String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final Application.RunMode runMode) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
         }
@@ -2354,7 +2360,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns text that appears in the corner of the drbd graph. */
-    public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
+    public Subtext getRightCornerTextForDrbdGraph(final Application.RunMode runMode) {
          final String vg;
          if (isLVM()) {
              vg = getBlockDevice().getVolumeGroup();
@@ -2400,19 +2406,19 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns whether this device is connected via drbd. */
-    public boolean isConnected(final boolean testOnly) {
+    public boolean isConnected(final Application.RunMode runMode) {
         final DRBDtestData dtd = getDRBDtestData();
-        if (testOnly && dtd != null) {
-            return isConnectedTest(dtd) && !isWFConnection(testOnly);
+        if (dtd != null && Application.isTest(runMode)) {
+            return isConnectedTest(dtd) && !isWFConnection(runMode);
         } else {
             return getBlockDevice().isConnected();
         }
     }
 
     /** Returns whether this device is connected or wait-for-c via drbd. */
-    boolean isConnectedOrWF(final boolean testOnly) {
+    boolean isConnectedOrWF(final Application.RunMode runMode) {
         final DRBDtestData dtd = getDRBDtestData();
-        if (testOnly && dtd != null) {
+        if (dtd != null && Application.isTest(runMode)) {
             return isConnectedTest(dtd);
         } else {
             return getBlockDevice().isConnectedOrWF();
@@ -2420,10 +2426,10 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns whether this device is in wait-for-connection state. */
-    public boolean isWFConnection(final boolean testOnly) {
+    public boolean isWFConnection(final Application.RunMode runMode) {
         final DRBDtestData dtd = getDRBDtestData();
-        if (testOnly && dtd != null) {
-            return isConnectedOrWF(testOnly)
+        if (dtd != null && Application.isTest(runMode)) {
+            return isConnectedOrWF(runMode)
                    && isConnectedTest(dtd)
                    && !getOtherBlockDevInfo().isConnectedTest(dtd);
         } else {
@@ -2442,10 +2448,10 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns whether this device is diskless. */
-    public boolean isDiskless(final boolean testOnly) {
+    public boolean isDiskless(final Application.RunMode runMode) {
         final DRBDtestData dtd = getDRBDtestData();
         final DrbdVolumeInfo dvi = drbdVolumeInfo;
-        if (testOnly && dtd != null && dvi != null) {
+        if (dtd != null && dvi != null && Application.isTest(runMode)) {
             return dtd.isDiskless(getHost(), drbdVolumeInfo.getDevice())
                    || (!dtd.isAttached(getHost(),
                                        drbdVolumeInfo.getDevice())
@@ -2689,7 +2695,7 @@ public final class BlockDevInfo extends EditableInfo {
      * Proxy status for graph, null if there's no proxy configured for the
      * resource.
      */
-    public String getProxyStateForGraph(final boolean testOnly) {
+    public String getProxyStateForGraph(final Application.RunMode runMode) {
         final DrbdVolumeInfo dvi = drbdVolumeInfo;
         if (dvi == null) {
             return null;
@@ -2708,7 +2714,7 @@ public final class BlockDevInfo extends EditableInfo {
                     return PROXY_DOWN;
                 }
             } else {
-                if (dvi.isConnected(testOnly)) {
+                if (dvi.isConnected(runMode)) {
                     return PROXY_UP;
                 } else {
                     return pHost.getName();

@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
+import lcmc.data.Application;
 
 import lcmc.utilities.TestSuite1;
 import lcmc.utilities.Tools;
-import lcmc.utilities.CRM;
 import lcmc.data.Host;
 
 public final class ClusterBrowserTest1 extends TestCase {
@@ -42,7 +42,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                     buffer,
                                     host,
                                     nolatch,
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
             assertEquals("cdab", buffer.toString());
 
             buffer = new StringBuffer("");
@@ -50,7 +50,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                     buffer,
                                     host,
                                     nolatch,
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
             assertEquals("ab", buffer.toString());
 
             buffer = new StringBuffer("cd");
@@ -58,7 +58,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                     buffer,
                                     host,
                                     nolatch,
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
             assertEquals("cdab", buffer.toString());
 
             buffer = new StringBuffer("cd");
@@ -66,7 +66,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                     buffer,
                                     host,
                                     nolatch,
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
             assertEquals("cdabc", buffer.toString());
         }
 
@@ -149,7 +149,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                 emptyCib = cib;
             }
             final CountDownLatch firstTime = new CountDownLatch(0);
-            final boolean testOnly = false;
+            final Application.RunMode runMode = Application.RunMode.LIVE;
             for (final Host host : TestSuite1.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
@@ -157,7 +157,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                         new StringBuffer(""),
                                         host,
                                         firstTime,
-                                        testOnly);
+                                        runMode);
                 Tools.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCRMGraph().repaint();
@@ -170,7 +170,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                                         new StringBuffer(""),
                                         host,
                                         firstTime,
-                                        testOnly);
+                                        runMode);
                 Tools.waitForSwing();
             }
         }

@@ -29,6 +29,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+import lcmc.data.Application;
 import lcmc.data.Value;
 
 /**
@@ -91,7 +92,7 @@ public class NetInfo extends Info {
 
     /** Returns icon of the net interface for the menu. */
     @Override
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    public final ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return NET_I_ICON;
     }
 

@@ -108,7 +108,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 @Override
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (!hi.isStandby(CRM.LIVE)) {
+                        if (!hi.isStandby(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -132,10 +132,10 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     final Host dcHost = getBrowser().getDCHost();
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (!hi.isStandby(CRM.LIVE)) {
+                        if (!hi.isStandby(Application.RunMode.LIVE)) {
                             CRM.standByOn(dcHost,
                                           hi.getHost(),
-                                          CRM.LIVE);
+                                          Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -146,8 +146,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (!hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOn(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (!hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -168,7 +168,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 @Override
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (hi.isStandby(CRM.LIVE)) {
+                        if (hi.isStandby(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -192,10 +192,10 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     final Host dcHost = getBrowser().getDCHost();
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (hi.isStandby(CRM.LIVE)) {
+                        if (hi.isStandby(Application.RunMode.LIVE)) {
                             CRM.standByOff(dcHost,
                                            hi.getHost(),
-                                           CRM.LIVE);
+                                           Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -206,8 +206,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOff(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOff(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -292,8 +292,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (!hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOn(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (!hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -347,8 +347,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (!hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOn(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (!hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -635,7 +635,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!si.isStarted(CRM.LIVE)) {
+                        if (!si.isStarted(Application.RunMode.LIVE)) {
                             allStarted = false;
                         }
                         final String avail =
@@ -660,7 +660,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.startResource(dcHost, CRM.LIVE);
+                        si.startResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -674,7 +674,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.startResource(dcHost, CRM.TESTONLY);
+                    si.startResource(dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -702,7 +702,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!si.isStopped(CRM.LIVE)) {
+                        if (!si.isStopped(Application.RunMode.LIVE)) {
                             allStopped = false;
                         }
                         final String avail =
@@ -727,7 +727,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.stopResource(dcHost, CRM.LIVE);
+                        si.stopResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -741,7 +741,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.stopResource(dcHost, CRM.TESTONLY);
+                    si.stopResource(dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -766,7 +766,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public boolean predicate() {
                     for (final ServiceInfo si : selectedServiceInfos) {
                         if (si.getService().isAvailable()
-                            && si.isOneFailed(CRM.LIVE)) {
+                            && si.isOneFailed(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -785,7 +785,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (si.isOneFailedCount(CRM.LIVE)) {
+                        if (si.isOneFailedCount(Application.RunMode.LIVE)) {
                             failCount = true;
                         }
                     }
@@ -817,7 +817,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.cleanupResource(dcHost, CRM.LIVE);
+                        si.cleanupResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -843,7 +843,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!si.isManaged(CRM.LIVE)) {
+                        if (!si.isManaged(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -879,7 +879,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.setManaged(true, dcHost, CRM.LIVE);
+                        si.setManaged(true, dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -893,7 +893,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.setManaged(true, dcHost, CRM.TESTONLY);
+                    si.setManaged(true, dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -918,7 +918,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (si.isManaged(CRM.LIVE)) {
+                        if (si.isManaged(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -954,7 +954,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.setManaged(false, dcHost, CRM.LIVE);
+                        si.setManaged(false, dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -968,7 +968,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.setManaged(false, dcHost, CRM.TESTONLY);
+                    si.setManaged(false, dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -1017,7 +1017,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                 return "not available on this host";
                             }
                             final List<String> runningOnNodes =
-                                                si.getRunningOnNodes(CRM.LIVE);
+                                                si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes == null
                                 || runningOnNodes.size() < 1) {
                                 return "must run";
@@ -1049,7 +1049,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                 || si.getService().isOrphaned()) {
                                 continue;
                             }
-                            si.migrateFromResource(dcHost, hostName, CRM.LIVE);
+                            si.migrateFromResource(dcHost, hostName, Application.RunMode.LIVE);
                         }
                     }
                 };
@@ -1063,7 +1063,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.migrateFromResource(dcHost, hostName, CRM.TESTONLY);
+                        si.migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
                     }
                 }
             };
@@ -1097,8 +1097,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         }
                         if (!getBrowser().clStatusFailed()
                              && si.getService().isAvailable()
-                             && (si.getMigratedTo(CRM.LIVE) != null
-                                 || si.getMigratedFrom(CRM.LIVE) != null)) {
+                             && (si.getMigratedTo(Application.RunMode.LIVE) != null
+                                 || si.getMigratedFrom(Application.RunMode.LIVE) != null)) {
                         } else {
                             return "not available";
                         }
@@ -1116,7 +1116,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.unmigrateResource(dcHost, CRM.LIVE);
+                        si.unmigrateResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
@@ -1130,7 +1130,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.unmigrateResource(dcHost, CRM.TESTONLY);
+                    si.unmigrateResource(dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -1156,7 +1156,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         continue;
                     } else if (si.getService().isRemoved()) {
                         return ServiceInfo.IS_BEING_REMOVED_STRING;
-                    } else if (si.isRunning(CRM.LIVE)
+                    } else if (si.isRunning(Application.RunMode.LIVE)
                                && !Tools.getApplication().isAdvancedMode()) {
                         return "cannot remove running resource<br>"
                                + "(advanced mode only)";
@@ -1166,8 +1166,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         continue;
                     }
                     final List<String> gr = cs.getGroupResources(
-                                              gi.getHeartbeatId(CRM.LIVE),
-                                              CRM.LIVE);
+                                              gi.getHeartbeatId(Application.RunMode.LIVE),
+                                              Application.RunMode.LIVE);
 
 
                     if (gr == null || gr.size() <= 1) {
@@ -1194,9 +1194,9 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         si = cs;
                     }
                     if (si.getService().isOrphaned()) {
-                        si.cleanupResource(dcHost, CRM.LIVE);
+                        si.cleanupResource(dcHost, Application.RunMode.LIVE);
                     } else {
-                        si.removeMyselfNoConfirm(dcHost, CRM.LIVE);
+                        si.removeMyselfNoConfirm(dcHost, Application.RunMode.LIVE);
                     }
                 }
                 getBrowser().getCRMGraph().repaint();
@@ -1221,7 +1221,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    si.removeMyselfNoConfirm(dcHost, CRM.TESTONLY);
+                    si.removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -1398,7 +1398,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     cs.setPtestData(null);
-                    apply(dcHost, CRM.TESTONLY);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData =
                                         new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
@@ -1421,7 +1421,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), CRM.LIVE);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -1500,6 +1500,6 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
      * Apply the changes to the service parameters.
      * not implemented
      */
-    void apply(final Host dcHost, final boolean testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
     }
 }

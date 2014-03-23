@@ -306,8 +306,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    final void apply(final boolean testOnly) {
-        if (testOnly) {
+    final void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -352,7 +352,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
         checkResourceFields(null, params);

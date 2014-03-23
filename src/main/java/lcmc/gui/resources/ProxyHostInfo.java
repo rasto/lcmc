@@ -85,7 +85,7 @@ public final class ProxyHostInfo extends Info {
 
     /** Returns a host icon for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
@@ -97,7 +97,7 @@ public final class ProxyHostInfo extends Info {
 
     /** Returns a host icon for the category in the menu. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
@@ -274,7 +274,7 @@ public final class ProxyHostInfo extends Info {
             };
         items.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
 
         /* proxy start/stop */
         final UpdatableItem proxyItem =
@@ -306,9 +306,9 @@ public final class ProxyHostInfo extends Info {
                 @Override
                 public void action() {
                     if (getHost().isDrbdProxyRunning()) {
-                        DRBD.stopProxy(getHost(), testOnly);
+                        DRBD.stopProxy(getHost(), runMode);
                     } else {
-                        DRBD.startProxy(getHost(), testOnly);
+                        DRBD.startProxy(getHost(), runMode);
                     }
                     getBrowser().getClusterBrowser().updateProxyHWInfo(host);
                 }
@@ -333,7 +333,7 @@ public final class ProxyHostInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.proxyUp(host, DRBD.ALL, null, testOnly);
+                    DRBD.proxyUp(host, DRBD.ALL, null, runMode);
                     getBrowser().getClusterBrowser().updateProxyHWInfo(host);
                 }
             };
@@ -357,7 +357,7 @@ public final class ProxyHostInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.proxyDown(host, DRBD.ALL, null, testOnly);
+                    DRBD.proxyDown(host, DRBD.ALL, null, runMode);
                     getBrowser().getClusterBrowser().updateProxyHWInfo(host);
                 }
             };

@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import lcmc.data.Application;
 
 
 /**
@@ -53,7 +54,7 @@ public class CategoryInfo extends Info {
 
     /** Returns the icon. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return Browser.CATEGORY_ICON;
     }
 

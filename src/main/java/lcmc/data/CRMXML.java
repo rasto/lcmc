@@ -25,7 +25,6 @@ package lcmc.data;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
-import lcmc.utilities.CRM;
 import lcmc.utilities.Unit;
 import lcmc.robotest.RoboTest;
 import lcmc.gui.resources.Info;
@@ -922,7 +921,7 @@ public final class CRMXML extends XML {
                                 Tools.getString("CRMXML.GetRAMetaData.Done");
                 Tools.startProgressIndicator(hn, text);
                 ssi.setAllResources(ssi.getBrowser().getClusterStatus(),
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
                 final Info li =
                    ssi.getBrowser().getClusterViewPanel().getLastSelectedInfo();
                 if (li instanceof ServiceInfo) {

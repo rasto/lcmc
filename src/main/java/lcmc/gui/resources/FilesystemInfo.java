@@ -35,6 +35,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;
 
 import java.util.Map;
+import lcmc.data.Application;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.gui.widget.Check;
@@ -129,8 +130,8 @@ final class FilesystemInfo extends ServiceInfo {
 
     /** Applies changes to the Filesystem service parameters. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -183,7 +184,7 @@ final class FilesystemInfo extends ServiceInfo {
                 }
             }
         }
-        super.apply(dcHost, testOnly);
+        super.apply(dcHost, runMode);
         //TODO: escape dir
     }
 
@@ -374,11 +375,11 @@ final class FilesystemInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
-        super.removeMyselfNoConfirm(dcHost, testOnly);
-        if (oldDvi != null && !testOnly) {
+        super.removeMyselfNoConfirm(dcHost, runMode);
+        if (oldDvi != null && Application.isLive(runMode)) {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -394,7 +395,7 @@ final class FilesystemInfo extends ServiceInfo {
      * if something was added.
      */
     @Override
-    void addResourceBefore(final Host dcHost, final boolean testOnly) {
+    void addResourceBefore(final Host dcHost, final Application.RunMode runMode) {
         if (getGroupInfo() != null) {
             // TODO: disabled for now
             return;
@@ -413,9 +414,9 @@ final class FilesystemInfo extends ServiceInfo {
         final boolean oldDrbddisk = getDrbddiskInfo() != null || drbddiskIsPreferred;
         if (oldDvi != null) {
             if (oldDrbddisk) {
-                oldDvi.removeDrbdDisk(this, dcHost, testOnly);
+                oldDvi.removeDrbdDisk(this, dcHost, runMode);
             } else {
-                oldDvi.removeLinbitDrbd(this, dcHost, testOnly);
+                oldDvi.removeLinbitDrbd(this, dcHost, runMode);
             }
             final Thread t = new Thread(new Runnable() {
                 @Override
@@ -451,12 +452,12 @@ final class FilesystemInfo extends ServiceInfo {
             final String drbdId = getBrowser().getFreeId(
                     getBrowser().getCRMXML().getHbDrbddisk().getName(),
                     fsId);
-            newDvi.addDrbdDisk(this, dcHost, drbdId, testOnly);
+            newDvi.addDrbdDisk(this, dcHost, drbdId, runMode);
         } else {
             final String drbdId = getBrowser().getFreeId(
                     getBrowser().getCRMXML().getHbLinbitDrbd().getName(),
                     fsId);
-            newDvi.addLinbitDrbd(this, dcHost, drbdId, testOnly);
+            newDvi.addLinbitDrbd(this, dcHost, drbdId, runMode);
         }
     }
 

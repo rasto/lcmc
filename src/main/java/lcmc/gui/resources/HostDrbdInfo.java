@@ -102,7 +102,7 @@ public final class HostDrbdInfo extends Info {
 
     /** Returns a host icon for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
@@ -114,7 +114,7 @@ public final class HostDrbdInfo extends Info {
 
     /** Returns a host icon for the category in the menu. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
@@ -126,7 +126,7 @@ public final class HostDrbdInfo extends Info {
 
     /** Returns tooltip for the host. */
     @Override
-    public String getToolTipForGraph(final boolean testOnly) {
+    public String getToolTipForGraph(final Application.RunMode runMode) {
         return getBrowser().getHostToolTip(host);
     }
 
@@ -282,7 +282,7 @@ public final class HostDrbdInfo extends Info {
             };
         items.add(proxyHostWizardItem);
         Tools.getGUIData().registerAddHostButton(proxyHostWizardItem);
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         /* load drbd */
         final UpdatableItem loadItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
@@ -307,7 +307,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.load(getHost(), testOnly);
+                    DRBD.load(getHost(), runMode);
                     getBrowser().getClusterBrowser().updateHWInfo(
                                                         host,
                                                         !Host.UPDATE_LVM);
@@ -337,9 +337,9 @@ public final class HostDrbdInfo extends Info {
                 @Override
                 public void action() {
                     if (getHost().isDrbdProxyRunning()) {
-                        DRBD.stopProxy(getHost(), testOnly);
+                        DRBD.stopProxy(getHost(), runMode);
                     } else {
-                        DRBD.startProxy(getHost(), testOnly);
+                        DRBD.startProxy(getHost(), runMode);
                     }
                     getBrowser().getClusterBrowser().updateHWInfo(
                                                         host,
@@ -366,7 +366,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.proxyUp(host, DRBD.ALL, null, testOnly);
+                    DRBD.proxyUp(host, DRBD.ALL, null, runMode);
                     getBrowser().getClusterBrowser().updateHWInfo(
                                                         host,
                                                         !Host.UPDATE_LVM);
@@ -392,7 +392,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.proxyDown(host, DRBD.ALL, null, testOnly);
+                    DRBD.proxyDown(host, DRBD.ALL, null, runMode);
                     getBrowser().getClusterBrowser().updateHWInfo(
                                                         host,
                                                         !Host.UPDATE_LVM);
@@ -421,7 +421,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.adjust(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.adjust(getHost(), DRBD.ALL, null, runMode);
                     getBrowser().getClusterBrowser().updateHWInfo(
                                                         host,
                                                         !Host.UPDATE_LVM);
@@ -434,7 +434,7 @@ public final class HostDrbdInfo extends Info {
                                        cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.adjust(getHost(), DRBD.ALL, null, true);
+                    DRBD.adjust(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(adjustAllItem, adjustAllItemCallback);
@@ -459,7 +459,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.up(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.up(getHost(), DRBD.ALL, null, runMode);
                 }
             };
         items.add(upAllItem);
@@ -468,7 +468,7 @@ public final class HostDrbdInfo extends Info {
                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.up(getHost(), DRBD.ALL, null, true);
+                    DRBD.up(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(upAllItem, upAllItemCallback);
@@ -567,7 +567,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.connect(getHost(), DRBD.ALL, null, true);
+                    DRBD.connect(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
         items.add(connectAllItem);
@@ -576,7 +576,7 @@ public final class HostDrbdInfo extends Info {
                                        cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.connect(getHost(), DRBD.ALL, null, true);
+                    DRBD.connect(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(connectAllItem, connectAllItemCallback);
@@ -602,7 +602,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.disconnect(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.disconnect(getHost(), DRBD.ALL, null, runMode);
                 }
             };
         items.add(disconnectAllItem);
@@ -612,7 +612,7 @@ public final class HostDrbdInfo extends Info {
                                       cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.disconnect(getHost(), DRBD.ALL, null, true);
+                    DRBD.disconnect(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(disconnectAllItem, disconnectAllItemCallback);
@@ -638,7 +638,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.attach(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.attach(getHost(), DRBD.ALL, null, runMode);
                 }
             };
         items.add(attachAllItem);
@@ -648,7 +648,7 @@ public final class HostDrbdInfo extends Info {
                                        cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.attach(getHost(), DRBD.ALL, null, true);
+                    DRBD.attach(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(attachAllItem, attachAllItemCallback);
@@ -674,7 +674,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.detach(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.detach(getHost(), DRBD.ALL, null, runMode);
                 }
             };
         items.add(detachAllItem);
@@ -684,7 +684,7 @@ public final class HostDrbdInfo extends Info {
                                        cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.detach(getHost(), DRBD.ALL, null, true);
+                    DRBD.detach(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(detachAllItem, detachAllItemCallback);
@@ -714,7 +714,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.setPrimary(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.setPrimary(getHost(), DRBD.ALL, null, runMode);
                 }
             };
         items.add(setAllPrimaryItem);
@@ -724,7 +724,7 @@ public final class HostDrbdInfo extends Info {
                                        cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.setPrimary(getHost(), DRBD.ALL, null, true);
+                    DRBD.setPrimary(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(setAllPrimaryItem, setAllPrimaryItemCallback);
@@ -750,7 +750,7 @@ public final class HostDrbdInfo extends Info {
 
                 @Override
                 public void action() {
-                    DRBD.setSecondary(getHost(), DRBD.ALL, null, testOnly);
+                    DRBD.setSecondary(getHost(), DRBD.ALL, null, runMode);
                 }
             };
         items.add(setAllSecondaryItem);
@@ -760,7 +760,7 @@ public final class HostDrbdInfo extends Info {
                                        cb.new DRBDMenuItemCallback(getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    DRBD.setSecondary(getHost(), DRBD.ALL, null, true);
+                    DRBD.setSecondary(getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(setAllSecondaryItem,
@@ -942,7 +942,8 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns subtexts that appears in the host vertex in the drbd graph. */
-    public Subtext[] getSubtextsForDrbdGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForDrbdGraph(
+                                         final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
@@ -957,7 +958,7 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns text that appears above the icon in the drbd graph. */
-    public String getIconTextForDrbdGraph(final boolean testOnly) {
+    public String getIconTextForDrbdGraph(final Application.RunMode runMode) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
         }
@@ -965,7 +966,8 @@ public final class HostDrbdInfo extends Info {
     }
 
     /** Returns text that appears in the corner of the drbd graph. */
-    public Subtext getRightCornerTextForDrbdGraph(final boolean testOnly) {
+    public Subtext getRightCornerTextForDrbdGraph(
+                                         final Application.RunMode runMode) {
         return null;
     }
 

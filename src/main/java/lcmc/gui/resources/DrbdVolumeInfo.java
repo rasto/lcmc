@@ -223,9 +223,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                 final Map<Host, String> testOutput =
                                             new LinkedHashMap<Host, String>();
                 try {
-                    getDrbdInfo().createDrbdConfig(true);
+                    getDrbdInfo().createDrbdConfig(Application.RunMode.TEST);
                     for (final Host h : getHosts()) {
-                        DRBD.adjustApply(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.TEST);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -292,11 +292,11 @@ public final class DrbdVolumeInfo extends EditableInfo
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getDrbdInfo().createDrbdConfig(false);
+                            getDrbdInfo().createDrbdConfig(Application.RunMode.LIVE);
                             for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL, null, false);
+                                DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                             }
-                            apply(false);
+                            apply(Application.RunMode.LIVE);
                         } catch (final Exceptions.DrbdConfigException dce) {
                             LOG.appError("getInfoPanelVolume: config failed", dce);
                         } catch (final UnknownHostException uhe) {
@@ -381,7 +381,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns the list of items for the popup menu for drbd volume. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final DrbdVolumeInfo thisClass = this;
 
@@ -402,7 +402,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public boolean predicate() {
-                return !isConnectedOrWF(testOnly);
+                return !isConnectedOrWF(runMode);
             }
 
             @Override
@@ -426,15 +426,15 @@ public final class DrbdVolumeInfo extends EditableInfo
                 if (this.getText().equals(
                          Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
                          + ' ' + getDrbdResourceInfo().getName())) {
-                    if (!destBDI.isConnectedOrWF(testOnly)) {
-                        destBDI.connect(testOnly);
+                    if (!destBDI.isConnectedOrWF(runMode)) {
+                        destBDI.connect(runMode);
                     }
-                    if (!sourceBDI.isConnectedOrWF(testOnly)) {
-                        sourceBDI.connect(testOnly);
+                    if (!sourceBDI.isConnectedOrWF(runMode)) {
+                        sourceBDI.connect(runMode);
                     }
                 } else {
-                    destBDI.disconnect(testOnly);
-                    sourceBDI.disconnect(testOnly);
+                    destBDI.disconnect(runMode);
+                    sourceBDI.disconnect(runMode);
                 }
             }
         };
@@ -454,11 +454,11 @@ public final class DrbdVolumeInfo extends EditableInfo
                 } else {
                     return;
                 }
-                if (sourceBDI.isConnected(false)
-                    && destBDI.isConnected(false)) {
-                    bdi.disconnect(true);
+                if (sourceBDI.isConnected(Application.RunMode.LIVE)
+                    && destBDI.isConnected(Application.RunMode.LIVE)) {
+                    bdi.disconnect(Application.RunMode.TEST);
                 } else {
-                    bdi.connect(true);
+                    bdi.connect(Application.RunMode.TEST);
                 }
             }
         };
@@ -498,14 +498,14 @@ public final class DrbdVolumeInfo extends EditableInfo
                 if (this.getText().equals(Tools.getString(
                             "ClusterBrowser.Drbd.ResourceResumeSync"))) {
                     if (destBDI.getBlockDevice().isPausedSync()) {
-                        destBDI.resumeSync(testOnly);
+                        destBDI.resumeSync(runMode);
                     }
                     if (sourceBDI.getBlockDevice().isPausedSync()) {
-                        sourceBDI.resumeSync(testOnly);
+                        sourceBDI.resumeSync(runMode);
                     }
                 } else {
-                    sourceBDI.pauseSync(testOnly);
-                    destBDI.pauseSync(testOnly);
+                    sourceBDI.pauseSync(runMode);
+                    destBDI.pauseSync(runMode);
                 }
             }
         };
@@ -550,7 +550,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public String enablePredicate() {
-                if (!isConnected(testOnly)) {
+                if (!isConnected(runMode)) {
                     return "not connected";
                 }
                 if (isSyncing()) {
@@ -564,7 +564,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public void action() {
-                verify(testOnly);
+                verify(runMode);
             }
         };
         items.add(verifyMenu);
@@ -582,7 +582,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 /* this drbdResourceInfo remove myself and this calls
                    removeDrbdResource in this class, that removes the edge
                    in the graph. */
-                removeMyself(testOnly);
+                removeMyself(runMode);
             }
 
             @Override
@@ -624,7 +624,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns tool tip when mouse is over the volume edge. */
     @Override
-    public String getToolTipForGraph(final boolean testOnly) {
+    public String getToolTipForGraph(final Application.RunMode runMode) {
         final StringBuilder s = new StringBuilder(50);
         s.append("<html><b>Resource: ");
         s.append(getDrbdResourceInfo().getName());
@@ -673,7 +673,7 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Removes this object from jtree and from list of drbd volume
      * infos without confirmation dialog.
      */
-    public void removeMyselfNoConfirm(final boolean testOnly) {
+    public void removeMyselfNoConfirm(final Application.RunMode runMode) {
         final ClusterBrowser cb = getBrowser();
         cb.drbdStatusLock();
         cb.getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
@@ -688,12 +688,12 @@ public final class DrbdVolumeInfo extends EditableInfo
                 DRBD.setSecondary(host,
                                   getDrbdResourceInfo().getName(),
                                   getName(),
-                                  testOnly);
+                                  runMode);
                 if (!host.hasVolumes()) {
                     DRBD.disconnect(host,
                                     getDrbdResourceInfo().getName(),
                                     null,
-                                    testOnly);
+                                    runMode);
                 }
                 for (final BlockDevInfo bdi : getBlockDevInfos()) {
                     if (bdi.getHost() == host) {
@@ -701,28 +701,28 @@ public final class DrbdVolumeInfo extends EditableInfo
                             DRBD.detach(host,
                                         getDrbdResourceInfo().getName(),
                                         getName(),
-                                        testOnly);
+                                        runMode);
                         }
                         break;
                     }
                 }
                 if (host.hasVolumes()) {
-                    DRBD.delMinor(host, getDevice(), testOnly);
+                    DRBD.delMinor(host, getDevice(), runMode);
                     if (lastVolume) {
                         DRBD.delConnection(host,
                                            getDrbdResourceInfo().getName(),
-                                           testOnly);
+                                           runMode);
                     }
                 }
             }
         }
-        super.removeMyself(testOnly);
+        super.removeMyself(runMode);
         cb.reload(cb.getDrbdNode(), true);
         cb.getDrbdDevHash().remove(getDevice());
         cb.putDrbdDevHash();
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             bdi.removeFromDrbd();
-            bdi.removeMyself(testOnly);
+            bdi.removeMyself(runMode);
         }
         if (lastVolume) {
             final DrbdResourceInfo dri = getDrbdResourceInfo();
@@ -731,15 +731,15 @@ public final class DrbdVolumeInfo extends EditableInfo
                     DRBD.proxyDown(bdi.getHost(),
                                    dri.getName(),
                                    null,
-                                   testOnly);
+                                   runMode);
                 }
             }
-            dri.removeMyself(testOnly);
+            dri.removeMyself(runMode);
         }
         cb.updateCommonBlockDevices();
 
         try {
-            getDrbdInfo().createDrbdConfig(testOnly);
+            getDrbdInfo().createDrbdConfig(runMode);
             getDrbdInfo().setSelectedNode(null);
             getDrbdInfo().selectMyself();
             cb.getDrbdGraph().updatePopupMenus();
@@ -767,7 +767,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             @Override
             public void run() {
                 cb.updateDrbdResources();
-                if (!testOnly) {
+                if (Application.isLive(runMode)) {
                     removeNode();
                 }
                 cb.getDrbdGraph().scale();
@@ -777,9 +777,9 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Removes this drbd resource with confirmation dialog. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (!getDrbdVolume().isCommited()) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
             return;
         }
         String desc = Tools.getString(
@@ -792,7 +792,7 @@ public final class DrbdVolumeInfo extends EditableInfo
               desc,
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Yes"),
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.No"))) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
         }
     }
 
@@ -862,9 +862,9 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns whether the resources are connected.
      * If all devices are waiting for connection it returns false
      */
-    public boolean isConnected(final boolean testOnly) {
+    public boolean isConnected(final Application.RunMode runMode) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (bdi.isConnected(testOnly)) {
+            if (bdi.isConnected(runMode)) {
                 return true;
             }
         }
@@ -874,9 +874,9 @@ public final class DrbdVolumeInfo extends EditableInfo
     /**
      * Returns whether the resources are connected or waiting for connection.
      */
-    public boolean isConnectedOrWF(final boolean testOnly) {
+    public boolean isConnectedOrWF(final Application.RunMode runMode) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (!bdi.isConnectedOrWF(testOnly)) {
+            if (!bdi.isConnectedOrWF(runMode)) {
                 return false;
             }
         }
@@ -937,27 +937,27 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Starts online verification. */
-    void verify(final boolean testOnly) {
-        getFirstBlockDevInfo().verify(testOnly);
+    void verify(final Application.RunMode runMode) {
+        getFirstBlockDevInfo().verify(runMode);
     }
 
     /** Remove drbddisk heartbeat service. */
     void removeDrbdDisk(final FilesystemInfo fi,
                         final Host dcHost,
-                        final boolean testOnly) {
+                        final Application.RunMode runMode) {
         final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
         if (drbddiskInfo != null) {
-            drbddiskInfo.removeMyselfNoConfirm(dcHost, testOnly);
+            drbddiskInfo.removeMyselfNoConfirm(dcHost, runMode);
         }
     }
 
     /** Remove drbddisk heartbeat service. */
     void removeLinbitDrbd(final FilesystemInfo fi,
                           final Host dcHost,
-                          final boolean testOnly) {
+                          final Application.RunMode runMode) {
         final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
         if (linbitDrbdInfo != null) {
-            linbitDrbdInfo.removeMyselfNoConfirm(dcHost, testOnly);
+            linbitDrbdInfo.removeMyselfNoConfirm(dcHost, runMode);
         }
     }
 
@@ -965,7 +965,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     void addDrbdDisk(final FilesystemInfo fi,
                             final Host dcHost,
                             final String drbdId,
-                            final boolean testOnly) {
+                            final Application.RunMode runMode) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
         final DrbddiskInfo di =
@@ -975,7 +975,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                     true,
                                     drbdId,
                                     null,
-                                    testOnly);
+                                    runMode);
         di.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(di);
         fi.setDrbddiskInfo(di);
@@ -990,7 +990,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         di.waitForInfoPanel();
         di.getWidget("1", null).setValueAndWait(
                                             new StringValue(getDrbdResourceInfo().getName()));
-        di.apply(dcHost, testOnly);
+        di.apply(dcHost, runMode);
         di.getResource().setNew(false);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -1004,7 +1004,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     void addLinbitDrbd(final FilesystemInfo fi,
                        final Host dcHost,
                        final String drbdId,
-                       final boolean testOnly) {
+                       final Application.RunMode runMode) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
         final LinbitDrbdInfo ldi =
@@ -1014,7 +1014,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                      true,
                                      drbdId,
                                      null,
-                                     testOnly);
+                                     runMode);
         Tools.waitForSwing();
         ldi.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(ldi);
@@ -1035,7 +1035,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                             new StringValue(getDrbdResourceInfo().getName()));
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();
-        ldi.apply(dcHost, testOnly);
+        ldi.apply(dcHost, runMode);
         ldi.getResource().setNew(false);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -1052,11 +1052,11 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Connect block device from the specified host. */
-    public void connect(final Host host, final boolean testOnly) {
+    public void connect(final Host host, final Application.RunMode runMode) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi.getHost() == host
-                && !bdi.isConnectedOrWF(false)) {
-                bdi.connect(testOnly);
+                && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
+                bdi.connect(runMode);
                 break;
             }
         }
@@ -1155,8 +1155,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Applies changes that user made to the drbd volume fields. */
-    public void apply(final boolean testOnly) {
-        if (!testOnly) {
+    public void apply(final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
                 @Override

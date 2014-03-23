@@ -311,7 +311,7 @@ final class HbColocationInfo extends EditableInfo
 
     /** Applies changes to the colocation parameters. */
     @Override
-    public void apply(final Host dcHost, final boolean testOnly) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = true;
@@ -336,10 +336,10 @@ final class HbColocationInfo extends EditableInfo
                                                     null,
                                                     null,
                                                     true,
-                                                    testOnly),
+                                                    runMode),
                               null,
                               attrs,
-                              testOnly);
+                              runMode);
             } else if (serviceInfoRsc.isConstraintPH()
                        || serviceInfoWithRsc.isConstraintPH()) {
                 /* edge */
@@ -363,20 +363,20 @@ final class HbColocationInfo extends EditableInfo
                                                     rscSet,
                                                     attrs,
                                                     true,
-                                                    testOnly),
+                                                    runMode),
                               null,
                               prsi.getColocationAttributes(colId),
-                              testOnly);
+                              runMode);
             } else {
                 CRM.addColocation(dcHost,
                                   colId,
-                                  serviceInfoRsc.getHeartbeatId(testOnly),
-                                  serviceInfoWithRsc.getHeartbeatId(testOnly),
+                                  serviceInfoRsc.getHeartbeatId(runMode),
+                                  serviceInfoWithRsc.getHeartbeatId(runMode),
                                   attrs,
-                                  testOnly);
+                                  runMode);
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
     }

@@ -28,6 +28,7 @@ import lcmc.utilities.SSH;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+import lcmc.data.Application;
 
 /**
  * This class holds info data for a filesystem.
@@ -51,7 +52,7 @@ public final class FSInfo extends Info {
 
     /** Returns file system icon for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return FS_ICON;
     }
 

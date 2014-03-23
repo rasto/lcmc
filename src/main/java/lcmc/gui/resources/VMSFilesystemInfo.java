@@ -146,7 +146,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns service icon in the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
@@ -288,8 +288,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -326,7 +326,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
         checkResourceFields(null, params);
@@ -447,7 +447,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Removes this fs without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);

@@ -141,7 +141,7 @@ public final class RscDefaultsInfo extends EditableInfo {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         Value value = super.getParamSaved(param);
         if (value == null) {
-            value = new StringValue(clStatus.getRscDefaultsParameter(param, false));
+            value = new StringValue(clStatus.getRscDefaultsParameter(param, Application.RunMode.LIVE));
             if (value.isNothingSelected()) {
                 value = getParamPreferred(param);
                 if (value == null) {

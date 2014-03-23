@@ -26,6 +26,7 @@ import lcmc.data.resources.Network;
 import lcmc.utilities.Tools;
 
 import javax.swing.ImageIcon;
+import lcmc.data.Application;
 
 /**
  * This class holds info data for a network.
@@ -59,7 +60,7 @@ public final class NetworkInfo extends Info {
 
     /** Returns menu icon for network. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return NETWORK_ICON;
     }
 }

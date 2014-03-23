@@ -367,7 +367,7 @@ public final class LVCreate extends LV {
                                          lvName,
                                          volumeGroup,
                                          size,
-                                         false);
+                                         Application.RunMode.LIVE);
         if (ret) {
             answerPaneAddText("Logical volume "
                               + lvName

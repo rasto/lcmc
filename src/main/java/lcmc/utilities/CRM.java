@@ -36,6 +36,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.UUID;
+import lcmc.data.Application;
 import lcmc.utilities.SSH.SSHOutput;
 
 /**
@@ -64,11 +65,6 @@ public final class CRM {
     public static final String LCMC_TEST_FILE = "/tmp/lcmc-test-"
                                                 + UUID.randomUUID()
                                                 + ".xml";
-    /** Test only boolean variable. */
-    public static final boolean TESTONLY = true;
-    /** Live boolean variable. */
-    public static final boolean LIVE = false;
-
     /**
      * No instantiation.
      */
@@ -94,14 +90,14 @@ public final class CRM {
     private static SSHOutput execCommand(final Host host,
                                              final String command,
                                              final boolean outputVisible,
-                                             final boolean testOnly) {
+                                             final Application.RunMode runMode) {
         M_PTEST_WRITELOCK.lock();
         try {
             ptestOutput = null;
         } finally {
             M_PTEST_WRITELOCK.unlock();
         }
-        if (testOnly) {
+        if (Application.isTest(runMode)) {
             final String testCmd =
              "if [ ! -e " + LCMC_TEST_FILE + " ]; "
              + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
@@ -177,7 +173,7 @@ public final class CRM {
                            final String metaAttrsRefId,
                            final String operationsRefId,
                            final boolean stonith,
-                           final boolean testOnly) {
+                           final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         if (resId != null) {
             if (instanceAttrId == null) {
@@ -326,7 +322,7 @@ public final class CRM {
                            final String groupMetaAttrsRefId,
                            final String operationsRefId,
                            final boolean stonith,
-                           final boolean testOnly) {
+                           final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
         if (cloneId != null) {
@@ -372,7 +368,7 @@ public final class CRM {
                                    metaAttrsRefId,
                                    operationsRefId,
                                    stonith,
-                                   testOnly));
+                                   runMode));
         if (groupId != null && resId != null) {
             xml.append("</group>");
         }
@@ -394,7 +390,7 @@ public final class CRM {
                                                             "resources",
                                                             xml.toString()),
                                               true,
-                                              testOnly);
+                                              runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -420,7 +416,7 @@ public final class CRM {
                final String groupMetaAttrsRefId,
                final Map<String, String> operationsRefId,
                final Map<String, Boolean> stonith,
-               final boolean testOnly) {
+               final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(720);
         xml.append('\'');
         if (cloneId != null) {
@@ -461,7 +457,7 @@ public final class CRM {
                                        metaAttrsRefId.get(resId),
                                        operationsRefId.get(resId),
                                        stonith.get(resId),
-                                       testOnly));
+                                       runMode));
         }
         xml.append("</group>");
         if (cloneId != null) {
@@ -489,7 +485,7 @@ public final class CRM {
                                                             "resources",
                                                             xml.toString()),
                                               true,
-                                              testOnly);
+                                              runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -504,7 +500,7 @@ public final class CRM {
                                 final String[] parents,
                                 final List<Map<String, String>> colAttrsList,
                                 final List<Map<String, String>> ordAttrsList,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         for (int i = 0; i < parents.length; i++) {
             if (colAttrsList.get(i) != null) {
                 addColocation(host,
@@ -512,7 +508,7 @@ public final class CRM {
                               resId,
                               parents[i],
                               colAttrsList.get(i),
-                              testOnly);
+                              runMode);
             }
             if (ordAttrsList.get(i) != null) {
                 addOrder(host,
@@ -520,7 +516,7 @@ public final class CRM {
                          parents[i],
                          resId,
                          ordAttrsList.get(i),
-                         testOnly);
+                         runMode);
             }
         }
     }
@@ -583,10 +579,10 @@ public final class CRM {
                                            CRMXML.RscSet,
                                            Map<String, String>> rscSetsOrdAttrs,
                                     final Map<String, String> attrs,
-                                    final boolean testOnly) {
+                                    final Application.RunMode runMode) {
         if (colId != null) {
             if (rscSetsColAttrs.isEmpty()) {
-                return removeColocation(host, colId, testOnly);
+                return removeColocation(host, colId, runMode);
             }
             final String cibadminOpt;
             if (createCol) {
@@ -600,14 +596,14 @@ public final class CRM {
                                                     rscSetsColAttrs,
                                                     attrs,
                                                     cibadminOpt,
-                                                    testOnly);
+                                                    runMode);
             if (!ret) {
                 return false;
             }
         }
         if (ordId != null) {
             if (rscSetsOrdAttrs.isEmpty()) {
-                return removeOrder(host, ordId, testOnly);
+                return removeOrder(host, ordId, runMode);
             }
             final String cibadminOpt;
             if (createOrd) {
@@ -621,7 +617,7 @@ public final class CRM {
                                        rscSetsOrdAttrs,
                                        attrs,
                                        cibadminOpt,
-                                       testOnly);
+                                       runMode);
         }
         return true;
     }
@@ -634,7 +630,7 @@ public final class CRM {
                     final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs,
                     final Map<String, String> attrs,
                     final String cibadminOpt,
-                    final boolean testOnly) {
+                    final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<");
         xml.append(tag);
@@ -667,7 +663,7 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -742,7 +738,7 @@ public final class CRM {
                                       final String onHost,
                                       final HostLocation hostLocation,
                                       String locationId,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         String command = "-U";
         if (locationId == null) {
             locationId = "loc_" + resId + '_' + onHost;
@@ -774,7 +770,7 @@ public final class CRM {
                                     host,
                                     getCibCommand(command, "constraints", xml),
                                     true,
-                                    testOnly);
+                                    runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -783,7 +779,7 @@ public final class CRM {
                                           final String resId,
                                           final String ruleType,
                                           String locationId,
-                                          final boolean testOnly) {
+                                          final Application.RunMode runMode) {
         String op = null;
         String value = null;
         String score = null;
@@ -817,7 +813,7 @@ public final class CRM {
                                     host,
                                     getCibCommand(command, "constraints", xml),
                                     true,
-                                    testOnly);
+                                    runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -825,7 +821,7 @@ public final class CRM {
     public static boolean removeLocation(final Host host,
                                          final String locationId,
                                          final String resId,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         final String xml = getLocationXML(resId,
                                           null,
                                           null,
@@ -835,7 +831,7 @@ public final class CRM {
                                           null,
                                           locationId);
         final String command = getCibCommand("-D", "constraints", xml);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -848,7 +844,7 @@ public final class CRM {
                                          final String groupId,
                                          final String cloneId,
                                          final boolean master,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
         if (cloneId != null) {
@@ -894,7 +890,7 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "resources",
                                              xml.toString());
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -902,8 +898,8 @@ public final class CRM {
     public static boolean cleanupResource(final Host host,
                                           final String resId,
                                           final Host[] clusterHosts,
-                                          final boolean testOnly) {
-        if (testOnly) {
+                                          final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return true;
         }
         /* make cleanup on all cluster hosts. */
@@ -914,7 +910,7 @@ public final class CRM {
             final String command =
                       host.getDistCommand("CRM.cleanupResource",
                                           replaceHash);
-            execCommand(host, command, true, testOnly);
+            execCommand(host, command, true, runMode);
         }
         return true; /* always return true */
     }
@@ -922,7 +918,7 @@ public final class CRM {
     /** Starts resource. */
     public static boolean startResource(final Host host,
                                         final String resId,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         String cmd = "CRM.startResource";
         if (Tools.versionBeforePacemaker(host)) {
             cmd = "CRM.2.1.4.startResource";
@@ -930,7 +926,7 @@ public final class CRM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -984,7 +980,7 @@ public final class CRM {
     public static boolean setManaged(final Host host,
                                      final String resId,
                                      final boolean isManaged,
-                                     final boolean testOnly) {
+                                     final Application.RunMode runMode) {
         final String label;
         if (isManaged) {
             label = ".isManagedOn";
@@ -999,14 +995,14 @@ public final class CRM {
         replaceHash.put("@ID@", resId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Stops resource. */
     public static boolean stopResource(final Host host,
                                        final String resId,
-                                       final boolean testOnly) {
+                                       final Application.RunMode runMode) {
         if (resId == null) {
             return false;
         }
@@ -1018,7 +1014,7 @@ public final class CRM {
         replaceHash.put("@ID@", resId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1026,27 +1022,27 @@ public final class CRM {
     public static boolean migrateResource(final Host host,
                                           final String resId,
                                           final String onHost,
-                                          final boolean testOnly) {
+                                          final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.migrateResource",
                                                    replaceHash);
 
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Migrates resource from where it is running. */
     public static boolean migrateFromResource(final Host host,
                                               final String resId,
-                                              final boolean testOnly) {
+                                              final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand("CRM.migrateFromResource",
                                                    replaceHash);
 
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1054,27 +1050,27 @@ public final class CRM {
     public static boolean forceMigrateResource(final Host host,
                                                final String resId,
                                                final String onHost,
-                                               final boolean testOnly) {
+                                               final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         replaceHash.put("@HOST@", onHost);
         final String command = host.getDistCommand("CRM.forceMigrateResource",
                                                    replaceHash);
 
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Unmigrates resource that was previously migrated. */
     public static boolean unmigrateResource(final Host host,
                                             final String resId,
-                                            final boolean testOnly) {
+                                            final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand(
                                              "CRM.unmigrateResource",
                                              replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1084,7 +1080,7 @@ public final class CRM {
                                         final Map<String, String> args,
                                         final Map<String, String> rdiMetaArgs,
                                         String rscDefaultsId,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append(
             "'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
@@ -1140,14 +1136,14 @@ public final class CRM {
                                          rscdXML.toString()));
         }
         final SSHOutput ret =
-                        execCommand(host, command.toString(), true, testOnly);
+                        execCommand(host, command.toString(), true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Removes colocation with specified colocation id. */
     public static boolean removeColocation(final Host host,
                                            final String colocationId,
-                                           final boolean testOnly) {
+                                           final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
@@ -1155,7 +1151,7 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "constraints",
                                              xml.toString());
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1165,7 +1161,7 @@ public final class CRM {
                                         final String resId,
                                         final String parentHbId,
                                         Map<String, String> attrs,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         if (parentHbId == null) {
             return false;
         }
@@ -1213,14 +1209,14 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Removes order constraint with specified order id. */
     public static boolean removeOrder(final Host host,
                                       final String orderId,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
@@ -1228,7 +1224,7 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "constraints",
                                              xml.toString());
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1238,7 +1234,7 @@ public final class CRM {
                                    final String parentHbId,
                                    final String resId,
                                    Map<String, String> attrs,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final String orderId;
         final String cibadminOpt;
         if (ordId == null) {
@@ -1279,14 +1275,14 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Makes heartbeat stand by. */
     public static boolean standByOn(final Host host,
                                     final Host standByHost,
-                                    final boolean testOnly) {
+                                    final Application.RunMode runMode) {
         String cmd = "CRM.standByOn";
         if (Tools.versionBeforePacemaker(host)) {
             cmd = "CRM.2.1.4.standByOn";
@@ -1294,14 +1290,14 @@ public final class CRM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", standByHost.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Undoes heartbeat stand by. */
     public static boolean standByOff(final Host host,
                                      final Host standByHost,
-                                     final boolean testOnly) {
+                                     final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         String cmd = "CRM.standByOff";
         if (Tools.versionBeforePacemaker(host)) {
@@ -1309,29 +1305,29 @@ public final class CRM {
         }
         replaceHash.put("@HOST@", standByHost.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Erase config. */
     public static boolean erase(final Host host,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         final Map<String, String> replaceHash = Collections.emptyMap();
         final String command = host.getDistCommand("CRM.erase", replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** crm configure commit. */
     public static String crmConfigureCommit(final Host host,
                                              final String config,
-                                             final boolean testOnly) {
+                                             final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@",
             Tools.escapeQuotes(Matcher.quoteReplacement(config), 1));
         final String command = host.getDistCommand("CRM.configureCommit",
                                                    replaceHash);
-        final SSHOutput ret = execCommand(host, command, true, testOnly);
+        final SSHOutput ret = execCommand(host, command, true, runMode);
         if (ret.getExitCode() == 0) {
             return ret.getOutput();
         }

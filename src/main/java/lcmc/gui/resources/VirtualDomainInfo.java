@@ -75,7 +75,7 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Returns the first on which this vm is running. */
     private Host getRunningOnHost() {
-        final List<String> nodes = getRunningOnNodes(false);
+        final List<String> nodes = getRunningOnNodes(Application.RunMode.LIVE);
         if (nodes != null
             && !nodes.isEmpty()) {
             return getBrowser().getCluster().getHostByName(nodes.get(0));
@@ -91,8 +91,8 @@ final class VirtualDomainInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
-        super.removeMyselfNoConfirm(dcHost, testOnly);
+                                         final Application.RunMode runMode) {
+        super.removeMyselfNoConfirm(dcHost, runMode);
     }
 
     /** Sets service parameters with values from resourceNode hash. */
@@ -316,8 +316,8 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Applies the changes to the service parameters. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
-        super.apply(dcHost, testOnly);
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        super.apply(dcHost, runMode);
     }
 
     /** Returns whether this parameter is advanced. */

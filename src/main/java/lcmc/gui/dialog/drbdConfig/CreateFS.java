@@ -99,11 +99,11 @@ final class CreateFS extends DrbdConfig {
     protected void finishDialog() {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
-            final boolean testOnly = false;
+            final Application.RunMode runMode = Application.RunMode.LIVE;
             if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
-                bdiPri.skipInitialFullSync(testOnly);
+                bdiPri.skipInitialFullSync(runMode);
             }
-            bdiPri.forcePrimary(testOnly);
+            bdiPri.forcePrimary(runMode);
         }
     }
 
@@ -137,17 +137,17 @@ final class CreateFS extends DrbdConfig {
                     }
                 });
                 final BlockDevInfo bdiPri = getPrimaryBD();
-                final boolean testOnly = false;
+                final Application.RunMode runMode = Application.RunMode.LIVE;
                 if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
-                    bdiPri.skipInitialFullSync(testOnly);
+                    bdiPri.skipInitialFullSync(runMode);
                 }
-                bdiPri.forcePrimary(testOnly);
+                bdiPri.forcePrimary(runMode);
                 final String fs = filesystemW.getStringValue();
-                bdiPri.makeFilesystem(fs, testOnly);
+                bdiPri.makeFilesystem(fs, runMode);
                 if (bdiPri.getDrbdVolumeInfo() != null) {
                     /* could be canceled */
                     getDrbdVolumeInfo().setCreatedFs(fs);
-                    bdiPri.setSecondary(testOnly);
+                    bdiPri.setSecondary(runMode);
                     hostW.setValue(NO_HOST_STRING);
                     filesystemW.setValue(NO_FILESYSTEM_STRING);
                     answerPaneSetText(

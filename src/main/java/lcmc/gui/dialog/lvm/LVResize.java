@@ -131,7 +131,7 @@ public final class LVResize extends LV {
         if (blockDevInfo.getBlockDevice().isDrbd()) {
             final DrbdVolumeInfo dvi = blockDevInfo.getDrbdVolumeInfo();
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
-            if (!dvi.isConnected(false)) {
+            if (!dvi.isConnected(Application.RunMode.LIVE)) {
                 printErrorAndRetry(
                               "Not resizing. DRBD resource is not connected.");
                 sizeWi.setEnabled(false);
@@ -360,7 +360,7 @@ public final class LVResize extends LV {
         final boolean ret = LVM.resize(blockDevInfo.getHost(),
                                        blockDevInfo.getBlockDevice().getName(),
                                        size,
-                                       false);
+                                       Application.RunMode.LIVE);
         if (ret) {
             answerPaneSetText("Logical volume was successfully resized on "
                               + blockDevInfo.getHost() + '.');
@@ -380,7 +380,7 @@ public final class LVResize extends LV {
                         final boolean oRet = LVM.resize(hostEntry.getKey(),
                                                         b.getName(),
                                                         size,
-                                                        false);
+                                                        Application.RunMode.LIVE);
                         if (oRet) {
                             answerPaneAddText("Logical volume was successfully"
                                               + " resized on "
@@ -401,7 +401,7 @@ public final class LVResize extends LV {
                 }
             }
             if (oBDI != null && !resizingFailed) {
-                final boolean dRet = blockDevInfo.resizeDrbd(false);
+                final boolean dRet = blockDevInfo.resizeDrbd(Application.RunMode.LIVE);
                 if (dRet) {
                     answerPaneAddText(
                          "DRBD resource "

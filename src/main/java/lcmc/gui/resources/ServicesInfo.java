@@ -227,10 +227,10 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     /** Applies changes that user has entered. */
-    void apply(final Host dcHost, final boolean testOnly) {
-        LOG.debug1("apply: start: test: " + testOnly);
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        LOG.debug1("apply: start: test: " + runMode);
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -270,13 +270,13 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         final String rscDefaultsId =
-                    getBrowser().getClusterStatus().getRscDefaultsId(testOnly);
+                    getBrowser().getClusterStatus().getRscDefaultsId(runMode);
         CRM.setGlobalParameters(dcHost,
                                 args,
                                 rdiMetaArgs,
                                 rscDefaultsId,
-                                testOnly);
-        if (!testOnly) {
+                                runMode);
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
             rdi.storeComboBoxValues(rdiParams);
         }
@@ -288,13 +288,13 @@ public final class ServicesInfo extends EditableInfo {
                                                       false,
                                                       false);
             if (check.isCorrect() && check.isChanged()) {
-                si.apply(dcHost, testOnly);
+                si.apply(dcHost, runMode);
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setApplyButtons(null, params);
         }
-        LOG.debug1("apply: end: test: " + testOnly);
+        LOG.debug1("apply: end: test: " + runMode);
     }
 
     /** Sets heartbeat global parameters after they were obtained. */
@@ -342,7 +342,7 @@ public final class ServicesInfo extends EditableInfo {
     /** Sets clone info object. */
     private CloneInfo setCreateCloneInfo(final String cloneId,
                                          final ClusterStatus clStatus,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         CloneInfo newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
         final CRMGraph hg = getBrowser().getCRMGraph();
         if (newCi == null) {
@@ -354,18 +354,18 @@ public final class ServicesInfo extends EditableInfo {
                                         false,
                                         cloneId,
                                         null,
-                                        testOnly);
+                                        runMode);
             getBrowser().addToHeartbeatIdList(newCi);
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
-                                          newCi.getHeartbeatId(testOnly));
+                                          newCi.getHeartbeatId(runMode));
             newCi.setParameters(resourceNode);
         } else {
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
-                                          newCi.getHeartbeatId(testOnly));
+                                          newCi.getHeartbeatId(runMode));
             newCi.setParameters(resourceNode);
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 newCi.setUpdated(false);
                 hg.repaint();
             }
@@ -378,7 +378,7 @@ public final class ServicesInfo extends EditableInfo {
     private GroupInfo setCreateGroupInfo(final String group,
                                          final CloneInfo newCi,
                                          final ClusterStatus clStatus,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         GroupInfo newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
         final CRMGraph hg = getBrowser().getCRMGraph();
         if (newGi == null) {
@@ -390,10 +390,10 @@ public final class ServicesInfo extends EditableInfo {
                                      false,
                                      group,
                                      newCi,
-                                     testOnly);
+                                     runMode);
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
-                                      newGi.getHeartbeatId(testOnly));
+                                      newGi.getHeartbeatId(runMode));
             newGi.setParameters(resourceNode);
             if (newCi != null) {
                 newCi.addCloneServicePanel(newGi);
@@ -401,9 +401,9 @@ public final class ServicesInfo extends EditableInfo {
         } else {
             final Map<String, String> resourceNode =
                                     clStatus.getParamValuePairs(
-                                      newGi.getHeartbeatId(testOnly));
+                                      newGi.getHeartbeatId(runMode));
             newGi.setParameters(resourceNode);
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 newGi.setUpdated(false);
                 hg.repaint();
             }
@@ -421,7 +421,7 @@ public final class ServicesInfo extends EditableInfo {
                                final List<ServiceInfo> serviceIsPresent,
                                final List<ServiceInfo> groupServiceIsPresent,
                                final ClusterStatus clStatus,
-                               final boolean testOnly) {
+                               final Application.RunMode runMode) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash =
                            new HashMap<ServiceInfo, Map<String, String>>();
         if (newCi != null) {
@@ -435,7 +435,7 @@ public final class ServicesInfo extends EditableInfo {
         }
         final CRMGraph hg = getBrowser().getCRMGraph();
         final List<String> gs = clStatus.getGroupResources(grpOrCloneId,
-                                                           testOnly);
+                                                           runMode);
         if (gs == null) {
             return;
         }
@@ -455,7 +455,7 @@ public final class ServicesInfo extends EditableInfo {
                 final GroupInfo gi = setCreateGroupInfo(hbId,
                                                         newCi,
                                                         clStatus,
-                                                        testOnly);
+                                                        runMode);
                 setGroupResources(allGroupsAndClones,
                                   hbId,
                                   gi,
@@ -463,7 +463,7 @@ public final class ServicesInfo extends EditableInfo {
                                   serviceIsPresent,
                                   groupServiceIsPresent,
                                   clStatus,
-                                  testOnly);
+                                  runMode);
                 newSi = gi;
             } else {
                 final ResourceAgent newRA = clStatus.getResourceType(hbId);
@@ -535,7 +535,7 @@ public final class ServicesInfo extends EditableInfo {
                         newCi.addCloneServicePanel(newSi);
                     } else {
                         final Point2D p = null;
-                        addServicePanel(newSi, p, false, false, testOnly);
+                        addServicePanel(newSi, p, false, false, runMode);
                     }
                 } else {
                     getBrowser().addNameToServiceInfoHash(newSi);
@@ -572,7 +572,7 @@ public final class ServicesInfo extends EditableInfo {
         for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry
                                                  : setParametersHash.entrySet()) {
             setEntry.getKey().setParameters(setEntry.getValue());
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setEntry.getKey().setUpdated(false);
             }
         }
@@ -593,7 +593,7 @@ public final class ServicesInfo extends EditableInfo {
      * clusterStatus and updates the internal structures and graph.
      */
     public void setAllResources(final ClusterStatus clStatus,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         if (clStatus == null) {
             return;
         }
@@ -607,7 +607,7 @@ public final class ServicesInfo extends EditableInfo {
             GroupInfo newGi = null;
             if (clStatus.isClone(groupOrClone)) {
                 /* clone */
-                newCi = setCreateCloneInfo(groupOrClone, clStatus, testOnly);
+                newCi = setCreateCloneInfo(groupOrClone, clStatus, runMode);
                 serviceIsPresent.add(newCi);
             } else if (!"none".equals(groupOrClone)) {
                 /* group */
@@ -622,7 +622,7 @@ public final class ServicesInfo extends EditableInfo {
                 newGi = setCreateGroupInfo(groupOrClone,
                                            newCi,
                                            clStatus,
-                                           testOnly);
+                                           runMode);
                 serviceIsPresent.add(newGi);
             }
             setGroupResources(allGroupsAndClones,
@@ -632,7 +632,7 @@ public final class ServicesInfo extends EditableInfo {
                               serviceIsPresent,
                               groupServiceIsPresent,
                               clStatus,
-                              testOnly);
+                              runMode);
         }
 
         hg.clearKeepColocationList();
@@ -799,7 +799,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                     }
                 }
-                if (!testOnly) {
+                if (Application.isLive(runMode)) {
                     cphi.setUpdated(false);
                     cphi.getService().setNew(false);
                 }
@@ -808,7 +808,7 @@ public final class ServicesInfo extends EditableInfo {
             for (final ConstraintPHInfo cphi : newCphis) {
                 hg.addConstraintPlaceholder(cphi,
                                             null, /* pos */
-                                            false);
+                                            Application.RunMode.LIVE);
             }
         }
 
@@ -1013,7 +1013,7 @@ public final class ServicesInfo extends EditableInfo {
                     final ClusterStatus clStatus =
                                               getBrowser().getClusterStatus();
                     clStatus.setPtestData(null);
-                    apply(dcHost, true);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData =
                                           new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
@@ -1065,7 +1065,7 @@ public final class ServicesInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), false);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         }
@@ -1130,7 +1130,7 @@ public final class ServicesInfo extends EditableInfo {
                                 final boolean reloadNode,
                                 final String heartbeatId,
                                 final CloneInfo newCi,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         final ServiceInfo newServiceInfo;
         final String name = newRA.getName();
         if (newRA.isFilesystem()) {
@@ -1170,7 +1170,7 @@ public final class ServicesInfo extends EditableInfo {
                             pos,
                             reloadNode,
                             true,
-                            testOnly);
+                            runMode);
         }
         return newServiceInfo;
     }
@@ -1184,7 +1184,7 @@ public final class ServicesInfo extends EditableInfo {
                          final Point2D pos,
                          final boolean reloadNode,
                          final boolean interactive,
-                         final boolean testOnly) {
+                         final Application.RunMode runMode) {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
         final CRMGraph hg = getBrowser().getCRMGraph();
@@ -1194,7 +1194,7 @@ public final class ServicesInfo extends EditableInfo {
                             pos,
                             false, /* colocation only */
                             false, /* order only */
-                            testOnly)) {
+                            runMode)) {
             final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
@@ -1243,7 +1243,7 @@ public final class ServicesInfo extends EditableInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
 
         /* add group */
         final UpdatableItem addGroupMenuItem =
@@ -1272,7 +1272,7 @@ public final class ServicesInfo extends EditableInfo {
                                     true,
                                     null,
                                     null,
-                                    testOnly);
+                                    runMode);
                     getBrowser().getCRMGraph().repaint();
                 }
             };
@@ -1337,7 +1337,7 @@ public final class ServicesInfo extends EditableInfo {
                                                                 true,
                                                                 null,
                                                                 null,
-                                                                testOnly);
+                                                                runMode);
                             fsi.setDrbddiskIsPreferred(false);
                             getBrowser().getCRMGraph().repaint();
                         }
@@ -1372,7 +1372,7 @@ public final class ServicesInfo extends EditableInfo {
                                             true,
                                             null,
                                             null,
-                                            testOnly);
+                                            runMode);
                             getBrowser().getCRMGraph().repaint();
                         }
                     };
@@ -1402,7 +1402,7 @@ public final class ServicesInfo extends EditableInfo {
                                                                 true,
                                                                 null,
                                                                 null,
-                                                                testOnly);
+                                                                runMode);
                             fsi.setDrbddiskIsPreferred(true);
                             getBrowser().getCRMGraph().repaint();
                         }
@@ -1476,7 +1476,7 @@ public final class ServicesInfo extends EditableInfo {
                                                 true,
                                                 null,
                                                 null,
-                                                testOnly);
+                                                runMode);
                                 getBrowser().getCRMGraph().repaint();
                             }
                         };
@@ -1534,7 +1534,7 @@ public final class ServicesInfo extends EditableInfo {
                                               ConstraintPHInfo.Preference.AND);
                     cphi.getService().setNew(true);
                     getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi, getPos(), testOnly);
+                    hg.addConstraintPlaceholder(cphi, getPos(), runMode);
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
@@ -1592,7 +1592,7 @@ public final class ServicesInfo extends EditableInfo {
                                               ConstraintPHInfo.Preference.OR);
                     cphi.getService().setNew(true);
                     getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi, getPos(), testOnly);
+                    hg.addConstraintPlaceholder(cphi, getPos(), runMode);
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
@@ -1624,7 +1624,7 @@ public final class ServicesInfo extends EditableInfo {
                 }
                 for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
-                    if (!si.isStopped(false) && !si.getService().isOrphaned()) {
+                    if (!si.isStopped(Application.RunMode.LIVE) && !si.getService().isOrphaned()) {
                         return null;
                     }
                 }
@@ -1638,10 +1638,10 @@ public final class ServicesInfo extends EditableInfo {
                 for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
-                        && !si.isStopped(false)
+                        && !si.isStopped(Application.RunMode.LIVE)
                         && !si.getService().isOrphaned()
                         && !si.getService().isNew()) {
-                        si.stopResource(dcHost, false);
+                        si.stopResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
                 getBrowser().getCRMGraph().repaint();
@@ -1656,10 +1656,10 @@ public final class ServicesInfo extends EditableInfo {
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
                         && !si.isConstraintPH()
-                        && !si.isStopped(true)
+                        && !si.isStopped(Application.RunMode.TEST)
                         && !si.getService().isOrphaned()
                         && !si.getService().isNew()) {
-                        si.stopResource(thisDCHost, true); /* test only */
+                        si.stopResource(thisDCHost, Application.RunMode.TEST);
                     }
                 }
             }
@@ -1690,8 +1690,8 @@ public final class ServicesInfo extends EditableInfo {
                 }
                 for (final ServiceInfo si
                                  : getBrowser().getExistingServiceList(null)) {
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
+                    if (si.getMigratedTo(runMode) != null
+                        || si.getMigratedFrom(runMode) != null) {
                         return null;
                     }
                 }
@@ -1704,9 +1704,9 @@ public final class ServicesInfo extends EditableInfo {
                 final Host dcHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
                                 : getBrowser().getExistingServiceList(null)) {
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
-                        si.unmigrateResource(dcHost, false);
+                    if (si.getMigratedTo(runMode) != null
+                        || si.getMigratedFrom(runMode) != null) {
+                        si.unmigrateResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
                 getBrowser().getCRMGraph().repaint();
@@ -1718,9 +1718,9 @@ public final class ServicesInfo extends EditableInfo {
             public void action(final Host dcHost) {
                 for (final ServiceInfo si
                                 : getBrowser().getExistingServiceList(null)) {
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
-                        si.unmigrateResource(dcHost, true); /* test only */
+                    if (si.getMigratedTo(runMode) != null
+                        || si.getMigratedFrom(runMode) != null) {
+                        si.unmigrateResource(dcHost, Application.RunMode.TEST);
                     }
                 }
             }
@@ -1747,7 +1747,7 @@ public final class ServicesInfo extends EditableInfo {
                 for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null) {
-                        if (si.isRunning(false)) {
+                        if (si.isRunning(Application.RunMode.LIVE)) {
                             return "there are running services";
                         }
                     }
@@ -1782,15 +1782,15 @@ public final class ServicesInfo extends EditableInfo {
                                     }
                                 }
                             }
-                            CRM.erase(dcHost, testOnly);
+                            CRM.erase(dcHost, runMode);
                             for (final ServiceInfo si : services) {
                                 if (si.getGroupInfo() == null) {
                                     final ResourceAgent ra =
                                                         si.getResourceAgent();
                                     if (si.getService().isNew()) {
-                                        si.removeMyself(testOnly);
+                                        si.removeMyself(runMode);
                                     } else if (ra != null && !ra.isClone()) {
-                                        si.cleanupResource(dcHost, false);
+                                        si.cleanupResource(dcHost, Application.RunMode.LIVE);
                                     }
                                 }
                             }
@@ -1805,7 +1805,7 @@ public final class ServicesInfo extends EditableInfo {
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                CRM.erase(dcHost, true); /* test only */
+                CRM.erase(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(removeMenuItem, removeItemCallback);
@@ -1978,7 +1978,7 @@ public final class ServicesInfo extends EditableInfo {
                                     true,
                                     null, /* clone id */
                                     null,
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {

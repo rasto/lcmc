@@ -26,6 +26,7 @@ import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.CommonBlockDevice;
 import lcmc.utilities.Tools;
 import javax.swing.ImageIcon;
+import lcmc.data.Application;
 
 /**
  * This class holds info data for a block device that is common
@@ -48,7 +49,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
 
     /** Returns icon for common block devices menu category. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 

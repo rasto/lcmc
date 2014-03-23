@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.data.Application;
 import lcmc.gui.widget.Check;
 
 /**
@@ -127,7 +128,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                                         final CRMXML.RscSet appliedRscSet,
                                         final Map<String, String> appliedAttrs,
                                         final boolean isColocation,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
@@ -168,8 +169,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
 
     /** Applies changes to the placeholders. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
-        super.apply(dcHost, testOnly);
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        super.apply(dcHost, runMode);
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
         mConstraintPHLock.lock();
         final Map<ServiceInfo, ServiceInfo> parentToChild =
@@ -199,7 +200,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         final List<CRMXML.RscSet> rscSetsOrd = new ArrayList<CRMXML.RscSet>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
             if (cphi.getService().isNew()) {
-                //cphi.apply(dcHost, testOnly);
+                //cphi.apply(dcHost, runMode);
                 final List<CRMXML.RscSet> sets =
                  cphi.addConstraintWithPlaceholder(
                         getBrowser().getCRMGraph().getChildrenAndParents(cphi),
@@ -208,7 +209,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                         true, /* order */
                         dcHost,
                         false,
-                        testOnly);
+                        runMode);
                 rscSetsCol.add(sets.get(0)); /* col1 */
                 rscSetsOrd.add(0, sets.get(3)); /* ord2 */
                 ConstraintPHInfo parent = cphi;
@@ -218,7 +219,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                         final ConstraintPHInfo child =
                             (ConstraintPHInfo) parentToChild.get(parent);
                         if (child.getService().isNew()) {
-                            //child.apply(dcHost, testOnly);
+                            //child.apply(dcHost, runMode);
                             childSets =
                              child.addConstraintWithPlaceholder(
                                   getBrowser().getCRMGraph()
@@ -228,10 +229,10 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                                   true, /* order */
                                   dcHost,
                                   false,
-                                  testOnly);
+                                  runMode);
                             rscSetsCol.add(childSets.get(0)); /* col1 */
                             rscSetsOrd.add(0, childSets.get(3)); /* ord2 */
-                            //if (!testOnly) {
+                            //if (Application.isLive(runMode)) {
                             //    child.getService().setNew(false);
                             //}
                         }
@@ -279,7 +280,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                       rscSetsColAttrs,
                       rscSetsOrdAttrs,
                       attrs,
-                      testOnly);
+                      runMode);
     }
 
     /** Check order and colocation constraints. */

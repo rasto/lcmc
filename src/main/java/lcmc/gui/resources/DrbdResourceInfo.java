@@ -468,8 +468,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Applies changes that user made to the drbd resource fields. */
-    public void apply(final boolean testOnly) {
-        if (!testOnly) {
+    public void apply(final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             Tools.invokeAndWait(new Runnable() {
                 @Override
@@ -557,9 +557,9 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                 final Map<Host, String> testOutput =
                                             new LinkedHashMap<Host, String>();
                 try {
-                    getDrbdInfo().createDrbdConfig(true);
+                    getDrbdInfo().createDrbdConfig(Application.RunMode.TEST);
                     for (final Host h : getHosts()) {
-                        DRBD.adjustApply(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.TEST);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -630,11 +630,11 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getDrbdInfo().createDrbdConfig(false);
+                            getDrbdInfo().createDrbdConfig(Application.RunMode.LIVE);
                             for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL, null, false);
+                                DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                             }
-                            apply(false);
+                            apply(Application.RunMode.LIVE);
                         } catch (final Exceptions.DrbdConfigException dce) {
                             LOG.appError("getInfoPanel: config failed", dce);
                         } catch (final UnknownHostException uhe) {
@@ -2066,8 +2066,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Removes this object. */
     @Override
-    public void removeMyself(final boolean testOnly) {
-        super.removeMyself(testOnly);
+    public void removeMyself(final Application.RunMode runMode) {
+        super.removeMyself(runMode);
         getBrowser().getDrbdXML().removeResource(getName());
         final Set<Host> hosts0 = getHosts();
         for (final Host host : hosts0) {
@@ -2087,7 +2087,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         if (dri != null) {
             dri.setName(null);
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             removeNode();
         }
         getDrbdInfo().reloadDRBDResourceComboBoxes();
@@ -2181,7 +2181,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Returns whether this drbd resource is used by crm. */
     public boolean isUsedByCRM() {
-        return isUsedByCRM != null && isUsedByCRM.isManaged(false);
+        return isUsedByCRM != null && isUsedByCRM.isManaged(Application.RunMode.LIVE);
     }
 
     /** Returns hosts from the first volume. */

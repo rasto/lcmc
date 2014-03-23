@@ -1198,7 +1198,7 @@ public final class ClusterBrowser extends Browser {
                               final StringBuffer clusterStatusOutput,
                               final Host host,
                               final CountDownLatch firstTime,
-                              final boolean testOnly) {
+                              final Application.RunMode runMode) {
         final ClusterStatus clStatus = clusterStatus;
         clStatusLock();
         if (clStatusCanceled || clStatus == null) {
@@ -1250,10 +1250,10 @@ public final class ClusterBrowser extends Browser {
                                     rscDefaultsInfo.setParameters(
                                       clStatus.getRscDefaultsValuePairs());
                                     ssi.setGlobalConfig(clStatus);
-                                    ssi.setAllResources(clStatus, testOnly);
+                                    ssi.setAllResources(clStatus, runMode);
                                     if (firstTime.getCount() == 1) {
                                         /* one more time so that id-refs work.*/
-                                        ssi.setAllResources(clStatus, testOnly);
+                                        ssi.setAllResources(clStatus, runMode);
                                     }
                                     repaintTree();
                                     clusterHostsInfo.updateTable(
@@ -1308,7 +1308,7 @@ public final class ClusterBrowser extends Browser {
         });
         thread.start();
         clStatusCanceled = false;
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         while (true) {
             final Host host = getDCHost();
             if (host == null) {
@@ -1364,7 +1364,7 @@ public final class ClusterBrowser extends Browser {
                                               clusterStatusOutput,
                                               host,
                                               firstTime,
-                                              testOnly);
+                                              runMode);
                      }
                  });
             host.waitOnClStatus();
@@ -1586,7 +1586,7 @@ public final class ClusterBrowser extends Browser {
             drbdStatusUnlock();
             return;
         }
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         boolean atLeastOneAdded = false;
         for (final Object k : dxml.getResourceDeviceMap().keySet()) {
             final String resName = (String) ((MultiKey) k).getKey(0);
@@ -1636,7 +1636,7 @@ public final class ClusterBrowser extends Browser {
                     dri = drbdInfo.addDrbdResource(
                                resName,
                                DrbdVolumeInfo.getHostsFromBlockDevices(bdis),
-                               testOnly);
+                               runMode);
                     atLeastOneAdded = true;
                 }
                 DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
@@ -1646,7 +1646,7 @@ public final class ClusterBrowser extends Browser {
                                            volumeNr,
                                            drbdDev,
                                            bdis,
-                                           testOnly);
+                                           runMode);
                     atLeastOneAdded = true;
                 }
                 dri.setParameters();
@@ -1687,10 +1687,10 @@ public final class ClusterBrowser extends Browser {
                 putDrbdDevHash();
                 for (final BlockDevInfo bdi : dvi.getBlockDevInfos()) {
                     bdi.removeFromDrbd();
-                    bdi.removeMyself(DRBD.LIVE);
+                    bdi.removeMyself(Application.RunMode.LIVE);
                 }
                 if (lastVolume) {
-                    dvi.getDrbdResourceInfo().removeMyself(CRM.LIVE);
+                    dvi.getDrbdResourceInfo().removeMyself(Application.RunMode.LIVE);
                 }
             }
         }
@@ -1738,7 +1738,7 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns whether the host is in stand by. */
-    public boolean isStandby(final Host host, final boolean testOnly) {
+    public boolean isStandby(final Host host, final Application.RunMode runMode) {
         // TODO: make it more efficient
         final ClusterStatus cl = clusterStatus;
         if (cl == null) {
@@ -1747,7 +1747,7 @@ public final class ClusterBrowser extends Browser {
         final String standby = cl.getNodeParameter(
                                        host.getName().toLowerCase(Locale.US),
                                        "standby",
-                                       testOnly);
+                                       runMode);
         return "on".equals(standby) || "true".equals(standby);
     }
 

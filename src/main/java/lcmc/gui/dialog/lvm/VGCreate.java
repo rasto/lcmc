@@ -398,7 +398,7 @@ public final class VGCreate extends LV {
                 bdi.getBrowser().getDrbdGraph().startAnimation(bdi);
             }
         }
-        final boolean ret = LVM.vgCreate(host, vgName, pvNames, false);
+        final boolean ret = LVM.vgCreate(host, vgName, pvNames, Application.RunMode.LIVE);
         if (ret) {
             answerPaneAddText("Volume group "
                               + vgName

@@ -40,6 +40,7 @@ import javax.swing.BoxLayout;
 
 import java.awt.Component;
 import java.net.UnknownHostException;
+import lcmc.data.Application;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -76,12 +77,11 @@ final class BlockDev extends DrbdConfig {
 
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */
     private String getGI(final BlockDevInfo bdi) {
-        final boolean testOnly = false;
         return DRBD.getGI(
                        bdi.getHost(),
                        bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                        bdi.getDrbdVolumeInfo().getName(),
-                       testOnly);
+                       Application.RunMode.LIVE);
     }
 
     /**
@@ -99,18 +99,18 @@ final class BlockDev extends DrbdConfig {
             final BlockDevInfo oBdi =
                     getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
             try {
-                final boolean testOnly = false;
+                final Application.RunMode runMode = Application.RunMode.LIVE;
 
                 /* apply */
-                getDrbdVolumeInfo().getDrbdInfo().apply(testOnly);
-                getDrbdVolumeInfo().getDrbdResourceInfo().apply(testOnly);
-                getDrbdVolumeInfo().apply(testOnly);
-                blockDevInfo.apply(testOnly);
-                oBdi.apply(testOnly);
+                getDrbdVolumeInfo().getDrbdInfo().apply(runMode);
+                getDrbdVolumeInfo().getDrbdResourceInfo().apply(runMode);
+                getDrbdVolumeInfo().apply(runMode);
+                blockDevInfo.apply(runMode);
+                oBdi.apply(runMode);
 
                 /* create config */
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
-                                                    .createDrbdConfig(false);
+                                                    .createDrbdConfig(Application.RunMode.LIVE);
                 final String gi1 = getGI(blockDevInfo);
                 final String gi2 = getGI(oBdi);
                 if (gi1 == null || gi2 == null) {

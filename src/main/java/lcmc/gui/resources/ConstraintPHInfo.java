@@ -309,7 +309,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Applies changes to the placeholder. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
         /* apply is in resource set info object. */
     }
 
@@ -360,7 +360,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns tool tip for the placeholder. */
     @Override
-    public String getToolTipText(final boolean testOnly) {
+    public String getToolTipText(final Application.RunMode runMode) {
         return Tools.getString("ConstraintPHInfo.ToolTip");
     }
 
@@ -368,8 +368,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
-        addDependencyMenuItems(items, true, testOnly);
+        final Application.RunMode runMode = Application.RunMode.LIVE;
+        addDependencyMenuItems(items, true, runMode);
         /* remove the placeholder and all constraints associated with it. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                     Tools.getString("ConstraintPHInfo.Remove"),
@@ -392,7 +392,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             @Override
             public void action() {
                 hidePopup();
-                removeMyself(false);
+                removeMyself(Application.RunMode.LIVE);
                 getBrowser().getCRMGraph().repaint();
             }
         };
@@ -404,7 +404,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             }
             @Override
             public void action(final Host dcHost) {
-                removeMyselfNoConfirm(dcHost, true); /* test only */
+                removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(removeMenuItem, removeItemCallback);
@@ -415,9 +415,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
     /** Removes the placeholder without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         if (getService().isNew()) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setUpdated(true);
                 getService().setRemoved(true);
                 final HbConnectionInfo[] hbcis =
@@ -425,7 +425,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 for (final HbConnectionInfo hbci : hbcis) {
                     getBrowser().getCRMGraph().removeConnection(hbci,
                                                                 dcHost,
-                                                                testOnly);
+                                                                runMode);
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
@@ -441,16 +441,16 @@ public final class ConstraintPHInfo extends ServiceInfo {
             if (rscSetConnectionDataOrd != null) {
                 final String ordId = rscSetConnectionDataOrd.getConstraintId();
                 if (ordId != null) {
-                    CRM.removeOrder(dcHost, ordId, testOnly);
+                    CRM.removeOrder(dcHost, ordId, runMode);
                 }
             }
             if (rscSetConnectionDataCol != null) {
                 final String colId = rscSetConnectionDataCol.getConstraintId();
                 if (colId != null) {
-                    CRM.removeColocation(dcHost, colId, testOnly);
+                    CRM.removeColocation(dcHost, colId, runMode);
                 }
             }
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setUpdated(true);
                 getService().setRemoved(true);
             }
@@ -459,9 +459,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Removes this placeholder from the crm with confirmation dialog. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (getService().isNew()) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             getService().setNew(false);
             return;
         }
@@ -473,7 +473,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                      desc,
                      Tools.getString("ConstraintPHInfo.confirmRemove.Yes"),
                      Tools.getString("ConstraintPHInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             getService().setNew(false);
         }
     }
@@ -525,7 +525,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                                       final boolean order,
                                       final Host dcHost,
                                       final boolean force,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         String colId = null;
         final CRMXML.RscSetConnectionData rdataCol =
                                                 getRscSetConnectionDataCol();
@@ -552,10 +552,10 @@ public final class ConstraintPHInfo extends ServiceInfo {
             ordRscSet2 = rdataOrd.getRscSet2();
         }
         if (servicesFrom.isEmpty()) {
-            if (!testOnly && order) {
+            if (order && Application.isLive(runMode)) {
                 reverseOrder();
             }
-            if (!testOnly && colocation) {
+            if (colocation && Application.isLive(runMode)) {
                 reverseColocation();
             }
         }
@@ -815,7 +815,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 }
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setUpdated(false);
         }
         final List<CRMXML.RscSet> sets = new ArrayList<CRMXML.RscSet>();
@@ -844,7 +844,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                           rscSetsColAttrs,
                           rscSetsOrdAttrs,
                           attrs,
-                          testOnly);
+                          runMode);
         }
         return sets;
     }
@@ -945,7 +945,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             final List<String> ids = rscSet.getRscIds();
             for (int i = 0; i < ids.size(); i++) {
                 if (i < ids.size() - 1
-                    && ids.get(i).equals(si.getHeartbeatId(true))) {
+                    && ids.get(i).equals(si.getHeartbeatId(Application.RunMode.TEST))) {
                     return getBrowser().getServiceInfoFromCRMId(ids.get(i + 1));
                 }
             }
@@ -975,7 +975,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
             }
             final List<String> ids = rscSet.getRscIds();
             for (int i = ids.size() - 1; i >= 0; i--) {
-                if (i > 0 && ids.get(i).equals(si.getHeartbeatId(true))) {
+                if (i > 0 && ids.get(i).equals(
+                    si.getHeartbeatId(Application.RunMode.TEST))) {
                     return getBrowser().getServiceInfoFromCRMId(ids.get(i - 1));
                 }
             }
@@ -1004,18 +1005,18 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns text that appears above the icon in the graph. */
     @Override
-    public String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final Application.RunMode runMode) {
         return "   " + getService().getId();
     }
     /** Returns text with lines as array that appears in the cluster graph. */
     @Override
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         return null;
     }
 
     /** Stops resource in crm. */
     @Override
-    void stopResource(final Host dcHost, final boolean testOnly) {
+    void stopResource(final Host dcHost, final Application.RunMode runMode) {
         /* cannot stop placeholder */
     }
 }

@@ -26,6 +26,7 @@ import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 
 import java.util.Map;
+import lcmc.data.Application;
 
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is
@@ -81,11 +82,11 @@ final class LinbitDrbdInfo extends ServiceInfo {
     /** Removes the linbit::drbd service. */
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
-        super.removeMyselfNoConfirm(dcHost, testOnly);
+        super.removeMyselfNoConfirm(dcHost, runMode);
         if (dri != null) {
             dri.setUsedByCRM(null);
         }
@@ -99,7 +100,7 @@ final class LinbitDrbdInfo extends ServiceInfo {
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
-            if (isManaged(false) && !getService().isOrphaned()) {
+            if (isManaged(Application.RunMode.LIVE) && !getService().isOrphaned()) {
                 dri.setUsedByCRM(this);
             } else {
                 dri.setUsedByCRM(null);

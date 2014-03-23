@@ -62,7 +62,7 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
 
     /** Returns icon for this menu category. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return AVAIL_SERVICES_ICON;
     }
 
@@ -154,13 +154,12 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
             public void action() {
                 hidePopup();
                 final ServicesInfo si = getBrowser().getServicesInfo();
-                final boolean testOnly = false;
                 si.addServicePanel(resourceAgent,
                                    null, /* pos */
                                    true,
                                    null,
                                    null,
-                                   testOnly);
+                                   Application.RunMode.LIVE);
             }
         };
         items.add(addServiceMenu);

@@ -79,6 +79,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
+import lcmc.data.Application;
 import lcmc.data.Value;
 import lcmc.utilities.ComponentWithTest;
 
@@ -176,7 +177,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns the tool tip for this object. */
-    String getToolTipText(final boolean testOnly) {
+    String getToolTipText(final Application.RunMode runMode) {
         return "no tooltip";
     }
 
@@ -267,12 +268,12 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns the icon. */
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return null;
     }
 
     /** Returns the icon for the category. */
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return null;
     }
 
@@ -406,7 +407,7 @@ public class Info implements Comparable<Info>, Value {
      * Removes this object from the tree and highlights and selects parent
      * node.
      */
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         cleanup();
     }
 
@@ -469,8 +470,8 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns tooltip for the object in the graph. */
-    public String getToolTipForGraph(final boolean testOnly) {
-        return getToolTipText(testOnly);
+    public String getToolTipForGraph(final Application.RunMode runMode) {
+        return getToolTipText(runMode);
     }
 
     /** Returns list of menu items for the popup. */

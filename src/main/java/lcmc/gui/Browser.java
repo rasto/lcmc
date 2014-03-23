@@ -45,6 +45,7 @@ import java.awt.Dimension;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.data.Application;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -312,14 +313,14 @@ public class Browser {
                 return this;
             }
             if (leaf) {
-                final ImageIcon icon = info.getMenuIcon(false);
+                final ImageIcon icon = info.getMenuIcon(Application.RunMode.LIVE);
                 if (icon != null) {
                     setIcon(icon);
                 }
                 setToolTipText("");
             } else {
                 setToolTipText("");
-                ImageIcon icon = info.getCategoryIcon(false);
+                ImageIcon icon = info.getCategoryIcon(Application.RunMode.LIVE);
                 if (icon == null) {
                     icon = CATEGORY_ICON;
                 }

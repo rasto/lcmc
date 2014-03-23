@@ -85,9 +85,9 @@ public final class GroupInfo extends ServiceInfo {
     void applyWhole(final Host dcHost,
                     final boolean createGroup,
                     final Iterable<String> newOrder,
-                    final boolean testOnly) {
+                    final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -161,8 +161,7 @@ public final class GroupInfo extends ServiceInfo {
             if (gsi == null) {
                 continue;
             }
-            pacemakerResAttrs.put(resId,
-                                  gsi.getPacemakerResAttrs(testOnly));
+            pacemakerResAttrs.put(resId, gsi.getPacemakerResAttrs(runMode));
             pacemakerResArgs.put(resId, gsi.getPacemakerResArgs());
             pacemakerMetaArgs.put(resId, gsi.getPacemakerMetaArgs());
             instanceAttrId.put(resId, cs.getResourceInstanceAttrId(resId));
@@ -180,7 +179,7 @@ public final class GroupInfo extends ServiceInfo {
                                             new LinkedHashMap<String, String>();
         String cloneMetaAttrsRefIds = null;
         if (createGroup && ci != null) {
-            cloneId = ci.getHeartbeatId(testOnly);
+            cloneId = ci.getHeartbeatId(runMode);
             final String[] cloneParams = ci.getParametersFromXML();
             master = ci.getService().isMaster();
             cloneMetaAttrsRefIds = ci.getMetaAttrsRefId();
@@ -206,7 +205,7 @@ public final class GroupInfo extends ServiceInfo {
                          cloneMetaAttrsRefIds,
                          newOrder,
                          groupMetaArgs,
-                         getHeartbeatId(testOnly),
+                         getHeartbeatId(runMode),
                          pacemakerResAttrs,
                          pacemakerResArgs,
                          pacemakerMetaArgs,
@@ -218,8 +217,8 @@ public final class GroupInfo extends ServiceInfo {
                          getMetaAttrsRefId(),
                          operationsRefId,
                          stonith,
-                         testOnly);
-        if (!testOnly) {
+                         runMode);
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
         }
@@ -228,8 +227,8 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Applies the changes to the group parameters. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -241,7 +240,7 @@ public final class GroupInfo extends ServiceInfo {
         getInfoPanel();
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -254,7 +253,7 @@ public final class GroupInfo extends ServiceInfo {
             /* add myself to the hash with service name and id as
              * keys */
             getBrowser().removeFromServiceInfoHash(this);
-            final String oldHeartbeatId = getHeartbeatId(testOnly);
+            final String oldHeartbeatId = getHeartbeatId(runMode);
             if (oldHeartbeatId != null) {
                 getBrowser().mHeartbeatIdToServiceLock();
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
@@ -279,7 +278,7 @@ public final class GroupInfo extends ServiceInfo {
                     ...
                     param_idn param_namen param_valuen
         */
-        final String heartbeatId = getHeartbeatId(testOnly);
+        final String heartbeatId = getHeartbeatId(runMode);
         if (getService().isNew()) {
             final Set<ServiceInfo> parents =
                                     getBrowser().getCRMGraph().getParents(this);
@@ -312,13 +311,13 @@ public final class GroupInfo extends ServiceInfo {
                                                 new String [parentIds.size()]),
                                       colAttrsList,
                                       ordAttrsList,
-                                      testOnly);
+                                      runMode);
             final Collection<String> newOrder = new ArrayList<String>();
             for (final ServiceInfo child : getGroupServices()) {
-                newOrder.add(child.getHeartbeatId(testOnly));
+                newOrder.add(child.getHeartbeatId(runMode));
             }
-            applyWhole(dcHost, true, newOrder, testOnly);
-            if (!testOnly) {
+            applyWhole(dcHost, true, newOrder, runMode);
+            if (Application.isLive(runMode)) {
                 setApplyButtons(null, params);
             }
             getBrowser().getCRMGraph().repaint();
@@ -364,16 +363,16 @@ public final class GroupInfo extends ServiceInfo {
                         getMetaAttrsRefId(),
                         null,  /* getOperationsRefId(), */
                         false, /* stonith */
-                        testOnly);
+                        runMode);
         }
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
-            setLocations(heartbeatId, dcHost, testOnly);
+            setLocations(heartbeatId, dcHost, runMode);
         } else {
-            ci.setLocations(heartbeatId, dcHost, testOnly);
+            ci.setLocations(heartbeatId, dcHost, runMode);
 
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
             getBrowser().reload(getNode(), false);
         }
@@ -385,10 +384,10 @@ public final class GroupInfo extends ServiceInfo {
                                           false,
                                           true);
             if (childCheck.isCorrect() && childCheck.isChanged()) {
-                child.apply(dcHost, testOnly);
+                child.apply(dcHost, runMode);
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setApplyButtons(null, params);
         }
         getBrowser().getCRMGraph().repaint();
@@ -470,16 +469,15 @@ public final class GroupInfo extends ServiceInfo {
      * nodes or not at all.
      */
     @Override
-    List<String> getRunningOnNodes(final boolean testOnly) {
+    List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
+                                                      getHeartbeatId(runMode),
+                                                      runMode);
         final List<String> allNodes = new ArrayList<String>();
         if (resources != null) {
             for (final String hbId : resources) {
-                final List<String> ns = cs.getRunningOnNodes(hbId,
-                                                             testOnly);
+                final List<String> ns = cs.getRunningOnNodes(hbId, runMode);
                 if (ns != null) {
                     for (final String n : ns) {
                         if (!allNodes.contains(n)) {
@@ -494,16 +492,15 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns node name of the host where this service is running. */
     @Override
-    List<String> getMasterOnNodes(final boolean testOnly) {
+    List<String> getMasterOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
+                                                      getHeartbeatId(runMode),
+                                                      runMode);
         final List<String> allNodes = new ArrayList<String>();
         if (resources != null) {
             for (final String hbId : resources) {
-                final List<String> ns = cs.getMasterOnNodes(hbId,
-                                                            testOnly);
+                final List<String> ns = cs.getMasterOnNodes(hbId, runMode);
                 if (ns != null) {
                     for (final String n : ns) {
                         if (!allNodes.contains(n)) {
@@ -518,34 +515,34 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Starts all resources in the group. */
     @Override
-    void startResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void startResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         for (final ServiceInfo child : getGroupServices()) {
-            CRM.startResource(dcHost, child.getHeartbeatId(testOnly), testOnly);
+            CRM.startResource(dcHost, child.getHeartbeatId(runMode), runMode);
         }
     }
 
     /** Stops all resources in the group. */
     @Override
-    void stopResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void stopResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         for (final ServiceInfo child : getGroupServices()) {
-            CRM.stopResource(dcHost, child.getHeartbeatId(testOnly), testOnly);
+            CRM.stopResource(dcHost, child.getHeartbeatId(runMode), runMode);
         }
     }
 
     /** Cleans up all resources in the group. */
     @Override
-    void cleanupResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void cleanupResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         for (final ServiceInfo child : getGroupServices()) {
-            child.cleanupResource(dcHost, testOnly);
+            child.cleanupResource(dcHost, runMode);
         }
     }
 
@@ -553,15 +550,15 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     void setManaged(final boolean isManaged,
                     final Host dcHost,
-                    final boolean testOnly) {
-        if (!testOnly) {
+                    final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         for (final ServiceInfo child : getGroupServices()) {
             CRM.setManaged(dcHost,
-                           child.getHeartbeatId(testOnly),
+                           child.getHeartbeatId(runMode),
                            isManaged,
-                           testOnly);
+                           runMode);
         }
     }
 
@@ -691,9 +688,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Removes this group from the cib. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (getService().isNew()) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             getService().setNew(false);
             super.removeInfo();
             getService().doneRemoving();
@@ -723,10 +720,10 @@ public final class GroupInfo extends ServiceInfo {
                 desc,
                 Tools.getString("ClusterBrowser.confirmRemoveGroup.Yes"),
                 Tools.getString("ClusterBrowser.confirmRemoveGroup.No"))) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 getService().setRemoved(true);
             }
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             super.removeInfo();
             getService().setNew(false);
         }
@@ -744,16 +741,16 @@ public final class GroupInfo extends ServiceInfo {
     /** Remove all the services in the group and the group. */
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         final Collection<ServiceInfo> children = new ArrayList<ServiceInfo>();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             for (final ServiceInfo child : getGroupServices()) {
                 child.getService().setRemoved(true);
                 children.add(child);
             }
         }
         if (getService().isNew()) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 getService().setNew(false);
                 getBrowser().getCRMGraph().killRemovedVertices();
                 getService().doneRemoving();
@@ -763,24 +760,24 @@ public final class GroupInfo extends ServiceInfo {
             boolean master = false;
             final CloneInfo ci = getCloneInfo();
             if (ci != null) {
-                cloneId = ci.getHeartbeatId(testOnly);
+                cloneId = ci.getHeartbeatId(runMode);
                 master = ci.getService().isMaster();
             }
-            super.removeMyselfNoConfirm(dcHost, testOnly);
+            super.removeMyselfNoConfirm(dcHost, runMode);
             for (final ServiceInfo child : children) {
-                child.removeConstraints(dcHost, testOnly);
+                child.removeConstraints(dcHost, runMode);
             }
             CRM.removeResource(dcHost,
                                null,
-                               getHeartbeatId(testOnly),
+                               getHeartbeatId(runMode),
                                cloneId, /* clone id */
                                master,
-                               testOnly);
+                               runMode);
             for (final ServiceInfo child : children) {
-                child.cleanupResource(dcHost, testOnly);
+                child.cleanupResource(dcHost, runMode);
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             for (final ServiceInfo child : children) {
                 getBrowser().mHeartbeatIdToServiceLock();
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
@@ -795,14 +792,14 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Removes the group, but not the services. */
     void removeMyselfNoConfirmFromChild(final Host dcHost,
-                                        final boolean testOnly) {
-        super.removeMyselfNoConfirm(dcHost, testOnly);
+                                        final Application.RunMode runMode) {
+        super.removeMyselfNoConfirm(dcHost, runMode);
     }
 
     /** Returns tool tip for the group vertex. */
     @Override
-    public String getToolTipText(final boolean testOnly) {
-        final List<String> hostNames = getRunningOnNodes(testOnly);
+    public String getToolTipText(final Application.RunMode runMode) {
+        final List<String> hostNames = getRunningOnNodes(runMode);
         final StringBuilder sb = new StringBuilder(220);
         sb.append("<b>");
         sb.append(this);
@@ -821,7 +818,7 @@ public final class GroupInfo extends ServiceInfo {
 
         for (final ServiceInfo child : getGroupServices()) {
             sb.append("\n&nbsp;&nbsp;&nbsp;");
-            sb.append(child.getToolTipText(testOnly));
+            sb.append(child.getToolTipText(runMode));
         }
 
         return sb.toString();
@@ -829,9 +826,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether one of the services on one of the hosts failed. */
     @Override
-    boolean isOneFailed(final boolean testOnly) {
+    boolean isOneFailed(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.isOneFailed(testOnly)) {
+            if (child.isOneFailed(runMode)) {
                 return true;
             }
         }
@@ -840,9 +837,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether one of the services on one of the hosts failed. */
     @Override
-    boolean isOneFailedCount(final boolean testOnly) {
+    boolean isOneFailedCount(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.isOneFailedCount(testOnly)) {
+            if (child.isOneFailedCount(runMode)) {
                 return true;
             }
         }
@@ -851,9 +848,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether one of the services failed to start. */
     @Override
-    public boolean isFailed(final boolean testOnly) {
+    public boolean isFailed(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.isFailed(testOnly)) {
+            if (child.isFailed(runMode)) {
                 return true;
             }
         }
@@ -862,12 +859,12 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns subtexts that appears in the service vertex. */
     @Override
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         Subtext prevSubtext = null;
 
         for (final ServiceInfo child : getGroupServices()) {
-            final Subtext[] subtexts = child.getSubtextsForGraph(testOnly);
+            final Subtext[] subtexts = child.getSubtextsForGraph(runMode);
 
             if (subtexts == null || subtexts.length == 0) {
                 continue;
@@ -883,12 +880,12 @@ public final class GroupInfo extends ServiceInfo {
                 prevSubtext = sSubtext;
             }
             String unmanaged = "";
-            if (!child.isManaged(testOnly)) {
+            if (!child.isManaged(runMode)) {
                 unmanaged = " / unmanaged";
             }
             String migrated = "";
-            if (child.getMigratedTo(testOnly) != null
-                || child.getMigratedFrom(testOnly) != null) {
+            if (child.getMigratedTo(runMode) != null
+                || child.getMigratedFrom(runMode) != null) {
                 migrated = " / migrated";
             }
             final HbConnectionInfo[] hbcis =
@@ -956,14 +953,14 @@ public final class GroupInfo extends ServiceInfo {
      * Returns from which hosts the services or the whole group was migrated.
      */
     @Override
-    public List<Host> getMigratedFrom(final boolean testOnly) {
-        List<Host> hosts = super.getMigratedFrom(testOnly);
+    public List<Host> getMigratedFrom(final Application.RunMode runMode) {
+        List<Host> hosts = super.getMigratedFrom(runMode);
         final List<ServiceInfo> gs = getGroupServices();
         if (gs.isEmpty()) {
             return null;
         }
         for (final ServiceInfo child : gs) {
-            final List<Host> siHosts = child.getMigratedFrom(testOnly);
+            final List<Host> siHosts = child.getMigratedFrom(runMode);
             if (siHosts != null) {
                 if (hosts == null) {
                     hosts = new ArrayList<Host>();
@@ -976,13 +973,13 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether at least one service is unmaneged. */
     @Override
-    public boolean isManaged(final boolean testOnly) {
+    public boolean isManaged(final Application.RunMode runMode) {
         final List<ServiceInfo> gs = getGroupServices();
         if (gs.isEmpty()) {
             return true;
         }
         for (final ServiceInfo child : gs) {
-            if (!child.isManaged(testOnly)) {
+            if (!child.isManaged(runMode)) {
                 return false;
             }
         }
@@ -991,9 +988,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether all of the services are started. */
     @Override
-    boolean isStarted(final boolean testOnly) {
+    boolean isStarted(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (!child.isStarted(testOnly)) {
+            if (!child.isStarted(runMode)) {
                 return false;
             }
         }
@@ -1002,9 +999,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether one of the services is stopped. */
     @Override
-    public boolean isStopped(final boolean testOnly) {
+    public boolean isStopped(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.isStopped(testOnly)) {
+            if (child.isStopped(runMode)) {
                 return true;
             }
         }
@@ -1013,14 +1010,14 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns whether the group is stopped. */
     @Override
-    boolean isGroupStopped(final boolean testOnly) {
-        return super.isStopped(testOnly);
+    boolean isGroupStopped(final Application.RunMode runMode) {
+        return super.isStopped(runMode);
     }
 
     /** Returns true if at least one service in the group are running. */
-    boolean isOneRunning(final boolean testOnly) {
+    boolean isOneRunning(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.isRunning(testOnly)) {
+            if (child.isRunning(runMode)) {
                 return true;
             }
         }
@@ -1029,9 +1026,9 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Returns true if all services in the group are running. */
     @Override
-    public boolean isRunning(final boolean testOnly) {
+    public boolean isRunning(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
-            if (!child.isRunning(testOnly)) {
+            if (!child.isRunning(runMode)) {
                 return false;
             }
         }
@@ -1104,24 +1101,24 @@ public final class GroupInfo extends ServiceInfo {
                         final JCheckBox colocationWi,
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
-                        final boolean testOnly) {
+                        final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
             asi.addExistingServiceMenuItem("         " + child,
                                            child,
                                            dlm,
                                            callbackHash,
                                            list,
-                    colocationWi,
+                                           colocationWi,
                                            orderWi,
                                            popups,
-                                           testOnly);
+                                           runMode);
         }
     }
 
     /** Returns the icon for the category. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
-        if (getBrowser().allHostsDown() || !isOneRunning(testOnly)) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
+        if (getBrowser().allHostsDown() || !isOneRunning(runMode)) {
             return ServiceInfo.SERVICE_STOPPED_ICON_SMALL;
         }
         return ServiceInfo.SERVICE_RUNNING_ICON_SMALL;

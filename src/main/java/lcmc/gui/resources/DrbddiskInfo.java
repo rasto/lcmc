@@ -26,6 +26,7 @@ import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
 
 import java.util.Map;
+import lcmc.data.Application;
 
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
@@ -63,8 +64,8 @@ final class DrbddiskInfo extends ServiceInfo {
     /** Removes the drbddisk service. */
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
-                                      final boolean testOnly) {
-        super.removeMyselfNoConfirm(dcHost, testOnly);
+                                      final Application.RunMode runMode) {
+        super.removeMyselfNoConfirm(dcHost, runMode);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
@@ -81,7 +82,7 @@ final class DrbddiskInfo extends ServiceInfo {
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
-            if (isManaged(false) && !getService().isOrphaned()) {
+            if (isManaged(Application.RunMode.LIVE) && !getService().isOrphaned()) {
                 dri.setUsedByCRM(this);
             } else {
                 dri.setUsedByCRM(null);

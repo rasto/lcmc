@@ -280,7 +280,7 @@ public final class LVSnapshot extends LV {
                             blockDevInfo.getBlockDevice().getVolumeGroup();
         final boolean ret = blockDevInfo.lvSnapshot(lvName,
                                                     size,
-                                                    false);
+                                                    Application.RunMode.LIVE);
         if (ret) {
             answerPaneSetText("Logical volume "
                               + lvName

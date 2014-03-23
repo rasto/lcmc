@@ -176,7 +176,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Creates drbd config. */
-    public void createDrbdConfig(final boolean testOnly)
+    public void createDrbdConfig(final Application.RunMode runMode)
                throws Exceptions.DrbdConfigException, UnknownHostException {
         /* resources */
         final Collection<Host> hosts = new LinkedHashSet<Host>(
@@ -257,7 +257,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final String configName;
             final boolean makeBackup;
             final String preCommand;
-            if (testOnly) {
+            if (Application.isTest(runMode)) {
                 dir = "/var/lib/drbd/";
                 configName = "drbd.conf-lcmc-test";
                 makeBackup = false;
@@ -375,8 +375,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Applies changes made in the info panel by user. */
-    public void apply(final boolean testOnly) {
-        if (!testOnly) {
+    public void apply(final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             storeComboBoxValues(params);
             Tools.invokeLater(new Runnable() {
@@ -455,9 +455,12 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 final Map<Host, String> testOutput =
                                            new LinkedHashMap<Host, String>();
                 try {
-                    createDrbdConfig(true);
+                    createDrbdConfig(Application.RunMode.TEST);
                     for (final Host h : getCluster().getHostsArray()) {
-                        DRBD.adjustApply(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h,
+                                         DRBD.ALL,
+                                         null,
+                                         Application.RunMode.TEST);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -519,11 +522,11 @@ public final class DrbdInfo extends DrbdGuiInfo {
                             });
                             getBrowser().drbdStatusLock();
                             try {
-                                createDrbdConfig(false);
+                                createDrbdConfig(Application.RunMode.LIVE);
                                 for (final Host h : getCluster().getHosts()) {
-                                    DRBD.adjustApply(h, DRBD.ALL, null, false);
+                                    DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                                 }
-                                apply(false);
+                                apply(Application.RunMode.LIVE);
                             } catch (final Exceptions.DrbdConfigException dce) {
                                 LOG.appError("getInfoPanel: config failed", dce);
                             } catch (final UnknownHostException uhe) {
@@ -636,7 +639,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                                         final String volumeNr,
                                         final String drbdDevStr,
                                         final List<BlockDevInfo> blockDevInfos,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         final DrbdVolumeInfo dvi = new DrbdVolumeInfo(volumeNr,
                                                       drbdDevStr,
                                                       dri,
@@ -651,7 +654,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     public void addDrbdVolume(final BlockDevInfo bd1,
                               final BlockDevInfo bd2,
                               final boolean interactive,
-                              final boolean testOnly) {
+                              final Application.RunMode runMode) {
         if (interactive) {
             if (bd1 != null) {
                 bd1.getBlockDevice().setNew(true);
@@ -677,7 +680,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                     if (adrd.isCanceled()) {
                         final DrbdVolumeInfo dvi = bd1.getDrbdVolumeInfo();
                         if (dvi != null) {
-                            dvi.removeMyself(testOnly);
+                            dvi.removeMyself(runMode);
                         }
                         getBrowser().getDrbdGraph().stopAnimation(bd1);
                         getBrowser().getDrbdGraph().stopAnimation(bd2);
@@ -800,7 +803,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     /** Adds existing drbd resource to the GUI. */
     public DrbdResourceInfo addDrbdResource(final String name,
                                             final Set<Host> hosts,
-                                            final boolean testOnly) {
+                                            final Application.RunMode runMode) {
         final DrbdXML dxml = getBrowser().getDrbdXML();
         final DrbdResourceInfo dri =
                                new DrbdResourceInfo(name, hosts, getBrowser());
@@ -917,13 +920,13 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
     /** Returns menu icon for drbd resource. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return DRBD_ICON;
     }
 
     /** Menu icon. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return DRBD_ICON;
     }
 

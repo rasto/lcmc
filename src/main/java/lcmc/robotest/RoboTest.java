@@ -50,6 +50,7 @@ import javax.swing.AbstractButton;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+import lcmc.data.Application;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
@@ -1595,7 +1596,7 @@ public final class RoboTest {
         }
         final DrbdGraph graph = cluster.getBrowser().getDrbdGraph();
         for (final Info i : graph.infoToVertexKeySet()) {
-            final String item = graph.getMainText(graph.getVertex(i), false);
+            final String item = graph.getMainText(graph.getVertex(i), Application.RunMode.LIVE);
             if (item.startsWith(text) || item.endsWith(text)) {
                 final Point2D loc = graph.getLocation(i);
                 moveToAbs((int) (graph.getVisualizationViewer()
