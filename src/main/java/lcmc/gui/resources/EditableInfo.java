@@ -55,6 +55,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
 
@@ -74,7 +75,7 @@ public abstract class EditableInfo extends Info {
     /** Hash from parameter to boolean value if the last entered value was
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
-                                                new HashMap<String, Boolean>();
+                                    new ConcurrentHashMap<String, Boolean>();
     private final MultiKeyMap<String, JPanel> sectionPanels =
                                              new MultiKeyMap<String, JPanel>();
     /** Returns section in which is this parameter. */
@@ -706,7 +707,7 @@ public abstract class EditableInfo extends Info {
      * parameter was modified, but not this one.
      */
     protected boolean checkParamCache(final String param) {
-        if (!paramCorrectValueMap.containsKey(param)) {
+        if (param == null || !paramCorrectValueMap.containsKey(param)) {
             return false;
         }
         final Boolean ret = paramCorrectValueMap.get(param);
@@ -719,6 +720,9 @@ public abstract class EditableInfo extends Info {
     /** Sets the cache for the result of the parameter check. */
     protected final void setCheckParamCache(final String param,
                                             final boolean correctValue) {
+        if (param == null) {
+            return;
+        }
         paramCorrectValueMap.put(param, correctValue);
     }
 
@@ -856,7 +860,7 @@ public abstract class EditableInfo extends Info {
                 }
 
                 /* check correctness */
-                final Boolean correctValueCache =
+                final Boolean correctValueCache = (param == null) ? null :
                                               paramCorrectValueMap.get(param);
                 if (param == null || otherParam.equals(param)
                     || correctValueCache == null) {
