@@ -52,7 +52,13 @@ public final class Application {
                                    LoggerFactory.getLogger(Application.class);
 
     /** access type. */
-    public static enum AccessType { RO, OP, ADMIN, GOD, NEVER };
+    public enum AccessType {
+        RO,
+        OP,
+        ADMIN,
+        GOD,
+        NEVER
+    }
     /** Read only operating mode. */
     public static final String OP_MODE_RO =
                                         Tools.getString("Application.OpMode.RO");
