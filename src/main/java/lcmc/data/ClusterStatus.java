@@ -561,7 +561,7 @@ public final class ClusterStatus {
                 final String cib =
                        Tools.join("\n", data.toArray(new String[data.size()]));
                 final boolean advancedMode =
-                                        Tools.getConfigData().isAdvancedMode();
+                                        Tools.getApplication().isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
                     LOG.debug1("parseCommand: cib update: " + host.getName());
                     oldCib = cib;

@@ -22,6 +22,7 @@
 
 package lcmc.gui.dialog.lvm;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -33,10 +34,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.LVM;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -55,9 +52,6 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import lcmc.data.StringValue;
-import lcmc.data.VMSXML;
-import lcmc.data.Value;
 
 /** Create LV dialog. */
 public final class LVCreate extends LV {
@@ -223,7 +217,7 @@ public final class LVCreate extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.OP,
+                                      new AccessMode(Application.AccessType.OP,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
@@ -247,7 +241,7 @@ public final class LVCreate extends LV {
                                        Widget.NO_REGEXP,
                                        250,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.OP,
+                                       new AccessMode(Application.AccessType.OP,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
@@ -309,7 +303,7 @@ public final class LVCreate extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.OP,
+                                      new AccessMode(Application.AccessType.OP,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);

@@ -23,10 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.Heartbeat;
@@ -56,9 +53,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
-import lcmc.data.StringValue;
 
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -138,7 +133,7 @@ public class Init extends DialogCluster {
                                    Widget.NO_REGEXP,
                                    0,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                   new AccessMode(Application.AccessType.ADMIN,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
 
@@ -485,7 +480,7 @@ public class Init extends DialogCluster {
                                 } else {
                                     Tools.getGUIData().setAccessible(
                                                     csAisStartButton,
-                                                    ConfigData.AccessType.OP);
+                                                    Application.AccessType.OP);
                                 }
                             }
                             csAisStartButton.setVisible(true);
@@ -550,7 +545,7 @@ public class Init extends DialogCluster {
                                 } else {
                                     Tools.getGUIData().setAccessible(
                                                     hbStartButton,
-                                                    ConfigData.AccessType.OP);
+                                                    Application.AccessType.OP);
                                 }
                             }
                             hbStartButton.setVisible(true);
@@ -594,7 +589,7 @@ public class Init extends DialogCluster {
                 nextButtonSetEnabled(true);
             }
             enableComponents();
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();
             }

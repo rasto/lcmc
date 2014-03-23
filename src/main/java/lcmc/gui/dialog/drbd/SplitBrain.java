@@ -26,7 +26,7 @@ package lcmc.gui.dialog.drbd;
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.DrbdVolumeInfo;
@@ -176,7 +176,7 @@ public final class SplitBrain extends DrbdConfig {
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.RO,
+                                    new AccessMode(Application.AccessType.RO,
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(hostLabel);

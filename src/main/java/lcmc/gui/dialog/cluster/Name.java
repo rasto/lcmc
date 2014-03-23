@@ -23,7 +23,7 @@
 package lcmc.gui.dialog.cluster;
 
 import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
@@ -78,7 +78,7 @@ public final class Name extends DialogCluster {
             v = false;
         } else {
             for (final Cluster c
-                    : Tools.getConfigData().getClusters().getClusterSet()) {
+                    : Tools.getApplication().getClusters().getClusterSet()) {
                 if (c != getCluster() && name.equals(c.getName())) {
                     v = false;
                     break;
@@ -119,8 +119,8 @@ public final class Name extends DialogCluster {
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
         enableComponents();
-        if (!Tools.getConfigData().existsCluster(getCluster())) {
-            Tools.getConfigData().addClusterToClusters(getCluster());
+        if (!Tools.getApplication().existsCluster(getCluster())) {
+            Tools.getApplication().addClusterToClusters(getCluster());
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -139,8 +139,8 @@ public final class Name extends DialogCluster {
                 nameField.requestFocus();
             }
         });
-        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
-            final String name = Tools.getConfigData().getAutoClusters().get(0);
+        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+            final String name = Tools.getApplication().getAutoClusters().get(0);
             if (!".".equals(name)) {
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -164,7 +164,7 @@ public final class Name extends DialogCluster {
         pane.add(nameLabel);
         String name = getCluster().getName();
         if (name == null) {
-            name = Tools.getConfigData().getClusters().getDefaultClusterName();
+            name = Tools.getApplication().getClusters().getDefaultClusterName();
         }
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";
@@ -175,7 +175,7 @@ public final class Name extends DialogCluster {
                                        regexp,
                                        NAME_FIELD_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         addCheckField(nameField);

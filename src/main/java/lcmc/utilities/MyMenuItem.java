@@ -22,7 +22,7 @@
 
 package lcmc.utilities;
 
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 
 import java.awt.AWTException;
@@ -304,15 +304,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessMode() {
         final boolean accessible =
-                   Tools.getConfigData().isAccessible(enableAccessMode);
+                   Tools.getApplication().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         final boolean visible = visiblePredicate();
         setEnabled(disableTooltip == null && accessible);
         setVisible(visible
-                   && Tools.getConfigData().isAccessible(visibleAccessMode));
+                   && Tools.getApplication().isAccessible(visibleAccessMode));
         if (toolTip != null && isVisible()) {
             if (!accessible && enableAccessMode.getAccessType()
-                               != ConfigData.AccessType.NEVER) {
+                               != Application.AccessType.NEVER) {
                 String advanced = "";
                 if (enableAccessMode.isAdvancedMode()) {
                     advanced = "Advanced ";
@@ -321,7 +321,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                                 + getText()
                                 + " (disabled)</b><br>available in \""
                                 + advanced
-                                + ConfigData.OP_MODES_MAP.get(
+                                + Application.OP_MODES_MAP.get(
                                       enableAccessMode.getAccessType())
                                 + "\" mode</html>");
             } else if (disableTooltip != null) {

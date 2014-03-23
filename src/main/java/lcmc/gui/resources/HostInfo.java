@@ -23,19 +23,13 @@
 package lcmc.gui.resources;
 
 import lcmc.EditHostDialog;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.HostLogs;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
 import lcmc.utilities.UpdatableItem;
-import lcmc.data.Subtext;
-import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.PtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.ExecCallback;
@@ -186,7 +180,7 @@ public final class HostInfo extends Info {
         }
         final Font f = new Font("Monospaced",
                                 Font.PLAIN,
-                                Tools.getConfigData().scaled(12));
+                                Tools.getApplication().scaled(12));
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(
                                   Tools.getString("HostInfo.crmShellLoading"));
@@ -198,7 +192,7 @@ public final class HostInfo extends Info {
                              Browser.APPLY_ICON);
         registerComponentEnableAccessMode(
                                     crmConfigureCommitButton,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                    new AccessMode(Application.AccessType.ADMIN,
                                                    false));
         final MyButton hostInfoButton =
                 new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
@@ -241,7 +235,7 @@ public final class HostInfo extends Info {
             public void actionPerformed(final ActionEvent e) {
                 registerComponentEditAccessMode(
                                 ta,
-                                new AccessMode(ConfigData.AccessType.GOD,
+                                new AccessMode(Application.AccessType.GOD,
                                                false));
                 crmInfo = true;
                 hostInfoButton.setEnabled(false);
@@ -264,7 +258,7 @@ public final class HostInfo extends Info {
             public void actionPerformed(final ActionEvent e) {
                 registerComponentEditAccessMode(
                                     ta,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                    new AccessMode(Application.AccessType.ADMIN,
                                                    false));
                 updateAdvancedPanels();
                 crmShowInProgress = true;
@@ -457,8 +451,8 @@ public final class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
                            "",
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -479,8 +473,8 @@ public final class HostInfo extends Info {
                            Tools.getString("HostBrowser.CRM.StandByOff"),
                            HOST_STANDBY_OFF_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -529,8 +523,8 @@ public final class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostInfo.CRM.AllMigrateFrom"),
                            HOST_STANDBY_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -598,8 +592,8 @@ public final class HostInfo extends Info {
                            HOST_STOP_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, true),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, true),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -673,8 +667,8 @@ public final class HostInfo extends Info {
                            HOST_STOP_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, true),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, true),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -724,8 +718,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -781,8 +775,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -833,8 +827,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -884,8 +878,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -931,8 +925,8 @@ public final class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
                            "",
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -954,8 +948,8 @@ public final class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            "",
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -976,8 +970,8 @@ public final class HostInfo extends Info {
         /* advacend options */
         final UpdatableItem hostAdvancedSubmenu = new MyMenu(
                         Tools.getString("HostBrowser.AdvancedSubmenu"),
-                        new AccessMode(ConfigData.AccessType.OP, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1001,8 +995,8 @@ public final class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
                            Tools.getString("HostBrowser.RemoveHost"),
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1021,7 +1015,7 @@ public final class HostInfo extends Info {
                         Tools.getGUIData().unregisterAllHostsUpdate(
                                                       b.getClusterViewPanel());
                     }
-                    Tools.getConfigData().removeHostFromHosts(getHost());
+                    Tools.getApplication().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
                 }
             };

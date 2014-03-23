@@ -25,7 +25,7 @@ package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
 import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.SSH.ExecCommandThread;
@@ -259,16 +259,16 @@ public abstract class DialogHost extends WizardDialog {
                        Widget.NO_REGEXP,
                        0,    /* width */
                        Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.RO,
+                       new AccessMode(Application.AccessType.RO,
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
-        if (Tools.getConfigData().getAutoOptionHost(autoOption) != null) {
+        if (Tools.getApplication().getAutoOptionHost(autoOption) != null) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     instMethodWi.setSelectedIndex(
                         Integer.parseInt(
-                         Tools.getConfigData().getAutoOptionHost(autoOption)));
+                         Tools.getApplication().getAutoOptionHost(autoOption)));
                 }
             });
         }

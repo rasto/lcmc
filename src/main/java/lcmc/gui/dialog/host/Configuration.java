@@ -23,9 +23,7 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
@@ -41,8 +39,6 @@ import java.awt.Component;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -305,7 +301,7 @@ public class Configuration extends DialogHost {
                         getHost().setHostname(
                                 Tools.join(",", hostnames, getHops()));
                         enableComponents();
-                        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+                        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
                         }
@@ -328,7 +324,7 @@ public class Configuration extends DialogHost {
                     });
                     enableComponents();
                     hostnameOk = true;
-                    if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+                    if (!Tools.getApplication().getAutoHosts().isEmpty()) {
                         Tools.sleep(1000);
                         pressNextButton();
                     }
@@ -366,7 +362,7 @@ public class Configuration extends DialogHost {
                                       Widget.NO_REGEXP,
                                       COMBO_BOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
             inputPane.add(hostnameField[i].getComponent());
@@ -387,7 +383,7 @@ public class Configuration extends DialogHost {
                                 Widget.NO_REGEXP,
                                 COMBO_BOX_WIDTH,
                                 Widget.NO_ABBRV,
-                                new AccessMode(ConfigData.AccessType.RO,
+                                new AccessMode(Application.AccessType.RO,
                                                !AccessMode.ADVANCED),
                                 Widget.NO_BUTTON);
 

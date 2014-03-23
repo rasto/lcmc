@@ -164,7 +164,7 @@ final class BlockDev extends DrbdConfig {
             }
         });
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }

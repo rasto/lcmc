@@ -75,7 +75,7 @@ final class ProxyInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.ProxyInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }

@@ -21,12 +21,9 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.CRMXML;
-import lcmc.data.ResourceAgent;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
@@ -112,8 +109,8 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
                          Tools.getString("ClusterBrowser.RAsOverviewButton"),
                          BACK_ICON);
         overviewButton.setPreferredSize(
-                            new Dimension(Tools.getConfigData().scaled(180),
-                                          Tools.getConfigData().scaled(50)));
+                            new Dimension(Tools.getApplication().scaled(180),
+                                          Tools.getApplication().scaled(50)));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -140,8 +137,8 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
                         Tools.getString("ClusterBrowser.AddServiceToCluster"),
                         null,
                         null,
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 

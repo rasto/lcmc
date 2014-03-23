@@ -22,6 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.Exceptions;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
@@ -30,13 +31,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;
 import lcmc.data.resources.DrbdResource;
 import lcmc.data.resources.NetInterface;
-import lcmc.data.Host;
-import lcmc.data.DrbdXML;
 import lcmc.data.DrbdXML.HostProxy;
-import lcmc.data.DRBDtestData;
-import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
-import lcmc.data.DrbdProxy;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
@@ -75,8 +70,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
@@ -1315,7 +1309,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                            Widget.NO_REGEXP,
                            rightWidth,
                            Widget.NO_ABBRV,
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false),
                            Widget.NO_BUTTON);
             //wi.setValueAndWait(haSaved);
             newAddressComboBoxHash.put(host, wi);
@@ -1359,7 +1353,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           "^\\d*$",
                           leftWidth,
                           Widget.NO_ABBRV,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         pwi.setAlwaysEditable(true);
         final String port =
@@ -1457,7 +1451,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           "^\\d*$",
                           leftWidth,
                           Widget.NO_ABBRV,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         insidePortWi.setAlwaysEditable(true);
 
@@ -1503,7 +1497,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                           "^\\d*$",
                           leftWidth,
                           Widget.NO_ABBRV,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.ADMIN, false),
                           Widget.NO_BUTTON);
         outsidePortWi.setAlwaysEditable(true);
 
@@ -1561,7 +1555,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                                    Widget.NO_REGEXP,
                                    rightWidth,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                   new AccessMode(Application.AccessType.ADMIN,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
             iIpWi.setAlwaysEditable(!pHost.isConnected());
@@ -1591,7 +1585,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
                            Widget.NO_REGEXP,
                            rightWidth,
                            Widget.NO_ABBRV,
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            Widget.NO_BUTTON);
             oIpWi.setAlwaysEditable(!pHost.isConnected());
@@ -2155,8 +2149,8 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
         for (final DrbdVolumeInfo dvi : drbdVolumes) {
             final UpdatableItem volumesMenu = new MyMenu(
                             dvi.toString(),
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override

@@ -117,7 +117,7 @@ public final class ProgressIndicatorPanel extends JComponent
     /** List of failed commands. */
     private final Collection<String> failuresMap = new LinkedList<String>();
     /** Amount of frames per second. */
-    private static final float FPS = Tools.getConfigData().getAnimFPS();
+    private static final float FPS = Tools.getApplication().getAnimFPS();
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;
     /** Lock for the animator. */

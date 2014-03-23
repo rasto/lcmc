@@ -27,7 +27,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.data.Host;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.Subtext;
 import lcmc.data.AccessMode;
 
@@ -321,8 +321,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns name of this placeholder. */
@@ -375,8 +375,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     Tools.getString("ConstraintPHInfo.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override

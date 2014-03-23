@@ -22,14 +22,11 @@
 
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
-import lcmc.data.Host;
-import lcmc.data.CRMXML;
-import lcmc.data.ClusterStatus;
 import lcmc.data.resources.Service;
-import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.Exceptions;
@@ -38,8 +35,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
@@ -459,9 +455,9 @@ final class HbOrderInfo extends EditableInfo
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(
+    protected Application.AccessType getAccessType(
                                                         final String param) {
-        return ConfigData.AccessType.ADMIN;
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns the score of this order. */

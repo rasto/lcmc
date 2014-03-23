@@ -50,10 +50,10 @@ public final class EmptyBrowser extends Browser {
     EmptyBrowser() {
         super();
         /* Load the default file */
-        final String saveFile = Tools.getConfigData().getSaveFile();
+        final String saveFile = Tools.getApplication().getSaveFile();
         String xml = Tools.loadFile(saveFile, false);
         if (xml == null) {
-            final String saveFileOld = Tools.getConfigData().getSaveFileOld();
+            final String saveFileOld = Tools.getApplication().getSaveFileOld();
             xml = Tools.loadFile(saveFileOld, false);
         }
         if (xml != null) {
@@ -86,7 +86,7 @@ public final class EmptyBrowser extends Browser {
     void updateHosts() {
         /* all hosts */
         final Iterable<Host> allHosts =
-              new TreeSet<Host>(Tools.getConfigData().getHosts().getHostSet());
+              new TreeSet<Host>(Tools.getApplication().getHosts().getHostSet());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {

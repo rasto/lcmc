@@ -23,11 +23,8 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.Component;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Value;
-import lcmc.data.StringValue;
+
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
@@ -170,7 +167,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             pressNextButton();
         }
     }
@@ -211,7 +208,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 

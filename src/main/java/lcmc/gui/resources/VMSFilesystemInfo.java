@@ -19,14 +19,11 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.FilesystemData;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
@@ -44,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
@@ -375,8 +370,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
     /** Returns true if the value of the parameter is ok. */
     @Override

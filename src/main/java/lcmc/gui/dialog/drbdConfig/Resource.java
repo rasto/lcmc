@@ -203,7 +203,7 @@ public final class Resource extends DrbdConfig {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }

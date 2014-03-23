@@ -22,13 +22,13 @@
 package lcmc.gui.resources;
 
 import lcmc.ProxyHostWizard;
+import lcmc.data.Application;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.drbd.DrbdsLog;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
@@ -106,7 +106,7 @@ public final class ProxyHostInfo extends Info {
     public JComponent getInfoPanel() {
         final Font f = new Font("Monospaced",
                                 Font.PLAIN,
-                                Tools.getConfigData().scaled(12));
+                                Tools.getApplication().scaled(12));
         final JTextArea ta = new JTextArea();
         ta.setFont(f);
 
@@ -146,11 +146,11 @@ public final class ProxyHostInfo extends Info {
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(
-                        new Dimension(0, Tools.getConfigData().scaled(50)));
+                        new Dimension(0, Tools.getApplication().scaled(50)));
         buttonPanel.setPreferredSize(
-                        new Dimension(0, Tools.getConfigData().scaled(50)));
+                        new Dimension(0, Tools.getApplication().scaled(50)));
         buttonPanel.setMaximumSize(
-             new Dimension(Short.MAX_VALUE, Tools.getConfigData().scaled(50)));
+             new Dimension(Short.MAX_VALUE, Tools.getApplication().scaled(50)));
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -223,9 +223,9 @@ public final class ProxyHostInfo extends Info {
                            Tools.getString("HostDrbdInfo.Disconnect"),
                            null,
                            Tools.getString("HostDrbdInfo.Disconnect"),
-                           new AccessMode(ConfigData.AccessType.RO,
+                           new AccessMode(Application.AccessType.RO,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.RO,
+                           new AccessMode(Application.AccessType.RO,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -259,9 +259,9 @@ public final class ProxyHostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
                            Tools.getString("HostBrowser.ProxyHostWizard"),
-                           new AccessMode(ConfigData.AccessType.RO,
+                           new AccessMode(Application.AccessType.RO,
                                           false),
-                           new AccessMode(ConfigData.AccessType.RO,
+                           new AccessMode(Application.AccessType.RO,
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -284,9 +284,9 @@ public final class ProxyHostInfo extends Info {
                            Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                            null,
                            getMenuToolTip("DRBD.startProxy", ""),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -320,9 +320,9 @@ public final class ProxyHostInfo extends Info {
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                            null,
                            getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -344,9 +344,9 @@ public final class ProxyHostInfo extends Info {
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                            null,
                            getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -368,8 +368,8 @@ public final class ProxyHostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -393,8 +393,8 @@ public final class ProxyHostInfo extends Info {
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
                            Tools.getString("HostBrowser.RemoveHost"),
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -408,7 +408,7 @@ public final class ProxyHostInfo extends Info {
                 @Override
                 public void action() {
                     getHost().disconnect();
-                    Tools.getConfigData().removeHostFromHosts(getHost());
+                    Tools.getApplication().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
                 }
             };

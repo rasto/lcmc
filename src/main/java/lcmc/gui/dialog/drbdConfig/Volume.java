@@ -104,7 +104,7 @@ public final class Volume extends DrbdConfig {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }

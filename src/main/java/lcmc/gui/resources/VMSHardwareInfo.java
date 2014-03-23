@@ -27,7 +27,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.Host;
 import lcmc.data.resources.Resource;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.data.LinuxFile;
 
@@ -326,8 +326,8 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                     Tools.getString("VMSHardwareInfo.Menu.Cancel"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override

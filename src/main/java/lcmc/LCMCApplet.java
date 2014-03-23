@@ -58,7 +58,7 @@ public final class LCMCApplet extends JApplet {
 
         LCMC.initApp(params);
 
-        if (Tools.getConfigData().isEmbed()) {
+        if (Tools.getApplication().isEmbed()) {
             Tools.getGUIData().setMainFrame(this);
             setJMenuBar(LCMC.getMenuBar());
             setContentPane(LCMC.getMainPanel());

@@ -133,7 +133,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     public void setEnabled(final String s, final boolean enabled) {
         final boolean accessible =
-                   Tools.getConfigData().isAccessible(getEnableAccessMode());
+                   Tools.getApplication().isAccessible(getEnableAccessMode());
         mComponentsReadLock.lock();
         final JComponent c;
         try {

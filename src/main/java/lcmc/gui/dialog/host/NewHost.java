@@ -22,9 +22,7 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.TerminalPanel;
@@ -40,8 +38,7 @@ import java.awt.Component;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.ArrayList;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.MyButton;
 
@@ -88,16 +85,16 @@ public class NewHost extends DialogHost {
         getHost().setHostnameEntered(hostnameEntered);
         final String username = usernameField.getStringValue().trim();
         getHost().setUsername(username);
-        Tools.getConfigData().setLastEnteredUser(username);
+        Tools.getApplication().setLastEnteredUser(username);
         final String sshPort = sshPortField.getStringValue().trim();
         getHost().setSSHPort(sshPort);
-        Tools.getConfigData().setLastEnteredSSHPort(sshPort);
+        Tools.getApplication().setLastEnteredSSHPort(sshPort);
         final String useSudoString = useSudoField.getStringValue().trim();
         getHost().setUseSudo("true".equals(useSudoString));
-        Tools.getConfigData().setLastEnteredUseSudo(
+        Tools.getApplication().setLastEnteredUseSudo(
                                                 "true".equals(useSudoString));
-        if (!Tools.getConfigData().existsHost(getHost())) {
-            Tools.getConfigData().addHostToHosts(getHost());
+        if (!Tools.getApplication().existsHost(getHost())) {
+            Tools.getApplication().addHostToHosts(getHost());
             final TerminalPanel terminalPanel = new TerminalPanel(getHost());
             Tools.getGUIData().setTerminalPanel(terminalPanel);
         }
@@ -247,12 +244,12 @@ public class NewHost extends DialogHost {
                 hostField.requestFocus();
             }
         });
-        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setValue(
-                                new StringValue(Tools.getConfigData().getAutoHosts().get(0)));
+                                new StringValue(Tools.getApplication().getAutoHosts().get(0)));
                 }
             });
             Tools.sleep(3000);
@@ -291,7 +288,7 @@ public class NewHost extends DialogHost {
                                        regexp,
                                        FIELD_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
@@ -317,7 +314,7 @@ public class NewHost extends DialogHost {
         inputPane.add(sshPortLabel);
         String sshPort = getHost().getSSHPort();
         if (sshPort == null) {
-            sshPort = Tools.getConfigData().getLastEnteredSSHPort();
+            sshPort = Tools.getApplication().getLastEnteredSSHPort();
             if (sshPort == null) {
                 sshPort = SSH_PORT;
             }
@@ -329,7 +326,7 @@ public class NewHost extends DialogHost {
                                       "^\\d+$",
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         addCheckField(sshPortField);
@@ -347,7 +344,7 @@ public class NewHost extends DialogHost {
         inputPane.add(usernameLabel);
         String userName = getHost().getUsername();
         if (userName == null) {
-            userName = Tools.getConfigData().getLastEnteredUser();
+            userName = Tools.getApplication().getLastEnteredUser();
             if (userName == null) {
                 userName = SSH_ROOT_USER;
             }
@@ -365,7 +362,7 @@ public class NewHost extends DialogHost {
                                    regexp,
                                    FIELD_WIDTH,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.RO,
+                                   new AccessMode(Application.AccessType.RO,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
         usernameField.setEditable(true);
@@ -382,7 +379,7 @@ public class NewHost extends DialogHost {
         inputPane.add(useSudoLabel);
         Boolean useSudo = getHost().isUseSudo();
         if (useSudo == null) {
-            useSudo = Tools.getConfigData().getLastEnteredUseSudo();
+            useSudo = Tools.getApplication().getLastEnteredUseSudo();
             if (useSudo == null) {
                 useSudo = false;
             }
@@ -396,7 +393,7 @@ public class NewHost extends DialogHost {
                                       Widget.NO_REGEXP,
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         //addCheckField(useSudoField);

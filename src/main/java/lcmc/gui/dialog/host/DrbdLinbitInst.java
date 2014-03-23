@@ -140,9 +140,9 @@ public class DrbdLinbitInst extends DialogHost {
     /** Install the drbd packages. */
     final void installDrbd() {
         getHost().setDrbdWasInstalled(true); /* even if we fail */
-        Tools.getConfigData().setLastDrbdInstalledMethod(
+        Tools.getApplication().setLastDrbdInstalledMethod(
                                             getHost().getDrbdInstallMethod());
-        Tools.getConfigData().setLastDrbdInstalledMethod(
+        Tools.getApplication().setLastDrbdInstalledMethod(
                          getHost().getDistString("DrbdInst.install.text."
                          + getHost().getDrbdInstallMethod()));
         answerPaneSetText(
@@ -189,7 +189,7 @@ public class DrbdLinbitInst extends DialogHost {
         answerPaneSetText(
                Tools.getString("Dialog.Host.DrbdLinbitInst.InstallationDone"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }

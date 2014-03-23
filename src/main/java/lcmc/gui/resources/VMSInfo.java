@@ -22,13 +22,10 @@
 package lcmc.gui.resources;
 
 import lcmc.AddVMConfigDialog;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.VMSXML;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
@@ -53,8 +50,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
-import lcmc.data.Value;
 
 /**
  * This class shows a list of virtual machines.
@@ -292,8 +287,8 @@ public final class VMSInfo extends CategoryInfo {
         final UpdatableItem newDomainMenuItem = new MyMenuItem(
                        Tools.getString("VMSInfo.AddNewDomain"),
                        HostBrowser.HOST_OFF_ICON_LARGE,
-                       new AccessMode(ConfigData.AccessType.ADMIN, false),
-                       new AccessMode(ConfigData.AccessType.OP, false)) {
+                       new AccessMode(Application.AccessType.ADMIN, false),
+                       new AccessMode(Application.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
                         @Override
                         public void action() {

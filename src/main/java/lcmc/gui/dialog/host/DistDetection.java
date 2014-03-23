@@ -65,7 +65,7 @@ final class DistDetection extends DialogHost {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }

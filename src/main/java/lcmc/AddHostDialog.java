@@ -63,7 +63,7 @@ public final class AddHostDialog {
             if (dialog.isPressedCancelButton()) {
                 /* remove host tab from main window */
                 host.disconnect();
-                Tools.getConfigData().removeHostFromHosts(host);
+                Tools.getApplication().removeHostFromHosts(host);
                 dialog.cancelDialog();
                 Tools.getGUIData().enableAddHostButtons(true);
                 Tools.getGUIData().expandTerminalSplitPane(1);

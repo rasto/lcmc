@@ -63,7 +63,7 @@ public class Devices extends DialogHost {
             enableComponents();
             buttonClass(nextButton()).requestFocus();
         }
-        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }

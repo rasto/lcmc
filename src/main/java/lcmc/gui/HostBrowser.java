@@ -23,13 +23,10 @@
 
 package lcmc.gui;
 
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.resources.BlockDevice;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.FSInfo;
@@ -381,8 +378,8 @@ public final class HostBrowser extends Browser {
                         Tools.getString("HostBrowser.CmdLog"),
                         Info.LOGFILE_ICON,
                         "",
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -406,8 +403,8 @@ public final class HostBrowser extends Browser {
                     Tools.getString("HostBrowser.MakeKernelPanic")
                     + host.getName(),
                     null,
-                    new AccessMode(ConfigData.AccessType.GOD, false),
-                    new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                    new AccessMode(Application.AccessType.GOD, false),
+                    new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -441,8 +438,8 @@ public final class HostBrowser extends Browser {
                     Tools.getString("HostBrowser.MakeKernelReboot")
                     + host.getName(),
                     null,
-                    new AccessMode(ConfigData.AccessType.GOD, false),
-                    new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                    new AccessMode(Application.AccessType.GOD, false),
+                    new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override

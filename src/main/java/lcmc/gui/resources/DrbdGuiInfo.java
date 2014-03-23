@@ -22,17 +22,11 @@
 package lcmc.gui.resources;
 
 import lcmc.Exceptions;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.Cluster;
-import lcmc.data.DrbdXML;
-import lcmc.data.DrbdProxy;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 
@@ -142,7 +136,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    protected final Application.AccessType getAccessType(final String param) {
         return getBrowser().getDrbdXML().getAccessType(param);
     }
 

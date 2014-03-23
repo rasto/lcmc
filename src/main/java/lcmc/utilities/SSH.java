@@ -917,7 +917,7 @@ public final class SSH {
 
             /* Check database */
             final int result =
-                        Tools.getConfigData().getKnownHosts().verifyHostkey(
+                        Tools.getApplication().getKnownHosts().verifyHostkey(
                                                       hostname,
                                                       serverHostKeyAlgorithm,
                                                       serverHostKey);
@@ -968,7 +968,7 @@ public final class SSH {
                                      KnownHosts.createHashedHostname(hostname);
 
                 /* Add the hostkey to the in-memory database */
-                Tools.getConfigData().getKnownHosts().addHostkey(
+                Tools.getApplication().getKnownHosts().addHostkey(
                                                 new String[] {hashedHostname},
                                                 serverHostKeyAlgorithm,
                                                 serverHostKey);
@@ -985,7 +985,7 @@ public final class SSH {
                     try {
                         KnownHosts.addHostkeyToFile(
                               new File(
-                                    Tools.getConfigData().getKnownHostPath()),
+                                    Tools.getApplication().getKnownHostPath()),
                               new String[] {hashedHostname},
                               serverHostKeyAlgorithm,
                               serverHostKey);
@@ -1153,23 +1153,23 @@ public final class SSH {
             final int connectTimeout =
                                     Tools.getDefaultInt("SSH.ConnectTimeout");
             final int kexTimeout = Tools.getDefaultInt("SSH.KexTimeout");
-            final boolean noPassphrase = Tools.getConfigData().isNoPassphrase();
+            final boolean noPassphrase = Tools.getApplication().isNoPassphrase();
             while (!cancelIt) {
                 if (lastPassword == null) {
                     lastPassword =
-                                Tools.getConfigData().getAutoOptionHost("pw");
+                                Tools.getApplication().getAutoOptionHost("pw");
                     if (lastPassword == null) {
                         lastPassword =
-                              Tools.getConfigData().getAutoOptionCluster("pw");
+                              Tools.getApplication().getAutoOptionCluster("pw");
                     }
                 }
                 if (lastPassword == null) {
                     if (enablePublicKey
                         && conn.isAuthMethodAvailable(username, "publickey")) {
                         final File dsaKey = new File(
-                                         Tools.getConfigData().getIdDSAPath());
+                                         Tools.getApplication().getIdDSAPath());
                         final File rsaKey = new File(
-                                         Tools.getConfigData().getIdRSAPath());
+                                         Tools.getApplication().getIdRSAPath());
                         if (dsaKey.exists() || rsaKey.exists()) {
                             String key = "";
                             if (lastDSAKey != null) {
@@ -1470,7 +1470,7 @@ public final class SSH {
                 /* connect and verify server host key (with callback) */
                 LOG.debug2("run: verify host keys: " + hostname);
                 final String[] hostkeyAlgos =
-                    Tools.getConfigData().getKnownHosts().
+                    Tools.getApplication().getKnownHosts().
                         getPreferredServerHostkeyAlgorithmOrder(hostname);
 
                 if (hostkeyAlgos != null) {
@@ -1559,7 +1559,7 @@ public final class SSH {
 
     /** Installs gui-helper on the remote host. */
     public void installGuiHelper() {
-        if (!Tools.getConfigData().getKeepHelper()) {
+        if (!Tools.getApplication().getKeepHelper()) {
             final String fileName = "/help-progs/lcmc-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
@@ -1747,7 +1747,7 @@ public final class SSH {
                                 final int remotePort)
         throws IOException {
         final int localPort =
-                        remotePort + Tools.getConfigData().getVncPortOffset();
+                        remotePort + Tools.getApplication().getVncPortOffset();
         try {
             localPortForwarder =
                 connection.createLocalPortForwarder(localPort,
@@ -1762,7 +1762,7 @@ public final class SSH {
     void stopVncPortForwarding(final int remotePort)
         throws IOException {
         final int localPort =
-                        remotePort + Tools.getConfigData().getVncPortOffset();
+                        remotePort + Tools.getApplication().getVncPortOffset();
         try {
             localPortForwarder.close();
         } catch (final IOException e) {

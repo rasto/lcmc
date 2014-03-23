@@ -22,7 +22,7 @@
 
 package lcmc.utilities;
 
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -109,12 +109,12 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessMode() {
         final boolean accessible =
-                   Tools.getConfigData().isAccessible(enableAccessMode);
+                   Tools.getApplication().isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate();
         setEnabled(disableTooltip == null && accessible);
         if (isVisible()) {
             if (!accessible && enableAccessMode.getAccessType()
-                               != ConfigData.AccessType.NEVER) {
+                               != Application.AccessType.NEVER) {
                 String advanced = "";
                 if (enableAccessMode.isAdvancedMode()) {
                     advanced = "Advanced ";
@@ -123,7 +123,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
                                + getText()
                                + " (disabled)</b><br>available in \""
                                + advanced
-                               + ConfigData.OP_MODES_MAP.get(
+                               + Application.OP_MODES_MAP.get(
                                       enableAccessMode.getAccessType())
                                + "\" mode</html>");
             } else if (disableTooltip != null) {

@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.gui.dialog.BugReport;
 
@@ -294,7 +294,7 @@ public final class Logger {
         }
 
         Tools.getGUIData().getMainMenu().setOperatingMode(
-                                                        ConfigData.OP_MODE_RO);
+                                                        Application.OP_MODE_RO);
 
         final Thread t = new Thread(new Runnable() {
             @Override

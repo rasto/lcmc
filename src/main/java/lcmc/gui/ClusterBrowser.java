@@ -32,7 +32,7 @@ import lcmc.data.ClusterStatus;
 import lcmc.data.CRMXML;
 import lcmc.data.DrbdXML;
 import lcmc.data.VMSXML;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.NewOutputCallback;
 
 import lcmc.utilities.ExecCallback;
@@ -1986,11 +1986,11 @@ public final class ClusterBrowser extends Browser {
         final String id = si.getService().getId();
         String pmId = si.getService().getHeartbeatId();
         if (pmId == null) {
-            if (ConfigData.PM_GROUP_NAME.equals(si.getService().getName())) {
+            if (Application.PM_GROUP_NAME.equals(si.getService().getName())) {
                 pmId = Service.GRP_ID_PREFIX;
-            } else if (ConfigData.PM_CLONE_SET_NAME.equals(
+            } else if (Application.PM_CLONE_SET_NAME.equals(
                                                     si.getService().getName())
-                       || ConfigData.PM_MASTER_SLAVE_SET_NAME.equals(
+                       || Application.PM_MASTER_SLAVE_SET_NAME.equals(
                                                 si.getService().getName())) {
                 if (si.getService().isMaster()) {
                     pmId = Service.MS_ID_PREFIX;

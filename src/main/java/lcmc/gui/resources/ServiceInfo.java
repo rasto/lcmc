@@ -21,23 +21,15 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.Host;
-import lcmc.data.HostLocation;
-import lcmc.data.ResourceAgent;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.widget.TextfieldWithUnit;
 
 import java.awt.geom.Point2D;
 import lcmc.data.resources.Service;
-import lcmc.data.Subtext;
-import lcmc.data.CRMXML;
-import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
-import lcmc.data.PtestData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Unit;
@@ -91,8 +83,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
@@ -476,7 +467,7 @@ public class ServiceInfo extends EditableInfo {
         if (si != null && si != this && !si.getService().isOrphaned()) {
             incorrect.add("not in LRM");
         }
-        if (ConfigData.PM_GROUP_NAME.equals(getName())) {
+        if (Application.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
                 changed.add("new resource");
             } else if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
@@ -486,8 +477,8 @@ public class ServiceInfo extends EditableInfo {
                 }
                 check.addCheck(checkOperationFields());
             }
-        } else if (ConfigData.PM_CLONE_SET_NAME.equals(getName())
-                   || ConfigData.PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
+        } else if (Application.PM_CLONE_SET_NAME.equals(getName())
+                   || Application.PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
             final String prefix;
             if (getService().isMaster()) {
                 prefix = Service.MS_ID_PREFIX;
@@ -1538,7 +1529,7 @@ public class ServiceInfo extends EditableInfo {
                                   + "))|ALWAYS|NEVER|@NOTHING_SELECTED@$",
                                   rightWidth,
                                   abbreviations,
-                                  new AccessMode(ConfigData.AccessType.ADMIN,
+                                  new AccessMode(Application.AccessType.ADMIN,
                                                  false),
                                   Widget.NO_BUTTON);
             wi.setEditable(true);
@@ -1645,7 +1636,7 @@ public class ServiceInfo extends EditableInfo {
                          Widget.NO_REGEXP,
                          rightWidth,
                          Widget.NO_ABBRV,
-                         new AccessMode(ConfigData.AccessType.ADMIN,
+                         new AccessMode(Application.AccessType.ADMIN,
                                         false),
                          Widget.NO_BUTTON);
         addField(panel, pingLabel, pingWi.getComponent(), leftWidth, rightWidth, 0);
@@ -1938,7 +1929,7 @@ public class ServiceInfo extends EditableInfo {
                                           rightWidth,
                                           Widget.NO_ABBRV,
                                           new AccessMode(
-                                                    ConfigData.AccessType.ADMIN,
+                                                    Application.AccessType.ADMIN,
                                                     false),
                                           Widget.NO_BUTTON);
         final String toolTip;
@@ -1969,7 +1960,7 @@ public class ServiceInfo extends EditableInfo {
         final JPanel advancedOpPanel = new JPanel(new SpringLayout());
         advancedOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         addToAdvancedList(advancedOpPanel);
-        advancedOpPanel.setVisible(Tools.getConfigData().isAdvancedMode());
+        advancedOpPanel.setVisible(Tools.getApplication().isAdvancedMode());
         int advancedRows = 0;
         int rows = 0;
         boolean allAreDefaultValues = true;
@@ -2026,7 +2017,7 @@ public class ServiceInfo extends EditableInfo {
                                   "^\\d*$",
                                   rightWidth,
                                   Widget.NO_ABBRV,
-                                  new AccessMode(ConfigData.AccessType.ADMIN,
+                                  new AccessMode(Application.AccessType.ADMIN,
                                                  false),
                                   Widget.NO_BUTTON);
                     //wi.setAlwaysEditable(true);
@@ -2038,7 +2029,7 @@ public class ServiceInfo extends EditableInfo {
                                                rightWidth,
                                                Widget.NO_ABBRV,
                                                new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    !AccessMode.ADVANCED),
                                                Widget.NO_BUTTON);
                 }
@@ -2313,7 +2304,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getAccessType(resourceAgent, param);
     }
@@ -2380,9 +2371,9 @@ public class ServiceInfo extends EditableInfo {
     private void changeTypeToClone(final boolean masterSlave) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         final CloneInfo oldCI = getCloneInfo();
-        String title = ConfigData.PM_CLONE_SET_NAME;
+        String title = Application.PM_CLONE_SET_NAME;
         if (masterSlave) {
-            title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+            title = Application.PM_MASTER_SLAVE_SET_NAME;
         }
         final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
                                            title,
@@ -2559,7 +2550,7 @@ public class ServiceInfo extends EditableInfo {
                                          ClusterBrowser.SERVICE_FIELD_WIDTH,
                                          Widget.NO_ABBRV,
                                          new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    false),
                                          Widget.NO_BUTTON);
         final String toolTip;
@@ -2773,7 +2764,7 @@ public class ServiceInfo extends EditableInfo {
                                      ClusterBrowser.SERVICE_LABEL_WIDTH
                                      + ClusterBrowser.SERVICE_FIELD_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.ADMIN,
+                                     new AccessMode(Application.AccessType.ADMIN,
                                                     false),
                                      Widget.NO_BUTTON);
 
@@ -4077,9 +4068,9 @@ public class ServiceInfo extends EditableInfo {
         } else if (newRA.isClone()) {
             final String cloneName;
             if (master) {
-                cloneName = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+                cloneName = Application.PM_MASTER_SLAVE_SET_NAME;
             } else {
-                cloneName = ConfigData.PM_CLONE_SET_NAME;
+                cloneName = Application.PM_CLONE_SET_NAME;
             }
             newServiceInfo = new CloneInfo(newRA,
                                            cloneName,
@@ -4586,10 +4577,10 @@ public class ServiceInfo extends EditableInfo {
                                               null,
                                               null,
                                               new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    false),
                                               new AccessMode(
-                                                   ConfigData.AccessType.OP,
+                                                   Application.AccessType.OP,
                                                    false)) {
             private static final long serialVersionUID = 1L;
             @Override
@@ -4647,8 +4638,8 @@ public class ServiceInfo extends EditableInfo {
                                               final boolean testOnly) {
         final ServiceInfo thisClass = this;
         return new MyMenu(name,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.OP, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -4748,8 +4739,8 @@ public class ServiceInfo extends EditableInfo {
                            Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -4789,8 +4780,8 @@ public class ServiceInfo extends EditableInfo {
                          Tools.getString("ClusterBrowser.DrbddiskMenuName"),
                          null,
                          null,
-                         new AccessMode(ConfigData.AccessType.ADMIN, false),
-                         new AccessMode(ConfigData.AccessType.OP, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, false),
+                         new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -4824,8 +4815,8 @@ public class ServiceInfo extends EditableInfo {
           new MyMenuItem(ipService.getMenuName(),
                          null,
                          null,
-                         new AccessMode(ConfigData.AccessType.ADMIN, false),
-                         new AccessMode(ConfigData.AccessType.OP, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, false),
+                         new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -4853,8 +4844,8 @@ public class ServiceInfo extends EditableInfo {
               new MyMenuItem(fsService.getMenuName(),
                              null,
                              null,
-                             new AccessMode(ConfigData.AccessType.ADMIN, false),
-                             new AccessMode(ConfigData.AccessType.OP, false)) {
+                             new AccessMode(Application.AccessType.ADMIN, false),
+                             new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
                 @Override
                 public void action() {
@@ -4886,9 +4877,9 @@ public class ServiceInfo extends EditableInfo {
                      ra.getMenuName(),
                      null,
                      null,
-                     new AccessMode(ConfigData.AccessType.ADMIN,
+                     new AccessMode(Application.AccessType.ADMIN,
                                     false),
-                     new AccessMode(ConfigData.AccessType.OP,
+                     new AccessMode(Application.AccessType.OP,
                                     false)) {
             private static final long serialVersionUID = 1L;
             @Override
@@ -4929,8 +4920,8 @@ public class ServiceInfo extends EditableInfo {
                                          final String name) {
         final ServiceInfo thisClass = this;
         return new MyMenu(name,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.OP, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -5011,8 +5002,8 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final MyMenu classItem = new MyMenu(
                             ClusterBrowser.getClassMenu(cl),
-                            new AccessMode(ConfigData.AccessType.ADMIN, mode),
-                            new AccessMode(ConfigData.AccessType.OP, mode));
+                            new AccessMode(Application.AccessType.ADMIN, mode),
+                            new AccessMode(Application.AccessType.OP, mode));
                     final MyListModel<MyMenuItem> dlm =
                                                  new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
@@ -5054,8 +5045,8 @@ public class ServiceInfo extends EditableInfo {
                                 "ClusterBrowser.Hb.AddDependentGroup"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5119,8 +5110,8 @@ public class ServiceInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StartResource"),
                            START_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5155,8 +5146,8 @@ public class ServiceInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StopResource"),
                            STOP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5191,8 +5182,8 @@ public class ServiceInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.UpResource"),
                            GROUP_UP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5248,8 +5239,8 @@ public class ServiceInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.DownResource"),
                            GROUP_DOWN_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5310,8 +5301,8 @@ public class ServiceInfo extends EditableInfo {
                Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
                SERVICE_RUNNING_ICON,
                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-               new AccessMode(ConfigData.AccessType.OP, false),
-               new AccessMode(ConfigData.AccessType.OP, false)) {
+               new AccessMode(Application.AccessType.OP, false),
+               new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5352,8 +5343,8 @@ public class ServiceInfo extends EditableInfo {
                   UNMANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5397,8 +5388,8 @@ public class ServiceInfo extends EditableInfo {
                         Tools.getString("ClusterBrowser.Hb.RemoveService"),
                         ClusterBrowser.REMOVE_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5411,7 +5402,7 @@ public class ServiceInfo extends EditableInfo {
                     } else if (getService().isRemoved()) {
                         return IS_BEING_REMOVED_STRING;
                     } else if (isRunning(testOnly)
-                               && !Tools.getConfigData().isAdvancedMode()) {
+                               && !Tools.getApplication().isAdvancedMode()) {
                         return "cannot remove running resource<br>"
                                + "(advanced mode only)";
                     }
@@ -5461,8 +5452,8 @@ public class ServiceInfo extends EditableInfo {
                         Tools.getString("ClusterBrowser.Hb.ViewServiceLog"),
                         LOGFILE_ICON,
                         null,
-                        new AccessMode(ConfigData.AccessType.RO, false),
-                        new AccessMode(ConfigData.AccessType.RO, false)) {
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -5488,8 +5479,8 @@ public class ServiceInfo extends EditableInfo {
         /* more migrate options */
         final MyMenu migrateSubmenu = new MyMenu(
                         Tools.getString("ClusterBrowser.MigrateSubmenu"),
-                        new AccessMode(ConfigData.AccessType.OP, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public String enablePredicate() {
@@ -5502,8 +5493,8 @@ public class ServiceInfo extends EditableInfo {
         /* config files */
         final UpdatableItem filesSubmenu = new MyMenu(
                         Tools.getString("ClusterBrowser.FilesSubmenu"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public String enablePredicate() {
@@ -5545,8 +5536,8 @@ public class ServiceInfo extends EditableInfo {
                                    + ' ' + hostName + " (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -5611,8 +5602,8 @@ public class ServiceInfo extends EditableInfo {
                     Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
                     UNMIGRATE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5667,8 +5658,8 @@ public class ServiceInfo extends EditableInfo {
                                    + ' ' + hostName + " (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -5745,8 +5736,8 @@ public class ServiceInfo extends EditableInfo {
                                    + ' ' + hostName + " (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -5853,8 +5844,8 @@ public class ServiceInfo extends EditableInfo {
                           configFile,
                           null,
                           null,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.ADMIN, false)) {
                     private static final long serialVersionUID = 1L;
 
                    @Override

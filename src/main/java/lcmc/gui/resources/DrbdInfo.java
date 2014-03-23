@@ -24,16 +24,11 @@ package lcmc.gui.resources;
 import lcmc.Exceptions;
 import lcmc.ProxyHostWizard;
 import lcmc.AddDrbdConfigDialog;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
-import lcmc.data.Host;
-import lcmc.data.DrbdXML;
 import lcmc.data.resources.Resource;
-import lcmc.data.DRBDtestData;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
@@ -68,8 +63,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
 import lcmc.EditClusterDialog;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
@@ -255,7 +248,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             boolean bigDRBDConf = true;
             try {
                 bigDRBDConf =
-                  Tools.getConfigData().getBigDRBDConf()
+                  Tools.getApplication().getBigDRBDConf()
                   || Tools.compareVersions(host.getDrbdVersion(), "8.3.7") < 0;
             } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("createDrbdConfig: " + e.getMessage(), e);
@@ -975,8 +968,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                 Tools.getString("DrbdInfo.AddProxyHost"),
                 null,
                 Tools.getString("DrbdInfo.AddProxyHost"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -992,9 +985,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
                            CLUSTER_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1012,9 +1005,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
             new MyMenuItem(Tools.getString("DrbdInfo.RescanLvm"),
                            null, /* icon */
                            null,
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1031,8 +1024,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
                            Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
 
             private static final long serialVersionUID = 1L;
 

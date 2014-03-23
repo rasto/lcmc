@@ -27,7 +27,7 @@ import lcmc.gui.TerminalPanel;
 import lcmc.data.Cluster;
 import lcmc.data.Clusters;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
@@ -140,7 +140,7 @@ public final class AllHostsInfo extends Info {
                 final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
                 final List<String> clusterNames = new ArrayList<String>();
                 final Set<Cluster> clusters =
-                           Tools.getConfigData().getClusters().getClusterSet();
+                           Tools.getApplication().getClusters().getClusterSet();
                 for (final Cluster cluster : clusters) {
                     final JCheckBox wi = allCheckboxes.get(cluster);
                     LOG.debug1("removeMarkedClusters: cluster: "
@@ -181,7 +181,7 @@ public final class AllHostsInfo extends Info {
                 });
                 Tools.stopClusters(selectedRunningClusters);
                 Tools.removeClusters(selectedClusters);
-                final String saveFile = Tools.getConfigData().getSaveFile();
+                final String saveFile = Tools.getApplication().getSaveFile();
                 Tools.save(saveFile, false);
                 mainPanel.repaint();
                 Tools.invokeLater(new Runnable() {
@@ -227,7 +227,7 @@ public final class AllHostsInfo extends Info {
         mainPanel.setBackground(Color.WHITE);
 
         final Set<Cluster> clusters =
-                           Tools.getConfigData().getClusters().getClusterSet();
+                           Tools.getApplication().getClusters().getClusterSet();
         if (clusters != null) {
             final JPanel bPanel =
                            new JPanel(new BorderLayout());
@@ -316,14 +316,14 @@ public final class AllHostsInfo extends Info {
             @Override
             public void run() {
                 Tools.sleep(3000);
-                if (Tools.getConfigData().getAutoHosts().isEmpty()
-                    && !Tools.getConfigData().getAutoClusters().isEmpty()) {
+                if (Tools.getApplication().getAutoHosts().isEmpty()
+                    && !Tools.getApplication().getAutoClusters().isEmpty()) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (final Map.Entry<Cluster, MyButton> clusterEntry : allLoadButtons.entrySet()) {
                                 if (clusterEntry.getKey().getClusterTab() == null
-                                    && Tools.getConfigData().getAutoClusters()
+                                    && Tools.getApplication().getAutoClusters()
                                                     .contains(clusterEntry.getKey().getName())) {
                                     clusterEntry.getValue().pressButton();
                                 }
@@ -506,14 +506,14 @@ public final class AllHostsInfo extends Info {
                             newClusterName = clusterName;
                         }
                         final Clusters clusters =
-                                           Tools.getConfigData().getClusters();
+                                           Tools.getApplication().getClusters();
                         if (clusters.isClusterName(newClusterName)) {
                             cluster.setName(clusters.getNextClusterName(
                                                        newClusterName + ' '));
                         } else {
                             cluster.setName(newClusterName);
                         }
-                        Tools.getConfigData().addClusterToClusters(cluster);
+                        Tools.getApplication().addClusterToClusters(cluster);
                         addClusterBox(cluster);
                         addCheckboxListener(cluster);
                         for (final JTextField hostTF : hostsTF) {
@@ -551,10 +551,10 @@ public final class AllHostsInfo extends Info {
                             host.setCluster(cluster);
                             host.setHostname(hostName);
                             cluster.addHost(host);
-                            Tools.getConfigData().addHostToHosts(host);
+                            Tools.getApplication().addHostToHosts(host);
                             Tools.getGUIData().allHostsUpdate();
                         }
-                        Tools.getConfigData().addClusterToClusters(cluster);
+                        Tools.getApplication().addClusterToClusters(cluster);
                         final Collection<Cluster> selectedClusters =
                                                  new ArrayList<Cluster>();
                         selectedClusters.add(cluster);
@@ -804,8 +804,8 @@ public final class AllHostsInfo extends Info {
             new MyMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
                            HOST_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override

@@ -22,7 +22,7 @@ package lcmc.gui.widget;
 
 import lcmc.data.Value;
 import lcmc.utilities.Tools;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.MyButton;
@@ -60,7 +60,6 @@ import java.awt.Component;
 
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.List;
 import java.util.ArrayList;
 
 import java.util.concurrent.locks.Lock;
@@ -104,7 +103,7 @@ implements Widget {
     private boolean tfButtonEnabled = true;
     /** Access Type for this component to become enabled. */
     private AccessMode enableAccessMode = new AccessMode(
-                                                    ConfigData.AccessType.RO,
+                                                    Application.AccessType.RO,
                                                     false);
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
@@ -193,9 +192,9 @@ implements Widget {
         if (disabledReason0 != null) {
             text = text + "<br>" + disabledReason0;
         }
-        if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
+        if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
             final boolean accessible =
-                     Tools.getConfigData().isAccessible(enableAccessMode);
+                     Tools.getApplication().isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
             }
@@ -214,9 +213,9 @@ implements Widget {
             return;
         }
         String disabledTooltip = null;
-        if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
+        if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
             final boolean accessible =
-                     Tools.getConfigData().isAccessible(enableAccessMode);
+                     Tools.getApplication().isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
             }
@@ -251,7 +250,7 @@ implements Widget {
         sb.append("editable in \"");
         sb.append(advanced);
         sb.append(
-                ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
+                Application.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
         sb.append("\" mode");
 
         if (disabledReason != null) {
@@ -340,7 +339,7 @@ implements Widget {
         enablePredicate = enabled;
         setComponentsEnabled(
                    enablePredicate
-                   && Tools.getConfigData().isAccessible(enableAccessMode));
+                   && Tools.getApplication().isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -804,7 +803,7 @@ implements Widget {
     @Override
     public final void processAccessMode() {
         final boolean accessible =
-                       Tools.getConfigData().isAccessible(enableAccessMode);
+                       Tools.getApplication().isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);

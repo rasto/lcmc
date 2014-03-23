@@ -209,7 +209,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 unitComboBox.repaint();
             }
             final boolean accessible =
-                     Tools.getConfigData().isAccessible(getEnableAccessMode());
+                     Tools.getApplication().isAccessible(getEnableAccessMode());
             if (text == null || text.isEmpty()) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);

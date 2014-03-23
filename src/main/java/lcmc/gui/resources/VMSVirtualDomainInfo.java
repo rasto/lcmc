@@ -21,13 +21,13 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;
-import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.DiskData;
 import lcmc.data.VMSXML.FilesystemData;
 import lcmc.data.VMSXML.InterfaceData;
@@ -37,10 +37,7 @@ import lcmc.data.VMSXML.SoundData;
 import lcmc.data.VMSXML.SerialData;
 import lcmc.data.VMSXML.ParallelData;
 import lcmc.data.VMSXML.VideoData;
-import lcmc.data.Host;
 import lcmc.data.resources.Resource;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenu;
@@ -77,8 +74,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
@@ -2054,7 +2050,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                         ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                                         Widget.NO_ABBRV,
                                         new AccessMode(
-                                          ConfigData.AccessType.ADMIN,
+                                          Application.AccessType.ADMIN,
                                           false),
                                         hostBtn);
             Widget rpwi = null;
@@ -2812,8 +2808,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
     /** Add new hardware. */
     private UpdatableItem getAddNewHardwareMenu(final String name) {
         return new MyMenu(name,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.OP, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -2829,8 +2825,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newDiskMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewDisk"),
                    BlockDevInfo.HARDDISK_ICON_LARGE,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2845,8 +2841,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newFilesystemMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewFilesystem"),
                    BlockDevInfo.HARDDISK_ICON_LARGE,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2861,8 +2857,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newInterfaceMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewInterface"),
                    NetInfo.NET_I_ICON_LARGE,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2877,8 +2873,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newGraphicsMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewGraphics"),
                    VNC_ICON,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2893,8 +2889,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newInputDevMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewInputDev"),
                    null,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2909,8 +2905,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newSoundsMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewSound"),
                    null,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2925,8 +2921,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newSerialsMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewSerial"),
                    null,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2941,8 +2937,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newParallelsMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewParallel"),
                    null,
-                   new AccessMode(ConfigData.AccessType.ADMIN, false),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, false),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2957,8 +2953,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 final MyMenuItem newVideosMenuItem = new MyMenuItem(
                    Tools.getString("VMSVirtualDomainInfo.AddNewVideo"),
                    null,
-                   new AccessMode(ConfigData.AccessType.ADMIN, true),
-                   new AccessMode(ConfigData.AccessType.OP, false)) {
+                   new AccessMode(Application.AccessType.ADMIN, true),
+                   new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
                     @Override
                     public void action() {
@@ -2981,8 +2977,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             HostBrowser.HOST_ON_ICON_LARGE,
                             Tools.getString("VMSVirtualDomainInfo.StartOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -2996,7 +2992,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                if (!Tools.getApplication().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
@@ -3022,8 +3018,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             SHUTDOWN_ICON,
                             Tools.getString("VMSVirtualDomainInfo.ShutdownOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -3037,7 +3033,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                if (!Tools.getApplication().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
@@ -3063,8 +3059,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             REBOOT_ICON,
                             Tools.getString("VMSVirtualDomainInfo.RebootOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -3078,7 +3074,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
             @Override
             public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                if (!Tools.getApplication().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 return null;
@@ -3104,8 +3100,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             RESUME_ICON,
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -3156,15 +3152,15 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             DESTROY_ICON,
                             Tools.getString("VMSVirtualDomainInfo.DestroyOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
 
             @Override
             public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode() && isUsedByCRM()) {
+                if (!Tools.getApplication().isAdvancedMode() && isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
                 if (getResource().isNew()) {
@@ -3201,8 +3197,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             PAUSE_ICON,
                             Tools.getString("VMSVirtualDomainInfo.SuspendOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -3245,8 +3241,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             RESUME_ICON,
                             Tools.getString("VMSVirtualDomainInfo.ResumeOn")
                             + host.getName(),
-                            new AccessMode(ConfigData.AccessType.OP, false),
-                            new AccessMode(ConfigData.AccessType.OP, false)) {
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -3320,8 +3316,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
         /* advanced options */
         final MyMenu advancedSubmenu = new MyMenu(
                         Tools.getString("VMSVirtualDomainInfo.MoreOptions"),
-                        new AccessMode(ConfigData.AccessType.OP, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public String enablePredicate() {
@@ -3348,8 +3344,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                        Tools.getString("VMSVirtualDomainInfo.CancelDomain"),
                        ClusterBrowser.REMOVE_ICON,
                        Tools.getString("VMSVirtualDomainInfo.CancelDomain"),
-                       new AccessMode(ConfigData.AccessType.ADMIN, false),
-                       new AccessMode(ConfigData.AccessType.OP, false)) {
+                       new AccessMode(Application.AccessType.ADMIN, false),
+                       new AccessMode(Application.AccessType.OP, false)) {
                             private static final long serialVersionUID = 1L;
                             @Override
                             public boolean predicate() {
@@ -3357,7 +3353,7 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                             }
                             @Override
                             public String enablePredicate() {
-                                if (!Tools.getConfigData().isAdvancedMode()
+                                if (!Tools.getApplication().isAdvancedMode()
                                     && isUsedByCRM()) {
                                     return IS_USED_BY_CRM_STRING;
                                 }
@@ -3408,14 +3404,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                                 final Host host) {
         final boolean testOnly = false;
         final VMSVirtualDomainInfo thisClass = this;
-        if (Tools.getConfigData().isTightvnc()) {
+        if (Tools.getApplication().isTightvnc()) {
             /* tight vnc test menu */
             final UpdatableItem tightvncViewerMenu = new MyMenuItem(
                             getVNCMenuString("TIGHT", host),
                             VNC_ICON,
                             getVNCMenuString("TIGHT", host),
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -3451,14 +3447,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             items.add(tightvncViewerMenu);
         }
 
-        if (Tools.getConfigData().isUltravnc()) {
+        if (Tools.getApplication().isUltravnc()) {
             /* ultra vnc test menu */
             final UpdatableItem ultravncViewerMenu = new MyMenuItem(
                             getVNCMenuString("ULTRA", host),
                             VNC_ICON,
                             getVNCMenuString("ULTRA", host),
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -3494,14 +3490,14 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
             items.add(ultravncViewerMenu);
         }
 
-        if (Tools.getConfigData().isRealvnc()) {
+        if (Tools.getApplication().isRealvnc()) {
             /* real vnc test menu */
             final UpdatableItem realvncViewerMenu = new MyMenuItem(
                             getVNCMenuString("REAL", host),
                             VNC_ICON,
                             getVNCMenuString("REAL", host),
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -5132,8 +5128,8 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns the regexp of the parameter. */

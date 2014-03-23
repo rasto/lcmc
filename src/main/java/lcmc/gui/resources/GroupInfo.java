@@ -21,16 +21,10 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
-import lcmc.data.ResourceAgent;
-import lcmc.data.Host;
-import lcmc.data.CRMXML;
-import lcmc.data.ClusterStatus;
-import lcmc.data.Subtext;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.CRM;
 import lcmc.utilities.MyMenu;
@@ -60,7 +54,7 @@ import java.awt.geom.Point2D;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.MyButton;
 
@@ -84,7 +78,7 @@ public final class GroupInfo extends ServiceInfo {
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
     /** Creates new GroupInfo object. */
     GroupInfo(final ResourceAgent ra, final Browser browser) {
-        super(ConfigData.PM_GROUP_NAME, ra, browser);
+        super(Application.PM_GROUP_NAME, ra, browser);
     }
 
     /** Applies the the whole group if for example an order has changed. */
@@ -578,8 +572,8 @@ public final class GroupInfo extends ServiceInfo {
         /* add group service */
         final UpdatableItem addGroupServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -599,9 +593,9 @@ public final class GroupInfo extends ServiceInfo {
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
-                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                   new AccessMode(Application.AccessType.ADMIN,
                                                   false),
-                                   new AccessMode(ConfigData.AccessType.OP,
+                                   new AccessMode(Application.AccessType.OP,
                                                   false));
                     final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : getAddGroupServiceList(cl)) {
@@ -610,9 +604,9 @@ public final class GroupInfo extends ServiceInfo {
                                    ra.getMenuName(),
                                    null,
                                    null,
-                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                   new AccessMode(Application.AccessType.ADMIN,
                                                   false),
-                                   new AccessMode(ConfigData.AccessType.OP,
+                                   new AccessMode(Application.AccessType.OP,
                                                   false)) {
                             private static final long serialVersionUID = 1L;
                             @Override
@@ -665,12 +659,12 @@ public final class GroupInfo extends ServiceInfo {
         }
 
         /* group services */
-        if (!Tools.getConfigData().isSlow()) {
+        if (!Tools.getApplication().isSlow()) {
             for (final ServiceInfo child : getGroupServices()) {
                 final UpdatableItem groupServicesMenu = new MyMenu(
                         child.toString(),
-                        new AccessMode(ConfigData.AccessType.RO, false),
-                        new AccessMode(ConfigData.AccessType.RO, false)) {
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -1093,7 +1087,7 @@ public final class GroupInfo extends ServiceInfo {
     @Override
     public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
-        if (!Tools.getConfigData().isSlow()) {
+        if (!Tools.getApplication().isSlow()) {
             for (final ServiceInfo child : getGroupServices()) {
                 child.updateMenus(pos);
             }

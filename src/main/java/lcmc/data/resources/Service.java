@@ -23,7 +23,7 @@
 
 package lcmc.data.resources;
 
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.StringValue;
 
 import lcmc.utilities.Logger;
@@ -70,12 +70,12 @@ public class Service extends Resource {
     /** Pacemaker id prefix for master/slave. */
     public static final String MS_ID_PREFIX = "ms_";
     /** Name of the clone set pacemaker object. */
-    private static final String CLONE_SET_NAME = ConfigData.PM_CLONE_SET_NAME;
+    private static final String CLONE_SET_NAME = Application.PM_CLONE_SET_NAME;
     /** Name of the master / slave set pacemaker object. */
     private static final String MASTER_SLAVE_SET_NAME =
-                                        ConfigData.PM_MASTER_SLAVE_SET_NAME;
+                                        Application.PM_MASTER_SLAVE_SET_NAME;
     /** Name of the group pacemaker object. */
-    private static final String GROUP_NAME = ConfigData.PM_GROUP_NAME;
+    private static final String GROUP_NAME = Application.PM_GROUP_NAME;
 
     /**
      * Prepares a new {@code Service} object.

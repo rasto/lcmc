@@ -21,6 +21,7 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -30,9 +31,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.CRMXML;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.data.resources.Resource;
 import lcmc.gui.SpringUtilities;
 
@@ -59,7 +57,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
@@ -89,7 +87,7 @@ public abstract class EditableInfo extends Info {
         a reason that appears in the tooltip. */
     protected abstract String isEnabled(String param);
     /** Returns access type of this parameter. */
-    protected abstract ConfigData.AccessType getAccessType(String param);
+    protected abstract Application.AccessType getAccessType(String param);
     /** Returns whether this parameter is enabled in advanced mode. */
     protected abstract boolean isEnabledOnlyInAdvancedMode(String param);
     /** Returns whether this parameter is of label type. */
@@ -281,13 +279,13 @@ public abstract class EditableInfo extends Info {
         /** Section of this panel part. */
         private final String section;
         /** Access type of this panel part. */
-        private final ConfigData.AccessType accessType;
+        private final Application.AccessType accessType;
         /** Whether it is an advanced panel part. */
         private final boolean advanced;
 
         /** Creates new panel part object. */
         PanelPart(final String section,
-                  final ConfigData.AccessType accessType,
+                  final Application.AccessType accessType,
                   final boolean advanced) {
             this.section = section;
             this.accessType = accessType;
@@ -300,7 +298,7 @@ public abstract class EditableInfo extends Info {
         }
 
         /** Returns access type of this panel part. */
-        public final ConfigData.AccessType getAccessType() {
+        public final Application.AccessType getAccessType() {
             return accessType;
         }
 
@@ -348,7 +346,7 @@ public abstract class EditableInfo extends Info {
             /* sub panel */
             final String section = getSection(param);
             final JPanel panel;
-            final ConfigData.AccessType accessType = getAccessType(param);
+            final Application.AccessType accessType = getAccessType(param);
             final String accessTypeString = accessType.toString();
             final Boolean advanced = isAdvanced(param);
             final String advancedString = advanced.toString();
@@ -370,7 +368,7 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    panel.setVisible(Tools.getConfigData().isAdvancedMode());
+                    panel.setVisible(Tools.getApplication().isAdvancedMode());
                 }
                 panelPartsMap.put(section,
                                   accessTypeString,
@@ -442,7 +440,7 @@ public abstract class EditableInfo extends Info {
         final Collection<JPanel> advancedSections = new HashSet<JPanel>();
         for (final PanelPart panelPart : panelPartsList) {
             final String section = panelPart.getSection();
-            final ConfigData.AccessType accessType = panelPart.getAccessType();
+            final Application.AccessType accessType = panelPart.getAccessType();
             final String accessTypeString = accessType.toString();
             final Boolean advanced = panelPart.isAdvanced();
             final String advancedString = advanced.toString();
@@ -503,12 +501,12 @@ public abstract class EditableInfo extends Info {
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(sectionEntry.getKey());
-                sectionPanel.setVisible(Tools.getConfigData().isAdvancedMode()
+                sectionPanel.setVisible(Tools.getApplication().isAdvancedMode()
                                         && isSectionEnabled(sectionEntry.getKey()));
             }
         }
         moreOptionsPanel.setVisible(advanced
-                                    && !Tools.getConfigData().isAdvancedMode());
+                                    && !Tools.getApplication().isAdvancedMode());
     }
 
     /** Returns a more panel with "more options are available" message. */
@@ -950,7 +948,7 @@ public abstract class EditableInfo extends Info {
     @Override
     public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
-        final boolean advancedMode = Tools.getConfigData().isAdvancedMode();
+        final boolean advancedMode = Tools.getApplication().isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
             Tools.invokeLater(new Runnable() {

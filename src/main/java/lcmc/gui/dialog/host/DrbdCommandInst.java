@@ -81,7 +81,7 @@ final class DrbdCommandInst extends DialogHost {
                     Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -117,7 +117,7 @@ final class DrbdCommandInst extends DialogHost {
         final String drbdVersion = getHost().getDrbdVersionToInstall();
         final String drbdVersionUrlString =
                               getHost().getDrbdVersionUrlStringToInstall();
-        Tools.getConfigData().setLastDrbdInstalledMethod(
+        Tools.getApplication().setLastDrbdInstalledMethod(
             getHost().getDistString("DrbdInst.install.text." + installMethod));
         LOG.debug1("installDrbd: cmd: " + installCommand
                    + " arch: " + archString

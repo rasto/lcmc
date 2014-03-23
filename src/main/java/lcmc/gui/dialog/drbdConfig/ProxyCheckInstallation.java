@@ -259,7 +259,7 @@ final class ProxyCheckInstallation extends DialogHost {
         /* get proxy installation methods */
         proxyInstMethodWi = getInstallationMethods(
                              PROXY_PREFIX,
-                             Tools.getConfigData().isStagingPacemaker(),
+                             Tools.getApplication().isStagingPacemaker(),
                              null, /* last installed method */
                              PROXY_AUTO_OPTION,
                              proxyButton);

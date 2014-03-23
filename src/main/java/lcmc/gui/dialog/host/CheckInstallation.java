@@ -22,8 +22,8 @@
 
 package lcmc.gui.dialog.host;
 
+import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.ExecCallback;
@@ -456,9 +456,9 @@ final class CheckInstallation extends DialogHost {
                                        "Dialog.Host.CheckInstallation.AllOk"));
                 }
             });
-            if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null
-                || Tools.getConfigData().getAutoOptionHost("hbinst") != null
-                || Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+            if (Tools.getApplication().getAutoOptionHost("drbdinst") != null
+                || Tools.getApplication().getAutoOptionHost("hbinst") != null
+                || Tools.getApplication().getAutoOptionHost("pminst") != null) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -469,15 +469,15 @@ final class CheckInstallation extends DialogHost {
                                 "Dialog.Host.CheckInstallation.SomeFailed"));
         }
         if (!drbdOk
-            && Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            && Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             drbdButton.pressButton();
         } else if (!hbPmOk
-            && Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+            && Tools.getApplication().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             hbPmButton.pressButton();
         } else if (!pmOk
-            && Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+            && Tools.getApplication().getAutoOptionHost("pminst") != null) {
             Tools.sleep(1000);
             pmButton.pressButton();
         }
@@ -515,30 +515,30 @@ final class CheckInstallation extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
         pmInstMethodWi = getInstallationMethods(
                             PM_PREFIX,
-                            Tools.getConfigData().isStagingPacemaker(),
-                            Tools.getConfigData().getLastHbPmInstalledMethod(),
+                            Tools.getApplication().isStagingPacemaker(),
+                            Tools.getApplication().getLastHbPmInstalledMethod(),
                             PM_AUTO_OPTION,
                             pmButton);
 
         hbPmInstMethodWi = getInstallationMethods(
                             HBPM_PREFIX,
-                            Tools.getConfigData().isStagingPacemaker(),
-                            Tools.getConfigData().getLastHbPmInstalledMethod(),
+                            Tools.getApplication().isStagingPacemaker(),
+                            Tools.getApplication().getLastHbPmInstalledMethod(),
                             HBPM_AUTO_OPTION,
                             hbPmButton);
         drbdInstMethodWi = getInstallationMethods(
                             DRBD_PREFIX,
-                            Tools.getConfigData().isStagingDrbd(),
-                            Tools.getConfigData().getLastDrbdInstalledMethod(),
+                            Tools.getApplication().isStagingDrbd(),
+                            Tools.getApplication().getLastDrbdInstalledMethod(),
                             DRBD_AUTO_OPTION,
                             drbdButton);
         final String lastInstalled =
-                          Tools.getConfigData().getLastInstalledClusterStack();
+                          Tools.getApplication().getLastInstalledClusterStack();
         if (lastInstalled != null) {
-            if (ConfigData.HEARTBEAT_NAME.equals(lastInstalled)) {
+            if (Application.HEARTBEAT_NAME.equals(lastInstalled)) {
                 pmJLabel.setForeground(Color.LIGHT_GRAY);
                 pmLabel.setForeground(Color.LIGHT_GRAY);
-            } else if (ConfigData.COROSYNC_NAME.equals(lastInstalled)) {
+            } else if (Application.COROSYNC_NAME.equals(lastInstalled)) {
                 hbPmJLabel.setForeground(Color.LIGHT_GRAY);
                 hbPmLabel.setForeground(Color.LIGHT_GRAY);
             }

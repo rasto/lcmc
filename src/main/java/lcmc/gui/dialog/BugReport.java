@@ -194,7 +194,7 @@ public final class BugReport extends ConfigDialog {
         textArea.setEditable(true);
         textArea.setText("loading...");
         final Set<Cluster> clusters =
-                          Tools.getConfigData().getClusters().getClusterSet();
+                          Tools.getApplication().getClusters().getClusterSet();
         final JComponent clPane = getClustersPane(clusters);
         if (clusters.size() > 1) {
             pane.add(clPane);
@@ -214,7 +214,7 @@ public final class BugReport extends ConfigDialog {
     protected void refresh() {
         enableAllComponents(false);
         final Set<Cluster> clusters =
-                          Tools.getConfigData().getClusters().getClusterSet();
+                          Tools.getApplication().getClusters().getClusterSet();
         final String allOldText = textArea.getText();
         final int i = allOldText.indexOf(GENERATED_DELIM);
         String oldText = "email: anonymous\nerror description:\n"

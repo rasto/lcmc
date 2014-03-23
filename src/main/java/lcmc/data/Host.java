@@ -369,7 +369,7 @@ public final class Host implements Comparable<Host>, Value {
      * host's resources.
      */
     public Host() {
-        if (Tools.getConfigData().getHosts().size() == 1) {
+        if (Tools.getApplication().getHosts().size() == 1) {
             hostnameEntered = Tools.getDefault("SSH.SecHost");
         }
         browser = new HostBrowser(this);
@@ -2022,7 +2022,7 @@ public final class Host implements Comparable<Host>, Value {
         if (command.indexOf("@USER@") > -1) {
             command = command.replaceAll(
                                     "@USER@",
-                                    Tools.getConfigData().getDownloadUser());
+                                    Tools.getApplication().getDownloadUser());
         }
         if (command.indexOf("@PASSWORD@") > -1) {
             if (hidePassword) {
@@ -2030,11 +2030,11 @@ public final class Host implements Comparable<Host>, Value {
             } else {
                 command = command.replaceAll(
                                    "@PASSWORD@",
-                                   Tools.getConfigData().getDownloadPassword());
+                                   Tools.getApplication().getDownloadPassword());
             }
         }
         String supportDir = "support";
-        if (Tools.getConfigData().isStagingDrbd()) {
+        if (Tools.getApplication().isStagingDrbd()) {
             supportDir = "support/staging";
         }
         if (kernelVersion != null
@@ -2073,7 +2073,7 @@ public final class Host implements Comparable<Host>, Value {
             final StringBuilder helperProg = new StringBuilder(
                                          "/usr/local/bin/lcmc-gui-helper-");
             helperProg.append(Tools.getRelease());
-            if (Tools.getConfigData().isCmdLog()) {
+            if (Tools.getApplication().isCmdLog()) {
                 helperProg.append(' ');
                 helperProg.append(GUI_HELPER_CMD_LOG_OP);
             }
@@ -2981,7 +2981,7 @@ public final class Host implements Comparable<Host>, Value {
     /** This is part of testsuite, it checks DRBD. */
     public boolean checkDRBDTest(final String test, final double index) {
         final StringBuilder testName = new StringBuilder(20);
-        if (Tools.getConfigData().getBigDRBDConf()) {
+        if (Tools.getApplication().getBigDRBDConf()) {
             testName.append("big-");
         }
         if (!hasVolumes()) {

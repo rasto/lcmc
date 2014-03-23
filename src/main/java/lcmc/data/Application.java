@@ -38,7 +38,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
 /**
- * ConfigData
+ * Application
  *
  * Holds data, that are used globaly in the application and provides some
  * functions for this data.
@@ -46,28 +46,28 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public final class ConfigData {
+public final class Application {
     /** Logger. */
     private static final Logger LOG =
-                                   LoggerFactory.getLogger(ConfigData.class);
+                                   LoggerFactory.getLogger(Application.class);
 
     /** access type. */
     public static enum AccessType { RO, OP, ADMIN, GOD, NEVER };
     /** Read only operating mode. */
     public static final String OP_MODE_RO =
-                                        Tools.getString("ConfigData.OpMode.RO");
+                                        Tools.getString("Application.OpMode.RO");
 
     /** Operator Level 1 operating mode. */
     private static final String OP_MODE_OP =
-                                       Tools.getString("ConfigData.OpMode.OP");
+                                       Tools.getString("Application.OpMode.OP");
 
     /** Administrator Level 1 operating mode. */
     private static final String OP_MODE_ADMIN =
-                                    Tools.getString("ConfigData.OpMode.ADMIN");
+                                    Tools.getString("Application.OpMode.ADMIN");
 
     /** Developer Level 10 operating mode. */
     public static final String OP_MODE_GOD =
-                                       Tools.getString("ConfigData.OpMode.GOD");
+                                       Tools.getString("Application.OpMode.GOD");
     /** Map from access type to its string representation. */
     public static final Map<AccessType, String> OP_MODES_MAP =
                                     new EnumMap<AccessType, String>(AccessType.class);
@@ -186,10 +186,10 @@ public final class ConfigData {
     private boolean checkSwing = false;
 
     /**
-     * Prepares a new {@code ConfigData} object and creates new hosts
+     * Prepares a new {@code Application} object and creates new hosts
      * and clusters objects.
      */
-    public ConfigData() {
+    public Application() {
         hosts = new Hosts();
         clusters = new Clusters();
     }
@@ -201,7 +201,7 @@ public final class ConfigData {
 
     /** Returns number of hosts that are not part of any cluster. */
     public int danglingHostsCount() {
-        final Hosts hosts0 = Tools.getConfigData().getHosts();
+        final Hosts hosts0 = Tools.getApplication().getHosts();
         int c = 0;
         for (final Host host : hosts0.getHostSet()) {
             if (!host.isInCluster()) {
@@ -638,7 +638,7 @@ public final class ConfigData {
     /** Returns available operating modes. */
     public String[] getOperatingModes() {
         final List<String> modes = new ArrayList<String>();
-        for (final AccessType at : ConfigData.OP_MODES_MAP.keySet()) {
+        for (final AccessType at : Application.OP_MODES_MAP.keySet()) {
             modes.add(OP_MODES_MAP.get(at));
             if (at.equals(maxAccessType)) {
                 break;

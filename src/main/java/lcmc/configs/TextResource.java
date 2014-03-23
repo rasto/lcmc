@@ -2455,16 +2455,16 @@ public final class TextResource extends ListResourceBundle {
         {"ConstraintPHInfo.Or",
          "OR"},
 
-        {"ConfigData.OpMode.RO",
+        {"Application.OpMode.RO",
          "Read-Only"},
 
-        {"ConfigData.OpMode.OP",
+        {"Application.OpMode.OP",
          "Operator"},
 
-        {"ConfigData.OpMode.ADMIN",
+        {"Application.OpMode.ADMIN",
          "Administrator"},
 
-        {"ConfigData.OpMode.GOD",
+        {"Application.OpMode.GOD",
          "Developer Level 10"},
 
         {"EditableInfo.MoreOptions",

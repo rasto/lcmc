@@ -26,7 +26,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.InterfaceData;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
@@ -439,8 +439,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */

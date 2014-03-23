@@ -192,7 +192,7 @@ public abstract class ResourceGraph {
     /** Lock for test edge list. */
     private final Lock mTestEdgeLock = new ReentrantLock();
     private final int animInterval =
-                             (int) (1000 / Tools.getConfigData().getAnimFPS());
+                             (int) (1000 / Tools.getApplication().getAnimFPS());
     /** Singleton instance of the Line2D edge shape. */
     private static final Shape INSTANCE =
                                     new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);

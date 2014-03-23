@@ -22,6 +22,7 @@
 
 package lcmc.gui.dialog.lvm;
 
+import lcmc.data.*;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
@@ -30,10 +31,6 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.LVM;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.TextfieldWithUnit;
@@ -54,9 +51,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-import lcmc.data.StringValue;
-import lcmc.data.VMSXML;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -227,7 +221,7 @@ public final class LVResize extends LV {
                       Widget.NO_REGEXP,
                       250,
                       Widget.NO_ABBRV,
-                      new AccessMode(ConfigData.AccessType.OP,
+                      new AccessMode(Application.AccessType.OP,
                                      !AccessMode.ADVANCED),
                       Widget.NO_BUTTON);
         oldSizeWi.setEnabled(false);
@@ -248,7 +242,7 @@ public final class LVResize extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.OP,
+                       new AccessMode(Application.AccessType.OP,
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
@@ -298,7 +292,7 @@ public final class LVResize extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.OP,
+                       new AccessMode(Application.AccessType.OP,
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);

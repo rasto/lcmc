@@ -26,7 +26,7 @@ package lcmc.gui;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServicesInfo;
 import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.AllHostsUpdatable;
@@ -313,7 +313,7 @@ public final class GUIData  {
             if (!addClusterButtonList.contains(addClusterButton)) {
                 addClusterButtonList.add(addClusterButton);
                 addClusterButton.setEnabled(
-                              Tools.getConfigData().danglingHostsCount() >= 1);
+                              Tools.getApplication().danglingHostsCount() >= 1);
             }
         } finally {
             mAddClusterButtonListWriteLock.unlock();
@@ -341,7 +341,7 @@ public final class GUIData  {
      */
     public void checkAddClusterButtons() {
         Tools.isSwingThread();
-        final boolean enabled = Tools.getConfigData().danglingHostsCount() >= 1;
+        final boolean enabled = Tools.getApplication().danglingHostsCount() >= 1;
         mAddClusterButtonListReadLock.lock();
         try {
             for (final JComponent addClusterButton
@@ -394,7 +394,7 @@ public final class GUIData  {
      */
     void addToVisibleInAccessType(final JComponent c,
                                   final AccessMode accessMode) {
-        c.setVisible(Tools.getConfigData().isAccessible(accessMode));
+        c.setVisible(Tools.getApplication().isAccessible(accessMode));
         visibleInAccessType.put(c, accessMode);
     }
 
@@ -404,7 +404,7 @@ public final class GUIData  {
      */
     void addToEnabledInAccessType(final JComponent c,
                                   final AccessMode accessMode) {
-        c.setEnabled(Tools.getConfigData().isAccessible(accessMode));
+        c.setEnabled(Tools.getApplication().isAccessible(accessMode));
         enabledInAccessType.put(c, accessMode);
     }
 
@@ -423,12 +423,12 @@ public final class GUIData  {
     void updateGlobalItems() {
         for (final Map.Entry<JComponent, AccessMode> accessEntry
                                                       : visibleInAccessType.entrySet()) {
-            accessEntry.getKey().setVisible(Tools.getConfigData().isAccessible(
+            accessEntry.getKey().setVisible(Tools.getApplication().isAccessible(
                     accessEntry.getValue()));
         }
         for (final Map.Entry<JComponent, AccessMode> enabledEntry
                                                       : enabledInAccessType.entrySet()) {
-            enabledEntry.getKey().setEnabled(Tools.getConfigData().isAccessible(
+            enabledEntry.getKey().setEnabled(Tools.getApplication().isAccessible(
                     enabledEntry.getValue()));
         }
     }
@@ -466,8 +466,8 @@ public final class GUIData  {
 
     /** Enabled the component if it is accessible. */
     public void setAccessible(final JComponent c,
-                                        final ConfigData.AccessType required) {
-        c.setEnabled(Tools.getConfigData().getAccessType().compareTo(
+                                        final Application.AccessType required) {
+        c.setEnabled(Tools.getApplication().getAccessType().compareTo(
                                                                 required) >= 0);
     }
 

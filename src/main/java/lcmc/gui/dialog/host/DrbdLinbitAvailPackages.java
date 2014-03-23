@@ -22,9 +22,7 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
@@ -47,8 +45,6 @@ import java.util.Arrays;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -356,7 +352,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                     Tools.getString(
                         "Dialog.Host.DrbdLinbitAvailPackages.AvailVersions")
                     + ' ' + Tools.join(", ", versions));
-            if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+            if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -421,7 +417,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
@@ -434,7 +430,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
@@ -447,7 +443,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 

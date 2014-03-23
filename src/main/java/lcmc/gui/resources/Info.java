@@ -101,7 +101,7 @@ public class Info implements Comparable<Info>, Value {
      * object. */
     private Resource resource;
     /** Amount of frames per second. */
-    private static final float FPS = Tools.getConfigData().getAnimFPS();
+    private static final float FPS = Tools.getApplication().getAnimFPS();
     /** TODL: Checking for leak. */
     private int maxMenuList = 0;
 
@@ -324,7 +324,7 @@ public class Info implements Comparable<Info>, Value {
             final Font f = new Font(
                                 "Monospaced",
                                 Font.PLAIN,
-                                Tools.getConfigData().scaled(12));
+                                Tools.getApplication().scaled(12));
             resourceInfoArea = new JEditorPane(getInfoType(), info);
             resourceInfoArea.setMinimumSize(new Dimension(
                 Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
@@ -1163,12 +1163,12 @@ public class Info implements Comparable<Info>, Value {
     /** Process access lists. TODO: rename.*/
     public void updateAdvancedPanels() {
         for (final Map.Entry<JComponent, AccessMode> componentEntry : componentToEnableAccessMode.entrySet()) {
-            final boolean accessible = Tools.getConfigData().isAccessible(
+            final boolean accessible = Tools.getApplication().isAccessible(
                     componentEntry.getValue());
             componentEntry.getKey().setEnabled(accessible);
         }
         for (final Map.Entry<JTextComponent, AccessMode> componentEntry : componentToEditAccessMode.entrySet()) {
-            final boolean accessible = Tools.getConfigData().isAccessible(
+            final boolean accessible = Tools.getApplication().isAccessible(
                     componentEntry.getValue());
             componentEntry.getKey().setEditable(accessible);
         }

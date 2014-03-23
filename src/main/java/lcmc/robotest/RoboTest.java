@@ -674,8 +674,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '1') {
@@ -693,8 +693,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '2') {
@@ -727,8 +727,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '4') {
@@ -746,8 +746,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '5') {
@@ -782,8 +782,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     }
@@ -1782,7 +1782,7 @@ public final class RoboTest {
     }
 
     static void saveAndExit() {
-        Tools.save(Tools.getConfigData().getSaveFile(), false);
+        Tools.save(Tools.getApplication().getSaveFile(), false);
         sleepNoFactor(5000);
         System.exit(0);
     }

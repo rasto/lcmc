@@ -230,11 +230,11 @@ public abstract class ConfigDialog {
         final JEditorPane descPane = new JEditorPane(
            Tools.MIME_TYPE_TEXT_HTML,
            "<span style='font:bold italic;font-family:Dialog; font-size:"
-           + Tools.getConfigData().scaled(14)
+           + Tools.getApplication().scaled(14)
            + ";'>"
            + getDialogTitle() + "</span><br>"
            + "<span style='font-family:Dialog; font-size:"
-           + Tools.getConfigData().scaled(12)
+           + Tools.getApplication().scaled(12)
            + ";'>"
            + getDescription() + "</span>");
         descPane.setSize(300, Integer.MAX_VALUE);

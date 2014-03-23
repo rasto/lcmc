@@ -31,21 +31,21 @@ package lcmc.data;
  */
 public final class AccessMode {
     /** Access type. */
-    private final ConfigData.AccessType accessType;
+    private final Application.AccessType accessType;
     /** Whether it is advanced mode or not. */
     private final boolean advancedMode;
     /** Advanced mode. */
     public static final boolean ADVANCED = true;
 
     /** Prepares a new {@code AccessMode} object. */
-    public AccessMode(final ConfigData.AccessType accessType,
+    public AccessMode(final Application.AccessType accessType,
                       final boolean advancedMode) {
         this.accessType = accessType;
         this.advancedMode = advancedMode;
     }
 
     /** Returns access type. */
-    public ConfigData.AccessType getAccessType() {
+    public Application.AccessType getAccessType() {
         return accessType;
     }
 

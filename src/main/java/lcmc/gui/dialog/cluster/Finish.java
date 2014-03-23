@@ -60,7 +60,7 @@ final class Finish extends DialogCluster {
     protected void finishDialog() {
         Tools.getGUIData().getEmptyBrowser().addClusterBox(getCluster());
         if (saveCB.isSelected()) {
-            final String saveFile = Tools.getConfigData().getSaveFile();
+            final String saveFile = Tools.getApplication().getSaveFile();
             Tools.save(saveFile, false);
         }
     }
@@ -77,8 +77,8 @@ final class Finish extends DialogCluster {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
-        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
-            Tools.getConfigData().removeAutoCluster();
+        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+            Tools.getApplication().removeAutoCluster();
             Tools.sleep(1000);
             buttonClass(finishButton()).pressButton();
         }

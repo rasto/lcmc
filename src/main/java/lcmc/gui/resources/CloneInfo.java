@@ -21,16 +21,9 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.ResourceAgent;
-import lcmc.data.Subtext;
-import lcmc.data.Host;
-import lcmc.data.ClusterStatus;
-import lcmc.data.CRMXML;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.HostLocation;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +39,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
@@ -569,8 +562,8 @@ final class CloneInfo extends ServiceInfo {
                                    + ' ' + hostName + " (stop) (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -730,9 +723,9 @@ final class CloneInfo extends ServiceInfo {
         }
         final UpdatableItem csMenu = new MyMenu(
                                      cs.toString(),
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     false),
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     false)) {
             private static final long serialVersionUID = 1L;
 

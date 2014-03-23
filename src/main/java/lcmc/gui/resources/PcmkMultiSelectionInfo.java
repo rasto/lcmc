@@ -20,13 +20,9 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-import lcmc.data.ClusterStatus;
-import lcmc.data.PtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.UpdatableItem;
@@ -54,7 +50,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
-import lcmc.data.Value;
+
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -105,8 +101,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                            HostInfo.HOST_STANDBY_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -165,8 +161,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                            HostInfo.HOST_STANDBY_OFF_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -229,8 +225,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                          HostInfo.HOST_STOP_COMM_LAYER_ICON,
                          ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                         new AccessMode(ConfigData.AccessType.ADMIN, true),
-                         new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, true),
+                         new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -311,8 +307,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         HostInfo.HOST_STOP_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(ConfigData.AccessType.ADMIN, true),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, true),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
              private static final long serialVersionUID = 1L;
 
              @Override
@@ -367,8 +363,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -434,8 +430,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                          HostInfo.HOST_START_COMM_LAYER_ICON,
                          ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                         new AccessMode(ConfigData.AccessType.ADMIN, false),
-                         new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, false),
+                         new AccessMode(Application.AccessType.ADMIN, false)) {
               private static final long serialVersionUID = 1L;
 
               @Override
@@ -494,8 +490,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                       HostInfo.HOST_START_COMM_LAYER_ICON,
                       ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                      new AccessMode(ConfigData.AccessType.ADMIN, false),
-                      new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                      new AccessMode(Application.AccessType.ADMIN, false),
+                      new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -545,8 +541,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                        HostInfo.HOST_START_COMM_LAYER_ICON,
                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                       new AccessMode(ConfigData.AccessType.ADMIN, false),
-                       new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                       new AccessMode(Application.AccessType.ADMIN, false),
+                       new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -591,8 +587,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     Tools.getString("PcmkMultiSelectionInfo.ChangeHostColor"),
                     null,
                     "",
-                    new AccessMode(ConfigData.AccessType.RO, false),
-                    new AccessMode(ConfigData.AccessType.RO, false)) {
+                    new AccessMode(Application.AccessType.RO, false),
+                    new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -623,8 +619,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                               "PcmkMultiSelectionInfo.StartSelectedResources"),
                            ServiceInfo.START_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -690,8 +686,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                 "PcmkMultiSelectionInfo.StopSelectedResources"),
                            ServiceInfo.STOP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -762,8 +758,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                Tools.getString("PcmkMultiSelectionInfo.CleanUpResource"),
                ServiceInfo.SERVICE_RUNNING_ICON,
                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-               new AccessMode(ConfigData.AccessType.OP, false),
-               new AccessMode(ConfigData.AccessType.OP, false)) {
+               new AccessMode(Application.AccessType.OP, false),
+               new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -835,8 +831,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                   Tools.getString("PcmkMultiSelectionInfo.ManageResource"),
                   ServiceInfo.MANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -910,8 +906,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                   ServiceInfo.UNMANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -993,8 +989,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                   + ' ' + hostName + " (offline)",
                               ServiceInfo.MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -1081,8 +1077,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     Tools.getString("PcmkMultiSelectionInfo.UnmigrateResource"),
                     ServiceInfo.UNMIGRATE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1145,8 +1141,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     Tools.getString("PcmkMultiSelectionInfo.RemoveService"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1161,7 +1157,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     } else if (si.getService().isRemoved()) {
                         return ServiceInfo.IS_BEING_REMOVED_STRING;
                     } else if (si.isRunning(CRM.LIVE)
-                               && !Tools.getConfigData().isAdvancedMode()) {
+                               && !Tools.getApplication().isAdvancedMode()) {
                         return "cannot remove running resource<br>"
                                + "(advanced mode only)";
                     }
@@ -1271,7 +1267,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
     }
 
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         return null;
     }
 

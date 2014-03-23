@@ -26,11 +26,11 @@
  */
 package lcmc;
 
+import lcmc.data.Application;
 import lcmc.gui.MainPanel;
 import lcmc.gui.MainMenu;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.ProgressIndicatorPanel;
-import lcmc.data.ConfigData;
 import lcmc.data.HostOptions;
 import lcmc.utilities.Tools;
 import lcmc.robotest.RoboTest;
@@ -288,9 +288,9 @@ public final class LCMC extends JPanel {
         });
         t.start();
         Tools.getGUIData().getMainFrame().setVisible(false);
-        final String saveFile = Tools.getConfigData().getSaveFile();
+        final String saveFile = Tools.getApplication().getSaveFile();
         Tools.save(saveFile, false);
-        Tools.getConfigData().disconnectAllHosts();
+        Tools.getApplication().disconnectAllHosts();
     }
 
     /** Inits the application. */
@@ -532,42 +532,42 @@ public final class LCMC extends JPanel {
                 }
             }
             final boolean advanced = cmd.hasOption(ADVANCED_OP);
-            Tools.getConfigData().setAdvancedMode(advanced);
-            Tools.getConfigData().setTightvnc(tightvnc);
-            Tools.getConfigData().setUltravnc(ultravnc);
-            Tools.getConfigData().setRealvnc(realvnc);
+            Tools.getApplication().setAdvancedMode(advanced);
+            Tools.getApplication().setTightvnc(tightvnc);
+            Tools.getApplication().setUltravnc(ultravnc);
+            Tools.getApplication().setRealvnc(realvnc);
 
-            Tools.getConfigData().setUpgradeCheckEnabled(
+            Tools.getApplication().setUpgradeCheckEnabled(
                                           !cmd.hasOption(NO_UPGRADE_CHECK_OP));
-            Tools.getConfigData().setBigDRBDConf(
+            Tools.getApplication().setBigDRBDConf(
                                                 cmd.hasOption(BIGDRBDCONF_OP));
-            Tools.getConfigData().setStagingDrbd(
+            Tools.getApplication().setStagingDrbd(
                                                cmd.hasOption(STAGING_DRBD_OP));
-            Tools.getConfigData().setStagingPacemaker(
+            Tools.getApplication().setStagingPacemaker(
                                           cmd.hasOption(STAGING_PACEMAKER_OP));
-            Tools.getConfigData().setNoLRM(cmd.hasOption(NOLRM_OP));
-            Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
-            Tools.getConfigData().setOneHostCluster(
+            Tools.getApplication().setNoLRM(cmd.hasOption(NOLRM_OP));
+            Tools.getApplication().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
+            Tools.getApplication().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
-            Tools.getConfigData().setNoPassphrase(
+            Tools.getApplication().setNoPassphrase(
                                            cmd.hasOption(NO_PASSPHRASE_OP));
             if (cmd.hasOption(EMBED_OP)) {
-                Tools.getConfigData().setEmbed(true);
+                Tools.getApplication().setEmbed(true);
             }
             if (cmd.hasOption(NO_EMBED_OP)) {
-                Tools.getConfigData().setEmbed(false);
+                Tools.getApplication().setEmbed(false);
             }
             if (cmd.hasOption(CMD_LOG_OP)) {
-                Tools.getConfigData().setCmdLog(true);
+                Tools.getApplication().setCmdLog(true);
             }
             if (cmd.hasOption(CHECK_SWING_OP)) {
-                Tools.getConfigData().setCheckSwing(true);
+                Tools.getApplication().setCheckSwing(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {
                 final int scale = Integer.parseInt(scaleOp);
-                Tools.getConfigData().setScale(scale);
+                Tools.getApplication().setScale(scale);
                 Tools.resizeFonts(scale);
             } catch (final NumberFormatException e) {
                 LOG.appWarning("initApp: cannot parse scale: " + scaleOp);
@@ -580,9 +580,9 @@ public final class LCMC extends JPanel {
             final String knownHostsPath = cmd.getOptionValue(
                                                     KNOWN_HOSTS_OP,
                                                     pwd + "/.ssh/known_hosts");
-            Tools.getConfigData().setIdDSAPath(idDsaPath);
-            Tools.getConfigData().setIdRSAPath(idRsaPath);
-            Tools.getConfigData().setKnownHostPath(knownHostsPath);
+            Tools.getApplication().setIdDSAPath(idDsaPath);
+            Tools.getApplication().setIdRSAPath(idRsaPath);
+            Tools.getApplication().setKnownHostPath(knownHostsPath);
 
 
             final String opMode = cmd.getOptionValue(OP_MODE_OP);
@@ -599,22 +599,22 @@ public final class LCMC extends JPanel {
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
-                Tools.getConfigData().setAccessType(ConfigData.AccessType.RO);
-                Tools.getConfigData().setMaxAccessType(
-                                                    ConfigData.AccessType.RO);
+                Tools.getApplication().setAccessType(Application.AccessType.RO);
+                Tools.getApplication().setMaxAccessType(
+                                                    Application.AccessType.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
-                Tools.getConfigData().setAccessType(ConfigData.AccessType.OP);
-                Tools.getConfigData().setMaxAccessType(
-                                                    ConfigData.AccessType.OP);
+                Tools.getApplication().setAccessType(Application.AccessType.OP);
+                Tools.getApplication().setMaxAccessType(
+                                                    Application.AccessType.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
-                Tools.getConfigData().setAccessType(
-                                          ConfigData.AccessType.ADMIN);
-                Tools.getConfigData().setMaxAccessType(
-                                          ConfigData.AccessType.ADMIN);
+                Tools.getApplication().setAccessType(
+                                          Application.AccessType.ADMIN);
+                Tools.getApplication().setMaxAccessType(
+                                          Application.AccessType.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
-            float fps = ConfigData.DEFAULT_ANIM_FPS;
+            float fps = Application.DEFAULT_ANIM_FPS;
             if (cmd.hasOption(SLOW_OP)) {
                 fps /= 2;
             }
@@ -627,10 +627,10 @@ public final class LCMC extends JPanel {
                                         cmd.getOptionValue(VNC_PORT_OFFSET_OP);
             if (vncPortOffsetString != null
                 && Tools.isNumber(vncPortOffsetString)) {
-                Tools.getConfigData().setVncPortOffset(
+                Tools.getApplication().setVncPortOffset(
                                         Integer.parseInt(vncPortOffsetString));
             }
-            Tools.getConfigData().setAnimFPS(fps);
+            Tools.getApplication().setAnimFPS(fps);
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
                 parseClusterOptions(cmd);
             }
@@ -729,25 +729,25 @@ public final class LCMC extends JPanel {
             } else if (PCMKTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    Tools.getConfigData().setAutoTest(
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
                 }
             } else if (DRBDTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    Tools.getConfigData().setAutoTest(
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
                 }
             } else if (VMTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    Tools.getConfigData().setAutoTest(
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
                 }
             } else if (GUITEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    Tools.getConfigData().setAutoTest(
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
                 }
             }
@@ -756,7 +756,7 @@ public final class LCMC extends JPanel {
             for (final HostOptions hostOptions : clusterEntry.getValue()) {
                 if (hostsOptions.size() < 1
                     || hostsOptions.size() == 1
-                        && !Tools.getConfigData().isOneHostCluster()) {
+                        && !Tools.getApplication().isOneHostCluster()) {
                     throw new ParseException("not enough hosts for cluster: "
                                              + clusterEntry.getKey());
                 }

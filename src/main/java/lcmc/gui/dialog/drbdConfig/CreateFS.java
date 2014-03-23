@@ -26,7 +26,7 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.Exceptions;
 import lcmc.utilities.Tools;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
@@ -198,7 +198,7 @@ final class CreateFS extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -284,7 +284,7 @@ final class CreateFS extends DrbdConfig {
         final JLabel hostLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfig.CreateFS.ChooseHost"));
         Value defaultHost = NO_HOST_STRING;
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             defaultHost = hosts[1];
         }
         hostW = WidgetFactory.createInstance(
@@ -294,7 +294,7 @@ final class CreateFS extends DrbdConfig {
                                        Widget.NO_REGEXP,
                                        COMBOBOX_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         hostW.addListeners(new WidgetListener() {
@@ -322,10 +322,10 @@ final class CreateFS extends DrbdConfig {
                                      Widget.NO_REGEXP,
                                      COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             filesystemW.setValueAndWait(new StringValue("ext3"));
         }
         inputPane.add(filesystemLabel);
@@ -363,7 +363,7 @@ final class CreateFS extends DrbdConfig {
                                       Widget.NO_REGEXP,
                                       COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         skipSyncW.setEnabled(false);

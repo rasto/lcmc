@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
 
@@ -488,13 +487,13 @@ public final class ResourceAgent {
 
     /** Returns whether this service/object is group. */
     public boolean isGroup() {
-        return ConfigData.PM_GROUP_NAME.equals(name)
+        return Application.PM_GROUP_NAME.equals(name)
                && "group".equals(resourceClass);
     }
 
     /** Returns whether this service/object is clone set. */
     public boolean isClone() {
-        return ConfigData.PM_CLONE_SET_NAME.equals(name)
+        return Application.PM_CLONE_SET_NAME.equals(name)
                && "clone".equals(resourceClass);
     }
 

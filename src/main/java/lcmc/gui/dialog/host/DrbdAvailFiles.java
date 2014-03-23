@@ -23,9 +23,8 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.Component;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
@@ -42,8 +41,6 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -239,7 +236,7 @@ public class DrbdAvailFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -281,7 +278,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         pane.add(drbdVersionCombo.getComponent());
@@ -294,7 +291,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 

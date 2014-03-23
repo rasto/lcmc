@@ -28,7 +28,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Unit;
@@ -97,7 +97,7 @@ public final class CmdLog extends HostLogs {
                                    Widget.NO_REGEXP,
                                    150,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                   new AccessMode(Application.AccessType.ADMIN,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
         return new JComponent[]{processed,

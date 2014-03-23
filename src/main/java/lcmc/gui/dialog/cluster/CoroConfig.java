@@ -23,6 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
+import lcmc.data.*;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Corosync;
@@ -31,12 +32,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.Cluster;
-import lcmc.data.AisCastAddress;
 import lcmc.data.resources.NetInterface;
-import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -68,8 +64,6 @@ import javax.swing.JTextArea;
 
 import javax.swing.JComponent;
 import java.awt.Component;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -205,7 +199,7 @@ final class CoroConfig extends DialogCluster {
                                 if (configOk) {
                                     hideRetryButton();
                                     nextButtonSetEnabled(true);
-                                    if (!Tools.getConfigData()
+                                    if (!Tools.getApplication()
                                               .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
                                         pressNextButton();
@@ -270,7 +264,7 @@ final class CoroConfig extends DialogCluster {
                     enableComponents();
                     if (configOk) {
                         nextButtonSetEnabled(true);
-                        if (!Tools.getConfigData().getAutoClusters()
+                        if (!Tools.getApplication().getAutoClusters()
                                                   .isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
@@ -430,7 +424,7 @@ final class CoroConfig extends DialogCluster {
                 }
             });
             retry();
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 addButton.pressButton();
             }
@@ -672,9 +666,9 @@ final class CoroConfig extends DialogCluster {
                     } else {
                         Tools.getGUIData().setAccessible(
                                                 makeConfigButton,
-                                                ConfigData.AccessType.ADMIN);
+                                                Application.AccessType.ADMIN);
                     }
-                    if (!Tools.getConfigData().getAutoClusters().isEmpty()
+                    if (!Tools.getApplication().getAutoClusters().isEmpty()
                         && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
                         makeConfigButton.pressButton();
@@ -939,7 +933,7 @@ final class CoroConfig extends DialogCluster {
                                    Widget.NO_REGEXP,
                                    TYPE_COMBOBOX_WIDTH,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.RO,
+                                   new AccessMode(Application.AccessType.RO,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
         typeW.setEnabled(false);
@@ -964,7 +958,7 @@ final class CoroConfig extends DialogCluster {
                                     Widget.NO_REGEXP,
                                     INTF_COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.RO,
+                                    new AccessMode(Application.AccessType.RO,
                                                    false), /* only adv. mode */
                                     Widget.NO_BUTTON);
 
@@ -980,7 +974,7 @@ final class CoroConfig extends DialogCluster {
               regexp,
               ADDR_COMBOBOX_WIDTH,
               Widget.NO_ABBRV,
-              new AccessMode(ConfigData.AccessType.RO,
+              new AccessMode(Application.AccessType.RO,
                              !AccessMode.ADVANCED),
               Widget.NO_BUTTON);
 
@@ -1006,7 +1000,7 @@ final class CoroConfig extends DialogCluster {
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
                 Widget.NO_ABBRV,
-                new AccessMode(ConfigData.AccessType.RO,
+                new AccessMode(Application.AccessType.RO,
                                !AccessMode.ADVANCED),
                 Widget.NO_BUTTON);
         portW.addListeners(new WidgetListener() {
@@ -1056,7 +1050,7 @@ final class CoroConfig extends DialogCluster {
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         Tools.getGUIData().setAccessible(configCheckbox,
-                                         ConfigData.AccessType.ADMIN);
+                                         Application.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {

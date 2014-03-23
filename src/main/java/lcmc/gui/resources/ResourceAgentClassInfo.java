@@ -114,7 +114,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
                      Tools.getString("ClusterBrowser.ClassesOverviewButton"),
                      BACK_ICON);
         overviewButton.setPreferredSize(
-                        new Dimension(Tools.getConfigData().scaled(180), 50));
+                        new Dimension(Tools.getApplication().scaled(180), 50));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

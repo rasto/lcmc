@@ -22,13 +22,7 @@
 
 package lcmc.utilities;
 
-import lcmc.data.ConfigData;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.Clusters;
-import lcmc.data.UserConfig;
-import lcmc.data.HostOptions;
-import lcmc.data.Value;
+import lcmc.data.*;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServiceInfo;
@@ -110,7 +104,7 @@ public final class Tools {
     private static ResourceBundle resourceAppDefaults = null;
 
     /** Config data object. */
-    private static ConfigData configData;
+    private static Application application;
     /** Gui data object. */
     private static GUIData guiData;
     /** Drbd gui xml object. */
@@ -152,7 +146,7 @@ public final class Tools {
     /** Inits this class. */
     public static void init() {
         setDefaults();
-        configData = new ConfigData();
+        application = new Application();
         guiData = new GUIData();
     }
 
@@ -506,7 +500,7 @@ public final class Tools {
         for (final Cluster cluster : selectedClusters) {
             LOG.debug1("removeClusters: remove hosts from cluster: "
                        + cluster.getName());
-            getConfigData().removeClusterFromClusters(cluster);
+            getApplication().removeClusterFromClusters(cluster);
             for (final Host host : cluster.getHosts()) {
                 host.removeFromCluster();
             }
@@ -559,7 +553,7 @@ public final class Tools {
             final Cluster cluster = new Cluster();
             cluster.setName(clusterName);
             cluster.setSavable(false);
-            Tools.getConfigData().addClusterToClusters(cluster);
+            Tools.getApplication().addClusterToClusters(cluster);
             for (final HostOptions ho : clusters.get(clusterName)) {
                 userConfig.setHostCluster(hostMap,
                                           cluster,
@@ -574,7 +568,7 @@ public final class Tools {
     public static void removeEverything() {
         Tools.startProgressIndicator(
                                  Tools.getString("MainMenu.RemoveEverything"));
-        Tools.getConfigData().disconnectAllHosts();
+        Tools.getApplication().disconnectAllHosts();
         getGUIData().getClustersPanel().removeAllTabs();
         Tools.stopProgressIndicator(
                                  Tools.getString("MainMenu.RemoveEverything"));
@@ -609,7 +603,7 @@ public final class Tools {
                 Thread.currentThread().interrupt();
             }
 
-            final Clusters clusters = Tools.getConfigData().getClusters();
+            final Clusters clusters = Tools.getApplication().getClusters();
             if (clusters != null) {
                 for (final Cluster cluster : clusters.getClusterSet()) {
                     final ClusterBrowser cb = cluster.getBrowser();
@@ -628,8 +622,8 @@ public final class Tools {
      *
      * @return config data object.
      */
-    public static ConfigData getConfigData() {
-        return configData;
+    public static Application getApplication() {
+        return application;
     }
 
     /**
@@ -693,7 +687,7 @@ public final class Tools {
      * bundle and scales it according the --scale option.
      */
     public static int getDefaultSize(final String option) {
-        return getConfigData().scaled(getDefaultInt(option));
+        return getApplication().scaled(getDefaultInt(option));
     }
 
     /**
@@ -1722,12 +1716,12 @@ public final class Tools {
             if ("host".equals(option)) {
                 cluster = null;
                 host = value;
-                Tools.getConfigData().addAutoHost(host);
+                Tools.getApplication().addAutoHost(host);
                 continue;
             } else if ("cluster".equals(option)) {
                 host = null;
                 cluster = value;
-                Tools.getConfigData().addAutoCluster(cluster);
+                Tools.getApplication().addAutoCluster(cluster);
                 continue;
             } else if ("global".equals(option)) {
                 host = null;
@@ -1736,11 +1730,11 @@ public final class Tools {
                 continue;
             }
             if (host != null) {
-                Tools.getConfigData().addAutoOption(host, option, value);
+                Tools.getApplication().addAutoOption(host, option, value);
             } else if (cluster != null) {
-                Tools.getConfigData().addAutoOption(cluster, option, value);
+                Tools.getApplication().addAutoOption(cluster, option, value);
             } else if (global) {
-                Tools.getConfigData().addAutoOption("global", option, value);
+                Tools.getApplication().addAutoOption("global", option, value);
             } else {
                 LOG.appWarning("parseAutoArgs: cannot parse: " + line);
                 return;
@@ -1841,7 +1835,7 @@ public final class Tools {
         if (Tools.isLocalIp(host.getIpAddress())) {
             return remotePort;
         }
-        final int localPort = remotePort + getConfigData().getVncPortOffset();
+        final int localPort = remotePort + getApplication().getVncPortOffset();
         LOG.debug("prepareVncViewer: start port forwarding "
                   + remotePort + " -> " + localPort);
         try {
@@ -1862,7 +1856,7 @@ public final class Tools {
         if (Tools.isLocalIp(host.getIpAddress())) {
             return;
         }
-        final int remotePort = localPort - getConfigData().getVncPortOffset();
+        final int remotePort = localPort - getApplication().getVncPortOffset();
         LOG.debug("cleanupVncViewer: stop port forwarding " + remotePort);
         try {
             host.getSSH().stopVncPortForwarding(remotePort);
@@ -2418,7 +2412,7 @@ public final class Tools {
         final String name = font.getFontName();
         final int style = font.getStyle();
         final int size = font.getSize();
-        ab.setFont(new Font(name, style, getConfigData().scaled(10)));
+        ab.setFont(new Font(name, style, getApplication().scaled(10)));
         ab.setMargin(new Insets(2, 2, 2, 2));
         ab.setIconTextGap(0);
     }
@@ -2460,7 +2454,7 @@ public final class Tools {
                               new FontUIResource(
                                          f.getName(),
                                          f.getStyle(),
-                                         getConfigData().scaled(f.getSize())));
+                                         getApplication().scaled(f.getSize())));
             }
         }
     }
@@ -2469,15 +2463,15 @@ public final class Tools {
      * Set maximum access type.
      */
     public static void setMaxAccessType(
-                                      final ConfigData.AccessType accessType) {
-        getConfigData().setAccessType(accessType);
-        getConfigData().setMaxAccessType(accessType);
+                                      final Application.AccessType accessType) {
+        getApplication().setAccessType(accessType);
+        getApplication().setMaxAccessType(accessType);
         checkAccessOfEverything();
     }
 
     /** Check access of every cluster. */
     public static void checkAccessOfEverything() {
-        for (final Cluster c : getConfigData().getClusters().getClusterSet()) {
+        for (final Cluster c : getApplication().getClusters().getClusterSet()) {
             final ClusterBrowser cb = c.getBrowser();
             if (cb != null) {
                 cb.checkAccessOfEverything();
@@ -2559,7 +2553,7 @@ public final class Tools {
      * Print stack trace if it's not in a swing thread.
      */
     public static void isSwingThread() {
-        if (!getConfigData().isCheckSwing()) {
+        if (!getApplication().isCheckSwing()) {
             return;
         }
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -2571,7 +2565,7 @@ public final class Tools {
      * Print stack trace if it's in a swing thread.
      */
     public static void isNotSwingThread() {
-        if (!getConfigData().isCheckSwing()) {
+        if (!getApplication().isCheckSwing()) {
             return;
         }
         if (SwingUtilities.isEventDispatchThread()) {

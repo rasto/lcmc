@@ -214,10 +214,10 @@ public final class DrbdXML extends XML {
                   "Can not open '/etc/drbd.conf': No such file or directory");
     }
     /** Access types of some parameters. */
-    static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
-                                new HashMap<String, ConfigData.AccessType>();
+    static final Map<String, Application.AccessType> PARAM_ACCESS_TYPE =
+                                new HashMap<String, Application.AccessType>();
     static {
-        PARAM_ACCESS_TYPE.put("rate", ConfigData.AccessType.OP);
+        PARAM_ACCESS_TYPE.put("rate", Application.AccessType.OP);
     }
 
     /** Preferred values. */
@@ -601,10 +601,10 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns access type of the parameter. */
-    public ConfigData.AccessType getAccessType(final String param) {
-        final ConfigData.AccessType at = PARAM_ACCESS_TYPE.get(param);
+    public Application.AccessType getAccessType(final String param) {
+        final Application.AccessType at = PARAM_ACCESS_TYPE.get(param);
         if (at == null) {
-          return ConfigData.AccessType.ADMIN;
+          return Application.AccessType.ADMIN;
         }
         return at;
     }
@@ -1449,7 +1449,7 @@ public final class DrbdXML extends XML {
      * want to overwrite.
      */
     public boolean isDrbdDisabled() {
-        return unknownSections && !Tools.getConfigData().isAdvancedMode();
+        return unknownSections && !Tools.getApplication().isAdvancedMode();
     }
 
     public class HostProxy {

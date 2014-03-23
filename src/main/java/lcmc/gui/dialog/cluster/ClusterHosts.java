@@ -110,7 +110,7 @@ final class ClusterHosts extends DialogCluster {
 
     /** Checks whether at least two hosts are selected for the cluster. */
     protected void checkCheckBoxes() {
-        Tools.getConfigData().getHosts().removeHostsFromCluster(getCluster());
+        Tools.getApplication().getHosts().removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
             if (button.isSelected()) {
@@ -121,7 +121,7 @@ final class ClusterHosts extends DialogCluster {
         final Collection<String> hostnames = new ArrayList<String>();
         if (selected < 1
             || (selected == 1
-                && !Tools.getConfigData().isOneHostCluster())) {
+                && !Tools.getApplication().isOneHostCluster())) {
             enable = false;
         } else {
             /* check if some of the hosts are the same. It will not work all
@@ -145,7 +145,7 @@ final class ClusterHosts extends DialogCluster {
                 buttonClass(nextButton()).setEnabled(enableButton);
             }
         });
-        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -191,7 +191,7 @@ final class ClusterHosts extends DialogCluster {
         /* Hosts */
         final ScrollableFlowPanel p1 =
             new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
-        final Hosts hosts = Tools.getConfigData().getHosts();
+        final Hosts hosts = Tools.getApplication().getHosts();
 
         final ItemListener chListener = new ItemListener() {
                 @Override

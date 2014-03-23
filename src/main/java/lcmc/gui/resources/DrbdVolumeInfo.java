@@ -21,6 +21,7 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
@@ -32,16 +33,11 @@ import java.util.Collections;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.DRBD;
-import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
 import lcmc.data.resources.DrbdVolume;
-import lcmc.data.Host;
-import lcmc.data.DrbdXML;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.Exceptions;
 import lcmc.AddDrbdSplitBrainDialog;
 import lcmc.gui.CRMGraph;
-import lcmc.data.DRBDtestData;
 import lcmc.utilities.ButtonCallback;
 
 import java.awt.geom.Point2D;
@@ -63,8 +59,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
@@ -400,8 +395,8 @@ public final class DrbdVolumeInfo extends EditableInfo
             + ' ' + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-            new AccessMode(ConfigData.AccessType.OP, true),
-            new AccessMode(ConfigData.AccessType.OP, false)) {
+            new AccessMode(Application.AccessType.OP, true),
+            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -412,7 +407,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode()
+                if (!Tools.getApplication().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
@@ -478,8 +473,8 @@ public final class DrbdVolumeInfo extends EditableInfo
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
            null,
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-           new AccessMode(ConfigData.AccessType.OP, false),
-           new AccessMode(ConfigData.AccessType.OP, false)) {
+           new AccessMode(Application.AccessType.OP, false),
+           new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -522,8 +517,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                 null,
                 Tools.getString(
                             "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -548,8 +543,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                 Tools.getString("ClusterBrowser.Drbd.Verify"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -579,8 +574,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                         ClusterBrowser.REMOVE_ICON,
                         Tools.getString(
                                 "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -593,7 +588,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             @Override
             public String enablePredicate() {
                 final DrbdXML dxml = getBrowser().getDrbdXML();
-                if (!Tools.getConfigData().isAdvancedMode()
+                if (!Tools.getApplication().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 } else if (dxml.isDrbdDisabled()) {
@@ -609,8 +604,8 @@ public final class DrbdVolumeInfo extends EditableInfo
                            Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -1293,8 +1288,8 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled. */

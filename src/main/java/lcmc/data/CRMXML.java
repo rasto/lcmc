@@ -70,8 +70,8 @@ public final class CRMXML extends XML {
     private final Collection<String> globalNotAdvancedParams =
                                                      new ArrayList<String>();
     /** Map from global parameter to its access type. */
-    private final Map<String, ConfigData.AccessType> paramGlobalAccessTypes =
-                                  new HashMap<String, ConfigData.AccessType>();
+    private final Map<String, Application.AccessType> paramGlobalAccessTypes =
+                                  new HashMap<String, Application.AccessType>();
     /** List of required global parameters. */
     private final Collection<String> globalRequiredParams = new ArrayList<String>();
     /** Map from class to the list of all crm services. */
@@ -163,7 +163,7 @@ public final class CRMXML extends XML {
                                               new HashMap<String, Value[]>();
     /** Predefined group as heartbeat service. */
     private final ResourceAgent hbGroup =
-                                  new ResourceAgent(ConfigData.PM_GROUP_NAME,
+                                  new ResourceAgent(Application.PM_GROUP_NAME,
                                                     "",
                                                     "group");
     /** Predefined clone as pacemaker service. */
@@ -331,12 +331,12 @@ public final class CRMXML extends XML {
     private static final Collection<String> GROUP_M_A_NOT_ADVANCED =
                                                        new ArrayList<String>();
     /** Access type of meta attributes. */
-    private static final Map<String, ConfigData.AccessType> M_A_ACCESS_TYPE =
-                                  new HashMap<String, ConfigData.AccessType>();
+    private static final Map<String, Application.AccessType> M_A_ACCESS_TYPE =
+                                  new HashMap<String, Application.AccessType>();
     /** Access type of meta attributes in rsc defaults. */
-    private static final Map<String, ConfigData.AccessType>
+    private static final Map<String, Application.AccessType>
                                 M_A_RSC_DEFAULTS_ACCESS_TYPE =
-                                  new HashMap<String, ConfigData.AccessType>();
+                                  new HashMap<String, Application.AccessType>();
     /** Possible choices for meta attributes. */
     private static final Map<String, Value[]> M_A_POSSIBLE_CHOICES =
                                                 new HashMap<String, Value[]>();
@@ -482,7 +482,7 @@ public final class CRMXML extends XML {
         M_A_SECTION.put(MASTER_MAX_META_ATTR,
                         "Master / Slave Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(MASTER_MAX_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* master-node-max */
         M_A_SHORT_DESC.put(MASTER_NODE_MAX_META_ATTR, "M/S Master-Node-Max");
         M_A_DEFAULT.put(MASTER_NODE_MAX_META_ATTR, new StringValue("1"));
@@ -491,7 +491,7 @@ public final class CRMXML extends XML {
         M_A_SECTION.put(MASTER_NODE_MAX_META_ATTR,
                         "Master / Slave Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(MASTER_NODE_MAX_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* clone-max */
         M_A_SHORT_DESC.put(CLONE_MAX_META_ATTR, "Clone Max");
         M_A_DEFAULT.put(CLONE_MAX_META_ATTR, new StringValue(""));
@@ -500,7 +500,7 @@ public final class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(CLONE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(CLONE_MAX_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(CLONE_MAX_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* clone-node-max */
         M_A_SHORT_DESC.put(CLONE_NODE_MAX_META_ATTR, "Clone Node Max");
         M_A_DEFAULT.put(CLONE_NODE_MAX_META_ATTR, new StringValue("1"));
@@ -508,7 +508,7 @@ public final class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(CLONE_NODE_MAX_META_ATTR, INTEGER_VALUES);
         M_A_SECTION.put(CLONE_NODE_MAX_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(CLONE_NODE_MAX_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* notify */
         M_A_SHORT_DESC.put(NOTIFY_META_ATTR, "Notify");
         M_A_DEFAULT.put(NOTIFY_META_ATTR, PCMK_FALSE);
@@ -516,7 +516,7 @@ public final class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(NOTIFY_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(NOTIFY_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(NOTIFY_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* globally-unique */
         M_A_SHORT_DESC.put(GLOBALLY_UNIQUE_META_ATTR, "Globally-Unique");
         M_A_DEFAULT.put(GLOBALLY_UNIQUE_META_ATTR, PCMK_FALSE);
@@ -524,21 +524,21 @@ public final class CRMXML extends XML {
                                  PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(GLOBALLY_UNIQUE_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GLOBALLY_UNIQUE_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* ordered */
         M_A_SHORT_DESC.put(ORDERED_META_ATTR, "Ordered");
         M_A_DEFAULT.put(ORDERED_META_ATTR, PCMK_FALSE);
         M_A_POSSIBLE_CHOICES.put(ORDERED_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(ORDERED_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(ORDERED_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         /* interleave */
         M_A_SHORT_DESC.put(INTERLEAVE_META_ATTR, "Interleave");
         M_A_DEFAULT.put(INTERLEAVE_META_ATTR, PCMK_FALSE);
         M_A_POSSIBLE_CHOICES.put(INTERLEAVE_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_SECTION.put(INTERLEAVE_META_ATTR, "Clone Resource Defaults");
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(INTERLEAVE_META_ATTR,
-                                         ConfigData.AccessType.GOD);
+                                         Application.AccessType.GOD);
         M_A_PREFERRED.put(INTERLEAVE_META_ATTR, PCMK_TRUE);
         /* Group collocated */
         M_A_SHORT_DESC.put(GROUP_COLLOCATED_META_ATTR, "Collocated");
@@ -546,13 +546,13 @@ public final class CRMXML extends XML {
         M_A_POSSIBLE_CHOICES.put(GROUP_COLLOCATED_META_ATTR,
                                  PCMK_BOOLEAN_VALUES);
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GROUP_COLLOCATED_META_ATTR,
-                                         ConfigData.AccessType.ADMIN);
+                                         Application.AccessType.ADMIN);
         /* group ordered */
         M_A_SHORT_DESC.put(GROUP_ORDERED_META_ATTR, "Ordered");
         M_A_DEFAULT.put(GROUP_ORDERED_META_ATTR, PCMK_TRUE);
         M_A_POSSIBLE_CHOICES.put(GROUP_ORDERED_META_ATTR, PCMK_BOOLEAN_VALUES);
         M_A_RSC_DEFAULTS_ACCESS_TYPE.put(GROUP_ORDERED_META_ATTR,
-                                         ConfigData.AccessType.ADMIN);
+                                         Application.AccessType.ADMIN);
 
         /* ignore defaults for this RAs. It means that default values will be
          * saved in the cib. */
@@ -586,7 +586,7 @@ public final class CRMXML extends XML {
             }
         }
         /* clones */
-        pcmkClone = new ResourceAgent(ConfigData.PM_CLONE_SET_NAME,
+        pcmkClone = new ResourceAgent(Application.PM_CLONE_SET_NAME,
                                       "",
                                       "clone");
         pcmkClone.setMetaDataLoaded(true);
@@ -734,19 +734,19 @@ public final class CRMXML extends XML {
                 paramGlobalShortDescMap.put("dc-version", "DC Version");
                 paramGlobalTypeMap.put("dc-version", PARAM_TYPE_LABEL);
                 paramGlobalAccessTypes.put("dc-version",
-                                           ConfigData.AccessType.NEVER);
+                                           Application.AccessType.NEVER);
                 globalParams.add("cluster-infrastructure");
                 paramGlobalShortDescMap.put("cluster-infrastructure",
                                             "Cluster Infrastructure");
                 paramGlobalTypeMap.put("cluster-infrastructure",
                                        PARAM_TYPE_LABEL);
                 paramGlobalAccessTypes.put("cluster-infrastructure",
-                                           ConfigData.AccessType.NEVER);
+                                           Application.AccessType.NEVER);
 
                 globalNotAdvancedParams.add("no-quorum-policy");
                 globalNotAdvancedParams.add("maintenance-mode");
                 paramGlobalAccessTypes.put("maintenance-mode",
-                                           ConfigData.AccessType.OP);
+                                           Application.AccessType.OP);
                 globalNotAdvancedParams.add(clusterRecheckInterval);
 
                 for (final String param : params) {
@@ -932,7 +932,7 @@ public final class CRMXML extends XML {
                 Tools.stopProgressIndicator(hn, text);
                 LOG.debug("CRMXML: RAs loaded");
                 final RoboTest.Test autoTest =
-                                          Tools.getConfigData().getAutoTest();
+                                          Tools.getApplication().getAutoTest();
                 if (autoTest != null) {
                     RoboTest.startTest(autoTest,
                                        ssi.getBrowser().getCluster());
@@ -1313,10 +1313,10 @@ public final class CRMXML extends XML {
     }
 
     /** Returns the global parameter's access type. */
-    public ConfigData.AccessType getGlobalAccessType(final String param) {
-        final ConfigData.AccessType at = paramGlobalAccessTypes.get(param);
+    public Application.AccessType getGlobalAccessType(final String param) {
+        final Application.AccessType at = paramGlobalAccessTypes.get(param);
         if (at == null) {
-            return ConfigData.AccessType.ADMIN; /* default access type */
+            return Application.AccessType.ADMIN; /* default access type */
         }
         return at;
     }
@@ -1343,16 +1343,16 @@ public final class CRMXML extends XML {
     }
 
     /** Returns access type of the parameter. */
-    public ConfigData.AccessType getAccessType(final ResourceAgent ra,
+    public Application.AccessType getAccessType(final ResourceAgent ra,
                                                final String param) {
         if (isMetaAttr(ra, param)) {
-            final ConfigData.AccessType accessType =
+            final Application.AccessType accessType =
                                                 M_A_ACCESS_TYPE.get(param);
             if (accessType != null) {
                 return accessType;
             }
         }
-        return ConfigData.AccessType.ADMIN;
+        return Application.AccessType.ADMIN;
     }
 
     /** Checks if parameter is required or not. */
@@ -1526,12 +1526,12 @@ public final class CRMXML extends XML {
     }
 
     /** Returns access type of the meta attribute. */
-    public ConfigData.AccessType getRscDefaultsAccessType(final String param) {
+    public Application.AccessType getRscDefaultsAccessType(final String param) {
         final String newParam = convertRscDefaultsParam(param);
-        final ConfigData.AccessType at =
+        final Application.AccessType at =
                                 M_A_RSC_DEFAULTS_ACCESS_TYPE.get(newParam);
         if (at == null) {
-            return ConfigData.AccessType.ADMIN;
+            return Application.AccessType.ADMIN;
         }
         return at;
     }

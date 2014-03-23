@@ -27,7 +27,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.ParallelSerialData;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
@@ -412,8 +412,8 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected final ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected final Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */

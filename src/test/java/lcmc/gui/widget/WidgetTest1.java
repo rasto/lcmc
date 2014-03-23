@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
 import lcmc.utilities.TestSuite1;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.Value;
 import lcmc.data.StringValue;
 import lcmc.data.AccessMode;
@@ -26,7 +26,7 @@ public final class WidgetTest1 extends TestCase {
                           Widget.NO_REGEXP,
                           100, /* width */
                           Widget.NO_ABBRV,
-                          new AccessMode(ConfigData.AccessType.ADMIN,
+                          new AccessMode(Application.AccessType.ADMIN,
                                          AccessMode.ADVANCED),
                           Widget.NO_BUTTON);
         }

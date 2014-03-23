@@ -21,12 +21,8 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
-import lcmc.data.Host;
-import lcmc.data.VMSXML;
-import lcmc.data.ResourceAgent;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
@@ -38,8 +34,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
@@ -130,14 +124,14 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Adds vnc viewer menu items. */
     void addVncViewersToTheMenu(final Collection<UpdatableItem> items) {
-        if (Tools.getConfigData().isTightvnc()) {
+        if (Tools.getApplication().isTightvnc()) {
             /* tight vnc test menu */
             final UpdatableItem tightvncViewerMenu = new MyMenuItem(
                             "start TIGHT VNC viewer",
                             null,
                             null,
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -173,14 +167,14 @@ final class VirtualDomainInfo extends ServiceInfo {
             items.add(tightvncViewerMenu);
         }
 
-        if (Tools.getConfigData().isUltravnc()) {
+        if (Tools.getApplication().isUltravnc()) {
             /* ultra vnc test menu */
             final UpdatableItem ultravncViewerMenu = new MyMenuItem(
                             "start ULTRA VNC viewer",
                             null,
                             null,
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -216,14 +210,14 @@ final class VirtualDomainInfo extends ServiceInfo {
             items.add(ultravncViewerMenu);
         }
 
-        if (Tools.getConfigData().isRealvnc()) {
+        if (Tools.getApplication().isRealvnc()) {
             /* real vnc test menu */
             final UpdatableItem realvncViewerMenu = new MyMenuItem(
                             "start REAL VNC test",
                             null,
                             null,
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 

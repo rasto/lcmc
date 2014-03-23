@@ -28,7 +28,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.resources.Resource;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 
 import java.util.Collection;
@@ -205,7 +205,7 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         return getBrowser().getCRMXML().getRscDefaultsAccessType(param);
     }
 

@@ -35,7 +35,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
 
@@ -180,7 +180,7 @@ final class CreateMD extends DrbdConfig {
                 public void run() {
                     makeMDButton.setEnabled(false);
                     buttonClass(nextButton()).setEnabled(true);
-                    if (Tools.getConfigData().getAutoOptionGlobal(
+                    if (Tools.getApplication().getAutoOptionGlobal(
                                                         "autodrbd") != null) {
                         pressNextButton();
                     }
@@ -269,7 +269,7 @@ final class CreateMD extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -307,7 +307,7 @@ final class CreateMD extends DrbdConfig {
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(ConfigData.AccessType.RO,
+                                        new AccessMode(Application.AccessType.RO,
                                                        !AccessMode.ADVANCED),
                                         Widget.NO_BUTTON);
         } else {
@@ -318,7 +318,7 @@ final class CreateMD extends DrbdConfig {
             makeMDButton.setText(
                Tools.getString("Dialog.DrbdConfig.CreateMD.OverwriteMDButton"));
             String metadataDefault = useExistingMetadata;
-            if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
                 metadataDefault = createNewMetadata;
                 makeMDButton.setEnabled(true);
             }
@@ -329,7 +329,7 @@ final class CreateMD extends DrbdConfig {
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(ConfigData.AccessType.RO,
+                                        new AccessMode(Application.AccessType.RO,
                                                        !AccessMode.ADVANCED),
                                         Widget.NO_BUTTON);
         }

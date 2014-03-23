@@ -23,6 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
+import lcmc.data.*;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Tools;
@@ -30,13 +31,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.CastAddress;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.resources.UcastLink;
-import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -73,8 +69,6 @@ import javax.swing.JTextArea;
 import javax.swing.JComponent;
 import java.awt.Component;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -357,7 +351,7 @@ final class HbConfig extends DialogCluster {
                                 if (configOk) {
                                     hideRetryButton();
                                     nextButtonSetEnabled(true);
-                                    if (!Tools.getConfigData()
+                                    if (!Tools.getApplication()
                                               .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
                                         pressNextButton();
@@ -422,7 +416,7 @@ final class HbConfig extends DialogCluster {
                     enableComponents();
                     if (configOk) {
                         nextButtonSetEnabled(true);
-                        if (!Tools.getConfigData().getAutoClusters()
+                        if (!Tools.getApplication().getAutoClusters()
                                                   .isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
@@ -566,7 +560,7 @@ final class HbConfig extends DialogCluster {
                 }
             });
             retry();
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 addButton.pressButton();
             }
@@ -816,9 +810,9 @@ final class HbConfig extends DialogCluster {
                     } else {
                         Tools.getGUIData().setAccessible(
                                             makeConfigButton,
-                                            ConfigData.AccessType.ADMIN);
+                                            Application.AccessType.ADMIN);
                     }
-                    if (!Tools.getConfigData().getAutoClusters().isEmpty()
+                    if (!Tools.getApplication().getAutoClusters().isEmpty()
                         && !castAddresses.isEmpty()) {
                         Tools.sleep(1000);
                         makeConfigButton.pressButton();
@@ -1028,7 +1022,7 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_REGEXP,
                                       TYPE_COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
@@ -1052,7 +1046,7 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_REGEXP,
                                       INTF_COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
@@ -1074,7 +1068,7 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_REGEXP,
                                      LINK_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
         ucastLink2W = WidgetFactory.createInstance(
@@ -1084,7 +1078,7 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_REGEXP,
                                      LINK_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
 
@@ -1101,7 +1095,7 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_REGEXP,
                                      LINK_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
 
@@ -1120,7 +1114,7 @@ final class HbConfig extends DialogCluster {
                                      regexp,
                                      ADDR_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
 
@@ -1238,7 +1232,7 @@ final class HbConfig extends DialogCluster {
         configCheckbox.setBackground(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         Tools.getGUIData().setAccessible(configCheckbox,
-                                         ConfigData.AccessType.ADMIN);
+                                         Application.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -1309,7 +1303,7 @@ final class HbConfig extends DialogCluster {
                     '^' + OPTION_REGEXPS.get(option) + "\\s*$",
                                     size,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                    new AccessMode(Application.AccessType.ADMIN,
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
             optionsW.put(option, w);
@@ -1392,7 +1386,7 @@ final class HbConfig extends DialogCluster {
                 }
                 Tools.getGUIData().setAccessible(
                                         makeConfigButton,
-                                        ConfigData.AccessType.ADMIN);
+                                        Application.AccessType.ADMIN);
             }
         };
     }

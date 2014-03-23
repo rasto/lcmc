@@ -104,18 +104,18 @@ public final class UserConfig extends XML {
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(
                                                 doc.createElement("drbdgui"));
-        if (Tools.getConfigData().getLoginSave()) {
+        if (Tools.getApplication().getLoginSave()) {
             final String downloadUser =
-                                Tools.getConfigData().getDownloadUser();
+                                Tools.getApplication().getDownloadUser();
             final String downloadPasswd =
-                                Tools.getConfigData().getDownloadPassword();
+                                Tools.getApplication().getDownloadPassword();
             if (downloadUser != null && downloadPasswd != null) {
                 root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
             }
         }
         final Node hostsNode = root.appendChild(doc.createElement("hosts"));
-        final Set<Host> hosts = Tools.getConfigData().getHosts().getHostSet();
+        final Set<Host> hosts = Tools.getApplication().getHosts().getHostSet();
         for (final Host host : hosts) {
             if (!saveAll && !host.isSavable()) {
                 continue;
@@ -126,7 +126,7 @@ public final class UserConfig extends XML {
         final Node clusters = root.appendChild(doc.createElement("clusters"));
 
         final Set<Cluster> clusterSet =
-                        Tools.getConfigData().getClusters().getClusterSet();
+                        Tools.getApplication().getClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
             if (!saveAll && !cluster.isSavable()) {
                 continue;
@@ -181,7 +181,7 @@ public final class UserConfig extends XML {
      */
     public void startClusters(final Collection<Cluster> selectedClusters) {
         final Set<Cluster> clusters =
-                        Tools.getConfigData().getClusters().getClusterSet();
+                        Tools.getApplication().getClusters().getClusterSet();
         if (clusters != null) {
             /* clusters */
             for (final Cluster cluster : clusters) {
@@ -253,7 +253,7 @@ public final class UserConfig extends XML {
             final String downloadPasswd = getAttribute(rootNode,
                                                        DOWNLOAD_PASSWD_ATTR);
             if (downloadUser != null && downloadPasswd != null) {
-                Tools.getConfigData().setDownloadLogin(downloadUser,
+                Tools.getApplication().setDownloadLogin(downloadUser,
                                                        downloadPasswd,
                                                        true);
             }
@@ -310,7 +310,7 @@ public final class UserConfig extends XML {
                                                             CLUSTER_NAME_ATTR);
                             final Cluster cluster = new Cluster();
                             cluster.setName(clusterName);
-                            Tools.getConfigData().addClusterToClusters(cluster);
+                            Tools.getApplication().addClusterToClusters(cluster);
                             loadClusterHosts(clusterNode, cluster, hostMap);
                         }
                     }
@@ -328,7 +328,7 @@ public final class UserConfig extends XML {
                         final String color,
                         final boolean sudo,
                         final boolean savable) {
-        Tools.getConfigData().setLastEnteredUser(username);
+        Tools.getApplication().setLastEnteredUser(username);
         final Host host = new Host();
         host.setSavable(savable);
         host.setHostname(nodeName);
@@ -336,13 +336,13 @@ public final class UserConfig extends XML {
             sshPort = "22";
         }
         host.setSSHPort(sshPort);
-        Tools.getConfigData().setLastEnteredSSHPort(sshPort);
+        Tools.getApplication().setLastEnteredSSHPort(sshPort);
         if (color != null) {
             host.setSavedColor(color);
         }
         host.setUseSudo(sudo);
-        Tools.getConfigData().setLastEnteredUseSudo(sudo);
-        Tools.getConfigData().addHostToHosts(host);
+        Tools.getApplication().setLastEnteredUseSudo(sudo);
+        Tools.getApplication().addHostToHosts(host);
 
         new TerminalPanel(host);
         host.setIpAddress(ip);

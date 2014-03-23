@@ -23,7 +23,7 @@
 package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
@@ -64,7 +64,7 @@ final class HeartbeatInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.HeartbeatInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -97,10 +97,10 @@ final class HeartbeatInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "HbPmInst.install." + installMethod;
         }
-        Tools.getConfigData().setLastHbPmInstalledMethod(
+        Tools.getApplication().setLastHbPmInstalledMethod(
             getHost().getDistString("HbPmInst.install.text." + installMethod));
-        Tools.getConfigData().setLastInstalledClusterStack(
-                                                ConfigData.HEARTBEAT_NAME);
+        Tools.getApplication().setLastInstalledClusterStack(
+                                                Application.HEARTBEAT_NAME);
 
         getHost().execCommandInBash(
                          installCommand,

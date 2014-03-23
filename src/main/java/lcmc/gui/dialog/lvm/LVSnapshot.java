@@ -28,7 +28,7 @@ import lcmc.gui.resources.BlockDevInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
 import lcmc.gui.widget.Widget;
@@ -176,7 +176,7 @@ public final class LVSnapshot extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.OP,
+                                      new AccessMode(Application.AccessType.OP,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
@@ -201,7 +201,7 @@ public final class LVSnapshot extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.OP,
+                       new AccessMode(Application.AccessType.OP,
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
@@ -246,7 +246,7 @@ public final class LVSnapshot extends LV {
                         Widget.NO_REGEXP,
                         250,
                         Widget.NO_ABBRV,
-                        new AccessMode(ConfigData.AccessType.OP,
+                        new AccessMode(Application.AccessType.OP,
                                        !AccessMode.ADVANCED),
                         Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);

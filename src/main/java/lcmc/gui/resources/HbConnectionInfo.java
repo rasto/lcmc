@@ -21,14 +21,10 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
-import lcmc.data.Host;
-import lcmc.data.PtestData;
-import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.Tools;
@@ -56,7 +52,7 @@ import java.awt.event.ActionEvent;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import lcmc.data.Value;
+
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
@@ -515,8 +511,8 @@ public class HbConnectionInfo extends EditableInfo {
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
                      ClusterBrowser.REMOVE_ICON,
                      Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
-                     new AccessMode(ConfigData.AccessType.ADMIN, false),
-                     new AccessMode(ConfigData.AccessType.OP, false)) {
+                     new AccessMode(Application.AccessType.ADMIN, false),
+                     new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -562,8 +558,8 @@ public class HbConnectionInfo extends EditableInfo {
                 Tools.getString("ClusterBrowser.Hb.AddOrder"),
                 null,
                 Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip"),
-                new AccessMode(ConfigData.AccessType.ADMIN, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.ADMIN, false),
+                new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -642,8 +638,8 @@ public class HbConnectionInfo extends EditableInfo {
                     null,
                     Tools.getString(
                             "ClusterBrowser.Hb.AddColocation.ToolTip"),
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -919,8 +915,8 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected final ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected final Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled. */
