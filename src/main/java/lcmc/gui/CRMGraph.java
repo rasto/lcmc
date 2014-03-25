@@ -289,27 +289,35 @@ public final class CRMGraph extends ResourceGraph {
             mHbConnectionReadLock.lock();
             try {
                 lockGraph();
-                for (final Vertex pV : getGraph().getPredecessors(v)) {
-                    Edge edge = getGraph().findEdge(pV, v);
-                    if (edge == null) {
-                        edge = getGraph().findEdge(v, pV);
-                    }
-                    if (edge != null) {
-                        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-                        if (hbci != null) {
-                            infos.add(hbci);
+                final Collection<Vertex> predecessors =
+		                                 getGraph().getPredecessors(v);
+                if (predecessors != null) {
+                    for (final Vertex pV : predecessors) {
+                        Edge edge = getGraph().findEdge(pV, v);
+                        if (edge == null) {
+                            edge = getGraph().findEdge(v, pV);
+                        }
+                        if (edge != null) {
+                            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+                            if (hbci != null) {
+                                infos.add(hbci);
+                            }
                         }
                     }
                 }
-                for (final Vertex sV : getGraph().getSuccessors(v)) {
-                    Edge edge = getGraph().findEdge(v, sV);
-                    if (edge == null) {
-                        edge = getGraph().findEdge(sV, v);
-                    }
-                    if (edge != null) {
-                        final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
-                        if (hbci != null) {
-                            infos.add(hbci);
+                final Collection<Vertex> successors =
+		                                 getGraph().getPredecessors(v);
+                if (successors != null) {
+                    for (final Vertex sV : successors) {
+                        Edge edge = getGraph().findEdge(v, sV);
+                        if (edge == null) {
+                            edge = getGraph().findEdge(sV, v);
+                        }
+                        if (edge != null) {
+                            final HbConnectionInfo hbci = edgeToHbconnectionMap.get(edge);
+                            if (hbci != null) {
+                                infos.add(hbci);
+                            }
                         }
                     }
                 }
