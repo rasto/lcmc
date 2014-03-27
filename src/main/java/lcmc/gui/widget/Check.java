@@ -97,7 +97,7 @@ public final class Check {
         final StringBuilder toolTip = new StringBuilder();
         if (!incorrectFields.isEmpty()) {
             toolTip.append("incorrect: ")
-                   .append(Tools.join(" ", incorrectFields))
+                   .append(Tools.join(", ", incorrectFields))
                    .append("<br>");
         }
         if (!changedFields.isEmpty()) {

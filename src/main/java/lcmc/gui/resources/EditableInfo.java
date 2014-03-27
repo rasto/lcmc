@@ -860,9 +860,11 @@ public abstract class EditableInfo extends Info {
                 }
 
                 /* check correctness */
-                final Boolean correctValueCache = (param == null) ? null :
-                                              paramCorrectValueMap.get(param);
-                if (param == null || otherParam.equals(param)
+                final Boolean correctValueCache =
+                         (otherParam == null) ? null :
+                                      paramCorrectValueMap.get(otherParam);
+                if (param == null
+                    || otherParam.equals(param)
                     || correctValueCache == null) {
                     final Widget wizardWi = getWidget(otherParam,
                                                       Widget.WIZARD_PREFIX);
