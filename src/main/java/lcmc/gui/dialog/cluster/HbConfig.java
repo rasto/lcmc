@@ -68,6 +68,7 @@ import javax.swing.JTextArea;
 
 import javax.swing.JComponent;
 import java.awt.Component;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -348,9 +349,18 @@ final class HbConfig extends DialogCluster {
                                 }
                                 Heartbeat.reloadHeartbeats(hosts);
                                 enableComponents();
+                                final List<String> incorrect =
+                                                     new ArrayList<String>();
+                                final List<String> changed =
+                                                     new ArrayList<String>();
                                 if (configOk) {
                                     hideRetryButton();
-                                    nextButtonSetEnabled(true);
+                                } else {
+                                    incorrect.add("config failed");
+                                }
+                                nextButtonSetEnabled(new Check(incorrect, changed));
+
+                                if (configOk) {
                                     if (!Tools.getApplication()
                                               .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
@@ -414,8 +424,13 @@ final class HbConfig extends DialogCluster {
                         }
                     });
                     enableComponents();
+                    final List<String> incorrect = new ArrayList<String>();
+                    final List<String> changed = new ArrayList<String>();
+                    if (!configOk) {
+                        incorrect.add("config failed");
+                    }
+                    nextButtonSetEnabled(new Check(incorrect, changed));
                     if (configOk) {
-                        nextButtonSetEnabled(true);
                         if (!Tools.getApplication().getAutoClusters()
                                                   .isEmpty()) {
                             Tools.sleep(1000);

@@ -28,6 +28,7 @@ import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
+import lcmc.gui.widget.Check;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JLabel;
@@ -35,12 +36,15 @@ import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import java.awt.Component;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
@@ -109,14 +113,13 @@ public class Configuration extends DialogHost {
      */
     @Override
     protected final void checkFields(final Widget field) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final JComponent btn : nextButtons()) {
-                    btn.setEnabled(hostnameOk);
-                }
-            }
-        });
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        if (!hostnameOk) {
+            incorrect.add(
+                  Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
+        }
+        enableNextButtons(incorrect, changed);
     }
 
     /**
@@ -254,7 +257,6 @@ public class Configuration extends DialogHost {
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -301,6 +303,8 @@ public class Configuration extends DialogHost {
                         getHost().setHostname(
                                 Tools.join(",", hostnames, getHops()));
                         enableComponents();
+                        makeDefaultAndRequestFocus(buttonClass(nextButton()));
+                        checkFields(null);
                         if (!Tools.getApplication().getAutoHosts().isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
@@ -323,6 +327,8 @@ public class Configuration extends DialogHost {
                         }
                     });
                     enableComponents();
+                    makeDefaultAndRequestFocus(buttonClass(nextButton()));
+                    checkFields(null);
                     hostnameOk = true;
                     if (!Tools.getApplication().getAutoHosts().isEmpty()) {
                         Tools.sleep(1000);
@@ -403,10 +409,5 @@ public class Configuration extends DialogHost {
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad
         return pane;
-    }
-
-    /** Buttons that are enabled/disabled during checks. */
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton())};
     }
 }

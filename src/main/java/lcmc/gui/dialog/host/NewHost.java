@@ -197,15 +197,8 @@ public class NewHost extends DialogHost {
             incorrect.add("SSH port");
         }
 
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final MyButton btn : nextButtons()) {
-                    btn.setEnabledCorrect(new Check(incorrect,
-                                          new ArrayList<String>()));
-                }
-            }
-        });
+        final List<String> changed = new ArrayList<String>();
+        enableNextButtons(incorrect, changed);
     }
 
     /**
@@ -230,13 +223,13 @@ public class NewHost extends DialogHost {
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog. */
     @Override
     protected final void initDialogAfterVisible() {
         enableComponents();
+        makeDefaultButton(buttonClass(nextButton()));
         checkFields(null);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -408,10 +401,5 @@ public class NewHost extends DialogHost {
                                                    1, 1); // xPad, yPad
         p.add(inputPane, BorderLayout.PAGE_END);
         return p;
-    }
-
-    /** Buttons that are enabled/disabled during checks. */
-    protected MyButton[] nextButtons() {
-        return new MyButton[]{buttonClass(nextButton())};
     }
 }

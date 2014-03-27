@@ -22,6 +22,8 @@
 
 package lcmc.gui.dialog.host;
 
+import java.util.ArrayList;
+import java.util.List;
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
@@ -50,19 +52,22 @@ public class Devices extends DialogHost {
 
     /** Checks the answer and makes it visible to the user. */
     final void checkAnswer(final String ans) {
+        enableComponents();
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             progressBarDoneError();
-            answerPaneSetTextError(Tools.getString(
-                                            "Dialog.Host.Devices.CheckError"));
-            enableComponents();
-            buttonClass(nextButton()).requestFocus();
+            final String error =
+                             Tools.getString("Dialog.Host.Devices.CheckError");
+            answerPaneSetTextError(error);
+            incorrect.add(error);
         } else {
             getHost().parseHostInfo(ans);
             progressBarDone();
             answerPaneSetText(ans);
-            enableComponents();
             buttonClass(nextButton()).requestFocus();
         }
+        enableNextButtons(incorrect, changed);
         if (!Tools.getApplication().getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
@@ -73,12 +78,12 @@ public class Devices extends DialogHost {
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
     @Override
     protected final void initDialogAfterVisible() {
+        makeDefaultAndRequestFocus(buttonClass(nextButton()));
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -91,7 +96,6 @@ public class Devices extends DialogHost {
 
     /** Returns info for input pane. */
     protected final void getAllInfo() {
-        enableComponentsLater(nextButtons());
         final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
                          getProgressBar(),
                          new ExecCallback() {
@@ -151,10 +155,5 @@ public class Devices extends DialogHost {
                                               0, 0); //xPad, yPad
 
         return pane;
-    }
-
-    /** Buttons that are enabled/disabled during checks. */
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton())};
     }
 }

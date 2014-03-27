@@ -38,6 +38,9 @@ import javax.swing.JPanel;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.Container;
+import java.util.ArrayList;
+import java.util.List;
+import lcmc.gui.widget.Check;
 
 /**
  * An implementation of a wizard dialog with next, back, finish and cancel
@@ -160,9 +163,9 @@ public abstract class WizardDialog extends ConfigDialog {
     }
 
     /** Enable next button, with skip button logic. */
-    protected final void nextButtonSetEnabled(final boolean enable) {
+    protected final void nextButtonSetEnabled(final Check check) {
         if (!skipButtonIsSelected()) {
-            if (enable) {
+            if (check.isCorrect()) {
                 skipButtonSetEnabled(false);
             } else {
                 skipButtonSetEnabled(true);
@@ -170,8 +173,8 @@ public abstract class WizardDialog extends ConfigDialog {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    buttonClass(nextButton()).setEnabled(enable);
-                    if (enable) {
+                    buttonClass(nextButton()).setEnabledCorrect(check);
+                    if (check.isCorrect()) {
                         makeDefaultAndRequestFocus(buttonClass(nextButton()));
                     }
                 }
@@ -369,11 +372,11 @@ public abstract class WizardDialog extends ConfigDialog {
      * buttons and adds retry button.
      */
     public final void printErrorAndRetry(String text,
-                                         final String ans,
+                                         final String errorMessage,
                                          final int exitCode) {
-        if (ans != null) {
+        if (errorMessage != null) {
             text += '\n' + Tools.getString("Dialog.Dialog.PrintErrorAndRetry")
-                 + exitCode + '\n' + ans;
+                 + exitCode + '\n' + errorMessage;
         }
         answerPaneSetTextError(text);
         addRetryButton();
@@ -385,12 +388,16 @@ public abstract class WizardDialog extends ConfigDialog {
                 }
             });
         }
+        final List<String> incorrect = new ArrayList<String>();
+        incorrect.add(text);
+        final List<String> changed = new ArrayList<String>();
         if (buttonClass(nextButton()) != null) {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    buttonClass(nextButton()).setEnabled(false);
+                    buttonClass(nextButton()).setEnabledCorrect(
+                                            new Check(incorrect, changed));
                 }
             });
         }

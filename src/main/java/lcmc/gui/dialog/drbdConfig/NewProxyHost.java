@@ -104,8 +104,7 @@ public final class NewProxyHost extends NewHost {
     /** Buttons that are enabled/disabled during check. */
     @Override
     protected MyButton[] nextButtons() {
-        return new MyButton[]{buttonClass(nextButton()),
-                              buttonClass(finishButton())};
+        return new MyButton[]{buttonClass(finishButton())};
     }
 
     /**

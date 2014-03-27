@@ -40,6 +40,8 @@ import javax.swing.SpringLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -138,7 +140,6 @@ final class CheckInstallation extends DialogHost {
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(new JComponent[]{});
     }
 
     /** Inits the dialog. */
@@ -445,10 +446,9 @@ final class CheckInstallation extends DialogHost {
             });
         }
 
+        final List<String> incorrect = new ArrayList<String>();
         if (drbdOk && (hbPmOk || pmOk)) {
             progressBarDone();
-            nextButtonSetEnabled(true);
-            enableComponents();
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -460,14 +460,25 @@ final class CheckInstallation extends DialogHost {
                 || Tools.getApplication().getAutoOptionHost("hbinst") != null
                 || Tools.getApplication().getAutoOptionHost("pminst") != null) {
                 Tools.sleep(1000);
-                pressNextButton();
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        pressNextButton();
+                    }
+                });
             }
         } else {
             progressBarDoneError();
             LOG.debug2("checkAisHbPm: drbd: " + drbdOk + ", ais/pm: " + pmOk + ", hb/pm: " + hbPmOk);
-            printErrorAndRetry(Tools.getString(
-                                "Dialog.Host.CheckInstallation.SomeFailed"));
+            final String error = Tools.getString(
+                                  "Dialog.Host.CheckInstallation.SomeFailed");
+            printErrorAndRetry(error);
+            incorrect.add(error);
         }
+        final List<String> changed = new ArrayList<String>();
+        enableComponents();
+        enableNextButtons(incorrect, changed);
+        makeDefaultAndRequestFocus(buttonClass(nextButton()));
         if (!drbdOk
             && Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);

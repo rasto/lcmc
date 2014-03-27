@@ -53,6 +53,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -577,18 +578,19 @@ public class Init extends DialogCluster {
                 }
             });
 
+	    final List<String> incorrect = new ArrayList<String>();
             if (oneFailed) {
+		incorrect.add("one component failed");
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(button).setEnabled(false);
                     }
                 });
-                nextButtonSetEnabled(false);
-            } else {
-                nextButtonSetEnabled(true);
             }
+	    final List<String> changed = new ArrayList<String>();
             enableComponents();
+	    nextButtonSetEnabled(new Check(incorrect, changed));
             if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();

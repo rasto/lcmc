@@ -22,6 +22,8 @@
 
 package lcmc.gui.dialog.host;
 
+import java.util.ArrayList;
+import java.util.List;
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import lcmc.utilities.CancelCallback;
@@ -76,19 +78,26 @@ public class SSH extends DialogHost {
                                     buttonClass(nextButton()).pressButton();
                                  }
                              });
+                             final List<String> incorrect =
+                                                      new ArrayList<String>();
+                             final List<String> changed =
+                                                      new ArrayList<String>();
+                             enableNextButtons(incorrect, changed);
                          }
 
                          @Override
                          public void doneError(final String errorText) {
                              getHost().setConnected();
-                             Tools.invokeLater(new Runnable() {
-                                 @Override
-                                 public void run() {
-                                    printErrorAndRetry(Tools.getString(
+                             final String error = Tools.getString(
                                                 "Dialog.Host.SSH.NotConnected")
-                                                + '\n' + errorText);
-                                 }
-                             });
+                                                + '\n' + errorText;
+                             printErrorAndRetry(error);
+                             final List<String> incorrect =
+                                                      new ArrayList<String>();
+                             incorrect.add(error);
+                             final List<String> changed =
+                                                      new ArrayList<String>();
+                             enableNextButtons(incorrect, changed);
                          }
                       });
         getProgressBar().setCancelEnabled(true);
@@ -106,7 +115,6 @@ public class SSH extends DialogHost {
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -161,10 +169,5 @@ public class SSH extends DialogHost {
 //                                              1, 1,  // initX, initY
 //                                              1, 1); // xPad, yPad
         return pane;
-    }
-
-    /** Buttons that are enabled/disabled during checks. */
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton())};
     }
 }

@@ -64,6 +64,9 @@ import javax.swing.JTextArea;
 
 import javax.swing.JComponent;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -196,9 +199,17 @@ final class CoroConfig extends DialogCluster {
                                     Openais.reloadOpenaises(hosts);
                                 }
                                 enableComponents();
+                                final List<String> incorrect =
+                                                     new ArrayList<String>();
+                                final List<String> changed =
+                                                     new ArrayList<String>();
                                 if (configOk) {
                                     hideRetryButton();
-                                    nextButtonSetEnabled(true);
+                                } else {
+                                    incorrect.add("config failed");
+                                }
+                                nextButtonSetEnabled(new Check(incorrect, changed));
+                                if (configOk) {
                                     if (!Tools.getApplication()
                                               .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
@@ -262,8 +273,13 @@ final class CoroConfig extends DialogCluster {
                         }
                     });
                     enableComponents();
+                    final List<String> incorrect = new ArrayList<String>();
+                    final List<String> changed = new ArrayList<String>();
+                    if (!configOk) {
+                        incorrect.add("config failed");
+                    }
+                    nextButtonSetEnabled(new Check(incorrect, changed));
                     if (configOk) {
-                        nextButtonSetEnabled(true);
                         if (!Tools.getApplication().getAutoClusters()
                                                   .isEmpty()) {
                             Tools.sleep(1000);

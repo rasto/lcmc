@@ -24,7 +24,7 @@ import lcmc.data.Host;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Devices;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import javax.swing.JComponent;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where hardware information is collected.
@@ -83,9 +83,8 @@ final class DevicesProxy extends Devices {
 
     /** Buttons that are enabled/disabled during checks. */
     @Override
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton()),
-                                buttonClass(finishButton())};
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{buttonClass(finishButton())};
     }
 
     /**

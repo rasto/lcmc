@@ -94,13 +94,25 @@ public final class Check {
     }
 
     public CharSequence getToolTipInside() {
-        final StringBuilder tt = new StringBuilder()
-                                 .append(Tools.join(" ", incorrectFields))
-                                 .append("<br>changed: ")
-                                 .append(Tools.join(" ", changedFields));
-        for (final Check subCheck : subChecks) {
-            tt.append("<br>").append(subCheck.getToolTipInside());
+        final StringBuilder toolTip = new StringBuilder();
+        if (!incorrectFields.isEmpty()) {
+            toolTip.append("incorrect: ")
+                   .append(Tools.join(" ", incorrectFields))
+                   .append("<br>");
         }
-        return tt;
+        if (!changedFields.isEmpty()) {
+            toolTip.append("changed: ")
+                   .append(Tools.join(" ", changedFields))
+                   .append("<br>");
+        }
+        for (final Check subCheck : subChecks) {
+            final CharSequence subToolTip = subCheck.getToolTipInside();
+            if (subToolTip.length() > 0) {
+                toolTip.append("<p>")
+                       .append(subCheck.getToolTipInside())
+                       .append("<p>");
+            }
+        }
+        return toolTip;
     }
 }

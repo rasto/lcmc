@@ -37,6 +37,8 @@ import javax.swing.JPanel;
 import java.util.List;
 import java.util.ArrayList;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
+import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
@@ -301,5 +303,24 @@ public abstract class DialogHost extends WizardDialog {
             getHost().getDistString(
                 prefix + ".install." + index)).replaceAll(";", ";<br>&gt; ")
                                            .replaceAll("&&", "<br>&gt; &&");
+    }
+
+    protected void enableNextButtons(final List<String> incorrect,
+                                     final List<String> changed) {
+        final Check check = new Check(incorrect, changed);
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                buttonClass(nextButton()).setEnabledCorrect(check);
+                for (final MyButton button : nextButtons()) {
+                    button.setEnabled(check.isCorrect());
+                }
+            }
+        });
+    }
+
+    /** Buttons that are enabled/disabled during checks. */
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{};
     }
 }

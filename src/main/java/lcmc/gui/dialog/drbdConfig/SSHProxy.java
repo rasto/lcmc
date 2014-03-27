@@ -24,7 +24,7 @@ import lcmc.data.Host;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import javax.swing.JComponent;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
@@ -83,8 +83,8 @@ public final class SSHProxy extends SSH {
 
     /** Buttons that are enabled/disabled during checks. */
     @Override
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(finishButton())};
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{buttonClass(finishButton())};
     }
 
     /**
