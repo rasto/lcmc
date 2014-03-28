@@ -296,19 +296,14 @@ public final class DrbdGraph extends ResourceGraph {
         e.reset();
         edgeToDrbdVolumeMap.remove(e);
         drbdVolumeToEdgeMap.remove(dvi);
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    lockGraph();
-                    getGraph().removeEdge(e);
-                    unlockGraph();
-                } catch (final Exception ignore) {
-                    unlockGraph();
-                    /* ignore */
-                }
-            }
-        });
+        try {
+            lockGraph();
+            getGraph().removeEdge(e);
+            unlockGraph();
+        } catch (final Exception ignore) {
+            unlockGraph();
+            /* ignore */
+        }
     }
 
     /**

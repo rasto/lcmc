@@ -2289,6 +2289,17 @@ public final class Tools {
                           }
                       });
     }
+    /**
+     * Convenience invoke and wait function if not already in an event
+     * dispatch thread.
+     */
+    public static void invokeAndWaitIfNeeded(final Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            invokeAndWait(runnable);
+        }
+    }
 
     /** Convenience invoke and wait function. */
     public static void invokeAndWait(final Runnable runnable) {

@@ -20,11 +20,11 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
+import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.dialog.WizardDialog;
@@ -40,8 +40,8 @@ import javax.swing.BoxLayout;
 
 import java.awt.Component;
 import java.net.UnknownHostException;
-import lcmc.data.Application;
 
+import lcmc.data.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -102,9 +102,26 @@ final class BlockDev extends DrbdConfig {
                 final Application.RunMode runMode = Application.RunMode.LIVE;
 
                 /* apply */
-                getDrbdVolumeInfo().getDrbdInfo().apply(runMode);
-                getDrbdVolumeInfo().getDrbdResourceInfo().apply(runMode);
-                getDrbdVolumeInfo().apply(runMode);
+                final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+                dvi.getDrbdInfo().apply(runMode);
+                final DrbdResourceInfo dri = dvi.getDrbdResourceInfo();
+                Tools.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        dri.getInfoPanel();
+                    }
+                });
+                dri.waitForInfoPanel();
+                dri.apply(runMode);
+
+                Tools.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        dvi.getInfoPanel();
+                    }
+                });
+                dvi.waitForInfoPanel();
+                dvi.apply(runMode);
                 blockDevInfo.apply(runMode);
                 oBdi.apply(runMode);
 

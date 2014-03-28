@@ -471,15 +471,6 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     public void apply(final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            Tools.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getInfoPanel();
-                }
-            });
-            waitForInfoPanel();
             getBrowser().getDrbdResHash().remove(getName());
             getBrowser().putDrbdResHash();
             storeComboBoxValues(params);

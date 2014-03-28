@@ -673,8 +673,28 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Removes this object from jtree and from list of drbd volume
      * infos without confirmation dialog.
      */
-    public void removeMyselfNoConfirm(final Application.RunMode runMode) {
-        final ClusterBrowser cb = getBrowser();
+    private void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        Tools.isNotSwingThread();
+        final ClusterBrowser clusterBrowser = getBrowser();
+        Tools.invokeLater(new Runnable() {
+             @Override
+             public void run() {
+                removeMyselfNoConfirm0(runMode, clusterBrowser);
+                clusterBrowser.updateDrbdResources();
+                if (Application.isLive(runMode)) {
+                    removeNode();
+                }
+                clusterBrowser.getDrbdGraph().scale();
+             }
+        });
+    }
+
+    /**
+     * Removes this object from jtree and from list of drbd volume
+     * infos without confirmation dialog.
+     */
+    private void removeMyselfNoConfirm0(final Application.RunMode runMode,
+                                        final ClusterBrowser cb) {
         cb.drbdStatusLock();
         cb.getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
                                                getDevice(),
@@ -763,16 +783,6 @@ public final class DrbdVolumeInfo extends EditableInfo
         } finally {
             cb.drbdStatusUnlock();
         }
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                cb.updateDrbdResources();
-                if (Application.isLive(runMode)) {
-                    removeNode();
-                }
-                cb.getDrbdGraph().scale();
-            }
-        });
     }
 
     /** Removes this drbd resource with confirmation dialog. */
@@ -1158,15 +1168,6 @@ public final class DrbdVolumeInfo extends EditableInfo
     public void apply(final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            Tools.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getInfoPanel();
-                }
-            });
-            waitForInfoPanel();
             getBrowser().getDrbdDevHash().remove(getDevice());
             getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);

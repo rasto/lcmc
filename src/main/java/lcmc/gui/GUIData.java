@@ -195,7 +195,7 @@ public final class GUIData  {
         final Component oldTerminalPanel =
                                 terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
-            Tools.invokeAndWait(new Runnable() {
+            Tools.invokeAndWaitIfNeeded(new Runnable() {
                 @Override
                 public void run() {
                     final int loc = terminalSplitPane.getDividerLocation();
