@@ -1265,10 +1265,12 @@ public class ServiceInfo extends EditableInfo {
                     final Value savedOp = savedOperation.get(op, param);
                     if (savedOp == null) {
                         if (!Tools.areEqual(value, defaultValue)) {
-                            changed.add(param);
+                            changed.add(param + ": " + defaultValue
+                                        + " \u2192 " + value);
                         }
                     } else if (!Tools.areEqual(value, savedOp)) {
-                        changed.add(param);
+                        changed.add(param + ": " + savedOp
+                                    + " \u2192 " + value);
                     }
                     wi.setBackground(defaultValue, savedOp, false);
                 } else {
@@ -1278,7 +1280,8 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final Value savedOp = savedOperation.get(op, param);
                     if (!Tools.areEqual(value, savedOp)) {
-                        changed.add(param);
+                        changed.add(param + ": " + savedOp
+                                    + " \u2192 " + value);
                     }
                     wi.setBackground(defaultValue, savedOp, false);
                 }

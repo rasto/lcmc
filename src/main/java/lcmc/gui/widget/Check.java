@@ -20,8 +20,6 @@
 
 package lcmc.gui.widget;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import lcmc.utilities.Tools;
 
@@ -30,7 +28,6 @@ import lcmc.utilities.Tools;
  */
 public final class Check {
     private String toolTipCache = null;
-    private final Collection<Check> subChecks = new ArrayList<Check>();
     private final List<String> incorrectFields;
     private final List<String> changedFields;
 
@@ -43,7 +40,8 @@ public final class Check {
     }
 
     public void addCheck(final Check subCheck) {
-        subChecks.add(subCheck);
+        incorrectFields.addAll(subCheck.incorrectFields);
+        changedFields.addAll(subCheck.changedFields);
         toolTipCache = null;
     }
 
@@ -59,59 +57,37 @@ public final class Check {
 
     /** All the fields are correct. */
     public boolean isCorrect() {
-        if (incorrectFields != null && !incorrectFields.isEmpty()) {
-            return false;
-        }
-        for (final Check subCheck : subChecks) {
-            if (!subCheck.isCorrect()) {
-                return false;
-            }
-        }
-        return true;
+        return incorrectFields == null || incorrectFields.isEmpty();
     }
 
     /** At least one field has changed. */
     public boolean isChanged() {
-        if (changedFields != null && !changedFields.isEmpty()) {
-            return true;
-        }
-        for (final Check subCheck : subChecks) {
-            if (subCheck.isChanged()) {
-                return true;
-            }
-        }
-        return false;
+        return changedFields != null && !changedFields.isEmpty();
     }
     public String getToolTip() {
         if (toolTipCache == null) {
-            final StringBuilder tt = new StringBuilder();
-            tt.append("<html>")
-              .append(getToolTipInside())
-              .append("</html>");
-            toolTipCache = tt.toString();
+            toolTipCache = getToolTipInside().toString();
+            return toolTipCache;
         }
         return toolTipCache;
     }
 
     public CharSequence getToolTipInside() {
         final StringBuilder toolTip = new StringBuilder();
-        if (!incorrectFields.isEmpty()) {
-            toolTip.append("incorrect: ")
-                   .append(Tools.join(", ", incorrectFields))
-                   .append("<br>");
-        }
-        if (!changedFields.isEmpty()) {
-            toolTip.append("changed: ")
-                   .append(Tools.join(" ", changedFields))
-                   .append("<br>");
-        }
-        for (final Check subCheck : subChecks) {
-            final CharSequence subToolTip = subCheck.getToolTipInside();
-            if (subToolTip.length() > 0) {
-                toolTip.append("<p>")
-                       .append(subCheck.getToolTipInside())
-                       .append("<p>");
+        if (!incorrectFields.isEmpty() || !changedFields.isEmpty()) {
+            toolTip.append("<table>");
+            if (!incorrectFields.isEmpty()) {
+                toolTip.append("<tr><td>incorrect:</td><td>")
+                       .append(Tools.join("<br>", incorrectFields))
+                       .append("</td></tr>");
             }
+            if (!changedFields.isEmpty()) {
+                toolTip.append("<tr>")
+                       .append("<td valign='top'>change:</td><td>")
+                       .append(Tools.join("<br>", changedFields))
+                       .append("</td></tr>");
+            }
+            toolTip.append("</table>");
         }
         return toolTip;
     }

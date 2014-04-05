@@ -61,6 +61,10 @@ public class MyButton extends JButton implements ComponentWithTest {
     private final Robot robot;
     /** Button tooltip. */
     private JToolTip toolTip = null;
+    /** Tooltip about simulation results. */
+    private String simulationToolTip = "";
+    /** Tooltip about changed/incorrect fields. */
+    private String checkToolTip = "";
     /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
      GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -172,14 +176,18 @@ public class MyButton extends JButton implements ComponentWithTest {
         this.toolTipBackground = toolTipBackground;
     }
 
-    /** Sets tooltip and wiggles the mouse to refresh it. */
     @Override
-    public final void setToolTipText(String text) {
-        if (text == null || text.isEmpty()) {
-            text = getText(); /* can't be "" */
-        }
+    public final void setToolTipText(final String simulationToolTip) {
+        this.simulationToolTip = simulationToolTip;
+        updateToolTip();
+    }
+
+    /** Sets tooltip and wiggles the mouse to refresh it. */
+    private final void updateToolTip() {
+        final String toolTipText = "<html>" + simulationToolTip + "<br>"
+                            + checkToolTip + "</html>";
         if (toolTip != null && robot != null && toolTip.isShowing()) {
-            super.setToolTipText(text);
+            super.setToolTipText(toolTipText);
             final GraphicsDevice[] devices =
                     GraphicsEnvironment.getLocalGraphicsEnvironment()
                                        .getScreenDevices();
@@ -203,7 +211,7 @@ public class MyButton extends JButton implements ComponentWithTest {
             robot.mouseMove((int) p.getX() + xOffset,
                             (int) p.getY());
         } else {
-            super.setToolTipText(text);
+            super.setToolTipText(toolTipText);
         }
     }
 
@@ -282,17 +290,20 @@ public class MyButton extends JButton implements ComponentWithTest {
 
     public final void setEnabled(final Check check) {
         setEnabled(check.isChanged() && check.isCorrect());
-        setToolTipText(check.getToolTip());
+        checkToolTip = check.getToolTip();
+        updateToolTip();
     }
 
     /** For revert buttons. */
     public final void setEnabledChanged(final Check check) {
         setEnabled(check.isChanged());
-        setToolTipText(check.getToolTip());
+        checkToolTip = check.getToolTip();
+        updateToolTip();
     }
 
     public final void setEnabledCorrect(final Check check) {
         setEnabled(check.isCorrect());
-        setToolTipText(check.getToolTip());
+        checkToolTip = check.getToolTip();
+        updateToolTip();
     }
 }

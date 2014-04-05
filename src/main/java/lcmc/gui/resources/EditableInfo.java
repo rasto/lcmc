@@ -856,7 +856,8 @@ public abstract class EditableInfo extends Info {
                     oldValue = getParamDefault(otherParam);
                 }
                 if (!Tools.areEqual(newValue, oldValue)) {
-                    changed.add(otherParam);
+                    changed.add(otherParam + ": " + oldValue
+                                + " \u2192 " + newValue);
                 }
 
                 /* check correctness */
@@ -908,12 +909,12 @@ public abstract class EditableInfo extends Info {
                         if (wizardWi != null) {
                             wizardWi.wrongValue();
                         }
-                        incorrect.add(otherParam + ": wrong value");
+                        incorrect.add(otherParam);
                     }
                     setCheckParamCache(otherParam, check);
                 } else {
                     if (!correctValueCache) {
-                        incorrect.add(otherParam + ": wrong value");
+                        incorrect.add(otherParam);
                     }
                 }
                 wi.processAccessMode();
