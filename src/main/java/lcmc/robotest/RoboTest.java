@@ -30,6 +30,7 @@ import lcmc.gui.CRMGraph;
 import lcmc.gui.resources.Info;
 
 import java.awt.AWTException;
+import java.awt.IllegalComponentStateException;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -41,15 +42,18 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
+
 import javax.swing.JFrame;
 import javax.swing.JDialog;
 import javax.swing.JCheckBox;
 import javax.swing.JTree;
 import javax.swing.JLabel;
 import javax.swing.AbstractButton;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+
 import lcmc.data.Application;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
@@ -1559,7 +1563,13 @@ public final class RoboTest {
             Tools.printStackTrace("can't find: " + clazz);
             return;
         }
-        final Point2D endP = c.getLocationOnScreen();
+        Point2D endP;
+        try {
+            endP = c.getLocationOnScreen();
+        } catch (final IllegalComponentStateException e) {
+            Tools.sleep(5000);
+            endP = c.getLocationOnScreen();
+        }
         final int endX = (int) endP.getX() + c.getWidth() / 2;
         final int endY = (int) endP.getY() + c.getHeight() / 2;
         moveToAbs(endX, endY);
@@ -1650,7 +1660,13 @@ public final class RoboTest {
                 return;
             }
         }
-        final Point2D endP = n.getLocationOnScreen();
+        Point2D endP;
+        try {
+            endP = n.getLocationOnScreen();
+        } catch (final IllegalComponentStateException e) {
+            Tools.sleep(5000);
+            endP = n.getLocationOnScreen();
+        }
         final int endX = (int) endP.getX() + 15;
         final int endY = (int) endP.getY() + c.getHeight() / 2;
         int tries = 0;
