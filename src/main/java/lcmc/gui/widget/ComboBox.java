@@ -22,6 +22,8 @@ package lcmc.gui.widget;
 
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.PatternDocument;
 import lcmc.data.AccessMode;
@@ -40,7 +42,6 @@ import java.awt.Color;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ import java.util.Map;
  */
 //TODO: public final class ComboBox<E> extends Widget {
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
+    private static final Logger LOG = LoggerFactory.getLogger(ComboBox.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Scrollbar max rows. */
@@ -143,11 +145,18 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Override
     public void reloadComboBox(final Value selectedValue,
                                final Value[] items) {
+        final String stackTrace = Tools.getStackTrace();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MComboBox<Value> cb = getInternalComponent();
-                final Value selectedItem = (Value) cb.getSelectedItem();
+                final Object selectedObject = cb.getSelectedItem();
+                if (selectedObject != null
+                    && !(selectedObject instanceof Value)) {
+                    LOG.appError("reloadComboBox: selected item not a value: " + selectedObject
+                        + ", stacktrance: " + stackTrace);
+                }
+                final Value selectedItem = (Value) selectedObject;
                 boolean selectedChanged = false;
                 if (selectedValue == null
                     && selectedItem != null
