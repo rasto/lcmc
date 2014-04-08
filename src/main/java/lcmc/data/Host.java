@@ -332,6 +332,7 @@ public final class Host implements Comparable<Host>, Value {
     private static final String GUI_HELPER_CMD_LOG_OP = "--cmd-log";
 
     private static final String NET_INFO            = "net-info";
+    private static final String BRIDGE_INFO         = "bridge-info";
     private static final String DISK_INFO           = "disk-info";
     private static final String DISK_SPACE          = "disk-space";
     private static final String VG_INFO             = "vg-info";
@@ -349,6 +350,7 @@ public final class Host implements Comparable<Host>, Value {
 
     private static final Collection<String> INFO_TYPES =
              new HashSet<String>(Arrays.asList(new String[]{NET_INFO,
+                                                            BRIDGE_INFO,
                                                             DISK_INFO,
                                                             DISK_SPACE,
                                                             VG_INFO,
@@ -2162,13 +2164,12 @@ public final class Host implements Comparable<Host>, Value {
                         && !"".equals(netInterface.getIp())) {
                         newNetInterfaces.add(netInterface);
                     }
-                    if (netInterface.isBridge()) {
-                        newBridges.add(new StringValue(netInterface.getName()));
-                    }
                 } catch (final UnknownHostException e) {
                     LOG.appWarning("parseHostInfo: cannot parse: net-info: "
                                    + line);
                 }
+            } else if (BRIDGE_INFO.equals(type)) {
+                newBridges.add(new StringValue(line));
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String bdName = blockDevice.getName();
@@ -2289,6 +2290,9 @@ public final class Host implements Comparable<Host>, Value {
 
         if (changedTypes.contains(NET_INFO)) {
             netInterfaces = newNetInterfaces;
+        }
+
+        if (changedTypes.contains(BRIDGE_INFO)) {
             bridges = newBridges;
         }
 
