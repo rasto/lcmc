@@ -48,7 +48,7 @@ public final class AddDrbdUpgradeDialog {
     /** Host on which the drbd will be upgraded. */
     private final HostDrbdInfo hostDrbdInfo;
 
-    /** Prepares a new <code>AddDrbdUpgradeDialog</code> object. */
+    /** Prepares a new {@code AddDrbdUpgradeDialog} object. */
     public AddDrbdUpgradeDialog(final HostDrbdInfo hostDrbdInfo) {
         this.hostDrbdInfo = hostDrbdInfo;
     }

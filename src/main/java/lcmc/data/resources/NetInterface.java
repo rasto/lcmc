@@ -44,8 +44,6 @@ public final class NetInterface extends Resource implements Value {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(NetInterface.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Ip address. */
     private final String ip;
     /** Cidr. */
@@ -66,7 +64,7 @@ public final class NetInterface extends Resource implements Value {
     private final String SDP_STRING = "sdp";
 
     /**
-     * Prepares a new <code>NetInterface</code> object.
+     * Prepares a new {@code NetInterface} object.
      *
      * @param line
      *          line with interface, ip, mac addr and net mask  delimited
@@ -114,7 +112,7 @@ public final class NetInterface extends Resource implements Value {
     }
 
     /**
-     * Creates a new <code>NetInterface</code> object.
+     * Creates a new {@code NetInterface} object.
      *
      * @param iface
      *          network interface
@@ -170,7 +168,7 @@ public final class NetInterface extends Resource implements Value {
 
     private static String getSymbolicIp(BigInteger numericIp,
                                         final int size) {
-        byte[] addr = new byte[size];
+        final byte[] addr = new byte[size];
         for (int i = size - 1; i >= 0; i--) {
             final byte a = (byte) numericIp.and(
                                 new BigInteger(Long.toString(0xff))).intValue();
@@ -179,7 +177,7 @@ public final class NetInterface extends Resource implements Value {
         }
         try {
             return InetAddress.getByAddress(addr).getHostAddress();
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
             LOG.appWarning("getSymbolicIp: unkonwn host: " + addr);
             return null;
         }

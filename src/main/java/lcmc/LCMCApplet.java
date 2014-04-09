@@ -41,27 +41,24 @@ public final class LCMCApplet extends JApplet {
     private static final long serialVersionUID = 1L;
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(LCMCApplet.class);
-
-    /** Public applet constructor. */
-    public LCMCApplet() {
-    }
+    public static final String[] NO_PARAMS = {};
 
     /** Start the applet. */
     @Override
     public void init() {
         Tools.init();
         LOG.debug1("init: start");
-        String[] params;
+        final String[] params;
         final String paramsLine = getParameter("params");
         if (paramsLine == null) {
-            params = new String[]{};
+            params = NO_PARAMS;
         } else {
             params = paramsLine.split("\\s+");
         }
 
         LCMC.initApp(params);
 
-        if (Tools.getConfigData().isEmbed()) {
+        if (Tools.getApplication().isEmbed()) {
             Tools.getGUIData().setMainFrame(this);
             setJMenuBar(LCMC.getMenuBar());
             setContentPane(LCMC.getMainPanel());

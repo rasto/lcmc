@@ -21,6 +21,8 @@
  */
 package lcmc.gui.resources;
 
+import java.util.ArrayList;
+import java.util.List;
 import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 import lcmc.data.AccessMode;
@@ -33,8 +35,10 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;
 
 import java.util.Map;
+import lcmc.data.Application;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -110,20 +114,24 @@ final class FilesystemInfo extends ServiceInfo {
      * one value is changed and we don't want to check everything.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        final boolean ret = super.checkResourceFieldsCorrect(param, params);
-        if (!ret) {
-            return false;
-        }
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
         final Widget wi = getWidget(FS_RES_PARAM_DEV, null);
-        return wi != null && wi.getValue() != null;
+        final List<String> incorrect = new ArrayList<String>();
+
+        if (wi == null || wi.getValue() == null) {
+            incorrect.add(FS_RES_PARAM_DEV);
+        }
+
+        final Check check = new Check(incorrect, new ArrayList<String>());
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Applies changes to the Filesystem service parameters. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -135,7 +143,7 @@ final class FilesystemInfo extends ServiceInfo {
             waitForInfoPanel();
             final String dir = getComboBoxValue("directory").getValueForConfig();
             boolean confirm = false; /* confirm only once */
-            for (Host host : getBrowser().getClusterHosts()) {
+            for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd =
                         DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
                 final SSH.SSHOutput ret =
@@ -176,7 +184,7 @@ final class FilesystemInfo extends ServiceInfo {
                 }
             }
         }
-        super.apply(dcHost, testOnly);
+        super.apply(dcHost, runMode);
         //TODO: escape dir
     }
 
@@ -195,9 +203,9 @@ final class FilesystemInfo extends ServiceInfo {
                                 }
                                 final String selectedValue =
                                                   getParamSaved("fstype").getValueForConfig();
-                                String createdFs;
+                                final String createdFs;
                                 if (selectedValue == null
-                                    || "".equals(selectedValue)) {
+                                    || selectedValue.isEmpty()) {
                                     final CommonDeviceInterface cdi =
                                              (CommonDeviceInterface) value;
                                     createdFs = cdi.getCreatedFs();
@@ -205,7 +213,7 @@ final class FilesystemInfo extends ServiceInfo {
                                     createdFs = selectedValue;
                                 }
                                 if (createdFs != null
-                                    && !"".equals(createdFs)) {
+                                    && !createdFs.isEmpty()) {
                                     fstypeParamWi.setValue(new StringValue(createdFs));
                                 }
                             }
@@ -218,7 +226,7 @@ final class FilesystemInfo extends ServiceInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
-        Widget paramWi;
+        final Widget paramWi;
         if (FS_RES_PARAM_DEV.equals(param)) {
             Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
@@ -292,7 +300,7 @@ final class FilesystemInfo extends ServiceInfo {
             paramWi.setEditable(false);
         } else if ("directory".equals(param)) {
             final String[] cmp = getBrowser().getCommonMountPoints();
-            Value[] items = new Value[cmp.length + 1];
+            final Value[] items = new Value[cmp.length + 1];
             final Value defaultValue = new StringValue() {
                               @Override
                               public String getNothingSelected() {
@@ -353,7 +361,7 @@ final class FilesystemInfo extends ServiceInfo {
             s.delete(0, s.length());
             s.append("Filesystem / Drbd");
         }
-        if (id == null || "".equals(id)) {
+        if (id == null || id.isEmpty()) {
             id = Tools.getString(
                         "ClusterBrowser.ClusterBlockDevice.Unconfigured");
         }
@@ -367,11 +375,11 @@ final class FilesystemInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
-        super.removeMyselfNoConfirm(dcHost, testOnly);
-        if (oldDvi != null && !testOnly) {
+        super.removeMyselfNoConfirm(dcHost, runMode);
+        if (oldDvi != null && Application.isLive(runMode)) {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -387,7 +395,7 @@ final class FilesystemInfo extends ServiceInfo {
      * if something was added.
      */
     @Override
-    void addResourceBefore(final Host dcHost, final boolean testOnly) {
+    void addResourceBefore(final Host dcHost, final Application.RunMode runMode) {
         if (getGroupInfo() != null) {
             // TODO: disabled for now
             return;
@@ -403,17 +411,12 @@ final class FilesystemInfo extends ServiceInfo {
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
         }
-        boolean oldDrbddisk;
-        if (getDrbddiskInfo() == null) {
-            oldDrbddisk = drbddiskIsPreferred;
-        } else {
-            oldDrbddisk = true;
-        }
+        final boolean oldDrbddisk = getDrbddiskInfo() != null || drbddiskIsPreferred;
         if (oldDvi != null) {
             if (oldDrbddisk) {
-                oldDvi.removeDrbdDisk(this, dcHost, testOnly);
+                oldDvi.removeDrbdDisk(this, dcHost, runMode);
             } else {
-                oldDvi.removeLinbitDrbd(this, dcHost, testOnly);
+                oldDvi.removeLinbitDrbd(this, dcHost, runMode);
             }
             final Thread t = new Thread(new Runnable() {
                 @Override
@@ -449,12 +452,12 @@ final class FilesystemInfo extends ServiceInfo {
             final String drbdId = getBrowser().getFreeId(
                     getBrowser().getCRMXML().getHbDrbddisk().getName(),
                     fsId);
-            newDvi.addDrbdDisk(this, dcHost, drbdId, testOnly);
+            newDvi.addDrbdDisk(this, dcHost, drbdId, runMode);
         } else {
             final String drbdId = getBrowser().getFreeId(
                     getBrowser().getCRMXML().getHbLinbitDrbd().getName(),
                     fsId);
-            newDvi.addLinbitDrbd(this, dcHost, drbdId, testOnly);
+            newDvi.addLinbitDrbd(this, dcHost, drbdId, runMode);
         }
     }
 
@@ -486,7 +489,7 @@ final class FilesystemInfo extends ServiceInfo {
         final DrbdVolumeInfo selectedInfo =
                                 getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
-        Value selectedValue;
+        final Value selectedValue;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);
         } else {

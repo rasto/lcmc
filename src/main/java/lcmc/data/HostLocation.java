@@ -30,24 +30,22 @@ package lcmc.data;
  *
  */
 public final class HostLocation {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Host score. */
     private final String score;
     /** Operation, eq. "eq", "ne". */
-    private final String op;
+    private final String operator;
     /** Value. */
     private final String value;
     /** Role. */
     private final String role;
 
-    /** Prepares a new <code>AisCastAddress</code> object. */
+    /** Prepares a new {@code AisCastAddress} object. */
     public HostLocation(final String score,
-                        final String op,
+                        final String operator,
                         final String value,
                         final String role) {
         this.score = score;
-        this.op = op;
+        this.operator = operator;
         this.value = value;
         this.role = role;
     }
@@ -59,7 +57,7 @@ public final class HostLocation {
 
     /** Returns score. */
     public String getOperation() {
-        return op;
+        return operator;
     }
 
     /** Returns value. */
@@ -77,7 +75,7 @@ public final class HostLocation {
     public boolean equals(final Object other) {
         if (other == null) {
             return (score == null || "".equals(score))
-                   && (op == null || "".equals(op))
+                   && (operator == null || "".equals(operator))
                    && (role == null || "".equals(role));
         }
         final HostLocation otherHL = (HostLocation) other;
@@ -99,14 +97,14 @@ public final class HostLocation {
                 return false;
             }
         }
-        if (op == null
-            || "".equals(op)
-            || "eq".equals(op)) {
+        if (operator == null
+            || "".equals(operator)
+            || "eq".equals(operator)) {
             return otherHL.getOperation() == null
                    || "".equals(otherHL.getOperation())
                    || "eq".equals(otherHL.getOperation());
         } else {
-            return op.equals(otherHL.getOperation());
+            return operator.equals(otherHL.getOperation());
         }
     }
 
@@ -114,7 +112,7 @@ public final class HostLocation {
     public int hashCode() {
         int hash = 7;
         hash = 97 * hash + (this.score != null ? this.score.hashCode() : 0);
-        hash = 97 * hash + (this.op != null ? this.op.hashCode() : 0);
+        hash = 97 * hash + (this.operator != null ? this.operator.hashCode() : 0);
         hash = 97 * hash + (this.role != null ? this.role.hashCode() : 0);
         return hash;
     }

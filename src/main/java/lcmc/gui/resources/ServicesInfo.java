@@ -22,19 +22,13 @@
 
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.dialog.ClusterLogs;
-import lcmc.data.Host;
-import lcmc.data.ResourceAgent;
-import lcmc.data.ClusterStatus;
 import lcmc.data.resources.Resource;
-import lcmc.data.PtestData;
-import lcmc.data.CRMXML;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
@@ -51,13 +45,14 @@ import java.awt.geom.Point2D;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.util.Set;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.ImageIcon;
@@ -67,10 +62,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JDialog;
+import javax.swing.tree.MutableTreeNode;
 
 import lcmc.EditClusterDialog;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -86,13 +81,11 @@ public final class ServicesInfo extends EditableInfo {
                                  LoggerFactory.getLogger(ServicesInfo.class);
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-    /** No clone parameter. */
-    public static final CloneInfo NO_CLONE = null;
     /** Icon of the cluster. */
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
 
-    /** Prepares a new <code>ServicesInfo</code> object. */
+    /** Prepares a new {@code ServicesInfo} object. */
     public ServicesInfo(final String name, final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
@@ -107,12 +100,6 @@ public final class ServicesInfo extends EditableInfo {
     /** Sets info panel. */
     void setInfoPanel(final JComponent infoPanel) {
         this.infoPanel = infoPanel;
-    }
-
-    /** Returns icon for services menu item. */
-    @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
     }
 
     /** Returns names of all global parameters. */
@@ -190,17 +177,13 @@ public final class ServicesInfo extends EditableInfo {
     /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
-        if (!Tools.areEqual(getParamDefault(param),
-                            getParamSaved(param))) {
-            /* it changed, show it */
-            return false;
-        }
-        return getBrowser().getCRMXML().isGlobalAdvanced(param);
+        return Tools.areEqual(getParamDefault(param), getParamSaved(param))
+               && getBrowser().getCRMXML().isGlobalAdvanced(param);
     }
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         return getBrowser().getCRMXML().getGlobalAccessType(param);
     }
 
@@ -244,10 +227,10 @@ public final class ServicesInfo extends EditableInfo {
     }
 
     /** Applies changes that user has entered. */
-    void apply(final Host dcHost, final boolean testOnly) {
-        LOG.debug1("apply: start: test: " + testOnly);
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        LOG.debug1("apply: start: test: " + runMode);
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -287,40 +270,37 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
         final String rscDefaultsId =
-                    getBrowser().getClusterStatus().getRscDefaultsId(testOnly);
+                    getBrowser().getClusterStatus().getRscDefaultsId(runMode);
         CRM.setGlobalParameters(dcHost,
                                 args,
                                 rdiMetaArgs,
                                 rscDefaultsId,
-                                testOnly);
-        if (!testOnly) {
+                                runMode);
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
             rdi.storeComboBoxValues(rdiParams);
         }
-        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (si.checkResourceFieldsCorrect(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)
-                && si.checkResourceFieldsChanged(null,
-                                                 si.getParametersFromXML(),
-                                                 true,
-                                                 false,
-                                                 false)) {
-                si.apply(dcHost, testOnly);
+        for (final ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            final Check check = si.checkResourceFields(
+                                                      null,
+                                                      si.getParametersFromXML(),
+                                                      true,
+                                                      false,
+                                                      false);
+            if (check.isCorrect() && check.isChanged()) {
+                si.apply(dcHost, runMode);
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setApplyButtons(null, params);
         }
-        LOG.debug1("apply: end: test: " + testOnly);
+        LOG.debug1("apply: end: test: " + runMode);
     }
 
     /** Sets heartbeat global parameters after they were obtained. */
     public void setGlobalConfig(final ClusterStatus clStatus) {
         final String[] params = getParametersFromXML();
-        for (String param : params) {
+        for (final String param : params) {
             final String valueS = clStatus.getGlobalParam(param);
             if (valueS == null) {
                 continue;
@@ -362,9 +342,8 @@ public final class ServicesInfo extends EditableInfo {
     /** Sets clone info object. */
     private CloneInfo setCreateCloneInfo(final String cloneId,
                                          final ClusterStatus clStatus,
-                                         final boolean testOnly) {
-        CloneInfo newCi;
-        newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
+                                         final Application.RunMode runMode) {
+        CloneInfo newCi = (CloneInfo) getBrowser().getServiceInfoFromCRMId(cloneId);
         final CRMGraph hg = getBrowser().getCRMGraph();
         if (newCi == null) {
             final Point2D p = null;
@@ -375,18 +354,18 @@ public final class ServicesInfo extends EditableInfo {
                                         false,
                                         cloneId,
                                         null,
-                                        testOnly);
+                                        runMode);
             getBrowser().addToHeartbeatIdList(newCi);
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
-                                          newCi.getHeartbeatId(testOnly));
+                                          newCi.getHeartbeatId(runMode));
             newCi.setParameters(resourceNode);
         } else {
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
-                                          newCi.getHeartbeatId(testOnly));
+                                          newCi.getHeartbeatId(runMode));
             newCi.setParameters(resourceNode);
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 newCi.setUpdated(false);
                 hg.repaint();
             }
@@ -399,9 +378,8 @@ public final class ServicesInfo extends EditableInfo {
     private GroupInfo setCreateGroupInfo(final String group,
                                          final CloneInfo newCi,
                                          final ClusterStatus clStatus,
-                                         final boolean testOnly) {
-        GroupInfo newGi;
-        newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
+                                         final Application.RunMode runMode) {
+        GroupInfo newGi = (GroupInfo) getBrowser().getServiceInfoFromCRMId(group);
         final CRMGraph hg = getBrowser().getCRMGraph();
         if (newGi == null) {
             final Point2D p = null;
@@ -412,10 +390,10 @@ public final class ServicesInfo extends EditableInfo {
                                      false,
                                      group,
                                      newCi,
-                                     testOnly);
+                                     runMode);
             final Map<String, String> resourceNode =
                                   clStatus.getParamValuePairs(
-                                      newGi.getHeartbeatId(testOnly));
+                                      newGi.getHeartbeatId(runMode));
             newGi.setParameters(resourceNode);
             if (newCi != null) {
                 newCi.addCloneServicePanel(newGi);
@@ -423,9 +401,9 @@ public final class ServicesInfo extends EditableInfo {
         } else {
             final Map<String, String> resourceNode =
                                     clStatus.getParamValuePairs(
-                                      newGi.getHeartbeatId(testOnly));
+                                      newGi.getHeartbeatId(runMode));
             newGi.setParameters(resourceNode);
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 newGi.setUpdated(false);
                 hg.repaint();
             }
@@ -443,7 +421,7 @@ public final class ServicesInfo extends EditableInfo {
                                final List<ServiceInfo> serviceIsPresent,
                                final List<ServiceInfo> groupServiceIsPresent,
                                final ClusterStatus clStatus,
-                               final boolean testOnly) {
+                               final Application.RunMode runMode) {
         final Map<ServiceInfo, Map<String, String>> setParametersHash =
                            new HashMap<ServiceInfo, Map<String, String>>();
         if (newCi != null) {
@@ -456,15 +434,15 @@ public final class ServicesInfo extends EditableInfo {
                             clStatus.getParamValuePairs(grpOrCloneId));
         }
         final CRMGraph hg = getBrowser().getCRMGraph();
-        boolean newService = false;
-        int pos = 0;
         final List<String> gs = clStatus.getGroupResources(grpOrCloneId,
-                                                           testOnly);
+                                                           runMode);
         if (gs == null) {
             return;
         }
+        boolean newService = false;
+        int pos = 0;
         for (final String hbId : gs) {
-            if (clStatus.isOrphaned(hbId) && Tools.getConfigData().isNoLRM()) {
+            if (clStatus.isOrphaned(hbId) && Tools.getApplication().isNoLRM()) {
                 continue;
             }
             ServiceInfo newSi;
@@ -477,7 +455,7 @@ public final class ServicesInfo extends EditableInfo {
                 final GroupInfo gi = setCreateGroupInfo(hbId,
                                                         newCi,
                                                         clStatus,
-                                                        testOnly);
+                                                        runMode);
                 setGroupResources(allGroupsAndClones,
                                   hbId,
                                   gi,
@@ -485,8 +463,8 @@ public final class ServicesInfo extends EditableInfo {
                                   serviceIsPresent,
                                   groupServiceIsPresent,
                                   clStatus,
-                                  testOnly);
-                newSi = (ServiceInfo) gi;
+                                  runMode);
+                newSi = gi;
             } else {
                 final ResourceAgent newRA = clStatus.getResourceType(hbId);
                 if (newRA == null) {
@@ -506,7 +484,7 @@ public final class ServicesInfo extends EditableInfo {
                 if (newSi == null) {
                     newService = true;
                     // TODO: get rid of the service name? (everywhere)
-                    String serviceName;
+                    final String serviceName;
                     if (newRA == null) {
                         serviceName = hbId;
                     } else {
@@ -551,13 +529,13 @@ public final class ServicesInfo extends EditableInfo {
                     }
                     newSi.getService().setHeartbeatId(hbId);
                     getBrowser().addToHeartbeatIdList(newSi);
-                    final Point2D p = null;
                     if (newGi != null) {
                         newGi.addGroupServicePanel(newSi, false);
                     } else if (newCi != null) {
                         newCi.addCloneServicePanel(newSi);
                     } else {
-                        addServicePanel(newSi, p, false, false, testOnly);
+                        final Point2D p = null;
+                        addServicePanel(newSi, p, false, false, runMode);
                     }
                 } else {
                     getBrowser().addNameToServiceInfoHash(newSi);
@@ -575,8 +553,8 @@ public final class ServicesInfo extends EditableInfo {
                 Tools.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
-                        final DefaultMutableTreeNode parent =
-                                        (DefaultMutableTreeNode) n.getParent();
+                        final MutableTreeNode parent =
+                                (MutableTreeNode) n.getParent();
                         if (parent != null) {
                             final int i = parent.getIndex(n);
                             if (i > p) {
@@ -591,10 +569,11 @@ public final class ServicesInfo extends EditableInfo {
             }
         }
 
-        for (final ServiceInfo newSi : setParametersHash.keySet()) {
-            newSi.setParameters(setParametersHash.get(newSi));
-            if (!testOnly) {
-                newSi.setUpdated(false);
+        for (final Map.Entry<ServiceInfo, Map<String, String>> setEntry
+                                                 : setParametersHash.entrySet()) {
+            setEntry.getKey().setParameters(setEntry.getValue());
+            if (Application.isLive(runMode)) {
+                setEntry.getKey().setUpdated(false);
             }
         }
         if (newService) {
@@ -614,7 +593,7 @@ public final class ServicesInfo extends EditableInfo {
      * clusterStatus and updates the internal structures and graph.
      */
     public void setAllResources(final ClusterStatus clStatus,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         if (clStatus == null) {
             return;
         }
@@ -628,7 +607,7 @@ public final class ServicesInfo extends EditableInfo {
             GroupInfo newGi = null;
             if (clStatus.isClone(groupOrClone)) {
                 /* clone */
-                newCi = setCreateCloneInfo(groupOrClone, clStatus, testOnly);
+                newCi = setCreateCloneInfo(groupOrClone, clStatus, runMode);
                 serviceIsPresent.add(newCi);
             } else if (!"none".equals(groupOrClone)) {
                 /* group */
@@ -643,7 +622,7 @@ public final class ServicesInfo extends EditableInfo {
                 newGi = setCreateGroupInfo(groupOrClone,
                                            newCi,
                                            clStatus,
-                                           testOnly);
+                                           runMode);
                 serviceIsPresent.add(newGi);
             }
             setGroupResources(allGroupsAndClones,
@@ -653,7 +632,7 @@ public final class ServicesInfo extends EditableInfo {
                               serviceIsPresent,
                               groupServiceIsPresent,
                               clStatus,
-                              testOnly);
+                              runMode);
         }
 
         hg.clearKeepColocationList();
@@ -673,9 +652,9 @@ public final class ServicesInfo extends EditableInfo {
             final List<ConstraintPHInfo> preNewCphis =
                                     new ArrayList<ConstraintPHInfo>();
             if (idToInfoHash != null) {
-                for (final String id : idToInfoHash.keySet()) {
+                for (final Map.Entry<String, ServiceInfo> infoEntry : idToInfoHash.entrySet()) {
                     final ConstraintPHInfo cphi =
-                               (ConstraintPHInfo) idToInfoHash.get(id);
+                               (ConstraintPHInfo) infoEntry.getValue();
                     final CRMXML.RscSetConnectionData rdataOrd =
                                     cphi.getRscSetConnectionDataOrd();
                     final CRMXML.RscSetConnectionData rdataCol =
@@ -692,45 +671,42 @@ public final class ServicesInfo extends EditableInfo {
                 }
             }
             getBrowser().unlockNameToServiceInfo();
-            final List<ConstraintPHInfo> newCphis =
+            final Collection<ConstraintPHInfo> newCphis =
                                     new ArrayList<ConstraintPHInfo>();
             for (final CRMXML.RscSetConnectionData rdata
                                                 : rscSetConnections) {
                 ConstraintPHInfo cphi = null;
-                PcmkRscSetsInfo prsi = null;
 
-                for (final CRMXML.RscSetConnectionData ordata
-                                              : rdataToCphi.keySet()) {
-                    if (ordata == rdata) {
+                for (final Map.Entry<CRMXML.RscSetConnectionData, ConstraintPHInfo> phEntry
+                                              : rdataToCphi.entrySet()) {
+                    if (phEntry.getKey() == rdata) {
                         continue;
                     }
-                    if (rdata.equals(ordata)
-                        || rdata.equalsReversed(ordata)) {
-                        cphi = rdataToCphi.get(ordata);
+                    if (rdata.equals(phEntry.getKey())
+                        || rdata.equalsReversed(phEntry.getKey())) {
+                        cphi = phEntry.getValue();
                         cphi.setRscSetConnectionData(rdata);
                         break;
                     }
                 }
+                PcmkRscSetsInfo prsi = null;
                 if (cphi == null) {
-                    for (final CRMXML.RscSetConnectionData ordata
-                                              : rdataToCphi.keySet()) {
-                        if (ordata == rdata) {
-                            cphi = rdataToCphi.get(ordata);
+                    for (final Map.Entry<CRMXML.RscSetConnectionData, ConstraintPHInfo> phEntry
+                                              : rdataToCphi.entrySet()) {
+                        if (phEntry.getKey() == rdata) {
+                            cphi = phEntry.getValue();
                             break;
                         }
-                        if (rdataToCphi.get(ordata).sameConstraintId(
-                                                              rdata)) {
+                        if (phEntry.getValue().sameConstraintId(
+                                rdata)) {
                             /* use the same rsc set info object */
-                            prsi = rdataToCphi.get(
-                                         ordata).getPcmkRscSetsInfo();
+                            prsi = phEntry.getValue().getPcmkRscSetsInfo();
                         }
-                        if (rdataToCphi.get(
-                                           ordata).getService().isNew()
-                            || (rdata.samePlaceholder(ordata)
-                                && rdataToCphi.get(
-                                             ordata).sameConstraintId(
-                                                             rdata))) {
-                            cphi = rdataToCphi.get(ordata);
+                        if (phEntry.getValue().getService().isNew()
+                            || (rdata.samePlaceholder(phEntry.getKey())
+                                && phEntry.getValue().sameConstraintId(
+                                rdata))) {
+                            cphi = phEntry.getValue();
                             cphi.setRscSetConnectionData(rdata);
                             prsi = cphi.getPcmkRscSetsInfo();
                             if (prsi != null) {
@@ -823,7 +799,7 @@ public final class ServicesInfo extends EditableInfo {
                         }
                     }
                 }
-                if (!testOnly) {
+                if (Application.isLive(runMode)) {
                     cphi.setUpdated(false);
                     cphi.getService().setNew(false);
                 }
@@ -832,22 +808,23 @@ public final class ServicesInfo extends EditableInfo {
             for (final ConstraintPHInfo cphi : newCphis) {
                 hg.addConstraintPlaceholder(cphi,
                                             null, /* pos */
-                                            false);
+                                            Application.RunMode.LIVE);
             }
         }
 
         /* colocations */
         final Map<String, List<CRMXML.ColocationData>> colocationMap =
                                         clStatus.getColocationRscMap();
-        for (final String rscId : colocationMap.keySet()) {
+        for (final Map.Entry<String, List<CRMXML.ColocationData>> colocationEntry
+                                                            : colocationMap.entrySet()) {
             final List<CRMXML.ColocationData> withs =
-                                              colocationMap.get(rscId);
+                    colocationEntry.getValue();
             for (final CRMXML.ColocationData data : withs) {
                 final String withRscId = data.getWithRsc();
                 final ServiceInfo withSi =
                       getBrowser().getServiceInfoFromCRMId(withRscId);
                 final ServiceInfo siP =
-                           getBrowser().getServiceInfoFromCRMId(rscId);
+                           getBrowser().getServiceInfoFromCRMId(colocationEntry.getKey());
                 hg.addColocation(data.getId(), siP, withSi);
             }
         }
@@ -855,22 +832,22 @@ public final class ServicesInfo extends EditableInfo {
         /* orders */
         final Map<String, List<CRMXML.OrderData>> orderMap =
                                               clStatus.getOrderRscMap();
-        for (final String rscFirstId : orderMap.keySet()) {
+        for (final Map.Entry<String, List<CRMXML.OrderData>> orderEntry : orderMap.entrySet()) {
             for (final CRMXML.OrderData data
-                                         : orderMap.get(rscFirstId)) {
+                                         : orderEntry.getValue()) {
                 final String rscThenId = data.getRscThen();
                 final ServiceInfo si =
                         getBrowser().getServiceInfoFromCRMId(rscThenId);
                 if (si != null) { /* not yet complete */
                     final ServiceInfo siP =
-                      getBrowser().getServiceInfoFromCRMId(rscFirstId);
+                      getBrowser().getServiceInfoFromCRMId(orderEntry.getKey());
                     if (siP != null && siP.getResourceAgent() != null) {
                         /* dangling orders and colocations */
                         if ((siP.getResourceAgent().isDrbddisk()
                              || siP.getResourceAgent().isLinbitDrbd())
-                            && si.getName().equals("Filesystem")) {
+                            && "Filesystem".equals(si.getName())) {
                             final List<CRMXML.ColocationData> cds =
-                               clStatus.getColocationDatas(rscFirstId);
+                               clStatus.getColocationDatas(orderEntry.getKey());
                             if (cds != null) {
                                 for (final CRMXML.ColocationData cd
                                                                : cds) {
@@ -918,9 +895,9 @@ public final class ServicesInfo extends EditableInfo {
                 final Map<String, ServiceInfo> idToInfoHash =
                    getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
                 if (idToInfoHash != null) {
-                    for (final String id : idToInfoHash.keySet()) {
+                    for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
                         final ConstraintPHInfo cphi =
-                                       (ConstraintPHInfo) idToInfoHash.get(id);
+                                       (ConstraintPHInfo) serviceEntry.getValue();
                         if (!cphi.getService().isNew() && cphi.isEmpty()) {
                             cphi.getService().setNew(true);
                         }
@@ -986,7 +963,7 @@ public final class ServicesInfo extends EditableInfo {
         }
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         if (getBrowser().getCRMXML() == null
             || getBrowser().getClusterStatus() == null) {
             return newPanel;
@@ -1000,13 +977,7 @@ public final class ServicesInfo extends EditableInfo {
             @Override
             public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
-                if (dcHost == null) {
-                    return false;
-                }
-                if (Tools.versionBeforePacemaker(dcHost)) {
-                    return false;
-                }
-                return true;
+                return dcHost != null && !Tools.versionBeforePacemaker(dcHost);
             }
 
             @Override
@@ -1042,7 +1013,7 @@ public final class ServicesInfo extends EditableInfo {
                     final ClusterStatus clStatus =
                                               getBrowser().getClusterStatus();
                     clStatus.setPtestData(null);
-                    apply(dcHost, true);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData =
                                           new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
@@ -1058,10 +1029,10 @@ public final class ServicesInfo extends EditableInfo {
         getBrowser().getRscDefaultsInfo().setRevertButton(getRevertButton());
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
@@ -1069,7 +1040,7 @@ public final class ServicesInfo extends EditableInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
 
         newPanel.add(buttonPanel);
 
@@ -1094,7 +1065,7 @@ public final class ServicesInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), false);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         }
@@ -1159,8 +1130,8 @@ public final class ServicesInfo extends EditableInfo {
                                 final boolean reloadNode,
                                 final String heartbeatId,
                                 final CloneInfo newCi,
-                                final boolean testOnly) {
-        ServiceInfo newServiceInfo;
+                                final Application.RunMode runMode) {
+        final ServiceInfo newServiceInfo;
         final String name = newRA.getName();
         if (newRA.isFilesystem()) {
             newServiceInfo = new FilesystemInfo(name, newRA, getBrowser());
@@ -1177,11 +1148,11 @@ public final class ServicesInfo extends EditableInfo {
         } else if (newRA.isClone()) {
             final boolean master =
                          getBrowser().getClusterStatus().isMaster(heartbeatId);
-            String cloneName;
+            final String cloneName;
             if (master) {
-                cloneName = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+                cloneName = Application.PM_MASTER_SLAVE_SET_NAME;
             } else {
-                cloneName = ConfigData.PM_CLONE_SET_NAME;
+                cloneName = Application.PM_CLONE_SET_NAME;
             }
             newServiceInfo = new CloneInfo(newRA,
                                            cloneName,
@@ -1199,7 +1170,7 @@ public final class ServicesInfo extends EditableInfo {
                             pos,
                             reloadNode,
                             true,
-                            testOnly);
+                            runMode);
         }
         return newServiceInfo;
     }
@@ -1213,7 +1184,7 @@ public final class ServicesInfo extends EditableInfo {
                          final Point2D pos,
                          final boolean reloadNode,
                          final boolean interactive,
-                         final boolean testOnly) {
+                         final Application.RunMode runMode) {
         newServiceInfo.getService().setResourceClass(
                     newServiceInfo.getResourceAgent().getResourceClass());
         final CRMGraph hg = getBrowser().getCRMGraph();
@@ -1223,7 +1194,7 @@ public final class ServicesInfo extends EditableInfo {
                             pos,
                             false, /* colocation only */
                             false, /* order only */
-                            testOnly)) {
+                            runMode)) {
             final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
@@ -1272,16 +1243,16 @@ public final class ServicesInfo extends EditableInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
 
         /* add group */
-        final MyMenuItem addGroupMenuItem =
+        final UpdatableItem addGroupMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           false),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1301,19 +1272,19 @@ public final class ServicesInfo extends EditableInfo {
                                     true,
                                     null,
                                     null,
-                                    testOnly);
+                                    runMode);
                     getBrowser().getCRMGraph().repaint();
                 }
             };
-        items.add((UpdatableItem) addGroupMenuItem);
+        items.add(addGroupMenuItem);
         final ServicesInfo thisClass = this;
 
         /* add service */
-        final MyMenu addServiceMenuItem = new MyMenu(
+        final UpdatableItem addServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddService"),
-                        new AccessMode(ConfigData.AccessType.OP,
+                        new AccessMode(Application.AccessType.OP,
                                        false),
-                        new AccessMode(ConfigData.AccessType.OP,
+                        new AccessMode(Application.AccessType.OP,
                                        false)) {
             private static final long serialVersionUID = 1L;
 
@@ -1332,7 +1303,7 @@ public final class ServicesInfo extends EditableInfo {
             public void updateAndWait() {
                 Tools.isSwingThread();
                 removeAll();
-                Point2D pos = getPos();
+                final Point2D pos = getPos();
                 final CRMXML crmXML = getBrowser().getCRMXML();
                 if (crmXML == null) {
                     return;
@@ -1343,15 +1314,13 @@ public final class ServicesInfo extends EditableInfo {
                                         ResourceAgent.OCF_CLASS);
                 if (crmXML.isLinbitDrbdPresent()) { /* just skip it,
                                                        if it is not */
-                    final ResourceAgent linbitDrbdService =
-                                                   crmXML.getHbLinbitDrbd();
                     final MyMenuItem ldMenuItem = new MyMenuItem(
                      Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
                      null,
                      null,
-                     new AccessMode(ConfigData.AccessType.ADMIN,
+                     new AccessMode(Application.AccessType.ADMIN,
                                     false),
-                     new AccessMode(ConfigData.AccessType.OP,
+                     new AccessMode(Application.AccessType.OP,
                                     false)) {
                         private static final long serialVersionUID = 1L;
                         @Override
@@ -1368,7 +1337,7 @@ public final class ServicesInfo extends EditableInfo {
                                                                 true,
                                                                 null,
                                                                 null,
-                                                                testOnly);
+                                                                runMode);
                             fsi.setDrbddiskIsPreferred(false);
                             getBrowser().getCRMGraph().repaint();
                         }
@@ -1390,9 +1359,9 @@ public final class ServicesInfo extends EditableInfo {
                                         null,
                                         null,
                                         new AccessMode(
-                                                  ConfigData.AccessType.ADMIN,
+                                                  Application.AccessType.ADMIN,
                                                   false),
-                                        new AccessMode(ConfigData.AccessType.OP,
+                                        new AccessMode(Application.AccessType.OP,
                                                        false)) {
                         private static final long serialVersionUID = 1L;
                         @Override
@@ -1403,7 +1372,7 @@ public final class ServicesInfo extends EditableInfo {
                                             true,
                                             null,
                                             null,
-                                            testOnly);
+                                            runMode);
                             getBrowser().getCRMGraph().repaint();
                         }
                     };
@@ -1414,15 +1383,13 @@ public final class ServicesInfo extends EditableInfo {
                     && (getBrowser().isDrbddiskPreferred()
                         || getBrowser().atLeastOneDrbddisk()
                         || !crmXML.isLinbitDrbdPresent())) {
-                    final ResourceAgent drbddiskService =
-                                                crmXML.getHbDrbddisk();
                     final MyMenuItem ddMenuItem = new MyMenuItem(
                      Tools.getString("ClusterBrowser.DrbddiskMenuName"),
                      null,
                      null,
-                     new AccessMode(ConfigData.AccessType.ADMIN,
+                     new AccessMode(Application.AccessType.ADMIN,
                                     false),
-                     new AccessMode(ConfigData.AccessType.OP,
+                     new AccessMode(Application.AccessType.OP,
                                     false)) {
                         private static final long serialVersionUID = 1L;
                         @Override
@@ -1435,7 +1402,7 @@ public final class ServicesInfo extends EditableInfo {
                                                                 true,
                                                                 null,
                                                                 null,
-                                                                testOnly);
+                                                                runMode);
                             fsi.setDrbddiskIsPreferred(true);
                             getBrowser().getCRMGraph().repaint();
                         }
@@ -1447,7 +1414,7 @@ public final class ServicesInfo extends EditableInfo {
                     ddMenuItem.setPos(pos);
                     add(ddMenuItem);
                 }
-                final List<JDialog> popups = new ArrayList<JDialog>();
+                final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final List<ResourceAgent> services = getAddServiceList(cl);
                     if (services.isEmpty()) {
@@ -1467,21 +1434,21 @@ public final class ServicesInfo extends EditableInfo {
                     final MyMenu classItem =
                             new MyMenu(ClusterBrowser.getClassMenu(cl),
                                        new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    mode),
-                                       new AccessMode(ConfigData.AccessType.OP,
+                                       new AccessMode(Application.AccessType.OP,
                                                       mode));
-                    MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
+                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
                         final MyMenuItem mmi =
                                 new MyMenuItem(ra.getMenuName(),
                                                null,
                                                null,
                                                new AccessMode(
-                                                    ConfigData.AccessType.ADMIN,
+                                                    Application.AccessType.ADMIN,
                                                     false),
                                                new AccessMode(
-                                                    ConfigData.AccessType.OP,
+                                                    Application.AccessType.OP,
                                                     false)) {
                             private static final long serialVersionUID = 1L;
                             @Override
@@ -1509,7 +1476,7 @@ public final class ServicesInfo extends EditableInfo {
                                                 true,
                                                 null,
                                                 null,
-                                                testOnly);
+                                                runMode);
                                 getBrowser().getCRMGraph().repaint();
                             }
                         };
@@ -1534,18 +1501,18 @@ public final class ServicesInfo extends EditableInfo {
                 super.updateAndWait();
             }
         };
-        items.add((UpdatableItem) addServiceMenuItem);
+        items.add(addServiceMenuItem);
 
         /* add constraint placeholder (and) */
-        final MyMenuItem addConstraintPlaceholderAnd =
+        final UpdatableItem addConstraintPlaceholderAnd =
             new MyMenuItem(Tools.getString(
                                  "ServicesInfo.AddConstraintPlaceholderAnd"),
                            null,
                            Tools.getString(
                             "ServicesInfo.AddConstraintPlaceholderAnd.ToolTip"),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           false),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1567,7 +1534,7 @@ public final class ServicesInfo extends EditableInfo {
                                               ConstraintPHInfo.Preference.AND);
                     cphi.getService().setNew(true);
                     getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi, getPos(), testOnly);
+                    hg.addConstraintPlaceholder(cphi, getPos(), runMode);
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
@@ -1579,18 +1546,18 @@ public final class ServicesInfo extends EditableInfo {
                     });
                 }
             };
-        items.add((UpdatableItem) addConstraintPlaceholderAnd);
+        items.add(addConstraintPlaceholderAnd);
 
         /* add constraint placeholder (or) */
-        final MyMenuItem addConstraintPlaceholderOr =
+        final UpdatableItem addConstraintPlaceholderOr =
             new MyMenuItem(Tools.getString(
                                  "ServicesInfo.AddConstraintPlaceholderOr"),
                            null,
                            Tools.getString(
                             "ServicesInfo.AddConstraintPlaceholderOr.ToolTip"),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           false),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1604,7 +1571,7 @@ public final class ServicesInfo extends EditableInfo {
                             || Tools.compareVersions(pmV, "1.1.7") <= 0) {
                             return HbOrderInfo.NOT_AVAIL_FOR_PCMK_VERSION;
                         }
-                    } catch (Exceptions.IllegalVersionException e) {
+                    } catch (final Exceptions.IllegalVersionException e) {
                         LOG.appWarning("enablePredicate: unkonwn version: "
                                        + pmV);
                         /* enable it, if version check doesn't work */
@@ -1625,7 +1592,7 @@ public final class ServicesInfo extends EditableInfo {
                                               ConstraintPHInfo.Preference.OR);
                     cphi.getService().setNew(true);
                     getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi, getPos(), testOnly);
+                    hg.addConstraintPlaceholder(cphi, getPos(), runMode);
                     final PcmkRscSetsInfo prsi =
                                       new PcmkRscSetsInfo(getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
@@ -1637,14 +1604,14 @@ public final class ServicesInfo extends EditableInfo {
                     });
                 }
             };
-        items.add((UpdatableItem) addConstraintPlaceholderOr);
+        items.add(addConstraintPlaceholderOr);
 
         /* stop all services. */
-        final MyMenuItem stopAllMenuItem = new MyMenuItem(
+        final ComponentWithTest stopAllMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.StopAllServices"),
                 ServiceInfo.STOP_ICON,
-                new AccessMode(ConfigData.AccessType.ADMIN, true),
-                new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                new AccessMode(Application.AccessType.ADMIN, true),
+                new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1655,9 +1622,9 @@ public final class ServicesInfo extends EditableInfo {
                 if (getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
-                for (ServiceInfo si
+                for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
-                    if (!si.isStopped(false) && !si.getService().isOrphaned()) {
+                    if (!si.isStopped(Application.RunMode.LIVE) && !si.getService().isOrphaned()) {
                         return null;
                     }
                 }
@@ -1671,16 +1638,16 @@ public final class ServicesInfo extends EditableInfo {
                 for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
-                        && !si.isStopped(false)
+                        && !si.isStopped(Application.RunMode.LIVE)
                         && !si.getService().isOrphaned()
                         && !si.getService().isNew()) {
-                        si.stopResource(dcHost, false);
+                        si.stopResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
                 getBrowser().getCRMGraph().repaint();
             }
         };
-        final ClusterBrowser.ClMenuItemCallback stopAllItemCallback =
+        final ButtonCallback stopAllItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
@@ -1689,10 +1656,10 @@ public final class ServicesInfo extends EditableInfo {
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
                         && !si.isConstraintPH()
-                        && !si.isStopped(true)
+                        && !si.isStopped(Application.RunMode.TEST)
                         && !si.getService().isOrphaned()
                         && !si.getService().isNew()) {
-                        si.stopResource(thisDCHost, true); /* test only */
+                        si.stopResource(thisDCHost, Application.RunMode.TEST);
                     }
                 }
             }
@@ -1701,11 +1668,11 @@ public final class ServicesInfo extends EditableInfo {
         items.add((UpdatableItem) stopAllMenuItem);
 
         /* unmigrate all services. */
-        final MyMenuItem unmigrateAllMenuItem = new MyMenuItem(
+        final ComponentWithTest unmigrateAllMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.UnmigrateAllServices"),
                 ServiceInfo.UNMIGRATE_ICON,
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1721,10 +1688,10 @@ public final class ServicesInfo extends EditableInfo {
                 if (getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
-                for (ServiceInfo si
+                for (final ServiceInfo si
                                  : getBrowser().getExistingServiceList(null)) {
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
+                    if (si.getMigratedTo(runMode) != null
+                        || si.getMigratedFrom(runMode) != null) {
                         return null;
                     }
                 }
@@ -1737,24 +1704,23 @@ public final class ServicesInfo extends EditableInfo {
                 final Host dcHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
                                 : getBrowser().getExistingServiceList(null)) {
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
-                        si.unmigrateResource(dcHost, false);
+                    if (si.getMigratedTo(runMode) != null
+                        || si.getMigratedFrom(runMode) != null) {
+                        si.unmigrateResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
                 getBrowser().getCRMGraph().repaint();
             }
         };
-        final ClusterBrowser.ClMenuItemCallback unmigrateAllItemCallback =
+        final ButtonCallback unmigrateAllItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                final Host thisDCHost = getBrowser().getDCHost();
                 for (final ServiceInfo si
                                 : getBrowser().getExistingServiceList(null)) {
-                    if (si.getMigratedTo(testOnly) != null
-                        || si.getMigratedFrom(testOnly) != null) {
-                        si.unmigrateResource(dcHost, true); /* test only */
+                    if (si.getMigratedTo(runMode) != null
+                        || si.getMigratedFrom(runMode) != null) {
+                        si.unmigrateResource(dcHost, Application.RunMode.TEST);
                     }
                 }
             }
@@ -1763,11 +1729,11 @@ public final class ServicesInfo extends EditableInfo {
         items.add((UpdatableItem) unmigrateAllMenuItem);
 
         /* remove all services. */
-        final MyMenuItem removeMenuItem = new MyMenuItem(
+        final ComponentWithTest removeMenuItem = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
                 ClusterBrowser.REMOVE_ICON,
-                new AccessMode(ConfigData.AccessType.ADMIN, true),
-                new AccessMode(ConfigData.AccessType.ADMIN, true)) {
+                new AccessMode(Application.AccessType.ADMIN, true),
+                new AccessMode(Application.AccessType.ADMIN, true)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1778,10 +1744,10 @@ public final class ServicesInfo extends EditableInfo {
                 if (getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
-                for (ServiceInfo si
+                for (final ServiceInfo si
                         : getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null) {
-                        if (si.isRunning(false)) {
+                        if (si.isRunning(Application.RunMode.LIVE)) {
                             return "there are running services";
                         }
                     }
@@ -1805,9 +1771,9 @@ public final class ServicesInfo extends EditableInfo {
                         @Override
                         public void run() {
                             final Host dcHost = getBrowser().getDCHost();
-                            List<ServiceInfo> services =
+                            final List<ServiceInfo> services =
                                     getBrowser().getExistingServiceList(null);
-                            for (ServiceInfo si : services) {
+                            for (final ServiceInfo si : services) {
                                 if (si.getGroupInfo() == null) {
                                     final ResourceAgent ra =
                                                         si.getResourceAgent();
@@ -1816,15 +1782,15 @@ public final class ServicesInfo extends EditableInfo {
                                     }
                                 }
                             }
-                            CRM.erase(dcHost, testOnly);
-                            for (ServiceInfo si : services) {
+                            CRM.erase(dcHost, runMode);
+                            for (final ServiceInfo si : services) {
                                 if (si.getGroupInfo() == null) {
                                     final ResourceAgent ra =
                                                         si.getResourceAgent();
                                     if (si.getService().isNew()) {
-                                        si.removeMyself(testOnly);
+                                        si.removeMyself(runMode);
                                     } else if (ra != null && !ra.isClone()) {
-                                        si.cleanupResource(dcHost, false);
+                                        si.cleanupResource(dcHost, Application.RunMode.LIVE);
                                     }
                                 }
                             }
@@ -1835,32 +1801,26 @@ public final class ServicesInfo extends EditableInfo {
                 }
             }
         };
-        final ClusterBrowser.ClMenuItemCallback removeItemCallback =
+        final ButtonCallback removeItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                final Host thisDCHost = getBrowser().getDCHost();
-                CRM.erase(dcHost, true); /* test only */
+                CRM.erase(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(removeMenuItem, removeItemCallback);
         items.add((UpdatableItem) removeMenuItem);
 
         /* cluster wizard */
-        final MyMenuItem clusterWizardItem =
+        final UpdatableItem clusterWizardItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
                            CLUSTER_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -1869,93 +1829,53 @@ public final class ServicesInfo extends EditableInfo {
                     dialog.showDialogs();
                 }
             };
-        items.add((UpdatableItem) clusterWizardItem);
+        items.add(clusterWizardItem);
 
         /* view logs */
-        final MyMenuItem viewLogsItem =
+        final UpdatableItem viewLogsItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
                            LOGFILE_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.RO,
+                           new AccessMode(Application.AccessType.RO,
                                           false),
-                           new AccessMode(ConfigData.AccessType.RO,
+                           new AccessMode(Application.AccessType.RO,
                                           false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public String enablePredicate() {
-                    return null;
-                }
-
-                @Override
                 public void action() {
-                    ClusterLogs l = new ClusterLogs(getBrowser().getCluster());
+                    final ClusterLogs l = new ClusterLogs(getBrowser().getCluster());
                     l.showDialog();
                 }
             };
-        items.add((UpdatableItem) viewLogsItem);
+        items.add(viewLogsItem);
         return items;
     }
 
     /**
      * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
+     * all parameters will be checked, otherwise only the param, but other
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
-        boolean ret = true;
-        if (!rdi.checkResourceFieldsCorrect(param,
-                                            rdi.getParametersFromXML(),
-                                            true)) {
-            ret = false;
+        final Check check = new Check(new ArrayList<String>(),
+                                      new ArrayList<String>());
+        check.addCheck(rdi.checkResourceFields(param,
+                                               rdi.getParametersFromXML(),
+                                               true));
+        check.addCheck(super.checkResourceFields(param, params));
+        for (final ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            check.addCheck(si.checkResourceFields(null,
+                                                  si.getParametersFromXML(),
+                                                  true,
+                                                  false,
+                                                  false));
         }
-        if (!super.checkResourceFieldsCorrect(param, params)) {
-            ret = false;
-        }
-        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (!si.checkResourceFieldsCorrect(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
-                ret = false;
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        boolean changed = false;
-        final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
-        if (super.checkResourceFieldsChanged(param, params)) {
-            changed = true;
-        }
-        if (rdi.checkResourceFieldsChanged(param,
-                                           rdi.getParametersFromXML(),
-                                           true)) {
-            changed = true;
-        }
-        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (si.checkResourceFieldsChanged(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
-                changed = true;
-            }
-        }
-        return changed;
+        return check;
     }
 
     /** Revert all values. */
@@ -1964,12 +1884,12 @@ public final class ServicesInfo extends EditableInfo {
         super.revert();
         final RscDefaultsInfo rdi = getBrowser().getRscDefaultsInfo();
         rdi.revert();
-        for (ServiceInfo si : getBrowser().getExistingServiceList(null)) {
-            if (si.checkResourceFieldsChanged(null,
-                                              si.getParametersFromXML(),
-                                              true,
-                                              false,
-                                              false)) {
+        for (final ServiceInfo si : getBrowser().getExistingServiceList(null)) {
+            if (si.checkResourceFields(null,
+                                       si.getParametersFromXML(),
+                                       true,
+                                       false,
+                                       false).isChanged()) {
                 si.revert();
             }
         }
@@ -2058,7 +1978,7 @@ public final class ServicesInfo extends EditableInfo {
                                     true,
                                     null, /* clone id */
                                     null,
-                                    CRM.LIVE);
+                                    Application.RunMode.LIVE);
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -2069,9 +1989,8 @@ public final class ServicesInfo extends EditableInfo {
                             newSi.waitForInfoPanel();
                         }
                         if (oldCi != null) {
-                            final CloneInfo oci = oldCi;
                             final Value v = newSi.getTypeRadioGroup().getValue();
-                            if (oci.getService().isMaster()) {
+                            if (oldCi.getService().isMaster()) {
                                 if (!ServiceInfo.MASTER_SLAVE_TYPE_STRING.equals(v)) {
                                     newSi.getTypeRadioGroup().setValue(
                                          ServiceInfo.MASTER_SLAVE_TYPE_STRING);
@@ -2090,19 +2009,18 @@ public final class ServicesInfo extends EditableInfo {
                 /* clone parameters */
                 final CloneInfo newCi = newSi.getCloneInfo();
                 if (newCi != null) {
-                    final CloneInfo oldCi0 = oldCi;
-                    for (final String param : oldCi0.getParametersFromXML()) {
+                    for (final String param : oldCi.getParametersFromXML()) {
                         if (ServiceInfo.GUI_ID.equals(param)
                             || ServiceInfo.PCMK_ID.equals(param)) {
                             if (getBrowser().isCRMId(
-                                    oldCi0.getService().getHeartbeatId())) {
+                                    oldCi.getService().getHeartbeatId())) {
                                 continue;
                             }
                         }
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                copyPasteField(oldCi0.getWidget(param, null),
+                                copyPasteField(oldCi.getWidget(param, null),
                                                newCi.getWidget(param, null));
                             }
                         });

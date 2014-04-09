@@ -70,7 +70,7 @@ public final class ClusterStatus {
     private final Host host;
 
     /**
-     * Prepares a new <code>ClusterStatus</code> object.
+     * Prepares a new {@code ClusterStatus} object.
      * Gets and parses metadata from pengine and crmd.
      */
     public ClusterStatus(final Host host, final CRMXML crmXML) {
@@ -103,8 +103,8 @@ public final class ClusterStatus {
 
     /** Returns value of meta attribute  parameter. */
     public String getRscDefaultsParameter(final String param,
-                                          final boolean testOnly) {
-        if (testOnly && ptestData != null) {
+                                          final Application.RunMode runMode) {
+        if (ptestData != null && Application.isTest(runMode)) {
             return shadowCibQueryMap.getRscDefaultsParams().get(param);
         } else {
             return cibQueryMap.getRscDefaultsParams().get(param);
@@ -112,8 +112,8 @@ public final class ClusterStatus {
     }
 
     /** Returns value of the rsc defaults id. */
-    public String getRscDefaultsId(final boolean testOnly) {
-        if (testOnly && ptestData != null) {
+    public String getRscDefaultsId(final Application.RunMode runMode) {
+        if (ptestData != null && Application.isTest(runMode)) {
             return shadowCibQueryMap.getRscDefaultsId();
         } else {
             return cibQueryMap.getRscDefaultsId();
@@ -123,9 +123,9 @@ public final class ClusterStatus {
     /** Returns value of parameter. */
     public String getParameter(final String hbId,
                                final String param,
-                               final boolean testOnly) {
+                               final Application.RunMode runMode) {
         final Map<String, String> params;
-        if (testOnly && ptestData != null) {
+        if (ptestData != null && Application.isTest(runMode)) {
             params = shadowCibQueryMap.getParameters().get(hbId);
         } else {
             params = cibQueryMap.getParameters().get(hbId);
@@ -178,43 +178,17 @@ public final class ClusterStatus {
 
     /** Returns list of resources belonging to the specified group. */
     public List<String> getGroupResources(final String group,
-                                          final boolean testOnly) {
-        if (testOnly && ptestData != null) {
+                                          final Application.RunMode runMode) {
+        if (ptestData != null && Application.isTest(runMode)) {
             return shadowCibQueryMap.getGroupsToResources().get(group);
         } else {
             return cibQueryMap.getGroupsToResources().get(group);
         }
     }
 
-    /** Returns all clone resources. */
-    String[] getAllClones() {
-        final Map<String, String> cloneToResource =
-                                             cibQueryMap.getCloneToResource();
-        return cloneToResource.keySet().toArray(
-                                          new String[cloneToResource.size()]);
-    }
-
     /** Returns whether clone is a master / slave resource. */
     public boolean isMaster(final String pmId) {
         return cibQueryMap.getMasterList().contains(pmId);
-    }
-
-    /** Returns resource belonging to the specified clone. */
-    String getCloneResource(final String clone) {
-        return cibQueryMap.getCloneToResource().get(clone);
-    }
-
-    /** Returns list of all resources. */
-    String[] getAllResources() {
-        final Map<String, Map<String, String>> parametersMap =
-                                                   cibQueryMap.getParameters();
-        return parametersMap.keySet().toArray(
-                                            new String[parametersMap.size()]);
-    }
-
-    /** Returns clone id. */
-    String getResourceFromClone(final String cloneId) {
-        return cibQueryMap.getCloneToResource().get(cloneId);
     }
 
     /** Returns whether the id is of the clone set. */
@@ -230,13 +204,10 @@ public final class ClusterStatus {
     /** Returns whether the res is in LRM on host. */
     public boolean isInLRMOnHost(final String hostName,
                                  final String rscId,
-                                 final boolean testOnly) {
+                                 final Application.RunMode runMode) {
         final Set<String> inLRMList =
                cibQueryMap.getInLRM().get(hostName.toLowerCase(Locale.US));
-        if (inLRMList == null) {
-            return false;
-        }
-        return inLRMList.contains(rscId);
+        return inLRMList != null && inLRMList.contains(rscId);
     }
 
     /** Returns whether the res is orphaned. */
@@ -295,10 +266,10 @@ public final class ClusterStatus {
     }
 
     /** Returns heartbeat ids of all resource locations. */
-    public List<String> getLocationIds(final String rsc,
-                                       final boolean testOnly) {
-        List<String> locs;
-        if (testOnly && ptestData != null) {
+    public Iterable<String> getLocationIds(final String rsc,
+                                       final Application.RunMode runMode) {
+        final List<String> locs;
+        if (ptestData != null && Application.isTest(runMode)) {
             locs = shadowCibQueryMap.getLocationsId().get(rsc);
         } else {
             locs = cibQueryMap.getLocationsId().get(rsc);
@@ -313,9 +284,9 @@ public final class ClusterStatus {
     /** Returns location object for resource and host. */
     public HostLocation getScore(final String hbId,
                                  final String onHost,
-                                 final boolean testOnly) {
-        Map<String, HostLocation> hostToScoreMap;
-        if (testOnly && ptestData != null) {
+                                 final Application.RunMode runMode) {
+        final Map<String, HostLocation> hostToScoreMap;
+        if (ptestData != null && Application.isTest(runMode)) {
             hostToScoreMap = shadowCibQueryMap.getLocation().get(hbId);
         } else {
             hostToScoreMap = cibQueryMap.getLocation().get(hbId);
@@ -328,9 +299,9 @@ public final class ClusterStatus {
 
     /** Returns ping location object for resource. */
     public HostLocation getPingScore(final String hbId,
-                                     final boolean testOnly) {
-        HostLocation hostLocation;
-        if (testOnly && ptestData != null) {
+                                     final Application.RunMode runMode) {
+        final HostLocation hostLocation;
+        if (ptestData != null && Application.isTest(runMode)) {
             hostLocation = shadowCibQueryMap.getPingLocation().get(hbId);
         } else {
             hostLocation = cibQueryMap.getPingLocation().get(hbId);
@@ -338,25 +309,12 @@ public final class ClusterStatus {
         return hostLocation;
     }
 
-    /**
-     * Returns score from location id.
-     * TODO: not used?
-     */
-    HostLocation getHostLocationFromId(final String locationId,
-                                       final boolean testOnly) {
-        if (testOnly && ptestData != null) {
-            return shadowCibQueryMap.getLocationMap().get(locationId);
-        } else {
-            return cibQueryMap.getLocationMap().get(locationId);
-        }
-    }
-
     /** Returns location id for specified resource and host. */
     public String getLocationId(final String rsc,
                                 final String node,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         /* node should not have to be in lower case. */
-        if (testOnly && ptestData != null) {
+        if (ptestData != null && Application.isTest(runMode)) {
             return shadowCibQueryMap.getResHostToLocId().get(
                                                 rsc,
                                                 node.toLowerCase(Locale.US));
@@ -369,9 +327,9 @@ public final class ClusterStatus {
 
     /** Returns location id for ping for specified resource. */
     public String getPingLocationId(final String rsc,
-                                    final boolean testOnly) {
+                                    final Application.RunMode runMode) {
         /* node should not have to be in lower case. */
-        if (testOnly && ptestData != null) {
+        if (ptestData != null && Application.isTest(runMode)) {
             return shadowCibQueryMap.getResPingToLocId().get(rsc);
         } else {
             return cibQueryMap.getResPingToLocId().get(rsc);
@@ -422,27 +380,24 @@ public final class ClusterStatus {
     }
 
     /** Returns on which nodes the resource is managed. */
-    public boolean isManaged(final String hbId, final boolean testOnly) {
+    public boolean isManaged(final String hbId, final Application.RunMode runMode) {
         final PtestData pd = ptestData;
-        if (testOnly && pd != null) {
+        if (pd != null && Application.isTest(runMode)) {
             return pd.isManaged(hbId);
         }
         if (resStateMap == null) {
             return true;
         }
         final ResStatus resStatus = resStateMap.get(hbId);
-        if (resStatus == null) {
-            return true;
-        }
-        return resStatus.isManaged();
+        return resStatus == null || resStatus.isManaged();
     }
 
 
     /** Returns on which nodes the resource is running. */
     public List<String> getRunningOnNodes(final String hbId,
-                                          final boolean testOnly) {
+                                          final Application.RunMode runMode) {
         final PtestData pd = ptestData;
-        if (testOnly && pd != null) {
+        if (pd != null && Application.isTest(runMode)) {
             final List<String> ron = pd.getRunningOnNodes(hbId);
             if (ron != null) {
                 Collections.sort(ron);
@@ -462,9 +417,9 @@ public final class ClusterStatus {
 
     /** Returns on which nodes the resource is slave. */
     public List<String> getSlaveOnNodes(final String hbId,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         final PtestData pd = ptestData;
-        if (testOnly && pd != null) {
+        if (pd != null && Application.isTest(runMode)) {
             final List<String> son = pd.getSlaveOnNodes(hbId);
             if (son != null) {
                 Collections.sort(son);
@@ -483,9 +438,9 @@ public final class ClusterStatus {
 
     /** Returns on which nodes the resource is master. */
     public List<String> getMasterOnNodes(final String hbId,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         final PtestData pd = ptestData;
-        if (testOnly && pd != null) {
+        if (pd != null && Application.isTest(runMode)) {
             final List<String> mon = pd.getMasterOnNodes(hbId);
             if (mon != null) {
                 Collections.sort(mon);
@@ -503,13 +458,13 @@ public final class ClusterStatus {
     }
 
     public Map<String, String> getAllocationScores(final String crmId,
-                                                   final boolean testOnly) {
+                                                   final Application.RunMode runMode) {
         if (resStateMap == null) {
-            return Collections.<String, String>emptyMap();
+            return Collections.emptyMap();
         }
         final ResStatus resStatus = resStateMap.get(crmId);
         if (resStatus == null) {
-            return Collections.<String, String>emptyMap();
+            return Collections.emptyMap();
         }
         return resStatus.getAllocationScores();
     }
@@ -546,13 +501,13 @@ public final class ClusterStatus {
     /** Returns fail count of the service on the specified node. */
     public String getFailCount(final String node,
                                final String res,
-                               final boolean testOnly) {
+                               final Application.RunMode runMode) {
         return cibQueryMap.getFailCount(node.toLowerCase(Locale.US), res);
     }
 
     /** Returns ping count of the specified node. */
-    public String getPingCount(final String node, final boolean testOnly) {
-        if (testOnly && ptestData != null) {
+    public String getPingCount(final String node, final Application.RunMode runMode) {
+        if (ptestData != null && Application.isTest(runMode)) {
             return shadowCibQueryMap.getPingCount(node.toLowerCase(Locale.US));
         }
         return cibQueryMap.getPingCount(node.toLowerCase(Locale.US));
@@ -561,7 +516,7 @@ public final class ClusterStatus {
     /** Returns failed clones for the specified resource. */
     public Set<String> getFailedClones(final String node,
                                        final String res,
-                                       final boolean testOnly) {
+                                       final Application.RunMode runMode) {
         return cibQueryMap.getFailedClones().get(node.toLowerCase(Locale.US),
                                                  res);
     }
@@ -569,9 +524,9 @@ public final class ClusterStatus {
     /** Returns value for specified node and parameter. */
     public String getNodeParameter(final String node,
                                    final String param,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final MultiKeyMap<String, String> nodeParams;
-        if (testOnly && ptestData != null) {
+        if (ptestData != null && Application.isTest(runMode)) {
             nodeParams = shadowCibQueryMap.getNodeParameters();
         } else {
             nodeParams = cibQueryMap.getNodeParameters();
@@ -606,7 +561,7 @@ public final class ClusterStatus {
                 final String cib =
                        Tools.join("\n", data.toArray(new String[data.size()]));
                 final boolean advancedMode =
-                                        Tools.getConfigData().isAdvancedMode();
+                                        Tools.getApplication().isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
                     LOG.debug1("parseCommand: cib update: " + host.getName());
                     oldCib = cib;
@@ -666,7 +621,7 @@ public final class ClusterStatus {
                     data.add(line);
                 }
             } else {
-                LOG.appWarning("parseStatus: error parsing heartbeat status, line not ok: " + line + "\n" + status);
+                LOG.appWarning("parseStatus: error parsing heartbeat status, line not ok: " + line + '\n' + status);
             }
         }
         return updated;

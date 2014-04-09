@@ -26,19 +26,20 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.SoundData;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
@@ -62,7 +63,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{SoundData.MODEL}));
 
     /** Possible values. */
@@ -196,8 +197,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -215,7 +216,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Value model = getParamSaved(SoundData.MODEL);
-                String modelS;
+                final String modelS;
                 if (model == null) {
                     modelS = null;
                 } else {
@@ -242,10 +243,10 @@ final class VMSSoundInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Returns device parameters. */
@@ -294,8 +295,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */
@@ -339,7 +340,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.SOUND_TABLE);
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        checkResourceFields(null, getParametersFromXML());
     }
 
     /** Returns string representation. */
@@ -357,8 +358,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
 
     /** Removes this sound device without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();

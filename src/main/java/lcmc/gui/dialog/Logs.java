@@ -27,7 +27,6 @@ import lcmc.utilities.Tools;
 import lcmc.data.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
-import lcmc.gui.ProgressBar;
 import lcmc.gui.resources.Info;
 
 import javax.swing.JPanel;
@@ -36,17 +35,17 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Comparator;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.HashSet;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
@@ -56,6 +55,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Dimension;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.SimpleAttributeSet;
@@ -76,8 +76,6 @@ import lcmc.utilities.LoggerFactory;
 class Logs extends ConfigDialog {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Text area for the log. */
     private final JTextPane logTextArea = new JTextPane();
     /** Map from pattern name to its checkbox. */
@@ -86,7 +84,7 @@ class Logs extends ConfigDialog {
     /** Refresh lock. */
     private final Lock mRefreshLock = new ReentrantLock();
     /** Additional components. */
-    private final List<JComponent> additionalComponents =
+    private final Collection<JComponent> additionalComponents =
                                                    new ArrayList<JComponent>();
 
     /**
@@ -103,12 +101,12 @@ class Logs extends ConfigDialog {
         pattern.append('\'');
         final Map<String, String> patternMap = getPatternMap();
         boolean first = true;
-        for (final String name : patternMap.keySet()) {
-            if (checkBoxMap.get(name).isSelected()) {
+        for (final Map.Entry<String, String> patternEntry : patternMap.entrySet()) {
+            if (checkBoxMap.get(patternEntry.getKey()).isSelected()) {
                 if (!first) {
                     pattern.append(".*");
                 }
-                pattern.append(patternMap.get(name));
+                pattern.append(patternEntry.getValue());
                 first = false;
             }
         }
@@ -153,8 +151,8 @@ class Logs extends ConfigDialog {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final String name : checkBoxMap.keySet()) {
-                    checkBoxMap.get(name).setEnabled(enable);
+                for (final Map.Entry<String, JCheckBox> checkBoxEntry : checkBoxMap.entrySet()) {
+                    checkBoxEntry.getValue().setEnabled(enable);
                 }
                 for (final JComponent ac : additionalComponents) {
                     ac.setEnabled(enable);
@@ -178,7 +176,7 @@ class Logs extends ConfigDialog {
     protected final void refreshLogs() {
         enableAllComponents(false);
         final Host[] hosts = getHosts();
-        Thread[] threads = new Thread[hosts.length];
+        final Thread[] threads = new Thread[hosts.length];
         final String[] texts = new String[hosts.length];
 
         final Map<String, String> replaceHash = getOptionsHash();
@@ -190,33 +188,33 @@ class Logs extends ConfigDialog {
             final String command = host.getDistCommand(logFileCommand(),
                                                        replaceHash);
             threads[index] = host.execCommandRaw(command,
-                         (ProgressBar) null,
+                    null,
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 texts[index] = ans;
+                             public void done(final String answer) {
+                                 texts[index] = answer;
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  texts[index] = host.getName()
                                                 + ": "
-                                                + ans + "\n";
+                                                + answer + '\n';
                                  LOG.sshError(host,
                                               command,
-                                              ans,
+                                         answer,
                                               stacktrace,
-                                              exitCode);
+                                         errorCode);
                              }
                          }, false, false, 30000);
             i++;
         }
         i = 0;
         final StringBuilder ans = new StringBuilder("");
-        for (Thread t : threads) {
+        for (final Thread t : threads) {
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             ans.append(texts[i]);
@@ -226,11 +224,11 @@ class Logs extends ConfigDialog {
         final String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
         final Pattern p = Pattern.compile(
-                                    "(" + Tools.join("|", months)
+                '(' + Tools.join("|", months)
                                     + ") +(\\d+) +(\\d+):(\\d+):(\\d+).*");
         final Map<String, Integer> monthsHash = new HashMap<String, Integer>();
         i = 0;
-        for (String m : months) {
+        for (final String m : months) {
             monthsHash.put(m, i);
             i++;
         }
@@ -305,13 +303,13 @@ class Logs extends ConfigDialog {
             final SimpleAttributeSet color0 = color;
             final int start0 = start;
             try {
-                doc.insertString(start0, line + "\n", color0);
-            } catch (Exception e) {
+                doc.insertString(start0, line + '\n', color0);
+            } catch (final BadLocationException e) {
                 LOG.appError("refreshLogs: could not insert line", e);
             }
 
             logTextArea.setCaretPosition(logTextArea.getDocument().getLength());
-            start = start + line.length() + 1;
+            start += line.length() + 1;
         }
 
         enableComponents();
@@ -350,7 +348,7 @@ class Logs extends ConfigDialog {
 
     /** Returns panel with checkboxes. */
     private JPanel getGrepChoicesPane() {
-        final JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         pane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         final Map<String, String> patternMap = getPatternMap();
@@ -397,7 +395,7 @@ class Logs extends ConfigDialog {
     @Override
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         pane.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         logTextArea.setEditable(false);

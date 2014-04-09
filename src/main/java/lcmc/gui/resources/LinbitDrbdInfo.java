@@ -26,7 +26,7 @@ import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 
 import java.util.Map;
-import lcmc.data.StringValue;
+import lcmc.data.Application;
 
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is
@@ -54,19 +54,20 @@ final class LinbitDrbdInfo extends ServiceInfo {
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
         final String provider = getResourceAgent().getProvider();
-        if (!ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
-            && !"".equals(provider)) {
+        if (provider != null
+            && !ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
+            && !provider.isEmpty()) {
             s.append(provider);
             s.append(':');
         }
         s.append(getName());
-        final String string = getParamSaved("drbd_resource").getValueForConfig();
-        if (string == null) {
+        final String drbdRes = getParamSaved("drbd_resource").getValueForConfig();
+        if (drbdRes == null) {
             s.insert(0, "new ");
         } else {
-            if (!"".equals(string)) {
+            if (!drbdRes.isEmpty()) {
                 s.append(" (");
-                s.append(string);
+                s.append(drbdRes);
                 s.append(')');
             }
         }
@@ -78,19 +79,14 @@ final class LinbitDrbdInfo extends ServiceInfo {
         return getParamSaved("drbd_resource").getValueForConfig();
     }
 
-    /** Sets resource name. TODO: not used? */
-    void setResourceName(final String resourceName) {
-        getResource().setValue("drbd_resource", new StringValue(resourceName));
-    }
-
     /** Removes the linbit::drbd service. */
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
-        super.removeMyselfNoConfirm(dcHost, testOnly);
+        super.removeMyselfNoConfirm(dcHost, runMode);
         if (dri != null) {
             dri.setUsedByCRM(null);
         }
@@ -104,7 +100,7 @@ final class LinbitDrbdInfo extends ServiceInfo {
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
-            if (isManaged(false) && !getService().isOrphaned()) {
+            if (isManaged(Application.RunMode.LIVE) && !getService().isOrphaned()) {
                 dri.setUsedByCRM(this);
             } else {
                 dri.setUsedByCRM(null);

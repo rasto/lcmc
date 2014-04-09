@@ -19,31 +19,28 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.FilesystemData;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.w3c.dom.Node;
 
 /**
@@ -63,21 +60,11 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                                 FilesystemData.SOURCE_DIR,
                                                 FilesystemData.SOURCE_NAME,
                                                 FilesystemData.TARGET_DIR};
-    /** Mount parameters. */
-    private static final String[] MOUNT_PARAMETERS =
-                                               {FilesystemData.TYPE,
-                                                FilesystemData.SOURCE_DIR,
-                                                FilesystemData.TARGET_DIR};
-    /** Template parameters. */
-    private static final String[] TEMPLATE_PARAMETERS =
-                                               {FilesystemData.TYPE,
-                                                FilesystemData.SOURCE_NAME,
-                                                FilesystemData.TARGET_DIR};
     /** Whether the parameter is enabled only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
                             new HashSet<String>(Arrays.asList(new String[]{}));
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{
                                                 FilesystemData.TYPE,
                                                 FilesystemData.TARGET_DIR}));
@@ -159,7 +146,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns service icon in the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
@@ -301,8 +288,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -339,10 +326,10 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Modify device xml. */
@@ -383,8 +370,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
     /** Returns true if the value of the parameter is ok. */
     @Override
@@ -393,19 +380,19 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
-                    for (final String p : sourceDirWi.keySet()) {
-                        sourceDirWi.get(p).setVisible(
-                                                MOUNT_TYPE.equals(newValue));
+                    for (final Map.Entry<String, Widget> entry : sourceDirWi.entrySet()) {
+                        entry.getValue().setVisible(
+                                MOUNT_TYPE.equals(newValue));
                     }
-                    for (final String p : sourceNameWi.keySet()) {
-                        sourceNameWi.get(p).setVisible(
-                                               TEMPLATE_TYPE.equals(newValue));
+                    for (final Map.Entry<String, Widget> entry : sourceNameWi.entrySet()) {
+                        entry.getValue().setVisible(
+                                TEMPLATE_TYPE.equals(newValue));
                     }
                 }
             });
         }
         return !isRequired(param)
-               || (newValue != null && !"".equals(newValue.getValueForConfig()));
+               || (newValue != null && newValue.getValueForConfig() != null && !newValue.getValueForConfig().isEmpty());
     }
 
     /** Whether the parameter should be enabled. */
@@ -460,7 +447,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
 
     /** Removes this fs without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
@@ -487,7 +474,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
         if (name == null) {
             return "new FS...";
         }
-        Value saved;
+        final Value saved;
         final Value type = getComboBoxValue(FilesystemData.TYPE);
 
         if (MOUNT_TYPE.equals(type)) {
@@ -538,9 +525,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                                   final int width) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
             final Value sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
-            final String regexp = ".*[^/]?$";
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
+            final String regexp = ".*[^/]?$";
             final Widget paramWi = WidgetFactory.createInstance(
                                      getFieldType(param),
                                      sourceDir,
@@ -566,9 +553,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                     final Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String file;
+                            final String file;
                             final String oldFile = paramWi.getStringValue();
-                            if (oldFile == null || "".equals(oldFile)) {
+                            if (oldFile == null || oldFile.isEmpty()) {
                                 file = LXC_SOURCE_DIR;
                             } else {
                                 file = oldFile;

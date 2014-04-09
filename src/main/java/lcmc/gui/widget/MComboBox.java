@@ -4,7 +4,10 @@
  */
 package lcmc.gui.widget;
 
+import java.awt.Container;
 import java.awt.Dimension;
+import java.util.Vector;
+import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
@@ -24,11 +27,11 @@ public final class MComboBox<E> extends JComboBox<E> {
         super(items);
     }
 
-    public MComboBox(@SuppressWarnings("UseOfObsoleteCollectionType") final java.util.Vector<E> items) {
+    public MComboBox(@SuppressWarnings("UseOfObsoleteCollectionType") final Vector<E> items) {
         super(items);
     }
 
-    public MComboBox(final javax.swing.ComboBoxModel<E> aModel) {
+    public MComboBox(final ComboBoxModel<E> aModel) {
         super(aModel);
     }
 
@@ -49,8 +52,7 @@ public final class MComboBox<E> extends JComboBox<E> {
         if (!layingOut) {
             final Object c = getUI().getAccessibleChild(this, 0);
             if (c instanceof JPopupMenu) {
-                final JScrollPane scrollPane = (JScrollPane) ((JPopupMenu) c).getComponent(0);
-                final Dimension size = scrollPane.getPreferredSize();
+                final JScrollPane scrollPane = (JScrollPane) ((Container) c).getComponent(0);
                 final JComponent view = (JComponent) scrollPane.getViewport().getView();
                 final int newSize = view.getPreferredSize().width + 2;
                 dim.width = Math.max(dim.width, newSize);

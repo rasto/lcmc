@@ -40,8 +40,6 @@ import java.util.concurrent.locks.Lock;
  *
  */
 public final class Clusters {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Set of cluster objects. */
     private final Set<Cluster> clusters = new TreeSet<Cluster>();
     /** Clusters set lock. */
@@ -72,7 +70,7 @@ public final class Clusters {
     }
 
     /** Returns true if cluster is in the clusters or false if it is not. */
-    boolean existsCluster(final Cluster cluster) {
+    boolean isClusterInClusters(final Cluster cluster) {
         mClustersReadLock.lock();
         try {
             return clusters.contains(cluster);
@@ -95,11 +93,9 @@ public final class Clusters {
     public boolean isClusterName(final String name) {
         mClustersReadLock.lock();
         try {
-            if (clusters != null) {
-                for (final Cluster cluster : clusters) {
-                    if (name.equals(cluster.getName())) {
-                        return true;
-                    }
+            for (final Cluster cluster : clusters) {
+                if (name.equals(cluster.getName())) {
+                    return true;
                 }
             }
             return false;
@@ -115,23 +111,21 @@ public final class Clusters {
 
     /** Return default name with incremented index. */
     public String getNextClusterName(final String defaultName) {
-        int index = 0;
         mClustersReadLock.lock();
+        int index = 0;
         try {
-            if (clusters != null) {
-                for (final Cluster cluster : clusters) {
-                    /* find the bigest index of cluster default name and
-                     * increment it by one */
-                    final String name = cluster.getName();
-                    final Pattern p = Pattern.compile("^"
-                                                      + defaultName
-                                                      + "(\\d+)$");
-                    final Matcher m = p.matcher(name);
-                    if (m.matches()) {
-                        final int i = Integer.parseInt(m.group(1));
-                        if (i > index) {
-                            index = i;
-                        }
+            for (final Cluster cluster : clusters) {
+                /* find the bigest index of cluster default name and
+                 * increment it by one */
+                final String name = cluster.getName();
+                final Pattern p = Pattern.compile('^'
+                                                  + defaultName
+                                                  + "(\\d+)$");
+                final Matcher m = p.matcher(name);
+                if (m.matches()) {
+                    final int i = Integer.parseInt(m.group(1));
+                    if (i > index) {
+                        index = i;
                     }
                 }
             }

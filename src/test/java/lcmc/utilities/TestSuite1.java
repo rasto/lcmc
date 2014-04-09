@@ -200,7 +200,7 @@ public final class TestSuite1 {
                 HOSTS.add(host);
                 host.setCluster(cluster);
                 cluster.addHost(host);
-                final String saveFile = Tools.getConfigData().getSaveFile();
+                final String saveFile = Tools.getApplication().getSaveFile();
                 Tools.save(saveFile, false);
             }
             for (int i = 0; i <= getFactor() / 100; i++) {
@@ -222,8 +222,8 @@ public final class TestSuite1 {
                     }
                 }
             }
-            if (!Tools.getConfigData().existsCluster(cluster)) {
-                Tools.getConfigData().addClusterToClusters(cluster);
+            if (!Tools.getApplication().existsCluster(cluster)) {
+                Tools.getApplication().addClusterToClusters(cluster);
                 Tools.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
@@ -233,7 +233,7 @@ public final class TestSuite1 {
             }
 
             Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
-            final String saveFile = Tools.getConfigData().getSaveFile();
+            final String saveFile = Tools.getApplication().getSaveFile();
             Tools.save(saveFile, false);
             Tools.getGUIData().refreshClustersPanel();
 
@@ -256,8 +256,8 @@ public final class TestSuite1 {
         host.setSSHPort("22");
         host.setUseSudo(useSudo);
 
-        if (!Tools.getConfigData().existsHost(host)) {
-            Tools.getConfigData().addHostToHosts(host);
+        if (!Tools.getApplication().existsHost(host)) {
+            Tools.getApplication().addHostToHosts(host);
             Tools.getGUIData().setTerminalPanel(new TerminalPanel(host));
 
         }
@@ -274,7 +274,7 @@ public final class TestSuite1 {
             return null;
         }
         host.getSSH().setPasswords(ID_DSA_KEY, ID_RSA_KEY, PASSWORD);
-        host.setIp(ip);
+        host.setIpAddress(ip);
         host.setIps(0, new String[]{ip});
         return host;
     }

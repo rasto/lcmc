@@ -23,6 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
+import lcmc.data.*;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Tools;
@@ -30,17 +31,11 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.CastAddress;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.resources.UcastLink;
-import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.ProgressBar;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.Exceptions;
 
@@ -53,12 +48,12 @@ import java.awt.event.ComponentEvent;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.Map;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
@@ -73,9 +68,8 @@ import javax.swing.JTextArea;
 
 import javax.swing.JComponent;
 import java.awt.Component;
+import lcmc.gui.widget.Check;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -89,8 +83,6 @@ import lcmc.utilities.LoggerFactory;
 final class HbConfig extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HbConfig.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Keepalive option. */
     private static final String KEEPALIVE = "keepalive";
     /** Warntime option. */
@@ -174,7 +166,7 @@ final class HbConfig extends DialogCluster {
         OPTION_SIZES.put(AUTOJOIN, 80);
         OPTION_SIZES.put(NODE, 300);
     }
-    final Map<String, Value> optionDefaults =
+    private final Map<String, Value> optionDefaults =
                                    new HashMap<String, Value>(OPTION_DEFAULTS);
     /** Option values. */
     private final Map<String, Value[]> optionValues =
@@ -190,7 +182,7 @@ final class HbConfig extends DialogCluster {
     /** Panel for mcast addresses. */
     private JPanel mcast;
     /** Set of ucast, bcast, mcast etc. addresses. */
-    private final Set<CastAddress> castAddresses =
+    private final Collection<CastAddress> castAddresses =
                                         new LinkedHashSet<CastAddress>();
     /** Atatus of the config. For example does not exist. */
     private final JLabel configStatus = new JLabel("");
@@ -259,14 +251,14 @@ final class HbConfig extends DialogCluster {
     /** When to start to check the fields. */
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
 
-    /** Prepares a new <code>HbConfig</code> object. */
+    /** Prepares a new {@code HbConfig} object. */
     HbConfig(final WizardDialog previousDialog,
              final Cluster cluster) {
         super(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
         final StringBuilder config = new StringBuilder();
         boolean first = true;
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             if (!first) {
                 config.append(' ');
             }
@@ -334,7 +326,7 @@ final class HbConfig extends DialogCluster {
                                                     mgmtdW.isSelected()));
 
                                 Heartbeat.createHBConfig(hosts, config);
-                                boolean configOk = updateOldHbConfig();
+                                final boolean configOk = updateOldHbConfig();
                                 if (dopdW.isSelected()) {
                                     for (final Host h : hosts) {
                                         final String hbV =
@@ -348,7 +340,7 @@ final class HbConfig extends DialogCluster {
                                                 wa = true;
                                             }
                                         } catch (
-                                         Exceptions.IllegalVersionException e) {
+                                         final Exceptions.IllegalVersionException e) {
                                             LOG.appWarning("run: "
                                                            + e.getMessage(), e);
                                         }
@@ -357,10 +349,19 @@ final class HbConfig extends DialogCluster {
                                 }
                                 Heartbeat.reloadHeartbeats(hosts);
                                 enableComponents();
+                                final List<String> incorrect =
+                                                     new ArrayList<String>();
+                                final List<String> changed =
+                                                     new ArrayList<String>();
                                 if (configOk) {
                                     hideRetryButton();
-                                    nextButtonSetEnabled(true);
-                                    if (!Tools.getConfigData()
+                                } else {
+                                    incorrect.add("config failed");
+                                }
+                                nextButtonSetEnabled(new Check(incorrect, changed));
+
+                                if (configOk) {
+                                    if (!Tools.getApplication()
                                               .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
                                         pressNextButton();
@@ -402,7 +403,7 @@ final class HbConfig extends DialogCluster {
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
+        configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.PAGE_AXIS));
         configPanel.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background"));
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
@@ -415,7 +416,7 @@ final class HbConfig extends DialogCluster {
             new Runnable() {
                 @Override
                 public void run() {
-                    boolean configOk = updateOldHbConfig();
+                    final boolean configOk = updateOldHbConfig();
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -423,9 +424,14 @@ final class HbConfig extends DialogCluster {
                         }
                     });
                     enableComponents();
+                    final List<String> incorrect = new ArrayList<String>();
+                    final List<String> changed = new ArrayList<String>();
+                    if (!configOk) {
+                        incorrect.add("config failed");
+                    }
+                    nextButtonSetEnabled(new Check(incorrect, changed));
                     if (configOk) {
-                        nextButtonSetEnabled(true);
-                        if (!Tools.getConfigData().getAutoClusters()
+                        if (!Tools.getApplication().getAutoClusters()
                                                   .isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
@@ -456,19 +462,19 @@ final class HbConfig extends DialogCluster {
                                                + ")\\s*$"));
         }
         final Pattern dopdP =
-                         Pattern.compile("^\\s*respawn hacluster .*\\/dopd$");
+                         Pattern.compile("^\\s*respawn hacluster .*/dopd$");
         final Pattern mgmtdP =
-                          Pattern.compile("^\\s*respawn root .*\\/mgmtd -v$");
+                          Pattern.compile("^\\s*respawn root .*/mgmtd -v$");
         castAddresses.clear();
         final Map<String, String> opValues = new HashMap<String, String>();
-        for (String line : config) {
+        for (final String line : config) {
             final Matcher bcastM  = bcastP.matcher(line);
             final Matcher mcastM  = mcastP.matcher(line);
             final Matcher ucastM  = ucastP.matcher(line);
             final Matcher serialM = serialP.matcher(line);
             final Matcher dopdM = dopdP.matcher(line);
             final Matcher mgmtdM = mgmtdP.matcher(line);
-            String type;
+            final String type;
             String iface      = "";
             String addr       = "";
             String serial     = "";
@@ -501,7 +507,7 @@ final class HbConfig extends DialogCluster {
                 }
                 continue;
             }
-            if (!"".equals(type)) {
+            if (type != null && !type.isEmpty()) {
                 castAddresses.add(new CastAddress(type,
                                                   iface,
                                                   addr,
@@ -524,25 +530,23 @@ final class HbConfig extends DialogCluster {
      */
     private boolean updateOldHbConfig() { /* is run in a thread */
         final Host[] hosts = getCluster().getHostsArray();
-        boolean configOk = false;
-        boolean noConfigs = true;
-        ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
+        final ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
         configStatus.setText(
                           Tools.getString("Dialog.Cluster.HbConfig.Loading"));
         int i = 0;
 
-        for (Host h : hosts) {
+        for (final Host h : hosts) {
             final int index = i;
             ts[i] = h.execCommand("Heartbeat.getHbConfig",
-                             (ProgressBar) null,
+                    null,
                              new ExecCallback() {
                                  @Override
-                                 public void done(final String ans) {
-                                     configs[index] = ans;
+                                 public void done(final String answer) {
+                                     configs[index] = answer;
                                  }
                                  @Override
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
+                                 public void doneError(final String answer,
+                                                       final int errorCode) {
                                      configs[index] = HA_CF_ERROR_STRING;
                                  }
                              },
@@ -551,15 +555,17 @@ final class HbConfig extends DialogCluster {
                              SSH.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
-        for (ExecCommandThread t : ts) {
+        for (final ExecCommandThread t : ts) {
             /* wait for all of them */
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
 
+        boolean configOk = false;
+        boolean noConfigs = true;
         if (configs[0].equals(HA_CF_ERROR_STRING)) {
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -569,7 +575,7 @@ final class HbConfig extends DialogCluster {
                 }
             });
             retry();
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 addButton.pressButton();
             }
@@ -686,12 +692,12 @@ final class HbConfig extends DialogCluster {
                             Tools.getString(
                                     "Dialog.Cluster.HbConfig.NoConfigFound");
                     }
-                    final JLabel l = new JLabel(hosts[i].getName() + ":");
+                    final JLabel l = new JLabel(hosts[i].getName() + ':');
                     l.setBackground(Color.WHITE);
                     final JPanel labelP = new JPanel();
                     labelP.setBackground(
                             Tools.getDefaultColor("ConfigDialog.Background"));
-                    labelP.setLayout(new BoxLayout(labelP, BoxLayout.Y_AXIS));
+                    labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
                     labelP.setAlignmentX(Component.TOP_ALIGNMENT);
                     labelP.add(l);
                     insideConfigPanel.add(labelP);
@@ -729,7 +735,7 @@ final class HbConfig extends DialogCluster {
                 /* head */
                 final String[] head =
                                 hbConfigHead(true).toString().split(NEWLINE);
-                for (String line : head) {
+                for (final String line : head) {
                     configPanel.add(new JLabel(line));
                 }
                 /* timeouts */
@@ -739,7 +745,7 @@ final class HbConfig extends DialogCluster {
                 }
                 configPanel.add(new JLabel(" "));
                 if (castAddresses.size() < 2) {
-                    JLabel l;
+                    final JLabel l;
                     if (castAddresses.size() < 1) {
                         l = new JLabel(Tools.getString(
                                "Dialog.Cluster.HbConfig.WarningAtLeastTwoInt"));
@@ -749,8 +755,7 @@ final class HbConfig extends DialogCluster {
                     }
                     l.setForeground(Color.RED);
                     configPanel.add(l);
-                    final JLabel label = l;
-                    label.addComponentListener(new ComponentListener() {
+                    l.addComponentListener(new ComponentListener() {
                         @Override
                         public void componentHidden(final ComponentEvent e) {
                             /* do nothing */
@@ -763,7 +768,7 @@ final class HbConfig extends DialogCluster {
                             }
                             alreadyMoved = true;
                             configScrollPane.getViewport().setViewPosition(
-                                              label.getBounds().getLocation());
+                                    l.getBounds().getLocation());
                         }
 
                         @Override
@@ -790,7 +795,7 @@ final class HbConfig extends DialogCluster {
                         hbConfigDopd(
                            dopdW.isSelected()).toString().split(NEWLINE);
                 boolean checkboxDone = false;
-                for (String line : dopdLines) {
+                for (final String line : dopdLines) {
                     if (checkboxDone) {
                         configPanel.add(new JLabel(line));
                     } else {
@@ -804,7 +809,7 @@ final class HbConfig extends DialogCluster {
                         hbConfigMgmtd(
                            mgmtdW.isSelected()).toString().split(NEWLINE);
                 checkboxDone = false;
-                for (String line : mgmtdLines) {
+                for (final String line : mgmtdLines) {
                     if (checkboxDone) {
                         configPanel.add(new JLabel(line));
                     } else {
@@ -820,9 +825,9 @@ final class HbConfig extends DialogCluster {
                     } else {
                         Tools.getGUIData().setAccessible(
                                             makeConfigButton,
-                                            ConfigData.AccessType.ADMIN);
+                                            Application.AccessType.ADMIN);
                     }
-                    if (!Tools.getConfigData().getAutoClusters().isEmpty()
+                    if (!Tools.getApplication().getAutoClusters().isEmpty()
                         && !castAddresses.isEmpty()) {
                         Tools.sleep(1000);
                         makeConfigButton.pressButton();
@@ -869,8 +874,6 @@ final class HbConfig extends DialogCluster {
         String addr       = "";
         String iface      = "";
         String serial     = "";
-        UcastLink ucastLink1;
-        UcastLink ucastLink2;
 
         if (BCAST_TYPE.equals(type)) {
             iface = ifaceW.getStringValue();
@@ -880,8 +883,8 @@ final class HbConfig extends DialogCluster {
         } else if (SERIAL_TYPE.equals(type)) {
             serial = serialW.getStringValue();
         } else if (UCAST_TYPE.equals(type)) {
-            ucastLink1 = (UcastLink) ucastLink1W.getValue();
-            ucastLink2 = (UcastLink) ucastLink2W.getValue();
+            final UcastLink ucastLink1 = (UcastLink) ucastLink1W.getValue();
+            final UcastLink ucastLink2 = (UcastLink) ucastLink2W.getValue();
             if (ucastLink1 == null
                 || ucastLink2 == null
                 || ucastLink1.getHost() == ucastLink2.getHost()) {
@@ -928,13 +931,13 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Returns timeouts. */
-    private StringBuilder hbConfigOptions() {
+    private CharSequence hbConfigOptions() {
         final StringBuilder config = new StringBuilder(130);
         config.append(Tools.getRelease());
         config.append("\n\n");
         for (final String option : OPTIONS) {
             final String value = optionsW.get(option).getStringValue();
-            if (value != null && !"".equals(value)) {
+            if (value != null && !value.isEmpty()) {
                 config.append(option);
                 config.append(' ');
                 config.append(optionsW.get(option).getStringValue());
@@ -945,9 +948,9 @@ final class HbConfig extends DialogCluster {
     }
 
     /** Returns the part of the hb config with addresses. */
-    private StringBuilder hbConfigAddr() {
+    private CharSequence hbConfigAddr() {
         final StringBuilder config = new StringBuilder(80);
-        for (CastAddress ca : castAddresses) {
+        for (final CastAddress ca : castAddresses) {
             config.append(ca.getConfigString());
             config.append('\n');
         }
@@ -958,7 +961,7 @@ final class HbConfig extends DialogCluster {
      * Returns the part of the config that turns on dopd. To turn it off, the
      * dopd config is commented out.
      */
-    private StringBuilder hbConfigDopd(final boolean useDopd) {
+    private CharSequence hbConfigDopd(final boolean useDopd) {
         final StringBuilder config = new StringBuilder(120);
         if (!useDopd) {
             config.append("# ");
@@ -978,7 +981,7 @@ final class HbConfig extends DialogCluster {
      * Returns the part of the config that turns on mgmt. To turn it off, the
      * mgmt config is commented out.
      */
-    private StringBuilder hbConfigMgmtd(final boolean useMgmt) {
+    private CharSequence hbConfigMgmtd(final boolean useMgmt) {
         final StringBuilder config = new StringBuilder(120);
         if (!useMgmt) {
             config.append("# ");
@@ -1020,7 +1023,7 @@ final class HbConfig extends DialogCluster {
     protected JComponent getInputPane() {
         optionsW.clear();
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         final Host[] hosts = getCluster().getHostsArray();
         final Value[] types = {MCAST_TYPE,
                                BCAST_TYPE,
@@ -1034,7 +1037,7 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_REGEXP,
                                       TYPE_COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
@@ -1058,15 +1061,15 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_REGEXP,
                                       INTF_COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
         /* ucast links */
         final List<UcastLink> ulList = new ArrayList<UcastLink>();
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             final NetInterface[] netInterfaces = host.getNetInterfaces();
-            for (NetInterface n : netInterfaces) {
+            for (final NetInterface n : netInterfaces) {
                 ulList.add(new UcastLink(host, n));
             }
         }
@@ -1080,7 +1083,7 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_REGEXP,
                                      LINK_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
         ucastLink2W = WidgetFactory.createInstance(
@@ -1090,7 +1093,7 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_REGEXP,
                                      LINK_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
 
@@ -1107,7 +1110,7 @@ final class HbConfig extends DialogCluster {
                                      Widget.NO_REGEXP,
                                      LINK_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
 
@@ -1126,7 +1129,7 @@ final class HbConfig extends DialogCluster {
                                      regexp,
                                      ADDR_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
 
@@ -1244,7 +1247,7 @@ final class HbConfig extends DialogCluster {
         configCheckbox.setBackground(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         Tools.getGUIData().setAccessible(configCheckbox,
-                                         ConfigData.AccessType.ADMIN);
+                                         Application.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -1289,7 +1292,7 @@ final class HbConfig extends DialogCluster {
         pane.add(statusPanel);
         pane.add(configScrollPane);
         configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mcast = new JPanel(new FlowLayout(FlowLayout.LEADING));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
         mcast.add(typeW.getComponent());
@@ -1302,7 +1305,7 @@ final class HbConfig extends DialogCluster {
         mcast.setMaximumSize(mcast.getPreferredSize());
         mcast.setAlignmentX(Component.LEFT_ALIGNMENT);
         for (final String option : OPTIONS) {
-            int size;
+            final int size;
             if (OPTION_SIZES.containsKey(option)) {
                 size = OPTION_SIZES.get(option);
             } else {
@@ -1312,10 +1315,10 @@ final class HbConfig extends DialogCluster {
                                     OPTION_TYPES.get(option),
                                     optionDefaults.get(option),
                                     optionValues.get(option),
-                                    "^" + OPTION_REGEXPS.get(option) + "\\s*$",
+                    '^' + OPTION_REGEXPS.get(option) + "\\s*$",
                                     size,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                    new AccessMode(Application.AccessType.ADMIN,
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
             optionsW.put(option, w);
@@ -1398,14 +1401,14 @@ final class HbConfig extends DialogCluster {
                 }
                 Tools.getGUIData().setAccessible(
                                         makeConfigButton,
-                                        ConfigData.AccessType.ADMIN);
+                                        Application.AccessType.ADMIN);
             }
         };
     }
 
     /** Checks regexp. */
     private boolean checkRegexp(final String regexp,
-                                final String value) {
+                                final CharSequence value) {
         if (regexp != null) {
             final Pattern p = Pattern.compile(regexp);
             final Matcher m = p.matcher(value);

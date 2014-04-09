@@ -49,21 +49,13 @@ final class PcmkTest1 {
         RoboTest.slowFactor = 0.4f;
         RoboTest.aborted = false;
         /* create IPaddr2 with 192.168.100.100 ip */
-        final int ipX = 235;
-        final int ipY = 207;
-        final int gx = 230;
-        final int gy = 305;
-        final int popX = 340;
-        final int popY = 257;
-        final int statefulX = 500;
-        final int statefulY = 207;
         String testName = "test1";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
         try {
             if (pmV != null && Tools.compareVersions(pmV, "1.1.6") < 0) {
                 testName = "test1-1.0";
             }
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
 
@@ -73,6 +65,8 @@ final class PcmkTest1 {
         checkTest(testName, 1.1);
         disableStonith();
         checkTest(testName, 1);
+        final int ipX = 235;
+        final int ipY = 207;
         moveTo(ipX, ipY + 200);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
@@ -176,6 +170,8 @@ final class PcmkTest1 {
         moveScrollBar(false);
 
         /* group with dummy resources */
+        final int gx = 230;
+        final int gy = 305;
         moveTo(gx, gy);
         rightClick(); /* popup */
         moveTo(gx + 46, gy + 11);
@@ -275,7 +271,7 @@ final class PcmkTest1 {
                     checkTest(testName, 3.12); /* 3.12 */
                 }
             }
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
 
@@ -354,6 +350,8 @@ final class PcmkTest1 {
                                   KeyEvent.VK_BACK_SPACE,
                                   KeyEvent.VK_BACK_SPACE});
         checkTest(testName, 4.4); /* 4.4 */
+        final int popX = 340;
+        final int popY = 257;
         removeConstraint(popX, popY);
         checkTest(testName, 5); /* 5 */
         moveTo(gx + 10, gy - 25);
@@ -508,6 +506,8 @@ final class PcmkTest1 {
         addConstraint(1);
         checkTest(testName, 11.8);
         /** Add m/s Stateful resource */
+        final int statefulX = 500;
+        final int statefulY = 207;
         moveTo(statefulX, statefulY);
         rightClick();
         moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));

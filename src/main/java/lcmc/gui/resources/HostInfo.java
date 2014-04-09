@@ -23,19 +23,13 @@
 package lcmc.gui.resources;
 
 import lcmc.EditHostDialog;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.HostLogs;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
 import lcmc.utilities.UpdatableItem;
-import lcmc.data.Subtext;
-import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.PtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.ExecCallback;
@@ -138,7 +132,7 @@ public final class HostInfo extends Info {
     private volatile boolean crmInfo = false;
     /** whether crm show is in progress. */
     private volatile boolean crmShowInProgress = true;
-    /** Prepares a new <code>HostInfo</code> object. */
+    /** Prepares a new {@code HostInfo} object. */
     public HostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);
         this.host = host;
@@ -152,7 +146,7 @@ public final class HostInfo extends Info {
 
     /** Returns a host icon for the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         final Cluster cl = host.getCluster();
         if (cl != null) {
             return HostBrowser.HOST_IN_CLUSTER_ICON_RIGHT_SMALL;
@@ -168,13 +162,13 @@ public final class HostInfo extends Info {
 
     /** Returns a host icon for the category in the menu. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
     /** Returns tooltip for the host. */
     @Override
-    public String getToolTipForGraph(final boolean testOnly) {
+    public String getToolTipForGraph(final Application.RunMode runMode) {
         return getBrowser().getHostToolTip(host);
     }
 
@@ -186,7 +180,7 @@ public final class HostInfo extends Info {
         }
         final Font f = new Font("Monospaced",
                                 Font.PLAIN,
-                                Tools.getConfigData().scaled(12));
+                                Tools.getApplication().scaled(12));
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(
                                   Tools.getString("HostInfo.crmShellLoading"));
@@ -198,7 +192,7 @@ public final class HostInfo extends Info {
                              Browser.APPLY_ICON);
         registerComponentEnableAccessMode(
                                     crmConfigureCommitButton,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                    new AccessMode(Application.AccessType.ADMIN,
                                                    false));
         final MyButton hostInfoButton =
                 new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
@@ -211,8 +205,8 @@ public final class HostInfo extends Info {
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override
-                public void done(final String ans) {
-                    ta.setText(ans);
+                public void done(final String answer) {
+                    ta.setText(answer);
                     Tools.invokeLater(new Runnable() {
                     @Override
                         public void run() {
@@ -224,9 +218,9 @@ public final class HostInfo extends Info {
                 }
 
                 @Override
-                public void doneError(final String ans, final int exitCode) {
-                    ta.setText(ans);
-                    LOG.sshError(host, "", ans, "", exitCode);
+                public void doneError(final String answer, final int errorCode) {
+                    ta.setText(answer);
+                    LOG.sshError(host, "", answer, "", errorCode);
                     Tools.invokeLater(new Runnable() {
                     @Override
                         public void run() {
@@ -241,7 +235,7 @@ public final class HostInfo extends Info {
             public void actionPerformed(final ActionEvent e) {
                 registerComponentEditAccessMode(
                                 ta,
-                                new AccessMode(ConfigData.AccessType.GOD,
+                                new AccessMode(Application.AccessType.GOD,
                                                false));
                 crmInfo = true;
                 hostInfoButton.setEnabled(false);
@@ -264,7 +258,7 @@ public final class HostInfo extends Info {
             public void actionPerformed(final ActionEvent e) {
                 registerComponentEditAccessMode(
                                     ta,
-                                    new AccessMode(ConfigData.AccessType.ADMIN,
+                                    new AccessMode(Application.AccessType.ADMIN,
                                                    false));
                 updateAdvancedPanels();
                 crmShowInProgress = true;
@@ -288,17 +282,17 @@ public final class HostInfo extends Info {
             }
 
             @Override
-            public void changedUpdate(final DocumentEvent documentEvent) {
+            public void changedUpdate(final DocumentEvent e) {
                 update();
             }
 
             @Override
-            public void insertUpdate(final DocumentEvent documentEvent) {
+            public void insertUpdate(final DocumentEvent e) {
                 update();
             }
 
             @Override
-            public void removeUpdate(final DocumentEvent documentEvent) {
+            public void removeUpdate(final DocumentEvent e) {
                 update();
             }
         });
@@ -350,7 +344,7 @@ public final class HostInfo extends Info {
                     final ClusterStatus clStatus =
                             getBrowser().getClusterBrowser().getClusterStatus();
                     clStatus.setPtestData(null);
-                    CRM.crmConfigureCommit(host, ta.getText(), true);
+                    CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.TEST);
                     final PtestData ptestData =
                                            new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
@@ -374,7 +368,7 @@ public final class HostInfo extends Info {
                             try {
                                 CRM.crmConfigureCommit(host,
                                                        ta.getText(),
-                                                       false);
+                                                       Application.RunMode.LIVE);
                             } finally {
                                 getBrowser().getClusterBrowser()
                                                     .clStatusUnlock();
@@ -388,7 +382,7 @@ public final class HostInfo extends Info {
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
@@ -398,7 +392,7 @@ public final class HostInfo extends Info {
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         final JPanel p = new JPanel(new SpringLayout());
         p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
@@ -452,20 +446,14 @@ public final class HostInfo extends Info {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
         /* host wizard */
         final MyMenuItem hostWizardItem =
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
                            "",
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -476,7 +464,7 @@ public final class HostInfo extends Info {
         items.add(hostWizardItem);
         Tools.getGUIData().registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */
-        final HostInfo thisClass = this;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("HostBrowser.CRM.StandByOn"),
                            HOST_STANDBY_ICON,
@@ -485,13 +473,13 @@ public final class HostInfo extends Info {
                            Tools.getString("HostBrowser.CRM.StandByOff"),
                            HOST_STANDBY_OFF_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public boolean predicate() {
-                    return !isStandby(testOnly);
+                    return !isStandby(runMode);
                 }
 
                 @Override
@@ -506,23 +494,23 @@ public final class HostInfo extends Info {
                 public void action() {
                     final Host dcHost =
                                   getBrowser().getClusterBrowser().getDCHost();
-                    if (isStandby(testOnly)) {
-                        CRM.standByOff(dcHost, host, testOnly);
+                    if (isStandby(runMode)) {
+                        CRM.standByOff(dcHost, host, runMode);
                     } else {
-                        CRM.standByOn(dcHost, host, testOnly);
+                        CRM.standByOn(dcHost, host, runMode);
                     }
                 }
             };
         final ClusterBrowser cb = getBrowser().getClusterBrowser();
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
+            final ButtonCallback standbyItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
-                    if (isStandby(false)) {
-                        CRM.standByOff(dcHost, host, true);
+                    if (isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOff(dcHost, host, Application.RunMode.TEST);
                     } else {
-                        CRM.standByOn(dcHost, host, true);
+                        CRM.standByOn(dcHost, host, Application.RunMode.TEST);
                     }
                 }
             };
@@ -535,14 +523,9 @@ public final class HostInfo extends Info {
             new MyMenuItem(Tools.getString("HostInfo.CRM.AllMigrateFrom"),
                            HOST_STANDBY_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean predicate() {
-                    return true;
-                }
 
                 @Override
                 public String enablePredicate() {
@@ -564,20 +547,20 @@ public final class HostInfo extends Info {
                             && si.getGroupInfo() == null
                             && si.getCloneInfo() == null) {
                             final List<String> runningOnNodes =
-                                                   si.getRunningOnNodes(false);
+                                  si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
                                                         getHost().getName())) {
                                 final Host dcHost = getHost();
                                 si.migrateFromResource(dcHost,
                                                        getHost().getName(),
-                                                       false);
+                                                       Application.RunMode.LIVE);
                             }
                         }
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback allMigrateFromItemCallback =
+        final ButtonCallback allMigrateFromItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -585,13 +568,13 @@ public final class HostInfo extends Info {
                             : cb.getExistingServiceList(null)) {
                         if (!si.isConstraintPH() && si.getGroupInfo() == null) {
                             final List<String> runningOnNodes =
-                                                   si.getRunningOnNodes(false);
+                                                   si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
                                                         host.getName())) {
                                 si.migrateFromResource(dcHost,
                                                        host.getName(),
-                                                       true);
+                                                       Application.RunMode.TEST);
                             }
                         }
                     }
@@ -609,8 +592,8 @@ public final class HostInfo extends Info {
                            HOST_STOP_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, true),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, true),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -641,36 +624,36 @@ public final class HostInfo extends Info {
                          Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
                          Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
                          Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
-                        final Host host = getHost();
-                        host.setCommLayerStopping(true);
-                        if (!host.isPcmkStartedByCorosync()
-                            && host.isPcmkInit()
-                            && host.isPcmkRunning()) {
+                        final Host thisHost = getHost();
+                        thisHost.setCommLayerStopping(true);
+                        if (!thisHost.isPcmkStartedByCorosync()
+                            && thisHost.isPcmkInit()
+                            && thisHost.isPcmkRunning()) {
                             if (getHost().isCsRunning()
                                 && !getHost().isAisRunning()) {
-                                Corosync.stopCorosyncWithPcmk(host);
+                                Corosync.stopCorosyncWithPcmk(thisHost);
                             } else {
-                                Openais.stopOpenaisWithPcmk(host);
+                                Openais.stopOpenaisWithPcmk(thisHost);
                             }
                         } else {
                             if (getHost().isCsRunning()
                                 && !getHost().isAisRunning()) {
-                                Corosync.stopCorosync(host);
+                                Corosync.stopCorosync(thisHost);
                             } else {
-                                Openais.stopOpenais(host);
+                                Openais.stopOpenais(thisHost);
                             }
                         }
-                        updateClusterView(host);
+                        updateClusterView(thisHost);
                     }
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
+            final ButtonCallback stopCorosyncItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
-                    if (!isStandby(false)) {
-                        CRM.standByOn(dcHost, host, true);
+                    if (!isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, host, Application.RunMode.TEST);
                     }
                 }
             };
@@ -684,8 +667,8 @@ public final class HostInfo extends Info {
                            HOST_STOP_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, true),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, true),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -716,12 +699,12 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
+            final ButtonCallback stopHeartbeatItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
-                    if (!isStandby(false)) {
-                        CRM.standByOn(dcHost, host, true);
+                    if (!isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, host, Application.RunMode.TEST);
                     }
                 }
             };
@@ -735,8 +718,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -775,10 +758,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
+            final ButtonCallback startCorosyncItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -792,8 +775,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -827,10 +810,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
+            final ButtonCallback startOpenaisItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -844,8 +827,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -877,10 +860,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
+            final ButtonCallback startHeartbeatItemCallback =
                                                cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -895,8 +878,8 @@ public final class HostInfo extends Info {
                            HOST_START_COMM_LAYER_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -926,10 +909,10 @@ public final class HostInfo extends Info {
                 }
             };
         if (cb != null) {
-            final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
+            final ButtonCallback startPcmkItemCallback =
                                                cb.new ClMenuItemCallback(host) {
                 @Override
-                public void action(final Host host) {
+                public void action(final Host dcHost) {
                     //TODO
                 }
             };
@@ -938,18 +921,13 @@ public final class HostInfo extends Info {
         }
         items.add(startPcmkItem);
         /* change host color */
-        final MyMenuItem changeHostColorItem =
+        final UpdatableItem changeHostColorItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                            null,
                            "",
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -966,12 +944,12 @@ public final class HostInfo extends Info {
         items.add(changeHostColorItem);
 
         /* view logs */
-        final MyMenuItem viewLogsItem =
+        final UpdatableItem viewLogsItem =
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            "",
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -984,16 +962,16 @@ public final class HostInfo extends Info {
 
                 @Override
                 public void action() {
-                    HostLogs l = new HostLogs(host);
+                    final HostLogs l = new HostLogs(host);
                     l.showDialog();
                 }
             };
         items.add(viewLogsItem);
         /* advacend options */
-        final MyMenu hostAdvancedSubmenu = new MyMenu(
+        final UpdatableItem hostAdvancedSubmenu = new MyMenu(
                         Tools.getString("HostBrowser.AdvancedSubmenu"),
-                        new AccessMode(ConfigData.AccessType.OP, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1013,12 +991,12 @@ public final class HostInfo extends Info {
         items.add(hostAdvancedSubmenu);
 
         /* remove host from gui */
-        final MyMenuItem removeHostItem =
+        final UpdatableItem removeHostItem =
             new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                            HostBrowser.HOST_REMOVE_ICON,
                            Tools.getString("HostBrowser.RemoveHost"),
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1037,7 +1015,7 @@ public final class HostInfo extends Info {
                         Tools.getGUIData().unregisterAllHostsUpdate(
                                                       b.getClusterViewPanel());
                     }
-                    Tools.getConfigData().removeHostFromHosts(getHost());
+                    Tools.getApplication().removeHostFromHosts(getHost());
                     Tools.getGUIData().allHostsUpdate();
                 }
             };
@@ -1064,7 +1042,7 @@ public final class HostInfo extends Info {
     /**
      * Returns subtexts that appears in the host vertex in the cluster graph.
      */
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isClStatus()) {
@@ -1079,7 +1057,7 @@ public final class HostInfo extends Info {
     }
 
     /** Returns text that appears above the icon in the graph. */
-    public String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final Application.RunMode runMode) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
         }
@@ -1087,12 +1065,9 @@ public final class HostInfo extends Info {
     }
 
     /** Returns whether this host is in stand by. */
-    public boolean isStandby(final boolean testOnly) {
+    public boolean isStandby(final Application.RunMode runMode) {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
-        if (b == null) {
-            return false;
-        }
-        return b.isStandby(host, testOnly);
+        return b != null && b.isStandby(host, runMode);
     }
 
     /** Returns cluster status. */
@@ -1105,7 +1080,7 @@ public final class HostInfo extends Info {
     }
 
     /** Returns text that appears in the corner of the graph. */
-    public Subtext getRightCornerTextForGraph(final boolean testOnly) {
+    public Subtext getRightCornerTextForGraph(final Application.RunMode runMode) {
         if (getHost().isCommLayerStopping()) {
             return STOPPING_SUBTEXT;
         } else if (getHost().isCommLayerStarting()) {
@@ -1117,7 +1092,7 @@ public final class HostInfo extends Info {
         if (cs != null && cs.isFencedNode(host.getName())) {
             return FENCED_SUBTEXT;
         } else if (getHost().isClStatus()) {
-            if (isStandby(testOnly)) {
+            if (isStandby(runMode)) {
                 return STANDBY_SUBTEXT;
             } else {
                 return ONLINE_SUBTEXT;

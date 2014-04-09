@@ -22,15 +22,14 @@
 
 package lcmc.gui;
 
-import java.util.Set;
 import java.util.TreeSet;
 import lcmc.utilities.Tools;
 import lcmc.data.Host;
 import lcmc.data.Cluster;
-import lcmc.gui.resources.Info;
 import lcmc.gui.resources.AllHostsInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
@@ -44,19 +43,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
-    /** Panel that holds this browser. */
-    private EmptyViewPanel emptyViewPanel = null;
     /** All hosts info object of the host of this browser. */
     private final AllHostsInfo allHostsInfo = new AllHostsInfo(this);
 
-    /** Prepares a new <code>CusterBrowser</code> object. */
+    /** Prepares a new {@code CusterBrowser} object. */
     EmptyBrowser() {
         super();
         /* Load the default file */
-        final String saveFile = Tools.getConfigData().getSaveFile();
+        final String saveFile = Tools.getApplication().getSaveFile();
         String xml = Tools.loadFile(saveFile, false);
         if (xml == null) {
-            final String saveFileOld = Tools.getConfigData().getSaveFileOld();
+            final String saveFileOld = Tools.getApplication().getSaveFileOld();
             xml = Tools.loadFile(saveFileOld, false);
         }
         if (xml != null) {
@@ -77,21 +74,6 @@ public final class EmptyBrowser extends Browser {
         allHostsInfo.setDisconnected(cluster);
     }
 
-    /** Sets the empty view panel. */
-    void setEmptyViewPanel(final EmptyViewPanel emptyViewPanel) {
-        this.emptyViewPanel = emptyViewPanel;
-    }
-
-    /** Returns empty view panel. */
-    EmptyViewPanel getEmptyViewPanel() {
-        return emptyViewPanel;
-    }
-
-    /** Sets the info panel component in the cluster view panel. */
-    void setRightComponentInView(final Info i) {
-        emptyViewPanel.setRightComponentInView(this, i);
-    }
-
     /** Initializes hosts tree for the empty view. */
     void initHosts() {
         /* all hosts */
@@ -103,17 +85,16 @@ public final class EmptyBrowser extends Browser {
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
         /* all hosts */
-        final Set<Host> allHosts =
-              new TreeSet<Host>(Tools.getConfigData().getHosts().getHostSet());
+        final Iterable<Host> allHosts =
+              new TreeSet<Host>(Tools.getApplication().getHosts().getHostSet());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                DefaultMutableTreeNode resource;
                 allHostsNode.removeAllChildren();
-                for (Host host : allHosts) {
+                for (final Host host : allHosts) {
                     final HostBrowser hostBrowser = host.getBrowser();
-                    resource = new DefaultMutableTreeNode(
-                                                    hostBrowser.getHostInfo());
+                    final MutableTreeNode resource = new DefaultMutableTreeNode(
+                            hostBrowser.getHostInfo());
                     //setNode(resource);
                     allHostsNode.add(resource);
                 }

@@ -26,11 +26,11 @@
  */
 package lcmc;
 
+import lcmc.data.Application;
 import lcmc.gui.MainPanel;
 import lcmc.gui.MainMenu;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.ProgressIndicatorPanel;
-import lcmc.data.ConfigData;
 import lcmc.data.HostOptions;
 import lcmc.utilities.Tools;
 import lcmc.robotest.RoboTest;
@@ -177,16 +177,16 @@ public final class LCMC extends JPanel {
     }
     /** Create the GUI and show it. */
     protected static void createAndShowGUI(final Container mainFrame) {
-        final java.util.List<Object> buttonGradient = Arrays.asList(
+        final List<Object> buttonGradient = Arrays.asList(
           new Object[]{
-               new Float(.5f),
-               new Float(1f),
+               0.5f,
+               1.0f,
                new ColorUIResource(0xFFFFFF),
                new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                new ColorUIResource(ClusterBrowser.BUTTON_PANEL_BACKGROUND)});
-        final java.util.List<Object> checkboxGradient = Arrays.asList(
-          new Object[]{new Float(.3f),
-                       new Float(0f),
+        final List<Object> checkboxGradient = Arrays.asList(
+          new Object[]{0.3f,
+                       0.0f,
                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                        new ColorUIResource(0xFFFFFF)});
@@ -288,9 +288,9 @@ public final class LCMC extends JPanel {
         });
         t.start();
         Tools.getGUIData().getMainFrame().setVisible(false);
-        final String saveFile = Tools.getConfigData().getSaveFile();
+        final String saveFile = Tools.getApplication().getSaveFile();
         Tools.save(saveFile, false);
-        Tools.getConfigData().disconnectAllHosts();
+        Tools.getApplication().disconnectAllHosts();
     }
 
     /** Inits the application. */
@@ -344,17 +344,16 @@ public final class LCMC extends JPanel {
             new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(final Thread t,
-                                              final Throwable ex) {
-                    System.out.println(ex.toString());
-                    System.out.println(Tools.getStackTrace(ex));
+                                              final Throwable e) {
+                    System.out.println(e);
+                    System.out.println(Tools.getStackTrace(e));
                     if (!uncaughtException
                         && Tools.getGUIData().getMainFrame() != null) {
                         uncaughtException = true;
-                        LOG.appError("", ex.toString(), ex);
+                        LOG.appError("", e.toString(), e);
                     }
                 }
             });
-        float fps = ConfigData.DEFAULT_ANIM_FPS;
         final Options options = new Options();
 
         options.addOption("h", HELP_OP, false, "print this help");
@@ -533,44 +532,44 @@ public final class LCMC extends JPanel {
                 }
             }
             final boolean advanced = cmd.hasOption(ADVANCED_OP);
-            Tools.getConfigData().setAdvancedMode(advanced);
-            Tools.getConfigData().setTightvnc(tightvnc);
-            Tools.getConfigData().setUltravnc(ultravnc);
-            Tools.getConfigData().setRealvnc(realvnc);
+            Tools.getApplication().setAdvancedMode(advanced);
+            Tools.getApplication().setTightvnc(tightvnc);
+            Tools.getApplication().setUltravnc(ultravnc);
+            Tools.getApplication().setRealvnc(realvnc);
 
-            Tools.getConfigData().setUpgradeCheckEnabled(
+            Tools.getApplication().setUpgradeCheckEnabled(
                                           !cmd.hasOption(NO_UPGRADE_CHECK_OP));
-            Tools.getConfigData().setBigDRBDConf(
+            Tools.getApplication().setBigDRBDConf(
                                                 cmd.hasOption(BIGDRBDCONF_OP));
-            Tools.getConfigData().setStagingDrbd(
+            Tools.getApplication().setStagingDrbd(
                                                cmd.hasOption(STAGING_DRBD_OP));
-            Tools.getConfigData().setStagingPacemaker(
+            Tools.getApplication().setStagingPacemaker(
                                           cmd.hasOption(STAGING_PACEMAKER_OP));
-            Tools.getConfigData().setNoLRM(cmd.hasOption(NOLRM_OP));
-            Tools.getConfigData().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
-            Tools.getConfigData().setOneHostCluster(
+            Tools.getApplication().setNoLRM(cmd.hasOption(NOLRM_OP));
+            Tools.getApplication().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
+            Tools.getApplication().setOneHostCluster(
                                            cmd.hasOption(ONE_HOST_CLUSTER_OP));
-            Tools.getConfigData().setNoPassphrase(
+            Tools.getApplication().setNoPassphrase(
                                            cmd.hasOption(NO_PASSPHRASE_OP));
             if (cmd.hasOption(EMBED_OP)) {
-                Tools.getConfigData().setEmbed(true);
+                Tools.getApplication().setEmbed(true);
             }
             if (cmd.hasOption(NO_EMBED_OP)) {
-                Tools.getConfigData().setEmbed(false);
+                Tools.getApplication().setEmbed(false);
             }
             if (cmd.hasOption(CMD_LOG_OP)) {
-                Tools.getConfigData().setCmdLog(true);
+                Tools.getApplication().setCmdLog(true);
             }
             if (cmd.hasOption(CHECK_SWING_OP)) {
-                Tools.getConfigData().setCheckSwing(true);
+                Tools.getApplication().setCheckSwing(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {
                 final int scale = Integer.parseInt(scaleOp);
-                Tools.getConfigData().setScale(scale);
+                Tools.getApplication().setScale(scale);
                 Tools.resizeFonts(scale);
-            } catch (java.lang.NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 LOG.appWarning("initApp: cannot parse scale: " + scaleOp);
             }
 
@@ -581,9 +580,9 @@ public final class LCMC extends JPanel {
             final String knownHostsPath = cmd.getOptionValue(
                                                     KNOWN_HOSTS_OP,
                                                     pwd + "/.ssh/known_hosts");
-            Tools.getConfigData().setIdDSAPath(idDsaPath);
-            Tools.getConfigData().setIdRSAPath(idRsaPath);
-            Tools.getConfigData().setKnownHostPath(knownHostsPath);
+            Tools.getApplication().setIdDSAPath(idDsaPath);
+            Tools.getApplication().setIdRSAPath(idRsaPath);
+            Tools.getApplication().setKnownHostPath(knownHostsPath);
 
 
             final String opMode = cmd.getOptionValue(OP_MODE_OP);
@@ -600,21 +599,22 @@ public final class LCMC extends JPanel {
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
-                Tools.getConfigData().setAccessType(ConfigData.AccessType.RO);
-                Tools.getConfigData().setMaxAccessType(
-                                                    ConfigData.AccessType.RO);
+                Tools.getApplication().setAccessType(Application.AccessType.RO);
+                Tools.getApplication().setMaxAccessType(
+                                                    Application.AccessType.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
-                Tools.getConfigData().setAccessType(ConfigData.AccessType.OP);
-                Tools.getConfigData().setMaxAccessType(
-                                                    ConfigData.AccessType.OP);
+                Tools.getApplication().setAccessType(Application.AccessType.OP);
+                Tools.getApplication().setMaxAccessType(
+                                                    Application.AccessType.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
-                Tools.getConfigData().setAccessType(
-                                          ConfigData.AccessType.ADMIN);
-                Tools.getConfigData().setMaxAccessType(
-                                          ConfigData.AccessType.ADMIN);
+                Tools.getApplication().setAccessType(
+                                          Application.AccessType.ADMIN);
+                Tools.getApplication().setMaxAccessType(
+                                          Application.AccessType.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
+            float fps = Application.DEFAULT_ANIM_FPS;
             if (cmd.hasOption(SLOW_OP)) {
                 fps /= 2;
             }
@@ -627,19 +627,19 @@ public final class LCMC extends JPanel {
                                         cmd.getOptionValue(VNC_PORT_OFFSET_OP);
             if (vncPortOffsetString != null
                 && Tools.isNumber(vncPortOffsetString)) {
-                Tools.getConfigData().setVncPortOffset(
+                Tools.getApplication().setVncPortOffset(
                                         Integer.parseInt(vncPortOffsetString));
             }
-            Tools.getConfigData().setAnimFPS(fps);
+            Tools.getApplication().setAnimFPS(fps);
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
                 parseClusterOptions(cmd);
             }
-        } catch (ParseException exp) {
+        } catch (final ParseException exp) {
             System.out.println("ERROR: " + exp.getMessage());
             System.exit(1);
         }
         LOG.debug1("initApp: max mem: "
-                   + Runtime.getRuntime().maxMemory() / 1024 / 1024 + "m");
+                   + Runtime.getRuntime().maxMemory() / 1024 / 1024 + 'm');
         return autoArgs;
     }
 
@@ -672,13 +672,13 @@ public final class LCMC extends JPanel {
                 }
                 hostsOptions = new ArrayList<HostOptions>();
                 for (final String hostNameEntered : hostNames) {
-                    String hostName;
+                    final String hostName;
                     String port = null;
                     if (hostNameEntered.indexOf(':') > 0) {
                         final String[] he = hostNameEntered.split(":");
                         hostName = he[0];
                         port = he[1];
-                        if ("".equals(port) || !Tools.isNumber(port)) {
+                        if (port != null && port.isEmpty() || !Tools.isNumber(port)) {
                             throw new ParseException(
                                     "could not parse " + HOST_OP + " option");
                         }
@@ -728,37 +728,37 @@ public final class LCMC extends JPanel {
                 }
             } else if (PCMKTEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
-                    Tools.getConfigData().setAutoTest(
+                if (index != null && !index.isEmpty()) {
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
                 }
             } else if (DRBDTEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
-                    Tools.getConfigData().setAutoTest(
+                if (index != null && !index.isEmpty()) {
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
                 }
             } else if (VMTEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
-                    Tools.getConfigData().setAutoTest(
+                if (index != null && !index.isEmpty()) {
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
                 }
             } else if (GUITEST_OP.equals(op)) {
                 final String index = option.getValue();
-                if (index != null && index.length() > 0) {
-                    Tools.getConfigData().setAutoTest(
+                if (index != null && !index.isEmpty()) {
+                    Tools.getApplication().setAutoTest(
                        new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
                 }
             }
         }
-        for (final String cn : clusters.keySet()) {
-            for (final HostOptions hostOptions : clusters.get(cn)) {
+        for (final Map.Entry<String, List<HostOptions>> clusterEntry : clusters.entrySet()) {
+            for (final HostOptions hostOptions : clusterEntry.getValue()) {
                 if (hostsOptions.size() < 1
-                    || (hostsOptions.size() == 1
-                        && !Tools.getConfigData().isOneHostCluster())) {
+                    || hostsOptions.size() == 1
+                        && !Tools.getApplication().isOneHostCluster()) {
                     throw new ParseException("not enough hosts for cluster: "
-                                             + cn);
+                                             + clusterEntry.getKey());
                 }
             }
         }
@@ -773,7 +773,7 @@ public final class LCMC extends JPanel {
     public static void main(final String[] args) {
         Tools.init();
         final JFrame mainFrame = new JFrame(
-               Tools.getString("DrbdMC.Title") + " " + Tools.getRelease());
+               Tools.getString("DrbdMC.Title") + ' ' + Tools.getRelease());
         final List<Image> il = new ArrayList<Image>();
         for (final String iconS : new String[]{"LCMC.AppIcon32",
                                                "LCMC.AppIcon48",
@@ -791,7 +791,7 @@ public final class LCMC extends JPanel {
             @Override
             public void run() {
                 createMainFrame(mainFrame);
-                createAndShowGUI((Container) mainFrame);
+                createAndShowGUI(mainFrame);
             }
         });
         //final Thread t = new Thread(new Runnable() {

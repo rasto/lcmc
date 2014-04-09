@@ -22,28 +22,31 @@ package lcmc.gui.widget;
 
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.PatternDocument;
 import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
 
+import javax.swing.ComboBoxEditor;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Document;
 import javax.swing.text.AbstractDocument;
 import javax.swing.event.DocumentListener;
-import javax.swing.ComboBoxEditor;
 
 import java.awt.Color;
 import java.awt.event.ItemListener;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -56,12 +59,13 @@ import java.util.HashSet;
  */
 //TODO: public final class ComboBox<E> extends Widget {
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
+    private static final Logger LOG = LoggerFactory.getLogger(ComboBox.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Scrollbar max rows. */
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
 
-    /** Prepares a new <code>ComboBox</code> object. */
+    /** Prepares a new {@code ComboBox} object. */
     public ComboBox(final Value selectedValue,
                     final Value[] items,
                     final String regexp,
@@ -108,7 +112,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         editor.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(final FocusEvent e) {
-                Value v = getValue();
+                final Value v = getValue();
                 if (v == null || v.isNothingSelected()) {
                     editor.setText("");
                 }
@@ -123,7 +127,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     /** Returns true if combo box has changed. */
-    private boolean comboBoxChanged(final Value[] items) {
+    private boolean hasComboBoxChanged(final Value[] items) {
         final MComboBox<Value> cb = getInternalComponent();
         if (items.length != cb.getItemCount()) {
             return true;
@@ -141,21 +145,28 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Override
     public void reloadComboBox(final Value selectedValue,
                                final Value[] items) {
+        final String stackTrace = Tools.getStackTrace();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MComboBox<Value> cb = getInternalComponent();
-                final Value selectedItem = (Value) cb.getSelectedItem();
+                final Object selectedObject = cb.getSelectedItem();
+                if (selectedObject != null
+                    && !(selectedObject instanceof Value)) {
+                    LOG.appError("reloadComboBox: selected item not a value: " + selectedObject
+                        + ", stacktrance: " + stackTrace);
+                }
+                final Value selectedItem = (Value) selectedObject;
                 boolean selectedChanged = false;
                 if (selectedValue == null
-                    && (selectedItem != null
-                         && !selectedItem.isNothingSelected())) {
+                    && selectedItem != null
+                         && !selectedItem.isNothingSelected()) {
                     selectedChanged = true;
                 } else if (selectedValue != null
                            && !selectedValue.equals(selectedItem)) {
                     selectedChanged = true;
                 }
-                final boolean itemsChanged = comboBoxChanged(items);
+                final boolean itemsChanged = hasComboBoxChanged(items);
                 if (!selectedChanged && !itemsChanged) {
                     return;
                 }
@@ -163,13 +174,13 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                 cb.setPreferredSize(null);
                 /* removing dupicates */
 
-                final List<Value> comboList = new ArrayList<Value>();
+                final Collection<Value> comboList = new ArrayList<Value>();
                 final Value selectedValueInfo = addItems(comboList,
                                                           selectedValue,
                                                           items);
 
                 if (itemsChanged) {
-                    final HashSet<Value> itemCache = new HashSet<Value>();
+                    final Collection<Value> itemCache = new HashSet<Value>();
                     cb.setSelectedIndex(-1);
                     cb.removeAllItems();
                     for (final Value item : comboList) {
@@ -187,7 +198,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     /** Add items to the combo box. */
-    protected static Value addItems(final List<Value> comboList,
+    protected static Value addItems(final Collection<Value> comboList,
                                      final Value selectedValue,
                                      final Value[] items) {
         Value selectedValueInfo = null;
@@ -214,16 +225,16 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                Value v = getValue();
+                final Value v = getValue();
                 if (isAlwaysEditable()) {
-                    ((MComboBox) comp).setEditable(true);
+                    ((JComboBox) comp).setEditable(true);
                     final JTextComponent editor = getTextComponent();
                     if (v == null || v.isNothingSelected()) {
                         editor.selectAll();
                     }
                 } else {
                     if (v != null && !v.isNothingSelected()) {
-                        ((MComboBox) comp).setEditable(editable);
+                        ((JComboBox) comp).setEditable(editable);
                     }
                 }
             }
@@ -247,7 +258,6 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     @Override
     protected Value getValueInternal() {
         final MComboBox<Value> cb = getInternalComponent();
-        Value value;
         if (cb.isEditable()) {
             final JTextComponent editor =
                         (JTextComponent) cb.getEditor().getEditorComponent();
@@ -266,9 +276,8 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                 }
             }
             return new StringValue(text);
-        } else {
-            value = (Value) cb.getSelectedItem();
         }
+        final Value value = (Value) cb.getSelectedItem();
         if (value == null || value.isNothingSelected()) {
             return null;
         }
@@ -361,7 +370,6 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Set background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        final JComponent comp = getInternalComponent();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
@@ -393,7 +401,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Returns the text component of the combo box. */
     public JTextComponent getTextComponent() {
         final JComponent comp = getInternalComponent();
-        final ComboBoxEditor editor = ((MComboBox) comp).getEditor();
+        final ComboBoxEditor editor = ((JComboBox) comp).getEditor();
         return (JTextComponent) editor.getEditorComponent();
     }
 

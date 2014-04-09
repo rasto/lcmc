@@ -28,7 +28,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.resources.Resource;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 
 import java.util.Collection;
@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.swing.JPanel;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -48,7 +49,7 @@ public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG =
                               LoggerFactory.getLogger(RscDefaultsInfo.class);
     /**
-     * Prepares a new <code>RscDefaultsInfo</code> object and creates
+     * Prepares a new {@code RscDefaultsInfo} object and creates
      * new rsc defaults object.
      */
     public RscDefaultsInfo(final String name,
@@ -75,9 +76,8 @@ public final class RscDefaultsInfo extends EditableInfo {
         }
         /* Attributes */
         final String[] params = getParametersFromXML();
-        final ClusterStatus cs = getBrowser().getClusterStatus();
         if (params != null) {
-            for (String param : params) {
+            for (final String param : params) {
                 Value value = new StringValue(resourceNode.get(param));
                 final Value defaultValue = getParamDefault(param);
                 if (value.isNothingSelected()) {
@@ -141,7 +141,7 @@ public final class RscDefaultsInfo extends EditableInfo {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         Value value = super.getParamSaved(param);
         if (value == null) {
-            value = new StringValue(clStatus.getRscDefaultsParameter(param, false));
+            value = new StringValue(clStatus.getRscDefaultsParameter(param, Application.RunMode.LIVE));
             if (value.isNothingSelected()) {
                 value = getParamPreferred(param);
                 if (value == null) {
@@ -205,7 +205,7 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         return getBrowser().getCRMXML().getRscDefaultsAccessType(param);
     }
 
@@ -226,11 +226,6 @@ public final class RscDefaultsInfo extends EditableInfo {
     protected boolean isRequired(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.isRscDefaultsRequired(param);
-    }
-
-    /** Returns true if the specified parameter is meta attribute. */
-    protected boolean isMetaAttr(final String param) {
-        return true;
     }
 
     /** Returns true if the specified parameter is integer. */
@@ -276,41 +271,19 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Check the fields. */
     @Override
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
+    Check checkResourceFields(final String param, final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /** Check the fields. */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo) {
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromServicesInfo) {
         if (fromServicesInfo) {
-            return super.checkResourceFieldsChanged(param, params);
+            return super.checkResourceFields(param, params);
         } else {
             final ServicesInfo ssi = getBrowser().getServicesInfo();
-            return ssi.checkResourceFieldsChanged(param,
-                                                  ssi.getParametersFromXML());
-        }
-    }
-
-    /** Check the fields. */
-    @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
-    }
-
-    /** Check the fields. */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo) {
-        if (fromServicesInfo) {
-            return super.checkResourceFieldsCorrect(param, params);
-        } else {
-            final ServicesInfo ssi = getBrowser().getServicesInfo();
-            return ssi.checkResourceFieldsCorrect(param,
-                                                  ssi.getParametersFromXML());
+            return ssi.checkResourceFields(param, ssi.getParametersFromXML());
         }
     }
 }

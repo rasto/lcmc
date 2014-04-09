@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for all ubuntus.
  */
-public final class DistResource_ubuntu extends java.util.ListResourceBundle {
+public final class DistResource_ubuntu extends ListResourceBundle {
 
     /** Get contents. */
     @Override

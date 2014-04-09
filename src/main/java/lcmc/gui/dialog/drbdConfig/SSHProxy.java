@@ -21,11 +21,10 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import javax.swing.JComponent;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
@@ -35,8 +34,6 @@ import javax.swing.JComponent;
  *
  */
 public final class SSHProxy extends SSH {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -44,7 +41,7 @@ public final class SSHProxy extends SSH {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>SSHProxy</code> object. */
+    /** Prepares a new {@code SSHProxy} object. */
     public SSHProxy(final WizardDialog previousDialog,
                     final Host host,
                     final DrbdVolumeInfo drbdVolumeInfo,
@@ -84,28 +81,10 @@ public final class SSHProxy extends SSH {
         }
     }
 
-    /**
-     * Returns the title of the dialog, defined as
-     * Dialog.Host.SSH.Title in TextResources.
-     */
-    @Override
-    protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.Host.SSH.Title");
-    }
-
-    /**
-     * Returns the description of the dialog, defined as
-     * Dialog.Host.SSH.Description in TextResources.
-     */
-    @Override
-    protected String getDescription() {
-        return Tools.getString("Dialog.Host.SSH.Description");
-    }
-
     /** Buttons that are enabled/disabled during checks. */
     @Override
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(finishButton())};
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{buttonClass(finishButton())};
     }
 
     /**

@@ -22,17 +22,11 @@
 package lcmc.gui.resources;
 
 import lcmc.Exceptions;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.Cluster;
-import lcmc.data.DrbdXML;
-import lcmc.data.DrbdProxy;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-import lcmc.data.Value;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 
@@ -45,7 +39,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     /** Name of the drbd after parameter. Before 8.4 */
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
-    /** Prepares a new <code>DrbdGuiInfo</code> object. */
+    /** Prepares a new {@code DrbdGuiInfo} object. */
     DrbdGuiInfo(final String name, final Browser browser) {
         super(name, browser);
     }
@@ -142,7 +136,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected final ConfigData.AccessType getAccessType(final String param) {
+    protected final Application.AccessType getAccessType(final String param) {
         return getBrowser().getDrbdXML().getAccessType(param);
     }
 
@@ -196,10 +190,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
     @Override
     protected final boolean isCheckBox(final String param) {
         final String type = getBrowser().getDrbdXML().getParamType(param);
-        if (type == null) {
-            return false;
-        }
-        return ClusterBrowser.DRBD_RES_BOOL_TYPE_NAME.equals(type);
+        return type != null && ClusterBrowser.DRBD_RES_BOOL_TYPE_NAME.equals(type);
     }
 
     /** Returns the type of the parameter (like boolean). */
@@ -215,9 +206,9 @@ abstract class DrbdGuiInfo extends EditableInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
-        Widget paramWi;
         final Value[] possibleChoices = getParamPossibleChoices(param);
         getResource().setPossibleChoices(param, possibleChoices);
+        final Widget paramWi;
         if (hasUnitPrefix(param)) {
             Value selectedValue = getParamSaved(param);
             if (selectedValue == null) {
@@ -226,7 +217,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                     selectedValue = getParamDefault(param);
                 }
             }
-            Unit[] units = getUnits(param);
+            final Unit[] units = getUnits(param);
             paramWi = WidgetFactory.createInstance(
                                  Widget.Type.TEXTFIELDWITHUNIT,
                                  selectedValue,
@@ -276,7 +267,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
             if (params.length != 0) {
                 final StringBuilder sectionConfig = new StringBuilder("");
                 boolean inPlugin = false;
-                for (String param : params) {
+                for (final String param : params) {
                     final Value value = getComboBoxValue(param);
                     if (value == null || value.isNothingSelected()) {
                         continue;
@@ -356,7 +347,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                 }
 
                 if (sectionConfig.length() > 0) {
-                    config.append("\t").append(section).append(" {\n");
+                    config.append('\t').append(section).append(" {\n");
                     config.append(sectionConfig);
                     config.append("\t}\n\n");
                 }
@@ -367,9 +358,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
 
     @Override
     protected final Unit[] getUnits(final String param) {
-        String unitLong = getUnitLong(param);
-        final Widget.Type type = null;
-        Unit[] units;
+        final String unitLong = getUnitLong(param);
         final String unitPart = DrbdXML.getUnitPart(unitLong);
         if ("".equals(unitPart)) {
             return DrbdXML.getUnits(unitPart);

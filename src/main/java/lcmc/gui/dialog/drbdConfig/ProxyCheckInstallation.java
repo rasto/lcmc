@@ -45,8 +45,6 @@ import java.awt.event.ActionEvent;
  *
  */
 final class ProxyCheckInstallation extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
@@ -85,7 +83,7 @@ final class ProxyCheckInstallation extends DialogHost {
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
-    /** Prepares a new <code>ProxyCheckInstallation</code> object. */
+    /** Prepares a new {@code ProxyCheckInstallation} object. */
     ProxyCheckInstallation(final WizardDialog previousDialog,
                            final Host host,
                            final DrbdVolumeInfo drbdVolumeInfo,
@@ -142,13 +140,12 @@ final class ProxyCheckInstallation extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkProxy(ans);
+                             public void done(final String answer) {
+                                 checkProxy(answer);
                              }
                              @Override
-                             public void doneError(
-                                                         final String ans,
-                                                         final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  checkProxy(""); // not installed
                              }
                          },
@@ -161,7 +158,7 @@ final class ProxyCheckInstallation extends DialogHost {
      * Checks whether proxy is installed.
      */
     void checkProxy(final String ans) {
-        if ("".equals(ans) || "\n".equals(ans)) {
+        if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -262,7 +259,7 @@ final class ProxyCheckInstallation extends DialogHost {
         /* get proxy installation methods */
         proxyInstMethodWi = getInstallationMethods(
                              PROXY_PREFIX,
-                             Tools.getConfigData().isStagingPacemaker(),
+                             Tools.getApplication().isStagingPacemaker(),
                              null, /* last installed method */
                              PROXY_AUTO_OPTION,
                              proxyButton);

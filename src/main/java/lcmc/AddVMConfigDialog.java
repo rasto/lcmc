@@ -22,6 +22,7 @@
 
 package lcmc;
 
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 
 import lcmc.gui.dialog.vm.VMConfig;
@@ -48,7 +49,7 @@ public final class AddVMConfigDialog {
     /** VMS virtual domain info object. */
     private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
 
-    /** Prepares new <code>AddVMConfigDialog</code> object. */
+    /** Prepares new {@code AddVMConfigDialog} object. */
     public AddVMConfigDialog(final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
@@ -65,7 +66,7 @@ public final class AddVMConfigDialog {
                 dialog.cancelDialog();
                 canceled = true;
                 vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
-                vmsVirtualDomainInfo.removeMyself(false);
+                vmsVirtualDomainInfo.removeMyself(Application.RunMode.LIVE);
                 vmsVirtualDomainInfo.setDialogStarted(false);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: "

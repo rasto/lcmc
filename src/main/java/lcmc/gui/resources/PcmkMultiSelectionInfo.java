@@ -20,13 +20,9 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-import lcmc.data.ClusterStatus;
-import lcmc.data.PtestData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.UpdatableItem;
@@ -35,7 +31,7 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.Corosync;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Heartbeat;
-import javax.swing.ImageIcon;
+
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -49,11 +45,12 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Color;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
-import lcmc.data.Value;
+
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -69,33 +66,25 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
     /** All selected objects. */
     private final List<Info> selectedInfos;
 
-    /** Prepares a new <code>PcmkMultiSelectionInfo</code> object. */
+    /** Prepares a new {@code PcmkMultiSelectionInfo} object. */
     public PcmkMultiSelectionInfo(final List<Info> selectedInfos,
                                   final Browser browser) {
         super("selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
-    /** @see EditableInfo#getMenuIcon() */
-    @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
-    }
-
-    /** @see EditableInfo#getInfoType() */
     @Override
     protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
-    /** @see EditableInfo#getInfo() */
     @Override
     public String getInfo() {
         final StringBuilder s = new StringBuilder(80);
         s.append(Tools.getString("PcmkMultiSelectionInfo.Selection"));
         for (final Info si : selectedInfos) {
             if (si != null) {
-                s.append(si.toString());
+                s.append(si);
             }
             s.append("<br />");
         }
@@ -105,22 +94,21 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
     /** Create menu items for selected hosts. */
     private void createSelectedHostsPopup(
                                         final List<HostInfo> selectedHostInfos,
-                                        final List<UpdatableItem> items) {
+                                        final Collection<UpdatableItem> items) {
         /* cluster manager standby on */
-        final int size = selectedHostInfos.size();
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("PcmkMultiSelectionInfo.StandByOn"),
                            HostInfo.HOST_STANDBY_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (!hi.isStandby(CRM.LIVE)) {
+                        if (!hi.isStandby(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -135,7 +123,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     final Host dcHost = getBrowser().getDCHost();
                     if (!dcHost.isClStatus()) {
                         return HostInfo.NO_PCMK_STATUS_STRING + " ("
-                               + dcHost.getName() + ")";
+                               + dcHost.getName() + ')';
                     }
                     return null;
                 }
@@ -144,22 +132,22 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     final Host dcHost = getBrowser().getDCHost();
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (!hi.isStandby(CRM.LIVE)) {
+                        if (!hi.isStandby(Application.RunMode.LIVE)) {
                             CRM.standByOn(dcHost,
                                           hi.getHost(),
-                                          CRM.LIVE);
+                                          Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback standbyItemCallback =
+        final ButtonCallback standbyItemCallback =
                                    getBrowser().new ClMenuItemCallback(
                                                     getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (!hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOn(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (!hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -173,14 +161,14 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                            HostInfo.HOST_STANDBY_OFF_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (hi.isStandby(CRM.LIVE)) {
+                        if (hi.isStandby(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -195,7 +183,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     final Host dcHost = getBrowser().getDCHost();
                     if (!dcHost.isClStatus()) {
                         return HostInfo.NO_PCMK_STATUS_STRING + " ("
-                               + dcHost.getName() + ")";
+                               + dcHost.getName() + ')';
                     }
                     return null;
                 }
@@ -204,22 +192,22 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     final Host dcHost = getBrowser().getDCHost();
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (hi.isStandby(CRM.LIVE)) {
+                        if (hi.isStandby(Application.RunMode.LIVE)) {
                             CRM.standByOff(dcHost,
                                            hi.getHost(),
-                                           CRM.LIVE);
+                                           Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback onlineItemCallback =
+        final ButtonCallback onlineItemCallback =
                                    getBrowser().new ClMenuItemCallback(
                                                     getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOff(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOff(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -237,8 +225,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                          HostInfo.HOST_STOP_COMM_LAYER_ICON,
                          ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                         new AccessMode(ConfigData.AccessType.ADMIN, true),
-                         new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, true),
+                         new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -298,14 +286,14 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback stopCorosyncItemCallback =
+        final ButtonCallback stopCorosyncItemCallback =
                     getBrowser().new ClMenuItemCallback(
                                                     getBrowser().getDCHost()) {
             @Override
-            public void action(final Host dchost) {
+            public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (!hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOn(dchost, hi.getHost(), CRM.TESTONLY);
+                    if (!hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -319,8 +307,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         HostInfo.HOST_STOP_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(ConfigData.AccessType.ADMIN, true),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, true),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
              private static final long serialVersionUID = 1L;
 
              @Override
@@ -354,13 +342,13 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                  }
              }
          };
-        final ClusterBrowser.ClMenuItemCallback stopHeartbeatItemCallback =
+        final ButtonCallback stopHeartbeatItemCallback =
                 getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
-                    if (!hi.isStandby(CRM.LIVE)) {
-                        CRM.standByOn(dcHost, hi.getHost(), CRM.TESTONLY);
+                    if (!hi.isStandby(Application.RunMode.LIVE)) {
+                        CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.TEST);
                     }
                 }
             }
@@ -375,8 +363,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -426,7 +414,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback startCorosyncItemCallback =
+        final ButtonCallback startCorosyncItemCallback =
                 getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
@@ -442,8 +430,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                          HostInfo.HOST_START_COMM_LAYER_ICON,
                          ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                         new AccessMode(ConfigData.AccessType.ADMIN, false),
-                         new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, false),
+                         new AccessMode(Application.AccessType.ADMIN, false)) {
               private static final long serialVersionUID = 1L;
 
               @Override
@@ -485,10 +473,10 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                   }
               }
           };
-        final ClusterBrowser.ClMenuItemCallback startOpenaisItemCallback =
+        final ButtonCallback startOpenaisItemCallback =
                 getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 //TODO
             }
         };
@@ -502,8 +490,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                       HostInfo.HOST_START_COMM_LAYER_ICON,
                       ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                      new AccessMode(ConfigData.AccessType.ADMIN, false),
-                      new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                      new AccessMode(Application.AccessType.ADMIN, false),
+                      new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -535,10 +523,10 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback startHeartbeatItemCallback =
+        final ButtonCallback startHeartbeatItemCallback =
                 getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 //TODO
             }
         };
@@ -553,8 +541,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                        HostInfo.HOST_START_COMM_LAYER_ICON,
                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                       new AccessMode(ConfigData.AccessType.ADMIN, false),
-                       new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                       new AccessMode(Application.AccessType.ADMIN, false),
+                       new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -573,11 +561,6 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 }
 
                 @Override
-                public String enablePredicate() {
-                    return null;
-                }
-
-                @Override
                 public void action() {
                     for (final HostInfo hi : selectedHostInfos) {
                         Corosync.startPacemaker(hi.getHost());
@@ -588,10 +571,10 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback startPcmkItemCallback =
+        final ButtonCallback startPcmkItemCallback =
                 getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 //TODO
             }
         };
@@ -599,19 +582,14 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                              startPcmkItemCallback);
         items.add(startPcmkItem);
         /* change host color */
-        final MyMenuItem changeHostColorItem =
+        final UpdatableItem changeHostColorItem =
             new MyMenuItem(
                     Tools.getString("PcmkMultiSelectionInfo.ChangeHostColor"),
                     null,
                     "",
-                    new AccessMode(ConfigData.AccessType.RO, false),
-                    new AccessMode(ConfigData.AccessType.RO, false)) {
+                    new AccessMode(Application.AccessType.RO, false),
+                    new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -633,22 +611,17 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
 
     /** Create menu items for selected services. */
     private void createSelectedServicesPopup(
-                                 final List<ServiceInfo> selectedServiceInfos,
-                                 final List<UpdatableItem> items) {
+                                 final Iterable<ServiceInfo> selectedServiceInfos,
+                                 final Collection<UpdatableItem> items) {
         /* start resources */
-        final MyMenuItem startMenuItem =
+        final ComponentWithTest startMenuItem =
             new MyMenuItem(Tools.getString(
                               "PcmkMultiSelectionInfo.StartSelectedResources"),
                            ServiceInfo.START_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return true;
-                }
 
                 @Override
                 public String enablePredicate() {
@@ -662,7 +635,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!si.isStarted(CRM.LIVE)) {
+                        if (!si.isStarted(Application.RunMode.LIVE)) {
                             allStarted = false;
                         }
                         final String avail =
@@ -687,11 +660,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.startResource(dcHost, CRM.LIVE);
+                        si.startResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback startItemCallback =
+        final ButtonCallback startItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
@@ -701,26 +674,21 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.startResource(dcHost, CRM.TESTONLY);
+                    si.startResource(dcHost, Application.RunMode.TEST);
                 }
             }
         };
         addMouseOverListener(startMenuItem, startItemCallback);
         items.add((UpdatableItem) startMenuItem);
         /* stop resources */
-        final MyMenuItem stopMenuItem =
+        final ComponentWithTest stopMenuItem =
             new MyMenuItem(Tools.getString(
                                 "PcmkMultiSelectionInfo.StopSelectedResources"),
                            ServiceInfo.STOP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return true;
-                }
 
                 @Override
                 public String enablePredicate() {
@@ -734,7 +702,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!si.isStopped(CRM.LIVE)) {
+                        if (!si.isStopped(Application.RunMode.LIVE)) {
                             allStopped = false;
                         }
                         final String avail =
@@ -759,11 +727,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.stopResource(dcHost, CRM.LIVE);
+                        si.stopResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback stopItemCallback =
+        final ButtonCallback stopItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
@@ -773,7 +741,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.stopResource(dcHost, CRM.TESTONLY);
+                    si.stopResource(dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -781,7 +749,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         items.add((UpdatableItem) stopMenuItem);
 
         /* clean up resource */
-        final MyMenuItem cleanupMenuItem =
+        final UpdatableItem cleanupMenuItem =
             new MyMenuItem(
                Tools.getString("PcmkMultiSelectionInfo.CleanUpFailedResource"),
                ServiceInfo.SERVICE_RUNNING_ICON,
@@ -790,15 +758,15 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                Tools.getString("PcmkMultiSelectionInfo.CleanUpResource"),
                ServiceInfo.SERVICE_RUNNING_ICON,
                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-               new AccessMode(ConfigData.AccessType.OP, false),
-               new AccessMode(ConfigData.AccessType.OP, false)) {
+               new AccessMode(Application.AccessType.OP, false),
+               new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public boolean predicate() {
                     for (final ServiceInfo si : selectedServiceInfos) {
                         if (si.getService().isAvailable()
-                            && si.isOneFailed(CRM.LIVE)) {
+                            && si.isOneFailed(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -817,7 +785,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (si.isOneFailedCount(CRM.LIVE)) {
+                        if (si.isOneFailedCount(Application.RunMode.LIVE)) {
                             failCount = true;
                         }
                     }
@@ -849,22 +817,22 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.cleanupResource(dcHost, CRM.LIVE);
+                        si.cleanupResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
         /* cleanup ignores CIB_file */
-        items.add((UpdatableItem) cleanupMenuItem);
+        items.add(cleanupMenuItem);
 
 
         /* manage resource */
-        final MyMenuItem manageMenuItem =
+        final ComponentWithTest manageMenuItem =
             new MyMenuItem(
                   Tools.getString("PcmkMultiSelectionInfo.ManageResource"),
                   ServiceInfo.MANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -875,7 +843,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!si.isManaged(CRM.LIVE)) {
+                        if (!si.isManaged(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -911,11 +879,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.setManaged(true, dcHost, CRM.LIVE);
+                        si.setManaged(true, dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback manageItemCallback =
+        final ButtonCallback manageItemCallback =
                                      getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
@@ -925,21 +893,21 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.setManaged(true, dcHost, CRM.TESTONLY);
+                    si.setManaged(true, dcHost, Application.RunMode.TEST);
                 }
             }
         };
         addMouseOverListener(manageMenuItem, manageItemCallback);
         items.add((UpdatableItem) manageMenuItem);
         /* unmanage resource */
-        final MyMenuItem unmanageMenuItem =
+        final ComponentWithTest unmanageMenuItem =
             new MyMenuItem(
                   Tools.getString("PcmkMultiSelectionInfo.UnmanageResource"),
                   ServiceInfo.UNMANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -950,7 +918,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (si.isManaged(CRM.LIVE)) {
+                        if (si.isManaged(Application.RunMode.LIVE)) {
                             return true;
                         }
                     }
@@ -986,11 +954,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.setManaged(false, dcHost, CRM.LIVE);
+                        si.setManaged(false, dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback unmanageItemCallback =
+        final ButtonCallback unmanageItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
@@ -1000,7 +968,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.setManaged(false, dcHost, CRM.TESTONLY);
+                    si.setManaged(false, dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -1012,17 +980,17 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             final MyMenuItem migrateFromMenuItem =
                new MyMenuItem(Tools.getString(
                                   "PcmkMultiSelectionInfo.MigrateFromResource")
-                                  + " " + hostName,
+                                  + ' ' + hostName,
                               ServiceInfo.MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                               Tools.getString(
                                   "PcmkMultiSelectionInfo.MigrateFromResource")
-                                  + " " + hostName + " (offline)",
+                                  + ' ' + hostName + " (offline)",
                               ServiceInfo.MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -1049,7 +1017,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                 return "not available on this host";
                             }
                             final List<String> runningOnNodes =
-                                                si.getRunningOnNodes(CRM.LIVE);
+                                                si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes == null
                                 || runningOnNodes.size() < 1) {
                                 return "must run";
@@ -1081,11 +1049,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                                 || si.getService().isOrphaned()) {
                                 continue;
                             }
-                            si.migrateFromResource(dcHost, hostName, CRM.LIVE);
+                            si.migrateFromResource(dcHost, hostName, Application.RunMode.LIVE);
                         }
                     }
                 };
-            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+            final ButtonCallback migrateItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
@@ -1095,7 +1063,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.migrateFromResource(dcHost, hostName, CRM.TESTONLY);
+                        si.migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
                     }
                 }
             };
@@ -1104,13 +1072,13 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         }
 
         /* unmigrate resource */
-        final MyMenuItem unmigrateMenuItem =
+        final ComponentWithTest unmigrateMenuItem =
             new MyMenuItem(
                     Tools.getString("PcmkMultiSelectionInfo.UnmigrateResource"),
                     ServiceInfo.UNMIGRATE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1129,8 +1097,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         }
                         if (!getBrowser().clStatusFailed()
                              && si.getService().isAvailable()
-                             && (si.getMigratedTo(CRM.LIVE) != null
-                                 || si.getMigratedFrom(CRM.LIVE) != null)) {
+                             && (si.getMigratedTo(Application.RunMode.LIVE) != null
+                                 || si.getMigratedFrom(Application.RunMode.LIVE) != null)) {
                         } else {
                             return "not available";
                         }
@@ -1148,11 +1116,11 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        si.unmigrateResource(dcHost, CRM.LIVE);
+                        si.unmigrateResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback unmigrateItemCallback =
+        final ButtonCallback unmigrateItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
@@ -1162,19 +1130,19 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         || si.getService().isOrphaned()) {
                         continue;
                     }
-                    si.unmigrateResource(dcHost, CRM.TESTONLY);
+                    si.unmigrateResource(dcHost, Application.RunMode.TEST);
                 }
             }
         };
         addMouseOverListener(unmigrateMenuItem, unmigrateItemCallback);
         items.add((UpdatableItem) unmigrateMenuItem);
         /* remove service */
-        final MyMenuItem removeMenuItem = new MyMenuItem(
+        final ComponentWithTest removeMenuItem = new MyMenuItem(
                     Tools.getString("PcmkMultiSelectionInfo.RemoveService"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -1188,8 +1156,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         continue;
                     } else if (si.getService().isRemoved()) {
                         return ServiceInfo.IS_BEING_REMOVED_STRING;
-                    } else if (si.isRunning(CRM.LIVE)
-                               && !Tools.getConfigData().isAdvancedMode()) {
+                    } else if (si.isRunning(Application.RunMode.LIVE)
+                               && !Tools.getApplication().isAdvancedMode()) {
                         return "cannot remove running resource<br>"
                                + "(advanced mode only)";
                     }
@@ -1198,8 +1166,8 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         continue;
                     }
                     final List<String> gr = cs.getGroupResources(
-                                              gi.getHeartbeatId(CRM.LIVE),
-                                              CRM.LIVE);
+                                              gi.getHeartbeatId(Application.RunMode.LIVE),
+                                              Application.RunMode.LIVE);
 
 
                     if (gr == null || gr.size() <= 1) {
@@ -1226,15 +1194,15 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                         si = cs;
                     }
                     if (si.getService().isOrphaned()) {
-                        si.cleanupResource(dcHost, CRM.LIVE);
+                        si.cleanupResource(dcHost, Application.RunMode.LIVE);
                     } else {
-                        si.removeMyselfNoConfirm(dcHost, CRM.LIVE);
+                        si.removeMyselfNoConfirm(dcHost, Application.RunMode.LIVE);
                     }
                 }
                 getBrowser().getCRMGraph().repaint();
             }
         };
-        final ClusterBrowser.ClMenuItemCallback removeItemCallback =
+        final ButtonCallback removeItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
 
@@ -1253,7 +1221,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    si.removeMyselfNoConfirm(dcHost, CRM.TESTONLY);
+                    si.removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
                 }
             }
         };
@@ -1261,11 +1229,10 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         items.add((UpdatableItem) removeMenuItem);
     }
 
-    /** @see EditableInfo#createPopup() */
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final List<ServiceInfo> selectedServiceInfos =
+        final Collection<ServiceInfo> selectedServiceInfos =
                                                  new ArrayList<ServiceInfo>();
         final List<HostInfo> selectedHostInfos = new ArrayList<HostInfo>();
         for (final Info i : selectedInfos) {
@@ -1284,138 +1251,106 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         return items;
     }
 
-    /** @see EditableInfo#getBrowser() */
     @Override
     protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** @see EditableInfo#getGraphicalView() */
     @Override
     public JPanel getGraphicalView() {
         return getBrowser().getCRMGraph().getGraphPanel();
     }
 
-    /** @see EditableInfo#isEnabledOnlyInAdvancedMode() */
     @Override
     protected boolean isEnabledOnlyInAdvancedMode(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#getAccessType() */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getSection()
-     */
     @Override
     protected String getSection(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#isRequired() */
     @Override
     protected boolean isRequired(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isAdvanced() */
     @Override
     protected boolean isAdvanced(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isEnabled() */
     @Override
     protected String isEnabled(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#isInteger() */
     @Override
     protected boolean isInteger(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isLabel() */
     @Override
     protected boolean isLabel(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isTimeType() */
     @Override
     protected boolean isTimeType(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isCheckBox() */
     @Override
     protected boolean isCheckBox(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#getParamType() */
     @Override
     protected String getParamType(final String param) {
         return null;
     }
 
-
-    /** @see EditableInfo#getParametersFromXML() */
     @Override
     public String[] getParametersFromXML() {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamPossibleChoices()
-     */
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#checkParam() */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         return true;
     }
 
-    /** @see EditableInfo#getParamDefault() */
     @Override
     public Value getParamDefault(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamPreferred()
-     */
     @Override
     protected Value getParamPreferred(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamShortDesc()
-     */
     @Override
     protected String getParamShortDesc(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamLongDesc()
-     */
     @Override
     protected String getParamLongDesc(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#getInfoPanel() */
     @Override
     public JComponent getInfoPanel() {
         Tools.isSwingThread();
@@ -1428,10 +1363,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
             @Override
             public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
-                if (dcHost == null) {
-                    return false;
-                }
-                return !Tools.versionBeforePacemaker(dcHost);
+                return dcHost != null && !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
             public void mouseOut(final ComponentWithTest component) {
@@ -1466,7 +1398,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     cs.setPtestData(null);
-                    apply(dcHost, CRM.TESTONLY);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData =
                                         new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
@@ -1489,7 +1421,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), CRM.LIVE);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -1519,7 +1451,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
@@ -1528,14 +1460,14 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         final AbstractButton serviceMenu = getActionsButton();
-        buttonPanel.add(serviceMenu, BorderLayout.EAST);
+        buttonPanel.add(serviceMenu, BorderLayout.LINE_END);
 
         /* apply button */
         addApplyButton(buttonPanel);
@@ -1552,7 +1484,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
         mainPanel.add(super.getInfoPanel());
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
                                   ClusterBrowser.SERVICE_LABEL_WIDTH
@@ -1568,6 +1500,6 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
      * Apply the changes to the service parameters.
      * not implemented
      */
-    void apply(final Host dcHost, final boolean testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
     }
 }

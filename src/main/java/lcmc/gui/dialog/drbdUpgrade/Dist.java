@@ -35,10 +35,8 @@ import lcmc.gui.dialog.WizardDialog;
  *
  */
 public final class Dist extends DrbdLinbitAvailPackages {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>Dist</code> object. */
+    /** Prepares a new {@code Dist} object. */
     public Dist(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }

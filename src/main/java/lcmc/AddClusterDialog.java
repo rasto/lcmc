@@ -44,8 +44,6 @@ public final class AddClusterDialog {
     /** Logger. */
     private static final Logger LOG =
                               LoggerFactory.getLogger(AddClusterDialog.class);
-    /** All clusters object. */
-    private Clusters clusters;
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
 
@@ -64,9 +62,9 @@ public final class AddClusterDialog {
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 Tools.getGUIData().removeSelectedClusterTab();
-                Tools.getConfigData().getHosts().removeHostsFromCluster(
+                Tools.getApplication().getHosts().removeHostsFromCluster(
                                                                       cluster);
-                Tools.getConfigData().removeClusterFromClusters(cluster);
+                Tools.getApplication().removeClusterFromClusters(cluster);
                 canceled = true;
                 dialog.cancelDialog();
                 Tools.invokeLater(new Runnable() {
@@ -115,6 +113,6 @@ public final class AddClusterDialog {
 
     /** Returns the clusters. */
     Clusters getClusters() {
-        return clusters;
+        return null;
     }
 }

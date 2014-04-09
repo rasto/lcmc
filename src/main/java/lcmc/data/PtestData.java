@@ -39,8 +39,6 @@ import java.util.ArrayList;
  *
  */
 public final class PtestData {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Pattern for LogActions. e.g. "Start res_IPaddr2_1     (hardy-a)" */
     private static final Pattern PTEST_ACTIONS_PATTERN =
           Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)"
@@ -70,21 +68,21 @@ public final class PtestData {
     private final Map<String, Boolean> managedHash =
                                      new LinkedHashMap<String, Boolean>();
 
-    /** Prepares a new <code>PtestData</code> object. */
+    /** Prepares a new {@code PtestData} object. */
     public PtestData(final String raw) {
         if (raw == null) {
-            this.toolTip = null;
-            this.shadowCib = null;
+            toolTip = null;
+            shadowCib = null;
             return;
         }
         final StringBuilder sb = new StringBuilder(300);
-        sb.append("<html><b>");
+        sb.append("<b>");
         sb.append(Tools.getString("PtestData.ToolTip"));
         sb.append("</b><br>");
         final String[] queries = raw.split(CRM.PTEST_END_DELIM);
         if (queries.length != 2) {
-            this.shadowCib = null;
-            this.toolTip = null;
+            shadowCib = null;
+            toolTip = null;
             return;
         }
         boolean isToolTip = false;
@@ -160,13 +158,13 @@ public final class PtestData {
                         masterNodes.remove(state);
                     }
                 } else if ("Move".equals(action)) {
-                    if (state.indexOf(" -> ") >= 0) {
+                    if (state.contains(" -> ")) {
                         final String[] parts = state.split(" -> ");
                         nodes.remove(parts[0]);
                         nodes.add(parts[parts.length - 1]);
                     }
                 } else if ("Promote".equals(action)) {
-                    if (state.indexOf(" -> Master ") >= 0) {
+                    if (state.contains(" -> Master ")) {
                         final String[] parts = state.split(" -> Master ");
                         if (parts.length > 0) {
                             nodes.add(parts[parts.length - 1]);
@@ -177,7 +175,7 @@ public final class PtestData {
                         }
                     }
                 } else if ("Demote".equals(action)) {
-                    if (state.indexOf(" -> Slave ") >= 0) {
+                    if (state.contains(" -> Slave ")) {
                         final String[] parts = state.split(" -> Slave ");
                         if (parts.length > 0 && clone) {
                                 masterNodes.remove(parts[parts.length - 1]);
@@ -255,13 +253,13 @@ public final class PtestData {
             } else {
                 continue;
             }
-            final String[] prefixes = new String[]{"LogActions: ",
-                                                   "ERROR: print_elem: "};
-            if (line.indexOf("_post_notify_") >= 0
-                || line.indexOf("_pre_notify_") >= 0
-                || line.indexOf("_monitor_") >= 0) {
+            if (line.contains("_post_notify_")
+                || line.contains("_pre_notify_")
+                || line.contains("_monitor_")) {
                 continue;
             }
+            final String[] prefixes = {"LogActions: ",
+                    "ERROR: print_elem: "};
             for (final String prefix : prefixes) {
                 final int index = line.indexOf(prefix);
                 if (index >= 0) {
@@ -274,9 +272,8 @@ public final class PtestData {
         if (!isToolTip) {
             sb.append(Tools.getString("PtestData.NoToolTip"));
         }
-        sb.append("</html>");
-        this.toolTip = sb.toString();
-        this.shadowCib = queries[1];
+        toolTip = sb.toString();
+        shadowCib = queries[1];
     }
 
     /** Returns tooltip. */

@@ -21,9 +21,7 @@
  */
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
@@ -36,7 +34,6 @@ import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
 import java.awt.BorderLayout;
-import lcmc.data.StringValue;
 
 /**.
  * An implementation of a dialog where user can enter the name and password
@@ -47,8 +44,6 @@ import lcmc.data.StringValue;
  *
  */
 public class LinbitLogin extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Field with user name. */
     private Widget downloadUserField;
     /** Field with password. */
@@ -58,7 +53,7 @@ public class LinbitLogin extends DialogHost {
     /** Width of the check boxes. */
     private static final int CHECKBOX_WIDTH = 120;
 
-    /** Prepares a new <code>LinbitLogin</code> object. */
+    /** Prepares a new {@code LinbitLogin} object. */
     public LinbitLogin(final WizardDialog previousDialog,
                        final Host host) {
         super(previousDialog, host);
@@ -67,7 +62,7 @@ public class LinbitLogin extends DialogHost {
     /** Finishes the dialog and sets the information. */
     @Override
     protected final void finishDialog() {
-        Tools.getConfigData().setDownloadLogin(
+        Tools.getApplication().setDownloadLogin(
                                 downloadUserField.getStringValue().trim(),
                                 downloadPasswordField.getStringValue().trim(),
                                 saveCheckBox.isSelected());
@@ -88,9 +83,8 @@ public class LinbitLogin extends DialogHost {
             @Override
             public void run() {
                 boolean v =
-                    (downloadUserField.getStringValue().trim().length() > 0);
-                v = v && (downloadPasswordField.getStringValue().trim().length()
-                         > 0);
+                    (!downloadUserField.getStringValue().trim().isEmpty());
+                v = v && (!downloadPasswordField.getStringValue().trim().isEmpty());
                 buttonClass(nextButton()).setEnabled(v);
             }
         });
@@ -103,9 +97,8 @@ public class LinbitLogin extends DialogHost {
             @Override
             public void run() {
                 boolean v =
-                    (downloadUserField.getStringValue().trim().length() > 0);
-                v = v && (downloadPasswordField.getStringValue().trim().length()
-                         > 0);
+                    (!downloadUserField.getStringValue().trim().isEmpty());
+                v = v && (!downloadPasswordField.getStringValue().trim().isEmpty());
                 buttonClass(nextButton()).setEnabled(v);
             }
         });
@@ -147,7 +140,7 @@ public class LinbitLogin extends DialogHost {
                 downloadUserField.requestFocus();
             }
         });
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -170,12 +163,12 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(userLabel);
         downloadUserField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
-                                       new StringValue(Tools.getConfigData().getDownloadUser()),
+                                       new StringValue(Tools.getApplication().getDownloadUser()),
                                        Widget.NO_ITEMS,
                                        "^[,\\w.-]+$",
                                        CHECKBOX_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
@@ -190,12 +183,12 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(passwordLabel);
         downloadPasswordField = WidgetFactory.createInstance(
                                   Widget.Type.PASSWDFIELD,
-                                  new StringValue(Tools.getConfigData().getDownloadPassword()),
+                                  new StringValue(Tools.getApplication().getDownloadPassword()),
                                   Widget.NO_ITEMS,
                                   Widget.NO_REGEXP,
                                   CHECKBOX_WIDTH,
                                   Widget.NO_ABBRV,
-                                  new AccessMode(ConfigData.AccessType.RO,
+                                  new AccessMode(Application.AccessType.RO,
                                                  !AccessMode.ADVANCED),
                                   Widget.NO_BUTTON);
 
@@ -211,7 +204,7 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(saveLabel);
         saveCheckBox = new JCheckBox(
                             Tools.getString("Dialog.Host.LinbitLogin.Save"),
-                            Tools.getConfigData().getLoginSave());
+                            Tools.getApplication().getLoginSave());
         saveLabel.setLabelFor(saveCheckBox);
         saveCheckBox.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -221,7 +214,7 @@ public class LinbitLogin extends DialogHost {
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
 
-        p.add(inputPane, BorderLayout.SOUTH);
+        p.add(inputPane, BorderLayout.PAGE_END);
         return p;
     }
 }

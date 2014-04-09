@@ -26,22 +26,24 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.GraphicsData;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import org.w3c.dom.Node;
@@ -93,11 +95,11 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     private static final Map<String, Value> PREFERRED_VALUES =
                                                  new HashMap<String, Value>();
     /** Whether the parameter is editable only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.KEYMAP}));
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{GraphicsData.TYPE}));
 
     /** Possible values. */
@@ -162,7 +164,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns service icon in the menu. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return VMSVirtualDomainInfo.VNC_ICON_SMALL;
     }
 
@@ -358,8 +360,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -398,10 +400,10 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                 tablePanel.setVisible(true);
             }
         });
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Returns data for the table. */
@@ -446,8 +448,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */
@@ -459,23 +461,23 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
-                    for (final String p : listenWi.keySet()) {
-                        listenWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : passwdWi.keySet()) {
-                        passwdWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : passwdWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : keymapWi.keySet()) {
-                        keymapWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : keymapWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : portWi.keySet()) {
-                        portWi.get(p).setVisible(vnc);
+                    for (final Map.Entry<String, Widget> entry : portWi.entrySet()) {
+                        entry.getValue().setVisible(vnc);
                     }
-                    for (final String p : displayWi.keySet()) {
-                        displayWi.get(p).setVisible(sdl);
+                    for (final Map.Entry<String, Widget> entry : displayWi.entrySet()) {
+                        entry.getValue().setVisible(sdl);
                     }
-                    for (final String p : xauthWi.keySet()) {
-                        xauthWi.get(p).setVisible(sdl);
+                    for (final Map.Entry<String, Widget> entry : xauthWi.entrySet()) {
+                        entry.getValue().setVisible(sdl);
                     }
                 }
             });
@@ -523,7 +525,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                                getParamSavedForConfig(GraphicsData.DISPLAY)));
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.GRAPHICS_TABLE);
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        checkResourceFields(null, getParametersFromXML());
     }
 
     /** Returns string representation. */
@@ -541,8 +543,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
 
     /** Removes this graphics device without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();

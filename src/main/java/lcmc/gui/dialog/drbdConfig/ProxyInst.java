@@ -34,6 +34,7 @@ import lcmc.utilities.SSH;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
+import lcmc.data.Application;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
@@ -43,8 +44,6 @@ import javax.swing.JComponent;
  *
  */
 final class ProxyInst extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Drbd volume info. */
@@ -52,7 +51,7 @@ final class ProxyInst extends DialogHost {
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
-    /** Prepares a new <code>ProxyInst</code> object. */
+    /** Prepares a new {@code ProxyInst} object. */
     ProxyInst(final WizardDialog previousDialog,
               final Host host,
               final DrbdVolumeInfo drbdVolumeInfo,
@@ -72,12 +71,12 @@ final class ProxyInst extends DialogHost {
                                         getHost(),
                                         drbdVolumeInfo,
                                         origDialog);
-        DRBD.startProxy(getHost(), DRBD.LIVE);
+        DRBD.startProxy(getHost(), Application.RunMode.LIVE);
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.ProxyInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -116,16 +115,17 @@ final class ProxyInst extends DialogHost {
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans, installMethod);
+                             public void done(final String answer) {
+                                checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(Tools.getString(
                                          "Dialog.Host.ProxyInst.InstError"),
-                                                    ans,
-                                                    exitCode);
+                                         answer,
+                                         errorCode
+                                 );
                              }
                          },
                          new ConvertCmdCallback() {

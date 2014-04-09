@@ -46,13 +46,13 @@ final class PcmkTestF {
     static void start(final Cluster cluster, final int count) {
         slowFactor = 0.2f;
         aborted = false;
-        final int gx = 235;
-        final int gy = 207;
         disableStonith();
         final String testName = "testF";
         final String distro = cluster.getHostsArray()[0].getDist();
         checkTest(testName, 1);
         /* group with dummy resources */
+        final int gx = 235;
+        final int gy = 207;
         moveTo(gx, gy);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));

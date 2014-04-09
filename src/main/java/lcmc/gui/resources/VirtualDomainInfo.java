@@ -21,24 +21,19 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
-import lcmc.data.Host;
-import lcmc.data.VMSXML;
-import lcmc.data.ResourceAgent;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
@@ -53,12 +48,12 @@ final class VirtualDomainInfo extends ServiceInfo {
     private static final String CONFIG_PARAM = "config";
     private static final String HYPERVISOR_PARAM = "hypervisor";
     /** Hypervisor choices. */
-    private static final Value[] HYPERVISORS = new Value[]{new StringValue("qemu:///system"),
-                                                           new StringValue("xen:///"),
-                                                           new StringValue("lxc:///"),
-                                                           new StringValue("vbox:///"),
-                                                           new StringValue("openvz:///system"),
-                                                           new StringValue("uml:///system")};
+    private static final Value[] HYPERVISORS = {new StringValue("qemu:///system"),
+                                                new StringValue("xen:///"),
+                                                new StringValue("lxc:///"),
+                                                new StringValue("vbox:///"),
+                                                new StringValue("openvz:///system"),
+                                                new StringValue("uml:///system")};
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
 
     /** Creates the VirtualDomainInfo object. */
@@ -80,12 +75,10 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Returns the first on which this vm is running. */
     private Host getRunningOnHost() {
-        final List<String> nodes = getRunningOnNodes(false);
+        final List<String> nodes = getRunningOnNodes(Application.RunMode.LIVE);
         if (nodes != null
             && !nodes.isEmpty()) {
-            final Host host = getBrowser().getCluster().getHostByName(
-                                                                nodes.get(0));
-            return host;
+            return getBrowser().getCluster().getHostByName(nodes.get(0));
         }
         return null;
     }
@@ -98,8 +91,8 @@ final class VirtualDomainInfo extends ServiceInfo {
     /** Removes the service without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
-        super.removeMyselfNoConfirm(dcHost, testOnly);
+                                         final Application.RunMode runMode) {
+        super.removeMyselfNoConfirm(dcHost, runMode);
     }
 
     /** Sets service parameters with values from resourceNode hash. */
@@ -130,16 +123,15 @@ final class VirtualDomainInfo extends ServiceInfo {
     }
 
     /** Adds vnc viewer menu items. */
-    void addVncViewersToTheMenu(final List<UpdatableItem> items) {
-        final boolean testOnly = false;
-        if (Tools.getConfigData().isTightvnc()) {
+    void addVncViewersToTheMenu(final Collection<UpdatableItem> items) {
+        if (Tools.getApplication().isTightvnc()) {
             /* tight vnc test menu */
-            final MyMenuItem tightvncViewerMenu = new MyMenuItem(
+            final UpdatableItem tightvncViewerMenu = new MyMenuItem(
                             "start TIGHT VNC viewer",
                             null,
                             null,
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -175,14 +167,14 @@ final class VirtualDomainInfo extends ServiceInfo {
             items.add(tightvncViewerMenu);
         }
 
-        if (Tools.getConfigData().isUltravnc()) {
+        if (Tools.getApplication().isUltravnc()) {
             /* ultra vnc test menu */
-            final MyMenuItem ultravncViewerMenu = new MyMenuItem(
+            final UpdatableItem ultravncViewerMenu = new MyMenuItem(
                             "start ULTRA VNC viewer",
                             null,
                             null,
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -218,14 +210,14 @@ final class VirtualDomainInfo extends ServiceInfo {
             items.add(ultravncViewerMenu);
         }
 
-        if (Tools.getConfigData().isRealvnc()) {
+        if (Tools.getApplication().isRealvnc()) {
             /* real vnc test menu */
-            final MyMenuItem realvncViewerMenu = new MyMenuItem(
+            final UpdatableItem realvncViewerMenu = new MyMenuItem(
                             "start REAL VNC test",
                             null,
                             null,
-                            new AccessMode(ConfigData.AccessType.RO, false),
-                            new AccessMode(ConfigData.AccessType.RO, false)) {
+                            new AccessMode(Application.AccessType.RO, false),
+                            new AccessMode(Application.AccessType.RO, false)) {
 
                 private static final long serialVersionUID = 1L;
 
@@ -313,7 +305,7 @@ final class VirtualDomainInfo extends ServiceInfo {
         if (string == null) {
             s.insert(0, "new ");
         } else {
-            if (!"".equals(string)) {
+            if (string != null && !string.isEmpty()) {
                 s.append(" (");
                 s.append(string);
                 s.append(')');
@@ -324,16 +316,13 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Applies the changes to the service parameters. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
-        super.apply(dcHost, testOnly);
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        super.apply(dcHost, runMode);
     }
 
     /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
-        if (PARAM_ALLOW_MIGRATE.equals(param)) {
-            return false;
-        }
-        return super.isAdvanced(param);
+        return !PARAM_ALLOW_MIGRATE.equals(param) && super.isAdvanced(param);
     }
 }

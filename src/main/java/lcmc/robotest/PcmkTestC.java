@@ -42,10 +42,10 @@ final class PcmkTestC {
 
     static void start(final int count) {
         slowFactor = 0.5f;
-        final int statefulX = 500;
-        final int statefulY = 207;
         disableStonith();
         final String testName = "testC";
+        final int statefulX = 500;
+        final int statefulY = 207;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
                 info(testName + " I: " + i);

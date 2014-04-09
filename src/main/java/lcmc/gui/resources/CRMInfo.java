@@ -26,6 +26,7 @@ import lcmc.gui.Browser;
 import lcmc.utilities.Tools;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import lcmc.data.Application;
 
 /**
  * This class holds data that describe the crm as whole.
@@ -35,21 +36,15 @@ public final class CRMInfo extends HbCategoryInfo {
     private static final ImageIcon CRM_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
-    /** Prepares a new <code>ServicesInfo</code> object. */
+    /** Prepares a new {@code ServicesInfo} object. */
     public CRMInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
     /** Returns icon for the heartbeat menu item. */
     @Override
-    public ImageIcon getCategoryIcon(final boolean testOnly) {
+    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return CRM_ICON;
-    }
-
-    /** Returns type of the info text. text/plain or text/html. */
-    @Override
-    protected String getInfoType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns editable info panel for global crm config. */

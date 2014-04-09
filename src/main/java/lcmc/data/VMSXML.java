@@ -33,17 +33,14 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import org.apache.commons.collections15.map.MultiKeyMap;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPath;
@@ -77,7 +74,7 @@ public final class VMSXML extends XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(VMSXML.class);
     /** List of domain names. */
-    private final List<String> domainNames = new ArrayList<String>();
+    private final Collection<String> domainNames = new ArrayList<String>();
     /** Map from configs to names. */
     private final Map<Value, String> configsMap =
                                             new HashMap<Value, String>();
@@ -136,9 +133,9 @@ public final class VMSXML extends XML {
     private final Map<Value, NetworkData> networkMap =
                                     new LinkedHashMap<Value, NetworkData>();
     /** Directories where are source files. */
-    private final Set<String> sourceFileDirs = new TreeSet<String>();
+    private final Collection<String> sourceFileDirs = new TreeSet<String>();
     /** All used mac addresses. */
-    private final Set<String> macAddresses = new HashSet<String>();
+    private final Collection<String> macAddresses = new HashSet<String>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -422,7 +419,7 @@ public final class VMSXML extends XML {
     /** Old config. */
     private String oldConfig = null;
 
-    /** Prepares a new <code>VMSXML</code> object. */
+    /** Prepares a new {@code VMSXML} object. */
     public VMSXML(final Host host) {
         super();
         this.host = host;
@@ -430,15 +427,15 @@ public final class VMSXML extends XML {
 
     /** Returns xml node of the specified domain. */
     public Node getDomainNode(final String domainName) {
-        final Document document;
         mXMLDocumentReadLock.lock();
+        final Document document;
         try {
             document = xmlDocument;
         } finally {
             mXMLDocumentReadLock.unlock();
         }
         final XPath xpath = XPathFactory.newInstance().newXPath();
-        Node domainNode;
+        final Node domainNode;
         try {
             final String path = "//vms/vm[@name='"
                                 + domainName
@@ -456,7 +453,7 @@ public final class VMSXML extends XML {
                 LOG.appWarning("getDomainNode: could not find xml for " + domainName);
                 return null;
             }
-        } catch (final javax.xml.xpath.XPathExpressionException e) {
+        } catch (final XPathExpressionException e) {
             LOG.appError("getDomainNode: could not evaluate: ", e);
             return null;
         }
@@ -467,15 +464,15 @@ public final class VMSXML extends XML {
     private void saveDomainXML(final String configName,
                                final Node node,
                                final String defineCommand) {
-        String xml;
+        final String xml;
         try {
             final Transformer transformer =
                             TransformerFactory.newInstance().newTransformer();
             final StreamResult res = new StreamResult(new StringWriter());
-            final DOMSource src = new DOMSource(node);
+            final Source src = new DOMSource(node);
             transformer.transform(src, res);
             xml = res.getWriter().toString();
-        } catch (final javax.xml.transform.TransformerException e) {
+        } catch (final TransformerException e) {
             LOG.appError("saveDomainXML: " + e.getMessageAndLocation(), e);
             return;
         }
@@ -492,8 +489,8 @@ public final class VMSXML extends XML {
 
     /** Return devices node. */
     private Node getDevicesNode(final XPath xpath, final Node domainNode) {
-        final String devicesPath = "devices";
         try {
+            final String devicesPath = "devices";
             final NodeList devicesNodes = (NodeList) xpath.evaluate(
                                                        devicesPath,
                                                        domainNode,
@@ -503,7 +500,7 @@ public final class VMSXML extends XML {
                 return null;
             }
             return devicesNodes.item(0);
-        } catch (final javax.xml.xpath.XPathExpressionException e) {
+        } catch (final XPathExpressionException e) {
             LOG.appError("getDevicesNode: could not evaluate: ", e);
             return null;
         }
@@ -521,13 +518,13 @@ public final class VMSXML extends XML {
         }
         final String model = parametersMap.get(VM_PARAM_CPUMATCH_MODEL);
         if (!"".equals(model)) {
-            final Node modelNode = (Element) cpuMatchNode.appendChild(
+            final Node modelNode = cpuMatchNode.appendChild(
                                               doc.createElement("model"));
             modelNode.appendChild(doc.createTextNode(model));
         }
         final String vendor = parametersMap.get(VM_PARAM_CPUMATCH_VENDOR);
         if (!"".equals(vendor)) {
-            final Node vendorNode = (Element) cpuMatchNode.appendChild(
+            final Node vendorNode = cpuMatchNode.appendChild(
                                               doc.createElement("vendor"));
             vendorNode.appendChild(doc.createTextNode(vendor));
         }
@@ -584,7 +581,7 @@ public final class VMSXML extends XML {
         final boolean pae = "True".equals(parametersMap.get(VM_PARAM_PAE));
         final boolean hap = "True".equals(parametersMap.get(VM_PARAM_HAP));
         if (acpi || apic || pae || hap) {
-            final Element featuresNode = (Element) root.appendChild(
+            final Node featuresNode = root.appendChild(
                                                 doc.createElement("features"));
             if (acpi) {
                 featuresNode.appendChild(doc.createElement("acpi"));
@@ -659,7 +656,7 @@ public final class VMSXML extends XML {
 
         try {
              db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
+        } catch (final ParserConfigurationException pce) {
              assert false;
         }
         final Document doc = db.newDocument();
@@ -668,20 +665,17 @@ public final class VMSXML extends XML {
         /* type */
         root.setAttribute("type", type); /* kvm/xen */
         /* uuid */
-        final Node uuidNode = (Element) root.appendChild(
-                                                doc.createElement("uuid"));
+        final Node uuidNode = root.appendChild(doc.createElement("uuid"));
         uuidNode.appendChild(doc.createTextNode(uuid));
         /* name */
-        final Node nameNode = (Element) root.appendChild(
-                                                    doc.createElement("name"));
+        final Node nameNode = root.appendChild(doc.createElement("name"));
         nameNode.appendChild(doc.createTextNode(domainName));
         /* memory */
-        final Node memoryNode = (Element) root.appendChild(
-                                                  doc.createElement("memory"));
+        final Node memoryNode = root.appendChild(doc.createElement("memory"));
         final long mem = Long.parseLong(parametersMap.get(VM_PARAM_MEMORY));
         memoryNode.appendChild(doc.createTextNode(Long.toString(mem)));
         /* current memory */
-        final Node curMemoryNode = (Element) root.appendChild(
+        final Node curMemoryNode = root.appendChild(
                                            doc.createElement("currentMemory"));
         final long curMem = Long.parseLong(
                                     parametersMap.get(VM_PARAM_CURRENTMEMORY));
@@ -689,22 +683,20 @@ public final class VMSXML extends XML {
         /* vcpu */
         final String vcpu = parametersMap.get(VM_PARAM_VCPU);
         if (vcpu != null) {
-            final Node vcpuNode = (Element) root.appendChild(
-                                                   doc.createElement("vcpu"));
+            final Node vcpuNode = root.appendChild(doc.createElement("vcpu"));
             vcpuNode.appendChild(doc.createTextNode(vcpu));
         }
 
         /* bootloader */
         final String bootloader = parametersMap.get(VM_PARAM_BOOTLOADER);
         if (bootloader != null) {
-            final Node bootloaderNode = (Element) root.appendChild(
+            final Node bootloaderNode = root.appendChild(
                                                doc.createElement("bootloader"));
             bootloaderNode.appendChild(doc.createTextNode(bootloader));
         }
 
         /* os */
-        final Element osNode = (Element) root.appendChild(
-                                                  doc.createElement("os"));
+        final Node osNode = root.appendChild(doc.createElement("os"));
         final Element typeNode = (Element) osNode.appendChild(
                                                   doc.createElement("type"));
         typeNode.appendChild(
@@ -714,7 +706,7 @@ public final class VMSXML extends XML {
                               parametersMap.get(VM_PARAM_TYPE_MACHINE));
         final String init = parametersMap.get(VM_PARAM_INIT);
         if (init != null && !"".equals(init)) {
-            final Element initNode = (Element) osNode.appendChild(
+            final Node initNode = osNode.appendChild(
                                                     doc.createElement("init"));
             initNode.appendChild(doc.createTextNode(init));
         }
@@ -730,8 +722,7 @@ public final class VMSXML extends XML {
                                    parametersMap.get(VM_PARAM_BOOT_2));
         }
 
-        final Node loaderNode = (Element) osNode.appendChild(
-                                                  doc.createElement("loader"));
+        final Node loaderNode = osNode.appendChild(doc.createElement("loader"));
         loaderNode.appendChild(doc.createTextNode(
                                           parametersMap.get(VM_PARAM_LOADER)));
 
@@ -747,21 +738,21 @@ public final class VMSXML extends XML {
         /* on_ */
         final String onPoweroff = parametersMap.get(VM_PARAM_ON_POWEROFF);
         if (onPoweroff != null) {
-            final Element onPoweroffNode = (Element) root.appendChild(
+            final Node onPoweroffNode = root.appendChild(
                                               doc.createElement("on_poweroff"));
             onPoweroffNode.appendChild(doc.createTextNode(onPoweroff));
 
         }
         final String onReboot = parametersMap.get(VM_PARAM_ON_REBOOT);
         if (onReboot != null) {
-            final Element onRebootNode = (Element) root.appendChild(
+            final Node onRebootNode = root.appendChild(
                                               doc.createElement("on_reboot"));
             onRebootNode.appendChild(doc.createTextNode(onReboot));
 
         }
         final String onCrash = parametersMap.get(VM_PARAM_ON_CRASH);
         if (onCrash != null) {
-            final Element onCrashNode = (Element) root.appendChild(
+            final Node onCrashNode = root.appendChild(
                                               doc.createElement("on_crash"));
             onCrashNode.appendChild(doc.createTextNode(onCrash));
 
@@ -769,14 +760,14 @@ public final class VMSXML extends XML {
         /* devices / emulator */
         final String emulator = parametersMap.get(VM_PARAM_EMULATOR);
         if (emulator != null || needConsole) {
-            final Element devicesNode = (Element) root.appendChild(
+            final Node devicesNode = root.appendChild(
                                               doc.createElement("devices"));
             if (needConsole) {
                 final Element consoleNode = (Element) devicesNode.appendChild(
                                                   doc.createElement("console"));
                 consoleNode.setAttribute("type", "pty");
             }
-            final Element emulatorNode = (Element) devicesNode.appendChild(
+            final Node emulatorNode = devicesNode.appendChild(
                                               doc.createElement("emulator"));
             emulatorNode.appendChild(doc.createTextNode(emulator));
         }
@@ -840,7 +831,7 @@ public final class VMSXML extends XML {
                                               doc.createElement(OS_BOOT_NODE));
                     }
                 }
-                String value = parametersMap.get(param);
+                final String value = parametersMap.get(param);
                 //if (VM_PARAM_MEMORY.equals(param)
                 //    || VM_PARAM_CURRENTMEMORY.equals(param)) {
                 //    value = Long.toString(
@@ -886,7 +877,7 @@ public final class VMSXML extends XML {
             addCPUMatchNode(doc, domainNode, parametersMap);
             addFeatures(doc, domainNode, parametersMap);
             addClockOffset(doc, domainNode, parametersMap);
-        } catch (final javax.xml.xpath.XPathExpressionException e) {
+        } catch (final XPathExpressionException e) {
             LOG.appError("modifyDomainXML: could not evaluate: ", e);
             return null;
         }
@@ -923,17 +914,16 @@ public final class VMSXML extends XML {
             return;
         }
 
-        String tag;
-        String parent;
+        final String tag;
         final int i = tag0.indexOf(':');
-        Element pNode;
+        final Element pNode;
         if (i > 0) {
             if (value == null) {
                 /* don't make empty parent */
                 return;
             }
             /* with parent */
-            parent = tag0.substring(0, i);
+            final String parent = tag0.substring(0, i);
             tag = tag0.substring(i + 1);
             pNode = parentNodes.get(parent);
         } else {
@@ -978,13 +968,12 @@ public final class VMSXML extends XML {
             return;
         }
 
-        String tag;
-        String parent;
+        final String tag;
         final int i = tag0.indexOf(':');
-        Element pNode;
+        final Element pNode;
         if (i > 0) {
             /* with parent */
-            parent = tag0.substring(0, i);
+            final String parent = tag0.substring(0, i);
             tag = tag0.substring(i + 1);
             pNode = parentNodes.get(parent);
         } else {
@@ -1063,12 +1052,11 @@ public final class VMSXML extends XML {
                     removeXMLOption(hwNode, pos, tag, parentNodes);
                 }
             }
-            final Element hwAddressNode = (Element) getChildNode(hwNode,
-                                                                 HW_ADDRESS);
+            final Node hwAddressNode = getChildNode(hwNode, HW_ADDRESS);
             if (hwAddressNode != null) {
                 hwNode.removeChild(hwAddressNode);
             }
-        } catch (final javax.xml.xpath.XPathExpressionException e) {
+        } catch (final XPathExpressionException e) {
             LOG.appError("modifyXML: could not evaluate: ", e);
         }
     }
@@ -1097,7 +1085,7 @@ public final class VMSXML extends XML {
             if (hwNode != null) {
                 hwNode.getParentNode().removeChild(hwNode);
             }
-        } catch (final javax.xml.xpath.XPathExpressionException e) {
+        } catch (final XPathExpressionException e) {
             LOG.appError("removeXML: could not evaluate: ", e);
             return;
         }
@@ -1475,8 +1463,8 @@ public final class VMSXML extends XML {
      * Zero, one or more host nodes.
      */
     private void getHostNodes(final Node n,
-                              final List<String> names,
-                              final List<String> ports) {
+                              final Collection<String> names,
+                              final Collection<String> ports) {
         final NodeList nodes = n.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             final Node hostN = nodes.item(i);
@@ -1497,8 +1485,8 @@ public final class VMSXML extends XML {
         String sourceDev = null;
         String sourceProtocol = null;
         String sourceName = null;
-        final List<String> sourceHostNames = new ArrayList<String>();
-        final List<String> sourceHostPorts = new ArrayList<String>();
+        final Collection<String> sourceHostNames = new ArrayList<String>();
+        final Collection<String> sourceHostPorts = new ArrayList<String>();
         String authUsername = null;
         String authSecretType = null;
         String authSecretUuid = null;
@@ -1561,7 +1549,7 @@ public final class VMSXML extends XML {
                                            authUsername,
                                            authSecretType,
                                            authSecretUuid,
-                                           targetBus + "/" + device,
+                                           targetBus + '/' + device,
                                            driverName,
                                            driverType,
                                            driverCache,
@@ -1682,7 +1670,7 @@ public final class VMSXML extends XML {
                     parameterValues.put(name, VM_PARAM_CPU_MATCH, match);
                     final NodeList cpuMatchOptions = option.getChildNodes();
                     String policy = "";
-                    final List<String> features = new ArrayList<String>();
+                    final Collection<String> features = new ArrayList<String>();
                     for (int j = 0; j < cpuMatchOptions.getLength(); j++) {
                         final Node cpuMatchOption = cpuMatchOptions.item(j);
                         final String op = cpuMatchOption.getNodeName();
@@ -2139,7 +2127,7 @@ public final class VMSXML extends XML {
     }
 
     /** Returns all domain names. */
-    public List<String> getDomainNames() {
+    public Collection<String> getDomainNames() {
         return domainNames;
     }
 
@@ -2178,7 +2166,7 @@ public final class VMSXML extends XML {
     }
 
     /** Returns configs of all vms. */
-    public Set<Value> getConfigs() {
+    public Collection<Value> getConfigs() {
         return configsMap.keySet();
     }
 
@@ -3187,18 +3175,18 @@ public final class VMSXML extends XML {
         if ("vnc".equals(type)) {
             return type + " : " + portString(port);
         } else if ("sdl".equals(type)) {
-            return type + " (" + display + ")";
+            return type + " (" + display + ')';
         }
         return "unknown";
     }
 
     /** Returns source file directories. */
-    public Set<String> getSourceFileDirs() {
+    public Iterable<String> getSourceFileDirs() {
         return sourceFileDirs;
     }
 
     /** Return set of mac addresses. */
-    public Set<String> getMacAddresses() {
+    public Collection<String> getMacAddresses() {
         return macAddresses;
     }
 

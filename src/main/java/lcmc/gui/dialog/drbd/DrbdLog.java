@@ -36,12 +36,10 @@ import java.util.LinkedHashMap;
  * @version $Id$
  */
 public final class DrbdLog extends HostLogs {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Drbd device name. */
     private final String deviceName;
 
-    /** Prepares a new <code>DrbdLog</code> object. */
+    /** Prepares a new {@code DrbdLog} object. */
     public DrbdLog(final Host host, final String device) {
         super(host);
         deviceName = device.substring(device.lastIndexOf('/') + 1);

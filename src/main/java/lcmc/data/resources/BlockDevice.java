@@ -24,14 +24,8 @@
 package lcmc.data.resources;
 
 import lcmc.utilities.Tools;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
-import java.util.Collections;
+
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -49,14 +43,12 @@ public final class BlockDevice extends Resource {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(BlockDevice.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Block size in blocks. */
     private String blockSize;
     /** Disk UUID. */
     private String diskUuid;
     /** Disk ID. */
-    private final Set<String> diskIds = new HashSet<String>();
+    private final Collection<String> diskIds = new HashSet<String>();
     /** Where is this block device mounted if it is at all. */
     private String mountedOn;
     /** Filesytem type. */
@@ -133,7 +125,7 @@ public final class BlockDevice extends Resource {
     private static final String TOKEN_DISK_ID = "disk-id";
 
     /**
-     * Creates a new <code>BlockDevice</code> object.
+     * Creates a new {@code BlockDevice} object.
      *
      * @param line
      *          line that contains device, blocksize, mount
@@ -554,7 +546,7 @@ public final class BlockDevice extends Resource {
     }
 
     /** Returns whether the disk device is disk id. */
-    public Set<String> getDiskIds() {
+    public Collection<String> getDiskIds() {
         return diskIds;
     }
 

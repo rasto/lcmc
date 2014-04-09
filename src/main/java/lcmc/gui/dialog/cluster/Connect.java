@@ -47,10 +47,8 @@ import lcmc.utilities.LoggerFactory;
 final class Connect extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>Connect</code> object. */
+    /** Prepares a new {@code Connect} object. */
     Connect(final WizardDialog previousDialog,
             final Cluster cluster) {
         super(previousDialog, cluster);
@@ -80,7 +78,7 @@ final class Connect extends DialogCluster {
         boolean pending = false;
         boolean oneFailed = false;
         for (final Host host : getCluster().getHosts()) {
-            String status;
+            final String status;
             if (host.getSSH().isConnectionFailed()) {
                 status = "failed.";
                 oneFailed = true;
@@ -90,7 +88,7 @@ final class Connect extends DialogCluster {
                 pending = true;
                 status = "connecting...";
             }
-            text.append(host.getName()).append(" ").append(status).append("\n");
+            text.append(host.getName()).append(' ').append(status).append('\n');
         }
         LOG.debug("checkHosts: pending: " + pending + ", one failed: "
                   + oneFailed);
@@ -102,7 +100,7 @@ final class Connect extends DialogCluster {
              answerPaneSetText(text.toString());
              try {
                  Thread.sleep(1000);
-             } catch (InterruptedException ex) {
+             } catch (final InterruptedException ex) {
                  Thread.currentThread().interrupt();
              }
 

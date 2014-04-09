@@ -22,11 +22,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for fedora 17.
  */
-public final class DistResource_fedora_17 extends java.util.ListResourceBundle {
+public final class DistResource_fedora_17 extends ListResourceBundle {
 
     /** Get contents. */
     @Override

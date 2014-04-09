@@ -46,8 +46,6 @@ import lcmc.data.StringValue;
  * @version $Id$
  */
 final class Storage extends VMConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
     /** Configuration options of the new domain. */
@@ -73,7 +71,7 @@ final class Storage extends VMConfig {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>Storage</code> object. */
+    /** Prepares a new {@code Storage} object. */
     Storage(final WizardDialog previousDialog,
             final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
@@ -130,9 +128,10 @@ final class Storage extends VMConfig {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsdi.checkResourceFieldsCorrect(
-                                            null,
-                                            vmsdi.getRealParametersFromXML());
+                final boolean enable = vmsdi.checkResourceFields(
+                                              null,
+                                              vmsdi.getRealParametersFromXML())
+                                            .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
@@ -145,10 +144,10 @@ final class Storage extends VMConfig {
             return inputPane;
         }
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
         vmsdi.getResource().setValue(DiskData.TYPE,

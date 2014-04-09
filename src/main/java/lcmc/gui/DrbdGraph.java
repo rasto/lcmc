@@ -52,6 +52,7 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
+import lcmc.data.Application;
 
 /**
  * This class creates graph and provides methods to add new block device
@@ -120,7 +121,7 @@ public final class DrbdGraph extends ResourceGraph {
     /** Maximum vertical position. */
     private static final int MAX_Y_POS = 2600;
 
-    /** Prepares a new <code>DrbdGraph</code> object. */
+    /** Prepares a new {@code DrbdGraph} object. */
     public DrbdGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
     }
@@ -157,7 +158,7 @@ public final class DrbdGraph extends ResourceGraph {
             putInfoToVertex(hostDrbdInfo, v);
             vertexToHostMap.put(v, hostDrbdInfo);
             hostToVertexMap.put(hostDrbdInfo, v);
-            putVertexToInfo(v, (Info) hostDrbdInfo);
+            putVertexToInfo(v, hostDrbdInfo);
             Point2D hostPos = getSavedPosition(hostDrbdInfo);
 
             if (hostPos == null) {
@@ -234,7 +235,7 @@ public final class DrbdGraph extends ResourceGraph {
                 somethingChanged();
                 bdiToVertexMap.put(bdi, bdv);
                 blockDeviceToVertexMap.put(bdi.getBlockDevice(), bdv);
-                putVertexToInfo(bdv, (Info) bdi);
+                putVertexToInfo(bdv, bdi);
                 putInfoToVertex(bdi, bdv);
                 vertexToHostMap.put(bdv, hostDrbdInfo);
                 vertexList.add(bdv);
@@ -261,10 +262,9 @@ public final class DrbdGraph extends ResourceGraph {
                          == prevBdi.getDrbdVolumeInfo().getDrbdResourceInfo()) {
                 devYPos -= 6;
             }
-            Point2D pos; // TODO: getSavedPosition(bdi);
-                pos = new Point2D.Double(
+            final Point2D pos = new Point2D.Double(
                     hostXPos + BD_X_OFFSET + VERTEX_SIZE_BD / 2,
-                    devYPos);
+                    devYPos); // TODO: getSavedPosition(bdi);
             devYPos += BD_STEP_Y;
             getVertexLocations().put(bdv, pos);
             putVertexLocations();
@@ -296,19 +296,14 @@ public final class DrbdGraph extends ResourceGraph {
         e.reset();
         edgeToDrbdVolumeMap.remove(e);
         drbdVolumeToEdgeMap.remove(dvi);
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    lockGraph();
-                    getGraph().removeEdge(e);
-                    unlockGraph();
-                } catch (final Exception ignore) {
-                    unlockGraph();
-                    /* ignore */
-                }
-            }
-        });
+        try {
+            lockGraph();
+            getGraph().removeEdge(e);
+            unlockGraph();
+        } catch (final Exception ignore) {
+            unlockGraph();
+            /* ignore */
+        }
     }
 
     /**
@@ -317,7 +312,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected List<ImageIcon> getIconsForVertex(final Vertex v,
-                                                final boolean testOnly) {
+                                                final Application.RunMode runMode) {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
@@ -329,7 +324,7 @@ public final class DrbdGraph extends ResourceGraph {
             } else {
                 icons.add(BlockDevInfo.HARDDISK_ICON_LARGE);
             }
-            if (bdi.isDiskless(testOnly)) {
+            if (bdi.isDiskless(runMode)) {
                 icons.add(BlockDevInfo.NO_HARDDISK_ICON_LARGE);
                 return icons;
             } else {
@@ -372,10 +367,10 @@ public final class DrbdGraph extends ResourceGraph {
             }
             final BlockDevice sourceBD = sourceBDI.getBlockDevice();
             final BlockDevice destBD = destBDI.getBlockDevice();
-            final boolean tOnly = isTestOnly();
-            if (!destBDI.isConnected(tOnly)) {
-                if (sourceBDI.isWFConnection(tOnly)
-                    && !destBDI.isWFConnection(tOnly)) {
+            final Application.RunMode runMode = getRunMode();
+            if (!destBDI.isConnected(runMode)) {
+                if (sourceBDI.isWFConnection(runMode)
+                    && !destBDI.isWFConnection(runMode)) {
                     edge.setDirection(dest, source);
                     Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
                                       new Runnable() {
@@ -426,7 +421,7 @@ public final class DrbdGraph extends ResourceGraph {
                 }
             } else if (dvi.isSplitBrain()) {
                 l.append(" (split-brain)");
-            } else if (!dvi.isConnected(tOnly)) {
+            } else if (!dvi.isConnected(runMode)) {
                 l.append(" (disconnected)");
             } else if (dvi.isVerifying()) {
                 l.append(" (verify)");
@@ -438,16 +433,16 @@ public final class DrbdGraph extends ResourceGraph {
 
     /** Small text that appears above the icon. */
     @Override
-    protected String getIconText(final Vertex v, final boolean testOnly) {
+    protected String getIconText(final Vertex v, final Application.RunMode runMode) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
-                return bdi.getIconTextForGraph(testOnly);
+                return bdi.getIconTextForGraph(runMode);
             }
         } else {
             final HostDrbdInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
-                return hi.getIconTextForDrbdGraph(testOnly);
+                return hi.getIconTextForDrbdGraph(runMode);
             }
         }
         return null;
@@ -456,17 +451,17 @@ public final class DrbdGraph extends ResourceGraph {
     /** Small text that appears in the right corner. */
     @Override
     protected Subtext getRightCornerText(final Vertex v,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
-                return bdi.getRightCornerTextForDrbdGraph(testOnly);
+                return bdi.getRightCornerTextForDrbdGraph(runMode);
 
             }
         } else {
             final HostDrbdInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
-                return hi.getRightCornerTextForDrbdGraph(testOnly);
+                return hi.getRightCornerTextForDrbdGraph(runMode);
             }
         }
         return null;
@@ -474,7 +469,7 @@ public final class DrbdGraph extends ResourceGraph {
 
     /** Small text that appears down. */
     @Override
-    protected Subtext[] getSubtexts(final Vertex v, final boolean testOnly) {
+    protected Subtext[] getSubtexts(final Vertex v, final Application.RunMode runMode) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null && bdi.getBlockDevice().isDrbd()
@@ -493,7 +488,7 @@ public final class DrbdGraph extends ResourceGraph {
 
                 Color color = null;
                 Color textColor = Color.BLACK;
-                final String proxyState = bdi.getProxyStateForGraph(testOnly);
+                final String proxyState = bdi.getProxyStateForGraph(runMode);
                 if ("StandAlone".equals(connState)
                     || !"UpToDate".equals(diskState)
                     || (proxyState != null
@@ -512,7 +507,7 @@ public final class DrbdGraph extends ResourceGraph {
         } else {
             final HostDrbdInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
-                return hi.getSubtextsForDrbdGraph(testOnly);
+                return hi.getSubtextsForDrbdGraph(runMode);
             }
         }
         return null;
@@ -523,7 +518,7 @@ public final class DrbdGraph extends ResourceGraph {
      * characters, it is shortened.
      */
     @Override
-    public String getMainText(final Vertex v, final boolean testOnly) {
+    public String getMainText(final Vertex v, final Application.RunMode runMode) {
         if (isVertexBlockDevice(v)) {
             String l;
             if (isVertexDrbd(v)) {
@@ -564,14 +559,14 @@ public final class DrbdGraph extends ResourceGraph {
     protected void handlePopupVertex(final Vertex v,
                                      final List<Vertex> pickedV,
                                      final Point2D pos) {
-        Info info;
+        final Info info;
         if (pickedV.size() > 1) {
             info = multiSelectionInfo;
         } else if (isVertexBlockDevice(v)) {
             info = getInfo(v);
         } else {
             /* host */
-            info = (HostDrbdInfo) getInfo(v);
+            info = getInfo(v);
         }
         if (info != null) {
             final JPopupMenu p = info.getPopup();
@@ -927,14 +922,14 @@ public final class DrbdGraph extends ResourceGraph {
         if (i == null) {
             return null;
         }
-        return i.getToolTipForGraph(isTestOnly());
+        return i.getToolTipForGraph(getRunMode());
     }
 
     /** Returns tool tip when mouse is over a resource edge. */
     @Override
     String getEdgeToolTip(final Edge edge) {
         final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
-        return dvi.getToolTipForGraph(isTestOnly());
+        return dvi.getToolTipForGraph(getRunMode());
     }
 
     /**
@@ -951,12 +946,12 @@ public final class DrbdGraph extends ResourceGraph {
         }
         final BlockDevice sourceBD = sourceBDI.getBlockDevice();
         final BlockDevice destBD = destBDI.getBlockDevice();
-        final boolean tOnly = isTestOnly();
-        if (sourceBDI.isConnected(tOnly)
+        final Application.RunMode runMode = getRunMode();
+        if (sourceBDI.isConnected(runMode)
             && sourceBD.isPrimary() != destBD.isPrimary()) {
             return true;
-        } else if (sourceBDI.isWFConnection(tOnly)
-                   ^ destBDI.isWFConnection(tOnly)) {
+        } else if (sourceBDI.isWFConnection(runMode)
+                   ^ destBDI.isWFConnection(runMode)) {
             /* show arrow from wf connection */
             return true;
         }
@@ -971,7 +966,7 @@ public final class DrbdGraph extends ResourceGraph {
     protected Paint getEdgeDrawPaint(final Edge edge) {
         final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
         if (dvi != null
-            && dvi.isConnected(isTestOnly())
+            && dvi.isConnected(getRunMode())
             && !dvi.isSplitBrain()) {
             return super.getEdgeDrawPaint(edge);
         } else {
@@ -989,7 +984,7 @@ public final class DrbdGraph extends ResourceGraph {
     protected Paint getEdgePickedPaint(final Edge edge) {
         final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
         if (dvi != null
-            && dvi.isConnected(isTestOnly())
+            && dvi.isConnected(getRunMode())
             && !dvi.isSplitBrain()) {
             return super.getEdgePickedPaint(edge);
         } else {
@@ -1089,7 +1084,7 @@ public final class DrbdGraph extends ResourceGraph {
                                  width);
             }
         }
-        final boolean tOnly = isTestOnly();
+        final Application.RunMode runMode = getRunMode();
         if (used > 0) {
             /** Show how much is used. */
             final double freeWidth = width * (100 - used) / 100;
@@ -1100,14 +1095,14 @@ public final class DrbdGraph extends ResourceGraph {
                          (int) (height));
         }
         if (isPicked(v)) {
-            if (tOnly) {
+            if (Application.isTest(runMode)) {
                 g2d.setColor(Color.RED);
             } else {
                 g2d.setColor(Color.BLACK);
             }
         } else {
             boolean pickedResource = false;
-            if (tOnly) {
+            if (Application.isTest(runMode)) {
                 lockGraph();
                 for (final Edge e : getGraph().getInEdges(v)) {
                     if (isPicked(e)) {
@@ -1142,7 +1137,7 @@ public final class DrbdGraph extends ResourceGraph {
         if (dvi == null) {
             return false;
         }
-        return !dvi.isConnected(isTestOnly());
+        return !dvi.isConnected(getRunMode());
     }
 
     /** Select multiple elements. */

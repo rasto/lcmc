@@ -50,7 +50,7 @@ public class StringValue implements Value, Comparable<Value> {
     public StringValue(final String valueForConfig,
                        final String valueForGui,
                        final Unit unit) {
-        if (valueForConfig == null || "".equals(valueForConfig)) {
+        if (valueForConfig == null || valueForConfig.isEmpty()) {
             this.valueForConfig = NOTHING_VALUE;
         } else {
             this.valueForConfig = valueForConfig;
@@ -60,7 +60,7 @@ public class StringValue implements Value, Comparable<Value> {
     }
 
     public StringValue(final String valueForConfig) {
-        if (valueForConfig == null || "".equals(valueForConfig)) {
+        if (valueForConfig == null || valueForConfig.isEmpty()) {
             this.valueForConfig = NOTHING_VALUE;
         } else {
             this.valueForConfig = valueForConfig;
@@ -70,7 +70,7 @@ public class StringValue implements Value, Comparable<Value> {
         } else {
             this.valueForGui = valueForConfig;
         }
-        this.unit = null;
+        unit = null;
     }
 
     /** Returns the display name. It will be shown in the GUI. */
@@ -109,8 +109,8 @@ public class StringValue implements Value, Comparable<Value> {
     }
 
     @Override
-    public boolean isNothingSelected() {
-        final String nv = getNothingValue();
+    public final boolean isNothingSelected() {
+        final String nv = NOTHING_VALUE;
         if (nv == null && valueForConfig == null) {
             return true;
         }
@@ -122,20 +122,16 @@ public class StringValue implements Value, Comparable<Value> {
         return NOTHING_SELECTED;
     }
 
-    public String getNothingValue() {
-        return NOTHING_VALUE;
-    }
-
     @Override
     public int hashCode() {
         int hash = 5;
         hash = 59 * hash + (this.valueForConfig != null ? this.valueForConfig.hashCode() : 0);
-        hash = 59 * hash + (this.unit != null ? this.unit.hashCode() : 0);
+        hash = 59 * hash + (unit != null ? this.unit.hashCode() : 0);
         return hash;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -174,10 +170,10 @@ public class StringValue implements Value, Comparable<Value> {
     }
 
     @Override
-    public int compareTo(final Value other) {
+    public int compareTo(final Value o) {
         String otherValue = null;
-        if (other != null) {
-            otherValue = other.getValueForConfig();
+        if (o != null) {
+            otherValue = o.getValueForConfig();
         }
         if (otherValue == null) {
             otherValue = "";

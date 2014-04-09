@@ -47,7 +47,7 @@ public final class AddHostDialog {
     /** The host object. */
     private final Host host;
 
-    /** Prepares a new <code>EditHostDialog</code> object. */
+    /** Prepares a new {@code EditHostDialog} object. */
     public AddHostDialog(final Host host) {
         this.host = host;
     }
@@ -63,7 +63,7 @@ public final class AddHostDialog {
             if (dialog.isPressedCancelButton()) {
                 /* remove host tab from main window */
                 host.disconnect();
-                Tools.getConfigData().removeHostFromHosts(host);
+                Tools.getApplication().removeHostFromHosts(host);
                 dialog.cancelDialog();
                 Tools.getGUIData().enableAddHostButtons(true);
                 Tools.getGUIData().expandTerminalSplitPane(1);

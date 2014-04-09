@@ -34,14 +34,12 @@ import lcmc.gui.resources.VMSVirtualDomainInfo;
  * @version $Id$
  */
 public abstract class VMConfig extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** VMS Virtual domain info object. */
     private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
 
-    /** Prepares a new <code>VMConfig</code> object. */
-    public VMConfig(final WizardDialog previousDialog,
-                    final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Prepares a new {@code VMConfig} object. */
+    protected VMConfig(final WizardDialog previousDialog,
+                       final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(previousDialog);
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }

@@ -35,10 +35,8 @@ import lcmc.gui.dialog.cluster.Init;
  *
  */
 final class InitForUpgrade extends Init {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>InitForUpgrade</code> object. */
+    /** Prepares a new {@code InitForUpgrade} object. */
     InitForUpgrade(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }

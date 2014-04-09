@@ -40,15 +40,13 @@ import lcmc.utilities.LoggerFactory;
 public final class Network extends Resource {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Network.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** List of all ips in the network. */
     private final String[] ips;
     /** Net mask. */
     private final Integer cidr;
 
     /**
-     * Prepares a new <code>Network</code> object.
+     * Prepares a new {@code Network} object.
      *
      * @param name
      *          ip with *

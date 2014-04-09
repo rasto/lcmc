@@ -41,6 +41,8 @@ import ch.ethz.ssh2.LocalPortForwarder;
 import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.channel.ChannelManager;
 
+import java.io.OutputStream;
+import java.lang.InterruptedException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -111,7 +113,7 @@ public final class SSH {
                 if (ct.isAlive()) {
                     return false;
                 }
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -206,7 +208,7 @@ public final class SSH {
                 final ConnectionThread ct = connectionThread;
                 mConnectionThreadLock.unlock();
                 ct.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -224,8 +226,8 @@ public final class SSH {
 
     /** Cancels the creating of connection to the sshd. */
     public void cancelConnection() {
-        final ConnectionThread ct;
         mConnectionThreadLock.lock();
+        final ConnectionThread ct;
         try {
             ct = connectionThread;
         } finally {
@@ -236,7 +238,7 @@ public final class SSH {
         }
         final String message = "canceled";
         LOG.debug1("cancelConnection: message: " + message);
-        host.getTerminalPanel().addCommandOutput(message + "\n");
+        host.getTerminalPanel().addCommandOutput(message + '\n');
         host.getTerminalPanel().nextCommand();
         connectionFailed = true;
         if (callback != null) {
@@ -367,7 +369,6 @@ public final class SSH {
             }
             this.command = command;
             this.outputVisible = outputVisible;
-            int exitCode = 100;
             final StringBuilder res = new StringBuilder("");
             mConnectionLock.lock();
             if (connection == null) {
@@ -380,9 +381,10 @@ public final class SSH {
                 installGuiHelper();
                 return new SSHOutput("", 0);
             }
+            int exitCode = 100;
             try {
-                final Session thisSession;
                 mSessionLock.lock();
+                final Session thisSession;
                 try {
                     thisSession = sess;
                 } finally {
@@ -408,9 +410,9 @@ public final class SSH {
                                                             "export LC_ALL=C;"
                                         + host.getSudoCommand(
                                                host.getHoppedCommand(command),
-                                               false), 1) + "'");
+                                               false), 1) + '\'');
                 final InputStream stdout = thisSession.getStdout();
-                final java.io.OutputStream stdin = thisSession.getStdin();
+                final OutputStream stdin = thisSession.getStdin();
                 final InputStream stderr = thisSession.getStderr();
                 //byte[] buff = new byte[8192];
                 final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
@@ -498,7 +500,7 @@ public final class SSH {
                         if (sudoPwd == null) {
                             cancelSudo = enterSudoPassword();
                         }
-                        final String pwd = host.getSudoPassword() + "\n";
+                        final String pwd = host.getSudoPassword() + '\n';
                         stdin.write(pwd.getBytes());
                         skipNextLine = true;
                         continue;
@@ -519,7 +521,7 @@ public final class SSH {
                     }
 
                     /* stderr */
-                    final StringBuilder errOutput = new StringBuilder("");
+                    final CharSequence errOutput = new StringBuilder("");
                     while (stderr.available() > 0 && !cancelIt) {
                         // this is unreachable.
                         // stdout and stderr are mixed in the stdout
@@ -566,10 +568,10 @@ public final class SSH {
                 }
                 thisSession.close();
                 sess = null;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.appWarning("execOneCommand: "
-                               + host.getName() + ":" + e.getMessage()
-                               + ":"  + command);
+                               + host.getName() + ':' + e.getMessage()
+                               + ':' + command);
                 exitCode = ERROR_EXIT_CODE;
                 cancel();
             }
@@ -584,8 +586,8 @@ public final class SSH {
         /** Cancel the session. */
         public void cancel() {
             cancelIt = true;
-            final Session thisSession;
             mSessionLock.lock();
+            final Session thisSession;
             try {
                 thisSession = sess;
                 sess = null;
@@ -604,7 +606,7 @@ public final class SSH {
                           final boolean outputVisible,
                           final boolean commandVisible,
                           final int sshCommandTimeout)
-        throws java.io.IOException {
+        throws IOException {
             super();
             this.command = command;
             LOG.debug2("ExecCommandThread: command: " + command);
@@ -654,7 +656,7 @@ public final class SSH {
             // if previous command has finished successfully.
             final String[] commands = command.split(";;;");
             final StringBuilder ans = new StringBuilder("");
-            for (String command1 : commands) {
+            for (final String command1 : commands) {
                 final Boolean[] cancelTimeout = new Boolean[1];
                 cancelTimeout[0] = false;
                 final Thread tt = new Thread(new Runnable() {
@@ -684,7 +686,7 @@ public final class SSH {
                         throw new IOException("open session failed");
                     }
                     cancelTimeout[0] = true;
-                } catch (java.io.IOException e) {
+                } catch (final IOException e) {
                     mConnectionLock.lock();
                     try {
                         connection = null;
@@ -736,7 +738,7 @@ public final class SSH {
         if (host == null) {
             return new SSHOutput("", 101);
         }
-        ExecCommandThread execCommandThread;
+        final ExecCommandThread execCommandThread;
         final String[] answer = new String[]{""};
         final Integer[] exitCode = new Integer[]{100};
         try {
@@ -759,7 +761,7 @@ public final class SSH {
                             outputVisible,
                             commandVisible,
                             sshCommandTimeout);
-        } catch (java.io.IOException e) {
+        } catch (final IOException e) {
             LOG.appError("execCommandThread: Can not execute command: "
                          + command, "", e);
             return new SSHOutput("", 102);
@@ -767,7 +769,7 @@ public final class SSH {
         execCommandThread.start();
         try {
             execCommandThread.join();
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         return new SSHOutput(answer[0], exitCode[0]);
@@ -797,7 +799,7 @@ public final class SSH {
         }
         final String realCommand = host.replaceVars(command);
         LOG.debug2("execCommand: real command: " + realCommand);
-        ExecCommandThread execCommandThread;
+        final ExecCommandThread execCommandThread;
         try {
             execCommandThread = new ExecCommandThread(realCommand,
                                                       execCallback,
@@ -805,7 +807,7 @@ public final class SSH {
                                                       outputVisible,
                                                       commandVisible,
                                                       sshCommandTimeout);
-        } catch (java.io.IOException e) {
+        } catch (final IOException e) {
             LOG.appError("execCommand: Can not execute command: "
                          + realCommand, "", e);
             return null;
@@ -842,7 +844,7 @@ public final class SSH {
                                final boolean commandVisible,
                                final int sshCommandTimeout) {
         final String realCommand = host.replaceVars(command);
-        ExecCommandThread execCommandThread;
+        final ExecCommandThread execCommandThread;
         try {
             execCommandThread = new ExecCommandThread(realCommand,
                                                       execCallback,
@@ -850,7 +852,7 @@ public final class SSH {
                                                       outputVisible,
                                                       commandVisible,
                                                       sshCommandTimeout);
-        } catch (java.io.IOException e) {
+        } catch (final IOException e) {
             LOG.appError("execCommand: can not execute command: "
                          + realCommand, "", e);
             return null;
@@ -915,7 +917,7 @@ public final class SSH {
 
             /* Check database */
             final int result =
-                        Tools.getConfigData().getKnownHosts().verifyHostkey(
+                        Tools.getApplication().getKnownHosts().verifyHostkey(
                                                       hostname,
                                                       serverHostKeyAlgorithm,
                                                       serverHostKey);
@@ -966,7 +968,7 @@ public final class SSH {
                                      KnownHosts.createHashedHostname(hostname);
 
                 /* Add the hostkey to the in-memory database */
-                Tools.getConfigData().getKnownHosts().addHostkey(
+                Tools.getApplication().getKnownHosts().addHostkey(
                                                 new String[] {hashedHostname},
                                                 serverHostKeyAlgorithm,
                                                 serverHostKey);
@@ -983,11 +985,11 @@ public final class SSH {
                     try {
                         KnownHosts.addHostkeyToFile(
                               new File(
-                                    Tools.getConfigData().getKnownHostPath()),
+                                    Tools.getApplication().getKnownHostPath()),
                               new String[] {hashedHostname},
                               serverHostKeyAlgorithm,
                               serverHostKey);
-                    } catch (IOException ignore) {
+                    } catch (final IOException ignore) {
                         LOG.appWarning("verifyServerHostKey: SSH "
                                        + "addHostKeyToFile failed "
                                        + ignore.getMessage());
@@ -1015,7 +1017,7 @@ public final class SSH {
         /** To show error only once.  */
         private String lastError;
 
-        /** Prepares a new <code>InteractiveLogic</code> object. */
+        /** Prepares a new {@code InteractiveLogic} object. */
         InteractiveLogic(final String lastError) {
             this.lastError = lastError;
         }
@@ -1031,7 +1033,7 @@ public final class SSH {
                                          final String[] prompt,
                                          final boolean[] echo)
         throws IOException {
-            String[] result = new String[numPrompts];
+            final String[] result = new String[numPrompts];
 
             for (int i = 0; i < numPrompts; i++) {
                 /* Often, servers just send empty strings for "name" and
@@ -1047,7 +1049,7 @@ public final class SSH {
                     /* show lastError only once */
                     lastError = null;
                 }
-                String ans;
+                final String ans;
                 if (lastPassword == null) {
                     ans = sshGui.enterSomethingDialog(
                                         "Keyboard Interactive Authentication",
@@ -1133,7 +1135,7 @@ public final class SSH {
         /** Cancel the connecting. */
         private boolean cancelIt = false;
 
-        /** Prepares a new <code>ConnectionThread</code> object. */
+        /** Prepares a new {@code ConnectionThread} object. */
         ConnectionThread() {
             super();
             username = host.getFirstUsername();
@@ -1151,24 +1153,23 @@ public final class SSH {
             final int connectTimeout =
                                     Tools.getDefaultInt("SSH.ConnectTimeout");
             final int kexTimeout = Tools.getDefaultInt("SSH.KexTimeout");
-            final boolean noPassphrase = Tools.getConfigData().isNoPassphrase();
+            final boolean noPassphrase = Tools.getApplication().isNoPassphrase();
             while (!cancelIt) {
                 if (lastPassword == null) {
                     lastPassword =
-                                Tools.getConfigData().getAutoOptionHost("pw");
+                                Tools.getApplication().getAutoOptionHost("pw");
                     if (lastPassword == null) {
                         lastPassword =
-                              Tools.getConfigData().getAutoOptionCluster("pw");
+                              Tools.getApplication().getAutoOptionCluster("pw");
                     }
                 }
                 if (lastPassword == null) {
                     if (enablePublicKey
                         && conn.isAuthMethodAvailable(username, "publickey")) {
                         final File dsaKey = new File(
-                                         Tools.getConfigData().getIdDSAPath());
+                                         Tools.getApplication().getIdDSAPath());
                         final File rsaKey = new File(
-                                         Tools.getConfigData().getIdRSAPath());
-                        boolean res = false;
+                                         Tools.getApplication().getIdRSAPath());
                         if (dsaKey.exists() || rsaKey.exists()) {
                             String key = "";
                             if (lastDSAKey != null) {
@@ -1178,6 +1179,7 @@ public final class SSH {
                             }
                             /* Passwordless auth */
 
+                            boolean res = false;
                             if (noPassphrase || !"".equals(key)) {
                                 /* try first passwordless authentication.  */
                                 if (lastRSAKey == null && dsaKey.exists()) {
@@ -1186,7 +1188,7 @@ public final class SSH {
                                                                       username,
                                                                       dsaKey,
                                                                       key);
-                                    } catch (Exception e) {
+                                    } catch (final Exception e) {
                                         lastDSAKey = null;
                                         LOG.debug("authenticate: dsa passwordless failed");
                                     }
@@ -1211,7 +1213,7 @@ public final class SSH {
                                                                       username,
                                                                       rsaKey,
                                                                       key);
-                                    } catch (Exception e) {
+                                    } catch (final Exception e) {
                                         lastRSAKey = null;
                                         LOG.debug("authenticate: rsa passwordless failed");
                                     }
@@ -1244,7 +1246,7 @@ public final class SSH {
                                                                       username,
                                                                       dsaKey,
                                                                       key);
-                                } catch (Exception e) {
+                                } catch (final Exception e) {
                                         lastDSAKey = null;
                                         LOG.debug("authenticate: dsa key auth failed");
                                 }
@@ -1267,7 +1269,7 @@ public final class SSH {
                                                                       username,
                                                                       rsaKey,
                                                                       key);
-                                } catch (Exception e) {
+                                } catch (final Exception e) {
                                     lastRSAKey = null;
                                     LOG.debug("authenticate: rsa key auth failed");
                                 }
@@ -1338,7 +1340,7 @@ public final class SSH {
                 }
 
                 if (conn.isAuthMethodAvailable(username, "password")) {
-                    String ans;
+                    final String ans;
                     if (lastPassword == null) {
                         ans = sshGui.enterSomethingDialog(
                                 Tools.getString("SSH.PasswordAuthentication"),
@@ -1468,7 +1470,7 @@ public final class SSH {
                 /* connect and verify server host key (with callback) */
                 LOG.debug2("run: verify host keys: " + hostname);
                 final String[] hostkeyAlgos =
-                    Tools.getConfigData().getKnownHosts().
+                    Tools.getApplication().getKnownHosts().
                         getPreferredServerHostkeyAlgorithmOrder(hostname);
 
                 if (hostkeyAlgos != null) {
@@ -1498,12 +1500,12 @@ public final class SSH {
 
                 /* authentication phase */
                 authenticate(conn);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 LOG.appWarning("run: connecting failed: " + e.getMessage());
                 connectionFailed = true;
                 if (!cancelIt) {
                     host.getTerminalPanel().addCommandOutput(e.getMessage()
-                                                             + "\n");
+                                                             + '\n');
                     host.getTerminalPanel().nextCommand();
                     if (callback != null) {
                         callback.doneError(e.getMessage());
@@ -1557,7 +1559,7 @@ public final class SSH {
 
     /** Installs gui-helper on the remote host. */
     public void installGuiHelper() {
-        if (!Tools.getConfigData().getKeepHelper()) {
+        if (!Tools.getApplication().getKeepHelper()) {
             final String fileName = "/help-progs/lcmc-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
@@ -1568,16 +1570,16 @@ public final class SSH {
 
     /** Installs test suite on the remote host. */
     public void installTestFiles() {
-        final String fileName = "lcmc-test.tar";
         final Connection conn = connection;
         if (conn == null) {
             return;
         }
         final SCPClient scpClient = new SCPClient(conn);
-        final String file = Tools.getFile("/" + fileName);
+        final String fileName = "lcmc-test.tar";
+        final String file = Tools.getFile('/' + fileName);
         try {
             scpClient.put(file.getBytes(), fileName, "/tmp");
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.appError("installTestFiles: could not copy: "
                          + fileName, "", e);
             return;
@@ -1657,7 +1659,7 @@ public final class SSH {
         }
         String modeString = "";
         if (mode != null) {
-            modeString = " && chmod " + mode + " " + remoteFilename + ".new";
+            modeString = " && chmod " + mode + ' ' + remoteFilename + ".new";
         }
         String postCommandString = "";
         if (postCommand != null) {
@@ -1697,7 +1699,7 @@ public final class SSH {
                                 + "echo \""
                                 + Tools.escapeQuotes(fileContent, 1)
                                 + commandTail, 1)
-                            + "\"",
+                            + '"',
                             new ExecCallback() {
                                 @Override
                                 public void done(final String ans) {
@@ -1735,7 +1737,7 @@ public final class SSH {
                             10000); /* smaller timeout */
         try {
             t.join();
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -1743,27 +1745,27 @@ public final class SSH {
     /** Starts port forwarding for vnc. */
     void startVncPortForwarding(final String remoteHost,
                                 final int remotePort)
-        throws java.io.IOException {
+        throws IOException {
         final int localPort =
-                        remotePort + Tools.getConfigData().getVncPortOffset();
+                        remotePort + Tools.getApplication().getVncPortOffset();
         try {
             localPortForwarder =
                 connection.createLocalPortForwarder(localPort,
                                                     "127.0.0.1",
                                                     remotePort);
-        } catch (final java.io.IOException e) {
+        } catch (final IOException e) {
             throw e;
         }
     }
 
     /** Stops port forwarding for vnc. */
     void stopVncPortForwarding(final int remotePort)
-        throws java.io.IOException {
+        throws IOException {
         final int localPort =
-                        remotePort + Tools.getConfigData().getVncPortOffset();
+                        remotePort + Tools.getApplication().getVncPortOffset();
         try {
             localPortForwarder.close();
-        } catch (final java.io.IOException e) {
+        } catch (final IOException e) {
             throw e;
         }
     }

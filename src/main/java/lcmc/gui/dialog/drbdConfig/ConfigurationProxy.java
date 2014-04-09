@@ -22,11 +22,10 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import javax.swing.JComponent;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
@@ -37,8 +36,6 @@ import javax.swing.JComponent;
  *
  */
 final class ConfigurationProxy extends Configuration {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -46,7 +43,7 @@ final class ConfigurationProxy extends Configuration {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>ConfigurationProxy</code> object. */
+    /** Prepares a new {@code ConfigurationProxy} object. */
     ConfigurationProxy(final WizardDialog previousDialog,
                        final Host host,
                        final DrbdVolumeInfo drbdVolumeInfo,
@@ -89,29 +86,10 @@ final class ConfigurationProxy extends Configuration {
         }
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.Configuration.Title in TextResources.
-     */
-    @Override
-    protected String getHostDialogTitle() {
-        return Tools.getString("Dialog.Host.Configuration.Title");
-    }
-
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.Configuration.Description in TextResources.
-     */
-    @Override
-    protected String getDescription() {
-        return Tools.getString("Dialog.Host.Configuration.Description");
-    }
-
     /** Buttons that are enabled/disabled during checks. */
     @Override
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton()),
-                                buttonClass(finishButton())};
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{buttonClass(finishButton())};
     }
 
     /**

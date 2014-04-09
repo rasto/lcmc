@@ -32,8 +32,6 @@ package lcmc.data;
  *
  */
 public final class CastAddress {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Type of the cast address. */
     private final String type; /* bcast, mcast or ucast */
     /** Interface like eth0. */
@@ -43,7 +41,7 @@ public final class CastAddress {
     /** Serial device. */
     private final String serial;
 
-    /** Prepares a new <code>CastAddress</code> object. */
+    /** Prepares a new {@code CastAddress} object. */
     public CastAddress(final String type,
                        final String iface,
                        final String address,
@@ -60,11 +58,13 @@ public final class CastAddress {
                            final String address,
                            final String serial) {
         if ("mcast".equals(type) || "ucast".equals(type)) {
-            return type + " " + iface + " " + address;
-        } else if ("bcast".equals(type)) {
-            return type + " " + iface;
-        } else if ("serial".equals(type)) {
-            return type + " " + serial;
+            return type + ' ' + iface + ' ' + address;
+        }
+        if ("bcast".equals(type)) {
+            return type + ' ' + iface;
+        }
+        if ("serial".equals(type)) {
+            return type + ' ' + serial;
         }
         return "";
 

@@ -34,13 +34,11 @@ import lcmc.gui.dialog.WizardDialog;
  * @version $Id$
  */
 public abstract class DrbdConfig extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Drbd resource info object. */
     private final DrbdVolumeInfo drbdVolumeInfo;
 
-    /** Prepares a new <code>DrbdConfig</code> object. */
-    public DrbdConfig(final WizardDialog previousDialog,
+    /** Prepares a new {@code DrbdConfig} object. */
+    protected DrbdConfig(final WizardDialog previousDialog,
                       final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog);
         this.drbdVolumeInfo = drbdVolumeInfo;

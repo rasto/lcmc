@@ -40,9 +40,9 @@ public final class ClusterTab extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Cluster data object. */
-    private final Cluster cluster;
+    private final transient Cluster cluster;
 
-    /** Prepares a new <code>ClusterTab</code> object. */
+    /** Prepares a new {@code ClusterTab} object. */
     ClusterTab(final Cluster cluster) {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));

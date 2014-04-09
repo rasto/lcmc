@@ -21,23 +21,15 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.Host;
-import lcmc.data.HostLocation;
-import lcmc.data.ResourceAgent;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.widget.TextfieldWithUnit;
 
 import java.awt.geom.Point2D;
 import lcmc.data.resources.Service;
-import lcmc.data.Subtext;
-import lcmc.data.CRMXML;
-import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
-import lcmc.data.PtestData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Unit;
@@ -61,16 +53,17 @@ import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.LinkedHashMap;
-import java.util.concurrent.CountDownLatch;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -81,7 +74,6 @@ import javax.swing.BoxLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JMenuBar;
 import javax.swing.JScrollPane;
-import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
 import javax.swing.SpringLayout;
 import javax.swing.AbstractButton;
@@ -91,8 +83,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -108,7 +100,7 @@ public class ServiceInfo extends EditableInfo {
                                   LoggerFactory.getLogger(ServiceInfo.class);
 
     /** Nothing selected */
-    private static final StringValue NOTHING_SELECTED_VALUE = new StringValue();
+    private static final Value NOTHING_SELECTED_VALUE = new StringValue();
     /** A map from host to the combobox with scores. */
     private final Map<HostInfo, Widget> scoreComboBoxHash =
                                           new HashMap<HostInfo, Widget>();
@@ -273,7 +265,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Prepares a new <code>ServiceInfo</code> object and creates
+     * Prepares a new {@code ServiceInfo} object and creates
      * new service object.
      */
     ServiceInfo(final String name,
@@ -291,7 +283,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /**
-     * Prepares a new <code>ServiceInfo</code> object and creates
+     * Prepares a new {@code ServiceInfo} object and creates
      * new service object. It also initializes parameters along with
      * heartbeat id with values from xml stored in resourceNode.
      */
@@ -328,145 +320,20 @@ public class ServiceInfo extends EditableInfo {
         this.infoPanel = infoPanel;
     }
 
-    /** Returns true if the node is active. */
-    boolean isOfflineNode(final String node) {
-        return "no".equals(getBrowser().getClusterStatus().isOnlineNode(node));
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false, false, false);
-    }
-
-    /**
-     * Returns whether all the parameters are correct. If param is null,
-     * all paremeters will be checked, otherwise only the param, but other
-     * parameters will be checked only in the cache. This is good if only
-     * one value is changed and we don't want to check everything.
-     */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromServicesInfo,
-                                       final boolean fromCloneInfo,
-                                       final boolean fromGroupInfo) {
-        final Value idV = getComboBoxValue(GUI_ID);
-        if (idV == null) {
-            return true;
-        }
-        final String id = idV.getValueForConfig();
-        final CloneInfo ci = getCloneInfo();
-        if (!fromCloneInfo && ci != null) {
-            return ci.checkResourceFieldsCorrect(param,
-                                                 ci.getParametersFromXML(),
-                                                 fromServicesInfo);
-        }
-        final GroupInfo gi = getGroupInfo();
-        if (!fromGroupInfo && gi != null) {
-            if (!gi.checkResourceFieldsCorrect(param,
-                                               gi.getParametersFromXML(),
-                                               fromServicesInfo,
-                                               fromCloneInfo)) {
-                return false;
-            }
-        }
-        if (!fromGroupInfo && gi != null) {
-            if (!fromServicesInfo) {
-                gi.setApplyButtons(null, gi.getParametersFromXML());
-            }
-        }
-        if (getService().isOrphaned()) {
-            return false;
-        }
-        /* Allow it only for resources that are in LRM. */
-        final ServiceInfo si =
-                getBrowser().getServiceInfoFromId(getService().getName(), id);
-        if (si != null && si != this && !si.getService().isOrphaned()) {
-            return false;
-        }
-
-        if (!super.checkResourceFieldsCorrect(param, params)) {
-            return false;
-        }
-        if (ci == null) {
-            boolean on = false;
-            for (Host host : getBrowser().getClusterHosts()) {
-                final HostInfo hi = host.getBrowser().getHostInfo();
-                /* at least one "eq" */
-                final Widget wi = scoreComboBoxHash.get(hi);
-                if (wi != null) {
-                    final JLabel label = wi.getLabel();
-                    if (label != null) {
-                        final String op = getOpFromLabel(hi.getName(),
-                                                         label.getText());
-                        if (wi.getValue() == null || "eq".equals(op)) {
-                            on = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (!on) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /**
      * Returns whether the specified parameter or any of the parameters
      * have changed. If param is null, only param will be checked,
      * otherwise all parameters will be checked.
      */
     @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false, false, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false, false, false);
     }
 
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params,
-                                              final boolean fromServicesInfo,
-                                              final boolean fromCloneInfo,
-                                              final boolean fromGroupInfo) {
-        final Value idV = getComboBoxValue(GUI_ID);
-        String id = null;
-        if (idV != null) {
-            id = getComboBoxValue(GUI_ID).getValueForConfig();
-        }
-        final CloneInfo ci = getCloneInfo();
-        if (!fromCloneInfo && ci != null) {
-            return ci.checkResourceFieldsChanged(param,
-                                                 ci.getParametersFromXML(),
-                                                 fromServicesInfo);
-        }
-        final GroupInfo gi = getGroupInfo();
-        if (!fromGroupInfo && gi != null) {
-            if (!fromServicesInfo) {
-                gi.setApplyButtons(null, gi.getParametersFromXML());
-            }
-        }
-        if (id == null) {
-            return false;
-        }
-        boolean changed = false;
-        if (super.checkResourceFieldsChanged(param, params)) {
-            changed = true;
-        }
-        boolean allMetaAttrsAreDefaultValues = true;
+    private boolean areAllMetaAttrsAreDefaultValues(final String[] params) {
         if (params != null) {
-            for (String otherParam : params) {
+            for (final String otherParam : params) {
                 if (isMetaAttr(otherParam)) {
                     final Widget wi = getWidget(otherParam, null);
                     if (wi == null) {
@@ -475,126 +342,188 @@ public class ServiceInfo extends EditableInfo {
                     final Value newValue = wi.getValue();
                     final Value defaultValue = getParamDefault(otherParam);
                     if (!Tools.areEqual(newValue, defaultValue)) {
-                        allMetaAttrsAreDefaultValues = false;
+                        return false;
                     }
                 }
             }
         }
+        return true;
+    }
+
+    private void oldStyleResourcesHideFields(final String[] params) {
+        /* in old style resources don't show all the textfields */
+        boolean visible = false;
+        Widget wi = null;
+        for (int i = params.length - 1; i >= 0; i--) {
+            final Widget prevWi = getWidget(params[i], null);
+            if (prevWi == null) {
+                continue;
+            }
+            if (!visible && !prevWi.getStringValue().isEmpty()) {
+                visible = true;
+            }
+            if (wi != null && wi.getComponent().isVisible() != visible) {
+                wi.setVisible(visible);
+            }
+            wi = prevWi;
+        }
+    }
+
+    private boolean checkSameAsMetaAttrsFieldsChanged(final String[] params) {
+        final Value info = sameAsMetaAttrsWiValue();
+        final boolean defaultValues =
+                info != null
+                && META_ATTRS_DEFAULT_VALUES.equals(info);
+        final boolean nothingSelected =
+                  info == null || info.isNothingSelected();
+        if (!nothingSelected
+            && !defaultValues
+            && info != savedMetaAttrInfoRef) {
+            sameAsMetaAttrsWi.processAccessMode();
+            return true;
+        } else {
+            if ((nothingSelected || defaultValues)
+                && savedMetaAttrInfoRef != null) {
+                sameAsMetaAttrsWi.processAccessMode();
+                return true;
+            }
+            final boolean allMetaAttrsAreDefaultValues =
+                                       areAllMetaAttrsAreDefaultValues(params);
+            if (savedMetaAttrInfoRef == null
+                && defaultValues != allMetaAttrsAreDefaultValues) {
+                if (allMetaAttrsAreDefaultValues) {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
+                        @Override
+                        public void run() {
+                            sameAsMetaAttrsWi.setValueNoListeners(
+                                               META_ATTRS_DEFAULT_VALUES);
+                        }
+                    });
+                } else {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
+                        @Override
+                        public void run() {
+                            sameAsMetaAttrsWi.setValueNoListeners(null);
+                        }
+                    });
+                }
+            }
+        }
+        sameAsMetaAttrsWi.processAccessMode();
+        return false;
+    }
+
+    /**
+     * Returns whether the specified parameter or any of the parameters
+     * have changed. If param is null, only param will be checked,
+     * otherwise all parameters will be checked.
+     */
+    public Check checkResourceFields(final String param,
+                                     final String[] params,
+                                     final boolean fromServicesInfo,
+                                     final boolean fromCloneInfo,
+                                     final boolean fromGroupInfo) {
+        final Value idV = getComboBoxValue(GUI_ID);
+        String id = null;
+        if (idV != null) {
+            id = getComboBoxValue(GUI_ID).getValueForConfig();
+        }
+        final CloneInfo ci = getCloneInfo();
+        if (!fromCloneInfo && ci != null) {
+            return ci.checkResourceFields(param,
+                                          ci.getParametersFromXML(),
+                                          fromServicesInfo);
+        }
+
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+
+        final Check check = new Check(incorrect, changed);
+        final GroupInfo gi = getGroupInfo();
+        if (!fromGroupInfo && gi != null) {
+            final Check groupCheck = gi.checkResourceFields(
+                                                      param,
+                                                      gi.getParametersFromXML(),
+                                                      fromServicesInfo,
+                                                      fromCloneInfo);
+            check.addCheck(groupCheck);
+            if (!fromServicesInfo) {
+                gi.setApplyButtons(null, gi.getParametersFromXML());
+            }
+        }
+        check.addCheck(super.checkResourceFields(param, params));
+        if (getService().isOrphaned()) {
+            incorrect.add("resource is orphaned");
+        }
         final String heartbeatId = getService().getHeartbeatId();
-        if (ConfigData.PM_GROUP_NAME.equals(getName())) {
+        /* Allow it only for resources that are in LRM. */
+        ServiceInfo si = null;
+        if (id != null) {
+            si = getBrowser().getServiceInfoFromId(getService().getName(),
+                                                   id);
+        }
+        if (si != null && si != this && !si.getService().isOrphaned()) {
+            incorrect.add("not in LRM");
+        }
+        if (Application.PM_GROUP_NAME.equals(getName())) {
             if (heartbeatId == null) {
-                changed = true;
+                changed.add("new resource");
             } else if (heartbeatId.equals(Service.GRP_ID_PREFIX + id)
                 || heartbeatId.equals(id)) {
-                if (checkHostLocationsFieldsChanged()
-                    || checkOperationFieldsChanged()) {
-                    changed = true;
+                if (ci == null) {
+                    check.addCheck(checkHostLocationsFields());
                 }
-            } else {
-                changed = true;
+                check.addCheck(checkOperationFields());
             }
-        } else if (ConfigData.PM_CLONE_SET_NAME.equals(getName())
-                   || ConfigData.PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
-            String prefix;
+        } else if (Application.PM_CLONE_SET_NAME.equals(getName())
+                   || Application.PM_MASTER_SLAVE_SET_NAME.equals(getName())) {
+            final String prefix;
             if (getService().isMaster()) {
                 prefix = Service.MS_ID_PREFIX;
             } else {
                 prefix = Service.CL_ID_PREFIX;
             }
-            if (heartbeatId.equals(prefix + id)
-                || heartbeatId.equals(id)) {
-                if (checkHostLocationsFieldsChanged()) {
-                    changed = true;
+            if (heartbeatId != null
+                && (heartbeatId.equals(prefix + id)
+                    || heartbeatId.equals(id))) {
+                if (ci == null) {
+                    check.addCheck(checkHostLocationsFields());
                 }
-            } else {
-                changed = true;
             }
         } else {
             if (heartbeatId == null) {
             } else if (heartbeatId.equals(Service.RES_ID_PREFIX
                                           + getService().getName()
-                                          + "_" + id)
+                                          + '_' + id)
                        || heartbeatId.equals(Service.STONITH_ID_PREFIX
                                           + getService().getName()
-                                          + "_" + id)
+                                          + '_' + id)
                        || heartbeatId.equals(id)) {
-                if (checkHostLocationsFieldsChanged()
-                    || checkOperationFieldsChanged()) {
-                    changed = true;
+                if (ci == null) {
+                    check.addCheck(checkHostLocationsFields());
                 }
-            } else {
-                changed = true;
+                check.addCheck(checkOperationFields());
             }
         }
         final String cl = getService().getResourceClass();
         if (cl != null && (cl.equals(ResourceAgent.HEARTBEAT_CLASS)
                            || ResourceAgent.SERVICE_CLASSES.contains(cl))) {
-            /* in old style resources don't show all the textfields */
-            boolean visible = false;
-            Widget wi = null;
-            for (int i = params.length - 1; i >= 0; i--) {
-                final Widget prevWi = getWidget(params[i], null);
-                if (prevWi == null) {
-                    continue;
-                }
-                if (!visible && !prevWi.getStringValue().isEmpty()) {
-                    visible = true;
-                }
-                if (wi != null && wi.getComponent().isVisible() != visible) {
-                    final boolean v = visible;
-                    final Widget c = wi;
-                    c.setVisible(v);
-                }
-                wi = prevWi;
-            }
+            oldStyleResourcesHideFields(params);
         }
 
         /* id-refs */
         if (sameAsMetaAttrsWi != null) {
-            final Value info = sameAsMetaAttrsWiValue();
-            final boolean defaultValues =
-                    info != null
-                    && META_ATTRS_DEFAULT_VALUES.equals(info);
-            final boolean nothingSelected =
-                      info == null || info.isNothingSelected();
-            if (!nothingSelected
-                && !defaultValues
-                && info != savedMetaAttrInfoRef) {
-                changed = true;
-            } else {
-                if ((nothingSelected || defaultValues)
-                    && savedMetaAttrInfoRef != null) {
-                    changed = true;
-                }
-                if (savedMetaAttrInfoRef == null
-                    && defaultValues != allMetaAttrsAreDefaultValues) {
-                    if (allMetaAttrsAreDefaultValues) {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                          new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsMetaAttrsWi.setValueNoListeners(
-                                                   META_ATTRS_DEFAULT_VALUES);
-                            }
-                        });
-                    } else {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                          new Runnable() {
-                            @Override
-                            public void run() {
-                                sameAsMetaAttrsWi.setValueNoListeners(null);
-                            }
-                        });
-                    }
-                }
+            if (checkSameAsMetaAttrsFieldsChanged(params)) {
+                changed.add("meta attributes");
             }
-            sameAsMetaAttrsWi.processAccessMode();
         }
         if (!fromServicesInfo) {
             final ServicesInfo sis = getBrowser().getServicesInfo();
             sis.setApplyButtons(null, sis.getParametersFromXML());
         }
-        return changed;
+        return check;
     }
 
     /** Returns operation default for parameter. */
@@ -625,8 +554,6 @@ public class ServiceInfo extends EditableInfo {
                                                       getService().isMaster()));
         final ClusterStatus cs = getBrowser().getClusterStatus();
         if (params != null) {
-            boolean allMetaAttrsAreDefaultValues = true;
-            boolean allSavedMetaAttrsAreDefaultValues = true;
             final String newMetaAttrsId = cs.getMetaAttrsId(
                                                getService().getHeartbeatId());
             if ((savedMetaAttrsId == null && newMetaAttrsId != null)
@@ -645,10 +572,12 @@ public class ServiceInfo extends EditableInfo {
             }
             resourceNode.put(PCMK_ID, getService().getHeartbeatId());
             resourceNode.put(GUI_ID, getService().getId());
-            for (String param : params) {
+            boolean allMetaAttrsAreDefaultValues = true;
+            boolean allSavedMetaAttrsAreDefaultValues = true;
+            for (final String param : params) {
                 Value value;
                 if (isMetaAttr(param) && refCRMId != null) {
-                    value = new StringValue(cs.getParameter(refCRMId, param, false));
+                    value = new StringValue(cs.getParameter(refCRMId, param, Application.RunMode.LIVE));
                 } else {
                     value = new StringValue(resourceNode.get(param));
                 }
@@ -705,12 +634,12 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* set scores */
-        for (Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation hostLocation = cs.getScore(
                                                 getService().getHeartbeatId(),
                                                 hi.getName(),
-                                                false);
+                                                Application.RunMode.LIVE);
             final HostLocation savedLocation = savedHostLocations.get(hi);
             if (Tools.areEqual(hostLocation, savedLocation)) {
                 if (hostLocation == null) {
@@ -740,7 +669,7 @@ public class ServiceInfo extends EditableInfo {
         /* set ping constraint */
         final HostLocation hostLocation = cs.getPingScore(
                                                 getService().getHeartbeatId(),
-                                                false);
+                                                Application.RunMode.LIVE);
         Value pingOperation = null;
         if (hostLocation != null) {
             final String op = hostLocation.getOperation();
@@ -765,8 +694,6 @@ public class ServiceInfo extends EditableInfo {
             }
         }
 
-        boolean allAreDefaultValues = true;
-        boolean allSavedAreDefaultValues = true;
         /* Operations */
         final String newOperationsId = cs.getOperationsId(
                                                 getService().getHeartbeatId());
@@ -786,6 +713,8 @@ public class ServiceInfo extends EditableInfo {
             refCRMId = getService().getHeartbeatId();
         }
         mSavedOperationsLock.lock();
+        boolean allAreDefaultValues = true;
+        boolean allSavedAreDefaultValues = true;
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param
                           : getBrowser().getCRMOperationParams(op)) {
@@ -834,14 +763,11 @@ public class ServiceInfo extends EditableInfo {
             for (final String op : getResourceAgent().getOperationNames()) {
                 for (final String param
                               : getBrowser().getCRMOperationParams(op)) {
-                    Value defaultValue =
+                    final Value defaultValue =
                                   resourceAgent.getOperationDefault(op, param);
                     if (defaultValue == null
                         || defaultValue.isNothingSelected()) {
                         continue;
-                    }
-                    if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
-                        defaultValue = NOTHING_SELECTED_VALUE;
                     }
                     Value value = cs.getOperation(refCRMId, op, param);
                     if (value == null || value.isNothingSelected()) {
@@ -870,7 +796,7 @@ public class ServiceInfo extends EditableInfo {
         }
         mSavedOperationsLock.unlock();
         getService().setAvailable();
-        if (cs.isOrphaned(getHeartbeatId(false))) {
+        if (cs.isOrphaned(getHeartbeatId(Application.RunMode.LIVE))) {
             getService().setOrphaned(true);
             getService().setNew(false);
             final CloneInfo ci = getCloneInfo();
@@ -893,7 +819,7 @@ public class ServiceInfo extends EditableInfo {
      */
     @Override
     public String getValueForConfig() {
-        return getName() + "_" + getService().getId();
+        return getName() + '_' + getService().getId();
     }
 
     /**
@@ -905,21 +831,21 @@ public class ServiceInfo extends EditableInfo {
         final StringBuilder s = new StringBuilder(30);
         final String provider = resourceAgent.getProvider();
         if (!ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
-            && !"".equals(provider)) {
+            && provider != null && !provider.isEmpty()) {
             s.append(provider);
             s.append(':');
         }
         s.append(getName());
-        final String string = getService().getId();
+        final String serviceId = getService().getId();
 
         /* 'string' contains the last string if there are more dependent
          * resources, although there is usually only one. */
-        if (string == null) {
+        if (serviceId == null) {
             s.insert(0, "new ");
         } else {
-            if (!"".equals(string)) {
+            if (serviceId != null && !serviceId.isEmpty()) {
                 s.append(" (");
-                s.append(string);
+                s.append(serviceId);
                 s.append(')');
             }
         }
@@ -927,92 +853,81 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns node name of the host where this service is running. */
-    List<String> getMasterOnNodes(final boolean testOnly) {
+    List<String> getMasterOnNodes(final Application.RunMode runMode) {
         return getBrowser().getClusterStatus().getMasterOnNodes(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
+                                                      getHeartbeatId(runMode),
+                                                      runMode);
     }
 
     /** Returns node name of the host where this service is running. */
-    List<String> getRunningOnNodes(final boolean testOnly) {
+    List<String> getRunningOnNodes(final Application.RunMode runMode) {
         return getBrowser().getClusterStatus().getRunningOnNodes(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
+                                                      getHeartbeatId(runMode),
+                                                      runMode);
     }
 
     /** Returns whether service is started. */
-    boolean isStarted(final boolean testOnly) {
+    boolean isStarted(final Application.RunMode runMode) {
         final Host dcHost = getBrowser().getDCHost();
-        final String hbV = dcHost.getHeartbeatVersion();
-        final String pmV = dcHost.getPacemakerVersion();
         String targetRoleString = "target-role";
         if (Tools.versionBeforePacemaker(dcHost)) {
             targetRoleString = "target_role";
         }
-        String crmId = getHeartbeatId(testOnly);
+        String crmId = getHeartbeatId(runMode);
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final String refCRMId = cs.getMetaAttrsRef(crmId);
         if (refCRMId != null) {
             crmId = refCRMId;
         }
-        String targetRole = cs.getParameter(crmId, targetRoleString, testOnly);
+        String targetRole = cs.getParameter(crmId, targetRoleString, runMode);
         if (targetRole == null) {
             targetRole = getParamDefault(targetRoleString).getValueForConfig();
         }
-        if (!CRMXML.TARGET_ROLE_STOPPED.equals(targetRole)) {
-            return true;
-        }
-        return false;
+        return !CRMXML.TARGET_ROLE_STOPPED.equals(targetRole);
     }
 
     /** Returns whether the service was set to be in slave role. */
-    public boolean isEnslaved(final boolean testOnly) {
+    public boolean isEnslaved(final Application.RunMode runMode) {
         final Host dcHost = getBrowser().getDCHost();
         String targetRoleString = "target-role";
         if (Tools.versionBeforePacemaker(dcHost)) {
             targetRoleString = "target_role";
         }
-        String crmId = getHeartbeatId(testOnly);
+        String crmId = getHeartbeatId(runMode);
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final String refCRMId = cs.getMetaAttrsRef(crmId);
         if (refCRMId != null) {
             crmId = refCRMId;
         }
-        String targetRole = cs.getParameter(crmId, targetRoleString, testOnly);
+        String targetRole = cs.getParameter(crmId, targetRoleString, runMode);
         if (targetRole == null) {
             targetRole = getParamDefault(targetRoleString).getValueForConfig();
         }
-        if (CRMXML.TARGET_ROLE_SLAVE.equals(targetRole)) {
-            return true;
-        }
-        return false;
+        return CRMXML.TARGET_ROLE_SLAVE.equals(targetRole);
     }
 
     /** Returns whether service is stopped. */
-    public boolean isStopped(final boolean testOnly) {
+    public boolean isStopped(final Application.RunMode runMode) {
         final Host dcHost = getBrowser().getDCHost();
         String targetRoleString = "target-role";
         if (Tools.versionBeforePacemaker(dcHost)) {
             targetRoleString = "target_role";
         }
-        String crmId = getHeartbeatId(testOnly);
+        String crmId = getHeartbeatId(runMode);
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final String refCRMId = cs.getMetaAttrsRef(crmId);
         if (refCRMId != null) {
             crmId = refCRMId;
         }
-        String targetRole = cs.getParameter(crmId, targetRoleString, testOnly);
+        String targetRole = cs.getParameter(crmId, targetRoleString, runMode);
         if (targetRole == null) {
             targetRole = getParamDefault(targetRoleString).getValueForConfig();
         }
-        if (CRMXML.TARGET_ROLE_STOPPED.equals(targetRole)) {
-            return true;
-        }
-        return false;
+        return CRMXML.TARGET_ROLE_STOPPED.equals(targetRole);
     }
 
     /** Returns whether the group is stopped. */
-    boolean isGroupStopped(final boolean testOnly) {
+    boolean isGroupStopped(final Application.RunMode runMode) {
         return false;
     }
 
@@ -1020,19 +935,19 @@ public class ServiceInfo extends EditableInfo {
      * Returns whether service is managed.
      * TODO: "default" value
      */
-    public boolean isManaged(final boolean testOnly) {
+    public boolean isManaged(final Application.RunMode runMode) {
         return getBrowser().getClusterStatus().isManaged(
-                                                    getHeartbeatId(testOnly),
-                                                    testOnly);
+                                                    getHeartbeatId(runMode),
+                                                    runMode);
     }
 
     /** Returns whether the service where was migrated or null. */
-    public List<Host> getMigratedTo(final boolean testOnly) {
+    public List<Host> getMigratedTo(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        for (Host host : getBrowser().getClusterHosts()) {
-            final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String locationId = cs.getLocationId(getHeartbeatId(runMode),
                                                        host.getName(),
-                                                       testOnly);
+                                                       runMode);
             if (locationId == null
                 || (!locationId.startsWith("cli-prefer-")
                     && !locationId.startsWith("cli-standby-")
@@ -1041,9 +956,9 @@ public class ServiceInfo extends EditableInfo {
             }
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation hostLocation = cs.getScore(
-                                                      getHeartbeatId(testOnly),
+                                                      getHeartbeatId(runMode),
                                                       hi.getName(),
-                                                      testOnly);
+                                                      runMode);
             String score = null;
             String op = null;
             if (hostLocation != null) {
@@ -1062,25 +977,23 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns whether the service was fenced. */
-    public List<Host> isFenced(final boolean testOnly) {
+    public List<Host> isFenced(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        for (Host host : getBrowser().getClusterHosts()) {
-            final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String locationId = cs.getLocationId(getHeartbeatId(runMode),
                                                        host.getName(),
-                                                       testOnly);
+                                                       runMode);
             if (locationId == null || !locationId.contains("fence")) {
                 continue;
             }
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation hostLocation = cs.getScore(
-                                                      getHeartbeatId(testOnly),
+                                                      getHeartbeatId(runMode),
                                                       hi.getName(),
-                                                      testOnly);
+                                                      runMode);
             String score = null;
-            String op = null;
             if (hostLocation != null) {
                 score = hostLocation.getScore();
-                op = hostLocation.getOperation();
             }
             if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)) {
                 final List<Host> hosts = new ArrayList<Host>();
@@ -1092,12 +1005,12 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns whether the service where was migrated or null. */
-    public List<Host> getMigratedFrom(final boolean testOnly) {
+    public List<Host> getMigratedFrom(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        for (Host host : getBrowser().getClusterHosts()) {
-            final String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+        for (final Host host : getBrowser().getClusterHosts()) {
+            final String locationId = cs.getLocationId(getHeartbeatId(runMode),
                                                        host.getName(),
-                                                       testOnly);
+                                                       runMode);
             if (locationId == null
                 || (!locationId.startsWith("cli-prefer-")
                     && !locationId.startsWith("cli-standby-")
@@ -1106,9 +1019,9 @@ public class ServiceInfo extends EditableInfo {
             }
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation hostLocation = cs.getScore(
-                                                      getHeartbeatId(testOnly),
+                                                      getHeartbeatId(runMode),
                                                       hi.getName(),
-                                                      testOnly);
+                                                      runMode);
             String score = null;
             String op = null;
             if (hostLocation != null) {
@@ -1126,16 +1039,16 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns whether the service is running. */
-    public boolean isRunning(final boolean testOnly) {
-        final List<String> runningOnNodes = getRunningOnNodes(testOnly);
+    public boolean isRunning(final Application.RunMode runMode) {
+        final List<String> runningOnNodes = getRunningOnNodes(runMode);
         return runningOnNodes != null && !runningOnNodes.isEmpty();
     }
 
     /** Returns fail count string that appears in the graph. */
     private String getFailCountString(final String hostName,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         String fcString = "";
-        final String failCount = getFailCount(hostName, testOnly);
+        final String failCount = getFailCount(hostName, runMode);
         if (failCount != null) {
             if (CRMXML.INFINITY_STRING.getValueForConfig().equals(failCount)) {
                 fcString = " failed";
@@ -1149,27 +1062,27 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns fail count. */
     protected String getFailCount(final String hostName,
-                                  final boolean testOnly) {
+                                  final Application.RunMode runMode) {
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        return cs.getFailCount(hostName, getHeartbeatId(testOnly), testOnly);
+        return cs.getFailCount(hostName, getHeartbeatId(runMode), runMode);
     }
 
     /** Returns ping count. */
     protected String getPingCount(final String hostName,
-                                  final boolean testOnly) {
+                                  final Application.RunMode runMode) {
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        return cs.getPingCount(hostName, testOnly);
+        return cs.getPingCount(hostName, runMode);
     }
 
     /** Returns fail ping string that appears in the graph. */
     protected String getPingCountString(final String hostName,
-                                        final boolean testOnly) {
+                                        final Application.RunMode runMode) {
         if (!resourceAgent.isPingService()) {
             return "";
         }
-        final String pingCount = getPingCount(hostName, testOnly);
+        final String pingCount = getPingCount(hostName, runMode);
         if (pingCount == null || "0".equals(pingCount)) {
             return " / no ping";
         } else {
@@ -1179,28 +1092,28 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns whether the resource is orphaned on the specified host. */
     protected final boolean isInLRMOnHost(final String hostName,
-                                          final boolean testOnly) {
+                                          final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        return cs.isInLRMOnHost(hostName, getHeartbeatId(testOnly), testOnly);
+        return cs.isInLRMOnHost(hostName, getHeartbeatId(runMode), runMode);
     }
 
     /** Returns whether the resource failed on the specified host. */
     protected final boolean failedOnHost(final String hostName,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         final String failCount = getFailCount(hostName,
-                                              testOnly);
+                                              runMode);
         return failCount != null
                && CRMXML.INFINITY_STRING.getValueForConfig().equals(failCount);
     }
 
     /** Returns whether the resource has failed to start. */
-    public boolean isFailed(final boolean testOnly) {
-        if (isRunning(testOnly)) {
+    public boolean isFailed(final Application.RunMode runMode) {
+        if (isRunning(runMode)) {
             return false;
         }
         for (final Host host : getBrowser().getClusterHosts()) {
             if (host.isClStatus() && failedOnHost(host.getName(),
-                                                  testOnly)) {
+                                                  runMode)) {
                 return true;
             }
         }
@@ -1208,9 +1121,9 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns whether the resource has failed on one of the nodes. */
-    boolean isOneFailed(final boolean testOnly) {
+    boolean isOneFailed(final Application.RunMode runMode) {
         for (final Host host : getBrowser().getClusterHosts()) {
-            if (failedOnHost(host.getName(), testOnly)) {
+            if (failedOnHost(host.getName(), runMode)) {
                 return true;
             }
         }
@@ -1218,9 +1131,9 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns whether the resource has fail-count on one of the nodes. */
-    boolean isOneFailedCount(final boolean testOnly) {
+    boolean isOneFailedCount(final Application.RunMode runMode) {
         for (final Host host : getBrowser().getClusterHosts()) {
-            if (getFailCount(host.getName(), testOnly) != null) {
+            if (getFailCount(host.getName(), runMode) != null) {
                 return true;
             }
         }
@@ -1230,17 +1143,17 @@ public class ServiceInfo extends EditableInfo {
     /** Sets whether the service is managed. */
     void setManaged(final boolean isManaged,
                     final Host dcHost,
-                    final boolean testOnly) {
-        if (!testOnly) {
+                    final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        CRM.setManaged(dcHost, getHeartbeatId(testOnly), isManaged, testOnly);
+        CRM.setManaged(dcHost, getHeartbeatId(runMode), isManaged, runMode);
     }
 
     /** Returns color for the host vertex. */
-    public List<Color> getHostColors(final boolean testOnly) {
+    public List<Color> getHostColors(final Application.RunMode runMode) {
         return getBrowser().getCluster().getHostColors(
-                                                  getRunningOnNodes(testOnly));
+                                                  getRunningOnNodes(runMode));
     }
 
     /**
@@ -1248,45 +1161,26 @@ public class ServiceInfo extends EditableInfo {
      * TODO: broken icon, not managed icon.
      */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
-        if (isFailed(testOnly)) {
-            if (isRunning(testOnly)) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
+        if (isFailed(runMode)) {
+            if (isRunning(runMode)) {
                 return SERVICE_RUNNING_FAILED_ICON_SMALL;
             } else {
                 return SERVICE_STOPPED_FAILED_ICON_SMALL;
             }
-        } else if (isStopped(testOnly) || getBrowser().allHostsDown()) {
-            if (isRunning(testOnly)) {
+        } else if (isStopped(runMode) || getBrowser().allHostsDown()) {
+            if (isRunning(runMode)) {
                 return SERVICE_STOPPING_ICON_SMALL;
             } else {
                 return SERVICE_STOPPED_ICON_SMALL;
             }
         } else {
-            if (isRunning(testOnly)) {
+            if (isRunning(runMode)) {
                 return SERVICE_RUNNING_ICON_SMALL;
             } else {
                 return SERVICE_STARTED_ICON_SMALL;
             }
         }
-    }
-
-    /** Gets saved host scores. */
-    Map<HostInfo, HostLocation> getSavedHostLocations() {
-        return savedHostLocations;
-    }
-
-    /** Returns list of all host names in this cluster. */
-    List<String> getHostNames() {
-        final List<String> hostNames = new ArrayList<String>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e =
-                                 getBrowser().getClusterHostsNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n = e.nextElement();
-            final String hostName = ((HostInfo) n.getUserObject()).getName();
-            hostNames.add(hostName);
-        }
-        return hostNames;
     }
 
     /**
@@ -1306,7 +1200,6 @@ public class ServiceInfo extends EditableInfo {
         while (e.hasMoreElements()) {
             final DefaultMutableTreeNode n = e.nextElement();
             final Info i = (Info) n.getUserObject();
-            final String name = i.getName();
             final ServiceInfo si = getBrowser().getServiceInfoFromId(
                                                                  serviceName,
                                                                  i.getName());
@@ -1345,10 +1238,10 @@ public class ServiceInfo extends EditableInfo {
     /**
      * Returns thrue if an operation field changed.
      */
-    private boolean checkOperationFieldsChanged() {
-        boolean changed = false;
-        boolean allAreDefaultValues = true;
+    private Check checkOperationFields() {
+        final List<String> changed = new ArrayList<String>(); // no check
         mSavedOperationsLock.lock();
+        boolean allAreDefaultValues = true;
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param : getBrowser().getCRMOperationParams(op)) {
                 Value defaultValue = resourceAgent.getOperationDefault(op, param);
@@ -1372,20 +1265,23 @@ public class ServiceInfo extends EditableInfo {
                     final Value savedOp = savedOperation.get(op, param);
                     if (savedOp == null) {
                         if (!Tools.areEqual(value, defaultValue)) {
-                            changed = true;
+                            changed.add(param + ": " + defaultValue
+                                        + " \u2192 " + value);
                         }
                     } else if (!Tools.areEqual(value, savedOp)) {
-                        changed = true;
+                        changed.add(param + ": " + savedOp
+                                    + " \u2192 " + value);
                     }
                     wi.setBackground(defaultValue, savedOp, false);
                 } else {
-                    Value value = wi.getValue();
+                    final Value value = wi.getValue();
                     if (!Tools.areEqual(value, defaultValue)) {
                         allAreDefaultValues = false;
                     }
                     final Value savedOp = savedOperation.get(op, param);
                     if (!Tools.areEqual(value, savedOp)) {
-                        changed = true;
+                        changed.add(param + ": " + savedOp
+                                    + " \u2192 " + value);
                     }
                     wi.setBackground(defaultValue, savedOp, false);
                 }
@@ -1401,11 +1297,11 @@ public class ServiceInfo extends EditableInfo {
             if (!nothingSelected
                 && !defaultValues
                 && info != savedOperationIdRef) {
-                changed = true;
+                changed.add("operation id ref");
             } else {
                 if ((nothingSelected || defaultValues)
                     && savedOperationIdRef != null) {
-                    changed = true;
+                    changed.add("operation id ref");
                 }
                 if (savedOperationIdRef == null
                     && defaultValues != allAreDefaultValues) {
@@ -1432,19 +1328,22 @@ public class ServiceInfo extends EditableInfo {
             sameAsOperationsWi.processAccessMode();
         }
         mSavedOperationsLock.unlock();
-        return changed;
+        final List<String> incorrect = new ArrayList<String>(); // no check
+        return new Check(incorrect, changed);
     }
 
     /**
      * Returns true if some of the scores have changed.
      */
-    private boolean checkHostLocationsFieldsChanged() {
-        boolean changed = false;
-        for (Host host : getBrowser().getClusterHosts()) {
+    private Check checkHostLocationsFields() {
+        final List<String> changed = new ArrayList<String>();
+        final List<String> incorrect = new ArrayList<String>();
+        boolean hostLocationFound = false;
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final Widget wi = scoreComboBoxHash.get(hi);
             final HostLocation hlSaved = savedHostLocations.get(hi);
-            Value hsSaved;
+            final Value hsSaved;
             String opSaved = null;
             if (hlSaved == null) {
                 hsSaved = NOTHING_SELECTED_VALUE;
@@ -1458,13 +1357,19 @@ public class ServiceInfo extends EditableInfo {
                 continue;
             }
             String labelText = null;
-            if (wi.getLabel() != null) {
-                labelText = wi.getLabel().getText();
+            final JLabel label = wi.getLabel();
+            if (label != null) {
+                labelText = label.getText();
+                final String op = getOpFromLabel(hi.getName(),
+                                                 label.getText());
+                if (wi.getValue() == null || "eq".equals(op)) {
+                    hostLocationFound = true;
+                }
             }
             if (!Tools.areEqual(hsSaved, wi.getValue())
                 || (!Tools.areEqual(opSavedLabel, labelText)
                     && (hsSaved != null  && !hsSaved.isNothingSelected()))) {
-                changed = true;
+                changed.add("host location");
             }
             wi.setBackground(getHostLocationLabel(host.getName(), "eq"),
                              null,
@@ -1472,15 +1377,18 @@ public class ServiceInfo extends EditableInfo {
                              hsSaved,
                              false);
         }
+        if (!hostLocationFound) {
+            incorrect.add("no host location found");
+        }
         /* ping */
         final Widget pwi = pingComboBox;
         if (pwi != null) {
             if (!Tools.areEqual(savedPingOperation, pwi.getValue())) {
-                changed = true;
+                changed.add("ping operation");
             }
             pwi.setBackground(null, savedPingOperation, false);
         }
-        return changed;
+        return new Check(incorrect, changed);
     }
 
     /**
@@ -1521,8 +1429,7 @@ public class ServiceInfo extends EditableInfo {
                                                         drbdResNode.children();
                 while (drbdVolumes.hasMoreElements()) {
                     final DefaultMutableTreeNode vn = drbdVolumes.nextElement();
-                    final CommonDeviceInterface drbdVol =
-                                   (CommonDeviceInterface) vn.getUserObject();
+                    final Value drbdVol = (Value) vn.getUserObject();
                     list.add(drbdVol);
                 }
             }
@@ -1534,8 +1441,7 @@ public class ServiceInfo extends EditableInfo {
                            getBrowser().getCommonBlockDevicesNode().children();
         while (wids.hasMoreElements()) {
             final DefaultMutableTreeNode n = wids.nextElement();
-            final CommonDeviceInterface wid =
-                                     (CommonDeviceInterface) n.getUserObject();
+            final Value wid = (Value) n.getUserObject();
             list.add(wid);
         }
 
@@ -1597,7 +1503,6 @@ public class ServiceInfo extends EditableInfo {
     protected void addHostLocations(final JPanel optionsPanel,
                                     final int leftWidth,
                                     final int rightWidth) {
-        int rows = 0;
 
         final JPanel panel =
              getParamPanel(Tools.getString("ClusterBrowser.HostLocations"));
@@ -1627,7 +1532,7 @@ public class ServiceInfo extends EditableInfo {
                                   + "))|ALWAYS|NEVER|@NOTHING_SELECTED@$",
                                   rightWidth,
                                   abbreviations,
-                                  new AccessMode(ConfigData.AccessType.ADMIN,
+                                  new AccessMode(Application.AccessType.ADMIN,
                                                  false),
                                   Widget.NO_BUTTON);
             wi.setEditable(true);
@@ -1649,7 +1554,8 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* host score combo boxes */
-        for (Host host : getBrowser().getClusterHosts()) {
+        int rows = 0;
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final Widget wi = scoreComboBoxHash.get(hi);
             String op = null;
@@ -1663,29 +1569,26 @@ public class ServiceInfo extends EditableInfo {
             final String notOnText = getHostLocationLabel(hi.getName(), "ne");
             label.addMouseListener(new MouseListener() {
                 @Override
-                public final void mouseClicked(final MouseEvent e) {
+                public void mouseClicked(final MouseEvent e) {
                     /* do nothing */
                 }
                 @Override
-                public final void mouseEntered(final MouseEvent e) {
+                public void mouseEntered(final MouseEvent e) {
                     /* do nothing */
                 }
                 @Override
-                public final void mouseExited(final MouseEvent e) {
+                public void mouseExited(final MouseEvent e) {
                     /* do nothing */
                 }
                 @Override
-                public final void mousePressed(final MouseEvent e) {
+                public void mousePressed(final MouseEvent e) {
                     final String currentText = label.getText();
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (currentText.equals(onText)) {
                                 label.setText(notOnText);
-                            } else if (currentText.equals(notOnText)) {
-                                label.setText(onText);
                             } else {
-                                /* wierd things */
                                 label.setText(onText);
                             }
                             final String[] params = getParametersFromXML();
@@ -1694,7 +1597,7 @@ public class ServiceInfo extends EditableInfo {
                     });
                 }
                 @Override
-                public final void mouseReleased(final MouseEvent e) {
+                public void mouseReleased(final MouseEvent e) {
                     /* do nothing */
                 }
             });
@@ -1719,9 +1622,8 @@ public class ServiceInfo extends EditableInfo {
     private int addPingField(final JPanel panel,
                              final int leftWidth,
                              final int rightWidth) {
-        int rows = 0;
         final JLabel pingLabel = new JLabel("pingd");
-        Value savedPO;
+        final Value savedPO;
         final Widget prevWi = pingComboBox;
         if (prevWi == null) {
             savedPO = savedPingOperation;
@@ -1737,7 +1639,7 @@ public class ServiceInfo extends EditableInfo {
                          Widget.NO_REGEXP,
                          rightWidth,
                          Widget.NO_ABBRV,
-                         new AccessMode(ConfigData.AccessType.ADMIN,
+                         new AccessMode(Application.AccessType.ADMIN,
                                         false),
                          Widget.NO_BUTTON);
         addField(panel, pingLabel, pingWi.getComponent(), leftWidth, rightWidth, 0);
@@ -1749,6 +1651,7 @@ public class ServiceInfo extends EditableInfo {
             pingWi.setEnabled(false);
         }
         pingComboBox = pingWi;
+        int rows = 0;
         rows++;
         return rows;
     }
@@ -1817,7 +1720,7 @@ public class ServiceInfo extends EditableInfo {
                     if (sameAs) {
                         /* same as some other service */
                         defaultValue =
-                                 ((ServiceInfo) info).getParamSaved(param);
+                                 ((EditableInfo) info).getParamSaved(param);
                     }
                     final Value newValue = defaultValue;
                     if (!Tools.areEqual(oldValue, newValue)) {
@@ -1923,8 +1826,6 @@ public class ServiceInfo extends EditableInfo {
         sl.add(NOTHING_SELECTED_VALUE);
         sl.add(OPERATIONS_DEFAULT_VALUES);
         final Host dcHost = getBrowser().getDCHost();
-        final String pmV = dcHost.getPacemakerVersion();
-        final String hbV = dcHost.getHeartbeatVersion();
         if (isOperationReferenced() || Tools.versionBeforePacemaker(dcHost)) {
             return sl.toArray(new Value[sl.size()]);
         }
@@ -2020,7 +1921,6 @@ public class ServiceInfo extends EditableInfo {
     protected void addOperations(final JPanel optionsPanel,
                                  final int leftWidth,
                                  final int rightWidth) {
-        int rows = 0;
         final JPanel sectionPanel = getParamPanel(
                                 Tools.getString("ClusterBrowser.Operations"));
         final Info savedOpIdRef = getSameServiceOpIdRef();
@@ -2032,10 +1932,10 @@ public class ServiceInfo extends EditableInfo {
                                           rightWidth,
                                           Widget.NO_ABBRV,
                                           new AccessMode(
-                                                    ConfigData.AccessType.ADMIN,
+                                                    Application.AccessType.ADMIN,
                                                     false),
                                           Widget.NO_BUTTON);
-        String toolTip;
+        final String toolTip;
         if (savedOpIdRef == null) {
             toolTip = "";
         } else {
@@ -2057,16 +1957,17 @@ public class ServiceInfo extends EditableInfo {
                                         1, 1,  // initX, initY
                                         1, 1); // xPad, yPad
         sectionPanel.add(saPanel);
-        boolean allAreDefaultValues = true;
         mSavedOperationsLock.lock();
         final JPanel normalOpPanel = new JPanel(new SpringLayout());
         normalOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        int normalRows = 0;
         final JPanel advancedOpPanel = new JPanel(new SpringLayout());
         advancedOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         addToAdvancedList(advancedOpPanel);
-        advancedOpPanel.setVisible(Tools.getConfigData().isAdvancedMode());
+        advancedOpPanel.setVisible(Tools.getApplication().isAdvancedMode());
         int advancedRows = 0;
+        int rows = 0;
+        boolean allAreDefaultValues = true;
+        int normalRows = 0;
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param : getBrowser().getCRMOperationParams(op)) {
                 Value defaultValue = resourceAgent.getOperationDefault(op, param);
@@ -2076,14 +1977,13 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = NOTHING_SELECTED_VALUE;
                 }
-                
-                final String regexp = "^-?\\d*$";
+
                 // TODO: old style resources
                 if (defaultValue == null) {
                     defaultValue = new StringValue("0");
                 }
-                Value savedValue = null;
                 mOperationsComboBoxHashWriteLock.lock();
+                Value savedValue = null;
                 try {
                     final Widget prevWi = operationsComboBoxHash.get(op, param);
                     if (prevWi != null) {
@@ -2109,7 +2009,7 @@ public class ServiceInfo extends EditableInfo {
                 if (savedValue != null) {
                     defaultValue = savedValue;
                 }
-                Widget wi;
+                final Widget wi;
                 if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
                     wi = WidgetFactory.createInstance(
                                   Widget.Type.COMBOBOX,
@@ -2120,18 +2020,19 @@ public class ServiceInfo extends EditableInfo {
                                   "^\\d*$",
                                   rightWidth,
                                   Widget.NO_ABBRV,
-                                  new AccessMode(ConfigData.AccessType.ADMIN,
+                                  new AccessMode(Application.AccessType.ADMIN,
                                                  false),
                                   Widget.NO_BUTTON);
                     //wi.setAlwaysEditable(true);
                 } else {
+                    final String regexp = "^-?\\d*$";
                     wi = new TextfieldWithUnit(defaultValue,
                                                getUnits(param),
                                                regexp,
                                                rightWidth,
                                                Widget.NO_ABBRV,
                                                new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    !AccessMode.ADVANCED),
                                                Widget.NO_BUTTON);
                 }
@@ -2149,7 +2050,7 @@ public class ServiceInfo extends EditableInfo {
                                          + Tools.ucfirst(param);
                 final JLabel wiLabel = new JLabel(labelText);
                 wi.setLabel(wiLabel, labelText);
-                JPanel panel;
+                final JPanel panel;
                 if (getBrowser().isCRMOperationAdvanced(op, param)) {
                     panel = advancedOpPanel;
                     advancedRows++;
@@ -2222,7 +2123,7 @@ public class ServiceInfo extends EditableInfo {
     protected String getParamRegexp(final String param) {
         if (isInteger(param)) {
             return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
-                   + "|" + CRMXML.DISABLED_STRING
+                   + '|' + CRMXML.DISABLED_STRING
                    + "))|@NOTHING_SELECTED@$";
         }
         return null;
@@ -2231,7 +2132,7 @@ public class ServiceInfo extends EditableInfo {
     /** Returns true if the value of the parameter is ok. */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        if (param.equals("ip")
+        if ("ip".equals(param)
             && newValue != null
             && !Tools.isIp(newValue.getValueForConfig())) {
             return false;
@@ -2262,7 +2163,7 @@ public class ServiceInfo extends EditableInfo {
             final String crmId = getService().getHeartbeatId();
             final String refCRMId = clStatus.getMetaAttrsRef(crmId);
             if (refCRMId != null) {
-                final String v = clStatus.getParameter(refCRMId, param, false);
+                final String v = clStatus.getParameter(refCRMId, param, Application.RunMode.LIVE);
                 if (v == null) {
                     final Value value = getParamPreferred(param);
                     if (value == null || value.isNothingSelected()) {
@@ -2278,7 +2179,7 @@ public class ServiceInfo extends EditableInfo {
         if (value == null || value.isNothingSelected()) {
             final String v = clStatus.getParameter(getService().getHeartbeatId(),
                                     param,
-                                    false);
+                                    Application.RunMode.LIVE);
             if (v == null) {
                 Value vp = null;
                 if (getService().isNew()) {
@@ -2406,7 +2307,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         return crmXML.getAccessType(resourceAgent, param);
     }
@@ -2465,7 +2366,7 @@ public class ServiceInfo extends EditableInfo {
      * FilesystemInfo so that it can add LinbitDrbdInfo or DrbddiskInfo
      * before it adds itself.
      */
-    void addResourceBefore(final Host dcHost, final boolean testOnly) {
+    void addResourceBefore(final Host dcHost, final Application.RunMode runMode) {
         /* Override to add resource before this one. */
     }
 
@@ -2473,9 +2374,9 @@ public class ServiceInfo extends EditableInfo {
     private void changeTypeToClone(final boolean masterSlave) {
         final CRMXML crmXML = getBrowser().getCRMXML();
         final CloneInfo oldCI = getCloneInfo();
-        String title = ConfigData.PM_CLONE_SET_NAME;
+        String title = Application.PM_CLONE_SET_NAME;
         if (masterSlave) {
-            title = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+            title = Application.PM_MASTER_SLAVE_SET_NAME;
         }
         final CloneInfo ci = new CloneInfo(crmXML.getHbClone(),
                                            title,
@@ -2486,14 +2387,14 @@ public class ServiceInfo extends EditableInfo {
         if (oldCI == null) {
             final Widget prevWi = getWidget(GUI_ID, null);
             if (prevWi != null) {
-                ci.getService().setId(getName() + "_" + prevWi.getStringValue());
+                ci.getService().setId(getName() + '_' + prevWi.getStringValue());
             }
             getBrowser().addNameToServiceInfoHash(ci);
             getBrowser().addToHeartbeatIdList(ci);
             getBrowser().getCRMGraph().exchangeObjectInTheVertex(ci, this);
             ci.setPingComboBox(pingComboBox);
-            for (final HostInfo hi : scoreComboBoxHash.keySet()) {
-                ci.getScoreComboBoxHash().put(hi, scoreComboBoxHash.get(hi));
+            for (final Map.Entry<HostInfo, Widget> hostInfoWidgetEntry : scoreComboBoxHash.entrySet()) {
+                ci.getScoreComboBoxHash().put(hostInfoWidgetEntry.getKey(), hostInfoWidgetEntry.getValue());
             }
         } else {
             oldCI.removeNodeAndWait();
@@ -2587,7 +2488,7 @@ public class ServiceInfo extends EditableInfo {
     /** Adds host score listeners. */
     protected void addHostLocationsListeners() {
         final String[] params = getParametersFromXML();
-        for (Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final Widget wi = scoreComboBoxHash.get(hi);
             wi.addListeners(new WidgetListener() {
@@ -2643,7 +2544,7 @@ public class ServiceInfo extends EditableInfo {
      * attributes".
      */
     protected final Map<String, Widget> getSameAsFields(
-                                                final Info savedMAIdRef) {
+                                                final Value savedMAIdRef) {
         sameAsMetaAttrsWi = WidgetFactory.createInstance(
                                          Widget.Type.COMBOBOX,
                                          savedMAIdRef,
@@ -2652,10 +2553,10 @@ public class ServiceInfo extends EditableInfo {
                                          ClusterBrowser.SERVICE_FIELD_WIDTH,
                                          Widget.NO_ABBRV,
                                          new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    false),
                                          Widget.NO_BUTTON);
-        String toolTip;
+        final String toolTip;
         if (savedMAIdRef == null) {
             toolTip = "";
         } else {
@@ -2721,25 +2622,18 @@ public class ServiceInfo extends EditableInfo {
         }
         /* init save button */
         final boolean abExisted = getApplyButton() != null;
-        final ServiceInfo thisClass = this;
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
             /**
              * Whether the whole thing should be enabled.
              */
             @Override
-            public final boolean isEnabled() {
+            public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
-                if (dcHost == null) {
-                    return false;
-                }
-                if (Tools.versionBeforePacemaker(dcHost)) {
-                    return false;
-                }
-                return true;
+                return dcHost != null && !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
-            public final void mouseOut(final ComponentWithTest component) {
+            public void mouseOut(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
@@ -2749,7 +2643,7 @@ public class ServiceInfo extends EditableInfo {
             }
 
             @Override
-            public final void mouseOver(final ComponentWithTest component) {
+            public void mouseOver(final ComponentWithTest component) {
                 if (!isEnabled()) {
                     return;
                 }
@@ -2771,7 +2665,7 @@ public class ServiceInfo extends EditableInfo {
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     cs.setPtestData(null);
-                    apply(dcHost, true);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestData(ptestData);
@@ -2802,7 +2696,7 @@ public class ServiceInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), false);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -2832,7 +2726,7 @@ public class ServiceInfo extends EditableInfo {
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
@@ -2841,19 +2735,19 @@ public class ServiceInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        AbstractButton serviceMenu;
+        final AbstractButton serviceMenu;
         if (ci == null) {
             serviceMenu = getActionsButton();
         } else {
             serviceMenu = ci.getActionsButton();
         }
-        buttonPanel.add(serviceMenu, BorderLayout.EAST);
+        buttonPanel.add(serviceMenu, BorderLayout.LINE_END);
         Value defaultValue = PRIMITIVE_TYPE_STRING;
         if (ci != null) {
             if (ci.getService().isMaster()) {
@@ -2873,7 +2767,7 @@ public class ServiceInfo extends EditableInfo {
                                      ClusterBrowser.SERVICE_LABEL_WIDTH
                                      + ClusterBrowser.SERVICE_FIELD_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.ADMIN,
+                                     new AccessMode(Application.AccessType.ADMIN,
                                                     false),
                                      Widget.NO_BUTTON);
 
@@ -2889,7 +2783,7 @@ public class ServiceInfo extends EditableInfo {
             });
             final JPanel tp = new JPanel();
             tp.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-            tp.setLayout(new BoxLayout(tp, BoxLayout.Y_AXIS));
+            tp.setLayout(new BoxLayout(tp, BoxLayout.PAGE_AXIS));
             tp.add(typeRadioGroup.getComponent());
             typeRadioGroup.setBackgroundColor(ClusterBrowser.PANEL_BACKGROUND);
             optionsPanel.add(tp);
@@ -2961,7 +2855,7 @@ public class ServiceInfo extends EditableInfo {
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
                                   ClusterBrowser.SERVICE_LABEL_WIDTH
@@ -2982,7 +2876,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns operation from host location label. "eq", "ne" etc. */
-    private String getOpFromLabel(final String onHost,
+    private String getOpFromLabel(final CharSequence onHost,
                                   final String labelText) {
         final int l = labelText.length();
         final int k = onHost.length();
@@ -3003,9 +2897,9 @@ public class ServiceInfo extends EditableInfo {
     /** Goes through the scores and sets preferred locations. */
     protected void setLocations(final String heartbeatId,
                                 final Host dcHost,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        for (Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final Widget wi = scoreComboBoxHash.get(hi);
             String hs = wi.getStringValue();
@@ -3015,35 +2909,33 @@ public class ServiceInfo extends EditableInfo {
                 hs = CRMXML.MINUS_INFINITY_STRING.getValueForConfig();
             }
             final HostLocation hlSaved = savedHostLocations.get(hi);
-            String hsSaved = null;
             String opSaved = null;
             if (hlSaved != null) {
-                hsSaved = hlSaved.getScore();
                 opSaved = hlSaved.getOperation();
             }
             final String onHost = hi.getName();
             final String op = getOpFromLabel(onHost, wi.getLabel().getText());
             final HostLocation hostLoc = new HostLocation(hs, op, null, null);
             if (!hostLoc.equals(hlSaved)) {
-                String locationId = cs.getLocationId(getHeartbeatId(testOnly),
+                String locationId = cs.getLocationId(getHeartbeatId(runMode),
                                                      onHost,
-                                                     testOnly);
-                if (((hs == null || "".equals(hs))
-                    || !Tools.areEqual(op, opSaved))
+                                                     runMode);
+                if ((hs == null || hs.isEmpty()
+                        || !Tools.areEqual(op, opSaved))
                     && locationId != null) {
                     CRM.removeLocation(dcHost,
                                        locationId,
-                                       getHeartbeatId(testOnly),
-                                       testOnly);
+                                       getHeartbeatId(runMode),
+                                       runMode);
                     locationId = null;
                 }
-                if (hs != null && !"".equals(hs)) {
+                if (hs != null && !hs.isEmpty()) {
                     CRM.setLocation(dcHost,
-                                    getHeartbeatId(testOnly),
+                                    getHeartbeatId(runMode),
                                     onHost,
                                     hostLoc,
                                     locationId,
-                                    testOnly);
+                                    runMode);
                 }
             }
         }
@@ -3051,27 +2943,26 @@ public class ServiceInfo extends EditableInfo {
         final Widget pwi = pingComboBox;
         if (pwi != null) {
             final Value value = pwi.getValue();
-            final String locationId = null;
             if (!Tools.areEqual(savedPingOperation, value)) {
                 final String pingLocationId = cs.getPingLocationId(
-                                                    getHeartbeatId(testOnly),
-                                                    testOnly);
+                                                    getHeartbeatId(runMode),
+                                                    runMode);
                 if (pingLocationId != null) {
                     CRM.removeLocation(dcHost,
                                        pingLocationId,
-                                       getHeartbeatId(testOnly),
-                                       testOnly);
+                                       getHeartbeatId(runMode),
+                                       runMode);
                 }
                 if (value != null && !value.isNothingSelected()) {
                     CRM.setPingLocation(dcHost,
-                                        getHeartbeatId(testOnly),
+                                        getHeartbeatId(runMode),
                                         value.getValueForConfig(),
                                         null, /* location id */
-                                        testOnly);
+                                        runMode);
                 }
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeHostLocations();
         }
     }
@@ -3093,7 +2984,7 @@ public class ServiceInfo extends EditableInfo {
             String opId = cs.getOpId(heartbeatId, op);
             if (opId == null) {
                 /* generate one */
-                opId = "op-" + heartbeatId + "-" + op;
+                opId = "op-" + heartbeatId + '-' + op;
             }
             /* operations have different kind of default, that is
              * recommended, but not used by default. */
@@ -3108,7 +2999,7 @@ public class ServiceInfo extends EditableInfo {
                     mOperationsComboBoxHashReadLock.lock();
                     final Widget wi = operationsComboBoxHash.get(op, param);
                     mOperationsComboBoxHashReadLock.unlock();
-                    Value value;
+                    final Value value;
                     if (wi == null) {
                         if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
                             value = NOTHING_SELECTED_VALUE;
@@ -3125,7 +3016,7 @@ public class ServiceInfo extends EditableInfo {
                             firstTime = false;
                             operations.put(op, opHash);
                         }
-                        String sn;
+                        final String sn;
                         if (value.getUnit() != null) {
                             sn = value.getUnit().getShortName();
                         } else {
@@ -3178,19 +3069,19 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns attributes of this resource. */
-    protected Map<String, String> getPacemakerResAttrs(final boolean testOnly) {
+    protected Map<String, String> getPacemakerResAttrs(final Application.RunMode runMode) {
         final Map<String, String> pacemakerResAttrs =
                                             new LinkedHashMap<String, String>();
         final String raClass = getService().getResourceClass();
         final String type = getName();
         final String provider = resourceAgent.getProvider();
-        final String heartbeatId = getHeartbeatId(testOnly);
+        final String heartbeatId = getHeartbeatId(runMode);
         LOG.debug1("getPacemakerResAttrs: raClass: "
                         + raClass
                         + ", type: " + type
                         + ", provider: " + provider
                         + ", crm id: " + heartbeatId
-                        + ", test: " + testOnly);
+                        + ", test: " + runMode);
 
         pacemakerResAttrs.put("id", heartbeatId);
         pacemakerResAttrs.put("class", raClass);
@@ -3217,7 +3108,7 @@ public class ServiceInfo extends EditableInfo {
                 || RA_PARAM.equals(param)) {
                 continue;
             }
-            Value value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (!resourceAgent.isIgnoreDefaults()
                 && Tools.areEqual(value, getParamDefault(param))) {
                 continue;
@@ -3244,7 +3135,7 @@ public class ServiceInfo extends EditableInfo {
                 || RA_PARAM.equals(param)) {
                 continue;
             }
-            Value value = getComboBoxValue(param);
+            final Value value = getComboBoxValue(param);
             if (Tools.areEqual(value, getParamDefault(param))) {
                 continue;
             }
@@ -3259,12 +3150,11 @@ public class ServiceInfo extends EditableInfo {
     /** Revert all values. */
     @Override
     public void revert() {
-        final CRMXML crmXML = getBrowser().getCRMXML();
         final String[] params = getParametersFromXML();
-        boolean allSavedMetaAttrsAreDefaultValues = true;
         boolean sameAs = false;
         if (sameAsMetaAttrsWi != null) {
-            for (String param : params) {
+            boolean allSavedMetaAttrsAreDefaultValues = true;
+            for (final String param : params) {
                 if (isMetaAttr(param)) {
                     final Value defaultValue = getParamDefault(param);
                     final Value oldValue = getResource().getValue(param);
@@ -3284,7 +3174,7 @@ public class ServiceInfo extends EditableInfo {
                 sameAsMetaAttrsWi.setValue(savedMetaAttrInfoRef);
             }
         }
-        for (String param : params) {
+        for (final String param : params) {
             if (!sameAs || !isMetaAttr(param)) {
                 final Value v = getParamSaved(param);
                 final Widget wi = getWidget(param, null);
@@ -3298,15 +3188,14 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         final GroupInfo gInfo = groupInfo;
-        CloneInfo ci;
+        final CloneInfo ci;
         if (gInfo == null) {
             ci = getCloneInfo();
         } else {
             ci = gInfo.getCloneInfo();
         }
-        final CloneInfo clInfo = ci;
-        if (clInfo != null) {
-            clInfo.revert();
+        if (ci != null) {
+            ci.revert();
         }
         revertOperations();
         revertLocations();
@@ -3314,7 +3203,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Revert locations to saved values. */
     protected final void revertLocations() {
-        for (Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : getBrowser().getClusterHosts()) {
             final HostInfo hi = host.getBrowser().getHostInfo();
             final HostLocation savedLocation = savedHostLocations.get(hi);
             final Widget wi = scoreComboBoxHash.get(hi);
@@ -3350,9 +3239,7 @@ public class ServiceInfo extends EditableInfo {
         if (sameAsOperationsWi == null) {
             return;
         }
-        final ClusterStatus cs = getBrowser().getClusterStatus();
         mSavedOperationsLock.lock();
-        boolean allAreDefaultValues = true;
         boolean allSavedAreDefaultValues = true;
         for (final String op : getResourceAgent().getOperationNames()) {
             for (final String param
@@ -3373,7 +3260,6 @@ public class ServiceInfo extends EditableInfo {
                     value = getOpDefaultsDefault(param);
                 }
                 if (!Tools.areEqual(defaultValue, value)) {
-                    allAreDefaultValues = false;
                 }
                 if (!Tools.areEqual(defaultValue,
                                     savedOperation.get(op, param))) {
@@ -3381,13 +3267,13 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         }
-        boolean sameAs = false;
         final ServiceInfo savedOpIdRef = savedOperationIdRef;
         ServiceInfo operationIdRef = null;
         final Value ref = sameAsOperationsWiValue();
         if (ref instanceof ServiceInfo) {
             operationIdRef = (ServiceInfo) ref;
         }
+        boolean sameAs = false;
         if (!Tools.areEqual(operationIdRef, savedOpIdRef)) {
             if (savedOpIdRef == null) {
                 if (allSavedAreDefaultValues) {
@@ -3428,9 +3314,9 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Applies the changes to the service parameters. */
-    void apply(final Host dcHost, final boolean testOnly) {
-        LOG.debug1("apply: start: test: " + testOnly);
-        if (!testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
+        LOG.debug1("apply: start: test: " + runMode);
+        if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
@@ -3442,29 +3328,28 @@ public class ServiceInfo extends EditableInfo {
         getInfoPanel();
         waitForInfoPanel();
         /* TODO: make progress indicator per resource. */
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         final String[] params = getParametersFromXML();
+        final GroupInfo gInfo = groupInfo;
+        final CloneInfo clInfo;
+        String[] groupParams = null;
+        if (gInfo == null) {
+            clInfo = getCloneInfo();
+        } else {
+            clInfo = gInfo.getCloneInfo();
+            groupParams = gInfo.getParametersFromXML();
+        }
         String cloneId = null;
         String[] cloneParams = null;
         boolean master = false;
-        final GroupInfo gInfo = groupInfo;
-        CloneInfo ci;
-        String[] groupParams = null;
-        if (gInfo == null) {
-            ci = getCloneInfo();
-        } else {
-            ci = gInfo.getCloneInfo();
-            groupParams = gInfo.getParametersFromXML();
-        }
-        final CloneInfo clInfo = ci;
         if (clInfo != null) {
-            cloneId = clInfo.getHeartbeatId(testOnly);
+            cloneId = clInfo.getHeartbeatId(runMode);
             cloneParams = clInfo.getParametersFromXML();
             master = clInfo.getService().isMaster();
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -3479,7 +3364,7 @@ public class ServiceInfo extends EditableInfo {
             /* add myself to the hash with service name and id as
              * keys */
             getBrowser().removeFromServiceInfoHash(this);
-            final String oldHeartbeatId = getHeartbeatId(testOnly);
+            final String oldHeartbeatId = getHeartbeatId(runMode);
             if (oldHeartbeatId != null) {
                 getBrowser().mHeartbeatIdToServiceLock();
                 getBrowser().getHeartbeatIdToServiceInfo().remove(
@@ -3506,8 +3391,8 @@ public class ServiceInfo extends EditableInfo {
             getBrowser().addNameToServiceInfoHash(this);
             getBrowser().addToHeartbeatIdList(this);
         }
-        if (!testOnly) {
-            addResourceBefore(dcHost, testOnly);
+        if (Application.isLive(runMode)) {
+            addResourceBefore(dcHost, runMode);
         }
 
         final Map<String, String> cloneMetaArgs =
@@ -3515,21 +3400,18 @@ public class ServiceInfo extends EditableInfo {
         final Map<String, String> groupMetaArgs =
                                             new LinkedHashMap<String, String>();
         final Map<String, String> pacemakerResAttrs =
-                                                getPacemakerResAttrs(testOnly);
+                                                getPacemakerResAttrs(runMode);
         final Map<String, String> pacemakerResArgs = getPacemakerResArgs();
         final Map<String, String> pacemakerMetaArgs = getPacemakerMetaArgs();
-        final String raClass = getService().getResourceClass();
-        final String type = getName();
-        final String provider = resourceAgent.getProvider();
-        final String heartbeatId = getHeartbeatId(testOnly);
+        final String heartbeatId = getHeartbeatId(runMode);
 
         String groupId = null; /* for pacemaker */
         if (gInfo != null) {
             if (gInfo.getService().isNew()) {
-                gInfo.apply(dcHost, testOnly);
+                gInfo.apply(dcHost, runMode);
                 return;
             }
-            groupId = gInfo.getHeartbeatId(testOnly);
+            groupId = gInfo.getHeartbeatId(runMode);
         }
         String cloneMetaAttrsRefIds = null;
         if (clInfo != null) {
@@ -3554,7 +3436,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (getService().isNew()) {
             if (clInfo != null) {
-                for (String param : cloneParams) {
+                for (final String param : cloneParams) {
                     if (GUI_ID.equals(param)
                         || PCMK_ID.equals(param)
                         || RA_PARAM.equals(param)) {
@@ -3572,7 +3454,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (gInfo != null) {
-                for (String param : groupParams) {
+                for (final String param : groupParams) {
                     if (GUI_ID.equals(param)
                         || PCMK_ID.equals(param)
                         || RA_PARAM.equals(param)) {
@@ -3614,18 +3496,18 @@ public class ServiceInfo extends EditableInfo {
                               groupMetaAttrsRefIds,
                               refCRMId,
                               resourceAgent.isStonith(),
-                              testOnly);
+                              runMode);
             if (gInfo == null) {
                 String hbId = heartbeatId;
                 if (clInfo != null) {
-                    hbId = clInfo.getHeartbeatId(testOnly);
+                    hbId = clInfo.getHeartbeatId(runMode);
                 }
                 final List<Map<String, String>> colAttrsList =
                                        new ArrayList<Map<String, String>>();
                 final List<Map<String, String>> ordAttrsList =
                                        new ArrayList<Map<String, String>>();
                 final List<String> parentIds = new ArrayList<String>();
-                ServiceInfo infoForDependency;
+                final ServiceInfo infoForDependency;
                 if (clInfo == null) {
                     infoForDependency = this;
                 } else {
@@ -3636,13 +3518,13 @@ public class ServiceInfo extends EditableInfo {
                                                             infoForDependency);
                 for (final ServiceInfo parentInfo : parents) {
                     if (parentInfo.isConstraintPH()) {
-                        final boolean colocation = true;
-                        final boolean order = true;
-                        final Set<ServiceInfo> with =
+                        final Collection<ServiceInfo> with =
                                                  new TreeSet<ServiceInfo>();
                         with.add(infoForDependency);
-                        final Set<ServiceInfo> withFrom =
+                        final Collection<ServiceInfo> withFrom =
                                                  new TreeSet<ServiceInfo>();
+                        final boolean colocation = true;
+                        final boolean order = true;
                         ((ConstraintPHInfo) parentInfo)
                                     .addConstraintWithPlaceholder(
                                              with,
@@ -3651,7 +3533,7 @@ public class ServiceInfo extends EditableInfo {
                                              order,
                                              dcHost,
                                              !parentInfo.getService().isNew(),
-                                             testOnly);
+                                             runMode);
                     } else {
                         final String parentId =
                                     parentInfo.getService().getHeartbeatId();
@@ -3694,14 +3576,14 @@ public class ServiceInfo extends EditableInfo {
                                                  new String [parentIds.size()]),
                                               colAttrsList,
                                               ordAttrsList,
-                                              testOnly);
+                                              runMode);
                 }
             } else {
                 gInfo.resetPopup();
             }
         } else {
             if (clInfo != null) {
-                for (String param : cloneParams) {
+                for (final String param : cloneParams) {
                     if (GUI_ID.equals(param)
                         || PCMK_ID.equals(param)
                         || RA_PARAM.equals(param)) {
@@ -3717,7 +3599,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (gInfo != null) {
-                for (String param : groupParams) {
+                for (final String param : groupParams) {
                     if (GUI_ID.equals(param)
                         || PCMK_ID.equals(param)
                         || RA_PARAM.equals(param)) {
@@ -3760,22 +3642,22 @@ public class ServiceInfo extends EditableInfo {
                         groupMetaAttrsRefIds,
                         refCRMId,
                         resourceAgent.isStonith(),
-                        testOnly);
-            if (isFailed(testOnly)) {
-                cleanupResource(dcHost, testOnly);
+                        runMode);
+            if (isFailed(runMode)) {
+                cleanupResource(dcHost, runMode);
             }
         }
 
         if (gInfo == null) {
             if (clInfo == null) {
-                setLocations(heartbeatId, dcHost, testOnly);
+                setLocations(heartbeatId, dcHost, runMode);
             } else {
-                clInfo.setLocations(heartbeatId, dcHost, testOnly);
+                clInfo.setLocations(heartbeatId, dcHost, runMode);
             }
         } else {
-            setLocations(heartbeatId, dcHost, testOnly);
+            setLocations(heartbeatId, dcHost, runMode);
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
             storeOperations();
             if (clInfo != null) {
@@ -3806,31 +3688,26 @@ public class ServiceInfo extends EditableInfo {
                 }
             });
         }
-        LOG.debug1("apply: end: test: " + testOnly);
+        LOG.debug1("apply: end: test: " + runMode);
     }
 
     /** Removes order(s). */
     public void removeOrder(final ServiceInfo parent,
                             final Host dcHost,
-                            final boolean testOnly) {
+                            final Application.RunMode runMode) {
         if (getService().isNew() || parent.getService().isNew()) {
             return;
         }
-        if (!testOnly
-            && !getService().isNew() && !parent.getService().isNew()) {
+        if (Application.isLive(runMode)
+            && !getService().isNew()
+            && !parent.getService().isNew()) {
             parent.setUpdated(true);
             setUpdated(true);
         }
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
 
-        String rscId;
-        if (isConstraintPH()) {
-            rscId = getId();
-        } else {
-            rscId = getHeartbeatId(testOnly);
-        }
         if (isConstraintPH() || parent.isConstraintPH()) {
-            ConstraintPHInfo cphi;
+            final ConstraintPHInfo cphi;
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
             } else {
@@ -3858,7 +3735,8 @@ public class ServiceInfo extends EditableInfo {
                         final List<String> newRscIds =
                                               new ArrayList<String>();
                         newRscIds.addAll(rscSet.getRscIds());
-                        if (newRscIds.remove(idToRemove) && !testOnly) {
+                        if (newRscIds.remove(idToRemove)
+                            && Application.isLive(runMode)) {
                             modifiedRscSet = rscSet;
                         }
                         if (!newRscIds.isEmpty()) {
@@ -3877,7 +3755,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
-            if (!testOnly && rscSetsOrdAttrs.isEmpty()) {
+            if (Application.isLive(runMode) && rscSetsOrdAttrs.isEmpty()) {
                 cphi.getRscSetConnectionDataOrd().setConstraintId(null);
             }
             final Map<String, String> attrs =
@@ -3887,7 +3765,7 @@ public class ServiceInfo extends EditableInfo {
                 final String score = od.getScore();
                 attrs.put(CRMXML.SCORE_STRING, score);
             }
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 ///* so that it will not be removed */
                 cphi.setUpdated(false);
             }
@@ -3899,19 +3777,19 @@ public class ServiceInfo extends EditableInfo {
                           null,
                           rscSetsOrdAttrs,
                           attrs,
-                          testOnly);
+                          runMode);
         } else {
-            final String rscFirstId = parent.getHeartbeatId(testOnly);
+            final String rscFirstId = parent.getHeartbeatId(runMode);
             final List<CRMXML.OrderData> allData =
                                             clStatus.getOrderDatas(rscFirstId);
             if (allData != null) {
                 for (final CRMXML.OrderData orderData : allData) {
                     final String orderId = orderData.getId();
                     final String rscThenId = orderData.getRscThen();
-                    if (rscThenId.equals(getHeartbeatId(testOnly))) {
+                    if (rscThenId.equals(getHeartbeatId(runMode))) {
                         CRM.removeOrder(dcHost,
                                         orderId,
-                                        testOnly);
+                                        runMode);
                     }
                 }
             }
@@ -3919,9 +3797,9 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns pacemaker id. */
-    final String getHeartbeatId(final boolean testOnly) {
+    final String getHeartbeatId(final Application.RunMode runMode) {
         String heartbeatId = getService().getHeartbeatId();
-        if (testOnly && heartbeatId == null) {
+        if (heartbeatId == null && Application.isTest(runMode)) {
             final String guiId = getComboBoxValue(GUI_ID).getValueForConfig();
             if (guiId == null) {
                 LOG.appWarning("getHearbeatId: RA meta-data not loaded: "
@@ -3936,14 +3814,15 @@ public class ServiceInfo extends EditableInfo {
     /** Adds order constraint from this service to the child. */
     public void addOrder(final ServiceInfo child,
                          final Host dcHost,
-                         final boolean testOnly) {
-        if (!testOnly
-            && !getService().isNew() && !child.getService().isNew()) {
+                         final Application.RunMode runMode) {
+        if (Application.isLive(runMode)
+            && !getService().isNew()
+            && !child.getService().isNew()) {
             child.setUpdated(true);
             setUpdated(true);
         }
         if (isConstraintPH() || child.isConstraintPH()) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 if (isConstraintPH()
                     && ((ConstraintPHInfo) this).isReversedCol()) {
                     ((ConstraintPHInfo) this).reverseOrder();
@@ -3954,7 +3833,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
-            final Set<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
@@ -3963,7 +3842,7 @@ public class ServiceInfo extends EditableInfo {
                 withService = this;
                 withFrom.add(this);
             }
-            final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
             with.add(withService);
             cphi.addConstraintWithPlaceholder(with,
                                               withFrom,
@@ -3971,9 +3850,9 @@ public class ServiceInfo extends EditableInfo {
                                               true,
                                               dcHost,
                                               !cphi.getService().isNew(),
-                                              testOnly);
+                                              runMode);
         } else {
-            final String childHbId = child.getHeartbeatId(testOnly);
+            final String childHbId = child.getHeartbeatId(runMode);
             final Map<String, String> attrs =
                                           new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
@@ -3985,36 +3864,37 @@ public class ServiceInfo extends EditableInfo {
             }
             CRM.addOrder(dcHost,
                          null, /* order id */
-                         getHeartbeatId(testOnly),
+                         getHeartbeatId(runMode),
                          childHbId,
                          attrs,
-                         testOnly);
+                         runMode);
         }
     }
 
     /** Removes colocation(s). */
     public void removeColocation(final ServiceInfo parent,
                                  final Host dcHost,
-                                 final boolean testOnly) {
+                                 final Application.RunMode runMode) {
         if (getService().isNew() || parent.getService().isNew()) {
             return;
         }
-        if (!testOnly
-            && !getService().isNew() && !parent.getService().isNew()) {
+        if (Application.isLive(runMode)
+            && !getService().isNew()
+            && !parent.getService().isNew()) {
             parent.setUpdated(true);
             setUpdated(true);
         }
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        String rscId;
+        final String rscId;
         if (isConstraintPH()) {
             rscId = getId();
         } else {
-            rscId = getHeartbeatId(testOnly);
+            rscId = getHeartbeatId(runMode);
         }
         if (isConstraintPH() || parent.isConstraintPH()) {
             final Map<CRMXML.RscSet, Map<String, String>> rscSetsColAttrs =
                        new LinkedHashMap<CRMXML.RscSet, Map<String, String>>();
-            ConstraintPHInfo cphi;
+            final ConstraintPHInfo cphi;
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
             } else {
@@ -4024,23 +3904,24 @@ public class ServiceInfo extends EditableInfo {
                                              cphi.getRscSetConnectionDataCol();
             /** resource set */
             final String colId = rdata.getConstraintId();
-            String idToRemove;
+            final String idToRemove;
             if (isConstraintPH()) {
                 idToRemove = parent.getService().getHeartbeatId();
             } else {
                 idToRemove = getService().getHeartbeatId();
             }
-            CRMXML.RscSet modifiedRscSet = null;
             final List<CRMXML.RscSet> colRscSets =
                                                clStatus.getRscSetsCol(colId);
             if (colRscSets != null) {
+                CRMXML.RscSet modifiedRscSet = null;
                 for (final CRMXML.RscSet rscSet : colRscSets) {
                     if (rscSet.equals(rdata.getRscSet1())
                         || rscSet.equals(rdata.getRscSet2())) {
                         final List<String> newRscIds =
                                               new ArrayList<String>();
                         newRscIds.addAll(rscSet.getRscIds());
-                        if (newRscIds.remove(idToRemove) && !testOnly) {
+                        if (newRscIds.remove(idToRemove)
+                            && Application.isLive(runMode)) {
                             modifiedRscSet = rscSet;
                         }
                         if (!newRscIds.isEmpty()) {
@@ -4059,7 +3940,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
             }
-            if (!testOnly && rscSetsColAttrs.isEmpty()) {
+            if (Application.isLive(runMode) && rscSetsColAttrs.isEmpty()) {
                 cphi.getRscSetConnectionDataCol().setConstraintId(null);
             }
             final Map<String, String> attrs =
@@ -4069,7 +3950,7 @@ public class ServiceInfo extends EditableInfo {
                 final String score = cd.getScore();
                 attrs.put(CRMXML.SCORE_STRING, score);
             }
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 cphi.setUpdated(false);
             }
             CRM.setRscSet(dcHost,
@@ -4080,7 +3961,7 @@ public class ServiceInfo extends EditableInfo {
                           rscSetsColAttrs,
                           null,
                           attrs,
-                          testOnly);
+                          runMode);
         } else {
             final List<CRMXML.ColocationData> allData =
                                             clStatus.getColocationDatas(rscId);
@@ -4091,10 +3972,10 @@ public class ServiceInfo extends EditableInfo {
                     final String withRscId =
                                        colocationData.getWithRsc();
                     if (withRscId.equals(
-                                parent.getHeartbeatId(testOnly))) {
+                                parent.getHeartbeatId(runMode))) {
                         CRM.removeColocation(dcHost,
                                              colId,
-                                             testOnly);
+                                             runMode);
                     }
                 }
             }
@@ -4108,14 +3989,15 @@ public class ServiceInfo extends EditableInfo {
      */
     public void addColocation(final ServiceInfo child,
                               final Host dcHost,
-                              final boolean testOnly) {
-        if (!testOnly
-            && !getService().isNew() && !child.getService().isNew()) {
+                              final Application.RunMode runMode) {
+        if (Application.isLive(runMode)
+            && !getService().isNew()
+            && !child.getService().isNew()) {
             child.setUpdated(true);
             setUpdated(true);
         }
         if (isConstraintPH() || child.isConstraintPH()) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 if (isConstraintPH()
                     && ((ConstraintPHInfo) this).isReversedOrd()) {
                     ((ConstraintPHInfo) this).reverseColocation();
@@ -4126,7 +4008,7 @@ public class ServiceInfo extends EditableInfo {
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
-            final Set<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
             if (isConstraintPH()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
@@ -4135,7 +4017,7 @@ public class ServiceInfo extends EditableInfo {
                 withService = this;
                 withFrom.add(this);
             }
-            final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
+            final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
             with.add(withService);
             cphi.addConstraintWithPlaceholder(with,
                                               withFrom,
@@ -4143,9 +4025,9 @@ public class ServiceInfo extends EditableInfo {
                                               false,
                                               dcHost,
                                               !cphi.getService().isNew(),
-                                              testOnly);
+                                              runMode);
         } else {
-            final String childHbId = child.getHeartbeatId(testOnly);
+            final String childHbId = child.getHeartbeatId(runMode);
             final Map<String, String> attrs =
                                         new LinkedHashMap<String, String>();
             attrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
@@ -4157,9 +4039,9 @@ public class ServiceInfo extends EditableInfo {
             CRM.addColocation(dcHost,
                               null, /* col id */
                               childHbId,
-                              getHeartbeatId(testOnly),
+                              getHeartbeatId(runMode),
                               attrs,
-                              testOnly);
+                              runMode);
         }
     }
 
@@ -4176,8 +4058,8 @@ public class ServiceInfo extends EditableInfo {
                                        final boolean order,
                                        final boolean reloadNode,
                                        final boolean master,
-                                       final boolean testOnly) {
-        ServiceInfo newServiceInfo;
+                                       final Application.RunMode runMode) {
+        final ServiceInfo newServiceInfo;
 
         final String name = newRA.getName();
         if (newRA.isFilesystem()) {
@@ -4193,11 +4075,11 @@ public class ServiceInfo extends EditableInfo {
         } else if (newRA.isGroup()) {
             newServiceInfo = new GroupInfo(newRA, getBrowser());
         } else if (newRA.isClone()) {
-            String cloneName;
+            final String cloneName;
             if (master) {
-                cloneName = ConfigData.PM_MASTER_SLAVE_SET_NAME;
+                cloneName = Application.PM_MASTER_SLAVE_SET_NAME;
             } else {
-                cloneName = ConfigData.PM_CLONE_SET_NAME;
+                cloneName = Application.PM_CLONE_SET_NAME;
             }
             newServiceInfo = new CloneInfo(newRA,
                                            cloneName,
@@ -4213,7 +4095,7 @@ public class ServiceInfo extends EditableInfo {
                         order,
                         reloadNode,
                         getBrowser().getDCHost(),
-                        testOnly);
+                        runMode);
         return newServiceInfo;
     }
 
@@ -4227,7 +4109,7 @@ public class ServiceInfo extends EditableInfo {
                                 final boolean order,
                                 final boolean reloadNode,
                                 final Host dcHost,
-                                final boolean testOnly) {
+                                final Application.RunMode runMode) {
         final ResourceAgent ra = serviceInfo.getResourceAgent();
         if (ra != null) {
             serviceInfo.getService().setResourceClass(ra.getResourceClass());
@@ -4237,13 +4119,13 @@ public class ServiceInfo extends EditableInfo {
                                                    pos,
                                                    colocation,
                                                    order,
-                                                   testOnly)) {
+                                                   runMode)) {
             Tools.waitForSwing();
             /* edge added */
             if (isConstraintPH() || serviceInfo.isConstraintPH()) {
                 final ConstraintPHInfo cphi;
                 final ServiceInfo withService;
-                final Set<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
+                final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
                 if (isConstraintPH()) {
                     cphi = (ConstraintPHInfo) this;
                     withService = serviceInfo;
@@ -4253,7 +4135,7 @@ public class ServiceInfo extends EditableInfo {
                     withFrom.add(this);
                 }
                 withFrom.addAll(getBrowser().getCRMGraph().getParents(cphi));
-                final Set<ServiceInfo> with = new TreeSet<ServiceInfo>();
+                final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
                 with.add(withService);
                 cphi.addConstraintWithPlaceholder(with,
                                                   withFrom,
@@ -4261,14 +4143,14 @@ public class ServiceInfo extends EditableInfo {
                                                   order,
                                                   dcHost,
                                                   !cphi.getService().isNew(),
-                                                  testOnly);
-                if (!testOnly) {
+                                                  runMode);
+                if (Application.isLive(runMode)) {
                     final PcmkRscSetsInfo prsi = cphi.getPcmkRscSetsInfo();
                     prsi.setApplyButtons(null, prsi.getParametersFromXML());
                 }
             } else {
-                final String parentId = getHeartbeatId(testOnly);
-                final String heartbeatId = serviceInfo.getHeartbeatId(testOnly);
+                final String parentId = getHeartbeatId(runMode);
+                final String heartbeatId = serviceInfo.getHeartbeatId(runMode);
                 final List<Map<String, String>> colAttrsList =
                                           new ArrayList<Map<String, String>>();
                 final List<Map<String, String>> ordAttrsList =
@@ -4301,7 +4183,7 @@ public class ServiceInfo extends EditableInfo {
                                               new String[]{parentId},
                                               colAttrsList,
                                               ordAttrsList,
-                                              testOnly);
+                                              runMode);
                 }
             }
         } else {
@@ -4347,23 +4229,23 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Starts resource in crm. */
-    void startResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void startResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        CRM.startResource(dcHost, getHeartbeatId(testOnly), testOnly);
+        CRM.startResource(dcHost, getHeartbeatId(runMode), runMode);
     }
 
     /** Stops resource in crm. */
-    void stopResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void stopResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        CRM.stopResource(dcHost, getHeartbeatId(testOnly), testOnly);
+        CRM.stopResource(dcHost, getHeartbeatId(runMode), runMode);
     }
 
     /** Puts a resource up in a group. */
-    void upResource(final Host dcHost, final boolean testOnly) {
+    void upResource(final Host dcHost, final Application.RunMode runMode) {
         final GroupInfo gi = groupInfo;
         final DefaultMutableTreeNode giNode = gi.getNode();
         if (giNode == null) {
@@ -4381,19 +4263,19 @@ public class ServiceInfo extends EditableInfo {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                newOrder.add(child.getHeartbeatId(testOnly));
+                newOrder.add(child.getHeartbeatId(runMode));
             }
             final String el = newOrder.remove(index);
             newOrder.add(index - 1,  el);
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setUpdated(true);
             }
-            gi.applyWhole(dcHost, false, newOrder, testOnly);
+            gi.applyWhole(dcHost, false, newOrder, runMode);
         }
     }
 
     /** Puts a resource down in a group. */
-    void downResource(final Host dcHost, final boolean testOnly) {
+    void downResource(final Host dcHost, final Application.RunMode runMode) {
         final GroupInfo gi = groupInfo;
         final DefaultMutableTreeNode giNode = gi.getNode();
         if (giNode == null) {
@@ -4411,41 +4293,41 @@ public class ServiceInfo extends EditableInfo {
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode n = e.nextElement();
                 final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                newOrder.add(child.getHeartbeatId(testOnly));
+                newOrder.add(child.getHeartbeatId(runMode));
             }
             final String el = newOrder.remove(index);
             newOrder.add(index + 1,  el);
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setUpdated(true);
             }
-            gi.applyWhole(dcHost, false, newOrder, testOnly);
+            gi.applyWhole(dcHost, false, newOrder, runMode);
         }
     }
 
     /** Migrates resource in cluster from current location. */
     void migrateResource(final String onHost,
                          final Host dcHost,
-                         final boolean testOnly) {
-        if (!testOnly) {
+                         final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         CRM.migrateResource(dcHost,
-                            getHeartbeatId(testOnly),
+                            getHeartbeatId(runMode),
                             onHost,
-                            testOnly);
+                            runMode);
     }
 
     /** Migrates resource in heartbeat from current location. */
     void migrateFromResource(final Host dcHost,
                              final String fromHost,
-                             final boolean testOnly) {
-        if (!testOnly) {
+                             final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         /* don't need fromHost, but m/s resources need it. */
         CRM.migrateFromResource(dcHost,
-                                getHeartbeatId(testOnly),
-                                testOnly);
+                                getHeartbeatId(runMode),
+                                runMode);
     }
 
     /**
@@ -4453,51 +4335,51 @@ public class ServiceInfo extends EditableInfo {
      */
     void forceMigrateResource(final String onHost,
                               final Host dcHost,
-                              final boolean testOnly) {
-        if (!testOnly) {
+                              final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         CRM.forceMigrateResource(dcHost,
-                                 getHeartbeatId(testOnly),
+                                 getHeartbeatId(runMode),
                                  onHost,
-                                 testOnly);
+                                 runMode);
     }
 
     /** Removes constraints created by resource migrate command. */
-    void unmigrateResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void unmigrateResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
-        CRM.unmigrateResource(dcHost, getHeartbeatId(testOnly), testOnly);
+        CRM.unmigrateResource(dcHost, getHeartbeatId(runMode), runMode);
     }
 
     /** Cleans up the resource. */
-    void cleanupResource(final Host dcHost, final boolean testOnly) {
-        if (!testOnly) {
+    void cleanupResource(final Host dcHost, final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final String rscId = getHeartbeatId(testOnly);
+        final String rscId = getHeartbeatId(runMode);
         boolean failedClone = false;
         for (final Host host : getBrowser().getClusterHosts()) {
             final Set<String> failedClones =
-                       cs.getFailedClones(host.getName(), rscId, testOnly);
+                       cs.getFailedClones(host.getName(), rscId, runMode);
             if (failedClones == null) {
                 continue;
             }
             failedClone = true;
             for (final String fc : failedClones) {
                 CRM.cleanupResource(dcHost,
-                                    rscId + ":" + fc,
+                                    rscId + ':' + fc,
                                     new Host[]{host},
-                                    testOnly);
+                                    runMode);
             }
         }
         if (!failedClone) {
             final List<Host> dirtyHosts = new ArrayList<Host>();
             for (final Host host : getBrowser().getClusterHosts()) {
-                if (isInLRMOnHost(host.getName(), testOnly)
-                    || getFailCount(host.getName(), testOnly) != null) {
+                if (isInLRMOnHost(host.getName(), runMode)
+                    || getFailCount(host.getName(), runMode) != null) {
                     dirtyHosts.add(host);
                 }
             }
@@ -4506,15 +4388,15 @@ public class ServiceInfo extends EditableInfo {
                                dcHost,
                                rscId,
                                dirtyHosts.toArray(new Host[dirtyHosts.size()]),
-                               testOnly);
+                               runMode);
             }
         }
     }
 
     /** Removes the service without confirmation dialog. */
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
-        if (!testOnly) {
+                                         final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             if (!getService().isNew()) {
                 setUpdated(true);
             }
@@ -4523,19 +4405,19 @@ public class ServiceInfo extends EditableInfo {
         }
         final CloneInfo ci = getCloneInfo();
         if (ci != null) {
-            ci.removeMyselfNoConfirm(dcHost, testOnly);
+            ci.removeMyselfNoConfirm(dcHost, runMode);
             setCloneInfo(null);
         }
         final GroupInfo gi = groupInfo;
         if (getService().isNew() && gi == null) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 getService().setNew(false);
                 getBrowser().getCRMGraph().killRemovedVertices();
             }
         } else {
             final ClusterStatus cs = getBrowser().getClusterStatus();
             if (gi == null) {
-                removeConstraints(dcHost, testOnly);
+                removeConstraints(dcHost, runMode);
             }
             if (!getResourceAgent().isGroup()
                 && !getResourceAgent().isClone()) {
@@ -4545,11 +4427,11 @@ public class ServiceInfo extends EditableInfo {
                      * group.
                      */
                     if (getService().isNew()) {
-                        if (!testOnly) {
-                            super.removeMyself(false);
+                        if (Application.isLive(runMode)) {
+                            super.removeMyself(Application.RunMode.LIVE);
                         }
                     } else {
-                        final String group = gi.getHeartbeatId(testOnly);
+                        final String group = gi.getHeartbeatId(runMode);
                         final DefaultMutableTreeNode giNode = gi.getNode();
                         if (giNode != null) {
                             @SuppressWarnings("unchecked")
@@ -4564,11 +4446,11 @@ public class ServiceInfo extends EditableInfo {
                                 child.getService().doneModifying();
                             }
                         }
-                        if (cs.getGroupResources(group, testOnly).size() == 1) {
-                            if (!testOnly) {
+                        if (cs.getGroupResources(group, runMode).size() == 1) {
+                            if (Application.isLive(runMode)) {
                                 gi.getService().setRemoved(true);
                             }
-                            gi.removeMyselfNoConfirmFromChild(dcHost, testOnly);
+                            gi.removeMyselfNoConfirmFromChild(dcHost, runMode);
                             groupId = group;
                             gi.getService().doneRemoving();
                         }
@@ -4579,26 +4461,26 @@ public class ServiceInfo extends EditableInfo {
                     String cloneId = null;
                     boolean master = false;
                     if (ci != null) {
-                        cloneId = ci.getHeartbeatId(testOnly);
+                        cloneId = ci.getHeartbeatId(runMode);
                         master = ci.getService().isMaster();
                     }
                     final boolean ret = CRM.removeResource(
                                                       dcHost,
-                                                      getHeartbeatId(testOnly),
+                                                      getHeartbeatId(runMode),
                                                       groupId,
                                                       cloneId,
                                                       master,
-                                                      testOnly);
-                    cleanupResource(dcHost, testOnly);
+                                                      runMode);
+                    cleanupResource(dcHost, runMode);
                     setUpdated(false); /* must be here, is not a clone anymore*/
-                    if (!testOnly && !ret) {
+                    if (!ret && Application.isLive(runMode)) {
                         Tools.progressIndicatorFailed(dcHost.getName(),
                                                       "removing failed");
                     }
                 }
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             getBrowser().removeFromServiceInfoHash(this);
             infoPanel = null;
             getService().doneRemoving();
@@ -4607,9 +4489,9 @@ public class ServiceInfo extends EditableInfo {
 
     /** Removes this service from the crm with confirmation dialog. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (getService().isNew()) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             getService().setNew(false);
             getService().doneRemoving();
             return;
@@ -4624,7 +4506,7 @@ public class ServiceInfo extends EditableInfo {
                desc,
                Tools.getString("ClusterBrowser.confirmRemoveService.Yes"),
                Tools.getString("ClusterBrowser.confirmRemoveService.No"))) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             removeInfo();
             getService().setNew(false);
         }
@@ -4647,7 +4529,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
         });
-        super.removeMyself(false);
+        super.removeMyself(Application.RunMode.LIVE);
     }
 
     /** Sets this service as part of a group. */
@@ -4685,7 +4567,7 @@ public class ServiceInfo extends EditableInfo {
                         final JCheckBox colocationWi,
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
-                        final boolean testOnly) {
+                        final Application.RunMode runMode) {
         /* empty */
     }
 
@@ -4698,16 +4580,16 @@ public class ServiceInfo extends EditableInfo {
                         final MyList<MyMenuItem> list,
                         final JCheckBox colocationWi,
                         final JCheckBox orderWi,
-                        final List<JDialog> popups,
-                        final boolean testOnly) {
+                        final Iterable<JDialog> popups,
+                        final Application.RunMode runMode) {
         final MyMenuItem mmi = new MyMenuItem(name,
                                               null,
                                               null,
                                               new AccessMode(
-                                                   ConfigData.AccessType.ADMIN,
+                                                   Application.AccessType.ADMIN,
                                                    false),
                                               new AccessMode(
-                                                   ConfigData.AccessType.OP,
+                                                   Application.AccessType.OP,
                                                    false)) {
             private static final long serialVersionUID = 1L;
             @Override
@@ -4730,7 +4612,7 @@ public class ServiceInfo extends EditableInfo {
                                         orderWi.isSelected(),
                                         true,
                                         getBrowser().getDCHost(),
-                                        testOnly);
+                                        runMode);
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -4743,7 +4625,7 @@ public class ServiceInfo extends EditableInfo {
             }
         };
         dlm.addElement(mmi);
-        final ClusterBrowser.ClMenuItemCallback mmiCallback =
+        final ButtonCallback mmiCallback =
                        getBrowser().new ClMenuItemCallback(null) {
                            @Override
                            public void action(final Host dcHost) {
@@ -4753,7 +4635,7 @@ public class ServiceInfo extends EditableInfo {
                                                orderWi.isSelected(),
                                                true,
                                                dcHost,
-                                               true); /* test only */
+                                               Application.RunMode.TEST);
                            }
                        };
         callbackHash.put(mmi, mmiCallback);
@@ -4762,11 +4644,11 @@ public class ServiceInfo extends EditableInfo {
     /** Returns existing service manu item. */
     private MyMenu getExistingServiceMenuItem(final String name,
                                               final boolean enableForNew,
-                                              final boolean testOnly) {
+                                              final Application.RunMode runMode) {
         final ServiceInfo thisClass = this;
         return new MyMenu(name,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.OP, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -4824,7 +4706,7 @@ public class ServiceInfo extends EditableInfo {
                                                colocationWi,
                                                orderWi,
                                                popups,
-                                               testOnly);
+                                               runMode);
                     asi.addExistingGroupServiceMenuItems(thisClass,
                                                          dlm,
                                                          callbackHash,
@@ -4832,10 +4714,10 @@ public class ServiceInfo extends EditableInfo {
                                                          colocationWi,
                                                          orderWi,
                                                          popups,
-                                                         testOnly);
+                                                         runMode);
                 }
                 final JPanel colOrdPanel =
-                            new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                            new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
                 colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 colOrdPanel.add(colocationWi);
                 colOrdPanel.add(orderWi);
@@ -4861,13 +4743,13 @@ public class ServiceInfo extends EditableInfo {
                                    final CRMXML crmXML,
                                    final Point2D pos,
                                    final ResourceAgent fsService,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final MyMenuItem ldMenuItem = new MyMenuItem(
                            Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -4884,7 +4766,7 @@ public class ServiceInfo extends EditableInfo {
                                                     true, /* order */
                                                     true,
                                                     false,
-                                                    testOnly);
+                                                    runMode);
                 fsi.setDrbddiskIsPreferred(false);
                 getBrowser().getCRMGraph().repaint();
             }
@@ -4902,14 +4784,13 @@ public class ServiceInfo extends EditableInfo {
                                  final CRMXML crmXML,
                                  final Point2D pos,
                                  final ResourceAgent fsService,
-                                 final boolean testOnly) {
-        final ResourceAgent drbddiskService = crmXML.getHbDrbddisk();
+                                 final Application.RunMode runMode) {
         final MyMenuItem ddMenuItem = new MyMenuItem(
                          Tools.getString("ClusterBrowser.DrbddiskMenuName"),
                          null,
                          null,
-                         new AccessMode(ConfigData.AccessType.ADMIN, false),
-                         new AccessMode(ConfigData.AccessType.OP, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, false),
+                         new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -4921,7 +4802,7 @@ public class ServiceInfo extends EditableInfo {
                                                     true, /* order */
                                                     true,
                                                     false,
-                                                    testOnly);
+                                                    runMode);
                 fsi.setDrbddiskIsPreferred(true);
                 getBrowser().getCRMGraph().repaint();
             }
@@ -4938,13 +4819,13 @@ public class ServiceInfo extends EditableInfo {
     private void addIpMenu(final MyMenu menu,
                            final Point2D pos,
                            final ResourceAgent ipService,
-                           final boolean testOnly) {
+                           final Application.RunMode runMode) {
         final MyMenuItem ipMenuItem =
           new MyMenuItem(ipService.getMenuName(),
                          null,
                          null,
-                         new AccessMode(ConfigData.AccessType.ADMIN, false),
-                         new AccessMode(ConfigData.AccessType.OP, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, false),
+                         new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
@@ -4955,7 +4836,7 @@ public class ServiceInfo extends EditableInfo {
                                 true, /* order */
                                 true,
                                 false,
-                                testOnly);
+                                runMode);
                 getBrowser().getCRMGraph().repaint();
             }
         };
@@ -4967,13 +4848,13 @@ public class ServiceInfo extends EditableInfo {
     private void addFilesystemMenu(final MyMenu menu,
                                    final Point2D pos,
                                    final ResourceAgent fsService,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final MyMenuItem fsMenuItem =
               new MyMenuItem(fsService.getMenuName(),
                              null,
                              null,
-                             new AccessMode(ConfigData.AccessType.ADMIN, false),
-                             new AccessMode(ConfigData.AccessType.OP, false)) {
+                             new AccessMode(Application.AccessType.ADMIN, false),
+                             new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
                 @Override
                 public void action() {
@@ -4984,7 +4865,7 @@ public class ServiceInfo extends EditableInfo {
                                     true, /* order */
                                     true,
                                     false,
-                                    testOnly);
+                                    runMode);
                     getBrowser().getCRMGraph().repaint();
                 }
         };
@@ -4996,18 +4877,18 @@ public class ServiceInfo extends EditableInfo {
     private void addResourceAgentMenu(final ResourceAgent ra,
                                       final MyListModel<MyMenuItem> dlm,
                                       final Point2D pos,
-                                      final List<JDialog> popups,
+                                      final Iterable<JDialog> popups,
                                       final JCheckBox colocationWi,
                                       final JCheckBox orderWi,
-                                      final boolean testOnly) {
+                                      final Application.RunMode runMode) {
         final MyMenuItem mmi =
                new MyMenuItem(
                      ra.getMenuName(),
                      null,
                      null,
-                     new AccessMode(ConfigData.AccessType.ADMIN,
+                     new AccessMode(Application.AccessType.ADMIN,
                                     false),
-                     new AccessMode(ConfigData.AccessType.OP,
+                     new AccessMode(Application.AccessType.OP,
                                     false)) {
             private static final long serialVersionUID = 1L;
             @Override
@@ -5035,7 +4916,7 @@ public class ServiceInfo extends EditableInfo {
                                 orderWi.isSelected(),
                                 true,
                                 false,
-                                testOnly);
+                                runMode);
                 getBrowser().getCRMGraph().repaint();
             }
         };
@@ -5044,12 +4925,12 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Adds new Service and dependence. */
-    private MyMenu getAddServiceMenuItem(final boolean testOnly,
+    private MyMenu getAddServiceMenuItem(final Application.RunMode runMode,
                                          final String name) {
         final ServiceInfo thisClass = this;
         return new MyMenu(name,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.OP, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -5078,15 +4959,13 @@ public class ServiceInfo extends EditableInfo {
                                              ResourceAgent.OCF_CLASS);
                 if (crmXML.isLinbitDrbdPresent()) { /* just skip it, if it
                                                        is not */
-                    final ResourceAgent linbitDrbdService =
-                                                  crmXML.getHbLinbitDrbd();
                     /* Linbit:DRBD */
-                    addDrbdLinbitMenu(this, crmXML, pos, fsService, testOnly);
+                    addDrbdLinbitMenu(this, crmXML, pos, fsService, runMode);
                 }
                 if (crmXML.isDrbddiskPresent()) { /* just skip it,
                                                      if it is not */
                     /* drbddisk */
-                    addDrbddiskMenu(this, crmXML, pos, fsService, testOnly);
+                    addDrbddiskMenu(this, crmXML, pos, fsService, runMode);
                 }
                 final ResourceAgent ipService = crmXML.getResourceAgent(
                                          "IPaddr2",
@@ -5094,13 +4973,13 @@ public class ServiceInfo extends EditableInfo {
                                          ResourceAgent.OCF_CLASS);
                 if (ipService != null) { /* just skip it, if it is not*/
                     /* ipaddr */
-                    addIpMenu(this, pos, ipService, testOnly);
+                    addIpMenu(this, pos, ipService, runMode);
                 }
                 if (fsService != null) { /* just skip it, if it is not*/
                     /* Filesystem */
-                    addFilesystemMenu(this, pos, fsService, testOnly);
+                    addFilesystemMenu(this, pos, fsService, runMode);
                 }
-                final List<JDialog> popups = new ArrayList<JDialog>();
+                final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.HB_CLASSES) {
                     final List<ResourceAgent> services = getAddServiceList(cl);
                     if (services.isEmpty()) {
@@ -5116,7 +4995,7 @@ public class ServiceInfo extends EditableInfo {
                     orderWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                     orderWi.setPreferredSize(orderWi.getMinimumSize());
                     final JPanel colOrdPanel =
-                            new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+                            new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
                     colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                     colOrdPanel.add(colocationWi);
                     colOrdPanel.add(orderWi);
@@ -5132,8 +5011,8 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final MyMenu classItem = new MyMenu(
                             ClusterBrowser.getClassMenu(cl),
-                            new AccessMode(ConfigData.AccessType.ADMIN, mode),
-                            new AccessMode(ConfigData.AccessType.OP, mode));
+                            new AccessMode(Application.AccessType.ADMIN, mode),
+                            new AccessMode(Application.AccessType.OP, mode));
                     final MyListModel<MyMenuItem> dlm =
                                                  new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
@@ -5143,7 +5022,7 @@ public class ServiceInfo extends EditableInfo {
                                              popups,
                                              colocationWi,
                                              orderWi,
-                                             testOnly);
+                                             runMode);
                     }
                     final boolean ret = Tools.getScrollingMenu(
                             ClusterBrowser.getClassMenu(cl),
@@ -5166,17 +5045,17 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Adds menu items with dependend services and groups. */
-    protected void addDependencyMenuItems(final List<UpdatableItem> items,
+    protected void addDependencyMenuItems(final Collection<UpdatableItem> items,
                                           final boolean enableForNew,
-                                          final boolean testOnly) {
+                                          final Application.RunMode runMode) {
         /* add new group and dependency*/
-        final MyMenuItem addGroupMenuItem =
+        final UpdatableItem addGroupMenuItem =
             new MyMenuItem(Tools.getString(
                                 "ClusterBrowser.Hb.AddDependentGroup"),
                            null,
                            null,
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5196,7 +5075,6 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final Value gi = new StringValue(ConfigData.PM_GROUP_NAME);
                     final CRMXML crmXML = getBrowser().getCRMXML();
                     addServicePanel(crmXML.getHbGroup(),
                                     getPos(),
@@ -5204,24 +5082,24 @@ public class ServiceInfo extends EditableInfo {
                                     false, /* order only */
                                     true,
                                     false,
-                                    testOnly);
+                                    runMode);
                     getBrowser().getCRMGraph().repaint();
                 }
             };
-        items.add((UpdatableItem) addGroupMenuItem);
+        items.add(addGroupMenuItem);
 
         /* add new service and dependency*/
         final MyMenu addServiceMenuItem = getAddServiceMenuItem(
-                        testOnly,
+                        runMode,
                         Tools.getString("ClusterBrowser.Hb.AddDependency"));
-        items.add((UpdatableItem) addServiceMenuItem);
+        items.add(addServiceMenuItem);
 
         /* add existing service dependency*/
         final MyMenu existingServiceMenuItem = getExistingServiceMenuItem(
                     Tools.getString("ClusterBrowser.Hb.AddStartBefore"),
                     enableForNew,
-                    testOnly);
-        items.add((UpdatableItem) existingServiceMenuItem);
+                    runMode);
+        items.add(existingServiceMenuItem);
     }
 
     /**
@@ -5231,25 +5109,25 @@ public class ServiceInfo extends EditableInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
-            addDependencyMenuItems(items, false, testOnly);
+            addDependencyMenuItems(items, false, runMode);
         }
         /* start resource */
-        final MyMenuItem startMenuItem =
+        final ComponentWithTest startMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StartResource"),
                            START_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                public final String enablePredicate() {
+                public String enablePredicate() {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (isStarted(testOnly)) {
+                    } else if (isStarted(runMode)) {
                         return Tools.getString("ServiceInfo.AlreadyStarted");
                     } else {
                         return getService().isAvailableWithText();
@@ -5259,33 +5137,33 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    startResource(getBrowser().getDCHost(), testOnly);
+                    startResource(getBrowser().getDCHost(), runMode);
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback startItemCallback =
+        final ButtonCallback startItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                startResource(dcHost, true); /* testOnly */
+                startResource(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(startMenuItem, startItemCallback);
         items.add((UpdatableItem) startMenuItem);
 
         /* stop resource */
-        final MyMenuItem stopMenuItem =
+        final ComponentWithTest stopMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StopResource"),
                            STOP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public String enablePredicate() {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (isStopped(testOnly)) {
+                    } else if (isStopped(runMode)) {
                         return Tools.getString("ServiceInfo.AlreadyStopped");
                     } else {
                         return getService().isAvailableWithText();
@@ -5295,26 +5173,26 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    stopResource(getBrowser().getDCHost(), testOnly);
+                    stopResource(getBrowser().getDCHost(), runMode);
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback stopItemCallback =
+        final ButtonCallback stopItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                stopResource(dcHost, true); /* testOnly */
+                stopResource(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(stopMenuItem, stopItemCallback);
         items.add((UpdatableItem) stopMenuItem);
 
         /* up group resource */
-        final MyMenuItem upMenuItem =
+        final ComponentWithTest upMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.UpResource"),
                            GROUP_UP_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5352,26 +5230,26 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    upResource(getBrowser().getDCHost(), testOnly);
+                    upResource(getBrowser().getDCHost(), runMode);
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback upItemCallback =
+        final ButtonCallback upItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                upResource(dcHost, true); /* testOnly */
+                upResource(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(upMenuItem, upItemCallback);
         items.add((UpdatableItem) upMenuItem);
 
         /* down group resource */
-        final MyMenuItem downMenuItem =
+        final ComponentWithTest downMenuItem =
             new MyMenuItem(Tools.getString("ClusterBrowser.Hb.DownResource"),
                            GROUP_DOWN_ICON,
                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5409,21 +5287,21 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    downResource(getBrowser().getDCHost(), testOnly);
+                    downResource(getBrowser().getDCHost(), runMode);
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback downItemCallback =
+        final ButtonCallback downItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                downResource(dcHost, true); /* testOnly */
+                downResource(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(downMenuItem, downItemCallback);
         items.add((UpdatableItem) downMenuItem);
 
         /* clean up resource */
-        final MyMenuItem cleanupMenuItem =
+        final UpdatableItem cleanupMenuItem =
             new MyMenuItem(
                Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
                SERVICE_RUNNING_ICON,
@@ -5432,21 +5310,21 @@ public class ServiceInfo extends EditableInfo {
                Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
                SERVICE_RUNNING_ICON,
                ClusterBrowser.STARTING_PTEST_TOOLTIP,
-               new AccessMode(ConfigData.AccessType.OP, false),
-               new AccessMode(ConfigData.AccessType.OP, false)) {
+               new AccessMode(Application.AccessType.OP, false),
+               new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public boolean predicate() {
                     return getService().isAvailable()
-                           && isOneFailed(testOnly);
+                           && isOneFailed(runMode);
                 }
 
                 @Override
                 public String enablePredicate() {
                     if (getBrowser().clStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (!isOneFailedCount(testOnly)) {
+                    } else if (!isOneFailedCount(runMode)) {
                         return "no fail count";
                     } else {
                         return getService().isAvailableWithText();
@@ -5456,15 +5334,15 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    cleanupResource(getBrowser().getDCHost(), testOnly);
+                    cleanupResource(getBrowser().getDCHost(), runMode);
                 }
             };
         /* cleanup ignores CIB_file */
-        items.add((UpdatableItem) cleanupMenuItem);
+        items.add(cleanupMenuItem);
 
 
         /* manage resource */
-        final MyMenuItem manageMenuItem =
+        final ComponentWithTest manageMenuItem =
             new MyMenuItem(
                   Tools.getString("ClusterBrowser.Hb.ManageResource"),
                   MANAGE_BY_CRM_ICON,
@@ -5474,13 +5352,13 @@ public class ServiceInfo extends EditableInfo {
                   UNMANAGE_BY_CRM_ICON,
                   ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public boolean predicate() {
-                    return !isManaged(testOnly);
+                    return !isManaged(runMode);
                 }
                 @Override
                 public String enablePredicate() {
@@ -5494,20 +5372,20 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    if (this.getText().equals(Tools.getString(
+                    if (getText().equals(Tools.getString(
                                     "ClusterBrowser.Hb.ManageResource"))) {
-                        setManaged(true, getBrowser().getDCHost(), testOnly);
+                        setManaged(true, getBrowser().getDCHost(), runMode);
                     } else {
-                        setManaged(false, getBrowser().getDCHost(), testOnly);
+                        setManaged(false, getBrowser().getDCHost(), runMode);
                     }
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback manageItemCallback =
+        final ButtonCallback manageItemCallback =
                                      getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                setManaged(!isManaged(false),
-                           dcHost, true); /* testOnly */
+                setManaged(!isManaged(Application.RunMode.LIVE),
+                           dcHost, Application.RunMode.LIVE);
             }
         };
         addMouseOverListener(manageMenuItem, manageItemCallback);
@@ -5515,12 +5393,12 @@ public class ServiceInfo extends EditableInfo {
         addMigrateMenuItems(items);
         if (ci == null) {
             /* remove service */
-            final MyMenuItem removeMenuItem = new MyMenuItem(
+            final ComponentWithTest removeMenuItem = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Hb.RemoveService"),
                         ClusterBrowser.REMOVE_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5532,8 +5410,8 @@ public class ServiceInfo extends EditableInfo {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     } else if (getService().isRemoved()) {
                         return IS_BEING_REMOVED_STRING;
-                    } else if (isRunning(testOnly)
-                               && !Tools.getConfigData().isAdvancedMode()) {
+                    } else if (isRunning(runMode)
+                               && !Tools.getApplication().isAdvancedMode()) {
                         return "cannot remove running resource<br>"
                                + "(advanced mode only)";
                     }
@@ -5542,8 +5420,8 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     final List<String> gr = cs.getGroupResources(
-                                          groupInfo.getHeartbeatId(testOnly),
-                                          testOnly);
+                                          groupInfo.getHeartbeatId(runMode),
+                                          runMode);
 
 
                     if (gr != null && gr.size() > 1) {
@@ -5557,35 +5435,34 @@ public class ServiceInfo extends EditableInfo {
                 public void action() {
                     hidePopup();
                     if (getService().isOrphaned()) {
-                        cleanupResource(getBrowser().getDCHost(), testOnly);
+                        cleanupResource(getBrowser().getDCHost(), runMode);
                     } else {
-                        removeMyself(false);
+                        removeMyself(Application.RunMode.LIVE);
                     }
                     getBrowser().getCRMGraph().repaint();
                 }
             };
-            final ServiceInfo thisClass = this;
-            final ClusterBrowser.ClMenuItemCallback removeItemCallback =
+            final ButtonCallback removeItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
                 @Override
-                public final boolean isEnabled() {
+                public boolean isEnabled() {
                     return super.isEnabled() && !getService().isNew();
                 }
                 @Override
-                public final void action(final Host dcHost) {
-                    removeMyselfNoConfirm(dcHost, true); /* test only */
+                public void action(final Host dcHost) {
+                    removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(removeMenuItem, removeItemCallback);
             items.add((UpdatableItem) removeMenuItem);
         }
         /* view log */
-        final MyMenuItem viewLogMenu = new MyMenuItem(
+        final UpdatableItem viewLogMenu = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Hb.ViewServiceLog"),
                         LOGFILE_ICON,
                         null,
-                        new AccessMode(ConfigData.AccessType.RO, false),
-                        new AccessMode(ConfigData.AccessType.RO, false)) {
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -5601,7 +5478,7 @@ public class ServiceInfo extends EditableInfo {
             @Override
             public void action() {
                 hidePopup();
-                ServiceLogs l = new ServiceLogs(getBrowser().getCluster(),
+                final ServiceLogs l = new ServiceLogs(getBrowser().getCluster(),
                                                 getNameForLog(),
                                                 getService().getHeartbeatId());
                 l.showDialog();
@@ -5611,8 +5488,8 @@ public class ServiceInfo extends EditableInfo {
         /* more migrate options */
         final MyMenu migrateSubmenu = new MyMenu(
                         Tools.getString("ClusterBrowser.MigrateSubmenu"),
-                        new AccessMode(ConfigData.AccessType.OP, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public String enablePredicate() {
@@ -5623,10 +5500,10 @@ public class ServiceInfo extends EditableInfo {
         addMoreMigrateMenuItems(migrateSubmenu);
 
         /* config files */
-        final MyMenu filesSubmenu = new MyMenu(
+        final UpdatableItem filesSubmenu = new MyMenu(
                         Tools.getString("ClusterBrowser.FilesSubmenu"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public String enablePredicate() {
@@ -5653,24 +5530,23 @@ public class ServiceInfo extends EditableInfo {
     /** Adds migrate and unmigrate menu items. */
     protected void addMigrateMenuItems(final List<UpdatableItem> items) {
         /* migrate resource */
-        final boolean testOnly = false;
-        final ServiceInfo thisClass = this;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         for (final Host host : getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateFromMenuItem =
                new MyMenuItem(Tools.getString(
                                    "ClusterBrowser.Hb.MigrateFromResource")
-                                   + " " + hostName,
+                                   + ' ' + hostName,
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                               Tools.getString(
                                    "ClusterBrowser.Hb.MigrateFromResource")
-                                   + " " + hostName + " (offline)",
+                                   + ' ' + hostName + " (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -5687,7 +5563,7 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public String enablePredicate() {
                         final List<String> runningOnNodes =
-                                               getRunningOnNodes(testOnly);
+                                               getRunningOnNodes(runMode);
                         if (runningOnNodes == null
                             || runningOnNodes.size() < 1) {
                             return "must run";
@@ -5715,14 +5591,14 @@ public class ServiceInfo extends EditableInfo {
                         hidePopup();
                         migrateFromResource(getBrowser().getDCHost(),
                                             hostName,
-                                            testOnly);
+                                            runMode);
                     }
                 };
-            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+            final ButtonCallback migrateItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
-                    migrateFromResource(dcHost, hostName, true); /* testOnly */
+                    migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
@@ -5730,13 +5606,13 @@ public class ServiceInfo extends EditableInfo {
         }
 
         /* unmigrate resource */
-        final MyMenuItem unmigrateMenuItem =
+        final ComponentWithTest unmigrateMenuItem =
             new MyMenuItem(
                     Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
                     UNMIGRATE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -5749,8 +5625,8 @@ public class ServiceInfo extends EditableInfo {
                     // TODO: if it was migrated
                     if (!getBrowser().clStatusFailed()
                            && getService().isAvailable()
-                           && (getMigratedTo(testOnly) != null
-                               || getMigratedFrom(testOnly) != null)) {
+                           && (getMigratedTo(runMode) != null
+                               || getMigratedFrom(runMode) != null)) {
                         return null;
                     } else {
                         return ""; /* it's not visible anyway */
@@ -5760,14 +5636,14 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    unmigrateResource(getBrowser().getDCHost(), testOnly);
+                    unmigrateResource(getBrowser().getDCHost(), runMode);
                 }
             };
-        final ClusterBrowser.ClMenuItemCallback unmigrateItemCallback =
+        final ButtonCallback unmigrateItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                unmigrateResource(dcHost, true); /* testOnly */
+                unmigrateResource(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(unmigrateMenuItem, unmigrateItemCallback);
@@ -5776,24 +5652,23 @@ public class ServiceInfo extends EditableInfo {
 
     /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
     protected void addMoreMigrateMenuItems(final MyMenu submenu) {
-        final boolean testOnly = false;
-        final ServiceInfo thisClass = this;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         for (final Host host : getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateMenuItem =
                new MyMenuItem(Tools.getString(
                                    "ClusterBrowser.Hb.MigrateResource")
-                                   + " " + hostName,
+                                   + ' ' + hostName,
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                               Tools.getString(
                                    "ClusterBrowser.Hb.MigrateResource")
-                                   + " " + hostName + " (offline)",
+                                   + ' ' + hostName + " (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -5810,7 +5685,7 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public String enablePredicate() {
                         final List<String> runningOnNodes =
-                                               getRunningOnNodes(testOnly);
+                                               getRunningOnNodes(runMode);
                         if (runningOnNodes == null
                             || runningOnNodes.isEmpty()) {
                             return Tools.getString(
@@ -5842,14 +5717,14 @@ public class ServiceInfo extends EditableInfo {
                         hidePopup();
                         migrateResource(hostName,
                                         getBrowser().getDCHost(),
-                                        testOnly);
+                                        runMode);
                     }
                 };
-            final ClusterBrowser.ClMenuItemCallback migrateItemCallback =
+            final ButtonCallback migrateItemCallback =
                                      getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
-                    migrateResource(hostName, dcHost, true); /* testOnly */
+                    migrateResource(hostName, dcHost, Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(migrateMenuItem, migrateItemCallback);
@@ -5861,17 +5736,17 @@ public class ServiceInfo extends EditableInfo {
             final MyMenuItem forceMigrateMenuItem =
                new MyMenuItem(Tools.getString(
                                    "ClusterBrowser.Hb.ForceMigrateResource")
-                                   + " " + hostName,
+                                   + ' ' + hostName,
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
                               Tools.getString(
                                    "ClusterBrowser.Hb.ForceMigrateResource")
-                                   + " " + hostName + " (offline)",
+                                   + ' ' + hostName + " (offline)",
                               MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(ConfigData.AccessType.OP, false),
-                              new AccessMode(ConfigData.AccessType.OP, false)) {
+                              new AccessMode(Application.AccessType.OP, false),
+                              new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;
 
                     @Override
@@ -5888,7 +5763,7 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public String enablePredicate() {
                         final List<String> runningOnNodes =
-                                               getRunningOnNodes(testOnly);
+                                               getRunningOnNodes(runMode);
                         if (runningOnNodes == null
                             || runningOnNodes.isEmpty()) {
                             return Tools.getString(
@@ -5912,14 +5787,16 @@ public class ServiceInfo extends EditableInfo {
                         hidePopup();
                         forceMigrateResource(hostName,
                                              getBrowser().getDCHost(),
-                                             testOnly);
+                                             runMode);
                     }
                 };
-            final ClusterBrowser.ClMenuItemCallback forceMigrateItemCallback =
+            final ButtonCallback forceMigrateItemCallback =
                                      getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
-                    forceMigrateResource(hostName, dcHost, true); /* testOnly */
+                    forceMigrateResource(hostName,
+                                         dcHost,
+                                         Application.RunMode.TEST);
                 }
             };
             addMouseOverListener(forceMigrateMenuItem,
@@ -5930,7 +5807,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Return config files defined in DistResource config files. */
     private List<String> getConfigFiles() {
-        String raName;
+        final String raName;
         final ServiceInfo cs = getContainedService();
         if (cs == null) {
             raName = getResourceAgent().getRAString();
@@ -5940,13 +5817,13 @@ public class ServiceInfo extends EditableInfo {
         final Host[] hosts = getBrowser().getCluster().getHostsArray();
         final List<String> cfs =
              new ArrayList<String>(hosts[0].getDistStrings(raName + ".files"));
-        final List<String> params =
+        final Collection<String> params =
             new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
         params.add("configfile");
         params.add("config");
         params.add("conffile");
         for (final String param : params) {
-            Value value;
+            final Value value;
             if (cs == null) {
                 final Widget wi = getWidget(param, null);
                 if (wi == null) {
@@ -5971,8 +5848,6 @@ public class ServiceInfo extends EditableInfo {
 
     /** Adds config files menuitems to the submenu. */
     protected void addFilesMenuItems(final MyMenu submenu) {
-        final boolean testOnly = false;
-        final ServiceInfo thisClass = this;
         final List<String> configFiles = getConfigFiles();
         for (final String configFile : configFiles) {
             final MyMenuItem fileItem =
@@ -5980,26 +5855,11 @@ public class ServiceInfo extends EditableInfo {
                           configFile,
                           null,
                           null,
-                          new AccessMode(ConfigData.AccessType.ADMIN, false),
-                          new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                          new AccessMode(Application.AccessType.ADMIN, false),
+                          new AccessMode(Application.AccessType.ADMIN, false)) {
                     private static final long serialVersionUID = 1L;
 
-                    @Override
-                    public boolean predicate() {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean visiblePredicate() {
-                        return true;
-                    }
-
-                    @Override
-                    public String enablePredicate() {
-                        return null;
-                    }
-
-                    @Override
+                   @Override
                     public void action() {
                         final EditConfig ed =
                           new EditConfig(configFile,
@@ -6014,9 +5874,9 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns tool tip for the service. */
     @Override
-    public String getToolTipText(final boolean testOnly) {
+    public String getToolTipText(final Application.RunMode runMode) {
         String nodeString = null;
-        final List<String> nodes = getRunningOnNodes(testOnly);
+        final List<String> nodes = getRunningOnNodes(runMode);
         if (nodes != null && !nodes.isEmpty()) {
             nodeString =
                      Tools.join(", ", nodes.toArray(new String[nodes.size()]));
@@ -6026,9 +5886,9 @@ public class ServiceInfo extends EditableInfo {
         }
         final StringBuilder sb = new StringBuilder(200);
         sb.append("<b>");
-        sb.append(toString());
-        String textOn;
-        String textNotOn;
+        sb.append(this);
+        final String textOn;
+        final String textNotOn;
         if (getResourceAgent().isFilesystem()) {
             textOn = Tools.getString("ServiceInfo.Filesystem.MoutedOn");
             textNotOn = Tools.getString("ServiceInfo.Filesystem.NotMounted");
@@ -6037,27 +5897,27 @@ public class ServiceInfo extends EditableInfo {
             textOn = Tools.getString("ServiceInfo.Filesystem.RunningOn");
             textNotOn = Tools.getString("ServiceInfo.Filesystem.NotRunning");
         }
-        if (isFailed(testOnly)) {
+        if (isFailed(runMode)) {
             sb.append("</b> <b>Failed</b>");
-        } else if (isStopped(testOnly)
+        } else if (isStopped(runMode)
                    || nodeString == null) {
             sb.append("</b> ").append(textNotOn);
         } else {
             sb.append("</b> ").append(textOn).append(": ");
             sb.append(nodeString);
         }
-        if (!isManaged(testOnly)) {
+        if (!isManaged(runMode)) {
             sb.append(" (unmanaged)");
         }
         final Map<String, String> scores =
                     getBrowser().getClusterStatus().getAllocationScores(
-                                                      getHeartbeatId(testOnly),
-                                                      testOnly);
-        for (final String h : scores.keySet()) {
+                                                      getHeartbeatId(runMode),
+                                                      runMode);
+        for (final Map.Entry<String, String> scoreEntry : scores.entrySet()) {
             sb.append("<br>allocation score on ");
-            sb.append(h);
+            sb.append(scoreEntry.getKey());
             sb.append(": ");
-            sb.append(scores.get(h));
+            sb.append(scoreEntry.getValue());
         }
         return sb.toString();
     }
@@ -6089,30 +5949,29 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns text that appears in the corner of the graph. */
-    public Subtext getRightCornerTextForGraph(final boolean testOnly) {
+    public Subtext getRightCornerTextForGraph(final Application.RunMode runMode) {
         if (getService().isOrphaned()) {
-            if (isFailed(testOnly)) {
+            if (isFailed(runMode)) {
                 return ORPHANED_FAILED_SUBTEXT;
             } else {
                 return ORPHANED_SUBTEXT;
             }
-        } else if (!isManaged(testOnly)) {
+        } else if (!isManaged(runMode)) {
             return UNMANAGED_SUBTEXT;
-        } else if (isFenced(testOnly) != null) {
+        } else if (isFenced(runMode) != null) {
             return FENCED_SUBTEXT;
-        } else if (getMigratedTo(testOnly) != null
-                   || getMigratedFrom(testOnly) != null) {
+        } else if (getMigratedTo(runMode) != null
+                   || getMigratedFrom(runMode) != null) {
             return MIGRATED_SUBTEXT;
         }
         return null;
     }
 
     /** Returns text with lines as array that appears in the cluster graph. */
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
-        Color color = null;
+    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
-        String textOn;
-        String textNotOn;
+        final String textOn;
+        final String textNotOn;
         if (getResourceAgent().isFilesystem()) {
             textOn = Tools.getString("ServiceInfo.Filesystem.MoutedOn");
             textNotOn = Tools.getString("ServiceInfo.Filesystem.NotMounted");
@@ -6129,27 +5988,28 @@ public class ServiceInfo extends EditableInfo {
             texts.add(new Subtext(textNotOn + " (new)",
                                   ClusterBrowser.FILL_PAINT_STOPPED,
                                   Color.BLACK));
-        } else if (isFailed(testOnly)) {
+        } else if (isFailed(runMode)) {
             texts.add(new Subtext(textNotOn,
                                   null,
                                   Color.BLACK));
-        } else if (isStopped(testOnly) && !isRunning(testOnly)) {
+        } else if (isStopped(runMode) && !isRunning(runMode)) {
             texts.add(new Subtext("stopped",
                                   ClusterBrowser.FILL_PAINT_STOPPED,
                                   Color.BLACK));
         } else {
             Color textColor = Color.BLACK;
             String runningOnNodeString = null;
+            Color color = null;
             if (getBrowser().allHostsDown()) {
                 runningOnNodeString = "unknown";
             } else {
-                final List<String> runningOnNodes = getRunningOnNodes(testOnly);
+                final List<String> runningOnNodes = getRunningOnNodes(runMode);
                 if (runningOnNodes != null
                            && !runningOnNodes.isEmpty()) {
                     runningOnNodeString = runningOnNodes.get(0);
                     if (resourceAgent.isPingService()
                         && "0".equals(
-                                getPingCount(runningOnNodeString, testOnly))) {
+                                getPingCount(runningOnNodeString, runMode))) {
                         color = Color.RED;
                         textColor = Color.WHITE;
                     } else {
@@ -6165,20 +6025,19 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 texts.add(new Subtext(textOn + ": " + runningOnNodeString
                                       + getPingCountString(runningOnNodeString,
-                                                           testOnly),
+                                                           runMode),
                                       color,
                                       textColor));
             }
         }
-        if (isOneFailedCount(testOnly)) {
+        if (isOneFailedCount(runMode)) {
             for (final Host host : getBrowser().getClusterHosts()) {
                 if (host.isClStatus()
-                    && getFailCount(host.getName(), testOnly) != null) {
+                    && getFailCount(host.getName(), runMode) != null) {
                     texts.add(new Subtext(ClusterBrowser.IDENT_4
                                           + host.getName()
-                                          + getFailCountString(
-                                                        host.getName(),
-                                                        testOnly),
+                                          + getFailCountString(host.getName(),
+                                                               runMode),
                                           null,
                                           Color.BLACK));
                 }
@@ -6204,35 +6063,34 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns whether it is slave on all nodes. */
-    protected boolean isSlaveOnAllNodes(final boolean testOnly) {
+    protected boolean isSlaveOnAllNodes(final Application.RunMode runMode) {
         return false;
     }
 
     /** Returns text that appears above the icon in the graph. */
-    public String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final Application.RunMode runMode) {
         if (getBrowser().allHostsDown()) {
             return Tools.getString("ClusterBrowser.Hb.NoInfoAvailable");
         }
-        final Host dcHost = getBrowser().getDCHost();
         if (getService().isNew()) {
             return "new...";
         } else if (getService().isOrphaned()) {
             return "";
-        } else if (isEnslaved(testOnly)) {
-            if (isSlaveOnAllNodes(testOnly)) {
+        } else if (isEnslaved(runMode)) {
+            if (isSlaveOnAllNodes(runMode)) {
                 return "";
             } else {
                 return Tools.getString("ClusterBrowser.Hb.Enslaving");
             }
-        } else if (isStarted(testOnly)) {
-            if (isRunning(testOnly)) {
-                final List<Host> migratedTo = getMigratedTo(testOnly);
+        } else if (isStarted(runMode)) {
+            if (isRunning(runMode)) {
+                final List<Host> migratedTo = getMigratedTo(runMode);
                 if (migratedTo == null) {
-                    final List<Host> migratedFrom = getMigratedFrom(testOnly);
+                    final List<Host> migratedFrom = getMigratedFrom(runMode);
                     if (migratedFrom != null) {
                         final List<String> runningOnNodes =
-                                                   getRunningOnNodes(testOnly);
-                        boolean alreadyThere = false;
+                                                   getRunningOnNodes(runMode);
+                        boolean alreadyThere;
                         if (runningOnNodes == null) {
                             alreadyThere = true;
                         } else  {
@@ -6250,7 +6108,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                 } else {
                     final List<String> runningOnNodes =
-                                               getRunningOnNodes(testOnly);
+                                               getRunningOnNodes(runMode);
                     if (runningOnNodes != null) {
                         boolean alreadyThere = false;
                         for (final Host mto : migratedTo) {
@@ -6265,15 +6123,15 @@ public class ServiceInfo extends EditableInfo {
                     }
                 }
                 return null;
-            } else if (isFailed(testOnly)) {
+            } else if (isFailed(runMode)) {
                 return Tools.getString("ClusterBrowser.Hb.StartingFailed");
-            } else if (isGroupStopped(testOnly)) {
+            } else if (isGroupStopped(runMode)) {
                 return Tools.getString("ClusterBrowser.Hb.GroupStopped");
             } else {
                 return Tools.getString("ClusterBrowser.Hb.Starting");
             }
-        } else if (isStopped(testOnly)) {
-            if (isRunning(testOnly)) {
+        } else if (isStopped(runMode)) {
+            if (isRunning(runMode)) {
                 return Tools.getString("ClusterBrowser.Hb.Stopping");
             } else {
                 return null;
@@ -6331,26 +6189,26 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Remove constraints of this service. */
-    void removeConstraints(final Host dcHost, final boolean testOnly) {
+    void removeConstraints(final Host dcHost, final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final HbConnectionInfo[] hbcis =
                      getBrowser().getCRMGraph().getHbConnections(this);
         for (final HbConnectionInfo hbci : hbcis) {
             if (hbci != null) {
-                getBrowser().getCRMGraph().removeOrder(hbci, dcHost, testOnly);
+                getBrowser().getCRMGraph().removeOrder(hbci, dcHost, runMode);
                 getBrowser().getCRMGraph().removeColocation(hbci,
                                                             dcHost,
-                                                            testOnly);
+                                                            runMode);
             }
         }
 
         for (final String locId : cs.getLocationIds(
-                                      getHeartbeatId(testOnly),
-                                      testOnly)) {
+                                      getHeartbeatId(runMode),
+                                      runMode)) {
             CRM.removeLocation(dcHost,
                                locId,
-                               getHeartbeatId(testOnly),
-                               testOnly);
+                               getHeartbeatId(runMode),
+                               runMode);
         }
     }
 

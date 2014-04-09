@@ -26,7 +26,7 @@ package lcmc.gui.dialog.drbd;
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.DrbdVolumeInfo;
@@ -61,8 +61,6 @@ public final class SplitBrain extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(SplitBrain.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Combo box with host that has more recent data. */
     private Widget hostWi;
     /** Resolve split brain button. */
@@ -71,7 +69,7 @@ public final class SplitBrain extends DrbdConfig {
     /** Width of the combo box. */
     private static final int COMBOBOX_WIDTH = 160;
 
-    /** Prepares a new <code>SplitBrain</code> object. */
+    /** Prepares a new {@code SplitBrain} object. */
     public SplitBrain(final WizardDialog previousDialog,
                final DrbdVolumeInfo dvi) {
         super(previousDialog, dvi);
@@ -86,8 +84,8 @@ public final class SplitBrain extends DrbdConfig {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                Host hostPri;
-                Host hostSec;
+                final Host hostPri;
+                final Host hostSec;
                 if (h.equals(h1.getName())) {
                     hostPri = h1;
                     hostSec = h2;
@@ -100,19 +98,19 @@ public final class SplitBrain extends DrbdConfig {
                 }
                 buttonClass(finishButton()).setEnabled(false);
                 resolveButton.setEnabled(false);
-                final boolean testOnly = false;
+                final Application.RunMode runMode = Application.RunMode.LIVE;
                 final String resName =
                           getDrbdVolumeInfo().getDrbdResourceInfo().getName();
                 DRBD.setSecondary(hostSec,
                                   resName,
                                   getDrbdVolumeInfo().getName(),
-                                  testOnly);
+                                  runMode);
                 DRBD.disconnect(hostSec,
                                 resName,
                                 getDrbdVolumeInfo().getName(),
-                                testOnly);
-                DRBD.discardData(hostSec, resName, null, testOnly);
-                getDrbdVolumeInfo().connect(hostPri, testOnly);
+                                runMode);
+                DRBD.discardData(hostSec, resName, null, runMode);
+                getDrbdVolumeInfo().connect(hostPri, runMode);
                 buttonClass(finishButton()).setEnabled(true);
                 buttonClass(cancelButton()).setEnabled(false);
             }
@@ -178,7 +176,7 @@ public final class SplitBrain extends DrbdConfig {
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.RO,
+                                    new AccessMode(Application.AccessType.RO,
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(hostLabel);

@@ -42,43 +42,36 @@ final class PcmkTest4 {
     static void start() {
         slowFactor = 0.6f;
         aborted = false;
-        final int dummy1X = 235;
-        final int dummy1Y = 207;
-
-        final int dummy2X = 545;
-        final int dummy2Y = 207;
-
-        final int dummy3X = 235;
-        final int dummy3Y = 346;
-
-        final int dummy4X = 545;
-        final int dummy4Y = 346;
-
-        final int dummy5X = 235;
-        final int dummy5Y = 505;
-
-        final int dummy6X = 545;
-        final int dummy6Y = 505;
-
-        final int ph1X = 445;
-        final int ph1Y = 266;
-
-        final int ph2X = 445;
-        final int ph2Y = 425;
 
         disableStonith();
         checkTest("test4", 1);
         /* create 6 dummies */
+        final int dummy1X = 235;
+        final int dummy1Y = 207;
         chooseDummy(dummy1X, dummy1Y, false, true);
+        final int dummy2X = 545;
+        final int dummy2Y = 207;
         chooseDummy(dummy2X, dummy2Y, false, true);
+        final int dummy3X = 235;
+        final int dummy3Y = 346;
         chooseDummy(dummy3X, dummy3Y, false, true);
+        final int dummy4X = 545;
+        final int dummy4Y = 346;
         chooseDummy(dummy4X, dummy4Y, false, true);
+        final int dummy5X = 235;
+        final int dummy5Y = 505;
         chooseDummy(dummy5X, dummy5Y, false, true);
+        final int dummy6X = 545;
+        final int dummy6Y = 505;
         chooseDummy(dummy6X, dummy6Y, false, true);
         checkTest("test4", 2);
 
         /* 2 placeholders */
         final int count = 1;
+        final int ph1X = 445;
+        final int ph1Y = 266;
+        final int ph2X = 445;
+        final int ph2Y = 425;
         for (int i = 0; i < count; i++) {
             moveTo(ph1X, ph1Y);
             rightClick();

@@ -23,10 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.Heartbeat;
@@ -37,7 +34,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.SSH;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.ExecCallback;
-import lcmc.gui.ProgressBar;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
@@ -57,9 +53,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
-import lcmc.data.StringValue;
+import lcmc.gui.widget.Check;
 
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -72,8 +67,6 @@ import lcmc.utilities.LoggerFactory;
 public class Init extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Init.class);
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** List with texts if drbd is loaded per host. */
     private List<JLabel> drbdLoadedInfos;
     /** List of load drbd buttons. */
@@ -141,11 +134,11 @@ public class Init extends DialogCluster {
                                    Widget.NO_REGEXP,
                                    0,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.ADMIN,
+                                   new AccessMode(Application.AccessType.ADMIN,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
 
-    /** Prepares a new <code>Init</code> object. */
+    /** Prepares a new {@code Init} object. */
     public Init(final WizardDialog previousDialog,
                 final Cluster cluster) {
         super(previousDialog, cluster);
@@ -228,7 +221,7 @@ public class Init extends DialogCluster {
                         if (!checkClusterStopped) {
                             try {
                                 Thread.sleep(CHECK_INTERVAL);
-                            } catch (InterruptedException ex) {
+                            } catch (final InterruptedException ex) {
                                 Thread.currentThread().interrupt();
                             }
                         }
@@ -248,19 +241,19 @@ public class Init extends DialogCluster {
         int i = 0;
         for (final Host h : hosts) {
             infoThreads[i] = h.execCommand("Cluster.Init.getInstallationInfo",
-                             (ProgressBar) null,
+                    null,
                              new ExecCallback() {
                                  @Override
-                                 public void done(final String ans) {
+                                 public void done(final String answer) {
                                      //drbdLoaded[index] = true;
                                      for (final String line
-                                                    : ans.split("\\r?\\n")) {
+                                                    : answer.split("\\r?\\n")) {
                                          h.parseInstallationInfo(line);
                                      }
                                  }
                                  @Override
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
+                                 public void doneError(final String answer,
+                                                       final int errorCode) {
                                      LOG.appWarning("doneError: could not get install info");
                                  }
                              },
@@ -273,15 +266,13 @@ public class Init extends DialogCluster {
             /* wait for all of them */
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
 
         /* DRBD */
         i = 0;
-        boolean oneFailed = false;
-        boolean oneChanged = false;
         final boolean lastDrbdLoadedExists = (lastDrbdLoaded != null);
         if (!lastDrbdLoadedExists) {
             lastDrbdLoaded = new Boolean[hosts.length];
@@ -302,16 +293,15 @@ public class Init extends DialogCluster {
         }
         boolean needOpenaisButton = false;
 
+        boolean oneFailed = false;
+        boolean oneChanged = false;
         for (final Host h : hosts) {
-            boolean drbdFailed = false;
-            boolean csAisFailed = false;
-            boolean hbFailed = false;
             /* is drbd loaded */
             boolean drbdLoadedChanged = false;
             final boolean drbdLoaded = h.isDrbdLoaded();
 
             if (lastDrbdLoadedExists) {
-                if (lastDrbdLoaded[i].booleanValue() != drbdLoaded) {
+                if (lastDrbdLoaded[i] != drbdLoaded) {
                     oneChanged = true;
                     drbdLoadedChanged = true;
                     lastDrbdLoaded[i] = drbdLoaded;
@@ -322,6 +312,7 @@ public class Init extends DialogCluster {
                 lastDrbdLoaded[i] = drbdLoaded;
             }
             final JLabel drbdLoadedInfo = drbdLoadedInfos.get(i);
+            boolean drbdFailed = false;
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
                     Tools.invokeLater(new Runnable() {
@@ -368,43 +359,43 @@ public class Init extends DialogCluster {
             boolean hbChanged = false;
             boolean csAisChanged = false;
             if (lastPmStartedExists) {
-                if (lastPmStarted[i].booleanValue() != csAisRunning) {
+                if (lastPmStarted[i] != csAisRunning) {
                     oneChanged = true;
                     csAisChanged = true;
                     lastPmStarted[i] = csAisRunning;
                 }
-                if (lastPmRc[i].booleanValue() != csAisIsRc) {
+                if (lastPmRc[i] != csAisIsRc) {
                     oneChanged = true;
                     csAisChanged = true;
                     lastPmRc[i] = csAisIsRc;
                 }
-                if (lastPmConf[i].booleanValue() != csAisIsConf) {
+                if (lastPmConf[i] != csAisIsConf) {
                     oneChanged = true;
                     csAisChanged = true;
                     lastPmConf[i] = csAisIsConf;
                 }
-                if (lastPmInstalled[i].booleanValue() != csAisIsInstalled) {
+                if (lastPmInstalled[i] != csAisIsInstalled) {
                     oneChanged = true;
                     csAisChanged = true;
                     lastPmInstalled[i] = csAisIsInstalled;
                 }
 
-                if (lastHbStarted[i].booleanValue() != heartbeatIsRunning) {
+                if (lastHbStarted[i] != heartbeatIsRunning) {
                     oneChanged = true;
                     hbChanged = true;
                     lastHbStarted[i] = heartbeatIsRunning;
                 }
-                if (lastHbRc[i].booleanValue() != heartbeatIsRc) {
+                if (lastHbRc[i] != heartbeatIsRc) {
                     oneChanged = true;
                     hbChanged = true;
                     lastHbRc[i] = heartbeatIsRc;
                 }
-                if (lastHbConf[i].booleanValue() != heartbeatIsConf) {
+                if (lastHbConf[i] != heartbeatIsConf) {
                     oneChanged = true;
                     hbChanged = true;
                     lastHbConf[i] = heartbeatIsConf;
                 }
-                if (lastHbInstalled[i].booleanValue() != heartbeatIsInstalled) {
+                if (lastHbInstalled[i] != heartbeatIsInstalled) {
                     oneChanged = true;
                     hbChanged = true;
                     lastHbInstalled[i] = heartbeatIsInstalled;
@@ -433,6 +424,7 @@ public class Init extends DialogCluster {
                 is = "OpenAIS";
             }
             final String initScript = is;
+            boolean csAisFailed = false;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
                     Tools.invokeLater(new Runnable() {
@@ -489,7 +481,7 @@ public class Init extends DialogCluster {
                                 } else {
                                     Tools.getGUIData().setAccessible(
                                                     csAisStartButton,
-                                                    ConfigData.AccessType.OP);
+                                                    Application.AccessType.OP);
                                 }
                             }
                             csAisStartButton.setVisible(true);
@@ -502,6 +494,7 @@ public class Init extends DialogCluster {
             /* Heartbeat */
             final JLabel hbStartedInfo = hbStartedInfos.get(i);
             final MyButton hbStartButton = hbStartButtons.get(i);
+            boolean hbFailed = false;
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
                     Tools.invokeLater(new Runnable() {
@@ -553,7 +546,7 @@ public class Init extends DialogCluster {
                                 } else {
                                     Tools.getGUIData().setAccessible(
                                                     hbStartButton,
-                                                    ConfigData.AccessType.OP);
+                                                    Application.AccessType.OP);
                                 }
                             }
                             hbStartButton.setVisible(true);
@@ -585,19 +578,20 @@ public class Init extends DialogCluster {
                 }
             });
 
+	    final List<String> incorrect = new ArrayList<String>();
             if (oneFailed) {
+		incorrect.add("one component failed");
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(button).setEnabled(false);
                     }
                 });
-                nextButtonSetEnabled(false);
-            } else {
-                nextButtonSetEnabled(true);
             }
+	    final List<String> changed = new ArrayList<String>();
             enableComponents();
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+	    nextButtonSetEnabled(new Check(incorrect, changed));
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -616,7 +610,7 @@ public class Init extends DialogCluster {
         if (t != null) {
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -672,13 +666,14 @@ public class Init extends DialogCluster {
                                                       index).setVisible(false);
                                         }
                                     });
-                                    final boolean testOnly = false;
-                                    DRBD.load(host, testOnly);
+                                    final Application.RunMode runMode =
+                                                       Application.RunMode.LIVE;
+                                    DRBD.load(host, runMode);
                                     if (host.isDrbdUpgraded()) {
                                         DRBD.adjustApply(host,
                                                     DRBD.ALL,
                                                     null,
-                                                    testOnly);
+                                                    runMode);
                                     }
                                     checkCluster(false);
                                 }
@@ -694,7 +689,7 @@ public class Init extends DialogCluster {
             /* Heartbeat */
             hbStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingHb")));
-            MyButton btn;
+            final MyButton btn;
             if (host.isCsRunning()
                 || host.isAisRunning()
                 || host.isCsRc()
@@ -838,7 +833,7 @@ public class Init extends DialogCluster {
             mainPanel.add(pane);
         }
         final JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
+        p.setLayout(new BoxLayout(p, BoxLayout.PAGE_AXIS));
         final JScrollPane s = new JScrollPane(mainPanel);
         if (oneStartedAsOpenais || noCorosync) {
             useOpenaisButton.setValue(new StringValue(OPENAIS_INIT_SCRIPT));
@@ -861,17 +856,8 @@ public class Init extends DialogCluster {
 
     /** Whether to use corosync or openais init script. */
     private boolean useCorosync(final Host host) {
-        if (!host.isCorosync() || !host.isCsInit()) {
-            return false;
-        }
-        if (host.isCsInit()
-            && COROSYNC_INIT_SCRIPT.equals(
-                                          useOpenaisButton.getStringValue())) {
-            return true;
-        }
-        if (!host.isAisInit()) {
-            return true;
-        }
-        return false;
+        return !(!host.isCorosync() || !host.isCsInit())
+               && (host.isCsInit() && COROSYNC_INIT_SCRIPT.equals(useOpenaisButton.getStringValue())
+               || !host.isAisInit());
     }
 }

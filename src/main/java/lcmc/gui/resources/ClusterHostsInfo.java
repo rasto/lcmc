@@ -34,7 +34,7 @@ import java.awt.Color;
  * This class holds the information hosts in this cluster.
  */
 public final class ClusterHostsInfo extends CategoryInfo {
-    /** Prepares a new <code>ClusterHostsInfo</code> object. */
+    /** Prepares a new {@code ClusterHostsInfo} object. */
     public ClusterHostsInfo(final String name, final Browser browser) {
         super(name, browser);
     }

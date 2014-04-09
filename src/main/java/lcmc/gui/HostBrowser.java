@@ -23,13 +23,10 @@
 
 package lcmc.gui;
 
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.resources.BlockDevice;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.FSInfo;
@@ -46,18 +43,18 @@ import lcmc.gui.resources.CategoryInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.ImageIcon;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
+import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -81,9 +78,9 @@ public final class HostBrowser extends Browser {
     private DefaultMutableTreeNode fileSystemsNode;
 
     /** List of used network interface ports. */
-    private final Set<String> usedPorts = new HashSet<String>();
+    private final Collection<String> usedPorts = new HashSet<String>();
     /** List of used proxy ports. */
-    private final Set<String> usedProxyPorts = new HashSet<String>();
+    private final Collection<String> usedProxyPorts = new HashSet<String>();
     /** Host object. */
     private final Host host;
     /** Host info object of the host of this browser. */
@@ -119,10 +116,6 @@ public final class HostBrowser extends Browser {
     public static final ImageIcon HOST_IN_CLUSTER_ICON_RIGHT_SMALL =
             Tools.createImageIcon(
                Tools.getDefault("HostBrowser.HostInClusterIconRightSmall"));
-    /** Small host in cluster icon (left side). */
-    static final ImageIcon HOST_IN_CLUSTER_ICON_LEFT_SMALL =
-            Tools.createImageIcon(
-               Tools.getDefault("HostBrowser.HostInClusterIconLeftSmall"));
     /** Map of block devices and their info objects. */
     private final Map<BlockDevice, BlockDevInfo> blockDevInfos =
                                 new LinkedHashMap<BlockDevice, BlockDevInfo>();
@@ -147,7 +140,7 @@ public final class HostBrowser extends Browser {
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
 
     /**
-     * Prepares a new <code>HostBrowser</code> object.
+     * Prepares a new {@code HostBrowser} object.
      *
      * @param host
      *          host to which this resource tree belongs
@@ -233,7 +226,7 @@ public final class HostBrowser extends Browser {
                 try {
                     netInterfacesNode.removeAllChildren();
                     for (final NetInterface ni : nis) {
-                        NetInfo nii;
+                        final NetInfo nii;
                         if (oldNetInterfaces.containsKey(ni)) {
                             nii = oldNetInterfaces.get(ni);
                         } else {
@@ -262,7 +255,7 @@ public final class HostBrowser extends Browser {
             }
             blockDevInfos.clear();
             for (final BlockDevice bd : bds) {
-                BlockDevInfo bdi;
+                final BlockDevInfo bdi;
                 if (oldBlockDevices.containsKey(bd)) {
                     bdi = oldBlockDevices.get(bd);
                     bdi.updateInfo();
@@ -282,9 +275,9 @@ public final class HostBrowser extends Browser {
                     mBlockDevInfosWriteLock.lock();
                     try {
                         blockDevicesNode.removeAllChildren();
-                        for (final BlockDevice bd : blockDevInfos.keySet()) {
-                            final BlockDevInfo bdi = blockDevInfos.get(bd);
-                            final DefaultMutableTreeNode resource =
+                        for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
+                            final BlockDevInfo bdi = bdEntry.getValue();
+                            final MutableTreeNode resource =
                                                new DefaultMutableTreeNode(bdi);
                             blockDevicesNode.add(resource);
                         }
@@ -305,7 +298,7 @@ public final class HostBrowser extends Browser {
                 try {
                             fileSystemsNode.removeAllChildren();
                     for (final String fs : fss) {
-                        FSInfo fsi;
+                        final FSInfo fsi;
                         if (oldFilesystems.containsKey(fs)) {
                             fsi = oldFilesystems.get(fs);
                         } else {
@@ -375,20 +368,6 @@ public final class HostBrowser extends Browser {
         return filesystems;
     }
 
-    /** @return list of network interfaces. */
-    List<NetInfo> getNetInfos() {
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e =
-                                                  netInterfacesNode.children();
-        final List<NetInfo> netInfos = new ArrayList<NetInfo>();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode niNode = e.nextElement();
-            final NetInfo ni = (NetInfo) niNode.getUserObject();
-            netInfos.add(ni);
-        }
-        return netInfos;
-    }
-
     /** Adds advanced submenu to the host menus in drbd and pacemaker view. */
     public void addAdvancedMenu(final MyMenu submenu) {
         if (submenu.getItemCount() > 0) {
@@ -399,8 +378,8 @@ public final class HostBrowser extends Browser {
                         Tools.getString("HostBrowser.CmdLog"),
                         Info.LOGFILE_ICON,
                         "",
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -424,8 +403,8 @@ public final class HostBrowser extends Browser {
                     Tools.getString("HostBrowser.MakeKernelPanic")
                     + host.getName(),
                     null,
-                    new AccessMode(ConfigData.AccessType.GOD, false),
-                    new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                    new AccessMode(Application.AccessType.GOD, false),
+                    new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -459,8 +438,8 @@ public final class HostBrowser extends Browser {
                     Tools.getString("HostBrowser.MakeKernelReboot")
                     + host.getName(),
                     null,
-                    new AccessMode(ConfigData.AccessType.GOD, false),
-                    new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                    new AccessMode(Application.AccessType.GOD, false),
+                    new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -495,15 +474,15 @@ public final class HostBrowser extends Browser {
         final StringBuilder tt = new StringBuilder(40);
         final String drbdV = host.getDrbdVersion();
         final String drbdModuleV = host.getDrbdModuleVersion();
-        String drbdS;
-        if (drbdV == null || "".equals(drbdV)) {
+        final String drbdS;
+        if (drbdV == null || drbdV.isEmpty()) {
             drbdS = "not installed";
         } else {
             drbdS = drbdV;
         }
 
-        String drbdModuleS;
-        if (drbdModuleV == null || "".equals(drbdModuleV)) {
+        final String drbdModuleS;
+        if (drbdModuleV == null || drbdModuleV.isEmpty()) {
             drbdModuleS = "not installed";
         } else {
             drbdModuleS = drbdModuleV;
@@ -544,11 +523,11 @@ public final class HostBrowser extends Browser {
                 tt.append(" \nHeartbeat ");
                 tt.append(hbV);
                 tt.append(" (");
-                tt.append(hbRunning.toString());
+                tt.append(hbRunning);
                 tt.append(')');
             }
         } else {
-            String pmRunning;
+            final String pmRunning;
             if (host.isClStatus()) {
                 pmRunning = "running";
             } else {
@@ -572,7 +551,7 @@ public final class HostBrowser extends Browser {
                 tt.append(" \nHeartbeat ");
                 tt.append(hbV);
                 tt.append(" (");
-                tt.append(hbRunning.toString());
+                tt.append(hbRunning);
                 tt.append(')');
             }
             if (corOrAis != null) {
@@ -597,7 +576,7 @@ public final class HostBrowser extends Browser {
                 tt.append(" \nHeartbeat ");
                 tt.append(hbV);
                 tt.append(" (");
-                tt.append(hbRunning.toString());
+                tt.append(hbRunning);
                 tt.append(')');
             }
         }
@@ -636,12 +615,12 @@ public final class HostBrowser extends Browser {
     }
 
     /** Returns a list of used network interface ports. */
-    public Set<String> getUsedPorts() {
+    public Collection<String> getUsedPorts() {
         return usedPorts;
     }
 
     /** Returns a list of used proxy ports. */
-    public Set<String> getUsedProxyPorts() {
+    public Collection<String> getUsedProxyPorts() {
         return usedProxyPorts;
     }
 
@@ -656,7 +635,7 @@ public final class HostBrowser extends Browser {
     }
 
     /** Returns net interfaces node from the menu. */
-    public DefaultMutableTreeNode getNetInterfacesNode() {
+    public TreeNode getNetInterfacesNode() {
         return netInterfacesNode;
     }
 }

@@ -41,8 +41,6 @@ final class PcmkTest6 {
     static void start(final int count) {
         slowFactor = 0.2f;
         aborted = false;
-        final int dummy1X = 235;
-        final int dummy1Y = 207;
 
         final int ph1X = 315;
         final int ph1Y = 346;
@@ -58,6 +56,8 @@ final class PcmkTest6 {
         moveTo("Placeholder (AND)");
         leftClick();
 
+        final int dummy1X = 235;
+        final int dummy1Y = 207;
         chooseDummy(dummy1X, dummy1Y, false, true);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;

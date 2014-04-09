@@ -25,7 +25,7 @@ import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.NewHost;
 import lcmc.gui.resources.DrbdVolumeInfo;
-import javax.swing.JComponent;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
@@ -35,8 +35,6 @@ import javax.swing.JComponent;
  *
  */
 public final class NewProxyHost extends NewHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Drbd volume info. */
     private final DrbdVolumeInfo drbdVolumeInfo;
     /** The dialog we came from. */
@@ -45,7 +43,7 @@ public final class NewProxyHost extends NewHost {
     private WizardDialog nextDialogObject = null;
 
 
-    /** Prepares a new <code>NewProxyHost</code> object. */
+    /** Prepares a new {@code NewProxyHost} object. */
     public NewProxyHost(final WizardDialog previousDialog,
                         final Host host,
                         final DrbdVolumeInfo drbdVolumeInfo,
@@ -105,9 +103,8 @@ public final class NewProxyHost extends NewHost {
 
     /** Buttons that are enabled/disabled during check. */
     @Override
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton()),
-                                buttonClass(finishButton())};
+    protected MyButton[] nextButtons() {
+        return new MyButton[]{buttonClass(finishButton())};
     }
 
     /**

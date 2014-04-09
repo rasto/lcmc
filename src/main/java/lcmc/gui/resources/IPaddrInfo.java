@@ -21,6 +21,8 @@
  */
 package lcmc.gui.resources;
 
+import java.util.ArrayList;
+import java.util.List;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -31,6 +33,7 @@ import lcmc.utilities.Tools;
 import java.util.Map;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.Check;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
@@ -60,29 +63,27 @@ final class IPaddrInfo extends ServiceInfo {
      * one value is changed and we don't want to check everything.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        boolean ret = super.checkResourceFieldsCorrect(param, params);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        final Check check = new Check(incorrect, changed);
+        check.addCheck(super.checkResourceFields(param, params));
         final Widget wi;
         if (getResourceAgent().isHeartbeatClass()) {
             wi = getWidget("1", null);
         } else if (getResourceAgent().isOCFClass()) {
             wi = getWidget("ip", null);
         } else {
-            return true;
-        }
-        if (wi == null) {
-            return false;
+            return check;
         }
         wi.setEditable(true);
         wi.selectSubnet();
-        if (ret) {
-            final String ip = wi.getStringValue();
-            if (!Tools.isIp(ip)) {
-                ret = false;
-            }
+        final String ip = wi.getStringValue();
+        if (!Tools.isIp(ip)) {
+            incorrect.add("wrong ip");
         }
-        return ret;
+        return check;
     }
 
     /** Returns combo box for parameter. */
@@ -90,14 +91,14 @@ final class IPaddrInfo extends ServiceInfo {
     protected Widget createWidget(final String param,
                                   final String prefix,
                                   final int width) {
-        Widget paramWi;
+        final Widget paramWi;
         if ("ip".equals(param)) {
             /* get networks */
             Value ip = getPreviouslySelected(param, prefix);
             if (ip == null) {
                 ip = getParamSaved(param);
             }
-            Value defaultValue;
+            final Value defaultValue;
             if (ip.isNothingSelected()) {
                 defaultValue = new StringValue(
                         ip.getValueForConfig(),

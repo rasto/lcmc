@@ -35,19 +35,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -82,37 +85,37 @@ public final class UserConfig extends XML {
     private static final String DOWNLOAD_USER_ATTR = "dwuser";
     /** Download user password. */
     private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
+    /** Encoding. */
+    private static final String encoding = "UTF-8";
     /** Whether the host is a proxy host. */
     public static final boolean PROXY_HOST = true;
 
     /** Saves data about clusters and hosts to the supplied output stream. */
     public String saveXML(final OutputStream outputStream,
                           final boolean saveAll) throws IOException {
-        final String encoding = "UTF-8";
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = null;
 
         try {
              db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
+        } catch (final ParserConfigurationException pce) {
              LOG.appError("saveXML: can't save: ", pce);
         }
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(
                                                 doc.createElement("drbdgui"));
-        if (Tools.getConfigData().getLoginSave()) {
+        if (Tools.getApplication().getLoginSave()) {
             final String downloadUser =
-                                Tools.getConfigData().getDownloadUser();
+                                Tools.getApplication().getDownloadUser();
             final String downloadPasswd =
-                                Tools.getConfigData().getDownloadPassword();
+                                Tools.getApplication().getDownloadPassword();
             if (downloadUser != null && downloadPasswd != null) {
                 root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
             }
         }
-        final Element hostsNode = (Element) root.appendChild(
-                                                doc.createElement("hosts"));
-        final Set<Host> hosts = Tools.getConfigData().getHosts().getHostSet();
+        final Node hostsNode = root.appendChild(doc.createElement("hosts"));
+        final Set<Host> hosts = Tools.getApplication().getHosts().getHostSet();
         for (final Host host : hosts) {
             if (!saveAll && !host.isSavable()) {
                 continue;
@@ -120,11 +123,10 @@ public final class UserConfig extends XML {
             host.setSavable(true);
             addHostConfigNode(doc, hostsNode, HOST_NODE_STRING, host);
         }
-        final Element clusters = (Element) root.appendChild(
-                                                doc.createElement("clusters"));
+        final Node clusters = root.appendChild(doc.createElement("clusters"));
 
         final Set<Cluster> clusterSet =
-                        Tools.getConfigData().getClusters().getClusterSet();
+                        Tools.getApplication().getClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
             if (!saveAll && !cluster.isSavable()) {
                 continue;
@@ -137,7 +139,7 @@ public final class UserConfig extends XML {
             final Set<Host> clusterHosts = cluster.getHosts();
             for (final Host host : clusterHosts) {
                 final String hostName = host.getHostname();
-                final Element hostNode = (Element) clusterNode.appendChild(
+                final Node hostNode = clusterNode.appendChild(
                                         doc.createElement(HOST_NODE_STRING));
                 hostNode.appendChild(doc.createTextNode(hostName));
             }
@@ -146,7 +148,7 @@ public final class UserConfig extends XML {
                     continue;
                 }
                 final String hostName = pHost.getHostname();
-                final Element hostNode = (Element) clusterNode.appendChild(
+                final Node hostNode = clusterNode.appendChild(
                                     doc.createElement(PROXY_HOST_NODE_STRING));
                 hostNode.appendChild(doc.createTextNode(hostName));
             }
@@ -159,14 +161,14 @@ public final class UserConfig extends XML {
             t.setOutputProperty(OutputKeys.INDENT, "yes");
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, encoding);
-        } catch (TransformerConfigurationException tce) {
+        } catch (final TransformerConfigurationException tce) {
             assert false;
         }
-        final DOMSource doms = new DOMSource(doc);
-        final StreamResult sr = new StreamResult(outputStream);
+        final Source doms = new DOMSource(doc);
+        final Result sr = new StreamResult(outputStream);
         try {
             t.transform(doms, sr);
-        } catch (TransformerException te) {
+        } catch (final TransformerException te) {
             final IOException ioe = new IOException();
             ioe.initCause(te);
             throw ioe;
@@ -177,9 +179,9 @@ public final class UserConfig extends XML {
     /**
      * Starts specified clusters and connects to the hosts of this clusters.
      */
-    public void startClusters(final List<Cluster> selectedClusters) {
+    public void startClusters(final Collection<Cluster> selectedClusters) {
         final Set<Cluster> clusters =
-                        Tools.getConfigData().getClusters().getClusterSet();
+                        Tools.getApplication().getClusters().getClusterSet();
         if (clusters != null) {
             /* clusters */
             for (final Cluster cluster : clusters) {
@@ -251,7 +253,7 @@ public final class UserConfig extends XML {
             final String downloadPasswd = getAttribute(rootNode,
                                                        DOWNLOAD_PASSWD_ATTR);
             if (downloadUser != null && downloadPasswd != null) {
-                Tools.getConfigData().setDownloadLogin(downloadUser,
+                Tools.getApplication().setDownloadLogin(downloadUser,
                                                        downloadPasswd,
                                                        true);
             }
@@ -302,13 +304,13 @@ public final class UserConfig extends XML {
                 if (clusters != null) {
                     for (int i = 0; i < clusters.getLength(); i++) {
                         final Node clusterNode = clusters.item(i);
-                        if (clusterNode.getNodeName().equals("cluster")) {
+                        if ("cluster".equals(clusterNode.getNodeName())) {
                             final String clusterName =
                                                getAttribute(clusterNode,
                                                             CLUSTER_NAME_ATTR);
                             final Cluster cluster = new Cluster();
                             cluster.setName(clusterName);
-                            Tools.getConfigData().addClusterToClusters(cluster);
+                            Tools.getApplication().addClusterToClusters(cluster);
                             loadClusterHosts(clusterNode, cluster, hostMap);
                         }
                     }
@@ -326,7 +328,7 @@ public final class UserConfig extends XML {
                         final String color,
                         final boolean sudo,
                         final boolean savable) {
-        Tools.getConfigData().setLastEnteredUser(username);
+        Tools.getApplication().setLastEnteredUser(username);
         final Host host = new Host();
         host.setSavable(savable);
         host.setHostname(nodeName);
@@ -334,16 +336,16 @@ public final class UserConfig extends XML {
             sshPort = "22";
         }
         host.setSSHPort(sshPort);
-        Tools.getConfigData().setLastEnteredSSHPort(sshPort);
+        Tools.getApplication().setLastEnteredSSHPort(sshPort);
         if (color != null) {
             host.setSavedColor(color);
         }
         host.setUseSudo(sudo);
-        Tools.getConfigData().setLastEnteredUseSudo(sudo);
-        Tools.getConfigData().addHostToHosts(host);
+        Tools.getApplication().setLastEnteredUseSudo(sudo);
+        Tools.getApplication().addHostToHosts(host);
 
         new TerminalPanel(host);
-        host.setIp(ip);
+        host.setIpAddress(ip);
         if (username == null && sudo) {
             username = System.getProperty("user.name");
         }
@@ -405,11 +407,11 @@ public final class UserConfig extends XML {
 
     /** Host node. */
     private void addHostConfigNode(final Document doc,
-                                   final Element parent,
+                                   final Node parent,
                                    final String nodeName,
                                    final Host host) {
         final String hostName = host.getHostname();
-        final String ip = host.getIp();
+        final String ip = host.getIpAddress();
         final String username = host.getUsername();
         final String sshPort = host.getSSHPort();
         final Boolean useSudo = host.isUseSudo();
@@ -425,15 +427,13 @@ public final class UserConfig extends XML {
             hostNode.setAttribute(HOST_USESUDO_ATTR, "true");
         }
         if (ip != null) {
-            final Node ipNode = (Element) hostNode.appendChild(
-                                                   doc.createElement("ip"));
+            final Node ipNode = hostNode.appendChild(doc.createElement("ip"));
 
             ipNode.appendChild(doc.createTextNode(ip));
         }
         if (username != null) {
             final Node usernameNode =
-                            (Element) hostNode.appendChild(
-                                                doc.createElement("user"));
+                    hostNode.appendChild(doc.createElement("user"));
 
             usernameNode.appendChild(doc.createTextNode(username));
         }

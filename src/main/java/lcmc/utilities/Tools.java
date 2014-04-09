@@ -22,13 +22,7 @@
 
 package lcmc.utilities;
 
-import lcmc.data.ConfigData;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.Clusters;
-import lcmc.data.UserConfig;
-import lcmc.data.HostOptions;
-import lcmc.data.Value;
+import lcmc.data.*;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.ServiceInfo;
@@ -37,6 +31,7 @@ import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.Exceptions;
 
+import java.awt.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
@@ -54,36 +49,11 @@ import java.util.Collection;
 import java.util.TreeSet;
 import java.util.LinkedHashMap;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.JEditorPane;
-import javax.swing.JScrollPane;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.BorderFactory;
+import javax.swing.table.*;
 import javax.swing.text.html.HTMLDocument;
-import javax.swing.UIManager;
-import javax.swing.JTable;
-import javax.swing.JCheckBox;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.JComponent;
-import javax.swing.JPopupMenu;
-import javax.swing.JViewport;
-import javax.swing.JDialog;
-import javax.swing.AbstractButton;
-import javax.swing.SwingUtilities;
 
-import java.awt.Component;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -93,16 +63,7 @@ import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import javax.swing.JApplet;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.GraphicsConfiguration;
-import java.awt.Insets;
-import java.awt.Desktop;
-import java.awt.Container;
 
-import java.awt.MouseInfo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.FileReader;
@@ -143,7 +104,7 @@ public final class Tools {
     private static ResourceBundle resourceAppDefaults = null;
 
     /** Config data object. */
-    private static ConfigData configData;
+    private static Application application;
     /** Gui data object. */
     private static GUIData guiData;
     /** Drbd gui xml object. */
@@ -185,7 +146,7 @@ public final class Tools {
     /** Inits this class. */
     public static void init() {
         setDefaults();
-        configData = new ConfigData();
+        application = new Application();
         guiData = new GUIData();
     }
 
@@ -222,7 +183,7 @@ public final class Tools {
             p.load(Tools.class.getResourceAsStream("/release.properties"));
             release = p.getProperty("release");
             return release;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.appError("getRelease: cannot open release file", "", e);
             return "unknown";
         }
@@ -263,33 +224,33 @@ public final class Tools {
                                            final boolean outputVisible,
                                            final String text,
                                            final int commandTimeout) {
-        ExecCallback ec;
         final String hostName = host.getName();
         Tools.startProgressIndicator(hostName, text);
         final StringBuilder output = new StringBuilder("");
         final Integer[] exitCodeHolder = new Integer[]{0};
+        final ExecCallback ec;
         if (execCallback == null) {
             final String stacktrace = getStackTrace();
             ec = new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 output.append(ans);
+                             public void done(final String answer) {
+                                 output.append(answer);
                              }
 
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
-                                 LOG.appWarning("doneError: " + command + " "
-                                                + ans + " rc: " + exitCode);
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
+                                 LOG.appWarning("doneError: " + command + ' '
+                                                + answer + " rc: " + errorCode);
                                  if (outputVisible) {
                                     LOG.sshError(host,
                                                  command,
-                                                 ans,
+                                            answer,
                                                  stacktrace,
-                                                 exitCode);
+                                            errorCode);
                                  }
-                                 exitCodeHolder[0] = exitCode;
-                                 output.append(ans);
+                                 exitCodeHolder[0] = errorCode;
+                                 output.append(answer);
                              }
                          };
         } else {
@@ -306,7 +267,7 @@ public final class Tools {
             if (commandThread != null) {
                 commandThread.join(0);
             }
-        } catch (java.lang.InterruptedException e) {
+        } catch (final java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         Tools.stopProgressIndicator(hostName, text);
@@ -319,29 +280,29 @@ public final class Tools {
                                             final ExecCallback execCallback,
                                             final boolean outputVisible,
                                             final int commandTimeout) {
-        ExecCallback ec;
+        final ExecCallback ec;
         final StringBuilder output = new StringBuilder("");
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
             final String stacktrace = getStackTrace();
             ec = new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 output.append(ans);
+                             public void done(final String answer) {
+                                 output.append(answer);
                              }
 
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  if (outputVisible) {
                                     LOG.sshError(host,
                                                  command,
-                                                 ans,
+                                            answer,
                                                  stacktrace,
-                                                 exitCode);
+                                            errorCode);
                                  }
-                                 exitCodeHolder[0] = exitCode;
-                                 output.append(ans);
+                                 exitCodeHolder[0] = errorCode;
+                                 output.append(answer);
                              }
                            };
         } else {
@@ -359,7 +320,7 @@ public final class Tools {
             if (commandThread != null) {
                 commandThread.join(0);
             }
-        } catch (java.lang.InterruptedException e) {
+        } catch (final java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         return new SSH.SSHOutput(output.toString(), exitCodeHolder[0]);
@@ -388,7 +349,7 @@ public final class Tools {
                                   final String info1,
                                   final String info2) {
         final JEditorPane infoPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN,
-                                                     info1 + "\n" + info2);
+                                                     info1 + '\n' + info2);
         infoPane.setEditable(false);
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
@@ -412,18 +373,17 @@ public final class Tools {
      *
      * @return whether string is ip or not.
      */
-    public static boolean isIp(final String ipString) {
+    public static boolean isIp(final CharSequence ipString) {
         boolean wasValid = true;
         // Inet4Address ip;
-        Pattern pattern;
-        final String ipPattern =
-                "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})";
         if (ipString == null || "".equals(ipString)) {
             wasValid = false;
         } else {
+            final Pattern pattern;
             try {
+                final String ipPattern = "([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})\\.([0-9]{1,3})";
                 pattern = Pattern.compile(ipPattern);
-            } catch (PatternSyntaxException exception) {
+            } catch (final PatternSyntaxException exception) {
                 return true;
             }
             final Matcher myMatcher = pattern.matcher(ipString);
@@ -469,7 +429,7 @@ public final class Tools {
      */
     public static String loadFile(final String filename,
                                       final boolean showError) {
-        BufferedReader in;
+        final BufferedReader in;
         final StringBuilder content = new StringBuilder("");
         //Tools.startProgressIndicator(Tools.getString("Tools.Loading"));
         try {
@@ -478,7 +438,7 @@ public final class Tools {
             while ((line = in.readLine()) != null) {
                 content.append(line);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             if (showError) {
                 infoDialog("Load Error",
                            "The file " + filename + " failed to load",
@@ -488,7 +448,7 @@ public final class Tools {
         }
         try {
             in.close();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             LOG.appError("loadFile: could not close: " + filename, ex);
         }
         return content.toString();
@@ -509,12 +469,12 @@ public final class Tools {
      * Starts the specified clusters and connects to the hosts of these
      * clusters.
      */
-    public static void startClusters(final List<Cluster> selectedClusters) {
+    public static void startClusters(final Collection<Cluster> selectedClusters) {
         userConfig.startClusters(selectedClusters);
     }
 
     /** Stops the specified clusters in the gui. */
-    public static void stopClusters(final List<Cluster> selectedClusters) {
+    public static void stopClusters(final Iterable<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
             stopCluster(cluster);
         }
@@ -536,11 +496,11 @@ public final class Tools {
     }
 
     /** Removes the specified clusters from the gui. */
-    public static void removeClusters(final List<Cluster> selectedClusters) {
+    public static void removeClusters(final Iterable<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
             LOG.debug1("removeClusters: remove hosts from cluster: "
                        + cluster.getName());
-            getConfigData().removeClusterFromClusters(cluster);
+            getApplication().removeClusterFromClusters(cluster);
             for (final Host host : cluster.getHosts()) {
                 host.removeFromCluster();
             }
@@ -565,7 +525,7 @@ public final class Tools {
                 InetAddress[] addresses = null;
                 try {
                     addresses = InetAddress.getAllByName(hostnameEntered);
-                } catch (UnknownHostException e) {
+                } catch (final UnknownHostException e) {
                 }
                 String ip = null;
                 if (addresses != null) {
@@ -593,7 +553,7 @@ public final class Tools {
             final Cluster cluster = new Cluster();
             cluster.setName(clusterName);
             cluster.setSavable(false);
-            Tools.getConfigData().addClusterToClusters(cluster);
+            Tools.getApplication().addClusterToClusters(cluster);
             for (final HostOptions ho : clusters.get(clusterName)) {
                 userConfig.setHostCluster(hostMap,
                                           cluster,
@@ -608,7 +568,7 @@ public final class Tools {
     public static void removeEverything() {
         Tools.startProgressIndicator(
                                  Tools.getString("MainMenu.RemoveEverything"));
-        Tools.getConfigData().disconnectAllHosts();
+        Tools.getApplication().disconnectAllHosts();
         getGUIData().getClustersPanel().removeAllTabs();
         Tools.stopProgressIndicator(
                                  Tools.getString("MainMenu.RemoveEverything"));
@@ -634,16 +594,16 @@ public final class Tools {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             userConfig.saveXML(fileOut, saveAll);
             LOG.debug("save: filename: " + filename);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.appError("save: error saving: " + filename, "", e);
         } finally {
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
 
-            final Clusters clusters = Tools.getConfigData().getClusters();
+            final Clusters clusters = Tools.getApplication().getClusters();
             if (clusters != null) {
                 for (final Cluster cluster : clusters.getClusterSet()) {
                     final ClusterBrowser cb = cluster.getBrowser();
@@ -662,8 +622,8 @@ public final class Tools {
      *
      * @return config data object.
      */
-    public static ConfigData getConfigData() {
-        return configData;
+    public static Application getApplication() {
+        return application;
     }
 
     /**
@@ -692,7 +652,7 @@ public final class Tools {
         }
         try {
             return resourceAppDefaults.getString(option);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.appError("getDefault: unresolved config resource", option, e);
             return option;
         }
@@ -715,7 +675,7 @@ public final class Tools {
         }
         try {
             return (Color) resourceAppDefaults.getObject(option);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.appError("getDefaultColor: unresolved config resource",
                          option, e);
             return Color.WHITE;
@@ -727,7 +687,7 @@ public final class Tools {
      * bundle and scales it according the --scale option.
      */
     public static int getDefaultSize(final String option) {
-        return getConfigData().scaled(getDefaultInt(option));
+        return getApplication().scaled(getDefaultInt(option));
     }
 
     /**
@@ -748,7 +708,7 @@ public final class Tools {
         }
         try {
             return (Integer) resourceAppDefaults.getObject(option);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.appError("getDefaultInt: exception", option + ": " + getDefault(option), e);
             return 0;
         }
@@ -810,7 +770,7 @@ public final class Tools {
         }
         try {
             return resource.getString(text);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.appError("getString: unresolved resource: " + text);
             return text;
         }
@@ -833,8 +793,8 @@ public final class Tools {
                 ResourceBundle.getBundle("lcmc.configs.DistResource", locale);
         String ret;
         try {
-            ret = resourceString.getString(text + "." + arch);
-        } catch (Exception e) {
+            ret = resourceString.getString(text + '.' + arch);
+        } catch (final Exception e) {
             ret = null;
         }
         if (ret == null) {
@@ -844,7 +804,7 @@ public final class Tools {
                 }
                 LOG.debug2("getDistString: ret: " + ret);
                 return ret;
-            } catch (Exception e) {
+            } catch (final RuntimeException e) {
                 return null;
             }
         }
@@ -870,7 +830,7 @@ public final class Tools {
         List<String> ret;
         try {
             ret = (List<String>) resourceString.getObject(text);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             ret = new ArrayList<String>();
         }
         return ret;
@@ -916,7 +876,7 @@ public final class Tools {
                 }
                 results.add(sudoS + "bash -c \""
                             + Tools.escapeQuotes(distString, 1)
-                            + "\"");
+                            + '"');
             } else {
                 results.add(distString);
             }
@@ -948,7 +908,7 @@ public final class Tools {
                 ResourceBundle.getBundle("lcmc.configs.ServiceDefinitions");
         try {
             return resourceSD.getStringArray(service);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOG.appWarning("getServiceDefinition: cannot get service definition for service: " + service, e);
             return new String[]{};
         }
@@ -958,7 +918,7 @@ public final class Tools {
      * Converts kernelVersion as parsed from uname to a version that is used
      * in the download area on the website.
      */
-    public static String getKernelDownloadDir(final String kernelVersion,
+    public static String getKernelDownloadDir(final CharSequence kernelVersion,
                                               final String dist,
                                               final String version,
                                               final String arch) {
@@ -997,15 +957,15 @@ public final class Tools {
         String distVersion = null;
         try {
             distVersion = resourceCommand.getString("version:" + version);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             /* with wildcard */
             final StringBuilder buf = new StringBuilder(version);
             for (int i = version.length() - 1; i >= 0; i--) {
                 try {
                     distVersion = resourceCommand.getString("version:"
                                                             + buf.toString()
-                                                            + "*");
-                } catch (Exception e2) {
+                                                            + '*');
+                } catch (final Exception e2) {
                     distVersion = null;
                 }
                 if (distVersion != null) {
@@ -1096,7 +1056,7 @@ public final class Tools {
 
     /** Uppercases the first character. */
     public static String ucfirst(final String s) {
-        if (s == null || s.length() == 0) {
+        if (s == null || s.isEmpty()) {
             return s;
         }
         final String f = s.substring(0, 1);
@@ -1180,7 +1140,7 @@ public final class Tools {
             return null;
         }
         if (value.indexOf(' ') > -1 || value.indexOf('"') > -1) {
-            return "\"" + value.replaceAll("\"", "\\\\\"") + "\"";
+            return '"' + value.replaceAll("\"", "\\\\\"") + '"';
         }
         return value;
     }
@@ -1262,7 +1222,7 @@ public final class Tools {
             version1a = m1.group(1);
             try {
                 rc1 = Integer.parseInt(m1.group(2));
-            } catch (java.lang.NumberFormatException e) {
+            } catch (final java.lang.NumberFormatException e) {
                 e.printStackTrace();
             }
         } else {
@@ -1277,13 +1237,13 @@ public final class Tools {
         }
 
         final Matcher m2 = p.matcher(version2);
-        String version2a;
+        final String version2a;
         int rc2 = Integer.MAX_VALUE;
         if (m2.matches()) {
             version2a = m2.group(1);
             try {
                 rc2 = Integer.parseInt(m2.group(2));
-            } catch (java.lang.NumberFormatException e) {
+            } catch (final java.lang.NumberFormatException e) {
                 e.printStackTrace();
             }
         } else {
@@ -1306,7 +1266,7 @@ public final class Tools {
                 final String v1 = v1a[i];
                 try {
                     v1i = Integer.parseInt(v1);
-                } catch (java.lang.NumberFormatException e) {
+                } catch (final java.lang.NumberFormatException e) {
                     throw new Exceptions.IllegalVersionException(version1);
                 }
             }
@@ -1316,7 +1276,7 @@ public final class Tools {
                 final String v2 = v2a[i];
                 try {
                     v2i = Integer.parseInt(v2);
-                } catch (java.lang.NumberFormatException e) {
+                } catch (final java.lang.NumberFormatException e) {
                     throw new Exceptions.IllegalVersionException(version2);
                 }
             }
@@ -1337,7 +1297,7 @@ public final class Tools {
     }
 
     /** Returns number of characters 'c' in a string 's'. */
-    public static int charCount(final String s, final char c) {
+    public static int charCount(final CharSequence s, final char c) {
         if (s == null) {
             return 0;
         }
@@ -1371,7 +1331,7 @@ public final class Tools {
                                               final String dir,
                                               final String mode,
                                               final boolean makeBackup) {
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             host.getSSH().createConfig(config,
                                        fileName,
                                        dir,
@@ -1398,7 +1358,7 @@ public final class Tools {
                         final MyListModel<MyMenuItem> dlm,
                         final MyList<MyMenuItem> list,
                         final Info infoObject,
-                        final List<JDialog> popups,
+                        final Collection<JDialog> popups,
                         final Map<MyMenuItem, ButtonCallback> callbackHash) {
         final int maxSize = dlm.getSize();
         if (maxSize <= 0) {
@@ -1420,7 +1380,7 @@ public final class Tools {
         if (mainFrame instanceof JApplet) {
             popup = new JDialog(new JFrame(), name, false);
         } else {
-            popup = new JDialog((JFrame) mainFrame, name, false);
+            popup = new JDialog((Frame) mainFrame, name, false);
         }
         popup.setUndecorated(true);
         popup.setAlwaysOnTop(true);
@@ -1438,7 +1398,7 @@ public final class Tools {
 
         list.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseExited(final MouseEvent evt) {
+            public void mouseExited(final MouseEvent e) {
                 prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
@@ -1448,14 +1408,14 @@ public final class Tools {
                 }
             }
             @Override
-            public void mouseEntered(final MouseEvent evt) {
+            public void mouseEntered(final MouseEvent e) {
                 /* request focus here causes the applet making all
                    textfields to be not editable. */
                 list.requestFocus();
             }
 
             @Override
-            public void mousePressed(final MouseEvent evt) {
+            public void mousePressed(final MouseEvent e) {
                 prevScrollingMenuIndex = -1;
                 if (callbackHash != null) {
                     for (final MyMenuItem item : callbackHash.keySet()) {
@@ -1465,7 +1425,7 @@ public final class Tools {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final int index = list.locationToIndex(evt.getPoint());
+                        final int index = list.locationToIndex(e.getPoint());
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -1486,16 +1446,16 @@ public final class Tools {
 
         list.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
-            public void mouseMoved(final MouseEvent evt) {
+            public void mouseMoved(final MouseEvent e) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        int pIndex = list.locationToIndex(evt.getPoint());
+                        int pIndex = list.locationToIndex(e.getPoint());
                         final Rectangle r = list.getCellBounds(pIndex, pIndex);
                         if (r == null) {
                             return;
                         }
-                        if (!r.contains(evt.getPoint())) {
+                        if (!r.contains(e.getPoint())) {
                             pIndex = -1;
                         }
                         final int index = pIndex;
@@ -1652,7 +1612,7 @@ public final class Tools {
                 final Point mouseLocation =
                                       MouseInfo.getPointerInfo().getLocation();
                 SwingUtilities.convertPointFromScreen(mouseLocation, sp);
-                boolean inside = sp.getBounds().contains(mouseLocation);
+                final boolean inside = sp.getBounds().contains(mouseLocation);
 
                 for (final JDialog otherP : popups) {
                     if (popup != otherP || !inside) {
@@ -1724,7 +1684,7 @@ public final class Tools {
                 content.append('\n');
             }
             return content.toString();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOG.appError("getFile: could not read: " + fileName, "", e);
             return null;
         }
@@ -1756,12 +1716,12 @@ public final class Tools {
             if ("host".equals(option)) {
                 cluster = null;
                 host = value;
-                Tools.getConfigData().addAutoHost(host);
+                Tools.getApplication().addAutoHost(host);
                 continue;
             } else if ("cluster".equals(option)) {
                 host = null;
                 cluster = value;
-                Tools.getConfigData().addAutoCluster(cluster);
+                Tools.getApplication().addAutoCluster(cluster);
                 continue;
             } else if ("global".equals(option)) {
                 host = null;
@@ -1770,11 +1730,11 @@ public final class Tools {
                 continue;
             }
             if (host != null) {
-                Tools.getConfigData().addAutoOption(host, option, value);
+                Tools.getApplication().addAutoOption(host, option, value);
             } else if (cluster != null) {
-                Tools.getConfigData().addAutoOption(cluster, option, value);
+                Tools.getApplication().addAutoOption(cluster, option, value);
             } else if (global) {
-                Tools.getConfigData().addAutoOption("global", option, value);
+                Tools.getApplication().addAutoOption("global", option, value);
             } else {
                 LOG.appWarning("parseAutoArgs: cannot parse: " + line);
                 return;
@@ -1786,7 +1746,7 @@ public final class Tools {
     public static void sleep(final int ms) {
         try {
             Thread.sleep(ms);
-        } catch (InterruptedException ex) {
+        } catch (final InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }
@@ -1802,7 +1762,6 @@ public final class Tools {
         final Pattern vPattern = Pattern.compile(".*version:\\s+([0-9.]*)");
         final Pattern iPattern = Pattern.compile(".*info:\\s+(\\d+)\\s+(.*)");
         final int randomInfo = (int) (Math.random() * 100);
-        int rate = 0;
         String info = null;
         try {
             final String url =
@@ -1810,9 +1769,9 @@ public final class Tools {
                           + getRelease();
             final BufferedReader reader = new BufferedReader(
                              new InputStreamReader(new URL(url).openStream()));
-            String line;
+            int rate = 0;
             do {
-                line = reader.readLine();
+                final String line = reader.readLine();
                 if (line == null) {
                     break;
                 }
@@ -1824,7 +1783,7 @@ public final class Tools {
                             || compareVersions(v, version) > 0) {
                             version = v;
                         }
-                    } catch (Exceptions.IllegalVersionException e) {
+                    } catch (final Exceptions.IllegalVersionException e) {
                         LOG.appWarning("getLatestVersion: "
                                        + e.getMessage(), e);
                     }
@@ -1838,9 +1797,9 @@ public final class Tools {
                     }
                 }
             } while (true);
-        } catch (MalformedURLException mue) {
+        } catch (final MalformedURLException mue) {
             return new String[]{null, null};
-        } catch (IOException ioe) {
+        } catch (final IOException ioe) {
             return new String[]{version, info};
         }
         return new String[]{version, info};
@@ -1873,15 +1832,15 @@ public final class Tools {
         if (remotePort < 0 || host == null) {
             return -1;
         }
-        if (Tools.isLocalIp(host.getIp())) {
+        if (Tools.isLocalIp(host.getIpAddress())) {
             return remotePort;
         }
-        final int localPort = remotePort + getConfigData().getVncPortOffset();
+        final int localPort = remotePort + getApplication().getVncPortOffset();
         LOG.debug("prepareVncViewer: start port forwarding "
                   + remotePort + " -> " + localPort);
         try {
-            host.getSSH().startVncPortForwarding(host.getIp(), remotePort);
-        } catch (final java.io.IOException e) {
+            host.getSSH().startVncPortForwarding(host.getIpAddress(), remotePort);
+        } catch (final IOException e) {
             LOG.error("prepareVncViewer: unable to create the tunnel "
                       + remotePort + " -> " + localPort
                       + ": " + e.getMessage()
@@ -1894,14 +1853,14 @@ public final class Tools {
     /** Cleans up after vnc viewer. It stops ssh tunnel. */
     private static void cleanupVncViewer(final Host host,
                                          final int localPort) {
-        if (Tools.isLocalIp(host.getIp())) {
+        if (Tools.isLocalIp(host.getIpAddress())) {
             return;
         }
-        final int remotePort = localPort - getConfigData().getVncPortOffset();
+        final int remotePort = localPort - getApplication().getVncPortOffset();
         LOG.debug("cleanupVncViewer: stop port forwarding " + remotePort);
         try {
             host.getSSH().stopVncPortForwarding(remotePort);
-        } catch (final java.io.IOException e) {
+        } catch (final IOException e) {
             LOG.appError("cleanupVncViewer: unable to close tunnel", e);
         }
     }
@@ -2024,7 +1983,7 @@ public final class Tools {
      * and "min" pair.
      */
     @Deprecated
-    public static String[] extractUnit(final String time) {
+    public static String[] extractUnit(final CharSequence time) {
         final String[] o = new String[]{null, null};
         if (time == null) {
             return o;
@@ -2067,14 +2026,14 @@ public final class Tools {
         try {
             final String localIp = InetAddress.getLocalHost().getHostAddress();
             return ip.equals(localIp);
-        } catch (java.net.UnknownHostException e) {
+        } catch (final java.net.UnknownHostException e) {
             return false;
         }
     }
 
     /** Converts value with units. */
     @Deprecated
-    public static long convertUnits(final String value) {
+    public static long convertUnits(final CharSequence value) {
         final String[] v = Tools.extractUnit(value);
         if (v.length == 2 && Tools.isNumber(v[0])) {
             long num = Long.parseLong(v[0]);
@@ -2101,17 +2060,16 @@ public final class Tools {
     /** Resize table. */
     public static void resizeTable(final JTable table,
                                    final Map<Integer, Integer> defaultWidths) {
-        final int margin = 3;
         if (table == null) {
             return;
         }
 
+        final int margin = 3;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final int vColIndex = i;
-            final DefaultTableColumnModel colModel =
-                            (DefaultTableColumnModel) table.getColumnModel();
+            final TableColumnModel colModel =
+                    table.getColumnModel();
             final TableColumn col = colModel.getColumn(vColIndex);
-            int width;
             TableCellRenderer renderer = col.getHeaderRenderer();
 
             if (renderer == null) {
@@ -2131,6 +2089,7 @@ public final class Tools {
             if (defaultWidths != null) {
                 dw = defaultWidths.get(i);
             }
+            int width;
             if (dw == null) {
                 width = comp.getPreferredSize().width;
                 for (int r = 0; r < table.getRowCount(); r++) {
@@ -2153,7 +2112,7 @@ public final class Tools {
             width += 2 * margin;
             col.setPreferredWidth(width);
         }
-        ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer())
+        ((JLabel) table.getTableHeader().getDefaultRenderer())
                             .setHorizontalAlignment(SwingConstants.CENTER);
     }
 
@@ -2175,7 +2134,7 @@ public final class Tools {
                 }
                 invP.setVisible(visible);
                 for (final Component c : invP.getComponents()) {
-                    ((JComponent) c).setVisible(visible);
+                    c.setVisible(visible);
                 }
                 final JComponent pp = (JComponent) invP.getParent();
                 if (pp != null) {
@@ -2190,7 +2149,7 @@ public final class Tools {
                 pp.setVisible(visible);
             }
             for (final Component c : parent.getComponents()) {
-                ((JComponent) c).setVisible(visible);
+                c.setVisible(visible);
             }
             parent.repaint();
         }
@@ -2272,15 +2231,15 @@ public final class Tools {
         /* Take into account screen insets, decrease viewport */
         sBounds.x += screenInsets.left;
         sBounds.y += screenInsets.top;
-        sBounds.width -= (screenInsets.left + screenInsets.right);
+        sBounds.width -= screenInsets.left + screenInsets.right;
         sBounds.height -= (screenInsets.top + screenInsets.bottom);
         return sBounds;
     }
 
     /** Compares two Lists with services if thery are equal. The order does not
      * matter. */
-    public static boolean serviceInfoListEquals(final Set<ServiceInfo> l1,
-                                                final Set<ServiceInfo> l2) {
+    public static boolean serviceInfoListEquals(final Collection<ServiceInfo> l1,
+                                                final Collection<ServiceInfo> l2) {
         if (l1 == l2) {
             return true;
         }
@@ -2329,6 +2288,17 @@ public final class Tools {
                               /* just wait */
                           }
                       });
+    }
+    /**
+     * Convenience invoke and wait function if not already in an event
+     * dispatch thread.
+     */
+    public static void invokeAndWaitIfNeeded(final Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            invokeAndWait(runnable);
+        }
     }
 
     /** Convenience invoke and wait function. */
@@ -2386,7 +2356,7 @@ public final class Tools {
                 sb.append('\\');
                 sb.append(c);
             } else if (c == '\n') {
-                sb.append("\n");
+                sb.append('\n');
             } else {
                 sb.append(c);
             }
@@ -2406,7 +2376,7 @@ public final class Tools {
         for (int i = 0; i < s.length(); i++) {
             final char c = s.charAt(i);
             if (c == '\n') {
-                sb.append("\n");
+                sb.append('\n');
             } else if (c == '\'') {
                 sb.append("'\\''");
             } else {
@@ -2441,7 +2411,7 @@ public final class Tools {
             return pcmkV == null
                    && hbV != null
                    && Tools.compareVersions(hbV, "2.99.0") < 0;
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("versionBeforePacemaker: " + e.getMessage(), e);
             return false;
         }
@@ -2453,7 +2423,7 @@ public final class Tools {
         final String name = font.getFontName();
         final int style = font.getStyle();
         final int size = font.getSize();
-        ab.setFont(new Font(name, style, getConfigData().scaled(10)));
+        ab.setFont(new Font(name, style, getApplication().scaled(10)));
         ab.setMargin(new Insets(2, 2, 2, 2));
         ab.setIconTextGap(0);
     }
@@ -2495,7 +2465,7 @@ public final class Tools {
                               new FontUIResource(
                                          f.getName(),
                                          f.getStyle(),
-                                         getConfigData().scaled(f.getSize())));
+                                         getApplication().scaled(f.getSize())));
             }
         }
     }
@@ -2504,15 +2474,15 @@ public final class Tools {
      * Set maximum access type.
      */
     public static void setMaxAccessType(
-                                      final ConfigData.AccessType accessType) {
-        getConfigData().setAccessType(accessType);
-        getConfigData().setMaxAccessType(accessType);
+                                      final Application.AccessType accessType) {
+        getApplication().setAccessType(accessType);
+        getApplication().setMaxAccessType(accessType);
         checkAccessOfEverything();
     }
 
     /** Check access of every cluster. */
     public static void checkAccessOfEverything() {
-        for (final Cluster c : getConfigData().getClusters().getClusterSet()) {
+        for (final Cluster c : getApplication().getClusters().getClusterSet()) {
             final ClusterBrowser cb = c.getBrowser();
             if (cb != null) {
                 cb.checkAccessOfEverything();
@@ -2546,7 +2516,7 @@ public final class Tools {
         return mac.toString();
     }
 
-    private static List<String> getNameParts(final String name) {
+    private static List<String> getNameParts(final CharSequence name) {
         final List<String> parts = new ArrayList<String>();
         if (name == null) {
             return parts;
@@ -2563,7 +2533,7 @@ public final class Tools {
      * Compare two names, doing the right thing there are numbers in the
      * beginning or in the end of the string.
      */
-    public static int compareNames(final String s1, final String s2) {
+    public static int compareNames(final CharSequence s1, final CharSequence s2) {
         final List<String> parts1 = getNameParts(s1);
         final List<String> parts2 = getNameParts(s2);
         int i = 0;
@@ -2572,7 +2542,7 @@ public final class Tools {
                 return 1;
             }
             final String p2 = parts2.get(i);
-            int res;
+            final int res;
             if (Character.isDigit(p1.charAt(0))
                 && Character.isDigit(p2.charAt(0))) {
                 res = Integer.parseInt(p1) - Integer.parseInt(p2);
@@ -2594,7 +2564,7 @@ public final class Tools {
      * Print stack trace if it's not in a swing thread.
      */
     public static void isSwingThread() {
-        if (!getConfigData().isCheckSwing()) {
+        if (!getApplication().isCheckSwing()) {
             return;
         }
         if (!SwingUtilities.isEventDispatchThread()) {
@@ -2606,7 +2576,7 @@ public final class Tools {
      * Print stack trace if it's in a swing thread.
      */
     public static void isNotSwingThread() {
-        if (!getConfigData().isCheckSwing()) {
+        if (!getApplication().isCheckSwing()) {
             return;
         }
         if (SwingUtilities.isEventDispatchThread()) {

@@ -34,8 +34,6 @@ import lcmc.data.Value;
 public final class Unit implements Value {
     /** Short name. */
     private final String shortName;
-    /** Secondary short name used for comparisons. */
-    private final String secShortName;
     /** Name of the unit. */
     private final String name;
     /** Plural name of the unit. */
@@ -45,13 +43,12 @@ public final class Unit implements Value {
     /** Whether the field to which this unit belongs is empty. */
     private boolean empty = false;
 
-    /** Prepares new <code>Unit</code> object. */
+    /** Prepares new {@code Unit} object. */
     public Unit(final String shortName,
                 final String secShortName,
                 final String name,
                 final String pluralName) {
         this.shortName    = shortName;
-        this.secShortName = secShortName;
         this.name         = name;
         this.pluralName   = pluralName;
     }
@@ -96,11 +93,6 @@ public final class Unit implements Value {
         return shortName;
     }
 
-    /** Returns second short name of the unit. */
-    public String getSecShortName() {
-        return secShortName;
-    }
-
     @Override
     public String getValueForGui() {
         return name;
@@ -132,7 +124,7 @@ public final class Unit implements Value {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

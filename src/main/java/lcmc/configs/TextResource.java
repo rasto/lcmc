@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are all English and common texts.
  */
-public final class TextResource extends java.util.ListResourceBundle {
+public final class TextResource extends ListResourceBundle {
 
     /** Get contents. */
     @Override
@@ -2454,16 +2455,16 @@ public final class TextResource extends java.util.ListResourceBundle {
         {"ConstraintPHInfo.Or",
          "OR"},
 
-        {"ConfigData.OpMode.RO",
+        {"Application.OpMode.RO",
          "Read-Only"},
 
-        {"ConfigData.OpMode.OP",
+        {"Application.OpMode.OP",
          "Operator"},
 
-        {"ConfigData.OpMode.ADMIN",
+        {"Application.OpMode.ADMIN",
          "Administrator"},
 
-        {"ConfigData.OpMode.GOD",
+        {"Application.OpMode.GOD",
          "Developer Level 10"},
 
         {"EditableInfo.MoreOptions",

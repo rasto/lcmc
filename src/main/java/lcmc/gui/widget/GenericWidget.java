@@ -22,7 +22,7 @@ package lcmc.gui.widget;
 
 import lcmc.data.Value;
 import lcmc.utilities.Tools;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.MyButton;
@@ -58,7 +58,8 @@ import java.awt.Container;
 
 import java.awt.Component;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.EventObject;
 import java.util.ArrayList;
 
 import java.util.concurrent.locks.Lock;
@@ -91,7 +92,7 @@ implements Widget {
     /** Whether the field should be always editable. */
     private boolean alwaysEditable = false;
     /** File chooser button or some other button. */
-    private MyButton fieldButton;
+    private final MyButton fieldButton;
     /** Component part of field with button. */
     private T componentPart = null;
     /** Label of this component. */
@@ -102,7 +103,7 @@ implements Widget {
     private boolean tfButtonEnabled = true;
     /** Access Type for this component to become enabled. */
     private AccessMode enableAccessMode = new AccessMode(
-                                                    ConfigData.AccessType.RO,
+                                                    Application.AccessType.RO,
                                                     false);
     /** Tooltip if element is enabled. */
     private String toolTipText = null;
@@ -117,12 +118,12 @@ implements Widget {
     /** Reason why it is disabled. */
     private String disabledReason = null;
     /** List of widget listeners. */
-    private final List<WidgetListener> widgetListeners =
+    private final Collection<WidgetListener> widgetListeners =
                                               new ArrayList<WidgetListener>();
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
 
-    /** Prepares a new <code>GenericWidget</code> object. */
+    /** Prepares a new {@code GenericWidget} object. */
     public GenericWidget(final String regexp,
                   final AccessMode enableAccessMode) {
         this(regexp,
@@ -130,7 +131,7 @@ implements Widget {
              NO_BUTTON); /* without button */
     }
 
-    /** Prepares a new <code>GenericWidget</code> object. */
+    /** Prepares a new {@code GenericWidget} object. */
     public GenericWidget(final String regexp,
                   final AccessMode enableAccessMode,
                   final MyButton fieldButton) {
@@ -191,9 +192,9 @@ implements Widget {
         if (disabledReason0 != null) {
             text = text + "<br>" + disabledReason0;
         }
-        if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
+        if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
             final boolean accessible =
-                     Tools.getConfigData().isAccessible(enableAccessMode);
+                     Tools.getApplication().isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
             }
@@ -212,9 +213,9 @@ implements Widget {
             return;
         }
         String disabledTooltip = null;
-        if (enableAccessMode.getAccessType() != ConfigData.AccessType.NEVER) {
+        if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
             final boolean accessible =
-                     Tools.getConfigData().isAccessible(enableAccessMode);
+                     Tools.getApplication().isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
             }
@@ -249,7 +250,7 @@ implements Widget {
         sb.append("editable in \"");
         sb.append(advanced);
         sb.append(
-                ConfigData.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
+                Application.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
         sb.append("\" mode");
 
         if (disabledReason != null) {
@@ -306,7 +307,7 @@ implements Widget {
 
     /** Sets component visible or invisible. */
     protected void setComponentsVisible(final boolean visible) {
-        JComponent c;
+        final JComponent c;
         if (fieldButton == null) {
             c = component;
         } else {
@@ -338,7 +339,7 @@ implements Widget {
         enablePredicate = enabled;
         setComponentsEnabled(
                    enablePredicate
-                   && Tools.getConfigData().isAccessible(enableAccessMode));
+                   && Tools.getApplication().isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -367,7 +368,7 @@ implements Widget {
 
     /** Returns whether component is editable or not. */
     @Override
-    abstract public boolean isEditable();
+    public abstract boolean isEditable();
 
     /** Sets item/value in the component and waits till it is set. */
     @Override
@@ -459,7 +460,7 @@ implements Widget {
                                     }
                                 });
                                 t.start();
-                            } catch (BadLocationException ble) {
+                            } catch (final BadLocationException ble) {
                                 LOG.appWarning("check: document listener error");
                             }
                         }
@@ -510,8 +511,8 @@ implements Widget {
 
     /** Adds item listener to the component. */
     @Override
-    public void addListeners(final WidgetListener wl) {
-        widgetListeners.add(wl);
+    public void addListeners(final WidgetListener widgetListener) {
+        widgetListeners.add(widgetListener);
     }
 
     /**
@@ -550,7 +551,7 @@ implements Widget {
         if (getParent() == null) {
             return;
         }
-        JComponent comp;
+        final JComponent comp;
         if (fieldButton == null) {
             comp = component;
         } else {
@@ -563,7 +564,6 @@ implements Widget {
         }
 
         final Color backgroundColor = getParent().getBackground();
-        final Color compColor = Color.WHITE;
         if (!Tools.areEqual(value, savedValue)
             || (savedLabel != null && !Tools.areEqual(labelText, savedLabel))) {
             if (label != null) {
@@ -587,6 +587,7 @@ implements Widget {
             }
         }
         setBackground(backgroundColor);
+        final Color compColor = Color.WHITE;
         setComponentBackground(backgroundColor, compColor);
         processAccessMode();
     }
@@ -623,7 +624,7 @@ implements Widget {
         }
 
         /** Do click. */
-        private void doClick(final java.util.EventObject e) {
+        private void doClick(final EventObject e) {
             final Component c = (Component) e.getSource();
 
             final JRootPane rootPane = SwingUtilities.getRootPane(c);
@@ -704,7 +705,7 @@ implements Widget {
     /** Sets the width of the widget. */
     @Override
     public final void setWidth(final int newWidth) {
-        JComponent c;
+        final JComponent c;
         if (fieldButton == null) {
             c = component;
         } else {
@@ -732,7 +733,7 @@ implements Widget {
 
     /** Sets the height of the widget. */
     public final void setHeight(final int newHeight) {
-        JComponent c;
+        final JComponent c;
         if (fieldButton == null) {
             c = component;
         } else {
@@ -802,7 +803,7 @@ implements Widget {
     @Override
     public final void processAccessMode() {
         final boolean accessible =
-                       Tools.getConfigData().isAccessible(enableAccessMode);
+                       Tools.getApplication().isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);
@@ -855,7 +856,7 @@ implements Widget {
     }
 
     /** Returns widget listeners. */
-    protected final List<WidgetListener> getWidgetListeners() {
+    protected final Collection<WidgetListener> getWidgetListeners() {
         return widgetListeners;
     }
 

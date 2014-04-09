@@ -52,7 +52,7 @@ public final class EditClusterDialog {
     private static final String FINISH_BTN =
                                        Tools.getString("Dialog.Dialog.Finish");
 
-    /** Prepares new <code>EditClusterDialog</code> object. */
+    /** Prepares new {@code EditClusterDialog} object. */
     public EditClusterDialog(final Cluster cluster) {
         this.cluster = cluster;
     }

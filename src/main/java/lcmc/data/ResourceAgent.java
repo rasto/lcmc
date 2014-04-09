@@ -25,14 +25,16 @@ package lcmc.data;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.ServiceInfo;
-import java.util.List;
+
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.HashSet;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 import lcmc.utilities.Logger;
@@ -51,8 +53,6 @@ public final class ResourceAgent {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(ResourceAgent.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Name of the service. */
     private final String name;
     /** Name of the provider like "linbit". */
@@ -72,9 +72,9 @@ public final class ResourceAgent {
     /** List of clone parameters. */
     private final List<String> parameters = new ArrayList<String>();
     /** List of required parameters. */
-    private final Set<String> paramRequired = new HashSet<String>();
+    private final Collection<String> paramRequired = new HashSet<String>();
     /** List of parameters that are meta attributes. */
-    private final Set<String> paramIsMetaAttr = new HashSet<String>();
+    private final Collection<String> paramIsMetaAttr = new HashSet<String>();
     /** Map from parameter to its long description. */
     private final Map<String, String> paramLongDesc =
                                                  new HashMap<String, String>();
@@ -102,7 +102,7 @@ public final class ResourceAgent {
     private final MultiKeyMap<String, Value> opToDefault =
                                             new MultiKeyMap<String, Value>();
     /** Names of the operations, with some of them predefined. */
-    private final Set<String> operations = new LinkedHashSet<String>();
+    private final Collection<String> operations = new LinkedHashSet<String>();
     /** Whether the service is probably master/slave resource. */
     private boolean probablyMasterSlave = false;
     /** Whether the service is probably clone resource. */
@@ -129,7 +129,7 @@ public final class ResourceAgent {
     /** Name of lsb style resource (/etc/init.d/*). */
     public static final String LSB_CLASS = "lsb";
     /** System services classes: upstart, systemd, lsb... */
-    public static final List<String> SERVICE_CLASSES = new ArrayList<String>();
+    public static final Collection<String> SERVICE_CLASSES = new ArrayList<String>();
     static {
         SERVICE_CLASSES.add(SERVICE_CLASS); /* contains upstart and systemd */
         SERVICE_CLASSES.add(UPSTART_CLASS);
@@ -145,7 +145,7 @@ public final class ResourceAgent {
     /** Name of the heartbeat provider. */
     public static final String HEARTBEAT_PROVIDER = "heartbeat";
     /**
-     * Prepares a new <code>ResourceAgent</code> object.
+     * Prepares a new {@code ResourceAgent} object.
      */
     public ResourceAgent(final String name,
                          final String provider,
@@ -159,7 +159,7 @@ public final class ResourceAgent {
         if (HEARTBEAT_PROVIDER.equals(provider)) {
             menuName = name;
         } else {
-            menuName = provider + ":" + name;
+            menuName = provider + ':' + name;
         }
         /* info fields */
         String section = "Resource";
@@ -237,14 +237,14 @@ public final class ResourceAgent {
      * the same hb class.
      */
     @Override
-    public boolean equals(final Object oth) {
-        if (this == oth) {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (oth == null || !getClass().isInstance(oth)) {
+        if (obj == null || !getClass().isInstance(obj)) {
             return false;
         }
-        final ResourceAgent other = getClass().cast(oth);
+        final ResourceAgent other = getClass().cast(obj);
         return (name == null ? other.name == null : name.equals(other.name))
                && (resourceClass == null ? other.resourceClass == null
                                 : resourceClass.equals(other.resourceClass));
@@ -487,13 +487,13 @@ public final class ResourceAgent {
 
     /** Returns whether this service/object is group. */
     public boolean isGroup() {
-        return ConfigData.PM_GROUP_NAME.equals(name)
+        return Application.PM_GROUP_NAME.equals(name)
                && "group".equals(resourceClass);
     }
 
     /** Returns whether this service/object is clone set. */
     public boolean isClone() {
-        return ConfigData.PM_CLONE_SET_NAME.equals(name)
+        return Application.PM_CLONE_SET_NAME.equals(name)
                && "clone".equals(resourceClass);
     }
 
@@ -529,7 +529,7 @@ public final class ResourceAgent {
     }
 
     /** Returns name of all operations. */
-    public Set<String> getOperationNames() {
+    public Iterable<String> getOperationNames() {
         return operations;
     }
 
@@ -573,9 +573,9 @@ public final class ResourceAgent {
     /** Returns resource agent string like ocf:linbit:drbd. */
     public String getRAString() {
         if (HEARTBEAT_PROVIDER.equals(provider)) {
-            return resourceClass + ":" + name;
+            return resourceClass + ':' + name;
         }
-        return resourceClass + ":" + provider + ":" + name;
+        return resourceClass + ':' + provider + ':' + name;
     }
 
     /** Returns whether this resource agent is ping or pingd. */

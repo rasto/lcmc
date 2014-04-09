@@ -21,12 +21,9 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.CRMXML;
-import lcmc.data.ResourceAgent;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
@@ -56,28 +53,17 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
 
-    /** Prepares a new <code>AvailableServiceInfo</code> object. */
+    /** Prepares a new {@code AvailableServiceInfo} object. */
     public AvailableServiceInfo(final ResourceAgent resourceAgent,
                                 final Browser browser) {
         super(resourceAgent.getName(), browser);
         this.resourceAgent = resourceAgent;
     }
 
-    /** Returns heartbeat service class. */
-    ResourceAgent getResourceAgent() {
-        return resourceAgent;
-    }
-
     /** Returns icon for this menu category. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return AVAIL_SERVICES_ICON;
-    }
-
-    /** Returns type of the info text. text/plain or text/html. */
-    @Override
-    protected String getInfoType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns the info about the service. */
@@ -123,8 +109,8 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
                          Tools.getString("ClusterBrowser.RAsOverviewButton"),
                          BACK_ICON);
         overviewButton.setPreferredSize(
-                            new Dimension(Tools.getConfigData().scaled(180),
-                                          Tools.getConfigData().scaled(50)));
+                            new Dimension(Tools.getApplication().scaled(180),
+                                          Tools.getApplication().scaled(50)));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -136,10 +122,10 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
                 }
             }
         });
-        buttonPanel.add(overviewButton, BorderLayout.WEST);
+        buttonPanel.add(overviewButton, BorderLayout.LINE_START);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         return buttonPanel;
     }
 
@@ -147,12 +133,12 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final MyMenuItem addServiceMenu = new MyMenuItem(
+        final UpdatableItem addServiceMenu = new MyMenuItem(
                         Tools.getString("ClusterBrowser.AddServiceToCluster"),
                         null,
                         null,
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -168,13 +154,12 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
             public void action() {
                 hidePopup();
                 final ServicesInfo si = getBrowser().getServicesInfo();
-                final boolean testOnly = false;
                 si.addServicePanel(resourceAgent,
                                    null, /* pos */
                                    true,
                                    null,
                                    null,
-                                   testOnly);
+                                   Application.RunMode.LIVE);
             }
         };
         items.add(addServiceMenu);

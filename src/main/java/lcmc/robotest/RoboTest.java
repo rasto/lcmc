@@ -28,6 +28,9 @@ import lcmc.configs.AppDefaults;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.resources.Info;
+
+import java.awt.AWTException;
+import java.awt.IllegalComponentStateException;
 import java.awt.Robot;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -39,15 +42,19 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Window;
+
 import javax.swing.JFrame;
 import javax.swing.JDialog;
 import javax.swing.JCheckBox;
 import javax.swing.JTree;
 import javax.swing.JLabel;
 import javax.swing.AbstractButton;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
+
+import lcmc.data.Application;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
@@ -168,7 +175,7 @@ public final class RoboTest {
     public static void restoreMouse() {
         try {
             robot = new Robot(SCREEN_DEVICE);
-        } catch (final java.awt.AWTException e) {
+        } catch (final AWTException e) {
             robot = null;
             LOG.appWarning("restoreMouse: robot error");
         }
@@ -216,7 +223,7 @@ public final class RoboTest {
                 Robot rbt = null;
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
-                } catch (final java.awt.AWTException e) {
+                } catch (final AWTException e) {
                     LOG.appWarning("startClicker0: robot error");
                 }
                 if (rbt == null) {
@@ -269,7 +276,7 @@ public final class RoboTest {
                 Robot rbt = null;
                 try {
                     rbt = new Robot(SCREEN_DEVICE);
-                } catch (final java.awt.AWTException e) {
+                } catch (final AWTException e) {
                     LOG.appWarning("startMover: robot error");
                 }
                 if (rbt == null) {
@@ -286,8 +293,8 @@ public final class RoboTest {
                 final Point2D endP = getAppPosition();
                 final int endX = (int) endP.getX();
                 final int endY = (int) endP.getY();
-                int destX = origX;
-                int destY = origY;
+                final int destX = origX;
+                final int destY = origY;
                 info("test started");
                 final long startTime = System.currentTimeMillis();
                 int i = 1;
@@ -362,7 +369,7 @@ public final class RoboTest {
                 robot = null;
                 try {
                     robot = new Robot(SCREEN_DEVICE);
-                } catch (final java.awt.AWTException e) {
+                } catch (final AWTException e) {
                     robot = null;
                     LOG.appWarning("startTest: robot error");
                 }
@@ -672,8 +679,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '1') {
@@ -691,8 +698,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '2') {
@@ -725,8 +732,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '4') {
@@ -744,8 +751,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '5') {
@@ -780,8 +787,8 @@ public final class RoboTest {
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getConfigData().setBigDRBDConf(
-                                      !Tools.getConfigData().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(
+                                      !Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     }
@@ -805,7 +812,7 @@ public final class RoboTest {
                     } else if (index == '2') {
                         /* VMs */
                         int i = 1;
-                        String testIndex = "1";
+                        final String testIndex = "1";
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
@@ -820,7 +827,7 @@ public final class RoboTest {
                     } else if (index == '3') {
                         /* VMs */
                         int i = 1;
-                        String testIndex = "1";
+                        final String testIndex = "1";
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
@@ -1202,7 +1209,7 @@ public final class RoboTest {
     static void startResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
-        moveTo("^" + Tools.getString("ClusterBrowser.Hb.StartResource") + "$");
+        moveTo('^' + Tools.getString("ClusterBrowser.Hb.StartResource") + '$');
         leftClick();
     }
 
@@ -1488,7 +1495,7 @@ public final class RoboTest {
             findInside(Tools.getGUIData().getMainFrame(),
                        Class.forName("javax.swing.JScrollPane$ScrollBar"),
                        res);
-        } catch (ClassNotFoundException e) {
+        } catch (final ClassNotFoundException e) {
             Tools.printStackTrace("can't find the scrollbar");
             return;
         }
@@ -1556,7 +1563,13 @@ public final class RoboTest {
             Tools.printStackTrace("can't find: " + clazz);
             return;
         }
-        final Point2D endP = c.getLocationOnScreen();
+        Point2D endP;
+        try {
+            endP = c.getLocationOnScreen();
+        } catch (final IllegalComponentStateException e) {
+            Tools.sleep(5000);
+            endP = c.getLocationOnScreen();
+        }
         final int endX = (int) endP.getX() + c.getWidth() / 2;
         final int endY = (int) endP.getY() + c.getHeight() / 2;
         moveToAbs(endX, endY);
@@ -1593,7 +1606,7 @@ public final class RoboTest {
         }
         final DrbdGraph graph = cluster.getBrowser().getDrbdGraph();
         for (final Info i : graph.infoToVertexKeySet()) {
-            final String item = graph.getMainText(graph.getVertex(i), false);
+            final String item = graph.getMainText(graph.getVertex(i), Application.RunMode.LIVE);
             if (item.startsWith(text) || item.endsWith(text)) {
                 final Point2D loc = graph.getLocation(i);
                 moveToAbs((int) (graph.getVisualizationViewer()
@@ -1621,7 +1634,7 @@ public final class RoboTest {
         Component c = null;
         int i = 0;
         while (c == null && i < 30 && !aborted) {
-            c = (Component) findComponent(text, number);
+            c = findComponent(text, number);
             if (i > 0) {
                 sleepNoFactor(100);
             } else if (i > 10) {
@@ -1637,7 +1650,7 @@ public final class RoboTest {
             Tools.printStackTrace("can't find: " + text);
             return;
         }
-        Component n;
+        final Component n;
         if (clazz == null) {
             n = c;
         } else {
@@ -1647,7 +1660,13 @@ public final class RoboTest {
                 return;
             }
         }
-        final Point2D endP = n.getLocationOnScreen();
+        Point2D endP;
+        try {
+            endP = n.getLocationOnScreen();
+        } catch (final IllegalComponentStateException e) {
+            Tools.sleep(5000);
+            endP = n.getLocationOnScreen();
+        }
         final int endX = (int) endP.getX() + 15;
         final int endY = (int) endP.getY() + c.getHeight() / 2;
         int tries = 0;
@@ -1681,12 +1700,12 @@ public final class RoboTest {
             final int x = (int) p.getX();
             final int y = (int) p.getY();
             int directionX = 0;
-            int directionY = 0;
             if (x < destX) {
                 directionX = 1;
             } else if (x > destX) {
                 directionX = -1;
             }
+            int directionY = 0;
             if (y < destY) {
                 directionY = 1;
             } else if (y > destY) {
@@ -1712,7 +1731,7 @@ public final class RoboTest {
         Robot rbt = null;
         try {
             rbt = new Robot(SCREEN_DEVICE);
-        } catch (final java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appWarning("registerMovement: robot error");
         }
         if (rbt == null) {
@@ -1780,7 +1799,7 @@ public final class RoboTest {
     }
 
     static void saveAndExit() {
-        Tools.save(Tools.getConfigData().getSaveFile(), false);
+        Tools.save(Tools.getApplication().getSaveFile(), false);
         sleepNoFactor(5000);
         System.exit(0);
     }
@@ -1796,7 +1815,7 @@ public final class RoboTest {
     public static void info(final String text) {
         if (cluster != null) {
             for (final Host h : cluster.getHosts()) {
-                h.getTerminalPanel().addCommandOutput(text + "\n");
+                h.getTerminalPanel().addCommandOutput(text + '\n');
             }
         }
         LOG.info(text);
@@ -1853,7 +1872,7 @@ public final class RoboTest {
     static Container findComponent(final String text,
                                    final Container component,
                                    final Integer[] number) {
-        String quotedText;
+        final String quotedText;
         if (text.contains("*") || text.contains("$") || text.contains("^")) {
             quotedText = text;
         } else {

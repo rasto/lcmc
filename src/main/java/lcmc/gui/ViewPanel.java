@@ -78,7 +78,7 @@ public class ViewPanel extends JPanel {
     /** Last selected info object in the right pane. */
     private Info lastSelectedInfo = null;
 
-    /** Prepares a new <code>ViewPanel</code> object. */
+    /** Prepares a new {@code ViewPanel} object. */
     ViewPanel() {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));

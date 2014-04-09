@@ -44,6 +44,8 @@ import lcmc.Exceptions;
 import java.awt.geom.Point2D;
 
 import java.awt.Color;
+import java.lang.InterruptedException;
+import java.lang.NumberFormatException;
 import java.net.UnknownHostException;
 
 import java.util.Collection;
@@ -80,15 +82,13 @@ import lcmc.utilities.Unit;
 public final class Host implements Comparable<Host>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Name of the host. */
     private String name;
-    /** Hostname as entered by the user. Could be ip, hostname with or without
+    /** Hostname as entered by the user. Could be ipAddress, hostname with or without
      * the domain name. */
     private String hostnameEntered = Tools.getDefault("SSH.Host");
     /** Ip of the host. */
-    private String ip;
+    private String ipAddress;
     /** Ips in the combo in Dialog.Host.Configuration. */
     private final Map<Integer, String[]> ips = new HashMap<Integer, String[]>();
     /** Hostname of the host. */
@@ -253,7 +253,7 @@ public final class Host implements Comparable<Host>, Value {
     /** A gate that waits for server status. */
     private final CountDownLatch serverStatusLatch = new CountDownLatch(1);
     /** List of gui elements that are to be enabled if the host is connected.*/
-    private final List<JComponent> enableOnConnectList =
+    private final Collection<JComponent> enableOnConnectList =
                                                    new ArrayList<JComponent>();
     /** Corosync/Openais/pacemaker installation method index. */
     private String pmInstallMethod;
@@ -332,6 +332,7 @@ public final class Host implements Comparable<Host>, Value {
     private static final String GUI_HELPER_CMD_LOG_OP = "--cmd-log";
 
     private static final String NET_INFO            = "net-info";
+    private static final String BRIDGE_INFO         = "bridge-info";
     private static final String DISK_INFO           = "disk-info";
     private static final String DISK_SPACE          = "disk-space";
     private static final String VG_INFO             = "vg-info";
@@ -347,8 +348,9 @@ public final class Host implements Comparable<Host>, Value {
     private static final String VERSION_INFO        = "version-info";
     private static final String DRBD_PROXY_INFO     = "drbd-proxy-info";
 
-    private static final Set<String> INFO_TYPES =
+    private static final Collection<String> INFO_TYPES =
              new HashSet<String>(Arrays.asList(new String[]{NET_INFO,
+                                                            BRIDGE_INFO,
                                                             DISK_INFO,
                                                             DISK_SPACE,
                                                             VG_INFO,
@@ -365,11 +367,11 @@ public final class Host implements Comparable<Host>, Value {
                                                             DRBD_PROXY_INFO}));
     public static final boolean UPDATE_LVM = true;
     /**
-     * Prepares a new <code>Host</code> object. Initializes host browser and
+     * Prepares a new {@code Host} object. Initializes host browser and
      * host's resources.
      */
     public Host() {
-        if (Tools.getConfigData().getHosts().size() == 1) {
+        if (Tools.getApplication().getHosts().size() == 1) {
             hostnameEntered = Tools.getDefault("SSH.SecHost");
         }
         browser = new HostBrowser(this);
@@ -382,10 +384,10 @@ public final class Host implements Comparable<Host>, Value {
         mountPoints.add("/mnt/");
     }
 
-    /** Prepares a new <code>Host</code> object. */
-    public Host(final String ip) {
+    /** Prepares a new {@code Host} object. */
+    public Host(final String ipAddress) {
     this();
-    this.ip = ip;
+    this.ipAddress = ipAddress;
     }
 
     /** Returns borwser object for this host. */
@@ -424,13 +426,13 @@ public final class Host implements Comparable<Host>, Value {
         if (defaultColor == null) {
             defaultColor = Tools.getDefaultColor("Host.DefaultColor");
         }
-        Color col;
-        Color secColor;
+        final Color col;
         if (savedColor == null) {
             col = defaultColor;
         } else {
             col = savedColor;
         }
+        final Color secColor;
         if (isConnected()) {
             if (isDrbdStatus() && isDrbdLoaded()) {
                 return new Color[]{col};
@@ -449,13 +451,13 @@ public final class Host implements Comparable<Host>, Value {
         if (defaultColor == null) {
             defaultColor = Tools.getDefaultColor("Host.DefaultColor");
         }
-        Color col;
-        Color secColor;
+        final Color col;
         if (savedColor == null) {
             col = defaultColor;
         } else {
             col = savedColor;
         }
+        final Color secColor;
         if (isConnected()) {
             if (isClStatus()) {
                 return new Color[]{col};
@@ -496,7 +498,7 @@ public final class Host implements Comparable<Host>, Value {
     public void setDrbdStatus(final boolean drbdStatus) {
         this.drbdStatus = drbdStatus;
         if (!drbdStatus) {
-            for (BlockDevice b : getBlockDevices()) {
+            for (final BlockDevice b : getBlockDevices()) {
                 b.resetDrbd();
             }
         }
@@ -526,7 +528,7 @@ public final class Host implements Comparable<Host>, Value {
     }
 
     /**
-     * Sets hostname as entered by user, this can be also ip. If
+     * Sets hostname as entered by user, this can be also ipAddress. If
      * hostnameEntered changed, it reinitilizes the name.
      */
     public void setHostnameEntered(final String hostnameEntered) {
@@ -534,7 +536,7 @@ public final class Host implements Comparable<Host>, Value {
             && !hostnameEntered.equals(this.hostnameEntered)) {
             /* back button and hostname changed */
             setName(null);
-            setIp(null);
+            setIpAddress(null);
             setHostname(null);
         }
         this.hostnameEntered = hostnameEntered;
@@ -558,18 +560,18 @@ public final class Host implements Comparable<Host>, Value {
     }
 
     /**
-     * Sets ip. If ip has changed, disconnect the
+     * Sets ipAddress. If ipAddress has changed, disconnect the
      * old connection.
      */
-    public void setIp(final String ip) {
-        if (ip != null) {
-            if (!ip.equals(this.ip)) {
+    public void setIpAddress(final String ipAddress) {
+        if (ipAddress != null) {
+            if (!ipAddress.equals(this.ipAddress)) {
                 ssh.disconnect();
             }
-        } else if (this.ip != null) {
+        } else if (this.ipAddress != null) {
             ssh.disconnect();
         }
-        this.ip = ip;
+        this.ipAddress = ipAddress;
     }
 
     /** Sets ips. */
@@ -617,7 +619,7 @@ public final class Host implements Comparable<Host>, Value {
      *
      */
     List<String> getBlockDevicesNamesIntersection(
-                                        final List<String> otherBlockDevices) {
+                                        final Iterable<String> otherBlockDevices) {
         final List<String> blockDevicesIntersection = new ArrayList<String>();
         if (otherBlockDevices == null) {
             return getBlockDevicesNames();
@@ -749,7 +751,7 @@ public final class Host implements Comparable<Host>, Value {
                 if (Tools.compareVersions(v, version) > 0) {
                     return true;
                 }
-            } catch (Exceptions.IllegalVersionException e) {
+            } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("isDrbdUpgradeAvailable: "+ e.getMessage(), e);
             }
         }
@@ -855,7 +857,7 @@ public final class Host implements Comparable<Host>, Value {
                 if (lsbVersion == null) {
                     detectedDistVersion = info[3];
                 } else {
-                    detectedDistVersion = info[3] + "/" + lsbVersion;
+                    detectedDistVersion = info[3] + '/' + lsbVersion;
                 }
             case 3:
                 detectedKernelVersion = info[2];
@@ -866,7 +868,7 @@ public final class Host implements Comparable<Host>, Value {
             case 0:
                 break;
             default:
-                LOG.appError("setDistInfo: list: ", java.util.Arrays.asList(info).toString());
+                LOG.appError("setDistInfo: list: ", Arrays.asList(info).toString());
                 break;
         }
         dist = detectedDist;
@@ -914,7 +916,7 @@ public final class Host implements Comparable<Host>, Value {
 
     /** Returns the detected info to show. */
     public String getDetectedInfo() {
-        return detectedDist + " " + detectedDistVersion;
+        return detectedDist + ' ' + detectedDistVersion;
     }
 
     /**
@@ -1284,7 +1286,7 @@ public final class Host implements Comparable<Host>, Value {
                 /* it probably hangs after this timeout, so it will be
                  * killed. */
                 dst.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             stopDrbdStatus();
@@ -1317,7 +1319,7 @@ public final class Host implements Comparable<Host>, Value {
     public void waitOnClStatus() {
         try {
             clStatusThread.join();
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         clStatusThread = null;
@@ -1333,29 +1335,29 @@ public final class Host implements Comparable<Host>, Value {
         cst.cancel();
     }
 
-    /** Gets ip. There can be more ips, delimited with "," */
-    public String getIp() {
-        return ip;
+    /** Gets ipAddress. There can be more ips, delimited with "," */
+    public String getIpAddress() {
+        return ipAddress;
     }
 
-    /** Returns the ip for the hop. */
+    /** Returns the ipAddress for the hop. */
     public String getIp(final int hop) {
-        if (ip == null) {
+        if (ipAddress == null) {
             return null;
         }
-        final String[] ipsA = ip.split(",");
+        final String[] ipsA = ipAddress.split(",");
         if (ipsA.length < hop + 1) {
             return null;
         }
         return ipsA[hop];
     }
 
-    /** Return first hop ip. */
+    /** Return first hop ipAddress. */
     public String getFirstIp() {
-        if (ip == null) {
+        if (ipAddress == null) {
             return null;
         }
-        final String[] ipsA = ip.split(",");
+        final String[] ipsA = ipAddress.split(",");
         return ipsA[0];
     }
     /** Returns username. */
@@ -1405,9 +1407,9 @@ public final class Host implements Comparable<Host>, Value {
      * -A   -tt -l root x.x.x.x \\\"ls\\\"\""
      */
     public String getHoppedCommand(final String command) {
-        final int hops = Tools.charCount(ip, ',') + 1;
+        final int hops = Tools.charCount(ipAddress, ',') + 1;
         final String[] usernames = username.split(",");
-        final String[] ipsA = ip.split(",");
+        final String[] ipsA = ipAddress.split(",");
         final StringBuilder s = new StringBuilder(200);
         if (hops > 1) {
             String sshAgentPid = "";
@@ -1463,11 +1465,11 @@ public final class Host implements Comparable<Host>, Value {
 
     /**
      * Gets name, that is shown in the tab. Name is either host name, if it is
-     * set or ip.
+     * set or ipAddress.
      */
     public String getName() {
         if (name == null) {
-            String nodeName;
+            final String nodeName;
             if (hostname != null) {
                 final int i = hostname.indexOf(',');
                 if (i > 0) {
@@ -1483,7 +1485,7 @@ public final class Host implements Comparable<Host>, Value {
                     nodeName = hostnameEntered;
                 }
             } else {
-                return ip;
+                return ipAddress;
             }
 
             //final int index = nodeName.indexOf('.');
@@ -1508,7 +1510,7 @@ public final class Host implements Comparable<Host>, Value {
      * rasto@linbit.at.
      */
     public String getUserAtHost() {
-        return username + "@" + getHostname();
+        return username + '@' + getHostname();
     }
 
     /** Gets SSH object. */
@@ -1624,7 +1626,7 @@ public final class Host implements Comparable<Host>, Value {
                 Tools.startProgressIndicator(
                                 hostName,
                                 Tools.getString("Dialog.Host.SSH.Connecting")
-                                + " (" + index + ")");
+                                + " (" + index + ')');
             }
             if (sshGui == null) {
                 sshGui = new SSHGui(Tools.getGUIData().getMainFrame(),
@@ -1647,7 +1649,7 @@ public final class Host implements Comparable<Host>, Value {
                                 Tools.stopProgressIndicator(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting")
-                                  + " (" + index + ")");
+                                  + " (" + index + ')');
                             }
                         }
 
@@ -1659,15 +1661,15 @@ public final class Host implements Comparable<Host>, Value {
                                 Tools.stopProgressIndicator(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting")
-                                  + " (" + index + ")");
+                                  + " (" + index + ')');
                                 Tools.progressIndicatorFailed(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting")
-                                  + " (" + index + ")");
+                                  + " (" + index + ')');
                                 Tools.stopProgressIndicator(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting")
-                                  + " (" + index + ")");
+                                  + " (" + index + ')');
                             }
                         }
                     });
@@ -1695,7 +1697,7 @@ public final class Host implements Comparable<Host>, Value {
                          HW_INFO_TIMEOUT);
         try {
             t.join();
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -1709,7 +1711,7 @@ public final class Host implements Comparable<Host>, Value {
     public void getHWInfo(final CategoryInfo[] infosToUpdate,
                           final ResourceGraph[] graphs,
                           final boolean updateLVM) {
-        String cmd;
+        final String cmd;
         if (updateLVM) {
             cmd = "GetHostHWInfoLVM";
         } else {
@@ -1744,7 +1746,7 @@ public final class Host implements Comparable<Host>, Value {
                          HW_INFO_TIMEOUT);
         try {
             t.join();
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -1764,7 +1766,7 @@ public final class Host implements Comparable<Host>, Value {
             try {
                 timestamp = Double.parseDouble(ts);
             }  catch (final NumberFormatException nfe) {
-                LOG.debug("getOutput: could not parse: " + ts + " " + nfe);
+                LOG.debug("getOutput: could not parse: " + ts + ' ' + nfe);
             }
             mInfoTimestampLock.lock();
             if (timestamp != null
@@ -1812,7 +1814,7 @@ public final class Host implements Comparable<Host>, Value {
                          PING_TIMEOUT);
         try {
             t.join();
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -1952,7 +1954,7 @@ public final class Host implements Comparable<Host>, Value {
             if (sst != null) {
                 sst.join();
             }
-        } catch (java.lang.InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
@@ -2022,7 +2024,7 @@ public final class Host implements Comparable<Host>, Value {
         if (command.indexOf("@USER@") > -1) {
             command = command.replaceAll(
                                     "@USER@",
-                                    Tools.getConfigData().getDownloadUser());
+                                    Tools.getApplication().getDownloadUser());
         }
         if (command.indexOf("@PASSWORD@") > -1) {
             if (hidePassword) {
@@ -2030,14 +2032,13 @@ public final class Host implements Comparable<Host>, Value {
             } else {
                 command = command.replaceAll(
                                    "@PASSWORD@",
-                                   Tools.getConfigData().getDownloadPassword());
+                                   Tools.getApplication().getDownloadPassword());
             }
         }
         String supportDir = "support";
-        if (Tools.getConfigData().isStagingDrbd()) {
+        if (Tools.getApplication().isStagingDrbd()) {
             supportDir = "support/staging";
         }
-        final String drbdDir = "drbd";
         if (kernelVersion != null
             && command.indexOf("@KERNELVERSIONDIR@") > -1) {
             command = command.replaceAll("@KERNELVERSIONDIR@", kernelVersion);
@@ -2067,13 +2068,14 @@ public final class Host implements Comparable<Host>, Value {
             command = command.replaceAll("@SUPPORTDIR@", supportDir);
         }
         if (command.indexOf("@DRBDDIR@") > -1) {
+            final String drbdDir = "drbd";
             command = command.replaceAll("@DRBDDIR@", drbdDir);
         }
         if (command.indexOf("@GUI-HELPER@") > -1) {
             final StringBuilder helperProg = new StringBuilder(
                                          "/usr/local/bin/lcmc-gui-helper-");
             helperProg.append(Tools.getRelease());
-            if (Tools.getConfigData().isCmdLog()) {
+            if (Tools.getApplication().isCmdLog()) {
                 helperProg.append(' ');
                 helperProg.append(GUI_HELPER_CMD_LOG_OP);
             }
@@ -2111,7 +2113,6 @@ public final class Host implements Comparable<Host>, Value {
     public void parseHostInfo(final String ans) {
         LOG.debug1("parseHostInfo: updating host info: " + getName());
         final String[] lines = ans.split("\\r?\\n");
-        String type = "";
         final List<String> versionLines = new ArrayList<String>();
         final Map<String, BlockDevice> newBlockDevices =
                                      new LinkedHashMap<String, BlockDevice>();
@@ -2137,14 +2138,15 @@ public final class Host implements Comparable<Host>, Value {
                                           new HashMap<String, List<String>>();
         final Set<String> newDrbdResProxy = new HashSet<String>();
 
-        final Set<String> changedTypes = new HashSet<String>();
+        final Collection<String> changedTypes = new HashSet<String>();
 
         final Map<String, String> diskSpaces = new HashMap<String, String>();
 
         newMountPoints.add("/mnt/");
         String guiOptionName = null;
 
-        for (String line : lines) {
+        String type = "";
+        for (final String line : lines) {
             if (line.indexOf("ERROR:") == 0) {
                 break;
             } else if (line.indexOf("WARNING:") == 0) {
@@ -2157,18 +2159,17 @@ public final class Host implements Comparable<Host>, Value {
             }
             if ("net-info".equals(type)) {
                 try {
-                    NetInterface netInterface = new NetInterface(line);
+                    final NetInterface netInterface = new NetInterface(line);
                     if (netInterface.getIp() != null
                         && !"".equals(netInterface.getIp())) {
                         newNetInterfaces.add(netInterface);
                     }
-                    if (netInterface.isBridge()) {
-                        newBridges.add(new StringValue(netInterface.getName()));
-                    }
-                } catch (UnknownHostException e) {
+                } catch (final UnknownHostException e) {
                     LOG.appWarning("parseHostInfo: cannot parse: net-info: "
                                    + line);
                 }
+            } else if (BRIDGE_INFO.equals(type)) {
+                newBridges.add(new StringValue(line));
             } else if ("disk-info".equals(type)) {
                 BlockDevice blockDevice = new BlockDevice(line);
                 final String bdName = blockDevice.getName();
@@ -2252,17 +2253,17 @@ public final class Host implements Comparable<Host>, Value {
                 versionLines.add(line);
             } else if ("drbd-proxy-info".equals(type)) {
                 /* res-other.host-this.host */
-                String res = null;
                 final Cluster cl = getCluster();
                 if (cl != null) {
+                    String res = null;
                     if (line.startsWith("up:")) {
                         for (final Host otherHost
                                               : getCluster().getProxyHosts()) {
                             if (otherHost == this) {
                                 continue;
                             }
-                            final String hostsPart = "-" + otherHost.getName()
-                                                     + "-" + getName();
+                            final String hostsPart = '-' + otherHost.getName()
+                                                     + '-' + getName();
                             final int i = line.indexOf(hostsPart);
                             if (i > 0) {
                                 res = line.substring(3, i);
@@ -2289,6 +2290,9 @@ public final class Host implements Comparable<Host>, Value {
 
         if (changedTypes.contains(NET_INFO)) {
             netInterfaces = newNetInterfaces;
+        }
+
+        if (changedTypes.contains(BRIDGE_INFO)) {
             bridges = newBridges;
         }
 
@@ -2359,7 +2363,7 @@ public final class Host implements Comparable<Host>, Value {
         String id = null;
         String x = null;
         String y = null;
-        for (String token : tokens) {
+        for (final String token : tokens) {
             final String[] r = token.split("=");
             if (r.length == 2) {
                 if (r[0].equals("hb") || r[0].equals("dr")) {
@@ -2522,7 +2526,7 @@ public final class Host implements Comparable<Host>, Value {
             if (tokens.length == 2) {
                 try {
                     pcmkServiceVersion = Integer.parseInt(tokens[1].trim());
-                } catch (java.lang.NumberFormatException e) {
+                } catch (final NumberFormatException e) {
                     pcmkServiceVersion = -1;
                 }
             }
@@ -2600,7 +2604,7 @@ public final class Host implements Comparable<Host>, Value {
             if (y < 0) {
                 y = 0;
             }
-            lines.append(id).append(";x=").append(x).append(";y=").append(y).append("\n");
+            lines.append(id).append(";x=").append(x).append(";y=").append(y).append('\n');
         }
         getSSH().createConfig(lines.toString(),
                               "drbdgui.cf",
@@ -2695,7 +2699,7 @@ public final class Host implements Comparable<Host>, Value {
         }
         try {
             isLoadingGate.await();
-        } catch (InterruptedException ignored) {
+        } catch (final InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
     }
@@ -2720,7 +2724,7 @@ public final class Host implements Comparable<Host>, Value {
     public void waitForServerStatusLatch() {
         try {
             serverStatusLatch.await();
-        } catch (InterruptedException ignored) {
+        } catch (final InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
     }
@@ -2960,16 +2964,16 @@ public final class Host implements Comparable<Host>, Value {
             i++;
             RoboTest.sleepNoFactor(i * 2000);
         }
-        String nameS = " " + name;
+        String nameS = ' ' + name;
         if (name == null) {
             nameS = "";
         }
         if (i > 0) {
-            RoboTest.info(getName() + " "
-                           + test + " " + index + nameS + " tries: " + (i + 1));
+            RoboTest.info(getName() + ' '
+                           + test + ' ' + index + nameS + " tries: " + (i + 1));
         }
-        RoboTest.info(getName() + " "
-                       + test + " " + index + nameS + " " + out.getOutput());
+        RoboTest.info(getName() + ' '
+                       + test + ' ' + index + nameS + ' ' + out.getOutput());
         return out.getExitCode() == 0;
     }
 
@@ -2981,7 +2985,7 @@ public final class Host implements Comparable<Host>, Value {
     /** This is part of testsuite, it checks DRBD. */
     public boolean checkDRBDTest(final String test, final double index) {
         final StringBuilder testName = new StringBuilder(20);
-        if (Tools.getConfigData().getBigDRBDConf()) {
+        if (Tools.getApplication().getBigDRBDConf()) {
             testName.append("big-");
         }
         if (!hasVolumes()) {
@@ -3010,7 +3014,7 @@ public final class Host implements Comparable<Host>, Value {
     public void setSavedColor(final String colorString) {
         try {
             savedColor = new Color(Integer.parseInt(colorString));
-        } catch (java.lang.NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             LOG.appWarning("setSavedColor: could not parse: " + colorString);
             /* ignore it */
         }
@@ -3117,14 +3121,14 @@ public final class Host implements Comparable<Host>, Value {
     public boolean hasVolumes() {
         try {
             return Tools.compareVersions(getDrbdVersion(), "8.4") >= 0;
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("hasVolumes: " + e.getMessage(), e);
         }
         return true;
     }
 
     /** Returns physical volumes. */
-    public List<BlockDevice> getPhysicalVolumes() {
+    public Iterable<BlockDevice> getPhysicalVolumes() {
         return physicalVolumes;
     }
 
@@ -3144,13 +3148,13 @@ public final class Host implements Comparable<Host>, Value {
     }
 
     /** Return DRBD block device objects. */
-    public Collection<BlockDevice> getDrbdBlockDevices() {
+    public Iterable<BlockDevice> getDrbdBlockDevices() {
         return drbdBlockDevices.values();
     }
 
     /** Return list of block devices that have the specified VG. */
-    public List<BlockDevice> getPhysicalVolumes(final String vg) {
-        final List<BlockDevice> bds = new ArrayList<BlockDevice>();
+    public Iterable<BlockDevice> getPhysicalVolumes(final String vg) {
+        final Collection<BlockDevice> bds = new ArrayList<BlockDevice>();
         if (vg == null) {
             return bds;
         }
@@ -3198,7 +3202,7 @@ public final class Host implements Comparable<Host>, Value {
     }
 
     /** Return options for GUI elements. */
-    public List<String> getGuiOptions(final String name) {
+    public Iterable<String> getGuiOptions(final String name) {
         final List<String> opts = guiOptions.get(name);
         if (opts == null) {
             return new ArrayList<String>();

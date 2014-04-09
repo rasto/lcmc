@@ -24,9 +24,11 @@ package lcmc.utilities;
 
 import lcmc.data.Host;
 import lcmc.configs.DistResource;
+
+import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
+import lcmc.data.Application;
 
 /**
  * This class provides LVM commands.
@@ -59,14 +61,14 @@ public final class LVM {
     private static SSH.SSHOutput execCommand(final Host host,
                                              final String command,
                                              final boolean outputVisible,
-                                             final boolean testOnly) {
+                                             final Application.RunMode runMode) {
         return Tools.execCommandProgressIndicator(
                                  host,
                                  command,
                                  null, /* exec callback */
                                  outputVisible,
                                  Tools.getString("LVM.ExecutingCommand")
-                                 + " "
+                                 + ' '
                                  + command.replaceAll(DistResource.SUDO, " ")
                                  + "...",
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
@@ -76,61 +78,56 @@ public final class LVM {
     public static boolean resize(final Host host,
                                  final String blockDevice,
                                  final String size,
-                                 final boolean testOnly) {
+                                 final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(SIZE_PH, size);
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.resize", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Initialize a physical volume. */
     public static boolean pvCreate(final Host host,
                                    final String blockDevice,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.pvcreate", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Remove a physical volume. */
     public static boolean pvRemove(final Host host,
                                    final String blockDevice,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.pvremove", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Remove a volume group. */
     public static boolean vgRemove(final Host host,
                                    final String vgName,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.vgremove", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Remove LVM device. */
     public static boolean lvRemove(final Host host,
                                    final String blockDevice,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.lvremove", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -139,28 +136,26 @@ public final class LVM {
                                    final String lvName,
                                    final String vgName,
                                    final String size,
-                                   final boolean testOnly) {
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(SIZE_PH, size);
         replaceHash.put(LV_NAME_PH, lvName);
         replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.lvcreate", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Create a volume group. */
     public static boolean vgCreate(final Host host,
                                    final String vgName,
-                                   final List<String> pvNames,
-                                   final boolean testOnly) {
+                                   final Collection<String> pvNames,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(PV_NAMES_PH, Tools.join(" ", pvNames));
         replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.vgcreate", replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -169,15 +164,14 @@ public final class LVM {
                                      final String snapshotName,
                                      final String device,
                                      final String size,
-                                     final boolean testOnly) {
+                                     final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(SIZE_PH, size);
         replaceHash.put(DEVICE_PH, device);
         replaceHash.put(LV_NAME_PH, snapshotName);
         final String command = host.getDistCommand("LVM.lvsnapshot",
                                                    replaceHash);
-        final SSH.SSHOutput ret =
-                    execCommand(host, command, true, testOnly);
+        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 }

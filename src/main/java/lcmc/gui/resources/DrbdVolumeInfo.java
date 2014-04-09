@@ -21,6 +21,7 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
@@ -32,16 +33,11 @@ import java.util.Collections;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.DRBD;
-import lcmc.data.AccessMode;
-import lcmc.data.ConfigData;
 import lcmc.data.resources.DrbdVolume;
-import lcmc.data.Host;
-import lcmc.data.DrbdXML;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.Exceptions;
 import lcmc.AddDrbdSplitBrainDialog;
 import lcmc.gui.CRMGraph;
-import lcmc.data.DRBDtestData;
 import lcmc.utilities.ButtonCallback;
 
 import java.awt.geom.Point2D;
@@ -63,8 +59,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
+import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 
 import lcmc.utilities.Logger;
@@ -149,7 +145,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }});
     private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
-    /** Prepares a new <code>DrbdVolumeInfo</code> object. */
+    /** Prepares a new {@code DrbdVolumeInfo} object. */
     DrbdVolumeInfo(final String name,
                    final String device,
                    final DrbdResourceInfo drbdResourceInfo,
@@ -227,17 +223,17 @@ public final class DrbdVolumeInfo extends EditableInfo
                 final Map<Host, String> testOutput =
                                             new LinkedHashMap<Host, String>();
                 try {
-                    getDrbdInfo().createDrbdConfig(true);
+                    getDrbdInfo().createDrbdConfig(Application.RunMode.TEST);
                     for (final Host h : getHosts()) {
-                        DRBD.adjustApply(h, DRBD.ALL, null, true);
+                        DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.TEST);
                         testOutput.put(h, DRBD.getDRBDtest());
                     }
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
-                } catch (Exceptions.DrbdConfigException dce) {
+                } catch (final Exceptions.DrbdConfigException dce) {
                     LOG.appError("getInfoPanelVolume: config failed", dce);
-                } catch (UnknownHostException e) {
+                } catch (final UnknownHostException e) {
                     LOG.appError("getInfoPanelVolume: config failed", e);
                 } finally {
                     getBrowser().drbdtestLockRelease();
@@ -250,7 +246,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
@@ -260,13 +256,13 @@ public final class DrbdVolumeInfo extends EditableInfo
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         mainPanel.add(buttonPanel);
 
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
 
         /* resource name */
         getResource().setValue(DRBD_VOL_PARAM_NUMBER,
@@ -296,15 +292,15 @@ public final class DrbdVolumeInfo extends EditableInfo
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getDrbdInfo().createDrbdConfig(false);
+                            getDrbdInfo().createDrbdConfig(Application.RunMode.LIVE);
                             for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL, null, false);
+                                DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                             }
-                            apply(false);
-                        } catch (Exceptions.DrbdConfigException dce) {
+                            apply(Application.RunMode.LIVE);
+                        } catch (final Exceptions.DrbdConfigException dce) {
                             LOG.appError("getInfoPanelVolume: config failed", dce);
-                        } catch (UnknownHostException e) {
-                            LOG.appError("getInfoPanelVolume: config failed", e);
+                        } catch (final UnknownHostException uhe) {
+                            LOG.appError("getInfoPanelVolume: config failed", uhe);
                         } finally {
                             getBrowser().drbdStatusUnlock();
                         }
@@ -343,7 +339,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
               Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth")
@@ -356,10 +352,10 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Return the first block devices. */
     public BlockDevInfo getFirstBlockDevInfo() {
-        if (!blockDevInfos.isEmpty()) {
-            return blockDevInfos.get(0);
-        } else {
+        if (blockDevInfos.isEmpty()) {
             return null;
+        } else {
+            return blockDevInfos.get(0);
         }
     }
 
@@ -373,7 +369,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Return all block devices of this volume. */
-    public List<BlockDevInfo> getBlockDevInfos() {
+    public Iterable<BlockDevInfo> getBlockDevInfos() {
         return blockDevInfos;
     }
 
@@ -385,33 +381,33 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns the list of items for the popup menu for drbd volume. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final boolean testOnly = false;
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final DrbdVolumeInfo thisClass = this;
 
         final MyMenuItem connectMenu = new MyMenuItem(
             Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
-            + " " + getDrbdResourceInfo().getName(),
+            + ' ' + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
 
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect")
-            + " " + getDrbdResourceInfo().getName(),
+            + ' ' + getDrbdResourceInfo().getName(),
             null,
             Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-            new AccessMode(ConfigData.AccessType.OP, true),
-            new AccessMode(ConfigData.AccessType.OP, false)) {
+            new AccessMode(Application.AccessType.OP, true),
+            new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public boolean predicate() {
-                return !isConnectedOrWF(testOnly);
+                return !isConnectedOrWF(runMode);
             }
 
             @Override
             public String enablePredicate() {
-                if (!Tools.getConfigData().isAdvancedMode()
+                if (!Tools.getApplication().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 }
@@ -423,53 +419,53 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public void action() {
-                BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(
-                         Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
-                         + " " + getDrbdResourceInfo().getName())) {
-                    if (!destBDI.isConnectedOrWF(testOnly)) {
-                        destBDI.connect(testOnly);
-                    }
-                    if (!sourceBDI.isConnectedOrWF(testOnly)) {
-                        sourceBDI.connect(testOnly);
-                    }
-                } else {
-                    destBDI.disconnect(testOnly);
-                    sourceBDI.disconnect(testOnly);
-                }
-            }
-        };
-        final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
-               getBrowser().new DRBDMenuItemCallback(null) {
-            @Override
-            public void action(final Host host) {
                 final BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
                 final BlockDevInfo destBDI =
                                 getBrowser().getDrbdGraph().getDest(thisClass);
-                BlockDevInfo bdi;
-                if (sourceBDI.getHost() == host) {
+                if (this.getText().equals(
+                         Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
+                         + ' ' + getDrbdResourceInfo().getName())) {
+                    if (!destBDI.isConnectedOrWF(runMode)) {
+                        destBDI.connect(runMode);
+                    }
+                    if (!sourceBDI.isConnectedOrWF(runMode)) {
+                        sourceBDI.connect(runMode);
+                    }
+                } else {
+                    destBDI.disconnect(runMode);
+                    sourceBDI.disconnect(runMode);
+                }
+            }
+        };
+        final ButtonCallback connectItemCallback =
+               getBrowser().new DRBDMenuItemCallback(null) {
+            @Override
+            public void action(final Host dcHost) {
+                final BlockDevInfo sourceBDI =
+                              getBrowser().getDrbdGraph().getSource(thisClass);
+                final BlockDevInfo destBDI =
+                                getBrowser().getDrbdGraph().getDest(thisClass);
+                final BlockDevInfo bdi;
+                if (sourceBDI.getHost() == dcHost) {
                     bdi = sourceBDI;
-                } else if (destBDI.getHost() == host) {
+                } else if (destBDI.getHost() == dcHost) {
                     bdi = destBDI;
                 } else {
                     return;
                 }
-                if (sourceBDI.isConnected(false)
-                    && destBDI.isConnected(false)) {
-                    bdi.disconnect(true);
+                if (sourceBDI.isConnected(Application.RunMode.LIVE)
+                    && destBDI.isConnected(Application.RunMode.LIVE)) {
+                    bdi.disconnect(Application.RunMode.TEST);
                 } else {
-                    bdi.connect(true);
+                    bdi.connect(Application.RunMode.TEST);
                 }
             }
         };
         addMouseOverListener(connectMenu, connectItemCallback);
         items.add(connectMenu);
 
-        final MyMenuItem resumeSync = new MyMenuItem(
+        final UpdatableItem resumeSync = new MyMenuItem(
            Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync"),
            null,
            Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync.ToolTip"),
@@ -477,8 +473,8 @@ public final class DrbdVolumeInfo extends EditableInfo
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
            null,
            Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-           new AccessMode(ConfigData.AccessType.OP, false),
-           new AccessMode(ConfigData.AccessType.OP, false)) {
+           new AccessMode(Application.AccessType.OP, false),
+           new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -495,34 +491,34 @@ public final class DrbdVolumeInfo extends EditableInfo
             }
             @Override
             public void action() {
-                BlockDevInfo sourceBDI =
+                final BlockDevInfo sourceBDI =
                               getBrowser().getDrbdGraph().getSource(thisClass);
-                BlockDevInfo destBDI =
+                final BlockDevInfo destBDI =
                                 getBrowser().getDrbdGraph().getDest(thisClass);
                 if (this.getText().equals(Tools.getString(
                             "ClusterBrowser.Drbd.ResourceResumeSync"))) {
                     if (destBDI.getBlockDevice().isPausedSync()) {
-                        destBDI.resumeSync(testOnly);
+                        destBDI.resumeSync(runMode);
                     }
                     if (sourceBDI.getBlockDevice().isPausedSync()) {
-                        sourceBDI.resumeSync(testOnly);
+                        sourceBDI.resumeSync(runMode);
                     }
                 } else {
-                    sourceBDI.pauseSync(testOnly);
-                    destBDI.pauseSync(testOnly);
+                    sourceBDI.pauseSync(runMode);
+                    destBDI.pauseSync(runMode);
                 }
             }
         };
         items.add(resumeSync);
 
         /* resolve split-brain */
-        final MyMenuItem splitBrainMenu = new MyMenuItem(
+        final UpdatableItem splitBrainMenu = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain"),
                 null,
                 Tools.getString(
                             "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
@@ -543,18 +539,18 @@ public final class DrbdVolumeInfo extends EditableInfo
         items.add(splitBrainMenu);
 
         /* start online verification */
-        final MyMenuItem verifyMenu = new MyMenuItem(
+        final UpdatableItem verifyMenu = new MyMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.Verify"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
-                new AccessMode(ConfigData.AccessType.OP, false),
-                new AccessMode(ConfigData.AccessType.OP, false)) {
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false)) {
 
             private static final long serialVersionUID = 1L;
 
             @Override
             public String enablePredicate() {
-                if (!isConnected(testOnly)) {
+                if (!isConnected(runMode)) {
                     return "not connected";
                 }
                 if (isSyncing()) {
@@ -568,31 +564,31 @@ public final class DrbdVolumeInfo extends EditableInfo
 
             @Override
             public void action() {
-                verify(testOnly);
+                verify(runMode);
             }
         };
         items.add(verifyMenu);
         /* remove resource */
-        final MyMenuItem removeResMenu = new MyMenuItem(
+        final UpdatableItem removeResMenu = new MyMenuItem(
                         Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
                         ClusterBrowser.REMOVE_ICON,
                         Tools.getString(
                                 "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
                 /* this drbdResourceInfo remove myself and this calls
                    removeDrbdResource in this class, that removes the edge
                    in the graph. */
-                removeMyself(testOnly);
+                removeMyself(runMode);
             }
 
             @Override
             public String enablePredicate() {
                 final DrbdXML dxml = getBrowser().getDrbdXML();
-                if (!Tools.getConfigData().isAdvancedMode()
+                if (!Tools.getApplication().isAdvancedMode()
                     && getDrbdResourceInfo().isUsedByCRM()) {
                     return IS_USED_BY_CRM_STRING;
                 } else if (dxml.isDrbdDisabled()) {
@@ -604,26 +600,21 @@ public final class DrbdVolumeInfo extends EditableInfo
         items.add(removeResMenu);
 
         /* view log */
-        final MyMenuItem viewLogMenu = new MyMenuItem(
+        final UpdatableItem viewLogMenu = new MyMenuItem(
                            Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
                            LOGFILE_ICON,
                            null,
-                           new AccessMode(ConfigData.AccessType.RO, false),
-                           new AccessMode(ConfigData.AccessType.RO, false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
 
             private static final long serialVersionUID = 1L;
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
                 hidePopup();
-                final String device = getDevice();
-                DrbdLogs l = new DrbdLogs(getDrbdResourceInfo().getCluster(),
-                                          device);
+                final String dev = getDevice();
+                final DrbdLogs l = new DrbdLogs(getDrbdResourceInfo().getCluster(),
+                                          dev);
                 l.showDialog();
             }
         };
@@ -633,7 +624,7 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns tool tip when mouse is over the volume edge. */
     @Override
-    public String getToolTipForGraph(final boolean testOnly) {
+    public String getToolTipForGraph(final Application.RunMode runMode) {
         final StringBuilder s = new StringBuilder(50);
         s.append("<html><b>Resource: ");
         s.append(getDrbdResourceInfo().getName());
@@ -682,8 +673,28 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Removes this object from jtree and from list of drbd volume
      * infos without confirmation dialog.
      */
-    public void removeMyselfNoConfirm(final boolean testOnly) {
-        final ClusterBrowser cb = getBrowser();
+    private void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        Tools.isNotSwingThread();
+        final ClusterBrowser clusterBrowser = getBrowser();
+        Tools.invokeLater(new Runnable() {
+             @Override
+             public void run() {
+                removeMyselfNoConfirm0(runMode, clusterBrowser);
+                clusterBrowser.updateDrbdResources();
+                if (Application.isLive(runMode)) {
+                    removeNode();
+                }
+                clusterBrowser.getDrbdGraph().scale();
+             }
+        });
+    }
+
+    /**
+     * Removes this object from jtree and from list of drbd volume
+     * infos without confirmation dialog.
+     */
+    private void removeMyselfNoConfirm0(final Application.RunMode runMode,
+                                        final ClusterBrowser cb) {
         cb.drbdStatusLock();
         cb.getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
                                                getDevice(),
@@ -697,12 +708,12 @@ public final class DrbdVolumeInfo extends EditableInfo
                 DRBD.setSecondary(host,
                                   getDrbdResourceInfo().getName(),
                                   getName(),
-                                  testOnly);
+                                  runMode);
                 if (!host.hasVolumes()) {
                     DRBD.disconnect(host,
                                     getDrbdResourceInfo().getName(),
                                     null,
-                                    testOnly);
+                                    runMode);
                 }
                 for (final BlockDevInfo bdi : getBlockDevInfos()) {
                     if (bdi.getHost() == host) {
@@ -710,28 +721,28 @@ public final class DrbdVolumeInfo extends EditableInfo
                             DRBD.detach(host,
                                         getDrbdResourceInfo().getName(),
                                         getName(),
-                                        testOnly);
+                                        runMode);
                         }
                         break;
                     }
                 }
                 if (host.hasVolumes()) {
-                    DRBD.delMinor(host, getDevice(), testOnly);
+                    DRBD.delMinor(host, getDevice(), runMode);
                     if (lastVolume) {
                         DRBD.delConnection(host,
                                            getDrbdResourceInfo().getName(),
-                                           testOnly);
+                                           runMode);
                     }
                 }
             }
         }
-        super.removeMyself(testOnly);
+        super.removeMyself(runMode);
         cb.reload(cb.getDrbdNode(), true);
         cb.getDrbdDevHash().remove(getDevice());
         cb.putDrbdDevHash();
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             bdi.removeFromDrbd();
-            bdi.removeMyself(testOnly);
+            bdi.removeMyself(runMode);
         }
         if (lastVolume) {
             final DrbdResourceInfo dri = getDrbdResourceInfo();
@@ -740,15 +751,15 @@ public final class DrbdVolumeInfo extends EditableInfo
                     DRBD.proxyDown(bdi.getHost(),
                                    dri.getName(),
                                    null,
-                                   testOnly);
+                                   runMode);
                 }
             }
-            dri.removeMyself(testOnly);
+            dri.removeMyself(runMode);
         }
         cb.updateCommonBlockDevices();
 
         try {
-            getDrbdInfo().createDrbdConfig(testOnly);
+            getDrbdInfo().createDrbdConfig(runMode);
             getDrbdInfo().setSelectedNode(null);
             getDrbdInfo().selectMyself();
             cb.getDrbdGraph().updatePopupMenus();
@@ -763,32 +774,22 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }
             }
             cb.setDrbdXML(dxml);
-        } catch (Exceptions.DrbdConfigException dce) {
+        } catch (final Exceptions.DrbdConfigException dce) {
             LOG.appError("removeMyselfNoConfirm: config failed", dce);
             return;
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
             LOG.appError("removeMyselfNoConfirm: config failed", e);
             return;
         } finally {
             cb.drbdStatusUnlock();
         }
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                cb.updateDrbdResources();
-                if (!testOnly) {
-                    removeNode();
-                }
-                cb.getDrbdGraph().scale();
-            }
-        });
     }
 
     /** Removes this drbd resource with confirmation dialog. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (!getDrbdVolume().isCommited()) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
             return;
         }
         String desc = Tools.getString(
@@ -801,7 +802,7 @@ public final class DrbdVolumeInfo extends EditableInfo
               desc,
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Yes"),
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.No"))) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
         }
     }
 
@@ -821,7 +822,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         if (getDrbdInfo().atLeastVersion("8.4")) {
             return BY_RES_DEV_DIR
                    + getDrbdResourceInfo().getName()
-                   + "/"
+                   + '/'
                    + getName();
         } else {
             return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
@@ -871,9 +872,9 @@ public final class DrbdVolumeInfo extends EditableInfo
      * Returns whether the resources are connected.
      * If all devices are waiting for connection it returns false
      */
-    public boolean isConnected(final boolean testOnly) {
+    public boolean isConnected(final Application.RunMode runMode) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (bdi.isConnected(testOnly)) {
+            if (bdi.isConnected(runMode)) {
                 return true;
             }
         }
@@ -883,9 +884,9 @@ public final class DrbdVolumeInfo extends EditableInfo
     /**
      * Returns whether the resources are connected or waiting for connection.
      */
-    public boolean isConnectedOrWF(final boolean testOnly) {
+    public boolean isConnectedOrWF(final Application.RunMode runMode) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (!bdi.isConnectedOrWF(testOnly)) {
+            if (!bdi.isConnectedOrWF(runMode)) {
                 return false;
             }
         }
@@ -946,27 +947,27 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Starts online verification. */
-    void verify(final boolean testOnly) {
-        getFirstBlockDevInfo().verify(testOnly);
+    void verify(final Application.RunMode runMode) {
+        getFirstBlockDevInfo().verify(runMode);
     }
 
     /** Remove drbddisk heartbeat service. */
     void removeDrbdDisk(final FilesystemInfo fi,
                         final Host dcHost,
-                        final boolean testOnly) {
+                        final Application.RunMode runMode) {
         final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
         if (drbddiskInfo != null) {
-            drbddiskInfo.removeMyselfNoConfirm(dcHost, testOnly);
+            drbddiskInfo.removeMyselfNoConfirm(dcHost, runMode);
         }
     }
 
     /** Remove drbddisk heartbeat service. */
     void removeLinbitDrbd(final FilesystemInfo fi,
                           final Host dcHost,
-                          final boolean testOnly) {
+                          final Application.RunMode runMode) {
         final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
         if (linbitDrbdInfo != null) {
-            linbitDrbdInfo.removeMyselfNoConfirm(dcHost, testOnly);
+            linbitDrbdInfo.removeMyselfNoConfirm(dcHost, runMode);
         }
     }
 
@@ -974,7 +975,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     void addDrbdDisk(final FilesystemInfo fi,
                             final Host dcHost,
                             final String drbdId,
-                            final boolean testOnly) {
+                            final Application.RunMode runMode) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
         final DrbddiskInfo di =
@@ -984,7 +985,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                     true,
                                     drbdId,
                                     null,
-                                    testOnly);
+                                    runMode);
         di.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(di);
         fi.setDrbddiskInfo(di);
@@ -999,7 +1000,7 @@ public final class DrbdVolumeInfo extends EditableInfo
         di.waitForInfoPanel();
         di.getWidget("1", null).setValueAndWait(
                                             new StringValue(getDrbdResourceInfo().getName()));
-        di.apply(dcHost, testOnly);
+        di.apply(dcHost, runMode);
         di.getResource().setNew(false);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -1013,7 +1014,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     void addLinbitDrbd(final FilesystemInfo fi,
                        final Host dcHost,
                        final String drbdId,
-                       final boolean testOnly) {
+                       final Application.RunMode runMode) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
         final LinbitDrbdInfo ldi =
@@ -1023,7 +1024,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                      true,
                                      drbdId,
                                      null,
-                                     testOnly);
+                                     runMode);
         Tools.waitForSwing();
         ldi.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(ldi);
@@ -1044,7 +1045,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                                             new StringValue(getDrbdResourceInfo().getName()));
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();
-        ldi.apply(dcHost, testOnly);
+        ldi.apply(dcHost, runMode);
         ldi.getResource().setNew(false);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -1061,11 +1062,11 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Connect block device from the specified host. */
-    public void connect(final Host host, final boolean testOnly) {
+    public void connect(final Host host, final Application.RunMode runMode) {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi.getHost() == host
-                && !bdi.isConnectedOrWF(false)) {
-                bdi.connect(testOnly);
+                && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
+                bdi.connect(runMode);
                 break;
             }
         }
@@ -1078,11 +1079,11 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns sorted hosts from the specified blockdevices. */
     public static Set<Host> getHostsFromBlockDevices(
-                                               final List<BlockDevInfo> bdis) {
-        final TreeSet<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
+                                               final Iterable<BlockDevInfo> bdis) {
+        final Set<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
             @Override
-            public int compare(final Host h1, final Host h2) {
-                return h1.getName().compareToIgnoreCase(h2.getName());
+            public int compare(final Host o1, final Host o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
             }
         });
         for (final BlockDevInfo bdi : bdis) {
@@ -1104,10 +1105,10 @@ public final class DrbdVolumeInfo extends EditableInfo
     public String toString() {
         final String resName = getDrbdResourceInfo().getName();
         final String name = getName();
-        if (resName == null || name == null || "".equals(name)) {
+        if (resName == null || name == null || name.isEmpty()) {
             return Tools.getString("ClusterBrowser.DrbdResUnconfigured");
         }
-        return "DRBD: " + resName + "/" + name;
+        return "DRBD: " + resName + '/' + name;
     }
 
     /** Returns drbd graphical view. */
@@ -1123,9 +1124,9 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false, false);
+    public Check checkResourceFields(final String param,
+                                     final String[] params) {
+        return checkResourceFields(param, params, false, false);
     }
 
     /**
@@ -1134,81 +1135,39 @@ public final class DrbdVolumeInfo extends EditableInfo
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromDrbdInfo,
-                                       final boolean fromDrbdResourceInfo) {
-        boolean correct = true;
+    Check checkResourceFields(final String param,
+                              final String[] params,
+                              final boolean fromDrbdInfo,
+                              final boolean fromDrbdResourceInfo) {
         final DrbdXML dxml = getBrowser().getDrbdXML();
-        if (dxml != null && dxml.isDrbdDisabled()) {
-            correct = false;
-        }
-        for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (bdi != null
-                && !bdi.getBlockDevice().isNew()
-                && !bdi.checkResourceFieldsCorrect(
-                                                param,
-                                                bdi.getParametersFromXML(),
-                                                fromDrbdInfo,
-                                                fromDrbdResourceInfo,
-                                                true)) {
-                correct = false;
-            }
-        }
-        return super.checkResourceFieldsCorrect(param, params) && correct;
-    }
-
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false, false);
-    }
-
-    /**
-     * Returns whether the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromDrbdInfo,
-                                       final boolean fromDrbdResourceInfo) {
         final DrbdInfo di = getDrbdInfo();
         if (di != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
             di.setApplyButtons(null, di.getParametersFromXML());
         }
-        //final DrbdResourceInfo dri = getDrbdResourceInfo();
-        //if (dri != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
-        //    dri.setApplyButtons(null, dri.getParametersFromXML());
-        //}
-        boolean changed = false;
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        if (dxml != null && dxml.isDrbdDisabled()) {
+            incorrect.add("DRBD is disabled");
+        }
+        final Check check = new Check(incorrect, changed);
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (bdi != null
-                && bdi.checkResourceFieldsChanged(
-                                              param,
-                                              bdi.getParametersFromXML(),
-                                              fromDrbdInfo,
-                                              fromDrbdResourceInfo,
-                                              true)) {
-                changed = true;
+            if (bdi != null) {
+                check.addCheck(bdi.checkResourceFields(
+                                                    param,
+                                                    bdi.getParametersFromXML(),
+                                                    fromDrbdInfo,
+                                                    fromDrbdResourceInfo,
+                                                    true));
             }
         }
-        return super.checkResourceFieldsChanged(param, params) || changed;
+        check.addCheck(super.checkResourceFields(param, params));
+        return check;
     }
 
     /** Applies changes that user made to the drbd volume fields. */
-    public void apply(final boolean testOnly) {
-        if (!testOnly) {
+    public void apply(final Application.RunMode runMode) {
+        if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            Tools.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getApplyButton().setEnabled(false);
-                    getRevertButton().setEnabled(false);
-                    getInfoPanel();
-                }
-            });
-            waitForInfoPanel();
             getBrowser().getDrbdDevHash().remove(getDevice());
             getBrowser().putDrbdDevHash();
             storeComboBoxValues(params);
@@ -1330,8 +1289,8 @@ public final class DrbdVolumeInfo extends EditableInfo
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Whether the parameter should be enabled. */
@@ -1460,7 +1419,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

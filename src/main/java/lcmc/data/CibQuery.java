@@ -22,13 +22,8 @@
 
 package lcmc.data;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
@@ -40,8 +35,6 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  *
  */
 final class CibQuery {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** crm_config / global config data. */
     private Map<String, String> crmConfig = new HashMap<String, String>();
     /** Map with resources and its parameters. */
@@ -126,7 +119,7 @@ final class CibQuery {
     /** List of mater resources. */
     private List<String> masterList = new ArrayList<String>();
     /** Designated co-ordinator. */
-    private String dc = null;
+    private String designatedCoOrdinator = null;
     /** Map from nodename and resource to the fail-count. */
     private MultiKeyMap<String, String> failed =
                                              new MultiKeyMap<String, String>();
@@ -204,7 +197,7 @@ final class CibQuery {
     }
 
     /** Returns list with orphaned resources. */
-    Set<String> getOrphaned() {
+    Collection<String> getOrphaned() {
         return orphanedList;
     }
 
@@ -461,7 +454,7 @@ final class CibQuery {
     }
 
     /** Gets map whith nodes that are pending. */
-    Set<String> getNodePending() {
+    Collection<String> getNodePending() {
         return nodePending;
     }
 
@@ -471,7 +464,7 @@ final class CibQuery {
     }
 
     /** Gets map whith nodes that are fenced. */
-    Set<String> getFencedNodes() {
+    Collection<String> getFencedNodes() {
         return fencedNodes;
     }
 
@@ -502,19 +495,19 @@ final class CibQuery {
     }
 
     /** Gets the master list. */
-    List<String> getMasterList() {
+    Collection<String> getMasterList() {
         return masterList;
     }
 
 
     /** Sets the designated co-ordinator. */
     void setDC(final String dc) {
-        this.dc = dc;
+        designatedCoOrdinator = dc;
     }
 
     /** Gets the designated co-ordinator. */
     String getDC() {
-        return dc;
+        return designatedCoOrdinator;
     }
 
     /** Sets failed map. */

@@ -24,22 +24,15 @@
 package lcmc.gui;
 
 import java.awt.Color;
+
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
-import lcmc.data.ConfigData;
 import lcmc.data.AccessMode;
 import lcmc.AddHostDialog;
 import lcmc.AddClusterDialog;
 import lcmc.gui.dialog.About;
 import lcmc.gui.dialog.BugReport;
 import lcmc.data.Host;
-
-import javax.swing.ImageIcon;
-import javax.swing.KeyStroke;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -52,15 +45,25 @@ import java.awt.FlowLayout;
 import java.util.Map;
 import java.util.HashMap;
 
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.SwingUtilities;
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-import java.io.File;
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
 import javax.swing.border.LineBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -111,11 +114,10 @@ public final class MainMenu extends JPanel implements ActionListener {
     private static final ImageIcon HOST_ICON =
                 Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
 
-    /** Prepares a new <code>MainMenu</code> object with main menu. */
+    /** Prepares a new {@code MainMenu} object with main menu. */
     public MainMenu() {
         super();
-        JMenu submenu, menuNew, menuLookAndFeel;
-        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
+        if (Tools.getApplication().isUpgradeCheckEnabled()) {
             upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
         } else {
             upgradeCheck = Tools.getString("MainPanel.UpgradeCheckDisabled");
@@ -123,8 +125,8 @@ public final class MainMenu extends JPanel implements ActionListener {
         menuBar = new JMenuBar();
 
         /* session */
-        submenu = addMenu(Tools.getString("MainMenu.Session"), KeyEvent.VK_S);
-        menuNew = addMenu(Tools.getString("MainMenu.New"), KeyEvent.VK_E);
+        JMenu submenu = addMenu(Tools.getString("MainMenu.Session"), KeyEvent.VK_S);
+        final JMenu menuNew = addMenu(Tools.getString("MainMenu.New"), KeyEvent.VK_E);
         final JMenuItem hostItem = addMenuItem(Tools.getString("MainMenu.Host"),
                                                menuNew,
                                                KeyEvent.VK_H,
@@ -154,7 +156,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                null);
         Tools.getGUIData().addToEnabledInAccessType(loadItem,
                                                     new AccessMode(
-                                                     ConfigData.AccessType.GOD,
+                                                     Application.AccessType.GOD,
                                                      false));
 
         final JMenuItem item = addMenuItem(
@@ -166,7 +168,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                 null);
         Tools.getGUIData().addToVisibleInAccessType(item,
                                                     new AccessMode(
-                                                     ConfigData.AccessType.GOD,
+                                                     Application.AccessType.GOD,
                                                      false));
 
         addMenuItem(Tools.getString("MainMenu.Save"),
@@ -198,12 +200,12 @@ public final class MainMenu extends JPanel implements ActionListener {
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
         Tools.getGUIData().addToVisibleInAccessType(submenu,
                                                     new AccessMode(
-                                                     ConfigData.AccessType.GOD,
+                                                     Application.AccessType.GOD,
                                                      false));
-        menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
+        final JMenu menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels =
                                         UIManager.getInstalledLookAndFeels();
-        for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+        for (final UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
             final String className = lookAndFeel.getClassName();
             final String classNamePart =
                     className.substring(className.lastIndexOf('.') + 1);
@@ -260,7 +262,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         /* Operating mode */
         operatingModesCB = createOperationModeCb();
         final JPanel opModePanel =
-                            new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+                            new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
         menuBar.add(getInfoTextField());
         opModePanel.add(getUpgradeTextField());
         opModePanel.add(operatingModesCB);
@@ -269,7 +271,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         opModePanel.setPreferredSize(new Dimension(1, 1));
 
         menuBar.add(opModePanel);
-        if (Tools.getConfigData().isUpgradeCheckEnabled()) {
+        if (Tools.getApplication().isUpgradeCheckEnabled()) {
             startUpgradeCheck();
         }
     }
@@ -293,7 +295,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         Tools.getConfigData().disconnectAllHosts();
+                         Tools.getApplication().disconnectAllHosts();
                          System.exit(0);
                      }
                  });
@@ -334,17 +336,17 @@ public final class MainMenu extends JPanel implements ActionListener {
                  LOG.debug1("actionPerformed: MENU ACTION: load");
                  final JFileChooser fc = new JFileChooser();
                  fc.setSelectedFile(new File(
-                                    Tools.getConfigData().getSaveFile()));
+                                    Tools.getApplication().getSaveFile()));
                  final FileFilter filter = new FileFilter() {
                     @Override
                      public boolean accept(final File f) {
                          if (f.isDirectory()) {
                             return true;
                          }
-                         String name = f.getName();
-                         int i = name.lastIndexOf('.');
+                         final String name = f.getName();
+                         final int i = name.lastIndexOf('.');
                          if (i > 0 && i < name.length() - 1) {
-                             String ext = name.substring(i + 1);
+                             final String ext = name.substring(i + 1);
                              if (ext.equals(Tools.getDefault(
                                         "MainMenu.DrbdGuiFiles.Extension"))) {
                                  return true;
@@ -364,7 +366,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name =
                                     fc.getSelectedFile().getAbsolutePath();
-                     Tools.getConfigData().setSaveFile(name);
+                     Tools.getApplication().setSaveFile(name);
                      Tools.loadConfigData(name);
                  }
              }
@@ -403,7 +405,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     new Runnable() {
                         @Override
                         public void run() {
-                            Tools.save(Tools.getConfigData().getSaveFile(),
+                            Tools.save(Tools.getApplication().getSaveFile(),
                                        true);
                         }
                     }
@@ -424,17 +426,17 @@ public final class MainMenu extends JPanel implements ActionListener {
                  LOG.debug1("actionPerformed: MENU ACTION: save as");
                  final JFileChooser fc = new JFileChooser();
                  fc.setSelectedFile(new File(
-                                    Tools.getConfigData().getSaveFile()));
+                                    Tools.getApplication().getSaveFile()));
                  final FileFilter filter = new FileFilter() {
                     @Override
                      public boolean accept(final File f) {
                          if (f.isDirectory()) {
                             return true;
                          }
-                         String name = f.getName();
-                         int i = name.lastIndexOf('.');
+                         final String name = f.getName();
+                         final int i = name.lastIndexOf('.');
                          if (i > 0 && i < name.length() - 1) {
-                             String ext = name.substring(i + 1);
+                             final String ext = name.substring(i + 1);
                              if (ext.equals(Tools.getDefault(
                                         "MainMenu.DrbdGuiFiles.Extension"))) {
                                  return true;
@@ -454,8 +456,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name =
                                     fc.getSelectedFile().getAbsolutePath();
-                     Tools.getConfigData().setSaveFile(name);
-                     Tools.save(Tools.getConfigData().getSaveFile(), true);
+                     Tools.getApplication().setSaveFile(name);
+                     Tools.save(Tools.getApplication().getSaveFile(), true);
                  }
 
              }
@@ -495,7 +497,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 try {
                     final String lookAndFeel =
                             LOOK_AND_FEEL_MAP.get(
-                                    ((JMenuItem) e.getSource()).getText());
+                                    ((AbstractButton) e.getSource()).getText());
 
                     UIManager.setLookAndFeel(lookAndFeel);
                     final JComponent componentToSwitch =
@@ -504,13 +506,13 @@ public final class MainMenu extends JPanel implements ActionListener {
                     componentToSwitch.invalidate();
                     componentToSwitch.validate();
                     componentToSwitch.repaint();
-                } catch (ClassNotFoundException ex) {
+                } catch (final ClassNotFoundException ex) {
                     ex.printStackTrace();
-                } catch (InstantiationException ex) {
+                } catch (final InstantiationException ex) {
                     ex.printStackTrace();
-                } catch (IllegalAccessException ex) {
+                } catch (final IllegalAccessException ex) {
                     ex.printStackTrace();
-                } catch (UnsupportedLookAndFeelException ex) {
+                } catch (final UnsupportedLookAndFeelException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -597,7 +599,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Action performed, to catch not implemented actions. */
     @Override
     public void actionPerformed(final ActionEvent e) {
-        final JMenuItem source = (JMenuItem) (e.getSource());
+        final JMenuItem source = (JMenuItem) e.getSource();
         LOG.appError("actionPerformed: action \"" + source.getText() + "\" not implemented");
     }
 
@@ -616,7 +618,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                   final int shortcut,
                                   final int accelerator,
                                   final ActionListener al,
-                                  final ImageIcon icon) {
+                                  final Icon icon) {
         final JMenuItem item = new JMenuItem(name);
         if (shortcut != 0) {
             item.setMnemonic(shortcut);
@@ -642,17 +644,17 @@ public final class MainMenu extends JPanel implements ActionListener {
     private JCheckBox createAdvancedModeButton() {
         final JCheckBox emCb = new JCheckBox(Tools.getString(
                                                       "Browser.AdvancedMode"));
-        emCb.setSelected(Tools.getConfigData().isAdvancedMode());
+        emCb.setSelected(Tools.getApplication().isAdvancedMode());
         emCb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 final boolean selected =
                                     e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != Tools.getConfigData().isAdvancedMode()) {
+                if (selected != Tools.getApplication().isAdvancedMode()) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.getConfigData().setAdvancedMode(selected);
+                            Tools.getApplication().setAdvancedMode(selected);
                             Tools.checkAccessOfEverything();
                         }
                     });
@@ -665,12 +667,12 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     private JComboBox<String> createOperationModeCb() {
-        final String[] modes = Tools.getConfigData().getOperatingModes();
+        final String[] modes = Tools.getApplication().getOperatingModes();
         final JComboBox<String> opModeCB = new JComboBox<String>(modes);
 
-        final ConfigData.AccessType accessType =
-                                        Tools.getConfigData().getAccessType();
-        opModeCB.setSelectedItem(ConfigData.OP_MODES_MAP.get(accessType));
+        final Application.AccessType accessType =
+                                        Tools.getApplication().getAccessType();
+        opModeCB.setSelectedItem(Application.OP_MODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -679,13 +681,13 @@ public final class MainMenu extends JPanel implements ActionListener {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            ConfigData.AccessType type =
-                                        ConfigData.ACCESS_TYPE_MAP.get(opMode);
+                            Application.AccessType type =
+                                        Application.ACCESS_TYPE_MAP.get(opMode);
                             if (type == null) {
                                 LOG.appError("run: unknown mode: " + opMode);
-                                type = ConfigData.AccessType.RO;
+                                type = Application.AccessType.RO;
                             }
-                            Tools.getConfigData().setAccessType(type);
+                            Tools.getApplication().setAccessType(type);
                             Tools.checkAccessOfEverything();
                         }
                     });
@@ -704,10 +706,10 @@ public final class MainMenu extends JPanel implements ActionListener {
             @Override
             public void run() {
                 if (godMode) {
-                    operatingModesCB.addItem(ConfigData.OP_MODE_GOD);
-                    operatingModesCB.setSelectedItem(ConfigData.OP_MODE_GOD);
+                    operatingModesCB.addItem(Application.OP_MODE_GOD);
+                    operatingModesCB.setSelectedItem(Application.OP_MODE_GOD);
                 } else {
-                    operatingModesCB.removeItem(ConfigData.OP_MODE_GOD);
+                    operatingModesCB.removeItem(Application.OP_MODE_GOD);
                 }
             }
         });
@@ -719,16 +721,6 @@ public final class MainMenu extends JPanel implements ActionListener {
             @Override
             public void run() {
                 operatingModesCB.setSelectedItem(opMode);
-            }
-        });
-    }
-
-    /** Sets advanced mode. */
-    void setAdvancedMode(final boolean advancedMode) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                advancedModeCB.setSelected(advancedMode);
             }
         });
     }
@@ -754,7 +746,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                             upgradeCheck =
                                Tools.getString("MainPanel.NoUpgradeAvailable");
                         }
-                    } catch (Exceptions.IllegalVersionException e) {
+                    } catch (final Exceptions.IllegalVersionException e) {
                         upgradeCheck =
                              Tools.getString("MainPanel.UpgradeCheckFailed");
                     }
@@ -764,7 +756,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     @Override
                     public void run() {
                         upgradeTextField.setText(text);
-                        upgradeTextField.setVisible(!"".equals(text));
+                        upgradeTextField.setVisible(text != null && !text.isEmpty());
                         infoTextField.setText(infoText);
                         infoTextPanel.setVisible(infoText != null);
                     }
@@ -779,14 +771,14 @@ public final class MainMenu extends JPanel implements ActionListener {
      * done.
      */
     private JEditorPane getUpgradeTextField() {
-        final LineBorder border = new LineBorder(Color.RED);
+        final Border border = new LineBorder(Color.RED);
         upgradeTextField.setBorder(border);
         Tools.setEditorFont(upgradeTextField);
         upgradeTextField.setEditable(false);
         upgradeTextField.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
                     Tools.openBrowser(e.getURL().toString());
                 }
             }
@@ -794,7 +786,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         upgradeTextField.setBackground(Color.WHITE);
         final String text = upgradeCheck;
         upgradeTextField.setText(text);
-        upgradeTextField.setVisible(!"".equals(text));
+        upgradeTextField.setVisible(text != null && !text.isEmpty());
         return upgradeTextField;
     }
 
@@ -803,14 +795,14 @@ public final class MainMenu extends JPanel implements ActionListener {
      * is ready.
      */
     private JPanel getInfoTextField() {
-        final LineBorder border = new LineBorder(Color.RED);
+        final Border border = new LineBorder(Color.RED);
         infoTextField.setBorder(border);
         Tools.setEditorFont(infoTextField);
         infoTextField.setEditable(false);
         infoTextField.addHyperlinkListener(new HyperlinkListener() {
             @Override
             public void hyperlinkUpdate(final HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
                     Tools.openBrowser(e.getURL().toString());
                 }
             }

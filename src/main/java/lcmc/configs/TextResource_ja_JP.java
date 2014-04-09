@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are japanese texts.
  */
-public final class TextResource_ja_JP extends java.util.ListResourceBundle {
+public final class TextResource_ja_JP extends ListResourceBundle {
 
     /** Get contents. */
     @Override
@@ -2103,16 +2104,16 @@ public final class TextResource_ja_JP extends java.util.ListResourceBundle {
         {"ConstraintPHInfo.confirmRemove.No",
          "キャンセル"},
 
-        {"ConfigData.OpMode.RO",
+        {"Application.OpMode.RO",
          "リードオンリー"},
 
-        {"ConfigData.OpMode.OP",
+        {"Application.OpMode.OP",
          "オペレーター"},
 
-        {"ConfigData.OpMode.ADMIN",
+        {"Application.OpMode.ADMIN",
          "管理者"},
 
-        {"ConfigData.OpMode.GOD",
+        {"Application.OpMode.GOD",
          "開発者レベル10"},
 
         {"EditableInfo.MoreOptions",

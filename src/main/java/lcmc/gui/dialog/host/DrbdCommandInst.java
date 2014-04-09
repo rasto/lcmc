@@ -49,12 +49,10 @@ final class DrbdCommandInst extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(DrbdCommandInst.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>DrbdCommandInst</code> object. */
+    /** Prepares a new {@code DrbdCommandInst} object. */
     DrbdCommandInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -83,7 +81,7 @@ final class DrbdCommandInst extends DialogHost {
                     Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -119,32 +117,32 @@ final class DrbdCommandInst extends DialogHost {
         final String drbdVersion = getHost().getDrbdVersionToInstall();
         final String drbdVersionUrlString =
                               getHost().getDrbdVersionUrlStringToInstall();
-        Tools.getConfigData().setLastDrbdInstalledMethod(
+        Tools.getApplication().setLastDrbdInstalledMethod(
             getHost().getDistString("DrbdInst.install.text." + installMethod));
         LOG.debug1("installDrbd: cmd: " + installCommand
                    + " arch: " + archString
                    + " version: " + drbdVersionUrlString
-                   + "/" + drbdVersion);
+                   + '/' + drbdVersion);
         getHost().execCommandInBash(
                          installCommand + ";;;DRBD.load",
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 LOG.debug1("installDrbd: done: " + ans);
-                                 checkAnswer(ans);
+                             public void done(final String answer) {
+                                 LOG.debug1("installDrbd: done: " + answer);
+                                 checkAnswer(answer);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  LOG.debug1("installDrbd: done error: "
-                                            + exitCode + " / "
-                                            + ans);
+                                            + errorCode + " / "
+                                            + answer);
                                  printErrorAndRetry(
                                     Tools.getString(
                                       "Dialog.Host.DrbdCommandInst.InstError"),
-                                    ans,
-                                    exitCode);
+                                         answer,
+                                         errorCode);
                              }
                          },
                          new ConvertCmdCallback() {

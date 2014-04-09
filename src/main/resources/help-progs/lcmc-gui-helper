@@ -376,6 +376,10 @@ sub get_net_info {
 			}
 		}
 	}
+	$out .= "bridge-info\n";
+	for (keys %$bridges) {
+		$out .= "$_\n";
+	}
 	return $out;
 }
 

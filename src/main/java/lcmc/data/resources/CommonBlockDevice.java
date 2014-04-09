@@ -40,11 +40,9 @@ public final class CommonBlockDevice extends Resource {
     /** Logger. */
     private static final Logger LOG =
                             LoggerFactory.getLogger(CommonBlockDevice.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
     /**
-     * Prepares a new <code>CommonBlockDevice</code> object.
+     * Prepares a new {@code CommonBlockDevice} object.
      *
      * @param name
      *          block device name

@@ -21,26 +21,23 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
-import lcmc.data.VMSXML;
 import lcmc.data.VMSXML.VideoData;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Arrays;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import org.w3c.dom.Node;
 
 /**
@@ -53,7 +50,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                                                 VideoData.MODEL_HEADS};
 
     /** Whether the parameter is editable only in advanced mode. */
-    private static final Set<String> IS_ENABLED_ONLY_IN_ADVANCED =
+    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
         new HashSet<String>(Arrays.asList(new String[]{
                                                 VideoData.MODEL_VRAM,
                                                 VideoData.MODEL_HEADS}));
@@ -81,7 +78,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     }
 
     /** Whether the parameter is required. */
-    private static final Set<String> IS_REQUIRED =
+    private static final Collection<String> IS_REQUIRED =
         new HashSet<String>(Arrays.asList(new String[]{VideoData.MODEL_TYPE}));
 
     /** Possible values. */
@@ -211,16 +208,10 @@ final class VMSVideoInfo extends VMSHardwareInfo {
         return null;
     }
 
-    /** Returns type of the field. */
-    @Override
-    protected Widget.Type getFieldType(final String param) {
-        return null;
-    }
-
     /** Applies the changes. */
     @Override
-    void apply(final boolean testOnly) {
-        if (testOnly) {
+    void apply(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         Tools.invokeAndWait(new Runnable() {
@@ -259,10 +250,10 @@ final class VMSVideoInfo extends VMSHardwareInfo {
             }
         });
         final String[] params = getParametersFromXML();
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
         }
-        checkResourceFieldsChanged(null, params);
+        checkResourceFields(null, params);
     }
 
     /** Returns device parameters. */
@@ -315,8 +306,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */
@@ -361,7 +352,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
         updateTable(VMSVirtualDomainInfo.VIDEO_TABLE);
-        checkResourceFieldsChanged(null, getParametersFromXML());
+        checkResourceFields(null, getParametersFromXML());
     }
 
     /** Returns string representation. */
@@ -379,8 +370,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
 
     /** Removes this video device without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final boolean testOnly) {
-        if (testOnly) {
+    protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
+        if (Application.isTest(runMode)) {
             return;
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();

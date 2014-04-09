@@ -60,7 +60,7 @@ public final class VIRSH {
                                  null,
                                  outputVisible,
                                  Tools.getString("VIRSH.ExecutingCommand")
-                                 + " "
+                                 + ' '
                                  + commands.replaceAll(DistResource.SUDO, " ")
                                  + "...",
                                  SSH.DEFAULT_COMMAND_TIMEOUT);
@@ -77,7 +77,7 @@ public final class VIRSH {
                                        final boolean outputVisible) {
         for (final Host host : hosts) {
             final String commands = hostCommands.get(host);
-            if (commands.length() > 0) {
+            if (!commands.isEmpty()) {
                 if (!execCommand(host, commands, outputVisible)) {
                     return false;
                 }
@@ -97,15 +97,15 @@ public final class VIRSH {
         replaceHash.put("@OPTIONS@", options);
         for (final Host host : hosts) {
             final StringBuilder commands = new StringBuilder(100);
-            for (final String param : parameters.keySet()) {
-                String command = host.getDistCommand(VIRSH_COMMANDS.get(param),
+            for (final Map.Entry<String, String> paramEntry : parameters.entrySet()) {
+                String command = host.getDistCommand(VIRSH_COMMANDS.get(paramEntry.getKey()),
                                                      replaceHash);
                 if (command == null) {
                     continue;
                 }
-                if (command.indexOf("@VALUE@") >= 0) {
-                    String value = parameters.get(param);
-                    if ("autostart".equals(param)) {
+                if (command.contains("@VALUE@")) {
+                    String value = paramEntry.getValue();
+                    if ("autostart".equals(paramEntry.getKey())) {
                         if (value == null || !value.equals(host.getName())) {
                             value = "--disable";
                         } else {
@@ -218,9 +218,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", config);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Define",
+        return host.getDistCommand("VIRSH.Define",
                                                    replaceHash);
-        return command;
     }
 
     /** Undefines virtual domain. It removes the config. */

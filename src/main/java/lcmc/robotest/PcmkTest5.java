@@ -39,17 +39,10 @@ final class PcmkTest5 {
         /* Cannot be instantiated. */
     }
 
+    @SuppressWarnings("TooBroadScope")
     static void start(final int count) {
         slowFactor = 0.2f;
         aborted = false;
-        final int dummy1X = 235;
-        final int dummy1Y = 207;
-
-        final int dummy2X = 500;
-        final int dummy2Y = 207;
-
-        final int ph1X = 380;
-        final int ph1Y = 452;
 
 
         disableStonith();
@@ -57,12 +50,18 @@ final class PcmkTest5 {
         checkTest("test5", 1);
 
         /* placeholders */
+        final int ph1X = 380;
+        final int ph1Y = 452;
         moveTo(ph1X, ph1Y);
         rightClick();
         moveTo("Placeholder (AND)");
         leftClick();
 
+        final int dummy1X = 235;
+        final int dummy1Y = 207;
         chooseDummy(dummy1X, dummy1Y, false, true);
+        final int dummy2X = 500;
+        final int dummy2Y = 207;
         chooseDummy(dummy2X, dummy2Y, false, true);
         checkTest("test5", 2);
 

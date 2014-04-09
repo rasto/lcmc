@@ -21,6 +21,7 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -30,9 +31,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.CRMXML;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.data.resources.Resource;
 import lcmc.gui.SpringUtilities;
 
@@ -42,13 +40,13 @@ import javax.swing.border.TitledBorder;
 import javax.swing.SpringLayout;
 import javax.swing.BoxLayout;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.awt.Color;
@@ -57,9 +55,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import java.util.concurrent.TimeUnit;
-import lcmc.data.Value;
+
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -75,7 +75,7 @@ public abstract class EditableInfo extends Info {
     /** Hash from parameter to boolean value if the last entered value was
      * correct. */
     private final Map<String, Boolean> paramCorrectValueMap =
-                                                new HashMap<String, Boolean>();
+                                    new ConcurrentHashMap<String, Boolean>();
     private final MultiKeyMap<String, JPanel> sectionPanels =
                                              new MultiKeyMap<String, JPanel>();
     /** Returns section in which is this parameter. */
@@ -88,7 +88,7 @@ public abstract class EditableInfo extends Info {
         a reason that appears in the tooltip. */
     protected abstract String isEnabled(String param);
     /** Returns access type of this parameter. */
-    protected abstract ConfigData.AccessType getAccessType(String param);
+    protected abstract Application.AccessType getAccessType(String param);
     /** Returns whether this parameter is enabled in advanced mode. */
     protected abstract boolean isEnabledOnlyInAdvancedMode(String param);
     /** Returns whether this parameter is of label type. */
@@ -115,7 +115,7 @@ public abstract class EditableInfo extends Info {
         // TODO: this should be only for Pacemaker
         if (isInteger(param)) {
             return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
-                   + "|" + CRMXML.DISABLED_STRING
+                   + '|' + CRMXML.DISABLED_STRING
                    + "))|@NOTHING_SELECTED@$";
         }
         return null;
@@ -133,16 +133,16 @@ public abstract class EditableInfo extends Info {
     /** Is counted down, first time the info panel is initialized. */
     private CountDownLatch infoPanelLatch = new CountDownLatch(1);
     /** List of advanced panels. */
-    private final List<JPanel> advancedPanelList = new ArrayList<JPanel>();
+    private final Collection<JPanel> advancedPanelList = new ArrayList<JPanel>();
     /** List of messages if advanced panels are hidden. */
-    private final List<String> advancedOnlySectionList =
+    private final Collection<String> advancedOnlySectionList =
                                                       new ArrayList<String>();
     /** More options panel. */
     private final JPanel moreOptionsPanel = new JPanel();
     /** Whether dialog was started. It disables the apply button. */
     private boolean dialogStarted = false;
     /** Disabled section, their not visible. */
-    private final Set<String> disabledSections = new HashSet<String>();
+    private final Collection<String> disabledSections = new HashSet<String>();
     /** Whether is's a wizard element. */
     public static final boolean WIZARD = true;
 
@@ -152,7 +152,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /**
-     * Prepares a new <code>EditableInfo</code> object.
+     * Prepares a new {@code EditableInfo} object.
      *
      * @param name
      *      name that will be shown to the user.
@@ -164,7 +164,7 @@ public abstract class EditableInfo extends Info {
     /** Inits apply button. */
     final void initApplyButton(final ButtonCallback buttonCallback) {
         initApplyButton(buttonCallback,
-                        Tools.getString("Browser.ApplyResource"));
+                Tools.getString("Browser.ApplyResource"));
     }
 
     /** Inits commit button. */
@@ -202,12 +202,12 @@ public abstract class EditableInfo extends Info {
 
     /** Creates apply button and adds it to the panel. */
     protected final void addApplyButton(final JPanel panel) {
-        panel.add(applyButton, BorderLayout.WEST);
+        panel.add(applyButton, BorderLayout.LINE_START);
     }
 
     /** Creates revert button and adds it to the panel. */
     protected final void addRevertButton(final JPanel panel) {
-        final JPanel p = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        final JPanel p = new JPanel(new FlowLayout(FlowLayout.TRAILING, 4, 0));
         p.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
         p.add(revertButton);
         panel.add(p, BorderLayout.CENTER);
@@ -280,13 +280,13 @@ public abstract class EditableInfo extends Info {
         /** Section of this panel part. */
         private final String section;
         /** Access type of this panel part. */
-        private final ConfigData.AccessType accessType;
+        private final Application.AccessType accessType;
         /** Whether it is an advanced panel part. */
         private final boolean advanced;
 
         /** Creates new panel part object. */
         PanelPart(final String section,
-                  final ConfigData.AccessType accessType,
+                  final Application.AccessType accessType,
                   final boolean advanced) {
             this.section = section;
             this.accessType = accessType;
@@ -299,7 +299,7 @@ public abstract class EditableInfo extends Info {
         }
 
         /** Returns access type of this panel part. */
-        public final ConfigData.AccessType getAccessType() {
+        public final Application.AccessType getAccessType() {
             return accessType;
         }
 
@@ -338,7 +338,7 @@ public abstract class EditableInfo extends Info {
         }
         final MultiKeyMap<String, JPanel> panelPartsMap =
                                             new MultiKeyMap<String, JPanel>();
-        final List<PanelPart> panelPartsList = new ArrayList<PanelPart>();
+        final Collection<PanelPart> panelPartsList = new ArrayList<PanelPart>();
         final MultiKeyMap<String, Integer> panelPartRowsMap =
                                             new MultiKeyMap<String, Integer>();
 
@@ -346,8 +346,8 @@ public abstract class EditableInfo extends Info {
             final Widget paramWi = createWidget(param, prefix, rightWidth);
             /* sub panel */
             final String section = getSection(param);
-            JPanel panel;
-            final ConfigData.AccessType accessType = getAccessType(param);
+            final JPanel panel;
+            final Application.AccessType accessType = getAccessType(param);
             final String accessTypeString = accessType.toString();
             final Boolean advanced = isAdvanced(param);
             final String advancedString = advanced.toString();
@@ -369,7 +369,7 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    panel.setVisible(Tools.getConfigData().isAdvancedMode());
+                    panel.setVisible(Tools.getApplication().isAdvancedMode());
                 }
                 panelPartsMap.put(section,
                                   accessTypeString,
@@ -401,16 +401,11 @@ public abstract class EditableInfo extends Info {
         final boolean wizard = Widget.WIZARD_PREFIX.equals(prefix);
         for (final String param : params) {
             final Widget paramWi = getWidget(param, prefix);
-            Widget rpwi;
             if (wizard) {
-                rpwi = getWidget(param, null);
+                final Widget rpwi = getWidget(param, null);
                 if (rpwi == null) {
                     LOG.error("addParams: unknown param: " + param);
                     continue;
-                }
-                int height = 0;
-                if (rpwi instanceof Label) {
-                    height = Tools.getDefaultSize("Browser.LabelFieldHeight");
                 }
                 if (paramWi.getValue() == null
                     || paramWi.getValue().isNothingSelected()) {
@@ -442,11 +437,11 @@ public abstract class EditableInfo extends Info {
 
         /* add sub panels to the option panel */
         final Map<String, JPanel> sectionMap = new HashMap<String, JPanel>();
-        final Set<JPanel> notAdvancedSections = new HashSet<JPanel>();
-        final Set<JPanel> advancedSections = new HashSet<JPanel>();
+        final Collection<JPanel> notAdvancedSections = new HashSet<JPanel>();
+        final Collection<JPanel> advancedSections = new HashSet<JPanel>();
         for (final PanelPart panelPart : panelPartsList) {
             final String section = panelPart.getSection();
-            final ConfigData.AccessType accessType = panelPart.getAccessType();
+            final Application.AccessType accessType = panelPart.getAccessType();
             final String accessTypeString = accessType.toString();
             final Boolean advanced = panelPart.isAdvanced();
             final String advancedString = advanced.toString();
@@ -461,7 +456,7 @@ public abstract class EditableInfo extends Info {
             SpringUtilities.makeCompactGrid(panel, rows, columns,
                                             1, 1,  // initX, initY
                                             1, 1); // xPad, yPad
-            JPanel sectionPanel;
+            final JPanel sectionPanel;
             if (sectionMap.containsKey(section)) {
                 sectionPanel = sectionMap.get(section);
             } else {
@@ -500,19 +495,19 @@ public abstract class EditableInfo extends Info {
             }
         }
         boolean advanced = false;
-        for (final String section : sectionMap.keySet()) {
-            final JPanel sectionPanel = sectionMap.get(section);
+        for (final Map.Entry<String, JPanel> sectionEntry : sectionMap.entrySet()) {
+            final JPanel sectionPanel = sectionEntry.getValue();
             if (advancedSections.contains(sectionPanel)) {
                 advanced = true;
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
-                advancedOnlySectionList.add(section);
-                sectionPanel.setVisible(Tools.getConfigData().isAdvancedMode()
-                                        && isSectionEnabled(section));
+                advancedOnlySectionList.add(sectionEntry.getKey());
+                sectionPanel.setVisible(Tools.getApplication().isAdvancedMode()
+                                        && isSectionEnabled(sectionEntry.getKey()));
             }
         }
         moreOptionsPanel.setVisible(advanced
-                                    && !Tools.getConfigData().isAdvancedMode());
+                                    && !Tools.getApplication().isAdvancedMode());
     }
 
     /** Returns a more panel with "more options are available" message. */
@@ -539,16 +534,13 @@ public abstract class EditableInfo extends Info {
                                      final String param,
                                      final String[] params,
                                      final MyButton thisApplyButton) {
-        final EditableInfo thisClass = this;
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                boolean c;
-                boolean ch = false;
+                final Check check;
                 if (realParamWi == null) {
                     Tools.waitForSwing();
-                    ch = checkResourceFieldsChanged(param, params);
-                    c = checkResourceFieldsCorrect(param, params);
+                    check = checkResourceFields(param, params);
                 } else {
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -563,24 +555,26 @@ public abstract class EditableInfo extends Info {
                         }
                     });
                     Tools.waitForSwing();
-                    c = checkResourceFieldsCorrect(param, params);
+                    check = checkResourceFields(param, params);
                 }
-                final boolean check = c;
-                final boolean changed = ch;
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
+                        if (getResource().isNew()) {
+                            check.addChanged("new resource");
+                        }
                         if (thisApplyButton == applyButton) {
-                            thisApplyButton.setEnabled(
-                                  !isDialogStarted()
-                                  && check
-                                  && (changed || getResource().isNew()));
+                            /* not a wizard button */
+                            if (isDialogStarted()) {
+                                check.addIncorrect("dialog started");
+                            }
+                            thisApplyButton.setEnabled(check);
                         } else {
                             /* wizard button */
-                            thisApplyButton.setEnabled(check);
+                            thisApplyButton.setEnabledCorrect(check);
                         }
                         if (revertButton != null) {
-                            revertButton.setEnabled(changed);
+                            revertButton.setEnabledChanged(check);
                         }
                         final String toolTip = getToolTipText(param, paramWi);
                         paramWi.setToolTipText(toolTip);
@@ -605,7 +599,7 @@ public abstract class EditableInfo extends Info {
 
     /** Stores values in the combo boxes in the component c. */
     protected void storeComboBoxValues(final String[] params) {
-        for (String param : params) {
+        for (final String param : params) {
             final Value value = getComboBoxValue(param);
             getResource().setValue(param, value);
             final Widget wi = getWidget(param, null);
@@ -713,7 +707,7 @@ public abstract class EditableInfo extends Info {
      * parameter was modified, but not this one.
      */
     protected boolean checkParamCache(final String param) {
-        if (!paramCorrectValueMap.containsKey(param)) {
+        if (param == null || !paramCorrectValueMap.containsKey(param)) {
             return false;
         }
         final Boolean ret = paramCorrectValueMap.get(param);
@@ -726,6 +720,9 @@ public abstract class EditableInfo extends Info {
     /** Sets the cache for the result of the parameter check. */
     protected final void setCheckParamCache(final String param,
                                             final boolean correctValue) {
+        if (param == null) {
+            return;
+        }
         paramCorrectValueMap.put(param, correctValue);
     }
 
@@ -780,7 +777,7 @@ public abstract class EditableInfo extends Info {
     protected final JPanel getParamPanel(final String title,
                                          final Color background) {
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setBackground(background);
         final TitledBorder titleBorder = Tools.getBorder(title);
         panel.setBorder(titleBorder);
@@ -815,41 +812,24 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param,
                                       final String[] params) {
-        final boolean ch = checkResourceFieldsChanged(param, params);
-        final boolean cor = checkResourceFieldsCorrect(param, params);
+        final Check check = checkResourceFields(param, params);
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
                 final Resource r = getResource();
                 if (ab != null) {
-                    ab.setEnabled((ch || (r != null && r.isNew())) && cor);
+                    if (r != null && r.isNew()) {
+                        check.addChanged("new resource");
+                    }
+                    ab.setEnabled(check);
                 }
                 final MyButton rb = getRevertButton();
                 if (rb != null) {
-                    rb.setEnabled(ch);
+                    rb.setEnabledChanged(check);
                 }
             }
         });
-    }
-
-    ///**
-    // * Can be called from dialog box, where it does not need to check if
-    // * fields have changed.
-    // */
-    //public boolean checkResourceFields(final String param,
-    //                                   final String[] params) {
-    //    final boolean cor = checkResourceFieldsCorrect(param, params);
-    //    final boolean changed = checkResourceFieldsChanged(param, params);
-    //    if (cor) {
-    //        return changed;
-    //    }
-    //    return cor;
-    //}
-
-    /** Checks one parameter. */
-    protected void checkOneParam(final String param) {
-        checkResourceFieldsCorrect(param, new String[]{param});
     }
 
     /**
@@ -858,30 +838,42 @@ public abstract class EditableInfo extends Info {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
+    Check checkResourceFields(final String param, final String[] params) {
         /* check if values are correct */
-        boolean correctValue = true;
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
         if (params != null) {
             for (final String otherParam : params) {
                 final Widget wi = getWidget(otherParam, null);
                 if (wi == null) {
                     continue;
                 }
-                Value newValue;
-                final Value o = wi.getValue();
-                newValue = o;
+                Value newValue = wi.getValue();
 
-                if (param == null || otherParam.equals(param)
-                    || !paramCorrectValueMap.containsKey(param)) {
+                /* check if value has changed */
+                Value oldValue = getParamSaved(otherParam);
+                if (oldValue == null) {
+                    oldValue = getParamDefault(otherParam);
+                }
+                if (!Tools.areEqual(newValue, oldValue)) {
+                    changed.add(otherParam + ": " + oldValue
+                                + " \u2192 " + newValue);
+                }
+
+                /* check correctness */
+                final Boolean correctValueCache =
+                         (otherParam == null) ? null :
+                                      paramCorrectValueMap.get(otherParam);
+                if (param == null
+                    || otherParam.equals(param)
+                    || correctValueCache == null) {
                     final Widget wizardWi = getWidget(otherParam,
                                                       Widget.WIZARD_PREFIX);
                     final String enable = isEnabled(otherParam);
                     if (wizardWi != null) {
                         wizardWi.setDisabledReason(enable);
                         wizardWi.setEnabled(enable == null);
-                        final Value wo = wizardWi.getValue();
-                        newValue = wo;
+                        newValue = wizardWi.getValue();
                     }
                     wi.setDisabledReason(enable);
                     wi.setEnabled(enable == null);
@@ -917,51 +909,18 @@ public abstract class EditableInfo extends Info {
                         if (wizardWi != null) {
                             wizardWi.wrongValue();
                         }
-                        correctValue = false;
+                        incorrect.add(otherParam);
                     }
                     setCheckParamCache(otherParam, check);
                 } else {
-                    correctValue = correctValue && checkParamCache(otherParam);
-                }
-            }
-        }
-        return correctValue;
-    }
-
-    /**
-     * Returns whetherrs the specified parameter or any of the parameters
-     * have changed. If param is null, only param will be checked,
-     * otherwise all parameters will be checked.
-     */
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params) {
-        /* check if something is different from saved values */
-        boolean changedValue = false;
-        if (params != null) {
-            for (String otherParam : params) {
-                final Widget wi = getWidget(otherParam, null);
-                if (wi == null) {
-                    continue;
-                }
-                final Value newValue = wi.getValue();
-
-                /* check if value has changed */
-                Value oldValue = getParamSaved(otherParam);
-                if (oldValue == null) {
-                    oldValue = getParamDefault(otherParam);
-                }
-                if (!Tools.areEqual(newValue, oldValue)) {
-                    changedValue = true;
+                    if (!correctValueCache) {
+                        incorrect.add(otherParam);
+                    }
                 }
                 wi.processAccessMode();
             }
         }
-        return changedValue;
-    }
-
-    /** Return JLabel object for the combobox. */
-    protected final JLabel getLabel(final Widget wi) {
-        return wi.getLabel();
+        return new Check(incorrect, changed);
     }
 
     /** Waits till the info panel is done for the first time. */
@@ -972,7 +931,7 @@ public abstract class EditableInfo extends Info {
                 Tools.printStackTrace("latch timeout detected");
             }
             infoPanelLatch.await();
-        } catch (InterruptedException ignored) {
+        } catch (final InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
     }
@@ -996,7 +955,7 @@ public abstract class EditableInfo extends Info {
     @Override
     public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
-        final boolean advancedMode = Tools.getConfigData().isAdvancedMode();
+        final boolean advancedMode = Tools.getApplication().isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
             Tools.invokeLater(new Runnable() {
@@ -1160,7 +1119,7 @@ public abstract class EditableInfo extends Info {
 
     /** Return parameters that are not in disabeld sections. */
     protected final String[] getEnabledSectionParams(
-                                                   final List<String> params) {
+                                                   final Iterable<String> params) {
         final List<String> newParams = new ArrayList<String>();
         for (final String param : params) {
 

@@ -32,13 +32,6 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.configs.AppDefaults;
 
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -56,6 +49,12 @@ import java.awt.geom.Point2D;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -77,8 +76,8 @@ import lcmc.utilities.LoggerFactory;
  * panel, preventing them from being forwared to the
  * underlying components.
  * <br /><br />
- * The panel can be controlled by the <code>start()</code>,
- * <code>stop()</code> and <code>interrupt()</code> methods.
+ * The panel can be controlled by the {@code start()},
+ * {@code stop()} and {@code interrupt()} methods.
  * <br /><br />
  * Example:
  * <br /><br />
@@ -88,8 +87,8 @@ import lcmc.utilities.LoggerFactory;
  * <br /><br />
  * Several properties can be configured at creation time. The
  * message and its font can be changed at runtime. Changing the
- * font can be done using <code>setFont()</code> and
- * <code>setForeground()</code>.
+ * font can be done using {@code setFont()} and
+ * {@code setForeground()}.
  */
 
 public final class ProgressIndicatorPanel extends JComponent
@@ -116,9 +115,9 @@ public final class ProgressIndicatorPanel extends JComponent
     private final Map<String, Point2D> textsPositions =
                                               new HashMap<String, Point2D>();
     /** List of failed commands. */
-    private final List<String> failuresMap = new LinkedList<String>();
+    private final Collection<String> failuresMap = new LinkedList<String>();
     /** Amount of frames per second. */
-    private static final float FPS = Tools.getConfigData().getAnimFPS();
+    private static final float FPS = Tools.getApplication().getAnimFPS();
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;
     /** Lock for the animator. */
@@ -270,8 +269,8 @@ public final class ProgressIndicatorPanel extends JComponent
             return;
         }
         texts.put(text, 250);
-        for (final String t : texts.keySet()) {
-            final int a = texts.get(t).intValue();
+        for (final Map.Entry<String, Integer> textEntry : texts.entrySet()) {
+            final int a = textEntry.getValue();
             if (a == MAX_ALPHA_LEVEL) {
                 /* at least one is going up */
                 mTextsLock.unlock();
@@ -281,8 +280,8 @@ public final class ProgressIndicatorPanel extends JComponent
         }
         mTextsLock.unlock();
         animator.setRampUp(false);
-        removeMouseListener(ProgressIndicatorPanel.this);
-        removeKeyListener(ProgressIndicatorPanel.this);
+        removeMouseListener(this);
+        removeKeyListener(this);
         Tools.getGUIData().getMainMenu().turnOn();
         mAnimatorLock.unlock();
     }
@@ -292,8 +291,6 @@ public final class ProgressIndicatorPanel extends JComponent
     protected void paintComponent(final Graphics g) {
         if (started) {
             final int width  = getWidth();
-
-            double maxY;
 
             final Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHints(hints);
@@ -347,24 +344,23 @@ public final class ProgressIndicatorPanel extends JComponent
                                            getFont().getStyle(),
                                            (int) (getFont().getSize() * 1.75));
 
-                maxY = getHeight() / 2 - 30;
+                final double maxY = getHeight() / 2 - 30;
 
                 int y = 0;
-                int x = 0;
-                for (String text : texts.keySet()) {
-                    if (text == null || text.length() == 0) {
+                for (final Map.Entry<String, Integer> textEntry : texts.entrySet()) {
+                    if (textEntry.getKey() == null || textEntry.getKey().isEmpty()) {
                         continue;
                     }
-                    final int alpha = texts.get(text).intValue();
+                    final int alpha = textEntry.getValue();
                     final TextLayout layout = new TextLayout(
-                                                    text,
+                            textEntry.getKey(),
                                                     new Font(font.getName(),
                                                              font.getStyle(),
                                                              font.getSize()),
                                                     context);
                     final Rectangle2D bounds = layout.getBounds();
-                    Color f;
-                    if (failuresMap.contains(text)) {
+                    final Color f;
+                    if (failuresMap.contains(textEntry.getKey())) {
                         f = new Color(255, 0, 0);
                     } else {
                         f = AppDefaults.BACKGROUND_DARK;
@@ -373,9 +369,9 @@ public final class ProgressIndicatorPanel extends JComponent
                                           f.getGreen(),
                                           f.getBlue(),
                                           alpha));
-                    final Point2D textPos = textsPositions.get(text);
-                    float textPosX;
-                    float textPosY;
+                    final Point2D textPos = textsPositions.get(textEntry.getKey());
+                    final float textPosX;
+                    final float textPosY;
                     if (textPos == null) {
                         textPosX = (float) (width - bounds.getWidth()) / 2;
                         textPosY = (float) (maxY + layout.getLeading()
@@ -387,11 +383,8 @@ public final class ProgressIndicatorPanel extends JComponent
                     layout.draw(g2,
                                 textPosX,
                                 textPosY + y);
-                    x = (int) (x + (((float) (10 + 15 * text.length())
-                                     / MAX_ALPHA_LEVEL)
-                                    * alpha));
-                    y = (int) (y + (((float) 27 / MAX_ALPHA_LEVEL)
-                                    * alpha));
+                    y += (((float) 27 / MAX_ALPHA_LEVEL)
+                            * alpha);
                 }
             }
             mTextsLock.unlock();
@@ -405,7 +398,7 @@ public final class ProgressIndicatorPanel extends JComponent
         /** Whether the alpha level goes up or down. */
         private volatile boolean rampUp;
 
-        /** Prepares a new <code>Animator</code> object. */
+        /** Prepares a new {@code Animator} object. */
         protected Animator() {
             rampUp = true;
         }
@@ -464,21 +457,21 @@ public final class ProgressIndicatorPanel extends JComponent
                     alphaLevel = newAlphaLevel;
                 }
 
-                final ArrayList<String> toRemove = new ArrayList<String>();
+                final Collection<String> toRemove = new ArrayList<String>();
                 mTextsLock.lock();
-                for (final String text : texts.keySet()) {
-                    int alpha = texts.get(text).intValue();
+                for (final Map.Entry<String, Integer> textEntry : texts.entrySet()) {
+                    int alpha = textEntry.getValue();
                     if (alpha < MAX_ALPHA_LEVEL) {
                         int delay = 1000;
-                        if (failuresMap.contains(text)) {
+                        if (failuresMap.contains(textEntry.getKey())) {
                             delay = 10000;
                         }
                         alpha -=
                             (int) (MAX_ALPHA_LEVEL * (time - start) / delay);
                         if (alpha < 0) {
-                            toRemove.add(text);
+                            toRemove.add(textEntry.getKey());
                         } else {
-                            texts.put(text, alpha);
+                            texts.put(textEntry.getKey(), alpha);
                         }
                     }
                 }
@@ -491,7 +484,7 @@ public final class ProgressIndicatorPanel extends JComponent
                 mTextsLock.unlock();
                 try {
                     Thread.sleep((int) (1000 / FPS));
-                } catch (InterruptedException ie) {
+                } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }
                 start = time;

@@ -35,7 +35,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
 
@@ -60,8 +60,6 @@ import lcmc.data.Value;
  *
  */
 final class CreateMD extends DrbdConfig {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Metadata pulldown choices. */
     private Widget metadataWi;
     /** Make Meta-Data button. */
@@ -71,7 +69,7 @@ final class CreateMD extends DrbdConfig {
     /** Return code of the create md command if fs is already there. */
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
 
-    /** Prepares a new <code>CreateMD</code> object. */
+    /** Prepares a new {@code CreateMD} object. */
     CreateMD(final WizardDialog previousDialog,
                        final DrbdVolumeInfo dvi) {
         super(previousDialog, dvi);
@@ -86,7 +84,7 @@ final class CreateMD extends DrbdConfig {
             }
         });
         final Thread[] thread = new Thread[2];
-        final String[] answer = new String[2];
+        final String[] answerStore = new String[2];
         final Integer[] returnCode = new Integer[2];
         final BlockDevInfo[] bdis = {
                                 getDrbdVolumeInfo().getFirstBlockDevInfo(),
@@ -102,22 +100,22 @@ final class CreateMD extends DrbdConfig {
                     final ExecCallback execCallback =
                         new ExecCallback() {
                             @Override
-                            public void done(final String ans) {
+                            public void done(final String answer) {
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeMDButton.setEnabled(false);
                                     }
                                 });
-                                answer[index] = ans;
+                                answerStore[index] = answer;
                                 returnCode[index] = 0;
                             }
 
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
-                                answer[index] = ans;
-                                returnCode[index] = exitCode;
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
+                                answerStore[index] = answer;
+                                returnCode[index] = errorCode;
                             }
 
                         };
@@ -127,7 +125,7 @@ final class CreateMD extends DrbdConfig {
                     if ("internal".equals(drbdMetaDisk)) {
                         drbdMetaDisk = bdis[index].getName();
                     }
-                    final boolean testOnly = false;
+                    final Application.RunMode runMode = Application.RunMode.LIVE;
                     if (destroyData) {
                         DRBD.createMDDestroyData(
                                     bdis[index].getHost(),
@@ -136,7 +134,7 @@ final class CreateMD extends DrbdConfig {
                                     getDrbdVolumeInfo().getName(),
                                     drbdMetaDisk,
                                     execCallback,
-                                    testOnly);
+                                    runMode);
                     } else {
                         DRBD.createMD(bdis[index].getHost(),
                                       getDrbdVolumeInfo().getDrbdResourceInfo()
@@ -144,7 +142,7 @@ final class CreateMD extends DrbdConfig {
                                       getDrbdVolumeInfo().getName(),
                                       drbdMetaDisk,
                                       execCallback,
-                                      testOnly);
+                                      runMode);
                     }
                 }
             });
@@ -154,41 +152,41 @@ final class CreateMD extends DrbdConfig {
         for (int i = 0; i < 2; i++) {
             try {
                 thread[i].join(0);
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             if (returnCode[i] == CREATE_MD_FS_ALREADY_THERE_RC) {
-                answer[i] = Tools.getString(
+                answerStore[i] = Tools.getString(
                                "Dialog.DrbdConfig.CreateMD.CreateMD.Failed.40");
                 error = true;
             } else if (returnCode[i] > 0) {
-                answer[i] = Tools.getString(
+                answerStore[i] = Tools.getString(
                                   "Dialog.DrbdConfig.CreateMD.CreateMD.Failed")
-                                  + answer[i];
+                                  + answerStore[i];
                 error = true;
             } else {
-                answer[i] = Tools.getString(
+                answerStore[i] = Tools.getString(
                                    "Dialog.DrbdConfig.CreateMD.CreateMD.Done");
             }
-            answer[i] = answer[i].replaceAll(
+            answerStore[i] = answerStore[i].replaceAll(
                          "@HOST@",
                          Matcher.quoteReplacement(bdis[i].getHost().getName()));
         }
         if (error) {
-            answerPaneSetTextError(Tools.join("\n", answer));
+            answerPaneSetTextError(Tools.join("\n", answerStore));
         } else {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMDButton.setEnabled(false);
                     buttonClass(nextButton()).setEnabled(true);
-                    if (Tools.getConfigData().getAutoOptionGlobal(
+                    if (Tools.getApplication().getAutoOptionGlobal(
                                                         "autodrbd") != null) {
                         pressNextButton();
                     }
                 }
             });
-            answerPaneSetText(Tools.join("\n", answer));
+            answerPaneSetText(Tools.join("\n", answerStore));
         }
     }
 
@@ -200,29 +198,29 @@ final class CreateMD extends DrbdConfig {
     public WizardDialog nextDialog() {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
-        final boolean testOnly = false;
         final String clusterName = bdi1.getHost().getCluster().getName();
         Tools.startProgressIndicator(clusterName, "scanning block devices...");
+        final Application.RunMode runMode = Application.RunMode.LIVE;
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
             DRBD.proxyUp(bdi1.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                          null,
-                         testOnly);
+                         runMode);
         }
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi2.getHost())) {
             DRBD.proxyUp(bdi2.getHost(),
                          getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                          null,
-                         testOnly);
+                         runMode);
         }
         DRBD.adjustApply(bdi1.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
-                    testOnly);
+                    runMode);
         DRBD.adjustApply(bdi2.getHost(),
                     getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
                     getDrbdVolumeInfo().getName(),
-                    testOnly);
+                    runMode);
         final String device = getDrbdVolumeInfo().getDevice();
         final ClusterBrowser browser =
                         getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
@@ -271,7 +269,7 @@ final class CreateMD extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -302,15 +300,14 @@ final class CreateMD extends DrbdConfig {
             makeMDButton.setEnabled(true);
             makeMDButton.setText(
                  Tools.getString("Dialog.DrbdConfig.CreateMD.CreateMDButton"));
-            final String metadataDefault = createNewMetadata;
             metadataWi = WidgetFactory.createInstance(
                                         Widget.Type.COMBOBOX,
-                                        new StringValue(metadataDefault),
+                                        new StringValue(createNewMetadata),
                                         choices,
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(ConfigData.AccessType.RO,
+                                        new AccessMode(Application.AccessType.RO,
                                                        !AccessMode.ADVANCED),
                                         Widget.NO_BUTTON);
         } else {
@@ -321,7 +318,7 @@ final class CreateMD extends DrbdConfig {
             makeMDButton.setText(
                Tools.getString("Dialog.DrbdConfig.CreateMD.OverwriteMDButton"));
             String metadataDefault = useExistingMetadata;
-            if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+            if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
                 metadataDefault = createNewMetadata;
                 makeMDButton.setEnabled(true);
             }
@@ -332,7 +329,7 @@ final class CreateMD extends DrbdConfig {
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(ConfigData.AccessType.RO,
+                                        new AccessMode(Application.AccessType.RO,
                                                        !AccessMode.ADVANCED),
                                         Widget.NO_BUTTON);
         }

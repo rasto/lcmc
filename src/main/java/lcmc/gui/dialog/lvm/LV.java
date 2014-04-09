@@ -27,11 +27,10 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.BlockDevInfo;
 import lcmc.utilities.Unit;
 import javax.swing.JComponent;
-import java.util.List;
 
 /** LVM dialogs. */
 class LV extends WizardDialog {
-    /** Prepares a new <code>LV</code> object. */
+    /** Prepares a new {@code LV} object. */
     protected LV(final WizardDialog previousDialog) {
         super(previousDialog);
     }
@@ -70,7 +69,7 @@ class LV extends WizardDialog {
         return null;
     }
 
-    protected boolean isOneDrbd(final List<BlockDevInfo> bdis) {
+    protected boolean isOneDrbd(final Iterable<BlockDevInfo> bdis) {
         for (final BlockDevInfo bdi : bdis) {
             if (bdi.getBlockDevice().isDrbd()) {
                 return true;

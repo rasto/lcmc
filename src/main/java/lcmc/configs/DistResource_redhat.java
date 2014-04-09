@@ -23,11 +23,12 @@
 package lcmc.configs;
 
 import java.util.Arrays;
+import java.util.ListResourceBundle;
 
 /**
  * Here are commands for all redhats.
  */
-public final class DistResource_redhat extends java.util.ListResourceBundle {
+public final class DistResource_redhat extends ListResourceBundle {
 
     /** Get contents. */
     @Override

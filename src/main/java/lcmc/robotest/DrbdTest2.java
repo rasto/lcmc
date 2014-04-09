@@ -42,9 +42,9 @@ final class DrbdTest2 {
     }
 
     static void start(final Cluster cluster, final int blockDevY) {
-        final String drbdTest = "drbd-test1";
         slowFactor = 0.2f;
         aborted = false;
+        final String drbdTest = "drbd-test1";
         for (int i = 0; i < 2; i++) {
             info(drbdTest + "/1");
             addDrbdResource(cluster, blockDevY);

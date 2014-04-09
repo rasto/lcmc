@@ -31,10 +31,6 @@ import lcmc.gui.dialog.WizardDialog;
 
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
@@ -50,6 +46,10 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Component;
 import java.awt.LayoutManager;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
@@ -60,8 +60,6 @@ import java.awt.LayoutManager;
  *
  */
 final class ClusterHosts extends DialogCluster {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Map from checkboxes to the host, which they choose. */
     private final Map<JCheckBox, Host> checkBoxToHost =
                                     new LinkedHashMap<JCheckBox, Host>();
@@ -74,7 +72,7 @@ final class ClusterHosts extends DialogCluster {
     ///** Whether the scrolling pane was already moved. */
     //private volatile boolean alreadyMoved = false;
 
-    /** Prepares a new <code>ClusterHosts</code> object. */
+    /** Prepares a new {@code ClusterHosts} object. */
     ClusterHosts(final WizardDialog previousDialog,
                  final Cluster cluster) {
         super(previousDialog, cluster);
@@ -84,9 +82,9 @@ final class ClusterHosts extends DialogCluster {
     @Override
     protected void finishDialog() {
         getCluster().clearHosts();
-        for (final JCheckBox button : checkBoxToHost.keySet()) {
-            if (button.isSelected()) {
-                final Host host = checkBoxToHost.get(button);
+        for (final Map.Entry<JCheckBox, Host> checkBoxEntry : checkBoxToHost.entrySet()) {
+            if (checkBoxEntry.getKey().isSelected()) {
+                final Host host = checkBoxEntry.getValue();
                 host.setCluster(getCluster());
                 getCluster().addHost(host);
             }
@@ -112,7 +110,7 @@ final class ClusterHosts extends DialogCluster {
 
     /** Checks whether at least two hosts are selected for the cluster. */
     protected void checkCheckBoxes() {
-        Tools.getConfigData().getHosts().removeHostsFromCluster(getCluster());
+        Tools.getApplication().getHosts().removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
             if (button.isSelected()) {
@@ -120,17 +118,17 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         boolean enable = true;
-        final List<String> hostnames = new ArrayList<String>();
+        final Collection<String> hostnames = new ArrayList<String>();
         if (selected < 1
             || (selected == 1
-                && !Tools.getConfigData().isOneHostCluster())) {
+                && !Tools.getApplication().isOneHostCluster())) {
             enable = false;
         } else {
             /* check if some of the hosts are the same. It will not work all
              * the time if hops are used. */
-            for (final JCheckBox button : checkBoxToHost.keySet()) {
-                if (button.isSelected() && button.isEnabled()) {
-                    final Host host = checkBoxToHost.get(button);
+            for (final Map.Entry<JCheckBox, Host> checkBoxEntry : checkBoxToHost.entrySet()) {
+                if (checkBoxEntry.getKey().isSelected() && checkBoxEntry.getKey().isEnabled()) {
+                    final Host host = checkBoxEntry.getValue();
                     final String hostname = host.getHostname();
                     if (hostnames.contains(hostname)) {
                         enable = false;
@@ -147,7 +145,7 @@ final class ClusterHosts extends DialogCluster {
                 buttonClass(nextButton()).setEnabled(enableButton);
             }
         });
-        if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -193,7 +191,7 @@ final class ClusterHosts extends DialogCluster {
         /* Hosts */
         final ScrollableFlowPanel p1 =
             new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
-        final Hosts hosts = Tools.getConfigData().getHosts();
+        final Hosts hosts = Tools.getApplication().getHosts();
 
         final ItemListener chListener = new ItemListener() {
                 @Override
@@ -209,8 +207,8 @@ final class ClusterHosts extends DialogCluster {
                 if (!getCluster().getHosts().contains(host)
                     && !host.isInCluster()) {
                     if (lastHost2 != null
-                        && lastHost2.getIp() != null
-                        && lastHost2.getIp().equals(host.getIp())) {
+                        && lastHost2.getIpAddress() != null
+                        && lastHost2.getIpAddress().equals(host.getIpAddress())) {
                         lastHost2 = host;
                     } else {
                         lastHost1 = lastHost2;
@@ -222,11 +220,9 @@ final class ClusterHosts extends DialogCluster {
         final JScrollPane sp = new JScrollPane(p1,
                                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        JCheckBox lastButton = null;
         for (final Host host : hosts.getHostsArray()) {
             final JCheckBox button = new JCheckBox(host.getName(),
                                                    HOST_UNCHECKED_ICON);
-            lastButton = button;
             button.setBackground(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
             button.setSelectedIcon(HOST_CHECKED_ICON);

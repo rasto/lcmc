@@ -22,14 +22,11 @@
 
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Widget;
-import lcmc.data.Host;
-import lcmc.data.CRMXML;
-import lcmc.data.ClusterStatus;
 import lcmc.data.resources.Service;
-import lcmc.data.ConfigData;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.Exceptions;
@@ -38,8 +35,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -62,7 +59,7 @@ final class HbOrderInfo extends EditableInfo
     public static final String NOT_AVAIL_FOR_PCMK_VERSION =
                     Tools.getString("HbOrderInfo.NotAvailableForThisVersion");
 
-    /** Prepares a new <code>HbOrderInfo</code> object. */
+    /** Prepares a new {@code HbOrderInfo} object. */
     HbOrderInfo(final HbConnectionInfo connectionInfo,
                 final ServiceInfo serviceInfoParent,
                 final ServiceInfo serviceInfoChild,
@@ -105,8 +102,8 @@ final class HbOrderInfo extends EditableInfo
         } else if (serviceInfoParent.isConstraintPH()
                    || serviceInfoChild.isConstraintPH()) {
             /* rsc set edge */
-            ConstraintPHInfo cphi;
-            CRMXML.RscSet rscSet;
+            final ConstraintPHInfo cphi;
+            final CRMXML.RscSet rscSet;
             if (serviceInfoParent.isConstraintPH()) {
                 cphi = (ConstraintPHInfo) serviceInfoParent;
                 rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -134,7 +131,7 @@ final class HbOrderInfo extends EditableInfo
 
         final String[] params = getParametersFromXML();
         if (params != null) {
-            for (String param : params) {
+            for (final String param : params) {
                 Value value = resourceNode.get(param);
                 if (value == null || value.isNothingSelected()) {
                     value = getParamDefault(param);
@@ -221,8 +218,8 @@ final class HbOrderInfo extends EditableInfo
 
     /** Returns when at least one resource in rsc set can be promoted. */
     private boolean isRscSetMaster() {
-        ConstraintPHInfo cphi;
-        CRMXML.RscSet rscSet;
+        final ConstraintPHInfo cphi;
+        final CRMXML.RscSet rscSet;
         if (serviceInfoParent.isConstraintPH()) {
             cphi = (ConstraintPHInfo) serviceInfoParent;
             rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -319,7 +316,7 @@ final class HbOrderInfo extends EditableInfo
 
     /** Applies changes to the order parameters. */
     @Override
-    public void apply(final Host dcHost, final boolean testOnly) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         boolean changed = false;
@@ -336,7 +333,6 @@ final class HbOrderInfo extends EditableInfo
             final String ordId = getService().getHeartbeatId();
             if (serviceInfoParent == null || serviceInfoChild == null) {
                 /* rsc set order */
-                final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 final PcmkRscSetsInfo prsi = (PcmkRscSetsInfo) connectionInfo;
                 CRM.setRscSet(dcHost,
                               null,
@@ -348,13 +344,13 @@ final class HbOrderInfo extends EditableInfo
                                                     null,
                                                     null,
                                                     false,
-                                                    testOnly),
+                                                    runMode),
                               attrs,
-                              testOnly);
+                              runMode);
             } else if (serviceInfoParent.isConstraintPH()
                        || serviceInfoChild.isConstraintPH()) {
-                ConstraintPHInfo cphi;
-                CRMXML.RscSet rscSet;
+                final ConstraintPHInfo cphi;
+                final CRMXML.RscSet rscSet;
                 if (serviceInfoParent.isConstraintPH()) {
                     cphi = (ConstraintPHInfo) serviceInfoParent;
                     rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -374,18 +370,18 @@ final class HbOrderInfo extends EditableInfo
                                                     rscSet,
                                                     attrs,
                                                     false,
-                                                    testOnly),
+                                                    runMode),
                               prsi.getOrderAttributes(ordId),
-                              testOnly);
+                              runMode);
             } else {
                 CRM.addOrder(dcHost,
                              ordId,
-                             serviceInfoParent.getHeartbeatId(testOnly),
-                             serviceInfoChild.getHeartbeatId(testOnly),
+                             serviceInfoParent.getHeartbeatId(runMode),
+                             serviceInfoChild.getHeartbeatId(runMode),
                              attrs,
-                             testOnly);
+                             runMode);
             }
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 storeComboBoxValues(params);
             }
         }
@@ -449,7 +445,7 @@ final class HbOrderInfo extends EditableInfo
                 if (pmV == null || Tools.compareVersions(pmV, "1.1.7") <= 0) {
                     return NOT_AVAIL_FOR_PCMK_VERSION;
                 }
-            } catch (Exceptions.IllegalVersionException e) {
+            } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("isEnabled: unkonwn version: " + pmV);
                 /* enable it, if version check doesn't work */
             }
@@ -459,9 +455,9 @@ final class HbOrderInfo extends EditableInfo
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(
+    protected Application.AccessType getAccessType(
                                                         final String param) {
-        return ConfigData.AccessType.ADMIN;
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns the score of this order. */
@@ -495,9 +491,8 @@ final class HbOrderInfo extends EditableInfo
      * connection with this constraint.
      */
     @Override
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
+    Check checkResourceFields(final String param, final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /**
@@ -505,38 +500,13 @@ final class HbOrderInfo extends EditableInfo
      * connection with this constraint.
      */
     @Override
-    public boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params,
-                                              final boolean fromUp) {
+    public Check checkResourceFields(final String param,
+                                     final String[] params,
+                                     final boolean fromUp) {
         if (fromUp) {
-            return super.checkResourceFieldsCorrect(param, params);
+            return super.checkResourceFields(param, params);
         } else {
-            return connectionInfo.checkResourceFieldsCorrect(param, null);
-        }
-    }
-
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
-    @Override
-    boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
-    }
-
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
-    @Override
-    public boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params,
-                                              final boolean fromUp) {
-        if (fromUp) {
-            return super.checkResourceFieldsChanged(param, params);
-        } else {
-            return connectionInfo.checkResourceFieldsChanged(param, null);
+            return connectionInfo.checkResourceFields(param, null);
         }
     }
 }

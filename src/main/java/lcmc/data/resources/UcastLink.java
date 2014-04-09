@@ -35,15 +35,13 @@ import lcmc.utilities.Unit;
  *
  */
 public final class UcastLink extends Resource implements Value {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Host object. */
     private final Host host;
     /** Net interface. */
     private final NetInterface netInterface;
 
     /**
-     * Prepares a new <code>UcastLink</code> object.
+     * Prepares a new {@code UcastLink} object.
      */
     public UcastLink(final Host host, final NetInterface netInterface) {
         super();
@@ -54,7 +52,7 @@ public final class UcastLink extends Resource implements Value {
     /** Rerurns the string. */
     @Override
     public String toString() {
-        return host.getName() + ":" + netInterface.getName();
+        return host.getName() + ':' + netInterface.getName();
     }
 
     /** Returns net interface. */

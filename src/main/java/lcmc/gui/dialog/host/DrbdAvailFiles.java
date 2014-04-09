@@ -23,9 +23,8 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.Component;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
@@ -42,8 +41,6 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -55,8 +52,6 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public class DrbdAvailFiles extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Combo box with drbd versions. */
@@ -66,7 +61,7 @@ public class DrbdAvailFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /** Prepares a new <code>DrbdAvailFiles</code> object. */
+    /** Prepares a new {@code DrbdAvailFiles} object. */
     public DrbdAvailFiles(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -114,10 +109,10 @@ public class DrbdAvailFiles extends DialogHost {
                           null, /* ProgresBar */
                           new ExecCallback() {
                             @Override
-                            public void done(final String ans) {
+                            public void done(final String answer) {
                                 String defaultValue =
                                             getHost().getDrbdBuildToInstall();
-                                final String[] items = ans.split("\\r?\\n");
+                                final String[] items = answer.split("\\r?\\n");
                                 boolean found = false;
                                 for (final String item : items) {
                                     if (item.equals(defaultValue)) {
@@ -150,16 +145,16 @@ public class DrbdAvailFiles extends DialogHost {
                             }
 
                             @Override
-                            public void doneError(final String ans,
-                                                  final int exitCode) {
+                            public void doneError(final String answer,
+                                                  final int errorCode) {
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         printErrorAndRetry(
                                          Tools.getString(
                                          "Dialog.Host.DrbdAvailFiles.NoBuilds"),
-                                         ans,
-                                         exitCode);
+                                                answer,
+                                                errorCode);
                                     }
                                 });
                             }
@@ -176,10 +171,10 @@ public class DrbdAvailFiles extends DialogHost {
                       null, /* ProgresBar */
                       new ExecCallback() {
                         @Override
-                        public void done(final String ans) {
+                        public void done(final String answer) {
                             final List<String> files = new ArrayList<String>(
                                                         Arrays.asList(
-                                                         ans.split("\\r?\\n")));
+                                                         answer.split("\\r?\\n")));
                             if (files.size() >= 2) {
                                 if (files.size() > 4) {
                                     /* remove the virtual package. */
@@ -209,16 +204,16 @@ public class DrbdAvailFiles extends DialogHost {
                         }
 
                         @Override
-                        public void doneError(final String ans,
-                                                        final int exitCode) {
+                        public void doneError(final String answer,
+                                              final int errorCode) {
                             Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     printErrorAndRetry(
                                      Tools.getString(
                                       "Dialog.Host.DrbdAvailFiles.NoBuilds"),
-                                     ans,
-                                     exitCode);
+                                            answer,
+                                            errorCode);
                                 }
                             });
                         }
@@ -241,7 +236,7 @@ public class DrbdAvailFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -283,7 +278,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         pane.add(drbdVersionCombo.getComponent());
@@ -296,7 +291,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 

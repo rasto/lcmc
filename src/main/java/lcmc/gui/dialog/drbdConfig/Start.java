@@ -23,9 +23,9 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.Info;
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.BlockDevInfo;
@@ -33,8 +33,6 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -44,8 +42,6 @@ import javax.swing.SpringLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
@@ -56,8 +52,6 @@ import lcmc.data.Value;
  *
  */
 public final class Start extends WizardDialog {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** DRBD resource pulldown menu. */
     private Widget drbdResourceWi;
     /** Width of the combo boxes. */
@@ -71,7 +65,7 @@ public final class Start extends WizardDialog {
     /** DRBD resource info object. */
     private DrbdResourceInfo drbdResourceInfo;
 
-    /** Prepares a new <code>Start</code> object. */
+    /** Prepares a new {@code Start} object. */
     public Start(final WizardDialog previousDialog,
                  final DrbdInfo drbdInfo,
                  final BlockDevInfo blockDevInfo1,
@@ -86,9 +80,9 @@ public final class Start extends WizardDialog {
     @Override
     public WizardDialog nextDialog() {
         boolean newResource = false;
-        final Info i = (Info) drbdResourceWi.getValue();
+        final Value i = drbdResourceWi.getValue();
         if (i == null || i.isNothingSelected()) {
-            final List<BlockDevInfo> bdis =
+            final Iterable<BlockDevInfo> bdis =
                     new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
                                                               blockDevInfo2));
             drbdResourceInfo = drbdInfo.getNewDrbdResource(
@@ -146,7 +140,7 @@ public final class Start extends WizardDialog {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -174,7 +168,7 @@ public final class Start extends WizardDialog {
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.RO,
+                                    new AccessMode(Application.AccessType.RO,
                                                    !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(drbdResourceLabel);

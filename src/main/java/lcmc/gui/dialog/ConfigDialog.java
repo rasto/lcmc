@@ -26,34 +26,28 @@ import lcmc.utilities.Tools;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JApplet;
-import javax.swing.JFrame;
-
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Point;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Arrays;
-
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JApplet;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.ActionEvent;
@@ -61,6 +55,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import java.beans.PropertyChangeEvent;
@@ -76,8 +78,6 @@ import java.beans.PropertyChangeListener;
  * @version $Id$
  */
 public abstract class ConfigDialog {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** The whole option pane. */
     private volatile JOptionPane optionPane;
     /** dialog panel. */
@@ -92,7 +92,7 @@ public abstract class ConfigDialog {
     /** Answer pane. The pane were texts can be easily written. */
     private JEditorPane answerPane = null;
     /** Components that were disabled and can be enabled later. */
-    private final List<Component> disabledComponents =
+    private final Collection<Component> disabledComponents =
                                                 new ArrayList<Component>();
     /** Size of the imput pane. */
     private static final int INPUT_PANE_HEIGHT = 200;
@@ -147,7 +147,7 @@ public abstract class ConfigDialog {
         answerPane = new JEditorPane(Tools.MIME_TYPE_TEXT_PLAIN, initialText);
         answerPane.setBackground(
                             Tools.getDefaultColor("ConfigDialog.AnswerPane"));
-        answerPane.setForeground(java.awt.Color.WHITE);
+        answerPane.setForeground(Color.WHITE);
         //answerPane.setBackground(
         //                    Tools.getDefaultColor("ConfigDialog.AnswerPane"));
         //descSP.setBorder(null);
@@ -226,15 +226,15 @@ public abstract class ConfigDialog {
      */
     protected final JPanel body() {
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         final JEditorPane descPane = new JEditorPane(
            Tools.MIME_TYPE_TEXT_HTML,
            "<span style='font:bold italic;font-family:Dialog; font-size:"
-           + Tools.getConfigData().scaled(14)
+           + Tools.getApplication().scaled(14)
            + ";'>"
            + getDialogTitle() + "</span><br>"
            + "<span style='font-family:Dialog; font-size:"
-           + Tools.getConfigData().scaled(12)
+           + Tools.getApplication().scaled(12)
            + ";'>"
            + getDescription() + "</span>");
         descPane.setSize(300, Integer.MAX_VALUE);
@@ -428,10 +428,7 @@ public abstract class ConfigDialog {
 
     /** Returns whether skip button is selected. */
     protected final boolean skipButtonIsSelected() {
-        if (skipButton != null) {
-            return skipButton.isSelected();
-        }
-        return false;
+        return skipButton != null && skipButton.isSelected();
     }
 
     /** Enable/disable skip button. */
@@ -455,8 +452,7 @@ public abstract class ConfigDialog {
         initDialogBeforeCreated();
         if (dialogPanel == null) {
             final ImageIcon[] icons = getIcons();
-            MyButton defaultButtonClass = null;
-            final List<JComponent> allOptions =
+            final Collection<JComponent> allOptions =
                                 new ArrayList<JComponent>(additionalOptions);
             if (skipButtonEnabled()) {
                 skipButton = new JCheckBox(Tools.getString(
@@ -469,6 +465,7 @@ public abstract class ConfigDialog {
             }
             final String[] buttons = buttons();
             /* populate buttonToObjectMap */
+            MyButton defaultButtonClass = null;
             for (int i = 0; i < buttons.length; i++) {
                 options[i] = new MyButton(buttons[i], icons[i]);
                 options[i].setBackgroundColor(
@@ -513,7 +510,7 @@ public abstract class ConfigDialog {
                         dialogPanel = new JDialog(noframe);
                         dialogPanel.setContentPane(optionPane);
                     } else {
-                        dialogPanel = new JDialog((JFrame) mainFrame);
+                        dialogPanel = new JDialog((Frame) mainFrame);
                         dialogPanel.setContentPane(optionPane);
                     }
                     dialogPanel.addWindowListener(new WindowAdapter() {
@@ -579,7 +576,7 @@ public abstract class ConfigDialog {
         initDialogAfterVisible();
         try {
             dialogGate.await();
-        } catch (InterruptedException ignored) {
+        } catch (final InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
 
@@ -637,7 +634,7 @@ public abstract class ConfigDialog {
      * the ones that are in componentsToDisable array.
      */
     protected void enableComponents(final JComponent[] componentsToDisable) {
-        final HashSet<Component> ctdHash =
+        final Collection<Component> ctdHash =
                 new HashSet<Component>(Arrays.asList(componentsToDisable));
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
@@ -661,9 +658,7 @@ public abstract class ConfigDialog {
      */
     protected void enableComponentsLater(
                                     final JComponent[] componentsToEnable) {
-        for (final JComponent c : componentsToEnable) {
-            disabledComponents.add(c);
-        }
+        Collections.addAll(disabledComponents, componentsToEnable);
     }
 
     /** Enables components that were disabled with disableComponents. */
@@ -684,7 +679,7 @@ public abstract class ConfigDialog {
          * Action performered on custom button.
          */
         @Override
-        public void actionPerformed(final ActionEvent event) {
+        public void actionPerformed(final ActionEvent e) {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -692,7 +687,7 @@ public abstract class ConfigDialog {
                         @Override
                         public void run() {
                             optionPane.setValue(
-                                      ((JButton) event.getSource()).getText());
+                                      ((AbstractButton) e.getSource()).getText());
                         }
                     });
                 }
@@ -705,7 +700,7 @@ public abstract class ConfigDialog {
     protected final JPanel getComponentPanel(final String text,
                                              final Component component) {
         final JPanel mp = new JPanel(
-                     new FlowLayout(FlowLayout.LEFT, 0, 0));
+                     new FlowLayout(FlowLayout.LEADING, 0, 0));
         mp.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mp.add(new JLabel(text));
         mp.add(new JLabel(" "));

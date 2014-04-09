@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import lcmc.data.Application;
 
 
 /**
@@ -39,7 +40,7 @@ public class CategoryInfo extends Info {
     /** Main table. */
     public static final String MAIN_TABLE = "main";
     /**
-     * Prepares a new <code>CategoryInfo</code> object.
+     * Prepares a new {@code CategoryInfo} object.
      */
     public CategoryInfo(final String name, final Browser browser) {
         super(name, browser);
@@ -53,7 +54,7 @@ public class CategoryInfo extends Info {
 
     /** Returns the icon. */
     @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
+    public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return Browser.CATEGORY_ICON;
     }
 
@@ -68,7 +69,7 @@ public class CategoryInfo extends Info {
             infoPanel = super.getInfoPanel();
         } else {
             infoPanel = new JPanel();
-            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+            infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
             infoPanel.setBackground(Browser.PANEL_BACKGROUND);
             final JComponent backButton = getBackButton();
             if (backButton != null) {

@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 
@@ -39,12 +38,10 @@ import java.util.HashSet;
  * @version $Id$
  */
 public class ClusterLogs extends Logs {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Cluster object. */
     private final Cluster cluster;
 
-    /** Prepares a new <code>ClusterLogs</code> object. */
+    /** Prepares a new {@code ClusterLogs} object. */
     public ClusterLogs(final Cluster cluster) {
         super();
         this.cluster = cluster;
@@ -59,21 +56,6 @@ public class ClusterLogs extends Logs {
     @Override
     protected final Host[] getHosts() {
         return cluster.getHostsArray();
-    }
-
-    /**
-     * Command that gets the log. The command must be specified in the
-     * DistResource or some such.
-     */
-    @Override
-    protected String logFileCommand() {
-        return "Logs.hbLog";
-    }
-
-    /** Gets the title of the dialog as string. */
-    @Override
-    protected final String getDialogTitle() {
-        return Tools.getString("Dialog.ClusterLogs.Title");
     }
 
     /** Returns a map from pattern name to its pattern. */

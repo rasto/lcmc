@@ -22,9 +22,7 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.TerminalPanel;
@@ -40,8 +38,9 @@ import java.awt.Component;
 import java.awt.BorderLayout;
 import java.util.List;
 import java.util.ArrayList;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+
+import lcmc.gui.widget.Check;
+import lcmc.utilities.MyButton;
 
 
 /**
@@ -53,8 +52,6 @@ import lcmc.data.Value;
  *
  */
 public class NewHost extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** hostField can be ip or hostname with or without domainname. */
     private Widget hostField;
     /** User name field. */
@@ -76,7 +73,7 @@ public class NewHost extends DialogHost {
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
 
-    /** Prepares a new <code>NewHost</code> object. */
+    /** Prepares a new {@code NewHost} object. */
     public NewHost(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -88,16 +85,16 @@ public class NewHost extends DialogHost {
         getHost().setHostnameEntered(hostnameEntered);
         final String username = usernameField.getStringValue().trim();
         getHost().setUsername(username);
-        Tools.getConfigData().setLastEnteredUser(username);
+        Tools.getApplication().setLastEnteredUser(username);
         final String sshPort = sshPortField.getStringValue().trim();
         getHost().setSSHPort(sshPort);
-        Tools.getConfigData().setLastEnteredSSHPort(sshPort);
+        Tools.getApplication().setLastEnteredSSHPort(sshPort);
         final String useSudoString = useSudoField.getStringValue().trim();
         getHost().setUseSudo("true".equals(useSudoString));
-        Tools.getConfigData().setLastEnteredUseSudo(
+        Tools.getApplication().setLastEnteredUseSudo(
                                                 "true".equals(useSudoString));
-        if (!Tools.getConfigData().existsHost(getHost())) {
-            Tools.getConfigData().addHostToHosts(getHost());
+        if (!Tools.getApplication().existsHost(getHost())) {
+            Tools.getApplication().addHostToHosts(getHost());
             final TerminalPanel terminalPanel = new TerminalPanel(getHost());
             Tools.getGUIData().setTerminalPanel(terminalPanel);
         }
@@ -118,11 +115,12 @@ public class NewHost extends DialogHost {
         final String hs = hostField.getStringValue().trim();
         final String us = usernameField.getStringValue().trim();
         final String ps = sshPortField.getStringValue().trim();
-        boolean hf = (hs.length() > 0);
-        boolean uf = (us.length() > 0);
-        final boolean pf = (ps.length() > 0);
+        boolean hf = (!hs.isEmpty());
+        boolean uf = (!us.isEmpty());
+        final boolean pf = (!ps.isEmpty());
         final int hc = Tools.charCount(hs, ',');
         final int uc = Tools.charCount(us, ',');
+        final List<String> incorrect = new ArrayList<String>();
         if (hf && uf) {
             if (hc != uc) {
                 uf = false;
@@ -159,6 +157,7 @@ public class NewHost extends DialogHost {
             });
         } else {
             hostField.wrongValue();
+            incorrect.add("host");
         }
 
         if (uf) {
@@ -181,6 +180,7 @@ public class NewHost extends DialogHost {
             });
         } else {
             usernameField.wrongValue();
+            incorrect.add("username");
         }
 
         if (pf) {
@@ -194,19 +194,11 @@ public class NewHost extends DialogHost {
             });
         } else {
             sshPortField.wrongValue();
+            incorrect.add("SSH port");
         }
 
-        final boolean hostF = hf;
-        final boolean userF = hf;
-        final boolean sshPortF = pf;
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final JComponent btn : nextButtons()) {
-                    btn.setEnabled(hostF && userF && sshPortF);
-                }
-            }
-        });
+        final List<String> changed = new ArrayList<String>();
+        enableNextButtons(incorrect, changed);
     }
 
     /**
@@ -231,26 +223,26 @@ public class NewHost extends DialogHost {
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog. */
     @Override
     protected final void initDialogAfterVisible() {
         enableComponents();
-        checkFields((Widget) null);
+        makeDefaultButton(buttonClass(nextButton()));
+        checkFields(null);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hostField.requestFocus();
             }
         });
-        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setValue(
-                                new StringValue(Tools.getConfigData().getAutoHosts().get(0)));
+                                new StringValue(Tools.getApplication().getAutoHosts().get(0)));
                 }
             });
             Tools.sleep(3000);
@@ -274,14 +266,14 @@ public class NewHost extends DialogHost {
         final JLabel hostLabel = new JLabel(
                         Tools.getString("Dialog.Host.NewHost.EnterHost"));
         inputPane.add(hostLabel);
-        final String regexp = "^[,\\w.-]+$";
         final String hostname = getHost().getHostname();
-        String hn;
+        final String hn;
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
             hn = getHost().getHostnameEntered();
         } else {
             hn = hostname;
         }
+        final String regexp = "^[,\\w.-]+$";
         hostField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
                                        new StringValue(hn),
@@ -289,7 +281,7 @@ public class NewHost extends DialogHost {
                                        regexp,
                                        FIELD_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
@@ -315,7 +307,7 @@ public class NewHost extends DialogHost {
         inputPane.add(sshPortLabel);
         String sshPort = getHost().getSSHPort();
         if (sshPort == null) {
-            sshPort = Tools.getConfigData().getLastEnteredSSHPort();
+            sshPort = Tools.getApplication().getLastEnteredSSHPort();
             if (sshPort == null) {
                 sshPort = SSH_PORT;
             }
@@ -327,7 +319,7 @@ public class NewHost extends DialogHost {
                                       "^\\d+$",
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         addCheckField(sshPortField);
@@ -345,7 +337,7 @@ public class NewHost extends DialogHost {
         inputPane.add(usernameLabel);
         String userName = getHost().getUsername();
         if (userName == null) {
-            userName = Tools.getConfigData().getLastEnteredUser();
+            userName = Tools.getApplication().getLastEnteredUser();
             if (userName == null) {
                 userName = SSH_ROOT_USER;
             }
@@ -363,7 +355,7 @@ public class NewHost extends DialogHost {
                                    regexp,
                                    FIELD_WIDTH,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.RO,
+                                   new AccessMode(Application.AccessType.RO,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
         usernameField.setEditable(true);
@@ -380,7 +372,7 @@ public class NewHost extends DialogHost {
         inputPane.add(useSudoLabel);
         Boolean useSudo = getHost().isUseSudo();
         if (useSudo == null) {
-            useSudo = Tools.getConfigData().getLastEnteredUseSudo();
+            useSudo = Tools.getApplication().getLastEnteredUseSudo();
             if (useSudo == null) {
                 useSudo = false;
             }
@@ -394,7 +386,7 @@ public class NewHost extends DialogHost {
                                       Widget.NO_REGEXP,
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         //addCheckField(useSudoField);
@@ -407,12 +399,7 @@ public class NewHost extends DialogHost {
         SpringUtilities.makeCompactGrid(inputPane, 2, 4,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad
-        p.add(inputPane, BorderLayout.SOUTH);
+        p.add(inputPane, BorderLayout.PAGE_END);
         return p;
-    }
-
-    /** Buttons that are enabled/disabled during checks. */
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton())};
     }
 }

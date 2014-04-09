@@ -29,11 +29,13 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+import lcmc.data.Application;
 import lcmc.data.Value;
 
 /**
  * This class holds info data for a net interface.
  */
+@SuppressWarnings("SingleCharacterStringConcatenation")
 public class NetInfo extends Info {
     /** Net interface icon. */
     static final ImageIcon NET_I_ICON = Tools.createImageIcon(
@@ -43,7 +45,7 @@ public class NetInfo extends Info {
                               Tools.getDefault("HostBrowser.NetIntIconLarge"));
     /** Placeholder where user can enter an ip. */
     public static final String IP_PLACEHOLDER = "--.--.--.--";
-    /** Prepares a new <code>NetInfo</code> object. */
+    /** Prepares a new {@code NetInfo} object. */
     public NetInfo(final String name,
                    final NetInterface netInterface,
                    final Browser browser) {
@@ -74,7 +76,6 @@ public class NetInfo extends Info {
             }
         };
         final Thread thread = new Thread(runnable);
-        thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
 
@@ -84,14 +85,14 @@ public class NetInfo extends Info {
         final StringBuilder s = new StringBuilder(getName());
         final String ip = getNetInterface().getIp();
         if (ip != null) {
-            s.append(" (").append(ip).append(")");
+            s.append(" (").append(ip).append(')');
         }
         return s.toString();
     }
 
     /** Returns icon of the net interface for the menu. */
     @Override
-    public final ImageIcon getMenuIcon(final boolean testOnly) {
+    public final ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return NET_I_ICON;
     }
 
@@ -130,7 +131,7 @@ public class NetInfo extends Info {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

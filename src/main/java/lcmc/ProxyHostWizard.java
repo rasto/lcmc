@@ -47,7 +47,7 @@ public final class ProxyHostWizard {
     private final Host host;
 
 
-    /** Prepares new <code>ProxyHostWizard</code> object. */
+    /** Prepares new {@code ProxyHostWizard} object. */
     public ProxyHostWizard(final Host host,
                            final DrbdVolumeInfo drbdVolumeInfo) {
         this.host = host;

@@ -28,7 +28,7 @@ import lcmc.gui.resources.BlockDevInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.data.Host;
 import lcmc.gui.widget.Widget;
@@ -53,8 +53,6 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public final class LVSnapshot extends LV {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** LV Snapshot timeout. */
     private static final int SNAPSHOT_TIMEOUT = 5000;
     /** Block device info object. */
@@ -70,12 +68,6 @@ public final class LVSnapshot extends LV {
     public LVSnapshot(final BlockDevInfo blockDevInfo) {
         super(null);
         this.blockDevInfo = blockDevInfo;
-    }
-
-    /** Finishes the dialog and sets the information. */
-    @Override
-    protected void finishDialog() {
-        /* disable finish button */
     }
 
     /** Returns the title of the dialog. */
@@ -184,7 +176,7 @@ public final class LVSnapshot extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.OP,
+                                      new AccessMode(Application.AccessType.OP,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
@@ -209,7 +201,7 @@ public final class LVSnapshot extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(ConfigData.AccessType.OP,
+                       new AccessMode(Application.AccessType.OP,
                                       !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
@@ -254,7 +246,7 @@ public final class LVSnapshot extends LV {
                         Widget.NO_REGEXP,
                         250,
                         Widget.NO_ABBRV,
-                        new AccessMode(ConfigData.AccessType.OP,
+                        new AccessMode(Application.AccessType.OP,
                                        !AccessMode.ADVANCED),
                         Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
@@ -288,12 +280,12 @@ public final class LVSnapshot extends LV {
                             blockDevInfo.getBlockDevice().getVolumeGroup();
         final boolean ret = blockDevInfo.lvSnapshot(lvName,
                                                     size,
-                                                    false);
+                                                    Application.RunMode.LIVE);
         if (ret) {
             answerPaneSetText("Logical volume "
                               + lvName
                               + " was successfully created on "
-                              + volumeGroup + ".");
+                              + volumeGroup + '.');
         } else {
             answerPaneSetTextError("Creating of logical volume "
                                    + lvName

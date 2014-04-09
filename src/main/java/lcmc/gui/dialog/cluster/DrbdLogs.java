@@ -38,12 +38,10 @@ import java.util.LinkedHashMap;
  * @version $Id$
  */
 public final class DrbdLogs extends ClusterLogs {
-    /** Serial version UUID. */
-    private static final long serialVersionUID = 1L;
     /** Name of the drbd device. */
     private final String deviceName;
 
-    /** Prepares a new <code>DrbdLogs</code> object. */
+    /** Prepares a new {@code DrbdLogs} object. */
     public DrbdLogs(final Cluster cluster, final String device) {
         super(cluster);
         deviceName = device.substring(device.lastIndexOf('/') + 1);

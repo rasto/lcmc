@@ -33,13 +33,10 @@ import lcmc.data.Cluster;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+import java.awt.Dimension;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
@@ -48,8 +45,15 @@ import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import lcmc.data.Application;
 
 /**
  * This class implements VG Remove dialog.
@@ -58,8 +62,6 @@ import java.util.LinkedHashSet;
  * @version $Id$
  */
 public final class VGRemove extends LV {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Remove VG timeout. */
     private static final int REMOVE_TIMEOUT = 5000;
     /** Block device info object. */
@@ -79,16 +81,10 @@ public final class VGRemove extends LV {
     }
 
     /** Remove new VGRemove object. */
-    public VGRemove(final List<BlockDevInfo> bdis) {
+    public VGRemove(final Collection<BlockDevInfo> bdis) {
         super(null);
         blockDevInfos.addAll(bdis);
         multiSelection = true;
-    }
-
-    /** Finishes the dialog and sets the information. */
-    @Override
-    protected void finishDialog() {
-        /* disable finish dialog button. */
     }
 
     /** Returns the title of the dialog. */
@@ -169,10 +165,10 @@ public final class VGRemove extends LV {
                                                    1, 1); /* xPad, yPad */
 
         pane.add(inputPane);
-        final JPanel bdPane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        final JPanel bdPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         bdPane.add(new JLabel("Block Devices: "));
-        final Set<String> bds = new HashSet<String>();
-        final Set<Host> selectedHosts = new HashSet<Host>();
+        final Collection<String> bds = new HashSet<String>();
+        final Collection<Host> selectedHosts = new HashSet<Host>();
         for (final BlockDevInfo bdi : blockDevInfos) {
             for (final BlockDevice bd : bdi.getHost().getBlockDevices()) {
                 final String thisVG = bd.getVolumeGroupOnPhysicalVolume();
@@ -196,29 +192,28 @@ public final class VGRemove extends LV {
         bdPane.add(new JLabel(Tools.join(", ", bds)));
         pane.add(bdPane);
         final JPanel hostsPane = new JPanel(
-                        new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+                        new FlowLayout(FlowLayout.LEADING));
         final Host host = blockDevInfos.get(0).getHost();
         final Cluster cluster = host.getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
-        for (final Host h : hostCheckBoxes.keySet()) {
-            hostCheckBoxes.get(h).addItemListener(
-                                            new ItemChangeListener(true));
-            if (host == h) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(true);
+        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+            hostEntry.getValue().addItemListener(
+                    new ItemChangeListener(true));
+            if (host == hostEntry.getKey()) {
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(true);
             } else if (isOneDrbd(blockDevInfos)) {
-                hostCheckBoxes.get(h).setEnabled(false);
-                hostCheckBoxes.get(h).setSelected(false);
+                hostEntry.getValue().setEnabled(false);
+                hostEntry.getValue().setSelected(false);
             } else {
-                hostCheckBoxes.get(h).setEnabled(true);
-                hostCheckBoxes.get(h).setSelected(selectedHosts.contains(h));
+                hostEntry.getValue().setEnabled(true);
+                hostEntry.getValue().setSelected(selectedHosts.contains(hostEntry.getKey()));
             }
-            hostsPane.add(hostCheckBoxes.get(h));
+            hostsPane.add(hostEntry.getValue());
         }
-        final javax.swing.JScrollPane sp = new javax.swing.JScrollPane(
-                                                               hostsPane);
-        sp.setPreferredSize(new java.awt.Dimension(0, 45));
+        final JScrollPane sp = new JScrollPane(hostsPane);
+        sp.setPreferredSize(new Dimension(0, 45));
         pane.add(sp);
         pane.add(getProgressBarPane(null));
         pane.add(getAnswerPane(""));
@@ -262,20 +257,20 @@ public final class VGRemove extends LV {
                             }
                         }
                     } else {
-                        for (final Host h : hostCheckBoxes.keySet()) {
-                            if (hostCheckBoxes.get(h).isSelected()) {
+                        for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                            if (hostEntry.getValue().isSelected()) {
                                 final boolean ret =
-                                   vgRemove(h, getVGName(blockDevInfos.get(0)));
+                                   vgRemove(hostEntry.getKey(), getVGName(blockDevInfos.get(0)));
                                 if (!ret) {
                                     oneFailed = true;
                                 }
                             }
                         }
                     }
-                    for (final Host h : hostCheckBoxes.keySet()) {
-                        if (hostCheckBoxes.get(h).isSelected()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(
-                                                           h,
+                    for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
+                        if (hostEntry.getValue().isSelected()) {
+                            hostEntry.getKey().getBrowser().getClusterBrowser().updateHWInfo(
+                                    hostEntry.getKey(),
                                                            Host.UPDATE_LVM);
                         }
                     }
@@ -301,12 +296,12 @@ public final class VGRemove extends LV {
     /** Remove VG. */
     private boolean vgRemove(final Host host,
                              final String vgName) {
-        final boolean ret = LVM.vgRemove(host, vgName, false);
+        final boolean ret = LVM.vgRemove(host, vgName, Application.RunMode.LIVE);
         if (ret) {
             answerPaneAddText("Volume group "
                               + vgName
                               + " was successfully removed "
-                              + " on " + host.getName() + ".");
+                              + " on " + host.getName() + '.');
         } else {
             answerPaneAddTextError("Removing volume group "
                                     + vgName

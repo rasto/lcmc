@@ -151,7 +151,7 @@ public final class Heartbeat {
 
     /** Reloads heartbeats on all nodes. */
     public static void reloadHeartbeats(final Host[] hosts) {
-        for (Host host : hosts) {
+        for (final Host host : hosts) {
             reloadHeartbeat(host);
         }
     }
@@ -161,7 +161,7 @@ public final class Heartbeat {
      * With workaround for dopd, that needs /var/run/heartbeat/crm directory.
      */
     public static void enableDopd(final Host host, final boolean workAround) {
-        String cmd;
+        final String cmd;
         if (workAround) {
             cmd = "Heartbeat.dopdWorkaround;;;Heartbeat.enableDopd";
         } else {
@@ -174,7 +174,7 @@ public final class Heartbeat {
                                           SSH.DEFAULT_COMMAND_TIMEOUT);
         try {
             t.join();
-        } catch (InterruptedException ie) {
+        } catch (final InterruptedException ie) {
             Thread.currentThread().interrupt();
         }
     }

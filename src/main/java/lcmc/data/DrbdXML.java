@@ -36,15 +36,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -69,9 +69,8 @@ import lcmc.utilities.LoggerFactory;
 public final class DrbdXML extends XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXML.class);
+    public static final String[] EMPTY_STRING = new String[0];
     // TODO: should that not be per host?
-    /** Drbd config filename. */
-    private String configFile = "unknown";
     /** Map from parameter name to the default value. */
     private final Map<String, Value> paramDefaultMap =
                                                new HashMap<String, Value>();
@@ -112,11 +111,11 @@ public final class DrbdXML extends XML {
     private final Map<String, List<Value>> paramItemsMap =
                                     new LinkedHashMap<String, List<Value>>();
     /** List of all parameters. */
-    private final List<String> parametersList = new ArrayList<String>();
+    private final Collection<String> parametersList = new ArrayList<String>();
     /** List of all global parameters. */
-    private final List<String> globalParametersList = new ArrayList<String>();
+    private final Collection<String> globalParametersList = new ArrayList<String>();
     /** List of all required parameters. */
-    private final List<String> requiredParametersList =
+    private final Collection<String> requiredParametersList =
                                                     new ArrayList<String>();
     /** Map from resource option to the value. */
     private final Map<String, Map<String, Value>> optionsMap =
@@ -158,7 +157,7 @@ public final class DrbdXML extends XML {
     private final MultiKeyMap<String, HostProxy> resourceHostProxyMap =
                                          new MultiKeyMap<String, HostProxy>();
     /** Set of all proxy hosts. */
-    private final Set<String> proxyHostNames = new LinkedHashSet<String>();
+    private final Collection<String> proxyHostNames = new LinkedHashSet<String>();
     /** Map from host to the boolean value if drbd is loaded on this host. */
     private final Map<String, Boolean> hostDrbdLoadedMap =
                                                 new HashMap<String, Boolean>();
@@ -187,7 +186,7 @@ public final class DrbdXML extends XML {
     /** DRBD communication protocols. */
     static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
     /** Some non advanced parameters. */
-    static final List<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
+    static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
     static {
         NOT_ADVANCED_PARAMS.add("rate");
         NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
@@ -208,17 +207,17 @@ public final class DrbdXML extends XML {
     }
 
     /** Drbd config "errors" that are to be ignored. */
-    static final Set<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
+    static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
     static {
         IGNORE_CONFIG_ERRORS.add("no resources defined!");
         IGNORE_CONFIG_ERRORS.add(
                   "Can not open '/etc/drbd.conf': No such file or directory");
     }
     /** Access types of some parameters. */
-    static final Map<String, ConfigData.AccessType> PARAM_ACCESS_TYPE =
-                                new HashMap<String, ConfigData.AccessType>();
+    static final Map<String, Application.AccessType> PARAM_ACCESS_TYPE =
+                                new HashMap<String, Application.AccessType>();
     static {
-        PARAM_ACCESS_TYPE.put("rate", ConfigData.AccessType.OP);
+        PARAM_ACCESS_TYPE.put("rate", Application.AccessType.OP);
     }
 
     /** Preferred values. */
@@ -251,12 +250,12 @@ public final class DrbdXML extends XML {
         HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
     }
 
-    /** Prepares a new <code>DrbdXML</code> object. */
+    /** Prepares a new {@code DrbdXML} object. */
     public DrbdXML(final Host[] hosts, final Map<Host, String> drbdParameters) {
         super();
         addSpecialParameter("resource", "name", true);
         for (final Host host : hosts) {
-            String output;
+            final String output;
             if (drbdParameters.get(host) == null) {
                 output = updateDrbdParameters(host);
                 drbdParameters.put(host, output);
@@ -323,11 +322,6 @@ public final class DrbdXML extends XML {
         }
     }
 
-    /** Returns the filename of the drbd config file. */
-    String getConfigFile() {
-        return configFile;
-    }
-
     /** Returns config from server. */
     public String getConfig(final Host host) {
         if (!host.isConnected()) {
@@ -360,7 +354,7 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns all drbd parameters. */
-    public List<String> getParameters() {
+    public Iterable<String> getParameters() {
         return parametersList;
     }
 
@@ -370,7 +364,7 @@ public final class DrbdXML extends XML {
                                 new StringBuilder(param.replaceAll("\\-", " "));
         name.replace(0, 1, name.substring(0, 1).toUpperCase());
         if (paramUnitLongMap.containsKey(param)) {
-            name.append(" (").append(paramUnitLongMap.get(param)).append(")");
+            name.append(" (").append(paramUnitLongMap.get(param)).append(')');
         }
         return name.toString();
     }
@@ -413,13 +407,7 @@ public final class DrbdXML extends XML {
 
     /** Gets default for the parameter. */
     public Value getParamDefault(final String param) {
-        final Value defaultValue = paramDefaultMap.get(param);
-
-        //if (hasUnitPrefix(param)) {
-        //    final String unit = getDefaultUnit(param);
-        //    return new StringValue(defaultValue, unit);
-        //}
-        return defaultValue;
+        return paramDefaultMap.get(param);
     }
 
     /** Gets preferred value for the parameter. */
@@ -439,7 +427,6 @@ public final class DrbdXML extends XML {
         final String type = paramTypeMap.get(param);
         boolean correctValue = true;
 
-        Value value = rawValue;
         //String unit = null;
         //if (rawValue != null && hasUnitPrefix(param)) {
         //    /* number with unit */
@@ -453,16 +440,16 @@ public final class DrbdXML extends XML {
         //    }
         //}
 
-        if (value == null || value.isNothingSelected()) {
+        if (rawValue == null || rawValue.isNothingSelected()) {
             correctValue = !isRequired(param);
         } else if ("boolean".equals(type)) {
-            if (!value.equals(CONFIG_YES)
-                && !value.equals(CONFIG_NO)) {
+            if (!rawValue.equals(CONFIG_YES)
+                && !rawValue.equals(CONFIG_NO)) {
                 correctValue = false;
             }
         } else if ("numeric".equals(type)) {
             final Pattern p = Pattern.compile("(-?\\d+)|\\d*");
-            final Matcher m = p.matcher(value.getValueForConfig());
+            final Matcher m = p.matcher(rawValue.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
             //} else if ((unit == null //TODO:
@@ -519,11 +506,6 @@ public final class DrbdXML extends XML {
         return "string".equals(type);
     }
 
-    /** Checks in the cache if the parameter was correct. */
-    boolean checkParamCache(final String param) {
-        return paramCorrectValueMap.get(param).booleanValue();
-    }
-
     /**
      * Adds parameter to the specified section. This parameter will be not
      * used in the generated config.
@@ -550,7 +532,7 @@ public final class DrbdXML extends XML {
                               final boolean required) {
         addParameter(section, param, defaultValue, required);
         final List<Value> l = new ArrayList<Value>();
-        for (Value item : items) {
+        for (final Value item : items) {
             if (!l.contains(item)) {
                 l.add(item);
             }
@@ -577,16 +559,6 @@ public final class DrbdXML extends XML {
         paramDefaultMap.put(param, defaultValue);
     }
 
-    /** Adds parameter with the specified type. */
-    private void addParameter(final String section,
-                              final String param,
-                              final Value defaultValue,
-                              final boolean required,
-                              final String type) {
-        addParameter(section, param, defaultValue, required);
-        paramTypeMap.put(param, type);
-    }
-
     /** Returns array with all the sections. */
     public String[] getSections() {
         return sectionParamsMap.keySet().toArray(
@@ -597,13 +569,13 @@ public final class DrbdXML extends XML {
     public String[] getSectionParams(final String section) {
         final List<String> params = sectionParamsMap.get(section);
         if (params == null) {
-            return new String[0];
+            return EMPTY_STRING;
         }
         return params.toArray(new String[params.size()]);
     }
 
     /** Returns parameters for the global section. */
-    public List<String> getGlobalParams() {
+    public Iterable<String> getGlobalParams() {
         return globalParametersList;
     }
 
@@ -629,10 +601,10 @@ public final class DrbdXML extends XML {
     }
 
     /** Returns access type of the parameter. */
-    public ConfigData.AccessType getAccessType(final String param) {
-        final ConfigData.AccessType at = PARAM_ACCESS_TYPE.get(param);
+    public Application.AccessType getAccessType(final String param) {
+        final Application.AccessType at = PARAM_ACCESS_TYPE.get(param);
         if (at == null) {
-          return ConfigData.AccessType.ADMIN;
+          return Application.AccessType.ADMIN;
         }
         return at;
     }
@@ -681,7 +653,7 @@ public final class DrbdXML extends XML {
             final Node optionNode = options.item(i);
 
             /* <option> */
-            if (optionNode.getNodeName().equals("option")) {
+            if ("option".equals(optionNode.getNodeName())) {
                 final String name = getAttribute(optionNode, "name");
                 final String type = getAttribute(optionNode, "type");
                 if ("flag".equals(type)) {
@@ -703,7 +675,7 @@ public final class DrbdXML extends XML {
                 if ("fence-peer".equals(name)) {
                     final List<Value> l = new ArrayList<Value>();
                     l.add(new StringValue());
-                    if (!"".equals(host.getArch())) {
+                    if (host.getArch() != null && !host.getArch().isEmpty()) {
                         l.add(new StringValue(host.getHeartbeatLibPath()
                                               + "/drbd-peer-outdater -t 5"));
                     }
@@ -810,11 +782,11 @@ public final class DrbdXML extends XML {
         final NodeList options = sectionNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if (option.getNodeName().equals("option")) {
+            if ("option".equals(option.getNodeName())) {
                 final String name = getAttribute(option, "name");
                 final String valueS = getAttribute(option, "value");
 
-                Value value;
+                final Value value;
                 if (valueS == null) { /* boolean option */
                     value = CONFIG_YES;
                 } else if (hasUnitPrefix(name)) {
@@ -823,7 +795,7 @@ public final class DrbdXML extends XML {
                     value = new StringValue(valueS);
                 }
                 nameValueMap.put(name, value);
-            } else if (option.getNodeName().equals("section")) {
+            } else if ("section".equals(option.getNodeName())) {
                 final String name = getAttribute(option, "name");
                 if ("plugin".equals(name)) {
                     /* proxy */
@@ -838,11 +810,11 @@ public final class DrbdXML extends XML {
                                       final Map<String, Value> nameValueMap) {
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if (option.getNodeName().equals("option")) {
+            if ("option".equals(option.getNodeName())) {
                 final String nameValues = getAttribute(option, "name");
                 final int spacePos = nameValues.indexOf(' ');
-                String name;
-                String value;
+                final String name;
+                final String value;
                 if (spacePos > 0) {
                     name = DrbdProxy.PLUGIN_PREFIX
                            + nameValues.substring(0, spacePos);
@@ -865,9 +837,9 @@ public final class DrbdXML extends XML {
         final NodeList options = hostNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if (option.getNodeName().equals("volume")) {
+            if ("volume".equals(option.getNodeName())) {
                 parseVolumeConfig(hostName, resName, option);
-            } else if (option.getNodeName().equals("address")) {
+            } else if ("address".equals(option.getNodeName())) {
                 final String ip = getText(option);
                 final String port = getAttribute(option, "port");
                 final String family = getAttribute(option, "family");
@@ -894,7 +866,7 @@ public final class DrbdXML extends XML {
                     resourceHostFamilyMap.put(resName, hostFamilyMap);
                 }
                 hostFamilyMap.put(hostName, family);
-            } else if (option.getNodeName().equals("proxy")) {
+            } else if ("proxy".equals(option.getNodeName())) {
                 parseProxyHostConfig(hostName, resName, option);
             }
         }
@@ -911,16 +883,16 @@ public final class DrbdXML extends XML {
         final NodeList options = volumeNode.getChildNodes();
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if (option.getNodeName().equals("device")) {
+            if ("device".equals(option.getNodeName())) {
                 String device = getText(option);
-                if (device != null && "".equals(device)) {
+                if (device != null && device.isEmpty()) {
                     final String minor = getAttribute(option, "minor");
                     device = "/dev/drbd" + minor;
                 }
                 resourceDeviceMap.put(resName, volumeNr, device);
                 deviceResourceMap.put(device, resName);
                 deviceVolumeMap.put(device, volumeNr);
-            } else if (option.getNodeName().equals("disk")) {
+            } else if ("disk".equals(option.getNodeName())) {
                 final String disk = getText(option);
                 Map<String, String> hostDiskMap =
                                     resourceHostDiskMap.get(resName, volumeNr);
@@ -929,10 +901,10 @@ public final class DrbdXML extends XML {
                     resourceHostDiskMap.put(resName, volumeNr, hostDiskMap);
                 }
                 hostDiskMap.put(hostName, disk);
-            } else if (option.getNodeName().equals("meta-disk")
-                       || option.getNodeName().equals("flexible-meta-disk")) {
+            } else if ("meta-disk".equals(option.getNodeName())
+                       || "flexible-meta-disk".equals(option.getNodeName())) {
                 final boolean flexible =
-                            option.getNodeName().equals("flexible-meta-disk");
+                        "flexible-meta-disk".equals(option.getNodeName());
                 final String metaDisk = getText(option);
                 String metaDiskIndex = null;
 
@@ -964,7 +936,7 @@ public final class DrbdXML extends XML {
                                                      hostMetaDiskIndexMap);
                 }
                 hostMetaDiskIndexMap.put(hostName, metaDiskIndex);
-            } else if (option.getNodeName().equals("address")) {
+            } else if ("address".equals(option.getNodeName())) {
                 /* since 8.4, it's outside of volume */
                 final String ip = getText(option);
                 final String port = getAttribute(option, "port");
@@ -992,7 +964,7 @@ public final class DrbdXML extends XML {
                     resourceHostFamilyMap.put(resName, hostFamilyMap);
                 }
                 hostFamilyMap.put(hostName, family);
-            } else if (option.getNodeName().equals("proxy")) {
+            } else if ("proxy".equals(option.getNodeName())) {
                 parseProxyHostConfig(hostName, resName, option);
             }
         }
@@ -1010,10 +982,10 @@ public final class DrbdXML extends XML {
         String outsidePort = null;
         for (int i = 0; i < options.getLength(); i++) {
             final Node option = options.item(i);
-            if (option.getNodeName().equals("inside")) {
+            if ("inside".equals(option.getNodeName())) {
                 insideIp = getText(option);
                 insidePort = getAttribute(option, "port");
-            } else if (option.getNodeName().equals("outside")) {
+            } else if ("outside".equals(option.getNodeName())) {
                 outsideIp = getText(option);
                 outsidePort = getAttribute(option, "port");
             }
@@ -1030,11 +1002,6 @@ public final class DrbdXML extends XML {
     public Map<String, String> getHostDiskMap(final String resName,
                                               final String volumeNr) {
         return resourceHostDiskMap.get(resName, volumeNr);
-    }
-
-    /** Returns map with hosts as keys and ips as values. */
-    Map<String, String> getHostIpMap(final String resName) {
-        return resourceHostIpMap.get(resName);
     }
 
     /** Gets virtual net interface port for a host and a resource. */
@@ -1077,13 +1044,8 @@ public final class DrbdXML extends XML {
     }
 
     /** Get all proxy hosts. */
-    public Set<String> getProxyHostNames() {
+    public Iterable<String> getProxyHostNames() {
         return proxyHostNames;
-    }
-
-    /** Returns whether a proxy is defined for this host and resource. */
-    public boolean isHostProxy(final String hostName, final String resName) {
-        return resourceHostProxyMap.containsKey(resName, hostName);
     }
 
     /** Gets meta-disk block device for a host and a resource. */
@@ -1120,36 +1082,36 @@ public final class DrbdXML extends XML {
         final String resProtocol = getAttribute(resourceNode, PROTOCOL_PARAM);
         if (resProtocol != null) {
             Map<String, Value> nameValueMap =
-                                    optionsMap.get(resName + "." + "resource");
+                                    optionsMap.get(resName + '.' + "resource");
             if (nameValueMap == null) {
                 nameValueMap = new HashMap<String, Value>();
             } else {
-                optionsMap.remove(resName + "." + "resource");
+                optionsMap.remove(resName + '.' + "resource");
             }
 
             nameValueMap.put(PROTOCOL_PARAM, new StringValue(resProtocol));
-            optionsMap.put(resName + "." + "resource", nameValueMap);
+            optionsMap.put(resName + '.' + "resource", nameValueMap);
         }
         final NodeList c = resourceNode.getChildNodes();
         for (int i = 0; i < c.getLength(); i++) {
             final Node n = c.item(i);
-            if (n.getNodeName().equals("host")) {
+            if ("host".equals(n.getNodeName())) {
                 /* <host> */
                 parseHostConfig(resName, n);
-            } else if (n.getNodeName().equals("section")
-                       || (n.getNodeName().equals("#text")
+            } else if ("section".equals(n.getNodeName())
+                       || ("#text".equals(n.getNodeName())
                            && !"".equals(n.getNodeValue().trim()))) {
-                String secName;
-                if (n.getNodeName().equals("#text")) {
+                final String secName;
+                if ("#text".equals(n.getNodeName())) {
                     secName = "proxy";
                     /* workaround for broken proxy xml in common section
                        at least till drbd 8.4.2 */
                     Map<String, Value> nameValueMap =
-                                       optionsMap.get(resName + "." + secName);
+                                       optionsMap.get(resName + '.' + secName);
                     if (nameValueMap == null) {
                         nameValueMap = new HashMap<String, Value>();
                     } else {
-                        optionsMap.remove(resName + "." + secName);
+                        optionsMap.remove(resName + '.' + secName);
                     }
                     try {
                         final boolean isProxy =
@@ -1157,28 +1119,28 @@ public final class DrbdXML extends XML {
                         if (!isProxy) {
                             continue;
                         }
-                    } catch (Exceptions.DrbdConfigException e) {
+                    } catch (final Exceptions.DrbdConfigException e) {
                         LOG.appWarning("parseConfigResourceNode: "
                                        + e.getMessage());
                         LOG.appWarning("parseConfigResourceNode: "
                                        + n.getNodeValue());
                         continue;
                     }
-                    optionsMap.put(resName + "." + secName, nameValueMap);
+                    optionsMap.put(resName + '.' + secName, nameValueMap);
                 } else {
                     /* <resource> */
                     secName = getAttribute(n, "name");
 
                     Map<String, Value> nameValueMap =
-                                       optionsMap.get(resName + "." + secName);
+                                       optionsMap.get(resName + '.' + secName);
                     if (nameValueMap == null) {
                         nameValueMap = new HashMap<String, Value>();
                     } else {
-                        optionsMap.remove(resName + "." + secName);
+                        optionsMap.remove(resName + '.' + secName);
                     }
 
                     parseConfigSectionNode(n, nameValueMap);
-                    optionsMap.put(resName + "." + secName, nameValueMap);
+                    optionsMap.put(resName + '.' + secName, nameValueMap);
                 }
                 if (!sectionParamsMap.containsKey(secName)
                     && !sectionParamsMap.containsKey(secName + "-options")) {
@@ -1200,7 +1162,7 @@ public final class DrbdXML extends XML {
         final int start = configXML.indexOf("<config");
         if (start < 0) {
             final String c = configXML.trim();
-            if (c.length() != 0 && !IGNORE_CONFIG_ERRORS.contains(c)) {
+            if (!c.isEmpty() && !IGNORE_CONFIG_ERRORS.contains(c)) {
                 LOG.error("parseConfig: error: " + c);
             }
             return;
@@ -1216,7 +1178,6 @@ public final class DrbdXML extends XML {
             return;
         }
         /* config file=".." TODO: */
-        configFile = getAttribute(configNode, "file");
 
         final NodeList resources = configNode.getChildNodes();
         Map<String, Value> globalNameValueMap = optionsMap.get(GLOBAL_SECTION);
@@ -1234,11 +1195,11 @@ public final class DrbdXML extends XML {
                 parseConfigGlobalNode(resourceNode, globalNameValueMap);
             }
             /* <common> */
-            if (resourceNode.getNodeName().equals("common")) {
+            if ("common".equals(resourceNode.getNodeName())) {
                 parseConfigResourceNode(resourceNode, "Section.Common");
             }
             /* <resource> */
-            if (resourceNode.getNodeName().equals("resource")) {
+            if ("resource".equals(resourceNode.getNodeName())) {
                 final String resName = getAttribute(resourceNode, "name");
                 if (!resourceList.contains(resName)) {
                     resourceList.add(resName);
@@ -1264,7 +1225,7 @@ public final class DrbdXML extends XML {
     public Value getConfigValue(final String res,
                                 final String section,
                                 final String optionName) {
-        final Map<String, Value> option = optionsMap.get(res + "." + section);
+        final Map<String, Value> option = optionsMap.get(res + '.' + section);
 
         Value value = null;
         if (option != null) {
@@ -1317,7 +1278,6 @@ public final class DrbdXML extends XML {
 
     /** Return backing disk from device number. Can return null. */
     private String getBackingDisk(final String devNr, final String hostName) {
-        BlockDevInfo bdi = null;
         final String device = "/dev/drbd" + devNr;
         final String resName = deviceResourceMap.get(device);
         String volumeNr = deviceVolumeMap.get(device);
@@ -1335,15 +1295,6 @@ public final class DrbdXML extends XML {
     }
 
 
-    /** Returns whether the drbd is loaded. */
-    boolean isDrbdLoaded(final String hostName) {
-        final Boolean l = hostDrbdLoadedMap.get(hostName);
-        if (l != null) {
-            return l.booleanValue();
-        }
-        return true;
-    }
-
     /**
      * Parses events from drbd kernel module obtained via drbdsetup .. events
      * command and stores the values in the BlockDevice object.
@@ -1356,7 +1307,7 @@ public final class DrbdXML extends XML {
         }
 
         final String output = rawOutput.trim();
-        if ("".equals(output)) {
+        if (output != null && output.isEmpty()) {
             return false;
         }
         if ("No response from the DRBD driver! Is the module loaded?".equals(
@@ -1390,12 +1341,8 @@ public final class DrbdXML extends XML {
 
             final Matcher mDev = pDev.matcher(devNrString);
             String devNr = devNrString;
-            String res = ""; // TODO: unused */
-            String volumeNr = "0";
             if (mDev.matches()) { /* since 8.4 */
                 devNr = mDev.group(1);
-                res = mDev.group(2);
-                volumeNr = mDev.group(3);
             }
             /* get blockdevice object from device */
             final String disk = getBackingDisk(devNr, hostName);
@@ -1433,12 +1380,8 @@ public final class DrbdXML extends XML {
 
             final Matcher mDev = pDev.matcher(devNrString);
             String devNr = devNrString;
-            String res = ""; // TODO: unused */
-            String volumeNr = "0";
             if (mDev.matches()) { /* since 8.4 */
                 devNr = mDev.group(1);
-                res = mDev.group(2);
-                volumeNr = mDev.group(3);
             }
             final BlockDevInfo bdi =
                                    getBlockDevInfo(devNr, hostName, drbdGraph);
@@ -1463,12 +1406,8 @@ public final class DrbdXML extends XML {
             final String what = m.group(3);
             final Matcher mDev = pDev.matcher(devNrString);
             String devNr = devNrString;
-            String res = ""; // TODO: unused */
-            String volumeNr = "0";
             if (mDev.matches()) { /* since 8.4 */
                 devNr = mDev.group(1);
-                res = mDev.group(2);
-                volumeNr = mDev.group(3);
             }
             LOG.debug("parseDrbdEvent: event: " + devNr + " - " + what);
             if ("split-brain".equals(what)) {
@@ -1510,7 +1449,7 @@ public final class DrbdXML extends XML {
      * want to overwrite.
      */
     public boolean isDrbdDisabled() {
-        return unknownSections && !Tools.getConfigData().isAdvancedMode();
+        return unknownSections && !Tools.getApplication().isAdvancedMode();
     }
 
     public class HostProxy {
@@ -1577,7 +1516,7 @@ public final class DrbdXML extends XML {
             return null;
         }
         final String unitType = getUnitLong(param);
-        if (unitType == null || "".equals(unitType)) {
+        if (unitType == null || unitType.isEmpty()) {
             return parseSizeUnit(param, u);
         } else {
             return parseByteUnit(param, u);
@@ -1586,7 +1525,7 @@ public final class DrbdXML extends XML {
 
     private Unit parseSizeUnit(final String param, final String u) {
         final String unitPart = getUnitPart(getUnitLong(param));
-        if (u == null || "".equals(u)) {
+        if (u == null || u.isEmpty()) {
             return getUnitDefault(unitPart);
         } else if ("k".equalsIgnoreCase(u)) {
             return getUnitKi(unitPart);
@@ -1604,7 +1543,7 @@ public final class DrbdXML extends XML {
 
     private Unit parseByteUnit(final String param, final String u) {
         final String unitPart = getUnitPart(getUnitLong(param));
-        if (u == null || "".equals(u)) {
+        if (u == null || u.isEmpty()) {
             return getUnitBytes(unitPart);
         } else if ("k".equalsIgnoreCase(u)) {
             return getUnitKiBytes(unitPart);

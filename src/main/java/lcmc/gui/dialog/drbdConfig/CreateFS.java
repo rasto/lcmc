@@ -26,7 +26,7 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.Exceptions;
 import lcmc.utilities.Tools;
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.BlockDevInfo;
@@ -61,8 +61,6 @@ import lcmc.utilities.LoggerFactory;
 final class CreateFS extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Pull down menu with hosts (or no host). */
     private Widget hostW;
     /** Pull down menu with file systems. */
@@ -87,7 +85,7 @@ final class CreateFS extends DrbdConfig {
     /** Skip sync true. */
     private static final Value SKIP_SYNC_TRUE = new StringValue("true");
 
-    /** Prepares a new <code>CreateFS</code> object. */
+    /** Prepares a new {@code CreateFS} object. */
     CreateFS(final WizardDialog previousDialog,
              final DrbdVolumeInfo drbdVolumeInfo) {
         super(previousDialog, drbdVolumeInfo);
@@ -101,11 +99,11 @@ final class CreateFS extends DrbdConfig {
     protected void finishDialog() {
         final BlockDevInfo bdiPri = getPrimaryBD();
         if (bdiPri != null) {
-            final boolean testOnly = false;
+            final Application.RunMode runMode = Application.RunMode.LIVE;
             if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
-                bdiPri.skipInitialFullSync(testOnly);
+                bdiPri.skipInitialFullSync(runMode);
             }
-            bdiPri.forcePrimary(testOnly);
+            bdiPri.forcePrimary(runMode);
         }
     }
 
@@ -119,21 +117,6 @@ final class CreateFS extends DrbdConfig {
         } else if (h.equals(bdi2.getHost().getName())) {
             return bdi2;
         } else {
-            return null;
-        }
-    }
-
-    /** Returns the secondary block device. */
-    protected BlockDevInfo getSecondaryBD() {
-        final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
-        final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
-        final String h = hostW.getStringValue();
-        if (h.equals(bdi1.getHost().getName())) {
-            return bdi2;
-        } else if (h.equals(bdi2.getHost().getName())) {
-            return bdi1;
-        } else {
-            LOG.appError("getSecondaryBD: unknown host: " + h);
             return null;
         }
     }
@@ -153,19 +136,18 @@ final class CreateFS extends DrbdConfig {
                         makeFsButton.setEnabled(false);
                     }
                 });
-                BlockDevInfo bdiPri = getPrimaryBD();
-                BlockDevInfo bdiSec = getSecondaryBD();
-                final boolean testOnly = false;
+                final BlockDevInfo bdiPri = getPrimaryBD();
+                final Application.RunMode runMode = Application.RunMode.LIVE;
                 if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
-                    bdiPri.skipInitialFullSync(testOnly);
+                    bdiPri.skipInitialFullSync(runMode);
                 }
-                bdiPri.forcePrimary(testOnly);
+                bdiPri.forcePrimary(runMode);
                 final String fs = filesystemW.getStringValue();
-                bdiPri.makeFilesystem(fs, testOnly);
+                bdiPri.makeFilesystem(fs, runMode);
                 if (bdiPri.getDrbdVolumeInfo() != null) {
                     /* could be canceled */
                     getDrbdVolumeInfo().setCreatedFs(fs);
-                    bdiPri.setSecondary(testOnly);
+                    bdiPri.setSecondary(runMode);
                     hostW.setValue(NO_HOST_STRING);
                     filesystemW.setValue(NO_FILESYSTEM_STRING);
                     answerPaneSetText(
@@ -216,7 +198,7 @@ final class CreateFS extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -302,7 +284,7 @@ final class CreateFS extends DrbdConfig {
         final JLabel hostLabel = new JLabel(
                     Tools.getString("Dialog.DrbdConfig.CreateFS.ChooseHost"));
         Value defaultHost = NO_HOST_STRING;
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             defaultHost = hosts[1];
         }
         hostW = WidgetFactory.createInstance(
@@ -312,7 +294,7 @@ final class CreateFS extends DrbdConfig {
                                        Widget.NO_REGEXP,
                                        COMBOBOX_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(ConfigData.AccessType.RO,
+                                       new AccessMode(Application.AccessType.RO,
                                                       !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         hostW.addListeners(new WidgetListener() {
@@ -340,10 +322,10 @@ final class CreateFS extends DrbdConfig {
                                      Widget.NO_REGEXP,
                                      COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(ConfigData.AccessType.RO,
+                                     new AccessMode(Application.AccessType.RO,
                                                     !AccessMode.ADVANCED),
                                      Widget.NO_BUTTON);
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             filesystemW.setValueAndWait(new StringValue("ext3"));
         }
         inputPane.add(filesystemLabel);
@@ -381,7 +363,7 @@ final class CreateFS extends DrbdConfig {
                                       Widget.NO_REGEXP,
                                       COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         skipSyncW.setEnabled(false);
@@ -414,7 +396,7 @@ final class CreateFS extends DrbdConfig {
                                 bdi1.getHost().getDrbdVersion(), "8.3.2") >= 0
                    && Tools.compareVersions(
                                 bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
-        } catch (Exceptions.IllegalVersionException e) {
+        } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("skipSyncAvailable: " + e.getMessage(), e);
             return false;
         }

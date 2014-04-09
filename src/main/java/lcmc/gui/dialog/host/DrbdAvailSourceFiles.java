@@ -23,11 +23,8 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.Component;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Value;
-import lcmc.data.StringValue;
+
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
@@ -52,8 +49,6 @@ import javax.swing.SpringLayout;
  * @version $Id$
  */
 final class DrbdAvailSourceFiles extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Combo box with drbd tarballs. */
@@ -61,7 +56,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /** Prepares a new <code>DrbdAvailSourceFiles</code> object. */
+    /** Prepares a new {@code DrbdAvailSourceFiles} object. */
     DrbdAvailSourceFiles(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -91,12 +86,12 @@ final class DrbdAvailSourceFiles extends DialogHost {
               null, /* ProgresBar */
               new ExecCallback() {
                 @Override
-                public void done(final String ans) {
-                    if ("".equals(ans)) {
+                public void done(final String answer) {
+                    if (answer != null && answer.isEmpty()) {
                         doneError(null, 1);
                         return;
                     }
-                    final String[] versions = ans.split("\\r?\\n");
+                    final String[] versions = answer.split("\\r?\\n");
                     if (versions.length == 0) {
                         doneError(null, 1);
                         return;
@@ -131,16 +126,16 @@ final class DrbdAvailSourceFiles extends DialogHost {
                 }
 
                 @Override
-                public void doneError(final String ans,
-                                                final int exitCode) {
+                public void doneError(final String answer,
+                                      final int errorCode) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBarDoneError();
                             printErrorAndRetry(Tools.getString(
                                    "Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
-                                               ans,
-                                               exitCode);
+                                    answer,
+                                    errorCode);
                         }
                     });
                 }
@@ -172,7 +167,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
-        if (Tools.getConfigData().getAutoOptionHost("drbdinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             pressNextButton();
         }
     }
@@ -213,7 +208,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 

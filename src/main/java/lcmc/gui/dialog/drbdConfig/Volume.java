@@ -24,8 +24,6 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 
@@ -46,12 +44,10 @@ import java.awt.Dimension;
  *
  */
 public final class Volume extends DrbdConfig {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
 
     /** Configuration options of the drbd volume. */
     private static final String[] PARAMS = {"number", "device"};
-    /** Prepares a new <code>Volume</code> object. */
+    /** Prepares a new {@code Volume} object. */
     public Volume(final WizardDialog previousDialog,
                   final DrbdVolumeInfo dvi) {
         super(previousDialog, dvi);
@@ -61,7 +57,6 @@ public final class Volume extends DrbdConfig {
     @Override
     public WizardDialog nextDialog() {
         Tools.waitForSwing();
-        getDrbdVolumeInfo().apply(false);
         return new BlockDev(this,
                             getDrbdVolumeInfo(),
                             getDrbdVolumeInfo().getFirstBlockDevInfo());
@@ -87,11 +82,9 @@ public final class Volume extends DrbdConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         getDrbdVolumeInfo().waitForInfoPanel();
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -101,23 +94,17 @@ public final class Volume extends DrbdConfig {
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        final boolean ch =
-                  getDrbdVolumeInfo().checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor =
-                  getDrbdVolumeInfo().checkResourceFieldsCorrect(null, PARAMS);
-        if (cor) {
+        final boolean correct = getDrbdVolumeInfo().checkResourceFields(
+                                                         null,
+                                                         PARAMS).isCorrect();
+        if (correct) {
             enableComponents();
         } else {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                makeDefaultButton(buttonClass(nextButton()));
-            }
-        });
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        enableComponents();
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -125,13 +112,11 @@ public final class Volume extends DrbdConfig {
     /** Returns input pane where user can configure a drbd volume. */
     @Override
     protected JComponent getInputPane() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final DrbdInfo drbdInfo = dri.getDrbdInfo();
         final JPanel inputPane = new JPanel();
-        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
+        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         getDrbdVolumeInfo().addWizardParams(

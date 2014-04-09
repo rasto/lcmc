@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.text.Document;
 import javax.swing.text.AbstractDocument;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.JTextComponent;
 import java.awt.Color;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class Textfield extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>Textfield</code> object. */
+    /** Prepares a new {@code Textfield} object. */
     public Textfield(final Value selectedValue,
                      final String regexp,
                      final int width,
@@ -65,15 +66,15 @@ public class Textfield extends GenericWidget<JComponent> {
     private JComponent getTextField(final Value value,
                                     final String regexp,
                                     final Map<String, String> abbreviations) {
-        MTextField tf;
 
-        String valueS;
+        final String valueS;
         if (value == null) {
             valueS = null;
         } else {
             valueS = value.getValueForConfig();
         }
 
+        final MTextField tf;
         if (regexp == null) {
             tf = new MTextField(valueS);
         } else {
@@ -100,7 +101,7 @@ public class Textfield extends GenericWidget<JComponent> {
     /** Return value, that user have chosen in the field or typed in. */
     @Override
     protected Value getValueInternal() {
-        final Value value = new StringValue(((MTextField) getInternalComponent()).getText());
+        final Value value = new StringValue(((JTextComponent) getInternalComponent()).getText());
         if (value.isNothingSelected()) {
             return null;
         }
@@ -117,23 +118,23 @@ public class Textfield extends GenericWidget<JComponent> {
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item == null) {
-            ((MTextField) getInternalComponent()).setText(null);
+            ((JTextComponent) getInternalComponent()).setText(null);
         } else {
-            ((MTextField) getInternalComponent()).setText(item.getValueForConfig());
+            ((JTextComponent) getInternalComponent()).setText(item.getValueForConfig());
         }
     }
 
     /** Returns document object of the component. */
     @Override
     public Document getDocument() {
-        return ((MTextField) getInternalComponent()).getDocument();
+        return ((JTextComponent) getInternalComponent()).getDocument();
     }
 
     /** Adds item listener to the component. */
     @Override
-    public void addListeners(final WidgetListener wl) {
-        getWidgetListeners().add(wl);
-        addDocumentListener(getDocument(), wl);
+    public void addListeners(final WidgetListener widgetListener) {
+        getWidgetListeners().add(widgetListener);
+        addDocumentListener(getDocument(), widgetListener);
     }
 
     @Override
@@ -145,13 +146,13 @@ public class Textfield extends GenericWidget<JComponent> {
     /** Requests focus if applicable. */
     @Override
     public void requestFocus() {
-        ((MTextField) getInternalComponent()).requestFocus();
+        getInternalComponent().requestFocus();
     }
 
     /** Selects the whole text in the widget if applicable. */
     @Override
     public void selectAll() {
-        ((MTextField) getInternalComponent()).selectAll();
+        ((JTextComponent) getInternalComponent()).selectAll();
     }
 
     /** Sets background color. */

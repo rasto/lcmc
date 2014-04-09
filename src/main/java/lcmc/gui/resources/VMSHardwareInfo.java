@@ -27,15 +27,9 @@ import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.Host;
 import lcmc.data.resources.Resource;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.data.LinuxFile;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.SSH;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -62,10 +56,17 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-import org.w3c.dom.Node;
-
+import lcmc.gui.widget.Check;
+import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.UpdatableItem;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Hardware.
@@ -119,7 +120,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         final JTable headerTable = getTable(VMSVirtualDomainInfo.HEADER_TABLE);
         if (headerTable != null) {
             mainPanel.add(headerTable.getTableHeader());
@@ -135,7 +136,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         final String[] params = getParametersFromXML();
@@ -150,7 +151,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(false);
+                                apply(Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -176,7 +177,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             );
         }
         final JPanel extraButtonPanel =
-                           new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
+                           new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 0));
         extraButtonPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
@@ -199,12 +200,12 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                   ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
                   null);
         /* Actions */
-        buttonPanel.add(getActionsButton(), BorderLayout.EAST);
+        buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
 
         mainPanel.add(optionsPanel);
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
                               ClusterBrowser.SERVICE_LABEL_WIDTH
@@ -221,12 +222,6 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
-    }
-
-    /** Returns whether this parameter has a unit prefix. */
-    @Override
-    protected final boolean hasUnitPrefix(final String param) {
-        return false;
     }
 
     /** Returns units. */
@@ -323,17 +318,16 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     @Override
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
         /* remove service */
-        final MyMenuItem removeMenuItem = new MyMenuItem(
+        final ComponentWithTest removeMenuItem = new MyMenuItem(
                     Tools.getString("VMSHardwareInfo.Menu.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
                     Tools.getString("VMSHardwareInfo.Menu.Cancel"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -352,7 +346,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             @Override
             public void action() {
                 hidePopup();
-                removeMyself(false);
+                removeMyself(Application.RunMode.LIVE);
             }
         };
         addMouseOverListener(removeMenuItem, null);
@@ -362,9 +356,9 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /** Removes this hardware from the libvirt with confirmation dialog. */
     @Override
-    public final void removeMyself(final boolean testOnly) {
+    public final void removeMyself(final Application.RunMode runMode) {
         if (getResource().isNew()) {
-            super.removeMyself(testOnly);
+            super.removeMyself(runMode);
             getResource().setNew(false);
             removeNode();
             return;
@@ -378,16 +372,16 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                desc,
                Tools.getString("VMSHardwareInfo.confirmRemove.Yes"),
                Tools.getString("VMSHardwareInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(testOnly);
+            removeMyselfNoConfirm(runMode);
             getResource().setNew(false);
         }
     }
 
     /** Removes this disk without confirmation dialog. */
-    protected abstract void removeMyselfNoConfirm(final boolean testOnly);
+    protected abstract void removeMyselfNoConfirm(final Application.RunMode runMode);
 
     /** Applies the changes. */
-    abstract void apply(final boolean testOnly);
+    abstract void apply(final Application.RunMode runMode);
 
     /** Adds disk table with only this disk to the main panel. */
     protected abstract void addHardwareTable(final JPanel mainPanel);
@@ -466,43 +460,40 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         final VMSHardwareInfo thisClass = this;
         return new FileSystemView() {
             @Override
-            public final File[] getRoots() {
+            public File[] getRoots() {
                 return new LinuxFile[]{getLinuxDir("/", host)};
             }
 
             @Override
-            public final boolean isRoot(final File f) {
+            public boolean isRoot(final File f) {
                 final String path = Tools.getUnixPath(f.toString());
                 return "/".equals(path);
             }
 
             @Override
-            public final File createNewFolder(final File containingDir) {
+            public File createNewFolder(final File containingDir) {
                 return null;
             }
 
             @Override
-            public final File getHomeDirectory() {
+            public File getHomeDirectory() {
                 return getLinuxDir(directory, host);
             }
 
             @Override
-            public final Boolean isTraversable(final File f) {
+            public Boolean isTraversable(final File f) {
                 final LinuxFile lf = linuxFileCache.get(f.toString());
-                if (lf != null) {
-                    return lf.isDirectory();
-                }
-                return true;
+                return lf == null || lf.isDirectory();
             }
 
             @Override
-            public final File getParentDirectory(final File dir) {
+            public File getParentDirectory(final File dir) {
                 return getLinuxDir(dir.getParent(), host);
             }
 
             @Override
-            public final File[] getFiles(final File dir,
-                                         final boolean useFileHiding) {
+            public File[] getFiles(final File dir,
+                                   final boolean useFileHiding) {
                 final StringBuilder dirSB = new StringBuilder(dir.toString());
                 if ("/".equals(dir.toString())) {
                     dirSB.append('*');
@@ -513,7 +504,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                         Tools.execCommandProgressIndicator(
                                       host,
                                       "stat -c \"%A %a %Y %s %n\" "
-                                      + dirSB.toString()
+                                      + dirSB
                                       + " 2>/dev/null",
                                       null,
                                       false,
@@ -522,7 +513,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
                 final List<LinuxFile> files = new ArrayList<LinuxFile>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {
-                        if ("".equals(line.trim())) {
+                        if (line.trim().isEmpty()) {
                             continue;
                         }
                         final Matcher m = STAT_PATTERN.matcher(line);
@@ -557,7 +548,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
 
     /**
      * Starts file chooser.
-     * @param dir whether it needs dir or file
+     * @param directory whether it needs dir or file
      */
     protected final void startFileChooser(final Widget paramWi,
                                           final String directory,
@@ -574,7 +565,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             /** Serial version UID. */
             private static final long serialVersionUID = 1L;
                 @Override
-                public final void setCurrentDirectory(final File dir) {
+                public void setCurrentDirectory(final File dir) {
                     super.setCurrentDirectory(new LinuxFile(
                                                     thisClass,
                                                     host,
@@ -611,61 +602,35 @@ public abstract class VMSHardwareInfo extends EditableInfo {
      * have changed. Don't check the invisible for the type parameters.
      */
     @Override
-    public final boolean checkResourceFieldsChanged(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsChanged(param, params, false);
+    public final Check checkResourceFields(final String param,
+                                           final String[] params) {
+        return checkResourceFields(param, params, false);
     }
 
     /**
      * Returns whether the specified parameter or any of the parameters
      * have changed. Don't check the invisible for the type parameters.
      */
-    final boolean checkResourceFieldsChanged(final String param,
-                                       final String[] params,
-                                       final boolean fromDomain) {
+    final Check checkResourceFields(final String param,
+                                    final String[] params,
+                                    final boolean fromDomain) {
         final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
         if (!fromDomain && vdi != null && params.length != 1) {
             vdi.setApplyButtons(null, vdi.getParametersFromXML());
         }
-        String[] parameters;
+        final String[] parameters;
         if (params == null || params.length == 1) {
             /* just one param */
             parameters = params;
         } else {
             parameters = getRealParametersFromXML();
         }
-        return super.checkResourceFieldsChanged(param, parameters);
-    }
-
-    /** Returns whether all the parameters are correct. */
-    @Override
-    public final boolean checkResourceFieldsCorrect(final String param,
-                                              final String[] params) {
-        return checkResourceFieldsCorrect(param, params, false);
-    }
-
-    /** Returns whether all the parameters are correct. */
-    boolean checkResourceFieldsCorrect(final String param,
-                                       final String[] params,
-                                       final boolean fromDomain) {
-        final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
-        if (!fromDomain && vdi != null && params.length != 1) {
-            vdi.setApplyButtons(null, vdi.getParametersFromXML());
-        }
-        String[] parameters;
-        if (params == null || params.length == 1) {
-            /* just one param */
-            parameters = params;
-        } else {
-            parameters = getRealParametersFromXML();
-        }
-        return super.checkResourceFieldsCorrect(param, parameters);
+        return super.checkResourceFields(param, parameters);
     }
 
     /** Checks one parameter. */
-    @Override
     protected final void checkOneParam(final String param) {
-        checkResourceFieldsCorrect(param, new String[]{param}, true);
+        checkResourceFields(param, new String[]{param}, true);
     }
 
     /** Returns parameters. */
@@ -684,7 +649,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }

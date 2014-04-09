@@ -22,7 +22,11 @@
 
 package lcmc.utilities;
 
+import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import javax.swing.JList;
 import javax.swing.JToolTip;
@@ -55,14 +59,14 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 
-    /** Prepares a new <code>MyList</code> object. */
+    /** Prepares a new {@code MyList} object. */
     public MyList(final ListModel<E> dataModel, final Color bg) {
         super(dataModel);
         toolTip = createToolTip();
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
-        } catch (java.awt.AWTException e) {
+        } catch (final AWTException e) {
             LOG.appWarning("MyList: robot error");
         }
         robot = r;
@@ -90,15 +94,15 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
     @Override
-    public void setToolTipText(String toolTipText) {
-        if (toolTipText == null) {
+    public void setToolTipText(String text) {
+        if (text == null) {
             return;
         }
-        if ("".equals(toolTipText)) {
-            toolTipText = " "; /* can't be "" */
+        if (text != null && text.isEmpty()) {
+            text = " "; /* can't be "" */
         }
-        super.setToolTipText(toolTipText);
-        toolTip.setTipText(toolTipText);
+        super.setToolTipText(text);
+        toolTip.setTipText(text);
         if (toolTip != null && toolTip.isShowing() && robot != null) {
             final GraphicsDevice[] devices =
                             GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -142,16 +146,16 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
     /** Clean up. */
     void cleanup() {
         for (int i = 0; i < getModel().getSize(); i++) {
-            final MyMenuItem m = (MyMenuItem) getModel().getElementAt(i);
+            final UpdatableItem m = (UpdatableItem) getModel().getElementAt(i);
             m.cleanup();
         }
-        for (final java.awt.event.MouseListener ml : getMouseListeners()) {
+        for (final MouseListener ml : getMouseListeners()) {
             removeMouseListener(ml);
         }
-        for (final java.awt.event.KeyListener kl : getKeyListeners()) {
+        for (final KeyListener kl : getKeyListeners()) {
             removeKeyListener(kl);
         }
-        for (final java.awt.event.MouseMotionListener mml
+        for (final MouseMotionListener mml
                                                 : getMouseMotionListeners()) {
             removeMouseMotionListener(mml);
         }

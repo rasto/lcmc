@@ -31,8 +31,6 @@ package lcmc.data;
  *
  */
 public final class AisCastAddress {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Type of the cast address. */
     private final String type; /* only mcast at the moment*/
     /** Bind net address like 192.168.122.0. */
@@ -43,7 +41,7 @@ public final class AisCastAddress {
     private final String port;
 
     /**
-     * Prepares a new <code>AisCastAddress</code> object.
+     * Prepares a new {@code AisCastAddress} object.
      */
     public AisCastAddress(final String type,
                           final String bindnetaddr,
@@ -66,10 +64,10 @@ public final class AisCastAddress {
                            final String port) {
         if ("mcast".equals(type)) {
             return tab + "interface {\n"
-                 + tab + tab + "bindnetaddr: " + bindnetaddr + "\n"
-                 + tab + tab + "mcastaddr: "   + address + "\n"
-                 + tab + tab + "mcastport: "   + port + "\n"
-                 + tab + "}";
+                 + tab + tab + "bindnetaddr: " + bindnetaddr + '\n'
+                 + tab + tab + "mcastaddr: "   + address + '\n'
+                 + tab + tab + "mcastport: "   + port + '\n'
+                 + tab + '}';
         } else {
             return "";
         }
@@ -83,11 +81,11 @@ public final class AisCastAddress {
         if ("mcast".equals(type)) {
             return tab + "interface {\n"
                  + tab + tab + "ringnumber: "  + Integer.toString(ringnumber)
-                 + "\n"
-                 + tab + tab + "bindnetaddr: " + bindnetaddr + "\n"
-                 + tab + tab + "mcastaddr: "   + address + "\n"
-                 + tab + tab + "mcastport: "   + port + "\n"
-                 + tab + "}";
+                 + '\n'
+                 + tab + tab + "bindnetaddr: " + bindnetaddr + '\n'
+                 + tab + tab + "mcastaddr: "   + address + '\n'
+                 + tab + tab + "mcastport: "   + port + '\n'
+                 + tab + '}';
         } else {
             return "";
         }

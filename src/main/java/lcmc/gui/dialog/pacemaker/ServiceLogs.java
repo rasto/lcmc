@@ -38,14 +38,12 @@ import java.util.HashSet;
  * @version $Id$
  */
 public final class ServiceLogs extends ClusterLogs {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Service type. e.g. Filesystem. */
     private final String serviceType;
     /** Service heartbeat id. */
     private final String serviceHbId;
 
-    /** Prepares a new <code>ServiceLogs</code> object. */
+    /** Prepares a new {@code ServiceLogs} object. */
     public ServiceLogs(final Cluster cluster,
                        final String serviceType,
                        final String serviceHbId) {

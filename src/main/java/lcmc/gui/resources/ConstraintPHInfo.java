@@ -27,25 +27,26 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.data.Host;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.data.Subtext;
 import lcmc.data.AccessMode;
-import lcmc.utilities.CRM;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.MyMenuItem;
 
 import javax.swing.JComponent;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * Object that holds an order constraint information.
@@ -80,12 +81,15 @@ public final class ConstraintPHInfo extends ServiceInfo {
     private static final String CONSTRAINT_PLACEHOLDER_OR =
                                        Tools.getString("ConstraintPHInfo.Or");
 
-    public enum Preference { AND, OR };
+    public enum Preference {
+        AND,
+        OR
+    }
     /** Whether the all resources are required to be started. */
     private final Preference preference;
 
 
-    /** Prepares a new <code>ConstraintPHInfo</code> object. */
+    /** Prepares a new {@code ConstraintPHInfo} object. */
     ConstraintPHInfo(final Browser browser,
                      final CRMXML.RscSetConnectionData rscSetConnectionData,
                      final Preference preference) {
@@ -93,9 +97,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
         this.preference = preference;
         if (rscSetConnectionData != null) {
             if (rscSetConnectionData.isColocation()) {
-                this.rscSetConnectionDataCol = rscSetConnectionData;
+                rscSetConnectionDataCol = rscSetConnectionData;
             } else {
-                this.rscSetConnectionDataOrd = rscSetConnectionData;
+                rscSetConnectionDataOrd = rscSetConnectionData;
             }
         }
     }
@@ -149,7 +153,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             } else {
                 reversedCol = false;
             }
-            this.rscSetConnectionDataCol = rscSetConnectionData;
+            rscSetConnectionDataCol = rscSetConnectionData;
         } else {
             if (reverseOrd) {
                 if (rscSetConnectionData.getRscSet2() == null
@@ -209,7 +213,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 reversedOrd = false;
             }
 
-            this.rscSetConnectionDataOrd = rscSetConnectionData;
+            rscSetConnectionDataOrd = rscSetConnectionData;
         }
     }
 
@@ -305,7 +309,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Applies changes to the placeholder. */
     @Override
-    void apply(final Host dcHost, final boolean testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
         /* apply is in resource set info object. */
     }
 
@@ -317,14 +321,14 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
-        return ConfigData.AccessType.ADMIN;
+    protected Application.AccessType getAccessType(final String param) {
+        return Application.AccessType.ADMIN;
     }
 
     /** Returns name of this placeholder. */
     @Override
     public String toString() {
-        return getName() +  " (" + getService().getId() + ")";
+        return getName() +  " (" + getService().getId() + ')';
     }
 
     /**
@@ -335,16 +339,16 @@ public final class ConstraintPHInfo extends ServiceInfo {
     @Override
     public String getId() {
         String ordId = "";
-        String colId = "";
         final CRMXML.RscSetConnectionData rodata = rscSetConnectionDataOrd;
         if (rodata != null) {
-            ordId = rodata.getConstraintId() + "-" + rodata.getConnectionPos();
+            ordId = rodata.getConstraintId() + '-' + rodata.getConnectionPos();
         }
         final CRMXML.RscSetConnectionData rcdata = rscSetConnectionDataCol;
+        String colId = "";
         if (rcdata != null) {
-            colId = rcdata.getConstraintId() + "-" + rcdata.getConnectionPos();
+            colId = rcdata.getConstraintId() + '-' + rcdata.getConnectionPos();
         }
-        return "ph_" + ordId + "_" + colId;
+        return "ph_" + ordId + '_' + colId;
     }
 
     /** Return information panel. */
@@ -356,7 +360,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns tool tip for the placeholder. */
     @Override
-    public String getToolTipText(final boolean testOnly) {
+    public String getToolTipText(final Application.RunMode runMode) {
         return Tools.getString("ConstraintPHInfo.ToolTip");
     }
 
@@ -364,15 +368,15 @@ public final class ConstraintPHInfo extends ServiceInfo {
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final boolean testOnly = false;
-        addDependencyMenuItems(items, true, testOnly);
+        final Application.RunMode runMode = Application.RunMode.LIVE;
+        addDependencyMenuItems(items, true, runMode);
         /* remove the placeholder and all constraints associated with it. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                     Tools.getString("ConstraintPHInfo.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(ConfigData.AccessType.ADMIN, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -388,11 +392,11 @@ public final class ConstraintPHInfo extends ServiceInfo {
             @Override
             public void action() {
                 hidePopup();
-                removeMyself(false);
+                removeMyself(Application.RunMode.LIVE);
                 getBrowser().getCRMGraph().repaint();
             }
         };
-        final ClusterBrowser.ClMenuItemCallback removeItemCallback =
+        final ButtonCallback removeItemCallback =
                                     getBrowser().new ClMenuItemCallback(null) {
             @Override
             public boolean isEnabled() {
@@ -400,20 +404,20 @@ public final class ConstraintPHInfo extends ServiceInfo {
             }
             @Override
             public void action(final Host dcHost) {
-                removeMyselfNoConfirm(dcHost, true); /* test only */
+                removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(removeMenuItem, removeItemCallback);
-        items.add((UpdatableItem) removeMenuItem);
+        items.add(removeMenuItem);
         return items;
     }
 
     /** Removes the placeholder without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final boolean testOnly) {
+                                         final Application.RunMode runMode) {
         if (getService().isNew()) {
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setUpdated(true);
                 getService().setRemoved(true);
                 final HbConnectionInfo[] hbcis =
@@ -421,7 +425,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 for (final HbConnectionInfo hbci : hbcis) {
                     getBrowser().getCRMGraph().removeConnection(hbci,
                                                                 dcHost,
-                                                                testOnly);
+                                                                runMode);
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
@@ -437,16 +441,16 @@ public final class ConstraintPHInfo extends ServiceInfo {
             if (rscSetConnectionDataOrd != null) {
                 final String ordId = rscSetConnectionDataOrd.getConstraintId();
                 if (ordId != null) {
-                    CRM.removeOrder(dcHost, ordId, testOnly);
+                    CRM.removeOrder(dcHost, ordId, runMode);
                 }
             }
             if (rscSetConnectionDataCol != null) {
                 final String colId = rscSetConnectionDataCol.getConstraintId();
                 if (colId != null) {
-                    CRM.removeColocation(dcHost, colId, testOnly);
+                    CRM.removeColocation(dcHost, colId, runMode);
                 }
             }
-            if (!testOnly) {
+            if (Application.isLive(runMode)) {
                 setUpdated(true);
                 getService().setRemoved(true);
             }
@@ -455,9 +459,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Removes this placeholder from the crm with confirmation dialog. */
     @Override
-    public void removeMyself(final boolean testOnly) {
+    public void removeMyself(final Application.RunMode runMode) {
         if (getService().isNew()) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             getService().setNew(false);
             return;
         }
@@ -469,7 +473,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                      desc,
                      Tools.getString("ConstraintPHInfo.confirmRemove.Yes"),
                      Tools.getString("ConstraintPHInfo.confirmRemove.No"))) {
-            removeMyselfNoConfirm(getBrowser().getDCHost(), testOnly);
+            removeMyselfNoConfirm(getBrowser().getDCHost(), runMode);
             getService().setNew(false);
         }
     }
@@ -515,25 +519,20 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Adds constraint to or from placeholder. */
     protected List<CRMXML.RscSet> addConstraintWithPlaceholder(
-                                      final Set<ServiceInfo> servicesAll,
-                                      final Set<ServiceInfo> servicesFrom,
+                                      final Iterable<ServiceInfo> servicesAll,
+                                      final Collection<ServiceInfo> servicesFrom,
                                       final boolean colocation,
                                       final boolean order,
                                       final Host dcHost,
                                       final boolean force,
-                                      final boolean testOnly) {
-        boolean createCol = false;
-        boolean createOrd = false;
+                                      final Application.RunMode runMode) {
         String colId = null;
-        String ordId = null;
         final CRMXML.RscSetConnectionData rdataCol =
                                                 getRscSetConnectionDataCol();
         final CRMXML.RscSetConnectionData rdataOrd =
                                                 getRscSetConnectionDataOrd();
         CRMXML.RscSet colRscSet1 = null;
         CRMXML.RscSet colRscSet2 = null;
-        CRMXML.RscSet ordRscSet1 = null;
-        CRMXML.RscSet ordRscSet2 = null;
 
         if (rdataCol != null) {
             if (colocation) {
@@ -542,6 +541,9 @@ public final class ConstraintPHInfo extends ServiceInfo {
             colRscSet1 = rdataCol.getRscSet1();
             colRscSet2 = rdataCol.getRscSet2();
         }
+        String ordId = null;
+        CRMXML.RscSet ordRscSet1 = null;
+        CRMXML.RscSet ordRscSet2 = null;
         if (rdataOrd != null) {
             if (order) {
                 ordId = rdataOrd.getConstraintId();
@@ -550,10 +552,10 @@ public final class ConstraintPHInfo extends ServiceInfo {
             ordRscSet2 = rdataOrd.getRscSet2();
         }
         if (servicesFrom.isEmpty()) {
-            if (!testOnly && order) {
+            if (order && Application.isLive(runMode)) {
                 reverseOrder();
             }
-            if (!testOnly && colocation) {
+            if (colocation && Application.isLive(runMode)) {
                 reverseColocation();
             }
         }
@@ -564,6 +566,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
         final String requireAll = (preference == Preference.AND)
                                                     ? CRMXML.REQUIRE_ALL_TRUE.getValueForConfig()
                                                     : CRMXML.REQUIRE_ALL_FALSE.getValueForConfig();
+        boolean createCol = false;
+        boolean createOrd = false;
         for (final ServiceInfo serviceInfo : servicesAll) {
             final boolean isFrom = servicesFrom.contains(serviceInfo);
             final String idToAdd = serviceInfo.getService().getHeartbeatId();
@@ -611,8 +615,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         outColRscSet2 = colRscSet2;
                     }
                 } else {
-                    boolean colRscSetAdded = false;
-                    CRMXML.RscSet toRscSet;
+                    final CRMXML.RscSet toRscSet;
                     if (isFrom) {
                         if (outColRscSet1 == null) {
                             toRscSet = colRscSet1;
@@ -628,6 +631,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     }
                     final List<CRMXML.RscSet> rscSetsColList =
                                                  clStatus.getRscSetsCol(colId);
+                    boolean colRscSetAdded = false;
                     if (rscSetsColList != null) {
                         for (final CRMXML.RscSet rscSet : rscSetsColList) {
                             if (rscSet.equals(toRscSet)) {
@@ -733,8 +737,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                         outOrdRscSet2 = ordRscSet2;
                     }
                 } else {
-                    boolean ordRscSetAdded = false;
-                    CRMXML.RscSet toRscSet;
+                    final CRMXML.RscSet toRscSet;
                     if (isFrom) {
                         if (outOrdRscSet1 == null) {
                             toRscSet = ordRscSet1;
@@ -750,6 +753,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     }
                     final List<CRMXML.RscSet> rscSetsOrdList =
                                                  clStatus.getRscSetsOrd(ordId);
+                    boolean ordRscSetAdded = false;
                     if (rscSetsOrdList != null) {
                         for (final CRMXML.RscSet rscSet : rscSetsOrdList) {
                             if (rscSet.equals(toRscSet)) {
@@ -783,7 +787,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                     }
                     if (!ordRscSetAdded) {
                         final List<String> newRscIds = new ArrayList<String>();
-                        CRMXML.RscSet newRscSet;
+                        final CRMXML.RscSet newRscSet;
                         if (toRscSet == null) {
                             newRscSet = new CRMXML.RscSet(ordId,
                                                   newRscIds,
@@ -811,7 +815,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                 }
             }
         }
-        if (!testOnly) {
+        if (Application.isLive(runMode)) {
             setUpdated(false);
         }
         final List<CRMXML.RscSet> sets = new ArrayList<CRMXML.RscSet>();
@@ -840,7 +844,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                           rscSetsColAttrs,
                           rscSetsOrdAttrs,
                           attrs,
-                          testOnly);
+                          runMode);
         }
         return sets;
     }
@@ -900,7 +904,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
                   final boolean isCol,
                   final boolean first,
                   final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs) {
-        CRMXML.RscSetConnectionData rscd;
+        final CRMXML.RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataCol;
         } else {
@@ -909,7 +913,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
         if (rscd == null) {
             return;
         }
-        CRMXML.RscSet rscSet;
+        final CRMXML.RscSet rscSet;
         if (first) {
             rscSet = rscd.getRscSet1();
         } else {
@@ -921,7 +925,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
     /** Returns resource that is next in sequence in the resource set. */
     public ServiceInfo nextInSequence(final ServiceInfo si,
                                       final boolean isCol) {
-        CRMXML.RscSetConnectionData rscd;
+        final CRMXML.RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataCol;
         } else {
@@ -941,7 +945,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
             final List<String> ids = rscSet.getRscIds();
             for (int i = 0; i < ids.size(); i++) {
                 if (i < ids.size() - 1
-                    && ids.get(i).equals(si.getHeartbeatId(true))) {
+                    && ids.get(i).equals(si.getHeartbeatId(Application.RunMode.TEST))) {
                     return getBrowser().getServiceInfoFromCRMId(ids.get(i + 1));
                 }
             }
@@ -952,7 +956,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
     /** Returns resource that is before in sequence in the resource set. */
     public ServiceInfo prevInSequence(final ServiceInfo si,
                                       final boolean isCol) {
-        CRMXML.RscSetConnectionData rscd;
+        final CRMXML.RscSetConnectionData rscd;
         if (isCol) {
             rscd = rscSetConnectionDataCol;
         } else {
@@ -971,7 +975,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
             }
             final List<String> ids = rscSet.getRscIds();
             for (int i = ids.size() - 1; i >= 0; i--) {
-                if (i > 0 && ids.get(i).equals(si.getHeartbeatId(true))) {
+                if (i > 0 && ids.get(i).equals(
+                    si.getHeartbeatId(Application.RunMode.TEST))) {
                     return getBrowser().getServiceInfoFromCRMId(ids.get(i - 1));
                 }
             }
@@ -1000,18 +1005,18 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Returns text that appears above the icon in the graph. */
     @Override
-    public String getIconTextForGraph(final boolean testOnly) {
+    public String getIconTextForGraph(final Application.RunMode runMode) {
         return "   " + getService().getId();
     }
     /** Returns text with lines as array that appears in the cluster graph. */
     @Override
-    public Subtext[] getSubtextsForGraph(final boolean testOnly) {
+    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         return null;
     }
 
     /** Stops resource in crm. */
     @Override
-    void stopResource(final Host dcHost, final boolean testOnly) {
+    void stopResource(final Host dcHost, final Application.RunMode runMode) {
         /* cannot stop placeholder */
     }
 }

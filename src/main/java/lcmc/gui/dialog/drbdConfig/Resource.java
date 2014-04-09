@@ -63,8 +63,6 @@ import lcmc.utilities.LoggerFactory;
 public final class Resource extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Resource.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Wfc timeout option string. */
     private static final String WFC_TIMEOUT_PARAM = "wfc-timeout";
     /** Degr wfc timeout option string. */
@@ -112,7 +110,7 @@ public final class Resource extends DrbdConfig {
     /** Whether to add proxy host. */
     private boolean proxyHostNextDialog = false;
 
-    /** Prepares a new <code>Resource</code> object. */
+    /** Prepares a new {@code Resource} object. */
     public Resource(final WizardDialog previousDialog,
                     final DrbdVolumeInfo dvi) {
         super(previousDialog, dvi);
@@ -154,8 +152,6 @@ public final class Resource extends DrbdConfig {
                 wi.setValue(value);
             }
         }
-        drbdInfo.apply(false);
-        dri.apply(false);
         return new Volume(this, getDrbdVolumeInfo());
     }
 
@@ -194,8 +190,7 @@ public final class Resource extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final boolean ch = dri.checkResourceFieldsChanged(null, PARAMS);
-        final boolean cor = dri.checkResourceFieldsCorrect(null, PARAMS);
+        final boolean cor = dri.checkResourceFields(null, PARAMS).isCorrect();
         if (cor) {
             enableComponents();
         } else {
@@ -208,7 +203,7 @@ public final class Resource extends DrbdConfig {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
-        if (Tools.getConfigData().getAutoOptionGlobal("autodrbd") != null) {
+        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -219,10 +214,10 @@ public final class Resource extends DrbdConfig {
         final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final DrbdInfo drbdInfo = dri.getDrbdInfo();
         final JPanel inputPane = new JPanel();
-        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.X_AXIS));
+        inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.LINE_AXIS));
 
         final JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         /* common options */
         final Map<String, Value> commonPreferredValue =
                                                 new HashMap<String, Value>();
@@ -281,7 +276,7 @@ public final class Resource extends DrbdConfig {
         /* address combo boxes */
         dri.addHostAddresses(optionsPanel,
                              ClusterBrowser.SERVICE_LABEL_WIDTH,
-                             ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
+                             ClusterBrowser.SERVICE_FIELD_WIDTH << 1,
                              true,
                              buttonClass(nextButton()));
         dri.addWizardParams(
@@ -291,7 +286,7 @@ public final class Resource extends DrbdConfig {
                   Tools.getDefaultSize(
                                 "Dialog.DrbdConfig.Resource.LabelWidth"),
                   Tools.getDefaultSize(
-                                "Dialog.DrbdConfig.Resource.FieldWidth") * 2,
+                        "Dialog.DrbdConfig.Resource.FieldWidth") << 1,
                   null);
 
         inputPane.add(optionsPanel);
@@ -309,7 +304,7 @@ public final class Resource extends DrbdConfig {
      */
     private JPanel getProxyHostsPanel() {
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setBorder(Tools.getBorder(
                     Tools.getString("Dialog.DrbdConfig.Resource.ProxyHosts")));
 

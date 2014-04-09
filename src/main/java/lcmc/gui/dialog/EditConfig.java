@@ -37,6 +37,7 @@ import javax.swing.ImageIcon;
 import javax.swing.text.Document;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
+import java.awt.Color;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.FlowLayout;
@@ -57,8 +58,6 @@ public final class EditConfig extends ConfigDialog {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(EditConfig.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** File to edit. */
     private final String file;
     /** Cluster hosts. */
@@ -93,22 +92,19 @@ public final class EditConfig extends ConfigDialog {
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-        final JPanel hostsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        errorPanel.setForeground(java.awt.Color.RED);
-        int i = 0;
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
+        final JPanel hostsPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        errorPanel.setForeground(Color.RED);
         backupCB.setBackground(
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
         hostsPanel.add(backupCB);
         for (final Host host : hosts) {
             final JCheckBox hcb = new JCheckBox(host.getName());
             hostCbs.put(host, hcb);
-            final int index = i;
             hcb.setBackground(
                         Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
             hostsPanel.add(hcb);
-            i++;
         }
         hostsPanel.add(errorPanel);
         pane.add(hostsPanel);
@@ -126,7 +122,7 @@ public final class EditConfig extends ConfigDialog {
         super.initDialogBeforeVisible();
         /* align buttons to the right */
         final FlowLayout layout = new FlowLayout();
-        layout.setAlignment(FlowLayout.RIGHT);
+        layout.setAlignment(FlowLayout.TRAILING);
 
         if (buttonClass(cancelButton()) != null) {
             buttonClass(cancelButton()).getParent().setLayout(layout);
@@ -140,7 +136,7 @@ public final class EditConfig extends ConfigDialog {
                                final int errorCode,
                                final boolean selected) {
         if (selected) {
-            String config;
+            final String config;
             if (errorCode == 0) {
                 config = text;
             } else {
@@ -169,19 +165,19 @@ public final class EditConfig extends ConfigDialog {
             final ExecCallback execCallback =
                 new ExecCallback() {
                     @Override
-                    public void done(final String ans) {
-                        final String text = ans.replaceAll("\r", "")
+                    public void done(final String answer) {
+                        final String text = answer.replaceAll("\r", "")
                                                .replaceFirst("\n$", "");
                         results[index] = text;
                         errors[index] = 0;
                     }
 
                     @Override
-                    public void doneError(final String ans,
-                                          final int exitCode) {
-                        results[index] = ans;
-                        errors[index] = exitCode;
-                        LOG.sshError(host, "", ans, "", exitCode);
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        results[index] = answer;
+                        errors[index] = errorCode;
+                        LOG.sshError(host, "", answer, "", errorCode);
                     }
 
                 };
@@ -195,13 +191,12 @@ public final class EditConfig extends ConfigDialog {
         for (final ExecCommandThread t : threads) {
             try {
                 t.join(0);
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
         i = 0;
         for (final Host host : hosts) {
-            final int index = i;
             final JCheckBox hcb = hostCbs.get(host);
             if (i == 0 || results[0].equals(results[i])) {
                 hcb.setSelected(true);
@@ -259,17 +254,17 @@ public final class EditConfig extends ConfigDialog {
             }
 
             @Override
-            public void changedUpdate(final DocumentEvent documentEvent) {
+            public void changedUpdate(final DocumentEvent e) {
                 update();
             }
 
             @Override
-            public void insertUpdate(final DocumentEvent documentEvent) {
+            public void insertUpdate(final DocumentEvent e) {
                 update();
             }
 
             @Override
-            public void removeUpdate(final DocumentEvent documentEvent) {
+            public void removeUpdate(final DocumentEvent e) {
                 update();
             }
         });
@@ -280,7 +275,7 @@ public final class EditConfig extends ConfigDialog {
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.EditConfig.Title")
-               + " " + file;
+               + ' ' + file;
     }
 
     /**

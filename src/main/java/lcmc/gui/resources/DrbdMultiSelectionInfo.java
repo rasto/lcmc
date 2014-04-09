@@ -20,13 +20,9 @@
  */
 package lcmc.gui.resources;
 
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-import lcmc.data.ClusterStatus;
-import lcmc.data.PtestData;
 import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenuItem;
@@ -34,7 +30,7 @@ import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.DRBD;
-import javax.swing.ImageIcon;
+
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
@@ -48,15 +44,16 @@ import java.awt.event.ActionEvent;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Color;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import lcmc.data.Value;
+
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
@@ -72,20 +69,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private static final String LV_CREATE_MENU_ITEM =
                             Tools.getString("DrbdMultiSelectionInfo.LVCreate");
 
-    /** Prepares a new <code>DrbdMultiSelectionInfo</code> object. */
+    /** Prepares a new {@code DrbdMultiSelectionInfo} object. */
     public DrbdMultiSelectionInfo(final List<Info> selectedInfos,
                                   final Browser browser) {
         super("selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
-    /** @see EditableInfo#getMenuIcon() */
-    @Override
-    public ImageIcon getMenuIcon(final boolean testOnly) {
-        return null;
-    }
-
-    /** @see EditableInfo#getInfoType() */
     @Override
     protected String getInfoType() {
         return Tools.MIME_TYPE_TEXT_HTML;
@@ -97,7 +87,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         final StringBuilder s = new StringBuilder(80);
         s.append(Tools.getString("DrbdMultiSelectionInfo.Selection"));
         for (final Info si : selectedInfos) {
-            s.append(si.toString());
+            s.append(si);
             s.append("<br />");
         }
         return s.toString();
@@ -106,14 +96,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     /** Create menu items for selected hosts. */
     private void createSelectedHostsPopup(
                                     final List<HostDrbdInfo> selectedHostInfos,
-                                    final List<UpdatableItem> items) {
+                                    final Collection<UpdatableItem> items) {
         /* load drbd */
-        final MyMenuItem loadItem =
+        final UpdatableItem loadItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.LoadDrbd"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.LoadDrbd"),
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -133,7 +123,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.load(hi.getHost(), CRM.LIVE);
+                        DRBD.load(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -149,8 +139,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                    Tools.getString("DrbdMultiSelectionInfo.AdjustAllDrbd"),
                    null,
                    Tools.getString("DrbdMultiSelectionInfo.AdjustAllDrbd"),
-                           new AccessMode(ConfigData.AccessType.OP, false),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -169,7 +159,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         DRBD.adjustApply(hi.getHost(),
                                          DRBD.ALL,
                                          null,
-                                         CRM.LIVE);
+                                         Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -178,7 +168,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
             };
         items.add(adjustAllItem);
-        final ClusterBrowser.DRBDMenuItemCallback adjustAllItemCallback =
+        final ButtonCallback adjustAllItemCallback =
                getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
@@ -186,7 +176,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     DRBD.adjustApply(hi.getHost(),
                                      DRBD.ALL,
                                      null,
-                                     CRM.TESTONLY);
+                                     Application.RunMode.TEST);
                 }
             }
         };
@@ -197,8 +187,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.UpAll"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.UpAll"),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false),
-                           new AccessMode(ConfigData.AccessType.ADMIN, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -214,30 +204,30 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.up(hi.getHost(), DRBD.ALL, null, CRM.LIVE);
+                        DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.LIVE);
                     }
                 }
             };
         items.add(upAllItem);
-        final ClusterBrowser.DRBDMenuItemCallback upAllItemCallback =
+        final ButtonCallback upAllItemCallback =
              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.up(hi.getHost(), DRBD.ALL, null, CRM.TESTONLY);
+                    DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
             }
         };
         addMouseOverListener(upAllItem, upAllItemCallback);
 
         /* stop drbd proxy with init script */
-        final MyMenuItem stopProxyItem =
+        final UpdatableItem stopProxyItem =
             new MyMenuItem(
                         Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
                         null,
                         Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
-                        new AccessMode(ConfigData.AccessType.OP, false),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -253,7 +243,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.stopProxy(hi.getHost(), CRM.LIVE);
+                        DRBD.stopProxy(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -264,13 +254,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(stopProxyItem);
 
         /* start drbd proxy with init script */
-        final MyMenuItem startProxyItem =
+        final UpdatableItem startProxyItem =
             new MyMenuItem(
                       Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
                       null,
                       Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
-                      new AccessMode(ConfigData.AccessType.OP, false),
-                      new AccessMode(ConfigData.AccessType.OP, false)) {
+                      new AccessMode(Application.AccessType.OP, false),
+                      new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -286,7 +276,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 @Override
                 public void action() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.startProxy(hi.getHost(), CRM.LIVE);
+                        DRBD.startProxy(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(),
@@ -297,19 +287,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(startProxyItem);
 
         /* change host color */
-        final MyMenuItem changeHostColorItem =
+        final UpdatableItem changeHostColorItem =
             new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.ChangeHostColor"),
                     null,
                     "",
-                    new AccessMode(ConfigData.AccessType.RO, false),
-                    new AccessMode(ConfigData.AccessType.RO, false)) {
+                    new AccessMode(Application.AccessType.RO, false),
+                    new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    return null;
-                }
 
                 @Override
                 public void action() {
@@ -330,14 +315,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'PV create' menu item. */
-    private MyMenuItem getPVCreateItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getPVCreateItem(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.PVCreate"),
                     null,
                     Tools.getString("DrbdMultiSelectionInfo.PVCreate.ToolTip"),
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -353,19 +338,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
                 /* at least one must be true */
-                final Set<Host> hosts = new HashSet<Host>();
+                final Collection<Host> hosts = new HashSet<Host>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.canCreatePV()
                         && (!bdi.getBlockDevice().isDrbd()
                             || bdi.getBlockDevice().isPrimary())) {
-                        final boolean ret = bdi.pvCreate(DRBD.LIVE);
+                        final boolean ret = bdi.pvCreate(Application.RunMode.LIVE);
                         if (!ret) {
                             Tools.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVCreate.Failed",
@@ -384,14 +364,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'PV remove' menu item. */
-    private MyMenuItem getPVRemoveItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getPVRemoveItem(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.PVRemove"),
                     null,
                     Tools.getString("DrbdMultiSelectionInfo.PVRemove.ToolTip"),
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -408,18 +388,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
-                final Set<Host> hosts = new HashSet<Host>();
+                final Collection<Host> hosts = new HashSet<Host>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.canRemovePV()
                         && (!bdi.getBlockDevice().isDrbd()
                             || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
-                        final boolean ret = bdi.pvRemove(DRBD.LIVE);
+                        final boolean ret = bdi.pvRemove(Application.RunMode.LIVE);
                         if (!ret) {
                             Tools.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVRemove.Failed",
@@ -438,26 +413,26 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'vg create' menu item. */
-    private MyMenuItem getVGCreateItem(
+    private UpdatableItem getVGCreateItem(
                               final List<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                   Tools.getString("DrbdMultiSelectionInfo.VGCreate"),
                   null,
                   Tools.getString("DrbdMultiSelectionInfo.VGCreate.ToolTip"),
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
             public boolean visiblePredicate() {
                 /* all of them must be true */
-                BlockDevice bd;
 
                 if (selectedBlockDevInfos.isEmpty()) {
                     return false;
                 }
 
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                    final BlockDevice bd;
                     if (bdi.getBlockDevice().isDrbd()) {
                         if (!bdi.getBlockDevice().isPrimary()) {
                             return false;
@@ -475,11 +450,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
                 return true;
-            }
-
-            @Override
-            public String enablePredicate() {
-                return null;
             }
 
             @Override
@@ -501,14 +471,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'vg remove' menu item. */
-    private MyMenuItem getVGRemoveItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getVGRemoveItem(
+                              final Collection<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                   Tools.getString("DrbdMultiSelectionInfo.VGRemove"),
                   null,
                   Tools.getString("DrbdMultiSelectionInfo.VGRemove.ToolTip"),
-                  new AccessMode(ConfigData.AccessType.OP, false),
-                  new AccessMode(ConfigData.AccessType.OP, false)) {
+                  new AccessMode(Application.AccessType.OP, false),
+                  new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -525,11 +495,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     }
                 }
                 return false;
-            }
-
-            @Override
-            public String enablePredicate() {
-                return null;
             }
 
             @Override
@@ -556,11 +521,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'lv create' menu item. */
-    private List<MyMenuItem> getLVCreateItems(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private Collection<MyMenuItem> getLVCreateItems(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         final Map<String, Set<BlockDevInfo>> vgs =
                                 new LinkedHashMap<String, Set<BlockDevInfo>>();
-        final List<MyMenuItem> mis = new ArrayList<MyMenuItem>();
+        final Collection<MyMenuItem> mis = new ArrayList<MyMenuItem>();
         for (final BlockDevInfo bdi : selectedBlockDevInfos) {
             final String vgName = bdi.getVGName();
             Set<BlockDevInfo> bdis = vgs.get(vgName);
@@ -583,8 +548,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     name,
                     null,
                     Tools.getString("DrbdMultiSelectionInfo.LVCreate.ToolTip"),
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -592,18 +557,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     for (final BlockDevInfo bdi : bdis) {
                         final String vg = bdi.getVGName();
                         if (vg != null
-                            && !"".equals(vg)
+                            && !vg.isEmpty()
                             && bdi.getHost().getVolumeGroupNames()
                                             .contains(vg)) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    return null;
                 }
 
                 @Override
@@ -635,20 +595,15 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     /** Returns 'LV remove' menu item. */
-    private MyMenuItem getLVRemoveItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
+    private UpdatableItem getLVRemoveItem(
+                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
                     Tools.getString("DrbdMultiSelectionInfo.LVRemove"),
                     null,
                     Tools.getString("DrbdMultiSelectionInfo.LVRemove.ToolTip"),
-                    new AccessMode(ConfigData.AccessType.OP, false),
-                    new AccessMode(ConfigData.AccessType.OP, false)) {
+                    new AccessMode(Application.AccessType.OP, false),
+                    new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return true;
-            }
 
             @Override
             public boolean visiblePredicate() {
@@ -661,14 +616,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             }
 
             @Override
-            public String enablePredicate() {
-                return null;
-            }
-
-            @Override
             public void action() {
-                final Set<Host> selectedHosts = new HashSet<Host>();
-                final List<String> bdNames = new ArrayList<String>();
+                final Collection<Host> selectedHosts = new HashSet<Host>();
+                final Collection<String> bdNames = new ArrayList<String>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     bdNames.add(bdi.getName());
                     selectedHosts.add(bdi.getHost());
@@ -685,7 +635,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             "DrbdMultiSelectionInfo.LVRemove.Confirm.Cancel")
                         )) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                        bdi.lvRemove(CRM.LIVE);
+                        bdi.lvRemove(Application.RunMode.LIVE);
                     }
                     for (final Host h : selectedHosts) {
                         getBrowser().updateHWInfo(h, Host.UPDATE_LVM);
@@ -698,14 +648,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     /** Create menu items for selected block devices. */
     private void createSelectedBlockDevPopup(
                                  final List<BlockDevInfo> selectedBlockDevInfos,
-                                 final List<UpdatableItem> items) {
+                                 final Collection<UpdatableItem> items) {
         /* detach */
         final MyMenuItem detachMenu =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Detach"),
                            BlockDevInfo.NO_HARDDISK_ICON_LARGE,
                            Tools.getString("DrbdMultiSelectionInfo.Detach"),
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -715,7 +665,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.isDiskless(CRM.LIVE)) {
+                        if (!bdi.isDiskless(Application.RunMode.LIVE)) {
                             oneAttached = true;
                         }
                     }
@@ -729,7 +679,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -749,26 +699,26 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
-                            && !bdi.isDiskless(CRM.LIVE)) {
-                            bdi.detach(CRM.LIVE);
+                            && !bdi.isDiskless(Application.RunMode.LIVE)) {
+                            bdi.detach(Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback detachItemCallback =
+        final ButtonCallback detachItemCallback =
               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (Tools.getConfigData().isAdvancedMode()
+                        && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
-                        && !bdi.isDiskless(CRM.LIVE)) {
-                        bdi.detach(CRM.TESTONLY);
+                        && !bdi.isDiskless(Application.RunMode.LIVE)) {
+                        bdi.detach(Application.RunMode.TEST);
                     }
                 }
             }
@@ -781,8 +731,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Attach"),
                            BlockDevInfo.HARDDISK_DRBD_ICON_LARGE,
                            Tools.getString("DrbdMultiSelectionInfo.Attach"),
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -792,7 +742,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (bdi.isDiskless(CRM.LIVE)) {
+                        if (bdi.isDiskless(Application.RunMode.LIVE)) {
                             oneDetached = true;
                         }
                     }
@@ -806,7 +756,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -826,26 +776,26 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
-                            && bdi.isDiskless(CRM.LIVE)) {
-                            bdi.attach(CRM.LIVE);
+                            && bdi.isDiskless(Application.RunMode.LIVE)) {
+                            bdi.attach(Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback attachItemCallback =
+        final ButtonCallback attachItemCallback =
              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (Tools.getConfigData().isAdvancedMode()
+                        && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
-                        && bdi.isDiskless(CRM.LIVE)) {
-                        bdi.attach(CRM.TESTONLY);
+                        && bdi.isDiskless(Application.RunMode.LIVE)) {
+                        bdi.attach(Application.RunMode.TEST);
                     }
                 }
             }
@@ -858,8 +808,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Connect"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.Connect"),
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -869,7 +819,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (!bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             oneDisconnected = true;
                         }
                     }
@@ -883,11 +833,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
-                        if (bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             continue;
                         }
                         connectable = true;
@@ -903,24 +853,24 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
-                            && !bdi.isConnectedOrWF(CRM.LIVE)) {
-                            bdi.connect(CRM.LIVE);
+                            && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
+                            bdi.connect(Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback connectItemCallback =
+        final ButtonCallback connectItemCallback =
               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (Tools.getConfigData().isAdvancedMode()
+                        && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
-                        && !bdi.isConnectedOrWF(CRM.LIVE)) {
-                        bdi.connect(CRM.TESTONLY);
+                        && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
+                        bdi.connect(Application.RunMode.TEST);
                     }
                 }
             }
@@ -933,8 +883,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Disconnect"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.Disconnect"),
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -944,7 +894,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             oneConnected = true;
                         }
                     }
@@ -958,7 +908,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -970,7 +920,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                     && bdi.getBlockDevice().isSyncSource()))) {
                             continue;
                         }
-                        if (!bdi.isConnectedOrWF(CRM.LIVE)) {
+                        if (!bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             continue;
                         }
                         disconnectable = true;
@@ -986,8 +936,8 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 public void action() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && bdi.isConnectedOrWF(CRM.LIVE)
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && bdi.isConnectedOrWF(Application.RunMode.LIVE)
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && (!bdi.getBlockDevice().isSyncing()
                                 || (bdi.getBlockDevice().isPrimary()
@@ -995,19 +945,19 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                    || (bdi.getOtherBlockDevInfo()
                                           .getBlockDevice().isPrimary()
                                        && bdi.getBlockDevice().isSyncTarget()))) {
-                            bdi.disconnect(CRM.LIVE);
+                            bdi.disconnect(Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ClusterBrowser.DRBDMenuItemCallback disconnectItemCallback =
+        final ButtonCallback disconnectItemCallback =
               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
             @Override
-            public void action(final Host host) {
+            public void action(final Host dcHost) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && bdi.isConnectedOrWF(CRM.LIVE)
-                        && (Tools.getConfigData().isAdvancedMode()
+                        && bdi.isConnectedOrWF(Application.RunMode.LIVE)
+                        && (Tools.getApplication().isAdvancedMode()
                             || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && (!bdi.getBlockDevice().isSyncing()
                             || (bdi.getBlockDevice().isPrimary()
@@ -1015,7 +965,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                || (bdi.getOtherBlockDevInfo()
                                       .getBlockDevice().isPrimary()
                                    && bdi.getBlockDevice().isSyncTarget()))) {
-                        bdi.disconnect(CRM.TESTONLY);
+                        bdi.disconnect(Application.RunMode.TEST);
                     }
                 }
             }
@@ -1024,12 +974,12 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(disconnectMenu);
 
         /* set primary */
-        final MyMenuItem setPrimaryItem =
+        final UpdatableItem setPrimaryItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.SetPrimary"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.SetPrimary"),
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1049,7 +999,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -1072,7 +1022,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isPrimary()
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             final BlockDevInfo oBdi =
                                                     bdi.getOtherBlockDevInfo();
@@ -1082,7 +1032,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                 && !bdi.allowTwoPrimaries()) {
                                 continue;
                             }
-                            bdi.setPrimary(CRM.LIVE);
+                            bdi.setPrimary(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1090,13 +1040,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(setPrimaryItem);
 
         /* set secondary */
-        final MyMenuItem setSecondaryItem =
+        final UpdatableItem setSecondaryItem =
             new MyMenuItem(
                         Tools.getString("DrbdMultiSelectionInfo.SetSecondary"),
                         null,
                         Tools.getString("DrbdMultiSelectionInfo.SetSecondary"),
-                        new AccessMode(ConfigData.AccessType.OP, true),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.OP, true),
+                        new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1116,7 +1066,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -1135,9 +1085,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && bdi.getBlockDevice().isPrimary()
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
-                            bdi.setSecondary(CRM.LIVE);
+                            bdi.setSecondary(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1145,13 +1095,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(setSecondaryItem);
 
         /* force primary */
-        final MyMenuItem forcePrimaryItem =
+        final UpdatableItem forcePrimaryItem =
             new MyMenuItem(
                         Tools.getString("DrbdMultiSelectionInfo.ForcePrimary"),
                         null,
                         Tools.getString("DrbdMultiSelectionInfo.ForcePrimary"),
-                        new AccessMode(ConfigData.AccessType.ADMIN, true),
-                        new AccessMode(ConfigData.AccessType.OP, false)) {
+                        new AccessMode(Application.AccessType.ADMIN, true),
+                        new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1171,7 +1121,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -1194,7 +1144,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isPrimary()
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             final BlockDevInfo oBdi =
                                                     bdi.getOtherBlockDevInfo();
@@ -1204,7 +1154,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                 && !bdi.allowTwoPrimaries()) {
                                 continue;
                             }
-                            bdi.forcePrimary(CRM.LIVE);
+                            bdi.forcePrimary(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1212,12 +1162,12 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(forcePrimaryItem);
 
         /* invalidate */
-        final MyMenuItem invalidateItem =
+        final UpdatableItem invalidateItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Invalidate"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.Invalidate"),
-                           new AccessMode(ConfigData.AccessType.ADMIN, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1237,7 +1187,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -1268,9 +1218,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && !bdi.getDrbdVolumeInfo().isVerifying()
                             && !selectedBlockDevInfos.contains(
                                                    bdi.getOtherBlockDevInfo())
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
-                            bdi.invalidateBD(CRM.LIVE);
+                            bdi.invalidateBD(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1278,13 +1228,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(invalidateItem);
 
         /* resume */
-        final MyMenuItem resumeSyncItem =
+        final UpdatableItem resumeSyncItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ResumeSync"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.ResumeSync"),
 
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1326,7 +1276,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && bdi.getBlockDevice().isSyncing()
                             && !bdi.getBlockDevice().isSyncTarget()
                             && !bdi.getBlockDevice().isSyncSource()) {
-                            bdi.resumeSync(CRM.LIVE);
+                            bdi.resumeSync(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1334,12 +1284,12 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(resumeSyncItem);
 
         /* pause sync */
-        final MyMenuItem pauseSyncItem =
+        final UpdatableItem pauseSyncItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.PauseSync"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.PauseSync"),
-                           new AccessMode(ConfigData.AccessType.OP, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.OP, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1377,7 +1327,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (bdi.getBlockDevice().isDrbd()
                             && (bdi.getBlockDevice().isSyncTarget()
                                 || bdi.getBlockDevice().isSyncSource())) {
-                            bdi.pauseSync(CRM.LIVE);
+                            bdi.pauseSync(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1385,12 +1335,12 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(pauseSyncItem);
 
         /* resize */
-        final MyMenuItem resizeItem =
+        final UpdatableItem resizeItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Resize"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.Resize"),
-                           new AccessMode(ConfigData.AccessType.ADMIN, true),
-                           new AccessMode(ConfigData.AccessType.OP, false)) {
+                           new AccessMode(Application.AccessType.ADMIN, true),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1433,7 +1383,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             && !selectedBlockDevInfos.contains(
                                                    bdi.getOtherBlockDevInfo())
                             && !bdi.getBlockDevice().isSyncing()) {
-                            bdi.resizeDrbd(CRM.LIVE);
+                            bdi.resizeDrbd(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1441,13 +1391,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(resizeItem);
 
         /* discard my data */
-        final MyMenuItem discardDataItem =
+        final UpdatableItem discardDataItem =
             new MyMenuItem(
                          Tools.getString("DrbdMultiSelectionInfo.DiscardData"),
                          null,
                          Tools.getString("DrbdMultiSelectionInfo.DiscardData"),
-                         new AccessMode(ConfigData.AccessType.ADMIN, true),
-                         new AccessMode(ConfigData.AccessType.OP, false)) {
+                         new AccessMode(Application.AccessType.ADMIN, true),
+                         new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -1467,7 +1417,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getConfigData().isAdvancedMode()
+                        if (!Tools.getApplication().isAdvancedMode()
                             && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
@@ -1496,11 +1446,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (bdi.getBlockDevice().isDrbd()
                             && !selectedBlockDevInfos.contains(
                                                    bdi.getOtherBlockDevInfo())
-                            && (Tools.getConfigData().isAdvancedMode()
+                            && (Tools.getApplication().isAdvancedMode()
                                 || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.getBlockDevice().isPrimary()) {
-                            bdi.discardData(CRM.LIVE);
+                            bdi.discardData(Application.RunMode.LIVE);
                         }
                     }
                 }
@@ -1508,13 +1458,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(discardDataItem);
 
         /* proxy down */
-        final MyMenuItem proxyDownItem =
+        final UpdatableItem proxyDownItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1562,7 +1512,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    final Set<Host> hosts = new HashSet<Host>();
+                    final Collection<Host> hosts = new HashSet<Host>();
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
@@ -1576,7 +1526,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             DRBD.proxyDown(pHost,
                                            dri.getName(),
                                            bdi.getDrbdVolumeInfo().getName(),
-                                           CRM.LIVE);
+                                           Application.RunMode.LIVE);
                             hosts.add(pHost);
                         }
                     }
@@ -1588,13 +1538,13 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         items.add(proxyDownItem);
 
         /* proxy up */
-        final MyMenuItem proxyUpItem =
+        final UpdatableItem proxyUpItem =
             new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
                            null,
                            Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
-                           new AccessMode(ConfigData.AccessType.ADMIN,
+                           new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
-                           new AccessMode(ConfigData.AccessType.OP,
+                           new AccessMode(Application.AccessType.OP,
                                           !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
@@ -1642,7 +1592,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
                 @Override
                 public void action() {
-                    final Set<Host> hosts = new HashSet<Host>();
+                    final Collection<Host> hosts = new HashSet<Host>();
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
@@ -1656,7 +1606,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             DRBD.proxyUp(pHost,
                                          dri.getName(),
                                          bdi.getDrbdVolumeInfo().getName(),
-                                         CRM.LIVE);
+                                         Application.RunMode.LIVE);
                             hosts.add(pHost);
                         }
                     }
@@ -1704,138 +1654,106 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         return items;
     }
 
-    /** @see EditableInfo#getBrowser() */
     @Override
     protected ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** @see EditableInfo#getGraphicalView() */
     @Override
     public JPanel getGraphicalView() {
         return getBrowser().getDrbdGraph().getGraphPanel();
     }
 
-    /** @see EditableInfo#isEnabledOnlyInAdvancedMode() */
     @Override
     protected boolean isEnabledOnlyInAdvancedMode(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#getAccessType() */
     @Override
-    protected ConfigData.AccessType getAccessType(final String param) {
+    protected Application.AccessType getAccessType(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getSection()
-     */
     @Override
     protected String getSection(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#isRequired() */
     @Override
     protected boolean isRequired(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isAdvanced() */
     @Override
     protected boolean isAdvanced(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isEnabled() */
     @Override
     protected String isEnabled(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#isInteger() */
     @Override
     protected boolean isInteger(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isLabel() */
     @Override
     protected boolean isLabel(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isTimeType() */
     @Override
     protected boolean isTimeType(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#isCheckBox() */
     @Override
     protected boolean isCheckBox(final String param) {
         return false;
     }
 
-    /** @see EditableInfo#getParamType() */
     @Override
     protected String getParamType(final String param) {
         return null;
     }
 
-
-    /** @see EditableInfo#getParametersFromXML() */
     @Override
     public String[] getParametersFromXML() {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamPossibleChoices()
-     */
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#checkParam() */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         return true;
     }
 
-    /** @see EditableInfo#getParamDefault() */
     @Override
     public Value getParamDefault(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamPreferred()
-     */
     @Override
     protected Value getParamPreferred(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamShortDesc()
-     */
     @Override
     protected String getParamShortDesc(final String param) {
         return null;
     }
 
-    /**
-     * @see EditableInfo#getParamLongDesc()
-     */
     @Override
     protected String getParamLongDesc(final String param) {
         return null;
     }
 
-    /** @see EditableInfo#getInfoPanel() */
     @Override
     public JComponent getInfoPanel() {
         final boolean abExisted = getApplyButton() != null;
@@ -1847,10 +1765,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             @Override
             public boolean isEnabled() {
                 final Host dcHost = getBrowser().getDCHost();
-                if (dcHost == null) {
-                    return false;
-                }
-                return !Tools.versionBeforePacemaker(dcHost);
+                return dcHost != null && !Tools.versionBeforePacemaker(dcHost);
             }
             @Override
             public void mouseOut(final ComponentWithTest component) {
@@ -1885,7 +1800,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     cs.setPtestData(null);
-                    apply(dcHost, CRM.TESTONLY);
+                    apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestData(ptestData);
@@ -1906,7 +1821,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                             @Override
                             public void run() {
                                 getBrowser().clStatusLock();
-                                apply(getBrowser().getDCHost(), CRM.LIVE);
+                                apply(getBrowser().getDCHost(), Application.RunMode.LIVE);
                                 getBrowser().clStatusUnlock();
                             }
                         });
@@ -1935,7 +1850,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* main, button and options panels */
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
@@ -1944,14 +1859,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Actions */
         final JMenuBar mb = new JMenuBar();
         mb.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         final AbstractButton serviceMenu = getActionsButton();
-        buttonPanel.add(serviceMenu, BorderLayout.EAST);
+        buttonPanel.add(serviceMenu, BorderLayout.LINE_END);
 
         /* apply button */
         addApplyButton(buttonPanel);
@@ -1968,7 +1883,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         mainPanel.add(super.getInfoPanel());
         final JPanel newPanel = new JPanel();
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
-        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.Y_AXIS));
+        newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
                                   ClusterBrowser.SERVICE_LABEL_WIDTH
@@ -1984,6 +1899,6 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
      * Apply the changes to the drbd parameters.
      * not implemented
      */
-    void apply(final Host dcHost, final boolean testOnly) {
+    void apply(final Host dcHost, final Application.RunMode runMode) {
     }
 }

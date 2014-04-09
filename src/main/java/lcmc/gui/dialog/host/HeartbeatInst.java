@@ -23,7 +23,7 @@
 package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
@@ -43,12 +43,10 @@ import javax.swing.JComponent;
  *
  */
 final class HeartbeatInst extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>HeartbeatInst</code> object. */
+    /** Prepares a new {@code HeartbeatInst} object. */
     HeartbeatInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -66,7 +64,7 @@ final class HeartbeatInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.HeartbeatInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("hbinst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -99,26 +97,26 @@ final class HeartbeatInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "HbPmInst.install." + installMethod;
         }
-        Tools.getConfigData().setLastHbPmInstalledMethod(
+        Tools.getApplication().setLastHbPmInstalledMethod(
             getHost().getDistString("HbPmInst.install.text." + installMethod));
-        Tools.getConfigData().setLastInstalledClusterStack(
-                                                ConfigData.HEARTBEAT_NAME);
+        Tools.getApplication().setLastInstalledClusterStack(
+                                                Application.HEARTBEAT_NAME);
 
         getHost().execCommandInBash(
                          installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans, installMethod);
+                             public void done(final String answer) {
+                                 checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(Tools.getString(
                                          "Dialog.Host.HeartbeatInst.InstError"),
-                                                    ans,
-                                                    exitCode);
+                                         answer,
+                                         errorCode);
                              }
                          },
                          new ConvertCmdCallback() {

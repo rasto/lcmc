@@ -45,8 +45,6 @@ import java.awt.Dimension;
  *
  */
 final class Finish extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Add another host button. */
     private MyButton addAnotherHostButton;
     /** Configure cluster button. */
@@ -66,7 +64,7 @@ final class Finish extends DialogHost {
     /** Next dialog. */
     private WizardDialog nextDialog = null;
     /**
-     * Prepares a new <code>Finish</code> object.
+     * Prepares a new {@code Finish} object.
      */
     Finish(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
@@ -82,7 +80,7 @@ final class Finish extends DialogHost {
     @Override
     protected void finishDialog() {
         if (saveCB.isSelected()) {
-            final String saveFile = Tools.getConfigData().getSaveFile();
+            final String saveFile = Tools.getApplication().getSaveFile();
             Tools.save(saveFile, false);
         }
     }
@@ -99,14 +97,14 @@ final class Finish extends DialogHost {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
-        if (Tools.getConfigData().danglingHostsCount() < 2) {
+        if (Tools.getApplication().danglingHostsCount() < 2) {
             makeDefaultAndRequestFocusLater(addAnotherHostButton);
         } else {
             makeDefaultAndRequestFocusLater(confClusterButton);
         }
-        Tools.getConfigData().removeAutoHost();
-        if (Tools.getConfigData().getAutoHosts().isEmpty()) {
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+        Tools.getApplication().removeAutoHost();
+        if (Tools.getApplication().getAutoHosts().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -208,7 +206,7 @@ final class Finish extends DialogHost {
             }
         });
         pane.add(addAnotherHostButton);
-        if (Tools.getConfigData().danglingHostsCount() < 1) {
+        if (Tools.getApplication().danglingHostsCount() < 1) {
             confClusterButton.setEnabled(false);
         }
         pane.add(confClusterButton);

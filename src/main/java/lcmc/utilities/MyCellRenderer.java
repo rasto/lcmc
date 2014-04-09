@@ -22,13 +22,15 @@
 
 package lcmc.utilities;
 
+import javax.swing.AbstractButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.JComponent;
+import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 import java.awt.Component;
-import javax.swing.SwingConstants;
 import java.awt.Color;
 import java.awt.Insets;
 
@@ -40,7 +42,7 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
     /** Border for jlabel so, that there is spacing in the table. Table spacing
      * cannot be used because of row colors. */
-    private static final EmptyBorder EMPTY_BORDER =
+    private static final Border EMPTY_BORDER =
                                        new EmptyBorder(new Insets(0, 4, 0, 4));
     /** Creates a new MyCellRenderer object. */
     public MyCellRenderer() {
@@ -59,10 +61,10 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
                                                       final boolean hasFocus,
                                                       final int row,
                                                       final int column) {
-        JComponent ret;
+        final JComponent ret;
         final int al = getColumnAlignment(column);
         if (value instanceof JLabel) {
-            ret  = (JLabel) value;
+            ret  = (JComponent) value;
         } else {
             if (value != null) {
                 setText(value.toString());
@@ -72,13 +74,13 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
         ((JLabel) ret).setHorizontalAlignment(al);
         final Object v = table.getValueAt(row, 0);
         if (v instanceof MyButton) {
-            final String key = ((MyButton) v).getText();
+            final String key = ((AbstractButton) v).getText();
             final Color bg = getRowColor(key);
             ret.setBackground(bg);
         }
         ret.setBorder(EMPTY_BORDER);
         if (value != null) {
-            if ("".equals(value.toString())) {
+            if (value.toString() != null && value.toString().isEmpty()) {
                 ret.setToolTipText(" ");
             } else {
                 ret.setToolTipText(value.toString());

@@ -46,7 +46,7 @@ public final class Label extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
 
-    /** Prepares a new <code>Label</code> object. */
+    /** Prepares a new {@code Label} object. */
     public Label(final Value selectedValue,
                  final String regexp,
                  final int width,
@@ -105,8 +105,8 @@ public final class Label extends GenericWidget<JComponent> {
 
     /** Adds item listener to the component. */
     @Override
-    public void addListeners(final WidgetListener wl) {
-        getWidgetListeners().add(wl);
+    public void addListeners(final WidgetListener widgetListener) {
+        getWidgetListeners().add(widgetListener);
     }
 
     @Override

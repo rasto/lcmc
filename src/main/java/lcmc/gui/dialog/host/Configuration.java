@@ -23,13 +23,12 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
+import lcmc.gui.widget.Check;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JLabel;
@@ -37,14 +36,15 @@ import javax.swing.SpringLayout;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import java.awt.Component;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
@@ -58,8 +58,6 @@ public class Configuration extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(Configuration.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Maximum hops. */
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
     /** Hostname fields. */
@@ -75,7 +73,7 @@ public class Configuration extends DialogHost {
     /** DNS timeout. */
     private static final int DNS_TIMEOUT = 5000;
 
-    /** Prepares a new <code>Configuration</code> object. */
+    /** Prepares a new {@code Configuration} object. */
     public Configuration(final WizardDialog previousDialog,
                          final Host host) {
         super(previousDialog, host);
@@ -86,11 +84,11 @@ public class Configuration extends DialogHost {
     protected void finishDialog() {
         getHost().setHostname(Tools.join(",", hostnames, getHops()));
         final int hops = getHops();
-        String[] ipsA = new String[hops];
+        final String[] ipsA = new String[hops];
         for (int i = 0; i < hops; i++) {
             ipsA[i] = ipCombo[i].getStringValue();
         }
-        getHost().setIp(Tools.join(",", ipsA));
+        getHost().setIpAddress(Tools.join(",", ipsA));
     }
 
     /**
@@ -115,14 +113,13 @@ public class Configuration extends DialogHost {
      */
     @Override
     protected final void checkFields(final Widget field) {
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final JComponent btn : nextButtons()) {
-                    btn.setEnabled(hostnameOk);
-                }
-            }
-        });
+        final List<String> incorrect = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
+        if (!hostnameOk) {
+            incorrect.add(
+                  Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
+        }
+        enableNextButtons(incorrect, changed);
     }
 
     /**
@@ -149,15 +146,15 @@ public class Configuration extends DialogHost {
      */
     protected final boolean checkDNS(final int hop,
                                      final String hostnameEntered) {
-        InetAddress[] addresses;
+        final InetAddress[] addresses;
         try {
             addresses = InetAddress.getAllByName(hostnameEntered);
-        } catch (UnknownHostException e) {
+        } catch (final UnknownHostException e) {
             return false;
         }
-        String hostname;
-        String ip;
         LOG.debug2("checkDNS: addresses.length: " + addresses.length + " a: " + addresses[0].getHostAddress());
+        final String hostname;
+        String ip;
         if (addresses.length == 0) {
             LOG.debug("checkDNS: lookup failed");
             // lookup failed;
@@ -170,7 +167,7 @@ public class Configuration extends DialogHost {
              */
             try {
                 hostname = InetAddress.getByName(ip).getHostName();
-            } catch (UnknownHostException e) {
+            } catch (final UnknownHostException e) {
                 LOG.appError("checkDNS: unknown host", "", e);
                 return false;
             }
@@ -182,16 +179,16 @@ public class Configuration extends DialogHost {
                 ip = addresses[0].getHostAddress();
             }
         }
-        String[] items = new String[addresses.length];
+        final String[] items = new String[addresses.length];
         for (int i = 0; i < addresses.length; i++) {
             items[i] = addresses[i].getHostAddress();
         }
-        //getHost().setIp(ip);
+        //getHost().setIpAddress(ip);
         getHost().setIps(hop, items);
         hostnames[hop] = hostname;
 
         hostnameField[hop].setValue(new StringValue(hostname));
-        LOG.debug1("checkDNS: got " + hostname + " (" + ip + ")");
+        LOG.debug1("checkDNS: got " + hostname + " (" + ip + ')');
         return true;
     }
 
@@ -205,7 +202,7 @@ public class Configuration extends DialogHost {
         private final String hostnameEntered;
 
         /**
-         * Prepares a new <code>CheckDNSThread</code> object, with number of
+         * Prepares a new {@code CheckDNSThread} object, with number of
          * hops and host names delimited with commas.
          */
         CheckDNSThread(final int hop, final String hostnameEntered) {
@@ -233,7 +230,7 @@ public class Configuration extends DialogHost {
                     @Override
                     public void run() {
                         final String savedIp = getHost().getIp(hop);
-                        Value defaultIp;
+                        final Value defaultIp;
                         if (savedIp == null && items.length > 0) {
                             defaultIp = items[0];
                         } else {
@@ -260,16 +257,14 @@ public class Configuration extends DialogHost {
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(nextButtons());
     }
 
     /** Inits the dialog after it becomes visible. */
     @Override
     protected final void initDialogAfterVisible() {
-        if (getHost().getIp() == null || "".equals(getHost().getIp())) {
-            final CheckDNSThread[] checkDNSThread =
-                            new CheckDNSThread[MAX_HOPS];
+        if (getHost().getIpAddress() == null || getHost().getIpAddress().isEmpty()) {
             getProgressBar().start(DNS_TIMEOUT);
+            final CheckDNSThread[] checkDNSThread = new CheckDNSThread[MAX_HOPS];
             for (int i = 0; i < getHops(); i++) {
                 final String hostnameEntered =
                                 getHost().getHostnameEntered().split(",")[i];
@@ -277,7 +272,7 @@ public class Configuration extends DialogHost {
                 hostnameField[i].setEnabled(false);
                 if (Tools.isIp(hostnameEntered)) {
                     hostnames[i] = hostnameEntered;
-                    getHost().setIp(hostnameEntered);
+                    getHost().setIpAddress(hostnameEntered);
                     getHost().setIps(i, new String[]{hostnameEntered});
                     final Value hostnameEnteredValue = new StringValue(hostnameEntered);
                     hostnameField[i].setValue(hostnameEnteredValue);
@@ -286,7 +281,6 @@ public class Configuration extends DialogHost {
                     hostnameOk = true;
                 } else {
                     checkDNSThread[i] = new CheckDNSThread(i, hostnameEntered);
-                    checkDNSThread[i].setPriority(Thread.MIN_PRIORITY);
                     checkDNSThread[i].start();
                 }
             }
@@ -300,7 +294,7 @@ public class Configuration extends DialogHost {
                             if (checkDNSThread[i] != null) {
                                 try {
                                     checkDNSThread[i].join();
-                                } catch (java.lang.InterruptedException e) {
+                                } catch (final InterruptedException e) {
                                     Thread.currentThread().interrupt();
                                 }
                             }
@@ -309,7 +303,9 @@ public class Configuration extends DialogHost {
                         getHost().setHostname(
                                 Tools.join(",", hostnames, getHops()));
                         enableComponents();
-                        if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+                        makeDefaultAndRequestFocus(buttonClass(nextButton()));
+                        checkFields(null);
+                        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
                         }
@@ -331,8 +327,10 @@ public class Configuration extends DialogHost {
                         }
                     });
                     enableComponents();
+                    makeDefaultAndRequestFocus(buttonClass(nextButton()));
+                    checkFields(null);
                     hostnameOk = true;
-                    if (!Tools.getConfigData().getAutoHosts().isEmpty()) {
+                    if (!Tools.getApplication().getAutoHosts().isEmpty()) {
                         Tools.sleep(1000);
                         pressNextButton();
                     }
@@ -370,7 +368,7 @@ public class Configuration extends DialogHost {
                                       Widget.NO_REGEXP,
                                       COMBO_BOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(ConfigData.AccessType.RO,
+                                      new AccessMode(Application.AccessType.RO,
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
             inputPane.add(hostnameField[i].getComponent());
@@ -391,7 +389,7 @@ public class Configuration extends DialogHost {
                                 Widget.NO_REGEXP,
                                 COMBO_BOX_WIDTH,
                                 Widget.NO_ABBRV,
-                                new AccessMode(ConfigData.AccessType.RO,
+                                new AccessMode(Application.AccessType.RO,
                                                !AccessMode.ADVANCED),
                                 Widget.NO_BUTTON);
 
@@ -411,10 +409,5 @@ public class Configuration extends DialogHost {
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad
         return pane;
-    }
-
-    /** Buttons that are enabled/disabled during checks. */
-    protected JComponent[] nextButtons() {
-        return new JComponent[]{buttonClass(nextButton())};
     }
 }

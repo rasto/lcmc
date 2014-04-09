@@ -23,7 +23,7 @@
 package lcmc.gui.dialog.host;
 
 import lcmc.data.Host;
-import lcmc.data.ConfigData;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import lcmc.utilities.ExecCallback;
@@ -43,12 +43,10 @@ import javax.swing.JComponent;
  *
  */
 final class PacemakerInst extends DialogHost {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new <code>PacemakerInst</code> object. */
+    /** Prepares a new {@code PacemakerInst} object. */
     PacemakerInst(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -66,7 +64,7 @@ final class PacemakerInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.PacemakerInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getConfigData().getAutoOptionHost("pminst") != null) {
+        if (Tools.getApplication().getAutoOptionHost("pminst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -122,27 +120,27 @@ final class PacemakerInst extends DialogHost {
                 }
             }
         }
-        Tools.getConfigData().setLastHbPmInstalledMethod(
+        Tools.getApplication().setLastHbPmInstalledMethod(
            getHost().getDistString("PmInst.install.text." + installMethod));
-        Tools.getConfigData().setLastInstalledClusterStack(
-                                                ConfigData.COROSYNC_NAME);
+        Tools.getApplication().setLastInstalledClusterStack(
+                                                Application.COROSYNC_NAME);
 
         getHost().execCommandInBash(
                          installCommand,
                          getProgressBar(),
                          new ExecCallback() {
                              @Override
-                             public void done(final String ans) {
-                                 checkAnswer(ans, installMethod);
+                             public void done(final String answer) {
+                                 checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String answer,
+                                                   final int errorCode) {
                                  printErrorAndRetry(
                                         Tools.getString(
                                          "Dialog.Host.PacemakerInst.InstError"),
-                                        ans,
-                                        exitCode);
+                                         answer,
+                                         errorCode);
                              }
                          },
                          new ConvertCmdCallback() {

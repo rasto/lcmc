@@ -22,37 +22,34 @@
 package lcmc.gui.resources;
 
 import lcmc.AddVMConfigDialog;
+import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.VMSXML;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.UpdatableItem;
 
-import javax.swing.SwingConstants;
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.Comparator;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import lcmc.data.Value;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * This class shows a list of virtual machines.
@@ -92,7 +89,7 @@ public final class VMSInfo extends CategoryInfo {
     @Override
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
-        final Set<String> domainNames = new TreeSet<String>();
+        final Collection<String> domainNames = new TreeSet<String>();
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
@@ -159,7 +156,7 @@ public final class VMSInfo extends CategoryInfo {
                 public void run() {
                     if (DEFAULT_WIDTHS.containsKey(column)) {
                         /* remove button */
-                        vmsvdi.removeMyself(false);
+                        vmsvdi.removeMyself(Application.RunMode.LIVE);
                     } else {
                         vmsvdi.selectMyself();
                     }
@@ -192,21 +189,20 @@ public final class VMSInfo extends CategoryInfo {
                                                   final int col) {
         if (col == 0) {
             /* memory */
-            final Comparator<Object> c = new Comparator<Object>() {
+            return new Comparator<Object>() {
                 @Override
-                public int compare(final Object l1, final Object l2) {
-                    return ((MyButton) l1).getText().compareToIgnoreCase(
-                                                    ((MyButton) l2).getText());
+                public int compare(final Object o1, final Object o2) {
+                    return ((AbstractButton) o1).getText().compareToIgnoreCase(
+                                                    ((AbstractButton) o2).getText());
                 }
             };
-            return c;
         } else if (col == 3) {
             /* memory */
-            final Comparator<Object> c = new Comparator<Object>() {
+            return new Comparator<Object>() {
                 @Override
-                public int compare(final Object s1, final Object s2) {
-                    final long i1 = VMSXML.convertToKilobytes((Value) s1);
-                    final long i2 = VMSXML.convertToKilobytes((Value) s2);
+                public int compare(final Object o1, final Object o2) {
+                    final long i1 = VMSXML.convertToKilobytes((Value) o1);
+                    final long i2 = VMSXML.convertToKilobytes((Value) o2);
                     if (i1 < i2) {
                         return -1;
                     } else if (i1 > i2) {
@@ -216,7 +212,6 @@ public final class VMSInfo extends CategoryInfo {
                     }
                 }
             };
-            return c;
         }
         return null;
     }
@@ -249,12 +244,12 @@ public final class VMSInfo extends CategoryInfo {
                 t.start();
             }
         });
-        final JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         bp.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         bp.add(newButton);
         final Dimension d = bp.getPreferredSize();
         bp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) d.getHeight()));
-        return (JComponent) bp;
+        return bp;
     }
 
     /** Adds new virtual domain. */
@@ -275,7 +270,7 @@ public final class VMSInfo extends CategoryInfo {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
+                        final AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
                         avmcd.showDialogs();
                     }
                 });
@@ -289,11 +284,11 @@ public final class VMSInfo extends CategoryInfo {
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* New domain */
-        final MyMenuItem newDomainMenuItem = new MyMenuItem(
+        final UpdatableItem newDomainMenuItem = new MyMenuItem(
                        Tools.getString("VMSInfo.AddNewDomain"),
                        HostBrowser.HOST_OFF_ICON_LARGE,
-                       new AccessMode(ConfigData.AccessType.ADMIN, false),
-                       new AccessMode(ConfigData.AccessType.OP, false)) {
+                       new AccessMode(Application.AccessType.ADMIN, false),
+                       new AccessMode(Application.AccessType.OP, false)) {
                         private static final long serialVersionUID = 1L;
                         @Override
                         public void action() {
@@ -326,7 +321,7 @@ public final class VMSInfo extends CategoryInfo {
                                      final int raw,
                                      final int column) {
         if (DEFAULT_WIDTHS.containsKey(column)) {
-            return "Remove domain " + key + ".";
+            return "Remove domain " + key + '.';
         }
         return super.getTableToolTip(tableName, key, object, raw, column);
     }

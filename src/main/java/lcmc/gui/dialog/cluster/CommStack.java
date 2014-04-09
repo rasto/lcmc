@@ -22,10 +22,7 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ConfigData;
-import lcmc.data.AccessMode;
+import lcmc.data.*;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
@@ -42,8 +39,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -60,12 +55,10 @@ final class CommStack extends DialogCluster {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(CommStack.class);
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Radio Combo box. */
     private Widget chooseStackCombo;
 
-    /** Prepares a new <code>CommStack</code> object. */
+    /** Prepares a new {@code CommStack} object. */
     CommStack(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
     }
@@ -73,13 +66,13 @@ final class CommStack extends DialogCluster {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        if (ConfigData.HEARTBEAT_NAME.equals(chooseStackCombo.getValue().getValueForConfig())) {
-            Tools.getConfigData().setLastInstalledClusterStack(
-                                                    ConfigData.HEARTBEAT_NAME);
+        if (Application.HEARTBEAT_NAME.equals(chooseStackCombo.getValue().getValueForConfig())) {
+            Tools.getApplication().setLastInstalledClusterStack(
+                                                    Application.HEARTBEAT_NAME);
             return new HbConfig(this, getCluster());
         } else {
-            Tools.getConfigData().setLastInstalledClusterStack(
-                                                    ConfigData.COROSYNC_NAME);
+            Tools.getApplication().setLastInstalledClusterStack(
+                                                    Application.COROSYNC_NAME);
             return new CoroConfig(this, getCluster());
         }
     }
@@ -109,29 +102,29 @@ final class CommStack extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         final ExecCommandThread[] infoThreads =
                                         new ExecCommandThread[hosts.length];
-        int i = 0;
         getProgressBar().start(10000);
+        int i = 0;
         for (final Host host : hosts) {
             infoThreads[i] = host.execCommand(
                              "Cluster.Init.getInstallationInfo",
                              getProgressBar(),
                              new ExecCallback() {
                                  @Override
-                                 public void done(final String ans) {
+                                 public void done(final String answer) {
                                      //drbdLoaded[index] = true;
                                      for (final String line
-                                                    : ans.split("\\r?\\n")) {
+                                                    : answer.split("\\r?\\n")) {
                                          host.parseInstallationInfo(line);
                                      }
                                  }
                                  @Override
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
+                                 public void doneError(final String answer,
+                                                       final int errorCode) {
                                      skipButtonSetEnabled(false);
                                      LOG.error("initDialogAfterVisible: "
                                              + host.getName()
                                              + ": could not get install info: "
-                                             + ans);
+                                             + answer);
                                  }
                              },
                              null,   /* ConvertCmdCallback */
@@ -143,7 +136,7 @@ final class CommStack extends DialogCluster {
             /* wait for all of them */
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
@@ -160,7 +153,7 @@ final class CommStack extends DialogCluster {
             }
         }
         if (!aisIsPossible && hbIsPossible) {
-            chooseStackCombo.setValue(new StringValue(ConfigData.HEARTBEAT_NAME));
+            chooseStackCombo.setValue(new StringValue(Application.HEARTBEAT_NAME));
         }
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
@@ -169,11 +162,11 @@ final class CommStack extends DialogCluster {
                 @Override
                 public void run() {
                     if (ais) {
-                        chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME,
+                        chooseStackCombo.setEnabled(Application.COROSYNC_NAME,
                                                     true);
                     }
                     if (hb) {
-                        chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME,
+                        chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME,
                                                     true);
                     }
                 }
@@ -188,7 +181,7 @@ final class CommStack extends DialogCluster {
                     makeDefaultAndRequestFocus(buttonClass(nextButton()));
                 }
             });
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -231,38 +224,38 @@ final class CommStack extends DialogCluster {
         /* slight preference to corosync */
         String defaultValue;
         if (hbImpossible) {
-            defaultValue = ConfigData.COROSYNC_NAME;
+            defaultValue = Application.COROSYNC_NAME;
         } else if (aisImpossible) {
-            defaultValue = ConfigData.HEARTBEAT_NAME;
+            defaultValue = Application.HEARTBEAT_NAME;
         } else if (aisIsRc < hbIsRc) {
-            defaultValue = ConfigData.HEARTBEAT_NAME;
+            defaultValue = Application.HEARTBEAT_NAME;
         } else if (aisIsRc > hbIsRc) {
-            defaultValue = ConfigData.COROSYNC_NAME;
+            defaultValue = Application.COROSYNC_NAME;
         } else if (aisIsRunning < hbIsRunning) {
-            defaultValue = ConfigData.HEARTBEAT_NAME;
+            defaultValue = Application.HEARTBEAT_NAME;
         } else if (aisIsRunning > hbIsRunning) {
-            defaultValue = ConfigData.COROSYNC_NAME;
+            defaultValue = Application.COROSYNC_NAME;
         } else {
-            defaultValue = Tools.getConfigData().getLastInstalledClusterStack();
+            defaultValue = Tools.getApplication().getLastInstalledClusterStack();
         }
         if (defaultValue == null) {
-            defaultValue = ConfigData.COROSYNC_NAME;
+            defaultValue = Application.COROSYNC_NAME;
         }
         chooseStackCombo = WidgetFactory.createInstance(
                                           Widget.Type.RADIOGROUP,
                                           new StringValue(defaultValue),
                                           new Value[]{
-                                                 new StringValue(ConfigData.HEARTBEAT_NAME),
-                                                 new StringValue(ConfigData.COROSYNC_NAME)},
+                                                 new StringValue(Application.HEARTBEAT_NAME),
+                                                 new StringValue(Application.COROSYNC_NAME)},
                                           Widget.NO_REGEXP,
                                           500,
                                           Widget.NO_ABBRV,
                                           new AccessMode(
-                                                 ConfigData.AccessType.ADMIN,
+                                                 Application.AccessType.ADMIN,
                                                  false), /* only adv. mode */
                                           Widget.NO_BUTTON);
-        chooseStackCombo.setEnabled(ConfigData.COROSYNC_NAME, false);
-        chooseStackCombo.setEnabled(ConfigData.HEARTBEAT_NAME, false);
+        chooseStackCombo.setEnabled(Application.COROSYNC_NAME, false);
+        chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME, false);
         chooseStackCombo.setBackgroundColor(Color.WHITE);
         inputPane.add(getProgressBarPane(null));
         inputPane.add(chooseStackCombo.getComponent());
@@ -270,7 +263,7 @@ final class CommStack extends DialogCluster {
                                                    0, 0,  // initX, initY
                                                    0, 0); // xPad, yPad
         final JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(inputPane);
         panel.add(Box.createVerticalStrut(100));
 

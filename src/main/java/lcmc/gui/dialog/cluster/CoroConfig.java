@@ -23,6 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
+import lcmc.data.*;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Corosync;
@@ -31,16 +32,10 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
-import lcmc.data.Host;
-import lcmc.data.ConfigData;
-import lcmc.data.Cluster;
-import lcmc.data.AisCastAddress;
 import lcmc.data.resources.NetInterface;
-import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.ProgressBar;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.Exceptions.IllegalVersionException;
 
@@ -53,7 +48,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;
-import java.util.Set;
+import java.lang.InterruptedException;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -68,8 +64,9 @@ import javax.swing.JTextArea;
 
 import javax.swing.JComponent;
 import java.awt.Component;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import java.util.ArrayList;
+import java.util.List;
+import lcmc.gui.widget.Check;
 
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -86,12 +83,10 @@ final class CoroConfig extends DialogCluster {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(CoroConfig.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Panel for mcast addresses. */
     private JPanel mcast;
     /** Set of mcast etc. addresses. */
-    private final Set<AisCastAddress> aisCastAddresses =
+    private final Collection<AisCastAddress> aisCastAddresses =
                                         new LinkedHashSet<AisCastAddress>();
     /** Atatus of the config. For example does not exist. */
     private final JLabel configStatus = new JLabel("");
@@ -150,7 +145,7 @@ final class CoroConfig extends DialogCluster {
     /** Whether the config pane was already moved to the position. */
     private volatile boolean alreadyMoved = false;
 
-    /** Prepares a new <code>CoroConfig</code> object. */
+    /** Prepares a new {@code CoroConfig} object. */
     CoroConfig(final WizardDialog previousDialog, final Cluster cluster) {
         super(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
@@ -175,7 +170,7 @@ final class CoroConfig extends DialogCluster {
                                 final StringBuilder config =
                                                         aisConfigHead(false);
                                 int ringnumber = 0;
-                                for (AisCastAddress ca : aisCastAddresses) {
+                                for (final AisCastAddress ca : aisCastAddresses) {
                                     config.append('\n');
                                     config.append(ca.getConfigString(
                                                                 ringnumber,
@@ -196,7 +191,7 @@ final class CoroConfig extends DialogCluster {
                                 } else {
                                     Openais.createAISConfig(hosts, config);
                                 }
-                                boolean configOk = updateOldAisConfig();
+                                final boolean configOk = updateOldAisConfig();
                                 if (hosts[0].isCorosync()
                                     && !hosts[0].isOpenaisWrapper()) {
                                     Corosync.reloadCorosyncs(hosts);
@@ -204,10 +199,18 @@ final class CoroConfig extends DialogCluster {
                                     Openais.reloadOpenaises(hosts);
                                 }
                                 enableComponents();
+                                final List<String> incorrect =
+                                                     new ArrayList<String>();
+                                final List<String> changed =
+                                                     new ArrayList<String>();
                                 if (configOk) {
                                     hideRetryButton();
-                                    nextButtonSetEnabled(true);
-                                    if (!Tools.getConfigData()
+                                } else {
+                                    incorrect.add("config failed");
+                                }
+                                nextButtonSetEnabled(new Check(incorrect, changed));
+                                if (configOk) {
+                                    if (!Tools.getApplication()
                                               .getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
                                         pressNextButton();
@@ -249,7 +252,7 @@ final class CoroConfig extends DialogCluster {
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.Y_AXIS));
+        configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.PAGE_AXIS));
         configPanel.setBackground(
                            Tools.getDefaultColor("ConfigDialog.Background"));
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
@@ -262,7 +265,7 @@ final class CoroConfig extends DialogCluster {
             new Runnable() {
                 @Override
                 public void run() {
-                    boolean configOk = updateOldAisConfig();
+                    final boolean configOk = updateOldAisConfig();
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -270,9 +273,14 @@ final class CoroConfig extends DialogCluster {
                         }
                     });
                     enableComponents();
+                    final List<String> incorrect = new ArrayList<String>();
+                    final List<String> changed = new ArrayList<String>();
+                    if (!configOk) {
+                        incorrect.add("config failed");
+                    }
+                    nextButtonSetEnabled(new Check(incorrect, changed));
                     if (configOk) {
-                        nextButtonSetEnabled(true);
-                        if (!Tools.getConfigData().getAutoClusters()
+                        if (!Tools.getApplication().getAutoClusters()
                                                   .isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
@@ -310,7 +318,7 @@ final class CoroConfig extends DialogCluster {
         String mcastaddr = null;
         String mcastport = null;
         String bindnetaddr = null;
-        for (String line : config) {
+        for (final String line : config) {
             final Matcher totemM = totemP.matcher(line);
             final Matcher serviceM = serviceP.matcher(line);
             if (!inService && serviceM.matches()) {
@@ -379,12 +387,9 @@ final class CoroConfig extends DialogCluster {
      */
     private boolean updateOldAisConfig() { /* is run in a thread */
         final Host[] hosts = getCluster().getHostsArray();
-        boolean noConfigs = true;
-        boolean configOk = false;
-        ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
+        final ExecCommandThread[] ts = new ExecCommandThread[hosts.length];
         configStatus.setText(
                    Tools.getString("Dialog.Cluster.CoroConfig.Loading"));
-        int i = 0;
 
         String cf = "/etc/corosync/corosync.conf";
         String command = "Corosync.getAisConfig";
@@ -393,19 +398,20 @@ final class CoroConfig extends DialogCluster {
             command = "OpenAIS.getAisConfig";
         }
         final String configFile = cf;
-        for (Host h : hosts) {
+        int i = 0;
+        for (final Host h : hosts) {
             final int index = i;
             ts[i] = h.execCommand(
                              command,
-                             (ProgressBar) null,
+                    null,
                              new ExecCallback() {
                                  @Override
-                                 public void done(final String ans) {
-                                     configs[index] = ans;
+                                 public void done(final String answer) {
+                                     configs[index] = answer;
                                  }
                                  @Override
-                                 public void doneError(final String ans,
-                                                       final int exitCode) {
+                                 public void doneError(final String answer,
+                                                       final int errorCode) {
                                      configs[index] = AIS_CONF_ERROR_STRING;
                                  }
                              },
@@ -414,15 +420,17 @@ final class CoroConfig extends DialogCluster {
                              SSH.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
-        for (ExecCommandThread t : ts) {
+        for (final ExecCommandThread t : ts) {
             /* wait for all of them */
             try {
                 t.join();
-            } catch (java.lang.InterruptedException e) {
+            } catch (final InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }
 
+        boolean noConfigs = true;
+        boolean configOk = false;
         if (configs[0].equals(AIS_CONF_ERROR_STRING)) {
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -432,7 +440,7 @@ final class CoroConfig extends DialogCluster {
                 }
             });
             retry();
-            if (!Tools.getConfigData().getAutoClusters().isEmpty()) {
+            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 addButton.pressButton();
             }
@@ -543,12 +551,12 @@ final class CoroConfig extends DialogCluster {
                             Tools.getString(
                                    "Dialog.Cluster.CoroConfig.NoConfigFound");
                     }
-                    final JLabel l = new JLabel(hosts[i].getName() + ":");
+                    final JLabel l = new JLabel(hosts[i].getName() + ':');
                     l.setBackground(Color.WHITE);
                     final JPanel labelP = new JPanel();
                     labelP.setBackground(
                              Tools.getDefaultColor("ConfigDialog.Background"));
-                    labelP.setLayout(new BoxLayout(labelP, BoxLayout.Y_AXIS));
+                    labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
                     labelP.setAlignmentX(Component.TOP_ALIGNMENT);
                     labelP.add(l);
                     insideConfigPanel.add(labelP);
@@ -584,7 +592,7 @@ final class CoroConfig extends DialogCluster {
                 /* head */
                 final String[] head =
                            aisConfigHead(true).toString().split(NEWLINE);
-                for (String line : head) {
+                for (final String line : head) {
                     configPanel.add(new JLabel(line));
                 }
                 /* addresses */
@@ -609,7 +617,7 @@ final class CoroConfig extends DialogCluster {
                 }
 
                 if (aisCastAddresses.size() < 2) {
-                    JLabel l;
+                    final JLabel l;
                     if (aisCastAddresses.size() < 1) {
                         l = new JLabel(Tools.getString(
                             "Dialog.Cluster.CoroConfig.WarningAtLeastTwoInt"));
@@ -622,8 +630,7 @@ final class CoroConfig extends DialogCluster {
                     l.setForeground(Color.RED);
                     configPanel.add(l);
                     configPanel.add(new JLabel(""));
-                    final JLabel label = l;
-                    label.addComponentListener(new ComponentListener() {
+                    l.addComponentListener(new ComponentListener() {
                         @Override
                         public void componentHidden(final ComponentEvent e) {
                             /* do nothing */
@@ -636,7 +643,7 @@ final class CoroConfig extends DialogCluster {
                             }
                             alreadyMoved = true;
                             configScrollPane.getViewport().setViewPosition(
-                                              label.getBounds().getLocation());
+                                    l.getBounds().getLocation());
                         }
 
                         @Override
@@ -664,7 +671,7 @@ final class CoroConfig extends DialogCluster {
                         aisConfigPacemaker(SPACE_TAB,
                                            serviceVersion).toString()
                                                           .split(NEWLINE);
-                for (String line : pacemakerLines) {
+                for (final String line : pacemakerLines) {
                     configPanel.add(new JLabel(line));
                 }
                 configPanel.revalidate();
@@ -675,9 +682,9 @@ final class CoroConfig extends DialogCluster {
                     } else {
                         Tools.getGUIData().setAccessible(
                                                 makeConfigButton,
-                                                ConfigData.AccessType.ADMIN);
+                                                Application.AccessType.ADMIN);
                     }
-                    if (!Tools.getConfigData().getAutoClusters().isEmpty()
+                    if (!Tools.getApplication().getAutoClusters().isEmpty()
                         && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
                         makeConfigButton.pressButton();
@@ -752,9 +759,9 @@ final class CoroConfig extends DialogCluster {
     }
 
     /** Plugins, not used from corosync 2.0. */
-    private StringBuilder plugins(final boolean fake) {
+    private CharSequence plugins(final boolean fake) {
         final StringBuilder config = new StringBuilder(500);
-        String tab;
+        final String tab;
         if (fake) {
             tab = SPACE_TAB;
         } else {
@@ -777,7 +784,7 @@ final class CoroConfig extends DialogCluster {
     /** Returns the head of the corosync or openais config. */
     private StringBuilder aisConfigHead(final boolean fake) {
         final StringBuilder config = new StringBuilder(500);
-        String tab;
+        final String tab;
         if (fake) {
             config.append("## to be generated by LCMC ");
             tab = SPACE_TAB;
@@ -792,7 +799,7 @@ final class CoroConfig extends DialogCluster {
         try {
            corosync2 =
                 Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
-        } catch (IllegalVersionException e) {
+        } catch (final IllegalVersionException e) {
             LOG.appWarning("aisConfigHead: cannot compare corosync version: "
                            + hosts[0].getCorosyncVersion());
         }
@@ -868,7 +875,7 @@ final class CoroConfig extends DialogCluster {
     /**
      * Returns the part of the config.
      */
-    private StringBuilder aisConfigPacemaker(final String tab,
+    private CharSequence aisConfigPacemaker(final String tab,
                                              final String serviceVersion) {
         final StringBuilder config = new StringBuilder(120);
         final Host[] hosts = getCluster().getHostsArray();
@@ -876,7 +883,7 @@ final class CoroConfig extends DialogCluster {
         try {
            corosync2 =
                 Tools.compareVersions(hosts[0].getCorosyncVersion(), "2") >= 0;
-        } catch (IllegalVersionException e) {
+        } catch (final IllegalVersionException e) {
             LOG.appWarning("aisConfigPacemaker: cannot compare corosync version: "
                            + hosts[0].getCorosyncVersion());
         }
@@ -931,7 +938,7 @@ final class CoroConfig extends DialogCluster {
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         final Host[] hosts = getCluster().getHostsArray();
         final Value[] types = {MCAST_TYPE};
 
@@ -942,7 +949,7 @@ final class CoroConfig extends DialogCluster {
                                    Widget.NO_REGEXP,
                                    TYPE_COMBOBOX_WIDTH,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(ConfigData.AccessType.RO,
+                                   new AccessMode(Application.AccessType.RO,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
         typeW.setEnabled(false);
@@ -967,7 +974,7 @@ final class CoroConfig extends DialogCluster {
                                     Widget.NO_REGEXP,
                                     INTF_COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(ConfigData.AccessType.RO,
+                                    new AccessMode(Application.AccessType.RO,
                                                    false), /* only adv. mode */
                                     Widget.NO_BUTTON);
 
@@ -983,7 +990,7 @@ final class CoroConfig extends DialogCluster {
               regexp,
               ADDR_COMBOBOX_WIDTH,
               Widget.NO_ABBRV,
-              new AccessMode(ConfigData.AccessType.RO,
+              new AccessMode(Application.AccessType.RO,
                              !AccessMode.ADVANCED),
               Widget.NO_BUTTON);
 
@@ -1009,7 +1016,7 @@ final class CoroConfig extends DialogCluster {
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
                 Widget.NO_ABBRV,
-                new AccessMode(ConfigData.AccessType.RO,
+                new AccessMode(Application.AccessType.RO,
                                !AccessMode.ADVANCED),
                 Widget.NO_BUTTON);
         portW.addListeners(new WidgetListener() {
@@ -1059,7 +1066,7 @@ final class CoroConfig extends DialogCluster {
                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         Tools.getGUIData().setAccessible(configCheckbox,
-                                         ConfigData.AccessType.ADMIN);
+                                         Application.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -1104,7 +1111,7 @@ final class CoroConfig extends DialogCluster {
         pane.add(statusPanel);
         pane.add(configScrollPane);
         configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mcast = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        mcast = new JPanel(new FlowLayout(FlowLayout.LEADING));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
         mcast.add(typeW.getComponent());
