@@ -76,7 +76,7 @@ public final class PtestData {
             return;
         }
         final StringBuilder sb = new StringBuilder(300);
-        sb.append("<b>");
+        sb.append("<html><b>");
         sb.append(Tools.getString("PtestData.ToolTip"));
         sb.append("</b><br>");
         final String[] queries = raw.split(CRM.PTEST_END_DELIM);
@@ -272,6 +272,7 @@ public final class PtestData {
         if (!isToolTip) {
             sb.append(Tools.getString("PtestData.NoToolTip"));
         }
+        sb.append("</html>");
         toolTip = sb.toString();
         shadowCib = queries[1];
     }
