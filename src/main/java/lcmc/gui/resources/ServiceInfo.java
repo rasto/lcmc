@@ -5384,8 +5384,8 @@ public class ServiceInfo extends EditableInfo {
                                      getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                setManaged(!isManaged(Application.RunMode.LIVE),
-                           dcHost, Application.RunMode.LIVE);
+                setManaged(!isManaged(Application.RunMode.TEST),
+                           dcHost, Application.RunMode.TEST);
             }
         };
         addMouseOverListener(manageMenuItem, manageItemCallback);
