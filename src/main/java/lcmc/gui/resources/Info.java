@@ -703,7 +703,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Adds mouse over listener. */
-    protected final void addMouseOverListener(final ComponentWithTest c,
+    public final void addMouseOverListener(final ComponentWithTest c,
                                               final ButtonCallback bc) {
         if (bc == null) {
             return;
