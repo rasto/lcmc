@@ -28,7 +28,7 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.NetInfo;
-import lcmc.gui.resources.ServiceInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;

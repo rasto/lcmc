@@ -18,11 +18,13 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.UpdatableItem;
@@ -39,6 +41,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JMenuBar;
 import javax.swing.AbstractButton;
 import javax.swing.JColorChooser;
+
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -52,7 +55,6 @@ import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

@@ -19,12 +19,12 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.widget.Widget;
-
 import lcmc.data.resources.Resource;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
@@ -33,11 +33,12 @@ import lcmc.utilities.Tools;
 
 import java.util.Collection;
 import java.util.Map;
+
 import javax.swing.JPanel;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.gui.widget.Check;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

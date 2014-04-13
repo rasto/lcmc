@@ -168,7 +168,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Inits commit button. */
-    final void initCommitButton(final ButtonCallback buttonCallback) {
+    protected final void initCommitButton(final ButtonCallback buttonCallback) {
         initApplyButton(buttonCallback,
                         Tools.getString("Browser.CommitResources"));
     }
@@ -511,7 +511,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Returns a more panel with "more options are available" message. */
-    protected final JPanel getMoreOptionsPanel(final int width) {
+    public final JPanel getMoreOptionsPanel(final int width) {
         final JLabel l = new JLabel(
                               Tools.getString("EditableInfo.MoreOptions"));
         final Font font = l.getFont();
@@ -1025,12 +1025,12 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Sets apply button. */
-    final void setApplyButton(final MyButton applyButton) {
+    public final void setApplyButton(final MyButton applyButton) {
         this.applyButton = applyButton;
     }
 
     /** Sets revert button. */
-    final void setRevertButton(final MyButton revertButton) {
+    public final void setRevertButton(final MyButton revertButton) {
         this.revertButton = revertButton;
     }
 

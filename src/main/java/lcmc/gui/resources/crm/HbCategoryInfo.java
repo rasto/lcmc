@@ -19,37 +19,41 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.CategoryInfo;
 import lcmc.utilities.Tools;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import lcmc.data.Application;
 
+import javax.swing.JPanel;
 /**
- * This class holds data that describe the crm as whole.
+ * This class is used for all kind of categories in the heartbeat
+ * hierarchy. Its point is to show heartbeat graph all the time, ane
+ * heartbeat category is clicked.
  */
-public final class CRMInfo extends HbCategoryInfo {
-    /** Cluster manager icon. */
-    private static final ImageIcon CRM_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
-    /** Prepares a new {@code ServicesInfo} object. */
-    public CRMInfo(final String name, final Browser browser) {
+public class HbCategoryInfo extends CategoryInfo {
+    /** Creates the new HbCategoryInfo object with name of the category. */
+    public HbCategoryInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /** Returns icon for the heartbeat menu item. */
+    /** Returns browser object of this info. */
     @Override
-    public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
-        return CRM_ICON;
+	public ClusterBrowser getBrowser() {
+        return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns editable info panel for global crm config. */
+
+    /** Returns type of the info text. text/plain or text/html. */
     @Override
-    public JComponent getInfoPanel() {
-        return getBrowser().getServicesInfo().getInfoPanel();
+    protected String getInfoType() {
+        return Tools.MIME_TYPE_TEXT_HTML;
+    }
+
+    /** Returns heartbeat graph. */
+    @Override
+    public final JPanel getGraphicalView() {
+        return getBrowser().getCRMGraph().getGraphPanel();
     }
 }

@@ -28,6 +28,7 @@ import lcmc.utilities.SSH;
 
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
+
 import lcmc.data.Application;
 
 /**

@@ -19,7 +19,7 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.data.Host;
 import lcmc.data.resources.Service;

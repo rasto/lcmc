@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;

@@ -177,7 +177,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns the tool tip for this object. */
-    String getToolTipText(final Application.RunMode runMode) {
+    public String getToolTipText(final Application.RunMode runMode) {
         return "no tooltip";
     }
 
@@ -225,7 +225,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Clears the whole widget hash. */
-    protected final void widgetClear() {
+    public final void widgetClear() {
         for (final Map.Entry<String, Widget> widgetEntry : widgetHash.entrySet()) {
             widgetEntry.getValue().cleanup();
         }
@@ -1120,7 +1120,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Remove node in tree menu. Call it from swing thread. */
-    final void removeNodeAndWait() {
+    protected final void removeNodeAndWait() {
         Tools.isSwingThread();
         final DefaultMutableTreeNode n = node;
         node = null;

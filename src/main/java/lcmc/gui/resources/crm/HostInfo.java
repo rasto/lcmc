@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.EditHostDialog;
 import lcmc.data.*;
@@ -29,6 +29,7 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.HostLogs;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
@@ -52,6 +53,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
+
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.ImageIcon;
@@ -64,8 +66,8 @@ import javax.swing.text.Document;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JLabel;
-import lcmc.utilities.ComponentWithTest;
 
+import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

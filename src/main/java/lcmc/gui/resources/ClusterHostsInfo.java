@@ -24,8 +24,10 @@ package lcmc.gui.resources;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.crm.HostInfo;
 import lcmc.data.Host;
 import lcmc.utilities.MyButton;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Color;

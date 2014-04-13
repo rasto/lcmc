@@ -19,7 +19,7 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
@@ -37,6 +37,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SpringLayout;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -48,11 +49,12 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
 

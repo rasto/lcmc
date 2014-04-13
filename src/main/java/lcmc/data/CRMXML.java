@@ -28,8 +28,8 @@ import lcmc.utilities.SSH;
 import lcmc.utilities.Unit;
 import lcmc.robotest.RoboTest;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.ServiceInfo;
-import lcmc.gui.resources.ServicesInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.resources.crm.ServicesInfo;
 import lcmc.Exceptions;
 
 import org.w3c.dom.Document;
@@ -37,12 +37,12 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 
 import java.util.*;
-
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 import lcmc.utilities.Logger;

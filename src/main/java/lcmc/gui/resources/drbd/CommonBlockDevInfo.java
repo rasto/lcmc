@@ -22,8 +22,8 @@
 package lcmc.gui.resources.drbd;
 
 import lcmc.gui.Browser;
-import lcmc.gui.resources.HbCategoryInfo;
-import lcmc.gui.resources.ServiceInfo;
+import lcmc.gui.resources.crm.HbCategoryInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.CommonBlockDevice;
 import lcmc.utilities.Tools;

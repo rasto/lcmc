@@ -25,7 +25,7 @@ package lcmc.utilities;
 import lcmc.data.*;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.ServiceInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
@@ -61,6 +61,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowEvent;
+
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -71,7 +72,6 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.InputStreamReader;
-
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -79,6 +79,7 @@ import java.net.URL;
 import java.net.URI;
 import java.net.InetAddress;
 import java.lang.reflect.InvocationTargetException;
+
 import javax.swing.plaf.FontUIResource;
 
 /**

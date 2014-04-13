@@ -24,7 +24,7 @@
 package lcmc.gui;
 
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.ServicesInfo;
+import lcmc.gui.resources.crm.ServicesInfo;
 import lcmc.data.Cluster;
 import lcmc.data.Application;
 import lcmc.data.AccessMode;
@@ -41,9 +41,9 @@ import javax.swing.JSplitPane;
 import javax.swing.RootPaneContainer;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
+
 import java.awt.Component;
 import java.awt.Container;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;

@@ -19,12 +19,11 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.vms.VirtualDomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.CRM;

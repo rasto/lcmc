@@ -19,58 +19,76 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.crm;
 
-import lcmc.data.Host;
-import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.data.ResourceAgent;
+import lcmc.data.Host;
 
 import java.util.Map;
 
 import lcmc.data.Application;
 
 /**
- * DrbddiskInfo class is used for drbddisk heartbeat service that is
+ * linbit::drbd info class is used for drbd pacemaker service that is
  * treated in special way.
  */
-public final class DrbddiskInfo extends ServiceInfo {
-
-    /** Creates new DrbddiskInfo object. */
-    DrbddiskInfo(final String name,
-                 final ResourceAgent ra,
-                 final Browser browser) {
+public final class LinbitDrbdInfo extends ServiceInfo {
+    /** Creates new LinbitDrbdInfo object. */
+    LinbitDrbdInfo(final String name,
+                   final ResourceAgent ra,
+                   final Browser browser) {
         super(name, ra, browser);
     }
 
-    /** Creates new DrbddiskInfo object. */
-    DrbddiskInfo(final String name,
-                 final ResourceAgent ra,
-                 final String hbId,
-                 final Map<String, String> resourceNode,
-                 final Browser browser) {
+    /** Creates new linbit::drbd info object. */
+    LinbitDrbdInfo(final String name,
+                   final ResourceAgent ra,
+                   final String hbId,
+                   final Map<String, String> resourceNode,
+                   final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
     }
 
-    /** Returns string representation of the drbddisk service. */
+    /** Returns string representation of the linbit::drbd service. */
     @Override
     public String toString() {
-        return getName() + " (" + getParamSaved("1") + ')';
+        final StringBuilder s = new StringBuilder(30);
+        final String provider = getResourceAgent().getProvider();
+        if (provider != null
+            && !ResourceAgent.HEARTBEAT_PROVIDER.equals(provider)
+            && !provider.isEmpty()) {
+            s.append(provider);
+            s.append(':');
+        }
+        s.append(getName());
+        final String drbdRes = getParamSaved("drbd_resource").getValueForConfig();
+        if (drbdRes == null) {
+            s.insert(0, "new ");
+        } else {
+            if (!drbdRes.isEmpty()) {
+                s.append(" (");
+                s.append(drbdRes);
+                s.append(')');
+            }
+        }
+        return s.toString();
     }
 
-    /** Returns resource name / parameter "1". */
+    /** Returns resource name. */
     String getResourceName() {
-        return getParamSaved("1").getValueForConfig();
+        return getParamSaved("drbd_resource").getValueForConfig();
     }
 
-    /** Removes the drbddisk service. */
+    /** Removes the linbit::drbd service. */
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
                                       final Application.RunMode runMode) {
-        super.removeMyselfNoConfirm(dcHost, runMode);
         final DrbdResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
+        super.removeMyselfNoConfirm(dcHost, runMode);
         if (dri != null) {
             dri.setUsedByCRM(null);
         }
@@ -89,13 +107,13 @@ public final class DrbddiskInfo extends ServiceInfo {
             } else {
                 dri.setUsedByCRM(null);
             }
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    dri.updateMenus(null);
-                }
-            });
-            t.start();
+            //final Thread t = new Thread(new Runnable() {
+            //    @Override
+            //    public void run() {
+            //        dri.updateMenus(null);
+            //    }
+            //});
+            //t.start();
         }
     }
 }

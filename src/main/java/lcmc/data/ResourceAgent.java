@@ -24,7 +24,7 @@ package lcmc.data;
 
 import lcmc.gui.widget.Widget;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.ServiceInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
