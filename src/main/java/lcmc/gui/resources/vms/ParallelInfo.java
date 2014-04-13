@@ -40,19 +40,19 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual parallel device.
  */
-final class VMSParallelInfo extends VMSParallelSerialInfo {
-    /** Creates the VMSParallelInfo object. */
-    VMSParallelInfo(final String name, final Browser browser,
-                   final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+final class ParallelInfo extends ParallelSerialInfo {
+    /** Creates the ParallelInfo object. */
+    ParallelInfo(final String name, final Browser browser,
+                   final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.PARALLEL_TABLE.equals(tableName)) {
+        } else if (DomainInfo.PARALLEL_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -98,8 +98,8 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
                 }
             }
         }
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.PARALLEL_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.PARALLEL_TABLE);
         checkResourceFields(null, getParametersFromXML());
     }
 
@@ -143,12 +143,12 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
 
     /** Returns "add new" button. */
     @Override
-    protected MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
+    protected MyButton getNewBtn0(final DomainInfo vdi) {
         return getNewBtn(vdi);
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Parallel Device");
         newBtn.addActionListener(new ActionListener() {
             @Override
@@ -185,7 +185,7 @@ final class VMSParallelInfo extends VMSParallelSerialInfo {
     /** Return table name. */
     @Override
     protected String getTableName() {
-        return VMSVirtualDomainInfo.PARALLEL_TABLE;
+        return DomainInfo.PARALLEL_TABLE;
     }
 
     /** Returns device parameters. */

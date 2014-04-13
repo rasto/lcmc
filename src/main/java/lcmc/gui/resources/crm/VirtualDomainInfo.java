@@ -23,7 +23,7 @@ package lcmc.gui.resources.crm;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
@@ -41,7 +41,7 @@ import java.util.regex.Matcher;
  */
 public final class VirtualDomainInfo extends ServiceInfo {
     /** VirtualDomain in the VMs menu. */
-    private VMSVirtualDomainInfo vmsVirtualDomainInfo = null;
+    private DomainInfo vmsVirtualDomainInfo = null;
     /** Pattern that captures a name from xml file name. */
     static final Pattern LIBVIRT_CONF_PATTERN =
                                             Pattern.compile(".*?([^/]+).xml$");
@@ -104,11 +104,11 @@ public final class VirtualDomainInfo extends ServiceInfo {
         connectWithVMS();
     }
 
-    /** Connects with VMSVirtualDomainInfo object. */
+    /** Connects with DomainInfo object. */
     @Override
-    public VMSVirtualDomainInfo connectWithVMS() {
+    public DomainInfo connectWithVMS() {
         final Value config = getParamSaved(CONFIG_PARAM);
-        VMSVirtualDomainInfo newVMSVDI = null;
+        DomainInfo newVMSVDI = null;
         for (final Host host : getBrowser().getClusterHosts()) {
             final VMSXML vxml = getBrowser().getVMSXML(host);
             if (vxml != null) {
@@ -154,7 +154,7 @@ public final class VirtualDomainInfo extends ServiceInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
+                    final DomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml != null && vvdi != null) {
                         final int remotePort = vxml.getRemotePort(
@@ -197,7 +197,7 @@ public final class VirtualDomainInfo extends ServiceInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
+                    final DomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml != null && vvdi != null) {
                         final int remotePort = vxml.getRemotePort(
@@ -240,7 +240,7 @@ public final class VirtualDomainInfo extends ServiceInfo {
                 @Override
                 public void action() {
                     hidePopup();
-                    final VMSVirtualDomainInfo vvdi = vmsVirtualDomainInfo;
+                    final DomainInfo vvdi = vmsVirtualDomainInfo;
                     final VMSXML vxml = getVMSXML(getRunningOnHost());
                     if (vxml != null && vvdi != null) {
                         final int remotePort = vxml.getRemotePort(

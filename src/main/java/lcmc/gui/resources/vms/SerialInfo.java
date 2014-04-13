@@ -40,19 +40,19 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual serial device.
  */
-final class VMSSerialInfo extends VMSParallelSerialInfo {
-    /** Creates the VMSSerialInfo object. */
-    VMSSerialInfo(final String name, final Browser browser,
-                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+final class SerialInfo extends ParallelSerialInfo {
+    /** Creates the SerialInfo object. */
+    SerialInfo(final String name, final Browser browser,
+                  final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.SERIAL_TABLE.equals(tableName)) {
+        } else if (DomainInfo.SERIAL_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -98,8 +98,8 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
                 }
             }
         }
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.SERIAL_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.SERIAL_TABLE);
         checkResourceFields(null, getParametersFromXML());
     }
 
@@ -143,12 +143,12 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
 
     /** Returns "add new" button. */
     @Override
-    protected MyButton getNewBtn0(final VMSVirtualDomainInfo vdi) {
+    protected MyButton getNewBtn0(final DomainInfo vdi) {
         return getNewBtn(vdi);
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Serial Device");
         newBtn.addActionListener(new ActionListener() {
             @Override
@@ -185,7 +185,7 @@ final class VMSSerialInfo extends VMSParallelSerialInfo {
     /** Return table name. */
     @Override
     protected String getTableName() {
-        return VMSVirtualDomainInfo.SERIAL_TABLE;
+        return DomainInfo.SERIAL_TABLE;
     }
 
     /** Returns device parameters. */

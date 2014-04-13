@@ -24,8 +24,8 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.vms.VMSInterfaceInfo;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.InterfaceInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML.InterfaceData;
@@ -57,13 +57,13 @@ final class Network extends VMConfig {
                                             InterfaceData.SCRIPT_PATH,
                                             InterfaceData.MODEL_TYPE};
     /** VMS interface info object. */
-    private VMSInterfaceInfo vmsii = null;
+    private InterfaceInfo vmsii = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Network} object. */
     Network(final WizardDialog previousDialog,
-            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+            final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -146,7 +146,7 @@ final class Network extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsii.savePreferredValues();
         vmsii.getResource().setValue(InterfaceData.TYPE,
-                                     VMSInterfaceInfo.TYPE_NETWORK);
+                                     InterfaceInfo.TYPE_NETWORK);
         vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
         vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, new StringValue());
         vmsii.addWizardParams(

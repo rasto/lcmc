@@ -52,7 +52,7 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about Virtual Interfaces.
  */
-public final class VMSInterfaceInfo extends VMSHardwareInfo {
+public final class InterfaceInfo extends HardwareInfo {
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
     private final Map<String, Widget> sourceNetworkWi =
@@ -144,9 +144,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the VMSInterfaceInfo object. */
-    VMSInterfaceInfo(final String name, final Browser browser,
-                     final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the InterfaceInfo object. */
+    InterfaceInfo(final String name, final Browser browser,
+                     final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
@@ -154,7 +154,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Interfaces",
-                                   VMSVirtualDomainInfo.INTERFACES_TABLE,
+                                   DomainInfo.INTERFACES_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -407,9 +407,9 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.INTERFACES_TABLE.equals(tableName)) {
+        } else if (DomainInfo.INTERFACES_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -521,8 +521,8 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
                 }
             }
         }
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.INTERFACES_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.INTERFACES_TABLE);
         checkResourceFields(null, getParametersFromXML());
     }
 
@@ -589,7 +589,7 @@ public final class VMSInterfaceInfo extends VMSHardwareInfo {
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Interface");
         newBtn.addActionListener(new ActionListener() {
             @Override

@@ -50,7 +50,7 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual parallel or serial device.
  */
-public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
+public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {
                                     ParallelSerialData.TYPE,
@@ -186,10 +186,10 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the VMSParallelSerialInfo object. */
-    VMSParallelSerialInfo(final String name,
+    /** Creates the ParallelSerialInfo object. */
+    ParallelSerialInfo(final String name,
                           final Browser browser,
-                          final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+                          final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
@@ -511,7 +511,7 @@ public abstract class VMSParallelSerialInfo extends VMSHardwareInfo {
     }
 
     /** Returns "add new" button. */
-    protected abstract MyButton getNewBtn0(final VMSVirtualDomainInfo vdi);
+    protected abstract MyButton getNewBtn0(final DomainInfo vdi);
 
     /** Return table name that appears on the screen. */
     protected abstract String getTableScreenName();

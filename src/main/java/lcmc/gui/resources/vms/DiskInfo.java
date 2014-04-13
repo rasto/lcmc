@@ -62,10 +62,10 @@ import lcmc.utilities.LoggerFactory;
 /**
  * This class holds info about Virtual Disks.
  */
-public final class VMSDiskInfo extends VMSHardwareInfo {
+public final class DiskInfo extends HardwareInfo {
     /** Logger. */
     private static final Logger LOG =
-                                  LoggerFactory.getLogger(VMSDiskInfo.class);
+                                  LoggerFactory.getLogger(DiskInfo.class);
     /** Source file combo box, so that it can be disabled, depending on type. */
     private final Map<String, Widget> sourceFileWi =
                                             new HashMap<String, Widget>();
@@ -205,62 +205,62 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                                                  new HashMap<String, String>();
     static {
         SHORTNAME_MAP.put(DiskData.TYPE,
-                          Tools.getString("VMSDiskInfo.Param.Type"));
+                          Tools.getString("DiskInfo.Param.Type"));
         SHORTNAME_MAP.put(DiskData.TARGET_DEVICE,
-                          Tools.getString("VMSDiskInfo.Param.TargetDevice"));
+                          Tools.getString("DiskInfo.Param.TargetDevice"));
         SHORTNAME_MAP.put(DiskData.SOURCE_FILE,
-                          Tools.getString("VMSDiskInfo.Param.SourceFile"));
+                          Tools.getString("DiskInfo.Param.SourceFile"));
         SHORTNAME_MAP.put(DiskData.SOURCE_DEVICE,
-                          Tools.getString("VMSDiskInfo.Param.SourceDevice"));
+                          Tools.getString("DiskInfo.Param.SourceDevice"));
 
         SHORTNAME_MAP.put(DiskData.SOURCE_PROTOCOL,
-                          Tools.getString("VMSDiskInfo.Param.SourceProtocol"));
+                          Tools.getString("DiskInfo.Param.SourceProtocol"));
         SHORTNAME_MAP.put(DiskData.SOURCE_NAME,
-                          Tools.getString("VMSDiskInfo.Param.SourceName"));
+                          Tools.getString("DiskInfo.Param.SourceName"));
         SHORTNAME_MAP.put(DiskData.SOURCE_HOST_NAME,
-                          Tools.getString("VMSDiskInfo.Param.SourceHostName"));
+                          Tools.getString("DiskInfo.Param.SourceHostName"));
         SHORTNAME_MAP.put(DiskData.SOURCE_HOST_PORT,
-                          Tools.getString("VMSDiskInfo.Param.SourceHostPort"));
+                          Tools.getString("DiskInfo.Param.SourceHostPort"));
 
         SHORTNAME_MAP.put(DiskData.AUTH_USERNAME,
-                          Tools.getString("VMSDiskInfo.Param.AuthUsername"));
+                          Tools.getString("DiskInfo.Param.AuthUsername"));
         SHORTNAME_MAP.put(DiskData.AUTH_SECRET_TYPE,
-                          Tools.getString("VMSDiskInfo.Param.AuthSecretType"));
+                          Tools.getString("DiskInfo.Param.AuthSecretType"));
         SHORTNAME_MAP.put(DiskData.AUTH_SECRET_UUID,
-                          Tools.getString("VMSDiskInfo.Param.AuthSecretUuid"));
+                          Tools.getString("DiskInfo.Param.AuthSecretUuid"));
 
         SHORTNAME_MAP.put(DiskData.TARGET_BUS_TYPE,
-                          Tools.getString("VMSDiskInfo.Param.TargetBusType"));
+                          Tools.getString("DiskInfo.Param.TargetBusType"));
         SHORTNAME_MAP.put(DiskData.DRIVER_NAME,
-                          Tools.getString("VMSDiskInfo.Param.DriverName"));
+                          Tools.getString("DiskInfo.Param.DriverName"));
         SHORTNAME_MAP.put(DiskData.DRIVER_TYPE,
-                          Tools.getString("VMSDiskInfo.Param.DriverType"));
+                          Tools.getString("DiskInfo.Param.DriverType"));
         SHORTNAME_MAP.put(DiskData.DRIVER_CACHE,
-                          Tools.getString("VMSDiskInfo.Param.DriverCache"));
+                          Tools.getString("DiskInfo.Param.DriverCache"));
         SHORTNAME_MAP.put(DiskData.READONLY,
-                          Tools.getString("VMSDiskInfo.Param.Readonly"));
+                          Tools.getString("DiskInfo.Param.Readonly"));
         SHORTNAME_MAP.put(DiskData.SHAREABLE,
-                          Tools.getString("VMSDiskInfo.Param.Shareable"));
+                          Tools.getString("DiskInfo.Param.Shareable"));
     }
     /** Tool tips. */
     private static final Map<String, String> TOOLTIP_MAP =
                                                  new HashMap<String, String>();
     static {
         TOOLTIP_MAP.put(DiskData.SOURCE_HOST_NAME,
-                  Tools.getString("VMSDiskInfo.Param.SourceHostName.ToolTip"));
+                  Tools.getString("DiskInfo.Param.SourceHostName.ToolTip"));
         TOOLTIP_MAP.put(DiskData.SOURCE_HOST_PORT,
-                  Tools.getString("VMSDiskInfo.Param.SourceHostPort.ToolTip"));
+                  Tools.getString("DiskInfo.Param.SourceHostPort.ToolTip"));
     }
 
     /** Sections. */
     private static final Map<String, String> SECTION_MAP =
                                                  new HashMap<String, String>();
     private static final String SECTION_DISK_OPTIONS =
-                         Tools.getString("VMSDiskInfo.Section.DiskOptions");
+                         Tools.getString("DiskInfo.Section.DiskOptions");
     private static final String SECTION_SOURCE =
-                         Tools.getString("VMSDiskInfo.Section.Source");
+                         Tools.getString("DiskInfo.Section.Source");
     private static final String SECTION_AUTHENTICATION =
-                         Tools.getString("VMSDiskInfo.Section.Authentication");
+                         Tools.getString("DiskInfo.Section.Authentication");
 
     static {
         SECTION_MAP.put(DiskData.TYPE, SECTION_SOURCE);
@@ -403,9 +403,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
 
-    /** Creates the VMSDiskInfo object. */
-    VMSDiskInfo(final String name, final Browser browser,
-                       final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the DiskInfo object. */
+    DiskInfo(final String name, final Browser browser,
+                       final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
 
         checkFieldList.add(sourceNameWi);
@@ -421,7 +421,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Disk",
-                                   VMSVirtualDomainInfo.DISK_TABLE,
+                                   DomainInfo.DISK_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -463,7 +463,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                         getVMSVirtualDomainInfo().getWidget(
                             VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
         if (DiskData.DRIVER_NAME.equals(param)
-            && VMSVirtualDomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
+            && DomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
             return DRIVER_NAME_QEMU;
         }
         return PREFERRED_MAP.get(param);
@@ -765,9 +765,9 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.DISK_TABLE.equals(tableName)) {
+        } else if (DomainInfo.DISK_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -931,8 +931,8 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
                 }
             }
         }
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.DISK_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.DISK_TABLE);
         setApplyButtons(null, getRealParametersFromXML());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
@@ -1092,7 +1092,7 @@ public final class VMSDiskInfo extends VMSHardwareInfo {
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Disk");
         newBtn.addActionListener(new ActionListener() {
             @Override

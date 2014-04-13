@@ -27,7 +27,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.widget.TextfieldWithUnit;
@@ -6183,8 +6183,8 @@ public class ServiceInfo extends EditableInfo {
         return infoPanel != null;
     }
 
-    /** Connects with VMSVirtualDomainInfo object. */
-    public VMSVirtualDomainInfo connectWithVMS() {
+    /** Connects with DomainInfo object. */
+    public DomainInfo connectWithVMS() {
         /* for VirtualDomainInfo */
         return null;
     }

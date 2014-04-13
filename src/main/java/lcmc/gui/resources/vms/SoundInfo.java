@@ -47,7 +47,7 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual sound device.
  */
-final class VMSSoundInfo extends VMSHardwareInfo {
+final class SoundInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {SoundData.MODEL};
 
@@ -78,9 +78,9 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the VMSSoundInfo object. */
-    VMSSoundInfo(final String name, final Browser browser,
-                 final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the SoundInfo object. */
+    SoundInfo(final String name, final Browser browser,
+                 final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
@@ -88,7 +88,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Sound Devices",
-                                   VMSVirtualDomainInfo.SOUND_TABLE,
+                                   DomainInfo.SOUND_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             Tools.invokeLater(new Runnable() {
@@ -260,9 +260,9 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.SOUND_TABLE.equals(tableName)) {
+        } else if (DomainInfo.SOUND_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -338,8 +338,8 @@ final class VMSSoundInfo extends VMSHardwareInfo {
                 }
             }
         }
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.SOUND_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.SOUND_TABLE);
         checkResourceFields(null, getParametersFromXML());
     }
 
@@ -389,7 +389,7 @@ final class VMSSoundInfo extends VMSHardwareInfo {
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Sound Device");
         newBtn.addActionListener(new ActionListener() {
             @Override

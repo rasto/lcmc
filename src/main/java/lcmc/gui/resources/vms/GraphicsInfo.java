@@ -51,7 +51,7 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about virtual graphics displays.
  */
-public final class VMSGraphicsInfo extends VMSHardwareInfo {
+public final class GraphicsInfo extends HardwareInfo {
     /** Combo box that can be made invisible. */
     private final Map<String, Widget> portWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
@@ -139,9 +139,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the VMSGraphicsInfo object. */
-    VMSGraphicsInfo(final String name, final Browser browser,
-                           final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the GraphicsInfo object. */
+    GraphicsInfo(final String name, final Browser browser,
+                           final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
@@ -149,7 +149,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Displays",
-                                   VMSVirtualDomainInfo.GRAPHICS_TABLE,
+                                   DomainInfo.GRAPHICS_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -165,7 +165,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns service icon in the menu. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
-        return VMSVirtualDomainInfo.VNC_ICON_SMALL;
+        return DomainInfo.VNC_ICON_SMALL;
     }
 
     /** Returns long description of the specified parameter. */
@@ -409,9 +409,9 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.GRAPHICS_TABLE.equals(tableName)) {
+        } else if (DomainInfo.GRAPHICS_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -523,8 +523,8 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
                                getParamSavedForConfig(GraphicsData.TYPE),
                                getParamSavedForConfig(GraphicsData.PORT),
                                getParamSavedForConfig(GraphicsData.DISPLAY)));
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.GRAPHICS_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.GRAPHICS_TABLE);
         checkResourceFields(null, getParametersFromXML());
     }
 
@@ -575,7 +575,7 @@ public final class VMSGraphicsInfo extends VMSHardwareInfo {
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Graphics Display");
         newBtn.addActionListener(new ActionListener() {
             @Override

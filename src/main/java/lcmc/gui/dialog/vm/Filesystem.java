@@ -23,8 +23,8 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.vms.VMSFilesystemInfo;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.FilesystemInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.VMSXML.FilesystemData;
 
@@ -51,13 +51,13 @@ final class Filesystem extends VMConfig {
                                             FilesystemData.SOURCE_NAME,
                                             FilesystemData.TARGET_DIR};
     /** VMS filesystem info object. */
-    private VMSFilesystemInfo vmsfi = null;
+    private FilesystemInfo vmsfi = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Filesystem} object. */
     Filesystem(final WizardDialog previousDialog,
-               final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+               final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -135,7 +135,7 @@ final class Filesystem extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsfi.savePreferredValues();
         vmsfi.getResource().setValue(FilesystemData.TYPE,
-                                     VMSFilesystemInfo.MOUNT_TYPE);
+                                     FilesystemInfo.MOUNT_TYPE);
         vmsfi.addWizardParams(
                       optionsPanel,
                       PARAMS,

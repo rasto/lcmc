@@ -24,7 +24,7 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
@@ -67,7 +67,7 @@ public final class Domain extends VMConfig {
 
     /** Prepares a new {@code Domain} object. */
     public Domain(final WizardDialog previousDialog,
-                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+                  final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -115,7 +115,7 @@ public final class Domain extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        final DomainInfo vdi = getVMSVirtualDomainInfo();
         final boolean cor = vdi.checkResourceFields(null, PARAMS).isCorrect();
         if (cor || nextDialogObject != null) {
             enableComponents();
@@ -140,7 +140,7 @@ public final class Domain extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        final DomainInfo vdi = getVMSVirtualDomainInfo();
         vdi.waitForInfoPanel();
         if (inputPane != null) {
             return inputPane;
@@ -153,7 +153,7 @@ public final class Domain extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT,
-                                   VMSVirtualDomainInfo.BOOT_CDROM);
+                                   DomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();
         vdi.addWizardParams(
                       optionsPanel,

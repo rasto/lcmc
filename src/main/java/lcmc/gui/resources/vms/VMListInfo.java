@@ -57,10 +57,10 @@ import java.util.TreeSet;
 /**
  * This class shows a list of virtual machines.
  */
-public final class VMSInfo extends CategoryInfo {
+public final class VMListInfo extends CategoryInfo {
     /** On what raw is the vms virtual domain info object. */
-    private volatile Map<String, VMSVirtualDomainInfo> domainToInfo =
-                                   new HashMap<String, VMSVirtualDomainInfo>();
+    private volatile Map<String, DomainInfo> domainToInfo =
+                                   new HashMap<String, DomainInfo>();
     /** Colors for some rows. */
     private volatile Map<String, Color> domainToColor =
                                                   new HashMap<String, Color>();
@@ -71,8 +71,8 @@ public final class VMSInfo extends CategoryInfo {
             {
                 put(4, 80); /* remove button column */
             }});
-    /** Creates the new VMSInfo object with name of the category. */
-    public VMSInfo(final String name, final Browser browser) {
+    /** Creates the new VMListInfo object with name of the category. */
+    public VMListInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
@@ -99,8 +99,8 @@ public final class VMSInfo extends CategoryInfo {
                 domainNames.addAll(vxml.getDomainNames());
             }
         }
-        final Map<String, VMSVirtualDomainInfo> dti =
-                                   new HashMap<String, VMSVirtualDomainInfo>();
+        final Map<String, DomainInfo> dti =
+                                   new HashMap<String, DomainInfo>();
         final Map<String, Color> dtc = new HashMap<String, Color>();
         for (final String domainName : domainNames) {
             ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
@@ -110,14 +110,14 @@ public final class VMSInfo extends CategoryInfo {
                     final Color bgColor = host.getPmColors()[0];
                     dtc.put(domainName, bgColor);
                     if (vxml.isSuspended(domainName)) {
-                        hostIcon = VMSVirtualDomainInfo.PAUSE_ICON;
+                        hostIcon = DomainInfo.PAUSE_ICON;
                     } else {
                         hostIcon = HostBrowser.HOST_ON_ICON_LARGE;
                     }
                     break;
                 }
             }
-            final VMSVirtualDomainInfo vmsvdi =
+            final DomainInfo vmsvdi =
                         getBrowser().findVMSVirtualDomainInfo(domainName);
             if (vmsvdi != null) {
                 dti.put(domainName, vmsvdi);
@@ -152,7 +152,7 @@ public final class VMSInfo extends CategoryInfo {
     protected void rowClicked(final String tableName,
                               final String key,
                               final int column) {
-        final VMSVirtualDomainInfo vmsvdi = domainToInfo.get(key);
+        final DomainInfo vmsvdi = domainToInfo.get(key);
         if (vmsvdi != null) {
             final Thread t = new Thread(new Runnable() {
                 @Override
@@ -234,7 +234,7 @@ public final class VMSInfo extends CategoryInfo {
     @Override
     protected JComponent getNewButton() {
         final MyButton newButton = new MyButton(
-                                     Tools.getString("VMSInfo.AddNewDomain"));
+                                     Tools.getString("VMListInfo.AddNewDomain"));
         newButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -257,8 +257,8 @@ public final class VMSInfo extends CategoryInfo {
 
     /** Adds new virtual domain. */
     public void addDomainPanel() {
-        final VMSVirtualDomainInfo vmsdi =
-                                new VMSVirtualDomainInfo(null, getBrowser());
+        final DomainInfo vmsdi =
+                                new DomainInfo(null, getBrowser());
         vmsdi.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
                                            new DefaultMutableTreeNode(vmsdi);
@@ -288,7 +288,7 @@ public final class VMSInfo extends CategoryInfo {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* New domain */
         final UpdatableItem newDomainMenuItem = new MyMenuItem(
-                       Tools.getString("VMSInfo.AddNewDomain"),
+                       Tools.getString("VMListInfo.AddNewDomain"),
                        HostBrowser.HOST_OFF_ICON_LARGE,
                        new AccessMode(Application.AccessType.ADMIN, false),
                        new AccessMode(Application.AccessType.OP, false)) {

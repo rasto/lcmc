@@ -2242,192 +2242,192 @@ public final class TextResource extends ListResourceBundle {
         {"VMSXML.GetConfig",
          "Parsing libvirt config..."},
 
-        {"VMSInfo.AddNewDomain",
+        {"VMListInfo.AddNewDomain",
          "Add New Virtual Machine"},
 
-        {"VMSVirtualDomainInfo.Section.VirtualSystem",
+        {"DomainInfo.Section.VirtualSystem",
          "Virtual System"},
 
-        {"VMSVirtualDomainInfo.Section.Options",
+        {"DomainInfo.Section.Options",
          "Advanced Options"},
 
-        {"VMSVirtualDomainInfo.Section.Features",
+        {"DomainInfo.Section.Features",
          "Features"},
 
-        {"VMSVirtualDomainInfo.Section.CPUMatch",
+        {"DomainInfo.Section.CPUMatch",
          "CPU Match"},
 
-        {"VMSVirtualDomainInfo.Short.Name",
+        {"DomainInfo.Short.Name",
          "Domain name"},
 
-        {"VMSVirtualDomainInfo.Short.DomainType",
+        {"DomainInfo.Short.DomainType",
          "Domain Type"},
 
-        {"VMSVirtualDomainInfo.Short.Vcpu",
+        {"DomainInfo.Short.Vcpu",
          "Number of CPUs"},
 
-        {"VMSVirtualDomainInfo.Short.Bootloader",
+        {"DomainInfo.Short.Bootloader",
          "Bootloader"},
 
-        {"VMSVirtualDomainInfo.Short.CurrentMemory",
+        {"DomainInfo.Short.CurrentMemory",
          "Current Memory"},
 
-        {"VMSVirtualDomainInfo.Short.Memory",
+        {"DomainInfo.Short.Memory",
          "Max Memory"},
 
-        {"VMSVirtualDomainInfo.Short.Os.Boot",
+        {"DomainInfo.Short.Os.Boot",
          "Boot Device"},
 
-        {"VMSVirtualDomainInfo.Short.Os.Boot.2",
+        {"DomainInfo.Short.Os.Boot.2",
          "2nd Boot Device"},
 
-        {"VMSVirtualDomainInfo.Short.Os.Loader",
+        {"DomainInfo.Short.Os.Loader",
          "Loader"},
 
-        {"VMSVirtualDomainInfo.Short.VirshOptions",
+        {"DomainInfo.Short.VirshOptions",
          "Virsh options"},
 
-        {"VMSVirtualDomainInfo.Short.Autostart",
+        {"DomainInfo.Short.Autostart",
          "Autostart"},
 
-        {"VMSVirtualDomainInfo.Short.Arch",
+        {"DomainInfo.Short.Arch",
          "Architecture"},
 
-        {"VMSVirtualDomainInfo.Short.Machine",
+        {"DomainInfo.Short.Machine",
          "Machine"},
 
-        {"VMSVirtualDomainInfo.Short.Type",
+        {"DomainInfo.Short.Type",
          "Type"},
 
-        {"VMSVirtualDomainInfo.Short.Init",
+        {"DomainInfo.Short.Init",
          "Init"},
 
 
-        {"VMSVirtualDomainInfo.Short.Acpi",
+        {"DomainInfo.Short.Acpi",
          "ACPI"},
 
-        {"VMSVirtualDomainInfo.Short.Apic",
+        {"DomainInfo.Short.Apic",
          "APIC"},
 
-        {"VMSVirtualDomainInfo.Short.Pae",
+        {"DomainInfo.Short.Pae",
          "PAE"},
 
-        {"VMSVirtualDomainInfo.Short.Hap",
+        {"DomainInfo.Short.Hap",
          "HAP"},
 
-        {"VMSVirtualDomainInfo.Short.Clock.Offset",
+        {"DomainInfo.Short.Clock.Offset",
          "Clock Offset"},
 
-        {"VMSVirtualDomainInfo.Short.CPU.Match",
+        {"DomainInfo.Short.CPU.Match",
          "Match"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Model",
+        {"DomainInfo.Short.CPUMatch.Model",
          "Model"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Vendor",
+        {"DomainInfo.Short.CPUMatch.Vendor",
          "Vendor"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologySockets",
+        {"DomainInfo.Short.CPUMatch.TopologySockets",
          "Topology Sockets"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyCores",
+        {"DomainInfo.Short.CPUMatch.TopologyCores",
          "Topology Cores"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyThreads",
+        {"DomainInfo.Short.CPUMatch.TopologyThreads",
          "Topology Threads"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Policy",
+        {"DomainInfo.Short.CPUMatch.Policy",
          "Policy"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Features",
+        {"DomainInfo.Short.CPUMatch.Features",
          "Features"},
 
-        {"VMSVirtualDomainInfo.Short.OnPoweroff",
+        {"DomainInfo.Short.OnPoweroff",
          "On Poweroff"},
 
-        {"VMSVirtualDomainInfo.Short.OnReboot",
+        {"DomainInfo.Short.OnReboot",
          "On Reboot"},
 
-        {"VMSVirtualDomainInfo.Short.OnCrash",
+        {"DomainInfo.Short.OnCrash",
          "On Crash"},
 
-        {"VMSVirtualDomainInfo.Short.Emulator",
+        {"DomainInfo.Short.Emulator",
          "Emulator"},
 
-        {"VMSVirtualDomainInfo.StartVNCViewerOn",
+        {"DomainInfo.StartVNCViewerOn",
          "Console (@VIEWER@ VNC) on "},
 
-        {"VMSVirtualDomainInfo.StartOn",
+        {"DomainInfo.StartOn",
          "Start on "},
 
-        {"VMSVirtualDomainInfo.ShutdownOn",
+        {"DomainInfo.ShutdownOn",
          "Gracefully shutdown on "},
 
-        {"VMSVirtualDomainInfo.DestroyOn",
+        {"DomainInfo.DestroyOn",
          "Kill on "},
 
-        {"VMSVirtualDomainInfo.RebootOn",
+        {"DomainInfo.RebootOn",
          "Reboot on "},
 
-        {"VMSVirtualDomainInfo.SuspendOn",
+        {"DomainInfo.SuspendOn",
          "Suspend on "},
 
-        {"VMSVirtualDomainInfo.ResumeOn",
+        {"DomainInfo.ResumeOn",
          "Resume on "},
 
-        {"VMSVirtualDomainInfo.AddNewDisk",
+        {"DomainInfo.AddNewDisk",
          "New Disk"},
 
-        {"VMSVirtualDomainInfo.AddNewFilesystem",
+        {"DomainInfo.AddNewFilesystem",
          "New Filesystem"},
 
-        {"VMSVirtualDomainInfo.AddNewInterface",
+        {"DomainInfo.AddNewInterface",
          "New Network Interface"},
 
-        {"VMSVirtualDomainInfo.AddNewInputDev",
+        {"DomainInfo.AddNewInputDev",
          "New Input Device (Mouse/Tablet)"},
 
-        {"VMSVirtualDomainInfo.AddNewGraphics",
+        {"DomainInfo.AddNewGraphics",
          "New Graphics Device (VNC, SDL)"},
 
-        {"VMSVirtualDomainInfo.AddNewSound",
+        {"DomainInfo.AddNewSound",
          "New Sound Device"},
 
-        {"VMSVirtualDomainInfo.AddNewSerial",
+        {"DomainInfo.AddNewSerial",
          "New Serial Device"},
 
-        {"VMSVirtualDomainInfo.AddNewParallel",
+        {"DomainInfo.AddNewParallel",
          "New Parallel Device"},
 
-        {"VMSVirtualDomainInfo.AddNewVideo",
+        {"DomainInfo.AddNewVideo",
          "New Video Device"},
 
-        {"VMSVirtualDomainInfo.AddNewHardware",
+        {"DomainInfo.AddNewHardware",
          "Add Hardware"},
 
-        {"VMSVirtualDomainInfo.MoreOptions",
+        {"DomainInfo.MoreOptions",
          "Resume/Suspend"},
 
-        {"VMSVirtualDomainInfo.RemoveDomain",
+        {"DomainInfo.RemoveDomain",
          "Remove Domain"},
 
-        {"VMSVirtualDomainInfo.CancelDomain",
+        {"DomainInfo.CancelDomain",
          "Cancel New Domain"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.Title",
+        {"DomainInfo.confirmRemove.Title",
          "Remove Virtual Domain"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.Description",
+        {"DomainInfo.confirmRemove.Description",
          "Virtual domain \"@DOMAIN@\" will be removed. "
          + "Are you sure?"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.Yes",
+        {"DomainInfo.confirmRemove.Yes",
          "Remove"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.No",
+        {"DomainInfo.confirmRemove.No",
          "Cancel"},
 
-        {"VMSVirtualDomainInfo.AvailableInVersion",
+        {"DomainInfo.AvailableInVersion",
          "Available in libvirt version @VERSION@"},
 
         {"ConstraintPHInfo.ToolTip",
@@ -2470,113 +2470,113 @@ public final class TextResource extends ListResourceBundle {
         {"EditableInfo.MoreOptions",
          "more options are available in advanced mode..."},
 
-        {"VMSDiskInfo.FileChooserTitle",
+        {"DiskInfo.FileChooserTitle",
          "Select image on "},
 
-        {"VMSDiskInfo.Approve",
+        {"DiskInfo.Approve",
          "Select"},
 
-        {"VMSDiskInfo.Approve.ToolTip",
+        {"DiskInfo.Approve.ToolTip",
          "Select this image."},
 
-        {"VMSDiskInfo.Section.DiskOptions",
+        {"DiskInfo.Section.DiskOptions",
          "Disk Options"},
 
-        {"VMSDiskInfo.Section.Source",
+        {"DiskInfo.Section.Source",
          "Source"},
 
-        {"VMSDiskInfo.Section.Authentication",
+        {"DiskInfo.Section.Authentication",
          "Authentication"},
 
-        {"VMSDiskInfo.Param.Type",
+        {"DiskInfo.Param.Type",
          "Type"},
 
-        {"VMSDiskInfo.Param.TargetDevice",
+        {"DiskInfo.Param.TargetDevice",
          "Target Device"},
 
-        {"VMSDiskInfo.Param.SourceFile",
+        {"DiskInfo.Param.SourceFile",
          "File"},
 
-        {"VMSDiskInfo.Param.SourceDevice",
+        {"DiskInfo.Param.SourceDevice",
          "Device"},
 
-        {"VMSDiskInfo.Param.SourceProtocol",
+        {"DiskInfo.Param.SourceProtocol",
          "Protocol"},
 
-        {"VMSDiskInfo.Param.SourceName",
+        {"DiskInfo.Param.SourceName",
          "Name"},
 
-        {"VMSDiskInfo.Param.SourceHostName",
+        {"DiskInfo.Param.SourceHostName",
          "Host Names"},
 
-        {"VMSDiskInfo.Param.SourceHostName.ToolTip",
+        {"DiskInfo.Param.SourceHostName.ToolTip",
          "<br>Enter multiple hosts delimited by comma."},
 
-        {"VMSDiskInfo.Param.SourceHostPort",
+        {"DiskInfo.Param.SourceHostPort",
          "Host Ports"},
 
-        {"VMSDiskInfo.Param.SourceHostPort.ToolTip",
+        {"DiskInfo.Param.SourceHostPort.ToolTip",
          "<br>Enter multiple ports delimited by comma."},
 
-        {"VMSDiskInfo.Param.AuthUsername",
+        {"DiskInfo.Param.AuthUsername",
          "Username"},
 
-        {"VMSDiskInfo.Param.AuthSecretType",
+        {"DiskInfo.Param.AuthSecretType",
          "Secret Type"},
 
-        {"VMSDiskInfo.Param.AuthSecretUuid",
+        {"DiskInfo.Param.AuthSecretUuid",
          "Secred UUID"},
 
-        {"VMSDiskInfo.Param.TargetBusType",
+        {"DiskInfo.Param.TargetBusType",
          "Disk Type"},
 
-        {"VMSDiskInfo.Param.DriverName",
+        {"DiskInfo.Param.DriverName",
          "Driver Name"},
 
-        {"VMSDiskInfo.Param.DriverType",
+        {"DiskInfo.Param.DriverType",
          "Driver Type"},
 
-        {"VMSDiskInfo.Param.DriverCache",
+        {"DiskInfo.Param.DriverCache",
          "Driver Cache"},
 
-        {"VMSDiskInfo.Param.Readonly",
+        {"DiskInfo.Param.Readonly",
          "Readonly"},
 
-        {"VMSDiskInfo.Param.Shareable",
+        {"DiskInfo.Param.Shareable",
          "Shareable"},
 
-        {"VMSVideoInfo.ModelType",
+        {"VideoInfo.ModelType",
          "Type"},
 
-        {"VMSVideoInfo.ModelVRAM",
+        {"VideoInfo.ModelVRAM",
          "Video Memory (Kb)"},
 
-        {"VMSVideoInfo.ModelHeads",
+        {"VideoInfo.ModelHeads",
          "Number of Screens"},
 
-        {"VMSVideoInfo.ModelVRAM.ToolTip",
+        {"VideoInfo.ModelVRAM.ToolTip",
          "Video Memory in kilobytes (VRAM)"},
 
-        {"VMSVideoInfo.ModelHeads.ToolTip",
+        {"VideoInfo.ModelHeads.ToolTip",
          "Number of Screens (Heads)"},
 
-        {"VMSHardwareInfo.Menu.Remove",
+        {"HardwareInfo.Menu.Remove",
          "Remove"},
 
-        {"VMSHardwareInfo.Menu.Cancel",
+        {"HardwareInfo.Menu.Cancel",
          "Cancel"},
 
-        {"VMSHardwareInfo.confirmRemove.Title",
+        {"HardwareInfo.confirmRemove.Title",
          "Remove Virtual Hardware"},
 
-        {"VMSHardwareInfo.confirmRemove.Description",
+        {"HardwareInfo.confirmRemove.Description",
          "Virtual \"@HW@\" will be removed. "
          + "Are you sure?"},
 
-        {"VMSHardwareInfo.confirmRemove.Yes",
+        {"HardwareInfo.confirmRemove.Yes",
          "Remove"},
 
-        {"VMSHardwareInfo.confirmRemove.No",
+        {"HardwareInfo.confirmRemove.No",
          "Cancel"},
 
         {"ServiceInfo.PingdToolTip",

@@ -3,7 +3,7 @@ package lcmc.gui.resources;
 import junit.framework.TestCase;
 import lcmc.utilities.TestSuite1;
 import lcmc.data.VMSXML.DiskData;
-import lcmc.gui.resources.vms.VMSDiskInfo;
+import lcmc.gui.resources.vms.DiskInfo;
 
 import org.junit.Test;
 import org.junit.After;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import mockit.Deencapsulation;
 
 public final class VMSDiskInfoTest1 extends TestCase {
-    //final VMSDiskInfo vmsdi = new VMSDiskInfo("", null, null);
+    //final DiskInfo vmsdi = new DiskInfo("", null, null);
     @Before
     @Override
     protected void setUp() {
@@ -35,7 +35,7 @@ public final class VMSDiskInfoTest1 extends TestCase {
         final Map<String, String> params = new HashMap<String, String>();
         params.put(DiskData.SOURCE_HOST_NAME, names);
         params.put(DiskData.SOURCE_HOST_PORT, ports);
-        Deencapsulation.invoke(VMSDiskInfo.class,
+        Deencapsulation.invoke(DiskInfo.class,
                                "fixSourceHostParams",
                                params);
         return params.get(DiskData.SOURCE_HOST_NAME)

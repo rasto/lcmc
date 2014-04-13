@@ -48,7 +48,7 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about Virtual filesystem.
  */
-public final class VMSFilesystemInfo extends VMSHardwareInfo {
+public final class FilesystemInfo extends HardwareInfo {
     /** Source file combo box, so that it can be disabled, depending on type. */
     private final Map<String, Widget> sourceDirWi =
                                             new HashMap<String, Widget>();
@@ -114,9 +114,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
 
-    /** Creates the VMSFilesystemInfo object. */
-    VMSFilesystemInfo(final String name, final Browser browser,
-                      final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+    /** Creates the FilesystemInfo object. */
+    FilesystemInfo(final String name, final Browser browser,
+                      final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
         final List<Host> hosts = getVMSVirtualDomainInfo().getDefinedOnHosts();
         final Set<Value> sds = new LinkedHashSet<Value>();
@@ -133,7 +133,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Filesystem",
-                                   VMSVirtualDomainInfo.FILESYSTEM_TABLE,
+                                   DomainInfo.FILESYSTEM_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -348,9 +348,9 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.FILESYSTEM_TABLE.equals(tableName)) {
+        } else if (DomainInfo.FILESYSTEM_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
@@ -442,8 +442,8 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
                 }
             }
         }
-        updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.FILESYSTEM_TABLE);
+        updateTable(DomainInfo.HEADER_TABLE);
+        updateTable(DomainInfo.FILESYSTEM_TABLE);
         setApplyButtons(null, getRealParametersFromXML());
     }
 
@@ -503,7 +503,7 @@ public final class VMSFilesystemInfo extends VMSHardwareInfo {
     }
 
     /** Returns "add new" button. */
-    static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
+    static MyButton getNewBtn(final DomainInfo vdi) {
         final MyButton newBtn = new MyButton("Add Filesystem");
         newBtn.addActionListener(new ActionListener() {
             @Override

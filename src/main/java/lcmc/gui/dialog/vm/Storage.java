@@ -25,8 +25,8 @@ package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
 import lcmc.data.VMSXML;
-import lcmc.gui.resources.vms.VMSDiskInfo;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.DiskInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.VMSXML.DiskData;
 
@@ -68,13 +68,13 @@ final class Storage extends VMConfig {
                                             DiskData.DRIVER_TYPE,
                                             DiskData.DRIVER_CACHE};
     /** VMS disk info object. */
-    private VMSDiskInfo vmsdi = null;
+    private DiskInfo vmsdi = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Storage} object. */
     Storage(final WizardDialog previousDialog,
-            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+            final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -152,9 +152,9 @@ final class Storage extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
         vmsdi.getResource().setValue(DiskData.TYPE,
-                                     VMSDiskInfo.FILE_TYPE);
+                                     DiskInfo.FILE_TYPE);
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE,
-                                     VMSDiskInfo.BUS_TYPE_IDE);
+                                     DiskInfo.BUS_TYPE_IDE);
         vmsdi.getResource().setValue(DiskData.TARGET_DEVICE,
                                      new StringValue("hda"));
         vmsdi.getResource().setValue(DiskData.DRIVER_TYPE,

@@ -25,7 +25,7 @@ package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
-import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
@@ -53,7 +53,7 @@ final class Finish extends VMConfig {
 
     /** Prepares a new {@code Finish} object. */
     Finish(final WizardDialog previousDialog,
-           final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+           final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -103,7 +103,7 @@ final class Finish extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        final DomainInfo vdi = getVMSVirtualDomainInfo();
         vdi.selectMyself();
         if (inputPane != null) {
             return inputPane;

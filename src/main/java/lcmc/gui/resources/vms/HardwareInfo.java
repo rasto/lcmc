@@ -76,13 +76,13 @@ import org.w3c.dom.Node;
 /**
  * This class holds info about Virtual Hardware.
  */
-public abstract class VMSHardwareInfo extends EditableInfo {
+public abstract class HardwareInfo extends EditableInfo {
     /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(VMSHardwareInfo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HardwareInfo.class);
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** VMS virtual domain info object. */
-    private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
+    private final DomainInfo vmsVirtualDomainInfo;
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                                  Tools.getDefault("BackIcon"));
@@ -99,10 +99,10 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     protected static final boolean FILECHOOSER_FILE_ONLY =
                                                         !FILECHOOSER_DIR_ONLY;
 
-    /** Creates the VMSHardwareInfo object. */
-    VMSHardwareInfo(final String name,
+    /** Creates the HardwareInfo object. */
+    HardwareInfo(final String name,
                     final Browser browser,
-                    final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+                    final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser);
         setResource(new Resource(name));
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
@@ -126,7 +126,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         final JPanel mainPanel = new JPanel();
         mainPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-        final JTable headerTable = getTable(VMSVirtualDomainInfo.HEADER_TABLE);
+        final JTable headerTable = getTable(DomainInfo.HEADER_TABLE);
         if (headerTable != null) {
             mainPanel.add(headerTable.getTableHeader());
             mainPanel.add(headerTable);
@@ -268,7 +268,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     @Override
     protected final Color getTableRowColor(final String tableName,
                                            final String key) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo.getTableRowColor(tableName, key);
         }
         return Browser.PANEL_BACKGROUND;
@@ -278,7 +278,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     @Override
     protected final int getTableColumnAlignment(final String tableName,
                                                 final int column) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo.getTableColumnAlignment(tableName,
                                                                 column);
         }
@@ -289,14 +289,14 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     @Override
     protected final Info getTableInfo(final String tableName,
                                       final String key) {
-        if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
+        if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo;
         }
         return null;
     }
 
     /** Return info object of the whole domain. */
-    protected final VMSVirtualDomainInfo getVMSVirtualDomainInfo() {
+    protected final DomainInfo getVMSVirtualDomainInfo() {
         return vmsVirtualDomainInfo;
     }
 
@@ -325,10 +325,10 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* remove service */
         final ComponentWithTest removeMenuItem = new MyMenuItem(
-                    Tools.getString("VMSHardwareInfo.Menu.Remove"),
+                    Tools.getString("HardwareInfo.Menu.Remove"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    Tools.getString("VMSHardwareInfo.Menu.Cancel"),
+                    Tools.getString("HardwareInfo.Menu.Cancel"),
                     ClusterBrowser.REMOVE_ICON,
                     ClusterBrowser.STARTING_PTEST_TOOLTIP,
                     new AccessMode(Application.AccessType.ADMIN, false),
@@ -369,14 +369,14 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             return;
         }
         String desc = Tools.getString(
-                                "VMSHardwareInfo.confirmRemove.Description");
+                                "HardwareInfo.confirmRemove.Description");
 
         desc  = desc.replaceAll("@HW@", Matcher.quoteReplacement(toString()));
         if (Tools.confirmDialog(
-               Tools.getString("VMSHardwareInfo.confirmRemove.Title"),
+               Tools.getString("HardwareInfo.confirmRemove.Title"),
                desc,
-               Tools.getString("VMSHardwareInfo.confirmRemove.Yes"),
-               Tools.getString("VMSHardwareInfo.confirmRemove.No"))) {
+               Tools.getString("HardwareInfo.confirmRemove.Yes"),
+               Tools.getString("HardwareInfo.confirmRemove.No"))) {
             removeMyselfNoConfirm(runMode);
             getResource().setNew(false);
         }
@@ -462,7 +462,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     /** Returns file system view that allows remote browsing. */
     private FileSystemView getFileSystemView(final Host host,
                                              final String directory) {
-        final VMSHardwareInfo thisClass = this;
+        final HardwareInfo thisClass = this;
         return new FileSystemView() {
             @Override
             public File[] getRoots() {
@@ -563,7 +563,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
             LOG.error("startFileChooser: connection to host lost.");
             return;
         }
-        final VMSHardwareInfo thisClass = this;
+        final HardwareInfo thisClass = this;
         final JFileChooser fc = new JFileChooser(
                                     getLinuxDir(directory, host),
                                     getFileSystemView(host, directory)) {
@@ -586,14 +586,14 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (dirOnly) {
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
-        fc.setDialogTitle(Tools.getString("VMSDiskInfo.FileChooserTitle")
+        fc.setDialogTitle(Tools.getString("DiskInfo.FileChooserTitle")
                           + host.getName());
-//        fc.setApproveButtonText(Tools.getString("VMSDiskInfo.Approve"));
+//        fc.setApproveButtonText(Tools.getString("DiskInfo.Approve"));
         fc.setApproveButtonToolTipText(
-                               Tools.getString("VMSDiskInfo.Approve.ToolTip"));
+                               Tools.getString("DiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
         final int ret = fc.showDialog(Tools.getGUIData().getMainFrame(),
-                                      Tools.getString("VMSDiskInfo.Approve"));
+                                      Tools.getString("DiskInfo.Approve"));
         linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION
             && fc.getSelectedFile() != null) {
@@ -619,7 +619,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
     final Check checkResourceFields(final String param,
                                     final String[] params,
                                     final boolean fromDomain) {
-        final VMSVirtualDomainInfo vdi = vmsVirtualDomainInfo;
+        final DomainInfo vdi = vmsVirtualDomainInfo;
         if (!fromDomain && vdi != null && params.length != 1) {
             vdi.setApplyButtons(null, vdi.getParametersFromXML());
         }
@@ -661,7 +661,7 @@ public abstract class VMSHardwareInfo extends EditableInfo {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final VMSHardwareInfo other = (VMSHardwareInfo) obj;
+        final HardwareInfo other = (HardwareInfo) obj;
         if (this.getName() != other.getName() && (this.getName() == null || !this.getName().equals(other.getName()))) {
             return false;
         }
