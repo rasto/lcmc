@@ -491,7 +491,7 @@ final class HbOrderInfo extends EditableInfo
      * connection with this constraint.
      */
     @Override
-    Check checkResourceFields(final String param, final String[] params) {
+	public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 

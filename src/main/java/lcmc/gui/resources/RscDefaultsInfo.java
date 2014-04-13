@@ -271,7 +271,7 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Check the fields. */
     @Override
-    Check checkResourceFields(final String param, final String[] params) {
+	public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 

@@ -19,12 +19,17 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.vms;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.NetInfo;
+import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;
@@ -59,6 +64,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.SpringLayout;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.awt.Color;
@@ -70,13 +76,13 @@ import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 
 import org.w3c.dom.Node;
+
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.Lock;
 
 import lcmc.gui.widget.Check;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

@@ -24,8 +24,8 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSInterfaceInfo;
+import lcmc.gui.resources.vms.VMSInterfaceInfo;
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML.InterfaceData;
@@ -37,6 +37,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.Component;
 import java.awt.Dimension;
+
 import lcmc.data.StringValue;
 
 /**

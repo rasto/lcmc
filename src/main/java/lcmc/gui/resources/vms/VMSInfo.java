@@ -19,13 +19,15 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.vms;
 
 import lcmc.AddVMConfigDialog;
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.CategoryInfo;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
@@ -37,6 +39,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.FlowLayout;

@@ -157,12 +157,12 @@ public abstract class EditableInfo extends Info {
      * @param name
      *      name that will be shown to the user.
      */
-    EditableInfo(final String name, final Browser browser) {
+    protected EditableInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
     /** Inits apply button. */
-    final void initApplyButton(final ButtonCallback buttonCallback) {
+    protected final void initApplyButton(final ButtonCallback buttonCallback) {
         initApplyButton(buttonCallback,
                 Tools.getString("Browser.ApplyResource"));
     }
@@ -838,7 +838,7 @@ public abstract class EditableInfo extends Info {
      * parameters will be checked only in the cache. This is good if only
      * one value is changed and we don't want to check everything.
      */
-    Check checkResourceFields(final String param, final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         /* check if values are correct */
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
@@ -937,7 +937,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Should be called after info panel is done. */
-    final void infoPanelDone() {
+    protected final void infoPanelDone() {
         infoPanelLatch.countDown();
     }
 
@@ -1015,12 +1015,12 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Returns apply button. */
-    final MyButton getApplyButton() {
+    public final MyButton getApplyButton() {
         return applyButton;
     }
 
     /** Returns revert button. */
-    final MyButton getRevertButton() {
+    public final MyButton getRevertButton() {
         return revertButton;
     }
 

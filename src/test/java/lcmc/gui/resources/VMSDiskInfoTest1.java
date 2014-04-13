@@ -3,11 +3,15 @@ package lcmc.gui.resources;
 import junit.framework.TestCase;
 import lcmc.utilities.TestSuite1;
 import lcmc.data.VMSXML.DiskData;
+import lcmc.gui.resources.vms.VMSDiskInfo;
+
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
+
 import java.util.Map;
 import java.util.HashMap;
+
 import mockit.Deencapsulation;
 
 public final class VMSDiskInfoTest1 extends TestCase {

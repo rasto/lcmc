@@ -379,7 +379,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Gets node of this resource or service. */
-    final DefaultMutableTreeNode getNode() {
+    protected final DefaultMutableTreeNode getNode() {
         return node;
     }
 
@@ -574,7 +574,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns the Action button. */
-    final JToggleButton getActionsButton() {
+    protected final JToggleButton getActionsButton() {
         final JToggleButton b =
                       new JToggleButton(Tools.getString("Browser.ActionsMenu"),
                                         Browser.MENU_ICON);
@@ -1134,7 +1134,7 @@ public class Info implements Comparable<Info>, Value {
         }
     }
 
-    final void removeNode() {
+    protected final void removeNode() {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {

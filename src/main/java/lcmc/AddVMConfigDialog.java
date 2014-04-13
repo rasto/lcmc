@@ -24,11 +24,9 @@ package lcmc;
 
 import lcmc.data.Application;
 import lcmc.utilities.Tools;
-
 import lcmc.gui.dialog.vm.VMConfig;
 import lcmc.gui.dialog.vm.Domain;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

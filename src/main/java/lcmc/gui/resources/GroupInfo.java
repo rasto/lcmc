@@ -24,6 +24,7 @@ package lcmc.gui.resources;
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.vms.VirtualDomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.CRM;
@@ -44,20 +45,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+
 import javax.swing.JDialog;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JCheckBox;
-import java.awt.geom.Point2D;
 
+import java.awt.geom.Point2D;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import lcmc.gui.widget.Check;
 import lcmc.utilities.MyButton;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -227,7 +228,7 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Applies the changes to the group parameters. */
     @Override
-    void apply(final Host dcHost, final Application.RunMode runMode) {
+	protected void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
@@ -469,7 +470,7 @@ public final class GroupInfo extends ServiceInfo {
      * nodes or not at all.
      */
     @Override
-    List<String> getRunningOnNodes(final Application.RunMode runMode) {
+	protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
                                                       getHeartbeatId(runMode),

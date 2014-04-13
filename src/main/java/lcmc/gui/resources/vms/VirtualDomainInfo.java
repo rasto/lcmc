@@ -19,10 +19,11 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.vms;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
+import lcmc.gui.resources.ServiceInfo;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
@@ -38,7 +39,7 @@ import java.util.regex.Matcher;
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
  */
-final class VirtualDomainInfo extends ServiceInfo {
+public final class VirtualDomainInfo extends ServiceInfo {
     /** VirtualDomain in the VMs menu. */
     private VMSVirtualDomainInfo vmsVirtualDomainInfo = null;
     /** Pattern that captures a name from xml file name. */
@@ -57,14 +58,14 @@ final class VirtualDomainInfo extends ServiceInfo {
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
 
     /** Creates the VirtualDomainInfo object. */
-    VirtualDomainInfo(final String name,
+    public VirtualDomainInfo(final String name,
                       final ResourceAgent ra,
                       final Browser browser) {
         super(name, ra, browser);
     }
 
     /** Creates the VirtualDomainInfo object. */
-    VirtualDomainInfo(final String name,
+    public VirtualDomainInfo(final String name,
                       final ResourceAgent ra,
                       final String hbId,
                       final Map<String, String> resourceNode,
@@ -97,6 +98,7 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Sets service parameters with values from resourceNode hash. */
     @Override
+	protected
     void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         connectWithVMS();
@@ -316,6 +318,7 @@ final class VirtualDomainInfo extends ServiceInfo {
 
     /** Applies the changes to the service parameters. */
     @Override
+	protected
     void apply(final Host dcHost, final Application.RunMode runMode) {
         super.apply(dcHost, runMode);
     }

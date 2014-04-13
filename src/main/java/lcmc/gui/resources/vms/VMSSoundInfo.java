@@ -19,12 +19,14 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.vms;
 
-import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
-import lcmc.data.VMSXML.VideoData;
+import lcmc.data.VMSXML;
+import lcmc.data.VMSXML.SoundData;
+import lcmc.data.Host;
+import lcmc.data.Application;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 
@@ -38,63 +40,46 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import org.w3c.dom.Node;
 
 /**
- * This class holds info about virtual video device.
+ * This class holds info about virtual sound device.
  */
-final class VMSVideoInfo extends VMSHardwareInfo {
+final class VMSSoundInfo extends VMSHardwareInfo {
     /** Parameters. */
-    private static final String[] PARAMETERS = {VideoData.MODEL_TYPE,
-                                                VideoData.MODEL_VRAM,
-                                                VideoData.MODEL_HEADS};
+    private static final String[] PARAMETERS = {SoundData.MODEL};
 
-    /** Whether the parameter is editable only in advanced mode. */
-    private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
-        new HashSet<String>(Arrays.asList(new String[]{
-                                                VideoData.MODEL_VRAM,
-                                                VideoData.MODEL_HEADS}));
-
+    /** Field type. */
+    private static final Map<String, Widget.Type> FIELD_TYPES =
+                                       new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
     static {
-        SHORTNAME_MAP.put(VideoData.MODEL_TYPE,
-                          Tools.getString("VMSVideoInfo.ModelType"));
-        SHORTNAME_MAP.put(VideoData.MODEL_VRAM,
-                          Tools.getString("VMSVideoInfo.ModelVRAM"));
-        SHORTNAME_MAP.put(VideoData.MODEL_HEADS,
-                          Tools.getString("VMSVideoInfo.ModelHeads"));
-    }
-
-    /** Long name. */
-    private static final Map<String, String> LONGNAME_MAP =
-                                                 new HashMap<String, String>();
-    static {
-        LONGNAME_MAP.put(VideoData.MODEL_VRAM,
-                         Tools.getString("VMSVideoInfo.ModelVRAM.ToolTip"));
-        LONGNAME_MAP.put(VideoData.MODEL_HEADS,
-                         Tools.getString("VMSVideoInfo.ModelHeads.ToolTip"));
+        FIELD_TYPES.put(SoundData.MODEL, Widget.Type.RADIOGROUP);
+        SHORTNAME_MAP.put(SoundData.MODEL, "Model");
     }
 
     /** Whether the parameter is required. */
     private static final Collection<String> IS_REQUIRED =
-        new HashSet<String>(Arrays.asList(new String[]{VideoData.MODEL_TYPE}));
+        new HashSet<String>(Arrays.asList(new String[]{SoundData.MODEL}));
 
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
     static {
-        POSSIBLE_VALUES.put(VideoData.MODEL_TYPE,
-                            new Value[]{new StringValue("cirrus"),
-                                        new StringValue("vga"),
-                                        new StringValue("vmvga"),
-                                        new StringValue("xen")});
+        POSSIBLE_VALUES.put(SoundData.MODEL,
+                            new Value[]{new StringValue("ac97"),
+                                         new StringValue("es1370"),
+                                         new StringValue("pcspk"),
+                                         new StringValue("sb16")});
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the VMSVideoInfo object. */
-    VMSVideoInfo(final String name, final Browser browser,
+    /** Creates the VMSSoundInfo object. */
+    VMSSoundInfo(final String name, final Browser browser,
                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
@@ -102,8 +87,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Adds disk table with only this disk to the main panel. */
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
-        tablePanel = getTablePanel("Video Devices",
-                                   VMSVirtualDomainInfo.VIDEO_TABLE,
+        tablePanel = getTablePanel("Sound Devices",
+                                   VMSVirtualDomainInfo.SOUND_TABLE,
                                    getNewBtn(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
             Tools.invokeLater(new Runnable() {
@@ -119,11 +104,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Returns long description of the specified parameter. */
     @Override
     protected String getParamLongDesc(final String param) {
-        final String name = LONGNAME_MAP.get(param);
-        if (name == null) {
-            return getParamShortDesc(param);
-        }
-        return name;
+        return getParamShortDesc(param);
     }
 
     /** Returns short description of the specified parameter. */
@@ -163,7 +144,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Returns section to which the specified parameter belongs. */
     @Override
     protected String getSection(final String param) {
-        return "Video Device Options";
+        return "Sound Device Options";
     }
 
     /** Returns true if the specified parameter is required. */
@@ -208,6 +189,12 @@ final class VMSVideoInfo extends VMSHardwareInfo {
         return null;
     }
 
+    /** Returns type of the field. */
+    @Override
+    protected Widget.Type getFieldType(final String param) {
+        return FIELD_TYPES.get(param);
+    }
+
     /** Applies the changes. */
     @Override
     void apply(final Application.RunMode runMode) {
@@ -228,8 +215,14 @@ final class VMSVideoInfo extends VMSHardwareInfo {
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
-                parameters.put(VideoData.SAVED_MODEL_TYPE,
-                               getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
+                final Value model = getParamSaved(SoundData.MODEL);
+                final String modelS;
+                if (model == null) {
+                    modelS = null;
+                } else {
+                    modelS = model.getValueForConfig();
+                }
+                parameters.put(SoundData.SAVED_MODEL, modelS);
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
                 final Node domainNode = vmsxml.getDomainNode(domainName);
@@ -238,8 +231,8 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                                    getVMSVirtualDomainInfo().getVirshOptions();
                 vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
             }
-            getResource().setNew(false);
         }
+        getResource().setNew(false);
         getBrowser().reload(getNode(), false);
         getBrowser().periodicalVMSUpdate(
                                 getVMSVirtualDomainInfo().getDefinedOnHosts());
@@ -260,7 +253,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
         final Map<String, String> params = super.getHWParameters(allParams);
-        setName(getParamSavedForConfig(VideoData.MODEL_TYPE));
+        setName(getParamSavedForConfig(SoundData.MODEL));
         return params;
     }
 
@@ -269,14 +262,14 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     protected Object[][] getTableData(final String tableName) {
         if (VMSVirtualDomainInfo.HEADER_TABLE.equals(tableName)) {
             return getVMSVirtualDomainInfo().getMainTableData();
-        } else if (VMSVirtualDomainInfo.VIDEO_TABLE.equals(tableName)) {
+        } else if (VMSVirtualDomainInfo.SOUND_TABLE.equals(tableName)) {
             if (getResource().isNew()) {
                 return new Object[][]{};
             }
-            return new Object[][]{getVMSVirtualDomainInfo().getVideoDataRow(
+            return new Object[][]{getVMSVirtualDomainInfo().getSoundDataRow(
                                 getName(),
                                 null,
-                                getVMSVirtualDomainInfo().getVideos(),
+                                getVMSVirtualDomainInfo().getSounds(),
                                 true)};
         }
         return new Object[][]{};
@@ -291,17 +284,13 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Whether the parameter should be enabled. */
     @Override
     protected String isEnabled(final String param) {
-        if (getResource().isNew() || !VideoData.MODEL_TYPE.equals(param)) {
-            return null;
-        } else {
-            return "";
-        }
+        return null;
     }
 
-    /** Whether the parameter should be enabled only in advanced mode. */
+    /** Whether the parameter should be enabled. */
     @Override
     protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
+         return false;
     }
 
     /** Returns access type of this parameter. */
@@ -320,11 +309,11 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     /** Updates parameters. */
     @Override
     void updateParameters() {
-        final Map<String, VideoData> videos =
-                              getVMSVirtualDomainInfo().getVideos();
-        if (videos != null) {
-            final VideoData videoData = videos.get(getName());
-            if (videoData != null) {
+        final Map<String, SoundData> sounds =
+                              getVMSVirtualDomainInfo().getSounds();
+        if (sounds != null) {
+            final SoundData soundData = sounds.get(getName());
+            if (soundData != null) {
                 for (final String param : getParametersFromXML()) {
                     final Value oldValue = getParamSaved(param);
                     Value value = getParamSaved(param);
@@ -333,8 +322,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
                         if (vmsxml != null) {
-                            final Value savedValue =
-                                                  videoData.getValue(param);
+                            final Value savedValue = soundData.getValue(param);
                             if (savedValue != null) {
                                 value = savedValue;
                             }
@@ -351,7 +339,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
             }
         }
         updateTable(VMSVirtualDomainInfo.HEADER_TABLE);
-        updateTable(VMSVirtualDomainInfo.VIDEO_TABLE);
+        updateTable(VMSVirtualDomainInfo.SOUND_TABLE);
         checkResourceFields(null, getParametersFromXML());
     }
 
@@ -359,16 +347,16 @@ final class VMSVideoInfo extends VMSHardwareInfo {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(30);
-        final Value type = getParamSaved(VideoData.MODEL_TYPE);
-        if (type == null) {
-            s.append("new video device...");
+        final Value model = getParamSaved(SoundData.MODEL);
+        if (model == null || model.isNothingSelected()) {
+            s.append("new sound device...");
         } else {
-            s.append(type.getValueForConfig());
+            s.append(model);
         }
         return s.toString();
     }
 
-    /** Removes this video device without confirmation dialog. */
+    /** Removes this sound device without confirmation dialog. */
     @Override
     protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
         if (Application.isTest(runMode)) {
@@ -380,9 +368,9 @@ final class VMSVideoInfo extends VMSHardwareInfo {
             if (vmsxml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
-                parameters.put(VideoData.SAVED_MODEL_TYPE,
-                               getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
-                vmsxml.removeVideoXML(getVMSVirtualDomainInfo().getDomainName(),
+                parameters.put(SoundData.SAVED_MODEL,
+                               getParamSaved(SoundData.MODEL).getValueForConfig());
+                vmsxml.removeSoundXML(getVMSVirtualDomainInfo().getDomainName(),
                                       parameters,
                                       virshOptions);
             }
@@ -400,17 +388,16 @@ final class VMSVideoInfo extends VMSHardwareInfo {
         return null;
     }
 
-
     /** Returns "add new" button. */
     static MyButton getNewBtn(final VMSVirtualDomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Video Device");
+        final MyButton newBtn = new MyButton("Add Sound Device");
         newBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        vdi.addVideosPanel();
+                        vdi.addSoundsPanel();
                     }
                 });
                 t.start();
@@ -426,7 +413,7 @@ final class VMSVideoInfo extends VMSHardwareInfo {
                              final String domainName,
                              final Map<String, String> params) {
         if (vmsxml != null) {
-            vmsxml.modifyVideoXML(node, domainName, params);
+            vmsxml.modifySoundXML(node, domainName, params);
         }
     }
 }

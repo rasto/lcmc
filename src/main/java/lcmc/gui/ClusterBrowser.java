@@ -25,7 +25,6 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.data.PtestData;
 import lcmc.data.DRBDtestData;
-
 import lcmc.data.Host;
 import lcmc.data.Cluster;
 import lcmc.data.ClusterStatus;
@@ -34,13 +33,11 @@ import lcmc.data.DrbdXML;
 import lcmc.data.VMSXML;
 import lcmc.data.Application;
 import lcmc.utilities.NewOutputCallback;
-
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Heartbeat;
 import lcmc.utilities.CRM;
 import lcmc.data.resources.Service;
 import lcmc.data.resources.Network;
-
 import lcmc.gui.resources.DrbdResourceInfo;
 import lcmc.gui.resources.DrbdVolumeInfo;
 import lcmc.gui.resources.HbCategoryInfo;
@@ -56,14 +53,13 @@ import lcmc.gui.resources.DrbdInfo;
 import lcmc.gui.resources.AvailableServiceInfo;
 import lcmc.gui.resources.CommonBlockDevInfo;
 import lcmc.gui.resources.CRMInfo;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSInfo;
-import lcmc.gui.resources.VMSHardwareInfo;
 import lcmc.gui.resources.AvailableServicesInfo;
 import lcmc.gui.resources.ResourceAgentClassInfo;
 import lcmc.gui.resources.ClusterHostsInfo;
 import lcmc.gui.resources.RscDefaultsInfo;
-
+import lcmc.gui.resources.vms.VMSHardwareInfo;
+import lcmc.gui.resources.vms.VMSInfo;
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.data.ResourceAgent;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.ButtonCallback;
@@ -75,7 +71,6 @@ import javax.swing.tree.TreeNode;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
-
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;

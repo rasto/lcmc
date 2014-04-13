@@ -25,7 +25,7 @@ package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.dialog.WizardDialog;
 
@@ -38,6 +38,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import lcmc.data.Application;
 
 /**

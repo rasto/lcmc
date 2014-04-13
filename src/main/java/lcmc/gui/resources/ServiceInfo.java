@@ -24,11 +24,14 @@ package lcmc.gui.resources;
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.VirtualDomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.widget.TextfieldWithUnit;
 
 import java.awt.geom.Point2D;
+
 import lcmc.data.resources.Service;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.UpdatableItem;
@@ -65,6 +68,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
+
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -79,6 +83,7 @@ import javax.swing.SpringLayout;
 import javax.swing.AbstractButton;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
+
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -86,7 +91,6 @@ import java.util.concurrent.locks.Lock;
 
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -165,7 +169,7 @@ public class ServiceInfo extends EditableInfo {
     private static final Value OPERATIONS_DEFAULT_VALUES = 
                                new StringValue("default", "advisory minimum");
     /** Check the cached fields. */
-    protected static final String CACHED_FIELD = "cached";
+    public static final String CACHED_FIELD = "cached";
     /** Master / Slave type string. */
     static final Value MASTER_SLAVE_TYPE_STRING = new StringValue("Master/Slave");
     /** Manage by CRM icon. */
@@ -268,7 +272,7 @@ public class ServiceInfo extends EditableInfo {
      * Prepares a new {@code ServiceInfo} object and creates
      * new service object.
      */
-    ServiceInfo(final String name,
+    protected ServiceInfo(final String name,
                 final ResourceAgent resourceAgent,
                 final Browser browser) {
         super(name, browser);
@@ -287,7 +291,7 @@ public class ServiceInfo extends EditableInfo {
      * new service object. It also initializes parameters along with
      * heartbeat id with values from xml stored in resourceNode.
      */
-    ServiceInfo(final String name,
+    protected ServiceInfo(final String name,
                 final ResourceAgent ra,
                 final String heartbeatId,
                 final Map<String, String> resourceNode,
@@ -538,7 +542,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Sets service parameters with values from resourceNode hash. */
-    void setParameters(final Map<String, String> resourceNode) {
+    protected void setParameters(final Map<String, String> resourceNode) {
         if (resourceNode == null) {
             return;
         }
@@ -860,7 +864,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Returns node name of the host where this service is running. */
-    List<String> getRunningOnNodes(final Application.RunMode runMode) {
+    protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         return getBrowser().getClusterStatus().getRunningOnNodes(
                                                       getHeartbeatId(runMode),
                                                       runMode);
@@ -3314,7 +3318,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Applies the changes to the service parameters. */
-    void apply(final Host dcHost, final Application.RunMode runMode) {
+    protected void apply(final Host dcHost, final Application.RunMode runMode) {
         LOG.debug1("apply: start: test: " + runMode);
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {

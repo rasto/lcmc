@@ -38,10 +38,10 @@ import lcmc.data.Value;
 @SuppressWarnings("SingleCharacterStringConcatenation")
 public class NetInfo extends Info {
     /** Net interface icon. */
-    static final ImageIcon NET_I_ICON = Tools.createImageIcon(
+    public static final ImageIcon NET_I_ICON = Tools.createImageIcon(
                                    Tools.getDefault("HostBrowser.NetIntIcon"));
     /** Net interface icon. */
-    static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
+    public static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
                               Tools.getDefault("HostBrowser.NetIntIconLarge"));
     /** Placeholder where user can enter an ip. */
     public static final String IP_PLACEHOLDER = "--.--.--.--";

@@ -28,7 +28,7 @@ import java.io.IOException;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import lcmc.configs.DistResource;
-import lcmc.gui.resources.VMSHardwareInfo;
+import lcmc.gui.resources.vms.VMSHardwareInfo;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite

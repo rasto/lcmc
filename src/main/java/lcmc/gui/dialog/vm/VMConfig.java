@@ -24,7 +24,7 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 
 /**
  * VMConfig super class from which all the vm wizards can be

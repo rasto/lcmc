@@ -197,7 +197,7 @@ final class CloneInfo extends ServiceInfo {
 
     /** Returns node name of the host where this cloned service is running. */
     @Override
-    List<String> getRunningOnNodes(final Application.RunMode runMode) {
+	protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             if (getService().isMaster()) {

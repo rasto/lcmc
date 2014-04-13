@@ -23,8 +23,8 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSFilesystemInfo;
+import lcmc.gui.resources.vms.VMSFilesystemInfo;
+import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.data.VMSXML.FilesystemData;
 

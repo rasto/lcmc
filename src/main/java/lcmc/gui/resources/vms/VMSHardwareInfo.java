@@ -19,10 +19,12 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.vms;
 
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Widget;
 import lcmc.data.VMSXML;
 import lcmc.data.Host;
@@ -40,6 +42,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileSystemView;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +57,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.gui.widget.Check;
@@ -66,6 +70,7 @@ import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
+
 import org.w3c.dom.Node;
 
 /**

@@ -25,6 +25,7 @@ package lcmc.gui.resources;
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.vms.VirtualDomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.dialog.ClusterLogs;
@@ -67,7 +68,6 @@ import javax.swing.tree.MutableTreeNode;
 import lcmc.EditClusterDialog;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
