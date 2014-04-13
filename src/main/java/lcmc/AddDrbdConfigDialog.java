@@ -27,9 +27,9 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.Start;
 import lcmc.gui.dialog.drbdConfig.Resource;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.DrbdInfo;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -53,17 +53,17 @@ public final class AddDrbdConfigDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
-    private final DrbdInfo drbdInfo;
+    private final GlobalInfo globalInfo;
     /** The first block device. */
     private final BlockDevInfo blockDevInfo1;
     /** The second block device. */
     private final BlockDevInfo blockDevInfo2;
 
     /** Prepares new {@code AddDrbdConfigDialog} object. */
-    public AddDrbdConfigDialog(final DrbdInfo drbdInfo,
+    public AddDrbdConfigDialog(final GlobalInfo globalInfo,
                                final BlockDevInfo blockDevInfo1,
                                final BlockDevInfo blockDevInfo2) {
-        this.drbdInfo = drbdInfo;
+        this.globalInfo = globalInfo;
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;
     }
@@ -72,25 +72,25 @@ public final class AddDrbdConfigDialog {
     public void showDialogs() {
         //dri.setDialogStarted(true);
         WizardDialog dialog;
-        if (!drbdInfo.getDrbdResources().isEmpty()
-            && drbdInfo.atLeastVersion("8.4")) {
-            dialog = new Start(null, drbdInfo, blockDevInfo1, blockDevInfo2);
+        if (!globalInfo.getDrbdResources().isEmpty()
+            && globalInfo.atLeastVersion("8.4")) {
+            dialog = new Start(null, globalInfo, blockDevInfo1, blockDevInfo2);
         } else {
             final List<BlockDevInfo> bdis =
                                 new ArrayList<BlockDevInfo>(Arrays.asList(
                                                               blockDevInfo1,
                                                               blockDevInfo2));
-            final DrbdResourceInfo drbdResourceInfo =
-                        drbdInfo.getNewDrbdResource(
-                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis));
-            final DrbdVolumeInfo dvi =
-                            drbdInfo.getNewDrbdVolume(drbdResourceInfo, bdis);
-            drbdResourceInfo.addDrbdVolume(dvi);
-            drbdInfo.addDrbdResource(drbdResourceInfo);
+            final ResourceInfo resourceInfo =
+                        globalInfo.getNewDrbdResource(
+                               VolumeInfo.getHostsFromBlockDevices(bdis));
+            final VolumeInfo dvi =
+                            globalInfo.getNewDrbdVolume(resourceInfo, bdis);
+            resourceInfo.addDrbdVolume(dvi);
+            globalInfo.addDrbdResource(resourceInfo);
             Tools.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
-                    drbdInfo.addDrbdVolume(dvi);
+                    globalInfo.addDrbdVolume(dvi);
                 }
             });
             dialog = new Resource(null, dvi);

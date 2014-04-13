@@ -54,9 +54,9 @@ import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.resources.crm.ServicesInfo;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.CommonBlockDevInfo;
-import lcmc.gui.resources.drbd.DrbdInfo;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.resources.vms.VMSHardwareInfo;
 import lcmc.gui.resources.vms.VMSInfo;
 import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
@@ -139,13 +139,13 @@ public final class ClusterBrowser extends Browser {
     /** DRBD resource hash lock. */
     private final Lock mDrbdResHashLock = new ReentrantLock();
     /** DRBD resource name string to drbd resource info hash. */
-    private final Map<String, DrbdResourceInfo> drbdResHash =
-                                new HashMap<String, DrbdResourceInfo>();
+    private final Map<String, ResourceInfo> drbdResHash =
+                                new HashMap<String, ResourceInfo>();
     /** DRBD device hash lock. */
     private final Lock mDrbdDevHashLock = new ReentrantLock();
     /** DRBD resource device string to drbd resource info hash. */
-    private final Map<String, DrbdVolumeInfo> drbdDevHash =
-                                new HashMap<String, DrbdVolumeInfo>();
+    private final Map<String, VolumeInfo> drbdDevHash =
+                                new HashMap<String, VolumeInfo>();
     /** Heartbeat id to service lock. */
     private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
@@ -566,7 +566,7 @@ public final class ClusterBrowser extends Browser {
 
         /* drbd */
         drbdNode = new DefaultMutableTreeNode(
-            new DrbdInfo(Tools.getString("ClusterBrowser.Drbd"),
+            new GlobalInfo(Tools.getString("ClusterBrowser.Drbd"),
                          this));
         setNode(drbdNode);
         topAdd(drbdNode);
@@ -1574,7 +1574,7 @@ public final class ClusterBrowser extends Browser {
     /** Updates drbd resources. */
     public void updateDrbdResources() {
         Tools.isSwingThread();
-        final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
+        final GlobalInfo globalInfo = drbdGraph.getDrbdInfo();
         drbdStatusLock();
         final DrbdXML dxml = drbdXML;
         if (dxml == null) {
@@ -1622,21 +1622,21 @@ public final class ClusterBrowser extends Browser {
             }
             if (bd1 != null && bd2 != null) {
                 /* add DRBD resource */
-                DrbdResourceInfo dri = getDrbdResHash().get(resName);
+                ResourceInfo dri = getDrbdResHash().get(resName);
                 putDrbdResHash();
                 final List<BlockDevInfo> bdis =
                                 new ArrayList<BlockDevInfo>(Arrays.asList(bd1,
                                                                           bd2));
                 if (dri == null) {
-                    dri = drbdInfo.addDrbdResource(
+                    dri = globalInfo.addDrbdResource(
                                resName,
-                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis),
+                               VolumeInfo.getHostsFromBlockDevices(bdis),
                                runMode);
                     atLeastOneAdded = true;
                 }
-                DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
+                VolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
                 if (dvi == null) {
-                    dvi = drbdInfo.addDrbdVolume(
+                    dvi = globalInfo.addDrbdVolume(
                                            dri,
                                            volumeNr,
                                            drbdDev,
@@ -1646,7 +1646,7 @@ public final class ClusterBrowser extends Browser {
                 }
                 dri.setParameters();
                 dvi.setParameters();
-                final DrbdResourceInfo dri0 = dri;
+                final ResourceInfo dri0 = dri;
                 dri0.getInfoPanel();
             }
         }
@@ -1654,9 +1654,9 @@ public final class ClusterBrowser extends Browser {
         //killRemovedVolumes(dxml.getResourceDeviceMap());
         drbdStatusUnlock();
         if (atLeastOneAdded) {
-            drbdInfo.getInfoPanel();
-            drbdInfo.setAllApplyButtons();
-            drbdInfo.reloadDRBDResourceComboBoxes();
+            globalInfo.getInfoPanel();
+            globalInfo.setAllApplyButtons();
+            globalInfo.reloadDRBDResourceComboBoxes();
             drbdGraph.scale();
         }
     }
@@ -1668,7 +1668,7 @@ public final class ClusterBrowser extends Browser {
 
     private void killRemovedVolumes(
                                 final MultiKeyMap<String, String> deviceMap) {
-        for (final DrbdVolumeInfo dvi
+        for (final VolumeInfo dvi
                          : getDrbdGraph().getDrbdVolumeToEdgeMap().keySet()) {
             if (!deviceMap.containsKey(dvi.getDrbdResourceInfo().getName(),
                                        dvi.getName())) {
@@ -2441,7 +2441,7 @@ public final class ClusterBrowser extends Browser {
     /**
      * Returns a hash from drbd device to drbd volume info. putDrbdDevHash
      * must follow after you're done. */
-    public Map<String, DrbdVolumeInfo> getDrbdDevHash() {
+    public Map<String, VolumeInfo> getDrbdDevHash() {
         mDrbdDevHashLock.lock();
         return drbdDevHash;
     }
@@ -2457,7 +2457,7 @@ public final class ClusterBrowser extends Browser {
      * /dev/drbd/by-res/r0/0
      * /dev/drbd0
      */
-    public DrbdVolumeInfo getDrbdVolumeFromDev(final CharSequence dev) {
+    public VolumeInfo getDrbdVolumeFromDev(final CharSequence dev) {
         if (dev == null) {
             return null;
         }
@@ -2470,7 +2470,7 @@ public final class ClusterBrowser extends Browser {
             } else {
                 vol = "0";
             }
-            final DrbdResourceInfo dri = getDrbdResHash().get(res);
+            final ResourceInfo dri = getDrbdResHash().get(res);
             putDrbdResHash();
             if (dri != null) {
                 return dri.getDrbdVolumeInfo(vol);
@@ -2483,7 +2483,7 @@ public final class ClusterBrowser extends Browser {
      * Returns a hash from resource name to drbd resource info hash.
      * Get locks the hash and put unlocks it
      */
-    public Map<String, DrbdResourceInfo> getDrbdResHash() {
+    public Map<String, ResourceInfo> getDrbdResHash() {
         mDrbdResHashLock.lock();
         return drbdResHash;
     }
@@ -2494,9 +2494,9 @@ public final class ClusterBrowser extends Browser {
     }
 
     /** Returns (shallow) copy of all drbdresource info objects. */
-    public Iterable<DrbdResourceInfo> getDrbdResHashValues() {
-        final Iterable<DrbdResourceInfo> values =
-                   new ArrayList<DrbdResourceInfo>(getDrbdResHash().values());
+    public Iterable<ResourceInfo> getDrbdResHashValues() {
+        final Iterable<ResourceInfo> values =
+                   new ArrayList<ResourceInfo>(getDrbdResHash().values());
         putDrbdResHash();
         return values;
     }
@@ -2589,7 +2589,7 @@ public final class ClusterBrowser extends Browser {
                                 null,
                                 drbdGraph.getDrbdInfo().getParametersFromXML());
         drbdGraph.getDrbdInfo().updateAdvancedPanels();
-        for (final DrbdResourceInfo dri : getDrbdResHashValues()) {
+        for (final ResourceInfo dri : getDrbdResHashValues()) {
             dri.checkResourceFields(null, dri.getParametersFromXML());
             dri.updateAdvancedPanels();
             dri.updateAllVolumes();

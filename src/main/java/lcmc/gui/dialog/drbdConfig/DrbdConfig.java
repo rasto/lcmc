@@ -23,29 +23,29 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 
 /**
  * DrbdConfig super class from which all the drbd config wizards can be
- * extended. It just adds DrbdVolumeInfo field.
+ * extended. It just adds VolumeInfo field.
  *
  * @author Rasto Levrinc
  * @version $Id$
  */
 public abstract class DrbdConfig extends WizardDialog {
     /** Drbd resource info object. */
-    private final DrbdVolumeInfo drbdVolumeInfo;
+    private final VolumeInfo volumeInfo;
 
     /** Prepares a new {@code DrbdConfig} object. */
     protected DrbdConfig(final WizardDialog previousDialog,
-                      final DrbdVolumeInfo drbdVolumeInfo) {
+                      final VolumeInfo volumeInfo) {
         super(previousDialog);
-        this.drbdVolumeInfo = drbdVolumeInfo;
+        this.volumeInfo = volumeInfo;
     }
 
     /** Returns drbd resource info object. */
-    protected final DrbdVolumeInfo getDrbdVolumeInfo() {
-        return drbdVolumeInfo;
+    protected final VolumeInfo getDrbdVolumeInfo() {
+        return volumeInfo;
     }
 }

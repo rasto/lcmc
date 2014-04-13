@@ -35,13 +35,13 @@ import lcmc.utilities.Unit;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-abstract class DrbdGuiInfo extends EditableInfo {
+abstract class AbstractDrbdInfo extends EditableInfo {
     /** Name of the drbd after parameter. */
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     /** Name of the drbd after parameter. Before 8.4 */
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
-    /** Prepares a new {@code DrbdGuiInfo} object. */
-    DrbdGuiInfo(final String name, final Browser browser) {
+    /** Prepares a new {@code AbstractDrbdInfo} object. */
+    AbstractDrbdInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
@@ -56,8 +56,8 @@ abstract class DrbdGuiInfo extends EditableInfo {
         return getBrowser().getCluster();
     }
 
-    /** Returns the DrbdInfo object (for all drbds). */
-    public final DrbdInfo getDrbdInfo() {
+    /** Returns the GlobalInfo object (for all drbds). */
+    public final GlobalInfo getDrbdInfo() {
         return getBrowser().getDrbdGraph().getDrbdInfo();
     }
 
@@ -317,7 +317,7 @@ abstract class DrbdGuiInfo extends EditableInfo {
                              * to the resource. */
                             if (!value.getValueForConfig().equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
-                                final DrbdResourceInfo v0 =
+                                final ResourceInfo v0 =
                                      getBrowser().getDrbdResHash().get(value.getValueForConfig());
                                 getBrowser().putDrbdResHash();
                                 if (v0 != null) {

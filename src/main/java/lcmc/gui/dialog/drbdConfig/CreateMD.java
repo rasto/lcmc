@@ -28,7 +28,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
@@ -71,7 +71,7 @@ final class CreateMD extends DrbdConfig {
 
     /** Prepares a new {@code CreateMD} object. */
     CreateMD(final WizardDialog previousDialog,
-                       final DrbdVolumeInfo dvi) {
+                       final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 

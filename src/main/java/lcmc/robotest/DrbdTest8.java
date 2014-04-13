@@ -68,7 +68,7 @@ final class DrbdTest8 {
             moveTo(700, 450);
             leftClick();
 
-            moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
+            moveTo(Tools.getString("ResourceInfo.ProxyOutsideIp"),
                    MComboBox.class); /* outside */
             leftClick();
             press(KeyEvent.VK_E);
@@ -109,13 +109,13 @@ final class DrbdTest8 {
         rightClick();
         moveToSlowly(400, blockDevY + 160);
 
-        moveTo(Tools.getString("DrbdMultiSelectionInfo.Detach"));
+        moveTo(Tools.getString("MultiSelectionInfo.Detach"));
         leftClick();
         checkDRBDTest(drbdTest, 2.01);
 
         moveTo(400, blockDevY);
         rightClick();
-        moveTo(Tools.getString("DrbdMultiSelectionInfo.Attach"));
+        moveTo(Tools.getString("MultiSelectionInfo.Attach"));
         leftClick();
         checkDRBDTest(drbdTest, 2.02);
 

@@ -80,13 +80,13 @@ import lcmc.utilities.LoggerFactory;
 /**
  * This class holds info data of a DRBD volume.
  */
-public final class DrbdVolumeInfo extends EditableInfo
+public final class VolumeInfo extends EditableInfo
                                   implements CommonDeviceInterface {
     /** Logger. */
     private static final Logger LOG =
-                               LoggerFactory.getLogger(DrbdVolumeInfo.class);
+                               LoggerFactory.getLogger(VolumeInfo.class);
     /** Drbd resource in which is this volume defined. */
-    private final DrbdResourceInfo drbdResourceInfo;
+    private final ResourceInfo resourceInfo;
     /** Block devices that are in this DRBD volume. */
     private final List<BlockDevInfo> blockDevInfos;
     /** Device name. TODO: */
@@ -111,7 +111,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
     /** Section name. */
     static final String SECTION_STRING =
-                               Tools.getString("DrbdVolumeInfo.VolumeSection");
+                               Tools.getString("VolumeInfo.VolumeSection");
     /** Long descriptions for parameters. */
     private static final Map<String, String> LONG_DESC =
                 Collections.unmodifiableMap(new HashMap<String, String>() {
@@ -126,9 +126,9 @@ public final class DrbdVolumeInfo extends EditableInfo
                 private static final long serialVersionUID = 1L;
             {
                 put(DRBD_VOL_PARAM_DEV,
-                    Tools.getString("DrbdVolumeInfo.Device"));
+                    Tools.getString("VolumeInfo.Device"));
                 put(DRBD_VOL_PARAM_NUMBER,
-                    Tools.getString("DrbdVolumeInfo.Number"));
+                    Tools.getString("VolumeInfo.Number"));
             }});
 
     /** Short descriptions for parameters. */
@@ -156,17 +156,17 @@ public final class DrbdVolumeInfo extends EditableInfo
                 }});
     private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
-    /** Prepares a new {@code DrbdVolumeInfo} object. */
-    DrbdVolumeInfo(final String name,
+    /** Prepares a new {@code VolumeInfo} object. */
+    VolumeInfo(final String name,
                    final String device,
-                   final DrbdResourceInfo drbdResourceInfo,
+                   final ResourceInfo resourceInfo,
                    final List<BlockDevInfo> blockDevInfos,
                    final Browser browser) {
         super(name, browser);
-        assert (drbdResourceInfo != null);
+        assert (resourceInfo != null);
         assert (blockDevInfos.size() >= 2);
 
-        this.drbdResourceInfo = drbdResourceInfo;
+        this.resourceInfo = resourceInfo;
         this.blockDevInfos = Collections.unmodifiableList(blockDevInfos);
         this.device = device;
         hosts = getHostsFromBlockDevices(blockDevInfos);
@@ -394,7 +394,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     public List<UpdatableItem> createPopup() {
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final DrbdVolumeInfo thisClass = this;
+        final VolumeInfo thisClass = this;
 
         final MyMenuItem connectMenu = new MyMenuItem(
             Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
@@ -590,7 +590,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             private static final long serialVersionUID = 1L;
             @Override
             public void action() {
-                /* this drbdResourceInfo remove myself and this calls
+                /* this resourceInfo remove myself and this calls
                    removeDrbdResource in this class, that removes the edge
                    in the graph. */
                 removeMyself(runMode);
@@ -756,7 +756,7 @@ public final class DrbdVolumeInfo extends EditableInfo
             bdi.removeMyself(runMode);
         }
         if (lastVolume) {
-            final DrbdResourceInfo dri = getDrbdResourceInfo();
+            final ResourceInfo dri = getDrbdResourceInfo();
             for (final BlockDevInfo bdi : getBlockDevInfos()) {
                 if (dri.isProxy(bdi.getHost())) {
                     DRBD.proxyDown(bdi.getHost(),
@@ -818,8 +818,8 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Returns drbd resource info object. */
-    public DrbdResourceInfo getDrbdResourceInfo() {
-        return drbdResourceInfo;
+    public ResourceInfo getDrbdResourceInfo() {
+        return resourceInfo;
     }
 
     /** Returns device name, like /dev/drbd0. */
@@ -1151,7 +1151,7 @@ public final class DrbdVolumeInfo extends EditableInfo
                               final boolean fromDrbdInfo,
                               final boolean fromDrbdResourceInfo) {
         final DrbdXML dxml = getBrowser().getDrbdXML();
-        final DrbdInfo di = getDrbdInfo();
+        final GlobalInfo di = getDrbdInfo();
         if (di != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
             di.setApplyButtons(null, di.getParametersFromXML());
         }
@@ -1366,7 +1366,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Returns name that is displayed in the graph. */
     public String getNameForGraph() {
         final StringBuilder n = new StringBuilder(20);
-        final DrbdResourceInfo dri = getDrbdResourceInfo();
+        final ResourceInfo dri = getDrbdResourceInfo();
         n.append(dri.getName());
         if (dri.getDrbdVolumes().size() > 1) {
             n.append('/');
@@ -1411,7 +1411,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Return DRBD info object. */
-    public DrbdInfo getDrbdInfo() {
+    public GlobalInfo getDrbdInfo() {
         return getDrbdResourceInfo().getDrbdInfo();
     }
 

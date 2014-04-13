@@ -2611,66 +2611,66 @@ public final class TextResource extends ListResourceBundle {
         {"ServiceInfo.LoadingMetaData",
          "Loading meta data..."},
 
-        {"DrbdInfo.CommonSection",
+        {"GlobalInfo.CommonSection",
          "Common "},
 
-        {"DrbdInfo.AddProxyHost",
+        {"GlobalInfo.AddProxyHost",
          "Add Proxy Host"},
 
-        {"DrbdInfo.RescanLvm",
+        {"GlobalInfo.RescanLvm",
          "Rescan LVM"},
 
-        {"DrbdResourceInfo.HostAddresses",
+        {"ResourceInfo.HostAddresses",
          "Net Interface"},
 
-        {"DrbdResourceInfo.AddressOnHost",
+        {"ResourceInfo.AddressOnHost",
          "on "},
 
-        {"DrbdResourceInfo.NetInterfacePort",
+        {"ResourceInfo.NetInterfacePort",
          "Port"},
 
-        {"DrbdResourceInfo.NetInterfacePortToProxy",
+        {"ResourceInfo.NetInterfacePortToProxy",
          "<html><u>DRBD</u> \u2192 Proxy Port</html>"},
 
-        {"DrbdResourceInfo.ProxyPorts",
+        {"ResourceInfo.ProxyPorts",
          "Common Proxy Ports"},
-        {"DrbdResourceInfo.Proxy",
+        {"ResourceInfo.Proxy",
          "Proxy on "},
 
-        {"DrbdResourceInfo.ProxyInsideIp",
+        {"ResourceInfo.ProxyInsideIp",
          "<html>DRBD \u2192 <u>Proxy</u> IP</html>"},
 
-        {"DrbdResourceInfo.ProxyInsidePort",
+        {"ResourceInfo.ProxyInsidePort",
          "<html>DRBD \u2192 <u>Proxy</u> Port</html>"},
 
-        {"DrbdResourceInfo.ProxyOutsideIp",
+        {"ResourceInfo.ProxyOutsideIp",
          "<html><u>Proxy</u> \u2192 Proxy IP</html>"},
 
-        {"DrbdResourceInfo.ProxyOutsidePort",
+        {"ResourceInfo.ProxyOutsidePort",
          "<html><u>Proxy</u> \u2192 Proxy Port</html>"},
 
-        {"DrbdResourceInfo.ProxyInsideIp.ToolTip",
+        {"ResourceInfo.ProxyInsideIp.ToolTip",
          "Proxy Inside IP"},
 
-        {"DrbdResourceInfo.ProxyInsidePort.ToolTip",
+        {"ResourceInfo.ProxyInsidePort.ToolTip",
          "Proxy Inside Port"},
 
-        {"DrbdResourceInfo.ProxyOutsideIp.ToolTip",
+        {"ResourceInfo.ProxyOutsideIp.ToolTip",
          "Proxy Outside IP"},
 
-        {"DrbdResourceInfo.ProxyOutsidePort.ToolTip",
+        {"ResourceInfo.ProxyOutsidePort.ToolTip",
          "Proxy Outside Port"},
 
         {"BlockDevice.MetaDiskSection",
          "DRBD Meta Disk"},
 
-        {"DrbdVolumeInfo.VolumeSection",
+        {"VolumeInfo.VolumeSection",
          "DRBD Volume"},
 
-        {"DrbdVolumeInfo.Number",
+        {"VolumeInfo.Number",
          "Number"},
 
-        {"DrbdVolumeInfo.Device",
+        {"VolumeInfo.Device",
          "Device"},
 
         {"PcmkMultiSelectionInfo.Selection",
@@ -2745,116 +2745,116 @@ public final class TextResource extends ListResourceBundle {
         {"PcmkMultiSelectionInfo.RemoveService",
          "Remove Selected Services"},
 
-        {"DrbdMultiSelectionInfo.Selection",
+        {"MultiSelectionInfo.Selection",
          "<h3>Selection:</h3>"},
 
-        {"DrbdMultiSelectionInfo.ChangeHostColor",
+        {"MultiSelectionInfo.ChangeHostColor",
          "Change Color of Selected Hosts"},
 
-        {"DrbdMultiSelectionInfo.LoadDrbd",
+        {"MultiSelectionInfo.LoadDrbd",
          "Load DRBD Module on Selected Hosts"},
 
-        {"DrbdMultiSelectionInfo.AdjustAllDrbd",
+        {"MultiSelectionInfo.AdjustAllDrbd",
          "Load DRBD Config on Selected Hosts (Adjust)"},
 
-        {"DrbdMultiSelectionInfo.UpAll",
+        {"MultiSelectionInfo.UpAll",
          "Start All DRBDs on Selected Hosts (up)"},
 
-        {"DrbdMultiSelectionInfo.Detach",
+        {"MultiSelectionInfo.Detach",
          "Detach Selected BDs"},
 
-        {"DrbdMultiSelectionInfo.Attach",
+        {"MultiSelectionInfo.Attach",
          "Attach Selected BDs"},
 
-        {"DrbdMultiSelectionInfo.Connect",
+        {"MultiSelectionInfo.Connect",
          "Connect Resources To Peers"},
 
-        {"DrbdMultiSelectionInfo.Disconnect",
+        {"MultiSelectionInfo.Disconnect",
          "Disconnect Resources From Peers"},
 
-        {"DrbdMultiSelectionInfo.SetPrimary",
+        {"MultiSelectionInfo.SetPrimary",
          "Promote Selected BDs To Primary"},
 
-        {"DrbdMultiSelectionInfo.SetSecondary",
+        {"MultiSelectionInfo.SetSecondary",
          "Demote Selected BDs To Secondary"},
 
-        {"DrbdMultiSelectionInfo.ForcePrimary",
+        {"MultiSelectionInfo.ForcePrimary",
          "Force Promotion To Primary"},
 
-        {"DrbdMultiSelectionInfo.Invalidate",
+        {"MultiSelectionInfo.Invalidate",
          "Invalidate Selected BDs"},
 
-        {"DrbdMultiSelectionInfo.ResumeSync",
+        {"MultiSelectionInfo.ResumeSync",
          "Resume Syncs"},
 
-        {"DrbdMultiSelectionInfo.PauseSync",
+        {"MultiSelectionInfo.PauseSync",
          "Pause Syncs"},
 
-        {"DrbdMultiSelectionInfo.Resize",
+        {"MultiSelectionInfo.Resize",
          "Resize selected BDs"},
 
-        {"DrbdMultiSelectionInfo.DiscardData",
+        {"MultiSelectionInfo.DiscardData",
          "Discard Data on selected BDs"},
 
-        {"DrbdMultiSelectionInfo.ProxyDown",
+        {"MultiSelectionInfo.ProxyDown",
          "Stop Proxies on selected BDs"},
 
-        {"DrbdMultiSelectionInfo.ProxyUp",
+        {"MultiSelectionInfo.ProxyUp",
          "Start Proxies on selected BDs"},
 
-        {"DrbdMultiSelectionInfo.HostStopProxy",
+        {"MultiSelectionInfo.HostStopProxy",
          "Stop Proxy Daemon on selected hosts"},
 
-        {"DrbdMultiSelectionInfo.HostStartProxy",
+        {"MultiSelectionInfo.HostStartProxy",
          "Start Proxy Daemon on selected hosts"},
 
-        {"DrbdMultiSelectionInfo.PVCreate",
+        {"MultiSelectionInfo.PVCreate",
          "Create PVs on selected BDs"},
 
-        {"DrbdMultiSelectionInfo.PVCreate.ToolTip",
+        {"MultiSelectionInfo.PVCreate.ToolTip",
          "Create physical volumes on selected block devices"},
 
-        {"DrbdMultiSelectionInfo.PVRemove",
+        {"MultiSelectionInfo.PVRemove",
          "Remove selected PVs"},
 
-        {"DrbdMultiSelectionInfo.PVRemove.ToolTip",
+        {"MultiSelectionInfo.PVRemove.ToolTip",
          "Remove selected physical volumes"},
 
-        {"DrbdMultiSelectionInfo.VGCreate",
+        {"MultiSelectionInfo.VGCreate",
          "Create VG on selected PVs"},
 
-        {"DrbdMultiSelectionInfo.VGCreate.ToolTip",
+        {"MultiSelectionInfo.VGCreate.ToolTip",
          "Create volume group on selected physical volumes"},
 
-        {"DrbdMultiSelectionInfo.VGRemove",
+        {"MultiSelectionInfo.VGRemove",
          "Remove selected VGs"},
 
-        {"DrbdMultiSelectionInfo.VGRemove.ToolTip",
+        {"MultiSelectionInfo.VGRemove.ToolTip",
          "Remove selected volume groups"},
 
-        {"DrbdMultiSelectionInfo.LVCreate",
+        {"MultiSelectionInfo.LVCreate",
          "Create LV in VG "},
 
-        {"DrbdMultiSelectionInfo.LVCreate.ToolTip",
+        {"MultiSelectionInfo.LVCreate.ToolTip",
          "Create a logical volume."},
 
-        {"DrbdMultiSelectionInfo.LVRemove",
+        {"MultiSelectionInfo.LVRemove",
          "Remove selected LVs"},
 
-        {"DrbdMultiSelectionInfo.LVRemove.ToolTip",
+        {"MultiSelectionInfo.LVRemove.ToolTip",
          "Remove selected logical volumes."},
 
-        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Title",
+        {"MultiSelectionInfo.LVRemove.Confirm.Title",
          "Remove selected LVs"},
 
-        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Desc",
+        {"MultiSelectionInfo.LVRemove.Confirm.Desc",
          "Remove selected logical volumes and DESTROY all the data on "
          + "them?<br>{}"},
 
-        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Remove",
+        {"MultiSelectionInfo.LVRemove.Confirm.Remove",
          "Remove"},
 
-        {"DrbdMultiSelectionInfo.LVRemove.Confirm.Cancel",
+        {"MultiSelectionInfo.LVRemove.Confirm.Cancel",
          "Cancel"},
 
         {"AllHostsInfo.QuickCluster",

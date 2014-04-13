@@ -29,7 +29,7 @@ import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -80,18 +80,18 @@ final class ProxyCheckInstallation extends DialogHost {
     /** The proxy host. */
     private final Host host;
     /** Drbd volume info. */
-    private final DrbdVolumeInfo drbdVolumeInfo;
+    private final VolumeInfo volumeInfo;
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
     /** Prepares a new {@code ProxyCheckInstallation} object. */
     ProxyCheckInstallation(final WizardDialog previousDialog,
                            final Host host,
-                           final DrbdVolumeInfo drbdVolumeInfo,
+                           final VolumeInfo volumeInfo,
                            final WizardDialog origDialog) {
         super(previousDialog, host);
         this.host = host;
-        this.drbdVolumeInfo = drbdVolumeInfo;
+        this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
 
@@ -122,7 +122,7 @@ final class ProxyCheckInstallation extends DialogHost {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new ProxyInst(thisClass,
                                                      getHost(),
-                                                     drbdVolumeInfo,
+                                                     volumeInfo,
                                                      origDialog);
                     final InstallMethods im =
                                  (InstallMethods) proxyInstMethodWi.getValue();
@@ -227,8 +227,8 @@ final class ProxyCheckInstallation extends DialogHost {
                 setPressedButton(nextButton());
             }
             getHost().getCluster().addProxyHost(getHost());
-            if (drbdVolumeInfo != null) {
-                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+            if (volumeInfo != null) {
+                volumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
         }
     }

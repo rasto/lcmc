@@ -22,7 +22,7 @@
 package lcmc.gui.resources.crm;
 
 import lcmc.gui.Browser;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 
@@ -85,7 +85,7 @@ public final class LinbitDrbdInfo extends ServiceInfo {
     @Override
     public void removeMyselfNoConfirm(final Host dcHost,
                                       final Application.RunMode runMode) {
-        final DrbdResourceInfo dri =
+        final ResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         super.removeMyselfNoConfirm(dcHost, runMode);
@@ -98,7 +98,7 @@ public final class LinbitDrbdInfo extends ServiceInfo {
     @Override
 	protected void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
-        final DrbdResourceInfo dri =
+        final ResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {

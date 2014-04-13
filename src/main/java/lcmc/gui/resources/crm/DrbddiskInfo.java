@@ -24,7 +24,7 @@ package lcmc.gui.resources.crm;
 import lcmc.data.Host;
 import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
 
 import java.util.Map;
 
@@ -68,7 +68,7 @@ public final class DrbddiskInfo extends ServiceInfo {
     public void removeMyselfNoConfirm(final Host dcHost,
                                       final Application.RunMode runMode) {
         super.removeMyselfNoConfirm(dcHost, runMode);
-        final DrbdResourceInfo dri =
+        final ResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
@@ -80,7 +80,7 @@ public final class DrbddiskInfo extends ServiceInfo {
     @Override
 	protected void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
-        final DrbdResourceInfo dri =
+        final ResourceInfo dri =
                         getBrowser().getDrbdResHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {

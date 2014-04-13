@@ -24,7 +24,7 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.data.Host;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.MyButton;
 
 /**
@@ -37,7 +37,7 @@ import lcmc.utilities.MyButton;
  */
 final class ConfigurationProxy extends Configuration {
     /** Drbd volume info. */
-    private final DrbdVolumeInfo drbdVolumeInfo;
+    private final VolumeInfo volumeInfo;
     /** The dialog we came from. */
     private final WizardDialog origDialog;
     /** Next dialog object. */
@@ -46,10 +46,10 @@ final class ConfigurationProxy extends Configuration {
     /** Prepares a new {@code ConfigurationProxy} object. */
     ConfigurationProxy(final WizardDialog previousDialog,
                        final Host host,
-                       final DrbdVolumeInfo drbdVolumeInfo,
+                       final VolumeInfo volumeInfo,
                        final WizardDialog origDialog) {
         super(previousDialog, host);
-        this.drbdVolumeInfo = drbdVolumeInfo;
+        this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
 
@@ -62,7 +62,7 @@ final class ConfigurationProxy extends Configuration {
         if (nextDialogObject == null) {
             return new SSHProxy(this,
                                 getHost(),
-                                drbdVolumeInfo,
+                                volumeInfo,
                                 origDialog);
         } else {
             return nextDialogObject;
@@ -79,9 +79,9 @@ final class ConfigurationProxy extends Configuration {
                 setPressedButton(nextButton());
             }
             getHost().getCluster().addProxyHost(getHost());
-            if (drbdVolumeInfo != null) {
-                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
-                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
+            if (volumeInfo != null) {
+                volumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                volumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }

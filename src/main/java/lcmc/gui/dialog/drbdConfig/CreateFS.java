@@ -30,7 +30,7 @@ import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
@@ -87,8 +87,8 @@ final class CreateFS extends DrbdConfig {
 
     /** Prepares a new {@code CreateFS} object. */
     CreateFS(final WizardDialog previousDialog,
-             final DrbdVolumeInfo drbdVolumeInfo) {
-        super(previousDialog, drbdVolumeInfo);
+             final VolumeInfo volumeInfo) {
+        super(previousDialog, volumeInfo);
     }
 
     /**

@@ -25,7 +25,7 @@ package lcmc.gui.dialog.lvm;
 import lcmc.data.*;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.LVM;
@@ -130,7 +130,7 @@ public final class LVResize extends LV {
     /** Check if it is DRBD device and if it could be resized. */
     private boolean checkDRBD() {
         if (blockDevInfo.getBlockDevice().isDrbd()) {
-            final DrbdVolumeInfo dvi = blockDevInfo.getDrbdVolumeInfo();
+            final VolumeInfo dvi = blockDevInfo.getDrbdVolumeInfo();
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
             if (!dvi.isConnected(Application.RunMode.LIVE)) {
                 printErrorAndRetry(

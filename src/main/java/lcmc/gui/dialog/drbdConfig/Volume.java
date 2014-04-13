@@ -24,7 +24,7 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;
@@ -49,7 +49,7 @@ public final class Volume extends DrbdConfig {
     private static final String[] PARAMS = {"number", "device"};
     /** Prepares a new {@code Volume} object. */
     public Volume(final WizardDialog previousDialog,
-                  final DrbdVolumeInfo dvi) {
+                  final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 

@@ -25,8 +25,8 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.ClusterBrowser;
@@ -61,7 +61,7 @@ final class BlockDev extends DrbdConfig {
 
     /** Prepares a new {@code BlockDev} object. */
     BlockDev(final WizardDialog previousDialog,
-             final DrbdVolumeInfo dli,
+             final VolumeInfo dli,
              final BlockDevInfo blockDevInfo) {
         super(previousDialog, dli);
         this.blockDevInfo = blockDevInfo;
@@ -102,9 +102,9 @@ final class BlockDev extends DrbdConfig {
                 final Application.RunMode runMode = Application.RunMode.LIVE;
 
                 /* apply */
-                final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+                final VolumeInfo dvi = getDrbdVolumeInfo();
                 dvi.getDrbdInfo().apply(runMode);
-                final DrbdResourceInfo dri = dvi.getDrbdResourceInfo();
+                final ResourceInfo dri = dvi.getDrbdResourceInfo();
                 Tools.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {

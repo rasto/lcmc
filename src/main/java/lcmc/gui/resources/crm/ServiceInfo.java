@@ -26,7 +26,7 @@ import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -1423,11 +1423,11 @@ public class ServiceInfo extends EditableInfo {
         }
         while (drbdResources.hasMoreElements()) {
             final DefaultMutableTreeNode n = drbdResources.nextElement();
-            if (!(n.getUserObject() instanceof DrbdResourceInfo)) {
+            if (!(n.getUserObject() instanceof ResourceInfo)) {
                 continue;
             }
-            final DrbdResourceInfo drbdRes =
-                                        (DrbdResourceInfo) n.getUserObject();
+            final ResourceInfo drbdRes =
+                                        (ResourceInfo) n.getUserObject();
             final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
             if (drbdResNode != null) {
                 @SuppressWarnings("unchecked")

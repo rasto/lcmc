@@ -33,7 +33,7 @@ import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.CommonDeviceInterface;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;
@@ -237,7 +237,7 @@ public final class FilesystemInfo extends ServiceInfo {
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
-            final DrbdVolumeInfo selectedInfo =
+            final VolumeInfo selectedInfo =
                             getBrowser().getDrbdVolumeFromDev(selectedValue.getValueForConfig());
             if (selectedInfo != null) {
                 selectedValue = selectedInfo;
@@ -357,7 +357,7 @@ public final class FilesystemInfo extends ServiceInfo {
         }
 
         final StringBuilder s = new StringBuilder(getName());
-        final DrbdVolumeInfo dvi = getBrowser().getDrbdVolumeFromDev(
+        final VolumeInfo dvi = getBrowser().getDrbdVolumeFromDev(
                                              getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         if (dvi == null) {
             id = getParamSaved(FS_RES_PARAM_DEV).getValueForConfig();
@@ -381,7 +381,7 @@ public final class FilesystemInfo extends ServiceInfo {
     @Override
     protected void removeMyselfNoConfirm(final Host dcHost,
                                          final Application.RunMode runMode) {
-        final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
+        final VolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         super.removeMyselfNoConfirm(dcHost, runMode);
         if (oldDvi != null && Application.isLive(runMode)) {
@@ -405,13 +405,13 @@ public final class FilesystemInfo extends ServiceInfo {
             // TODO: disabled for now
             return;
         }
-        final DrbdVolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
+        final VolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         if (oldDvi != null) {
             // TODO: disabled because it does not work well at the moment.
             return;
         }
-        final DrbdVolumeInfo newDvi = getBrowser().getDrbdVolumeFromDev(
+        final VolumeInfo newDvi = getBrowser().getDrbdVolumeFromDev(
                                           getComboBoxValue(FS_RES_PARAM_DEV).getValueForConfig());
         if (newDvi == null || newDvi.equals(oldDvi)) {
             return;
@@ -491,7 +491,7 @@ public final class FilesystemInfo extends ServiceInfo {
     @Override
     public void reloadComboBoxes() {
         super.reloadComboBoxes();
-        final DrbdVolumeInfo selectedInfo =
+        final VolumeInfo selectedInfo =
                                 getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         final Value selectedValue;

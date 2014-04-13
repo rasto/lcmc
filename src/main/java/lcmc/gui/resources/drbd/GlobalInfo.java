@@ -75,9 +75,9 @@ import lcmc.utilities.LoggerFactory;
  * drbd config, but if a drbd block device is selected it forwards to the
  * block device info, which is defined in HostBrowser.java.
  */
-public final class DrbdInfo extends DrbdGuiInfo {
+public final class GlobalInfo extends AbstractDrbdInfo {
     /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(DrbdInfo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalInfo.class);
     /** Selected block device. */
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
@@ -94,8 +94,8 @@ public final class DrbdInfo extends DrbdGuiInfo {
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
 
-    /** Prepares a new {@code DrbdInfo} object. */
-    public DrbdInfo(final String name, final Browser browser) {
+    /** Prepares a new {@code GlobalInfo} object. */
+    public GlobalInfo(final String name, final Browser browser) {
         super(name, browser);
         setResource(new Resource(name));
         ((ClusterBrowser) browser).getDrbdGraph().setDrbdInfo(this);
@@ -239,7 +239,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             final Map<String, String> resConfigs =
                                            new LinkedHashMap<String, String>();
             final Set<Host> proxyHosts = getCluster().getProxyHosts();
-            for (final DrbdResourceInfo dri
+            for (final ResourceInfo dri
                                        : getBrowser().getDrbdResHashValues()) {
                 if (dri.resourceInHost(host) || proxyHosts.contains(host)) {
                     final String rConf = dri.drbdResourceConfig(host);
@@ -361,7 +361,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         if (DrbdXML.GLOBAL_SECTION.equals(section)) {
             return super.getSectionDisplayName(section);
         } else {
-            return Tools.getString("DrbdInfo.CommonSection")
+            return Tools.getString("GlobalInfo.CommonSection")
                    + super.getSectionDisplayName(section);
         }
     }
@@ -383,7 +383,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    for (final DrbdResourceInfo dri : getDrbdResources()) {
+                    for (final ResourceInfo dri : getDrbdResources()) {
                         dri.setParameters();
                     }
                     setAllApplyButtons();
@@ -636,12 +636,12 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Adds existing drbd volume to the GUI. */
-    public DrbdVolumeInfo addDrbdVolume(final DrbdResourceInfo dri,
+    public VolumeInfo addDrbdVolume(final ResourceInfo dri,
                                         final String volumeNr,
                                         final String drbdDevStr,
                                         final List<BlockDevInfo> blockDevInfos,
                                         final Application.RunMode runMode) {
-        final DrbdVolumeInfo dvi = new DrbdVolumeInfo(volumeNr,
+        final VolumeInfo dvi = new VolumeInfo(volumeNr,
                                                       drbdDevStr,
                                                       dri,
                                                       blockDevInfos,
@@ -663,7 +663,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
             if (bd2 != null) {
                 bd2.getBlockDevice().setNew(true);
             }
-            final DrbdInfo thisClass = this;
+            final GlobalInfo thisClass = this;
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -679,7 +679,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
                         bd2.widgetRemove(p, Widget.WIZARD_PREFIX);
                     }
                     if (adrd.isCanceled()) {
-                        final DrbdVolumeInfo dvi = bd1.getDrbdVolumeInfo();
+                        final VolumeInfo dvi = bd1.getDrbdVolumeInfo();
                         if (dvi != null) {
                             dvi.removeMyself(runMode);
                         }
@@ -698,21 +698,21 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Return new DRBD resoruce info object. */
-    public DrbdResourceInfo getNewDrbdResource(final Set<Host> hosts) {
+    public ResourceInfo getNewDrbdResource(final Set<Host> hosts) {
         final int index = getNewDrbdResourceIndex();
         final String name = 'r' + Integer.toString(index);
         /* search for next available drbd device */
-        final DrbdResourceInfo dri =
-                                new DrbdResourceInfo(name, hosts, getBrowser());
+        final ResourceInfo dri =
+                                new ResourceInfo(name, hosts, getBrowser());
         dri.getResource().setNew(true);
         return dri;
     }
 
     /** Return new DRBD volume info object. */
-    public DrbdVolumeInfo getNewDrbdVolume(
-                                    final DrbdResourceInfo dri,
+    public VolumeInfo getNewDrbdVolume(
+                                    final ResourceInfo dri,
                                     final List<BlockDevInfo> blockDevInfos) {
-        final Map<String, DrbdVolumeInfo> drbdDevHash =
+        final Map<String, VolumeInfo> drbdDevHash =
                                                 getBrowser().getDrbdDevHash();
         int index = 0;
         String drbdDevStr = "/dev/drbd" + Integer.toString(index);
@@ -723,7 +723,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         }
         getBrowser().putDrbdDevHash();
         final String volumeNr = dri.getAvailVolumeNumber();
-        return new DrbdVolumeInfo(volumeNr,
+        return new VolumeInfo(volumeNr,
                                   drbdDevStr,
                                   dri,
                                   blockDevInfos,
@@ -731,10 +731,10 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Add DRBD resource. */
-    public void addDrbdResource(final DrbdResourceInfo dri) {
+    public void addDrbdResource(final ResourceInfo dri) {
         final String name = dri.getName();
         dri.getDrbdResource().setDefaultValue(
-                                        DrbdResourceInfo.DRBD_RES_PARAM_NAME,
+                                        ResourceInfo.DRBD_RES_PARAM_NAME,
                                         new StringValue(name));
         getBrowser().getDrbdResHash().put(name, dri);
         getBrowser().putDrbdResHash();
@@ -753,7 +753,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Add DRBD volume. */
-    public void addDrbdVolume(final DrbdVolumeInfo dvi) {
+    public void addDrbdVolume(final VolumeInfo dvi) {
         /* We want next port number on both devices to be the same,
          * although other port numbers may not be the same on both. */
         final BlockDevInfo bdi1 = dvi.getFirstBlockDevInfo();
@@ -802,12 +802,12 @@ public final class DrbdInfo extends DrbdGuiInfo {
     }
 
     /** Adds existing drbd resource to the GUI. */
-    public DrbdResourceInfo addDrbdResource(final String name,
+    public ResourceInfo addDrbdResource(final String name,
                                             final Set<Host> hosts,
                                             final Application.RunMode runMode) {
         final DrbdXML dxml = getBrowser().getDrbdXML();
-        final DrbdResourceInfo dri =
-                               new DrbdResourceInfo(name, hosts, getBrowser());
+        final ResourceInfo dri =
+                               new ResourceInfo(name, hosts, getBrowser());
         final String[] sections = dxml.getSections();
         for (final String sectionString : sections) {
             /* remove -options */
@@ -838,7 +838,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         final Check check = new Check(incorrect, changed);
-        for (final DrbdResourceInfo dri : getDrbdResources()) {
+        for (final ResourceInfo dri : getDrbdResources()) {
             check.addCheck(dri.checkResourceFields(param,
                                                    dri.getParametersFromXML(),
                                                    true));
@@ -863,25 +863,25 @@ public final class DrbdInfo extends DrbdGuiInfo {
     @Override
     public void revert() {
         super.revert();
-        for (final DrbdResourceInfo dri : getDrbdResources()) {
+        for (final ResourceInfo dri : getDrbdResources()) {
             dri.revert();
         }
     }
 
     /** Set all apply buttons. */
     public void setAllApplyButtons() {
-        for (final DrbdResourceInfo dri : getDrbdResources()) {
+        for (final ResourceInfo dri : getDrbdResources()) {
             dri.storeComboBoxValues(dri.getParametersFromXML());
             dri.setAllApplyButtons();
         }
     }
 
     /** Returns all drbd resources in this cluster. */
-    public Collection<DrbdResourceInfo> getDrbdResources() {
-        final Collection<DrbdResourceInfo> resources =
-                                        new LinkedHashSet<DrbdResourceInfo>();
+    public Collection<ResourceInfo> getDrbdResources() {
+        final Collection<ResourceInfo> resources =
+                                        new LinkedHashSet<ResourceInfo>();
         final Host[] hosts = getCluster().getHostsArray();
-        for (final DrbdResourceInfo dri : getBrowser().getDrbdResHashValues()) {
+        for (final ResourceInfo dri : getBrowser().getDrbdResHashValues()) {
             for (final Host host : hosts) {
                 if (dri.resourceInHost(host)) {
                     resources.add(dri);
@@ -914,7 +914,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
     /** Reload DRBD resource combo boxes. (resync-after). */
     public void reloadDRBDResourceComboBoxes() {
-        for (final DrbdResourceInfo dri : getDrbdResources()) {
+        for (final ResourceInfo dri : getDrbdResources()) {
             dri.reloadComboBoxes();
         }
     }
@@ -969,9 +969,9 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
         /** Add proxy host */
         final UpdatableItem addProxyHostMenu = new MyMenuItem(
-                Tools.getString("DrbdInfo.AddProxyHost"),
+                Tools.getString("GlobalInfo.AddProxyHost"),
                 null,
-                Tools.getString("DrbdInfo.AddProxyHost"),
+                Tools.getString("GlobalInfo.AddProxyHost"),
                 new AccessMode(Application.AccessType.OP, false),
                 new AccessMode(Application.AccessType.OP, false)) {
 
@@ -1006,7 +1006,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
 
         /* Rescan LVM */
         final UpdatableItem rescanLvmItem =
-            new MyMenuItem(Tools.getString("DrbdInfo.RescanLvm"),
+            new MyMenuItem(Tools.getString("GlobalInfo.RescanLvm"),
                            null, /* icon */
                            null,
                            new AccessMode(Application.AccessType.OP,

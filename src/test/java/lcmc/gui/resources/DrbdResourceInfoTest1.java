@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 import lcmc.data.Host;
 import lcmc.utilities.TestSuite1;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
 
 import org.junit.Test;
 import org.junit.After;
@@ -33,8 +33,8 @@ public final class DrbdResourceInfoTest1 extends TestCase {
 
         final ClusterBrowser b =
                 TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
-        final DrbdResourceInfo r1 = new DrbdResourceInfo("name1", null, b);
-        final DrbdResourceInfo r2 = new DrbdResourceInfo("name2", null, b);
+        final ResourceInfo r1 = new ResourceInfo("name1", null, b);
+        final ResourceInfo r2 = new ResourceInfo("name2", null, b);
         assertFalse("not equal names", r1.equals(r2));
     }
 
@@ -43,8 +43,8 @@ public final class DrbdResourceInfoTest1 extends TestCase {
 
         final ClusterBrowser b =
                 TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
-        final DrbdResourceInfo r1 = new DrbdResourceInfo("name", null, b);
-        final DrbdResourceInfo r2 = new DrbdResourceInfo("name", null, b);
+        final ResourceInfo r1 = new ResourceInfo("name", null, b);
+        final ResourceInfo r2 = new ResourceInfo("name", null, b);
         assertTrue("equal names", r1.equals(r2));
     }
 
@@ -53,7 +53,7 @@ public final class DrbdResourceInfoTest1 extends TestCase {
 
         final ClusterBrowser b =
                 TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
-        final DrbdResourceInfo r1 = new DrbdResourceInfo("name", null, b);
+        final ResourceInfo r1 = new ResourceInfo("name", null, b);
         assertFalse("equal name null", r1.getName() == null);
     }
 
@@ -63,10 +63,10 @@ public final class DrbdResourceInfoTest1 extends TestCase {
         final ClusterBrowser b =
                 TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
         
-        final DrbdResourceInfo r1 =
-                new DrbdResourceInfo("name", new LinkedHashSet<Host>(
+        final ResourceInfo r1 =
+                new ResourceInfo("name", new LinkedHashSet<Host>(
                                                  Arrays.asList(new Host())), b);
-        final DrbdResourceInfo r2 = new DrbdResourceInfo("name", null, b);
+        final ResourceInfo r2 = new ResourceInfo("name", null, b);
         assertTrue("equal names", r1.equals(r2));
     }
 }

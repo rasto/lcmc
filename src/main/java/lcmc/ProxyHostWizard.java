@@ -24,7 +24,7 @@ import lcmc.utilities.Tools;
 import lcmc.data.Host;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.NewProxyHost;
-import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -41,22 +41,22 @@ public final class ProxyHostWizard {
                               LoggerFactory.getLogger(ProxyHostWizard.class);
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
-    private final DrbdVolumeInfo drbdVolumeInfo;
+    private final VolumeInfo volumeInfo;
     private final Host host;
 
 
     /** Prepares new {@code ProxyHostWizard} object. */
     public ProxyHostWizard(final Host host,
-                           final DrbdVolumeInfo drbdVolumeInfo) {
+                           final VolumeInfo volumeInfo) {
         this.host = host;
-        this.drbdVolumeInfo = drbdVolumeInfo;
+        this.volumeInfo = volumeInfo;
     }
 
     /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
         WizardDialog dialog = new NewProxyHost(null,
                                                host,
-                                               drbdVolumeInfo,
+                                               volumeInfo,
                                                null);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {

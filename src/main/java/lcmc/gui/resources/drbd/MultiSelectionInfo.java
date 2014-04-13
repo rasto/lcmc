@@ -65,15 +65,15 @@ import lcmc.utilities.ComponentWithTest;
 /**
  * This class provides menus for block device and host multi selection.
  */
-public final class DrbdMultiSelectionInfo extends EditableInfo {
+public final class MultiSelectionInfo extends EditableInfo {
     /** All selected objects. */
     private final List<Info> selectedInfos;
 
     private static final String LV_CREATE_MENU_ITEM =
-                            Tools.getString("DrbdMultiSelectionInfo.LVCreate");
+                            Tools.getString("MultiSelectionInfo.LVCreate");
 
-    /** Prepares a new {@code DrbdMultiSelectionInfo} object. */
-    public DrbdMultiSelectionInfo(final List<Info> selectedInfos,
+    /** Prepares a new {@code MultiSelectionInfo} object. */
+    public MultiSelectionInfo(final List<Info> selectedInfos,
                                   final Browser browser) {
         super("selection", browser);
         this.selectedInfos = selectedInfos;
@@ -88,7 +88,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     @Override
     public String getInfo() {
         final StringBuilder s = new StringBuilder(80);
-        s.append(Tools.getString("DrbdMultiSelectionInfo.Selection"));
+        s.append(Tools.getString("MultiSelectionInfo.Selection"));
         for (final Info si : selectedInfos) {
             s.append(si);
             s.append("<br />");
@@ -102,9 +102,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                     final Collection<UpdatableItem> items) {
         /* load drbd */
         final UpdatableItem loadItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.LoadDrbd"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.LoadDrbd"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.LoadDrbd"),
+                           Tools.getString("MultiSelectionInfo.LoadDrbd"),
                            new AccessMode(Application.AccessType.OP, false),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -139,9 +139,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* load DRBD config / adjust all */
         final MyMenuItem adjustAllItem =
             new MyMenuItem(
-                   Tools.getString("DrbdMultiSelectionInfo.AdjustAllDrbd"),
+                   Tools.getString("MultiSelectionInfo.AdjustAllDrbd"),
                    null,
-                   Tools.getString("DrbdMultiSelectionInfo.AdjustAllDrbd"),
+                   Tools.getString("MultiSelectionInfo.AdjustAllDrbd"),
                            new AccessMode(Application.AccessType.OP, false),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -187,9 +187,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* start drbd */
         final MyMenuItem upAllItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.UpAll"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.UpAll"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.UpAll"),
+                           Tools.getString("MultiSelectionInfo.UpAll"),
                            new AccessMode(Application.AccessType.ADMIN, false),
                            new AccessMode(Application.AccessType.ADMIN, false)) {
                 private static final long serialVersionUID = 1L;
@@ -226,9 +226,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* stop drbd proxy with init script */
         final UpdatableItem stopProxyItem =
             new MyMenuItem(
-                        Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
+                        Tools.getString("MultiSelectionInfo.HostStopProxy"),
                         null,
-                        Tools.getString("DrbdMultiSelectionInfo.HostStopProxy"),
+                        Tools.getString("MultiSelectionInfo.HostStopProxy"),
                         new AccessMode(Application.AccessType.OP, false),
                         new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -259,9 +259,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* start drbd proxy with init script */
         final UpdatableItem startProxyItem =
             new MyMenuItem(
-                      Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
+                      Tools.getString("MultiSelectionInfo.HostStartProxy"),
                       null,
-                      Tools.getString("DrbdMultiSelectionInfo.HostStartProxy"),
+                      Tools.getString("MultiSelectionInfo.HostStartProxy"),
                       new AccessMode(Application.AccessType.OP, false),
                       new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -292,7 +292,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* change host color */
         final UpdatableItem changeHostColorItem =
             new MyMenuItem(
-                    Tools.getString("DrbdMultiSelectionInfo.ChangeHostColor"),
+                    Tools.getString("MultiSelectionInfo.ChangeHostColor"),
                     null,
                     "",
                     new AccessMode(Application.AccessType.RO, false),
@@ -321,9 +321,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private UpdatableItem getPVCreateItem(
                               final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
-                    Tools.getString("DrbdMultiSelectionInfo.PVCreate"),
+                    Tools.getString("MultiSelectionInfo.PVCreate"),
                     null,
-                    Tools.getString("DrbdMultiSelectionInfo.PVCreate.ToolTip"),
+                    Tools.getString("MultiSelectionInfo.PVCreate.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
                     new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
@@ -370,9 +370,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private UpdatableItem getPVRemoveItem(
                               final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
-                    Tools.getString("DrbdMultiSelectionInfo.PVRemove"),
+                    Tools.getString("MultiSelectionInfo.PVRemove"),
                     null,
-                    Tools.getString("DrbdMultiSelectionInfo.PVRemove.ToolTip"),
+                    Tools.getString("MultiSelectionInfo.PVRemove.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
                     new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
@@ -419,9 +419,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private UpdatableItem getVGCreateItem(
                               final List<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
-                  Tools.getString("DrbdMultiSelectionInfo.VGCreate"),
+                  Tools.getString("MultiSelectionInfo.VGCreate"),
                   null,
-                  Tools.getString("DrbdMultiSelectionInfo.VGCreate.ToolTip"),
+                  Tools.getString("MultiSelectionInfo.VGCreate.ToolTip"),
                   new AccessMode(Application.AccessType.OP, false),
                   new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
@@ -477,9 +477,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private UpdatableItem getVGRemoveItem(
                               final Collection<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
-                  Tools.getString("DrbdMultiSelectionInfo.VGRemove"),
+                  Tools.getString("MultiSelectionInfo.VGRemove"),
                   null,
-                  Tools.getString("DrbdMultiSelectionInfo.VGRemove.ToolTip"),
+                  Tools.getString("MultiSelectionInfo.VGRemove.ToolTip"),
                   new AccessMode(Application.AccessType.OP, false),
                   new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
@@ -550,7 +550,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
             final MyMenuItem mi = new MyMenuItem(
                     name,
                     null,
-                    Tools.getString("DrbdMultiSelectionInfo.LVCreate.ToolTip"),
+                    Tools.getString("MultiSelectionInfo.LVCreate.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
                     new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -601,9 +601,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     private UpdatableItem getLVRemoveItem(
                               final Iterable<BlockDevInfo> selectedBlockDevInfos) {
         return new MyMenuItem(
-                    Tools.getString("DrbdMultiSelectionInfo.LVRemove"),
+                    Tools.getString("MultiSelectionInfo.LVRemove"),
                     null,
-                    Tools.getString("DrbdMultiSelectionInfo.LVRemove.ToolTip"),
+                    Tools.getString("MultiSelectionInfo.LVRemove.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
                     new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
@@ -628,14 +628,14 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                 }
                 if (Tools.confirmDialog(
                         Tools.getString(
-                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Title"),
+                            "MultiSelectionInfo.LVRemove.Confirm.Title"),
                         Tools.getString(
-                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Desc",
+                            "MultiSelectionInfo.LVRemove.Confirm.Desc",
                             Tools.join(", ", bdNames)),
                         Tools.getString(
-                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Remove"),
+                            "MultiSelectionInfo.LVRemove.Confirm.Remove"),
                         Tools.getString(
-                            "DrbdMultiSelectionInfo.LVRemove.Confirm.Cancel")
+                            "MultiSelectionInfo.LVRemove.Confirm.Cancel")
                         )) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         bdi.lvRemove(Application.RunMode.LIVE);
@@ -654,9 +654,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                                  final Collection<UpdatableItem> items) {
         /* detach */
         final MyMenuItem detachMenu =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Detach"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.Detach"),
                            BlockDevInfo.NO_HARDDISK_ICON_LARGE,
-                           Tools.getString("DrbdMultiSelectionInfo.Detach"),
+                           Tools.getString("MultiSelectionInfo.Detach"),
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -731,9 +731,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* attach */
         final MyMenuItem attachMenu =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Attach"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.Attach"),
                            BlockDevInfo.HARDDISK_DRBD_ICON_LARGE,
-                           Tools.getString("DrbdMultiSelectionInfo.Attach"),
+                           Tools.getString("MultiSelectionInfo.Attach"),
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -808,9 +808,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* connect */
         final MyMenuItem connectMenu =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Connect"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.Connect"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.Connect"),
+                           Tools.getString("MultiSelectionInfo.Connect"),
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -883,9 +883,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* disconnect */
         final MyMenuItem disconnectMenu =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Disconnect"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.Disconnect"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.Disconnect"),
+                           Tools.getString("MultiSelectionInfo.Disconnect"),
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -978,9 +978,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* set primary */
         final UpdatableItem setPrimaryItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.SetPrimary"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.SetPrimary"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.SetPrimary"),
+                           Tools.getString("MultiSelectionInfo.SetPrimary"),
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1045,9 +1045,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* set secondary */
         final UpdatableItem setSecondaryItem =
             new MyMenuItem(
-                        Tools.getString("DrbdMultiSelectionInfo.SetSecondary"),
+                        Tools.getString("MultiSelectionInfo.SetSecondary"),
                         null,
-                        Tools.getString("DrbdMultiSelectionInfo.SetSecondary"),
+                        Tools.getString("MultiSelectionInfo.SetSecondary"),
                         new AccessMode(Application.AccessType.OP, true),
                         new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1100,9 +1100,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* force primary */
         final UpdatableItem forcePrimaryItem =
             new MyMenuItem(
-                        Tools.getString("DrbdMultiSelectionInfo.ForcePrimary"),
+                        Tools.getString("MultiSelectionInfo.ForcePrimary"),
                         null,
-                        Tools.getString("DrbdMultiSelectionInfo.ForcePrimary"),
+                        Tools.getString("MultiSelectionInfo.ForcePrimary"),
                         new AccessMode(Application.AccessType.ADMIN, true),
                         new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1166,9 +1166,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* invalidate */
         final UpdatableItem invalidateItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Invalidate"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.Invalidate"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.Invalidate"),
+                           Tools.getString("MultiSelectionInfo.Invalidate"),
                            new AccessMode(Application.AccessType.ADMIN, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1232,9 +1232,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* resume */
         final UpdatableItem resumeSyncItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ResumeSync"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.ResumeSync"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.ResumeSync"),
+                           Tools.getString("MultiSelectionInfo.ResumeSync"),
 
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
@@ -1288,9 +1288,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* pause sync */
         final UpdatableItem pauseSyncItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.PauseSync"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.PauseSync"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.PauseSync"),
+                           Tools.getString("MultiSelectionInfo.PauseSync"),
                            new AccessMode(Application.AccessType.OP, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1339,9 +1339,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* resize */
         final UpdatableItem resizeItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.Resize"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.Resize"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.Resize"),
+                           Tools.getString("MultiSelectionInfo.Resize"),
                            new AccessMode(Application.AccessType.ADMIN, true),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1396,9 +1396,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
         /* discard my data */
         final UpdatableItem discardDataItem =
             new MyMenuItem(
-                         Tools.getString("DrbdMultiSelectionInfo.DiscardData"),
+                         Tools.getString("MultiSelectionInfo.DiscardData"),
                          null,
-                         Tools.getString("DrbdMultiSelectionInfo.DiscardData"),
+                         Tools.getString("MultiSelectionInfo.DiscardData"),
                          new AccessMode(Application.AccessType.ADMIN, true),
                          new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -1462,9 +1462,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* proxy down */
         final UpdatableItem proxyDownItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.ProxyDown"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.ProxyDown"),
+                           Tools.getString("MultiSelectionInfo.ProxyDown"),
                            new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(Application.AccessType.OP,
@@ -1477,11 +1477,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri =
+                        final ResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
-                                                     !DrbdResourceInfo.WIZARD);
+                                                     !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return false;
                         }
@@ -1498,11 +1498,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri =
+                        final ResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
-                                                     !DrbdResourceInfo.WIZARD);
+                                                     !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return "";
                         }
@@ -1520,11 +1520,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri =
+                        final ResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
-                                                     !DrbdResourceInfo.WIZARD);
+                                                     !ResourceInfo.WIZARD);
                         if (pHost.isDrbdProxyUp(dri.getName())) {
                             DRBD.proxyDown(pHost,
                                            dri.getName(),
@@ -1542,9 +1542,9 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
 
         /* proxy up */
         final UpdatableItem proxyUpItem =
-            new MyMenuItem(Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
+            new MyMenuItem(Tools.getString("MultiSelectionInfo.ProxyUp"),
                            null,
-                           Tools.getString("DrbdMultiSelectionInfo.ProxyUp"),
+                           Tools.getString("MultiSelectionInfo.ProxyUp"),
                            new AccessMode(Application.AccessType.ADMIN,
                                           !AccessMode.ADVANCED),
                            new AccessMode(Application.AccessType.OP,
@@ -1557,11 +1557,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri =
+                        final ResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
-                                                     !DrbdResourceInfo.WIZARD);
+                                                     !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return false;
                         }
@@ -1578,11 +1578,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri =
+                        final ResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
-                                                     !DrbdResourceInfo.WIZARD);
+                                                     !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return "";
                         }
@@ -1600,11 +1600,11 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final DrbdResourceInfo dri =
+                        final ResourceInfo dri =
                                  bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
                         final Host pHost =
                                     dri.getProxyHost(bdi.getHost(),
-                                                     !DrbdResourceInfo.WIZARD);
+                                                     !ResourceInfo.WIZARD);
                         if (!pHost.isDrbdProxyUp(dri.getName())) {
                             DRBD.proxyUp(pHost,
                                          dri.getName(),

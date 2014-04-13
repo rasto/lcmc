@@ -2191,28 +2191,28 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"ServiceInfo.AlreadyStopped",
          "既に停止している"},
 
-        {"DrbdInfo.CommonSection",
+        {"GlobalInfo.CommonSection",
          "common "},
 
-        {"DrbdResourceInfo.HostAddresses",
+        {"ResourceInfo.HostAddresses",
          "Net Interface"},
 
-        {"DrbdResourceInfo.AddressOnHost",
+        {"ResourceInfo.AddressOnHost",
          "on "},
 
-        {"DrbdResourceInfo.NetInterfacePort",
+        {"ResourceInfo.NetInterfacePort",
          "Port"},
 
         {"BlockDevice.MetaDiskSection",
          "DRBDメタディスク"},
 
-        {"DrbdVolumeInfo.VolumeSection",
+        {"VolumeInfo.VolumeSection",
          "DRBD Volume"},
 
-        {"DrbdVolumeInfo.Number",
+        {"VolumeInfo.Number",
          "Number"},
 
-        {"DrbdVolumeInfo.Device",
+        {"VolumeInfo.Device",
          "Device"},
     };
 }
