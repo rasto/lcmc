@@ -23,14 +23,13 @@
 package lcmc;
 
 import lcmc.utilities.Tools;
-
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.Start;
 import lcmc.gui.dialog.drbdConfig.Resource;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.DrbdInfo;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 
 import java.util.Arrays;
 import java.util.ArrayList;

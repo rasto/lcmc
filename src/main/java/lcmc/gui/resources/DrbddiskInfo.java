@@ -24,15 +24,17 @@ package lcmc.gui.resources;
 import lcmc.data.Host;
 import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
 
 import java.util.Map;
+
 import lcmc.data.Application;
 
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
  * treated in special way.
  */
-final class DrbddiskInfo extends ServiceInfo {
+public final class DrbddiskInfo extends ServiceInfo {
 
     /** Creates new DrbddiskInfo object. */
     DrbddiskInfo(final String name,

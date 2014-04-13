@@ -99,7 +99,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-    protected final ClusterBrowser getBrowser() {
+	public final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

@@ -30,7 +30,7 @@ import lcmc.utilities.SSH;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.DrbdInfo;
+import lcmc.gui.resources.drbd.DrbdInfo;
 
 import javax.swing.JPanel;
 import javax.swing.JComponent;

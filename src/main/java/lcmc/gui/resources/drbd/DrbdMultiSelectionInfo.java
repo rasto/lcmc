@@ -18,7 +18,7 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
@@ -38,6 +38,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JMenuBar;
 import javax.swing.AbstractButton;
 import javax.swing.JColorChooser;
+
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -57,6 +58,8 @@ import java.util.concurrent.CountDownLatch;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.ComponentWithTest;
 
 /**
@@ -1655,7 +1658,7 @@ public final class DrbdMultiSelectionInfo extends EditableInfo {
     }
 
     @Override
-    protected ClusterBrowser getBrowser() {
+	public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

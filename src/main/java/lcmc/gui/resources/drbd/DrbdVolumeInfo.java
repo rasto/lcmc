@@ -19,7 +19,7 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.data.*;
 import lcmc.gui.Browser;
@@ -27,9 +27,11 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
 
 import javax.swing.JComponent;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.DRBD;
@@ -48,6 +50,7 @@ import java.util.TreeSet;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.net.UnknownHostException;
+
 import javax.swing.JPanel;
 
 import java.awt.BorderLayout;
@@ -57,12 +60,20 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.concurrent.CountDownLatch;
 import java.util.LinkedHashMap;
+
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
+import lcmc.gui.resources.CloneInfo;
+import lcmc.gui.resources.DrbddiskInfo;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.FilesystemInfo;
+import lcmc.gui.resources.GroupInfo;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.LinbitDrbdInfo;
+import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -91,11 +102,11 @@ public final class DrbdVolumeInfo extends EditableInfo
     /** Name of the drbd volume number parameter. */
     static final String DRBD_VOL_PARAM_NUMBER = "number";
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
-    static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
+    public static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
     /** String that is displayed as a tool tip for disabled menu item. */
-    static final String IS_SYNCING_STRING = "it is being full-synced";
+    public static final String IS_SYNCING_STRING = "it is being full-synced";
     /** String that is displayed as a tool tip for disabled menu item. */
-    static final String IS_VERIFYING_STRING = "it is being verified";
+    public static final String IS_VERIFYING_STRING = "it is being verified";
     /** Parameters. */
     static final String[] PARAMS = {DRBD_VOL_PARAM_NUMBER, DRBD_VOL_PARAM_DEV};
     /** Section name. */
@@ -952,7 +963,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Remove drbddisk heartbeat service. */
-    void removeDrbdDisk(final FilesystemInfo fi,
+    public void removeDrbdDisk(final FilesystemInfo fi,
                         final Host dcHost,
                         final Application.RunMode runMode) {
         final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
@@ -962,9 +973,9 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Remove drbddisk heartbeat service. */
-    void removeLinbitDrbd(final FilesystemInfo fi,
-                          final Host dcHost,
-                          final Application.RunMode runMode) {
+    public void removeLinbitDrbd(final FilesystemInfo fi,
+                                 final Host dcHost,
+                                 final Application.RunMode runMode) {
         final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
         if (linbitDrbdInfo != null) {
             linbitDrbdInfo.removeMyselfNoConfirm(dcHost, runMode);
@@ -972,7 +983,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Adds old style drbddisk service in the heartbeat and graph. */
-    void addDrbdDisk(final FilesystemInfo fi,
+    public void addDrbdDisk(final FilesystemInfo fi,
                             final Host dcHost,
                             final String drbdId,
                             final Application.RunMode runMode) {
@@ -1011,7 +1022,7 @@ public final class DrbdVolumeInfo extends EditableInfo
     }
 
     /** Adds linbit::drbd service in the pacemaker graph. */
-    void addLinbitDrbd(final FilesystemInfo fi,
+    public void addLinbitDrbd(final FilesystemInfo fi,
                        final Host dcHost,
                        final String drbdId,
                        final Application.RunMode runMode) {

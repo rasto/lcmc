@@ -174,8 +174,8 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Inits apply or commit button button. */
-    final void initApplyButton(final ButtonCallback buttonCallback,
-                               final String text) {
+    protected final void initApplyButton(final ButtonCallback buttonCallback,
+                                         final String text) {
         if (oldApplyButton == null) {
             applyButton = new MyButton(
                     text,
@@ -598,7 +598,7 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Stores values in the combo boxes in the component c. */
-    protected void storeComboBoxValues(final String[] params) {
+    public void storeComboBoxValues(final String[] params) {
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
             getResource().setValue(param, value);
@@ -730,7 +730,7 @@ public abstract class EditableInfo extends Info {
     protected abstract Value getParamDefault(String param);
 
     /** Returns saved value of a parameter. */
-    protected Value getParamSaved(final String param) {
+    public Value getParamSaved(final String param) {
         return getResource().getValue(param);
     }
 
@@ -1056,7 +1056,7 @@ public abstract class EditableInfo extends Info {
 
     /** Cleanup. */
     @Override
-    final void cleanup() {
+	public final void cleanup() {
         super.cleanup();
         clearPanelLists();
     }

@@ -25,10 +25,10 @@ package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.*;
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.DrbdInfo;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;

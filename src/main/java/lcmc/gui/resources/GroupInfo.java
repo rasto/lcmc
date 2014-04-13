@@ -228,7 +228,7 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Applies the changes to the group parameters. */
     @Override
-	protected void apply(final Host dcHost, final Application.RunMode runMode) {
+	public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override

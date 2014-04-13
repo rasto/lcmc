@@ -26,9 +26,9 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdInfo;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.dialog.WizardDialog;
@@ -46,9 +46,9 @@ import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

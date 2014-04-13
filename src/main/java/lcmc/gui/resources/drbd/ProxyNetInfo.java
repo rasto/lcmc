@@ -19,9 +19,10 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.gui.Browser;
+import lcmc.gui.resources.NetInfo;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.Host;
 

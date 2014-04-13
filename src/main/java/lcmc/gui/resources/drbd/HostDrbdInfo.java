@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.AddDrbdUpgradeDialog;
 import lcmc.EditHostDialog;
@@ -34,6 +34,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.drbd.DrbdsLog;
+import lcmc.gui.resources.Info;
 import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
@@ -55,6 +56,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -96,7 +98,7 @@ public final class HostDrbdInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected HostBrowser getBrowser() {
+	public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

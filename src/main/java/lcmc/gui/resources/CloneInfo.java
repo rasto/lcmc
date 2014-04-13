@@ -52,7 +52,7 @@ import lcmc.utilities.UpdatableItem;
 /**
  * This class holds clone service info object.
  */
-final class CloneInfo extends ServiceInfo {
+public final class CloneInfo extends ServiceInfo {
     /** Service that belongs to this clone. */
     private ServiceInfo containedService = null;
     /** Creates new CloneInfo object. */

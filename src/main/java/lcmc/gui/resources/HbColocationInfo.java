@@ -73,7 +73,7 @@ final class HbColocationInfo extends EditableInfo
 
     /** Returns browser object of this info. */
     @Override
-    protected ClusterBrowser getBrowser() {
+	public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

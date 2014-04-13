@@ -24,8 +24,9 @@
 package lcmc.gui.dialog.lvm;
 
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.utilities.Unit;
+
 import javax.swing.JComponent;
 
 /** LVM dialogs. */

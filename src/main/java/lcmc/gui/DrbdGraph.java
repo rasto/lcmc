@@ -27,12 +27,12 @@ import lcmc.utilities.Tools;
 import lcmc.data.Host;
 import lcmc.data.Subtext;
 import lcmc.data.resources.BlockDevice;
-import lcmc.gui.resources.HostDrbdInfo;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.DrbdMultiSelectionInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.DrbdInfo;
+import lcmc.gui.resources.drbd.DrbdMultiSelectionInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
 
 import java.awt.Shape;
 import java.awt.Graphics2D;
@@ -52,6 +52,7 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
+
 import lcmc.data.Application;
 
 /**

@@ -23,6 +23,7 @@ package lcmc.gui.resources;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lcmc.data.ResourceAgent;
 import lcmc.data.Host;
 import lcmc.data.AccessMode;
@@ -30,11 +31,14 @@ import lcmc.configs.DistResource;
 import lcmc.utilities.Tools;
 import lcmc.utilities.SSH;
 import lcmc.utilities.WidgetListener;
+import lcmc.gui.resources.drbd.CommonDeviceInterface;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;
 
 import java.util.Map;
+
 import lcmc.data.Application;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
@@ -45,7 +49,7 @@ import lcmc.gui.widget.Check;
  * way, so that it can use block device information and drbd devices. If
  * drbd device is selected, the drbddisk service will be added too.
  */
-final class FilesystemInfo extends ServiceInfo {
+public final class FilesystemInfo extends ServiceInfo {
     /** linbit::drbd service object. */
     private LinbitDrbdInfo linbitDrbdInfo = null;
     /** drbddisk service object. */
@@ -79,7 +83,7 @@ final class FilesystemInfo extends ServiceInfo {
      * Sets Linbit::drbd info object for this Filesystem service if it uses
      * drbd block device.
      */
-    void setLinbitDrbdInfo(final LinbitDrbdInfo linbitDrbdInfo) {
+    public void setLinbitDrbdInfo(final LinbitDrbdInfo linbitDrbdInfo) {
         this.linbitDrbdInfo = linbitDrbdInfo;
     }
 
@@ -87,7 +91,7 @@ final class FilesystemInfo extends ServiceInfo {
      * Returns linbit::drbd info object that is associated with the drbd
      * device or null if it is not a drbd device.
      */
-    LinbitDrbdInfo getLinbitDrbdInfo() {
+    public LinbitDrbdInfo getLinbitDrbdInfo() {
         return linbitDrbdInfo;
     }
 
@@ -95,7 +99,7 @@ final class FilesystemInfo extends ServiceInfo {
      * Sets DrbddiskInfo object for this Filesystem service if it uses drbd
      * block device.
      */
-    void setDrbddiskInfo(final DrbddiskInfo drbddiskInfo) {
+    public void setDrbddiskInfo(final DrbddiskInfo drbddiskInfo) {
         this.drbddiskInfo = drbddiskInfo;
     }
 
@@ -103,7 +107,7 @@ final class FilesystemInfo extends ServiceInfo {
      * Returns DrbddiskInfo object that is associated with the drbd device
      * or null if it is not a drbd device.
      */
-    DrbddiskInfo getDrbddiskInfo() {
+    public DrbddiskInfo getDrbddiskInfo() {
         return drbddiskInfo;
     }
 
@@ -130,7 +134,7 @@ final class FilesystemInfo extends ServiceInfo {
 
     /** Applies changes to the Filesystem service parameters. */
     @Override
-	protected void apply(final Host dcHost, final Application.RunMode runMode) {
+	public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override

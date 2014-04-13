@@ -41,7 +41,7 @@ public final class ClusterHostsInfo extends CategoryInfo {
 
     /** Returns browser object of this info. */
     @Override
-    protected ClusterBrowser getBrowser() {
+	public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

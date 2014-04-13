@@ -24,7 +24,7 @@ package lcmc.gui.dialog.drbdConfig;
 import lcmc.data.Host;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.utilities.MyButton;
 
 /**

@@ -27,7 +27,7 @@ import lcmc.utilities.Tools;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.DrbdInfo;
+import lcmc.gui.resources.drbd.DrbdInfo;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.ConvertCmdCallback;
@@ -35,6 +35,7 @@ import lcmc.utilities.ConvertCmdCallback;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
+
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

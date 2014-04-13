@@ -140,7 +140,7 @@ public final class HostInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected HostBrowser getBrowser() {
+	public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

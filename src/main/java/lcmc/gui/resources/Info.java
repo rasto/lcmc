@@ -151,7 +151,7 @@ public class Info implements Comparable<Info>, Value {
      * @param name
      *      name that will be shown to the user
      */
-    Info(final String name, final Browser browser) {
+    public Info(final String name, final Browser browser) {
         this.name = name;
         this.browser = browser;
     }
@@ -172,7 +172,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns browser object of this info. */
-    protected Browser getBrowser() {
+    public Browser getBrowser() {
         return browser;
     }
 
@@ -207,7 +207,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Removes the parameter from the widget hash. */
-    protected final Widget widgetRemove(final String param,
+    public final Widget widgetRemove(final String param,
                                                final String prefix) {
         if (prefix == null) {
             if (widgetHash.containsKey(param)) {
@@ -350,7 +350,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** TODO: clears info panel cache most of the time. */
-    boolean selectAutomaticallyInTreeMenu() {
+    public boolean selectAutomaticallyInTreeMenu() {
         return false;
     }
 
@@ -363,7 +363,7 @@ public class Info implements Comparable<Info>, Value {
      * Returns info as string. This can be used by simple view, when
      * getInfoPanel() is not overwritten.
      */
-    String getInfo() {
+    public String getInfo() {
         return name;
     }
 
@@ -379,7 +379,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Gets node of this resource or service. */
-    protected final DefaultMutableTreeNode getNode() {
+    public final DefaultMutableTreeNode getNode() {
         return node;
     }
 

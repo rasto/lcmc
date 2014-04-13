@@ -28,18 +28,17 @@ import lcmc.utilities.Tools;
 import lcmc.data.resources.NetInterface;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.BlockDevInfo;
 import lcmc.gui.resources.FSInfo;
-import lcmc.gui.resources.HostDrbdInfo;
-import lcmc.gui.resources.ProxyHostInfo;
 import lcmc.gui.resources.HostInfo;
 import lcmc.gui.resources.NetInfo;
 import lcmc.gui.dialog.CmdLog;
-
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.SSH;
 import lcmc.gui.resources.CategoryInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
+import lcmc.gui.resources.drbd.ProxyHostInfo;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.ImageIcon;

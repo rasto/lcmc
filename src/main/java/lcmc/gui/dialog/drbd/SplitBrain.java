@@ -29,7 +29,7 @@ import lcmc.data.Host;
 import lcmc.data.Application;
 import lcmc.data.AccessMode;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
@@ -43,7 +43,6 @@ import javax.swing.JComponent;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
 import java.util.Set;
 
 import lcmc.utilities.Logger;

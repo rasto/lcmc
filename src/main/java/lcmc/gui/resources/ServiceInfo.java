@@ -24,6 +24,7 @@ package lcmc.gui.resources;
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
 import lcmc.gui.resources.vms.VMSVirtualDomainInfo;
 import lcmc.gui.resources.vms.VirtualDomainInfo;
 import lcmc.gui.widget.Widget;
@@ -315,7 +316,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-    protected ClusterBrowser getBrowser() {
+	public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -2161,7 +2162,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns saved value for specified parameter. */
     @Override
-    protected Value getParamSaved(final String param) {
+	public Value getParamSaved(final String param) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         if (isMetaAttr(param)) {
             final String crmId = getService().getHeartbeatId();
@@ -2875,7 +2876,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Clears the info panel cache, forcing it to reload. */
     @Override
-    boolean selectAutomaticallyInTreeMenu() {
+	public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
@@ -3318,7 +3319,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Applies the changes to the service parameters. */
-    protected void apply(final Host dcHost, final Application.RunMode runMode) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         LOG.debug1("apply: start: test: " + runMode);
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
@@ -4537,7 +4538,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Sets this service as part of a group. */
-    void setGroupInfo(final GroupInfo groupInfo) {
+    public void setGroupInfo(final GroupInfo groupInfo) {
         this.groupInfo = groupInfo;
     }
 
@@ -4558,7 +4559,7 @@ public class ServiceInfo extends EditableInfo {
      * Returns the clone set to which this service belongs
      * or null, if it is not in such set.
      */
-    CloneInfo getCloneInfo() {
+    public CloneInfo getCloneInfo() {
         return cloneInfo;
     }
 

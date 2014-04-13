@@ -19,7 +19,7 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.Exceptions;
 import lcmc.ProxyHostWizard;
@@ -55,6 +55,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.net.UnknownHostException;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -62,10 +63,10 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
+
 import lcmc.EditClusterDialog;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -582,7 +583,7 @@ public final class DrbdInfo extends DrbdGuiInfo {
      * TODO: should select something.
      */
     @Override
-    boolean selectAutomaticallyInTreeMenu() {
+	public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 

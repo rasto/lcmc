@@ -28,7 +28,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;

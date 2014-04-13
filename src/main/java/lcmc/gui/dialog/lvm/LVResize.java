@@ -24,9 +24,8 @@ package lcmc.gui.dialog.lvm;
 
 import lcmc.data.*;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.LVM;
@@ -40,12 +39,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.Set;
 import java.util.Map;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
+
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;

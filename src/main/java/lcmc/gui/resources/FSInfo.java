@@ -46,7 +46,7 @@ public final class FSInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected HostBrowser getBrowser() {
+	public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
@@ -64,7 +64,7 @@ public final class FSInfo extends Info {
 
     /** Returns info, before it is updated. */
     @Override
-    String getInfo() {
+	public String getInfo() {
         return "<html><pre>" + getName() + "</html></pre>";
     }
 

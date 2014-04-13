@@ -27,8 +27,8 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ExecCallback;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
@@ -46,8 +46,8 @@ import javax.swing.JComponent;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
 import java.util.regex.Matcher;
+
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 

@@ -23,7 +23,7 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 
 /**

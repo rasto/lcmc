@@ -19,13 +19,17 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.gui.Browser;
+import lcmc.gui.resources.HbCategoryInfo;
+import lcmc.gui.resources.ServiceInfo;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.CommonBlockDevice;
 import lcmc.utilities.Tools;
+
 import javax.swing.ImageIcon;
+
 import lcmc.data.Application;
 
 /**
@@ -61,7 +65,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
 
     /** Returns info for this block device. */
     @Override
-    String getInfo() {
+	public String getInfo() {
         return "Device    : " + getCommonBlockDevice().getName() + '\n';
     }
 

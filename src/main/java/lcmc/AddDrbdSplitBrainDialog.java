@@ -24,10 +24,9 @@
 package lcmc;
 
 import lcmc.utilities.Tools;
-
 import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.dialog.drbd.SplitBrain;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

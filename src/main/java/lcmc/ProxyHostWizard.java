@@ -22,11 +22,9 @@ package lcmc;
 
 import lcmc.utilities.Tools;
 import lcmc.data.Host;
-
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.NewProxyHost;
-import lcmc.gui.resources.DrbdVolumeInfo;
-
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

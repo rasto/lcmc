@@ -24,10 +24,9 @@
 package lcmc;
 
 import lcmc.utilities.Tools;
-
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdUpgrade.Dist;
-import lcmc.gui.resources.HostDrbdInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

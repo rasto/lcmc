@@ -318,8 +318,7 @@ public final class VirtualDomainInfo extends ServiceInfo {
 
     /** Applies the changes to the service parameters. */
     @Override
-	protected
-    void apply(final Host dcHost, final Application.RunMode runMode) {
+	public void apply(final Host dcHost, final Application.RunMode runMode) {
         super.apply(dcHost, runMode);
     }
 

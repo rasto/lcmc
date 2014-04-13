@@ -24,8 +24,8 @@
 package lcmc.data;
 
 import lcmc.gui.DrbdGraph;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.ProxyNetInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.ProxyNetInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
@@ -47,8 +47,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
 import java.math.BigInteger;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.keyvalue.MultiKey;

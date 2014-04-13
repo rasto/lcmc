@@ -19,7 +19,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.ProxyHostWizard;
 import lcmc.data.Application;
@@ -28,6 +28,7 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.drbd.DrbdsLog;
+import lcmc.gui.resources.Info;
 import lcmc.data.Host;
 import lcmc.data.AccessMode;
 import lcmc.utilities.UpdatableItem;
@@ -45,6 +46,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -79,7 +81,7 @@ public final class ProxyHostInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected HostBrowser getBrowser() {
+	public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

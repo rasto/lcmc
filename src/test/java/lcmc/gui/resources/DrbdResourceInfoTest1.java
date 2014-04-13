@@ -2,10 +2,13 @@ package lcmc.gui.resources;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+
 import junit.framework.TestCase;
 import lcmc.data.Host;
 import lcmc.utilities.TestSuite1;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
+
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;

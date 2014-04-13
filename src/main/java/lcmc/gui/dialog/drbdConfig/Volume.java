@@ -24,7 +24,7 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 
 import javax.swing.JPanel;

@@ -23,8 +23,7 @@
 package lcmc.gui.dialog.lvm;
 
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
-
+import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
@@ -37,12 +36,15 @@ import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.Browser;
 
 import java.util.Set;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JLabel;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import lcmc.data.StringValue;
 import lcmc.data.VMSXML;
 import lcmc.data.Value;

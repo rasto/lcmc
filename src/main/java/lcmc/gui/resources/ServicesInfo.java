@@ -911,7 +911,7 @@ public final class ServicesInfo extends EditableInfo {
 
     /** Clears the info panel cache, forcing it to reload. */
     @Override
-    boolean selectAutomaticallyInTreeMenu() {
+	public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
@@ -926,7 +926,7 @@ public final class ServicesInfo extends EditableInfo {
      * case the getInfoPanel() function will show.
      */
     @Override
-    String getInfo() {
+	public String getInfo() {
         if (getBrowser().clStatusFailed()) {
             return Tools.getString("ClusterBrowser.ClStatusFailed");
         }
@@ -1125,7 +1125,7 @@ public final class ServicesInfo extends EditableInfo {
      * Adds service to the list of services.
      * TODO: are they both used?
      */
-    ServiceInfo addServicePanel(final ResourceAgent newRA,
+    public ServiceInfo addServicePanel(final ResourceAgent newRA,
                                 final Point2D pos,
                                 final boolean reloadNode,
                                 final String heartbeatId,

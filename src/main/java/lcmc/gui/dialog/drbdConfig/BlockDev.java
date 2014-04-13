@@ -24,9 +24,9 @@ package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.DrbdResourceInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.ClusterBrowser;

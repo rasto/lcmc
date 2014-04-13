@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.Exceptions;
 import lcmc.data.*;
@@ -28,15 +28,12 @@ import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.DrbdGraph;
-
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.LVResize;
 import lcmc.gui.dialog.lvm.LVSnapshot;
 import lcmc.gui.dialog.drbd.DrbdLog;
-
-
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.UpdatableItem;
@@ -44,6 +41,8 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.LVM;
 import lcmc.utilities.ButtonCallback;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Widget;
 import lcmc.data.resources.BlockDevice;
 
@@ -59,6 +58,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
 import java.net.UnknownHostException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
@@ -67,7 +67,6 @@ import javax.swing.JScrollPane;
 
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -240,7 +239,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** Returns info of this block device as string. */
     @Override
-    String getInfo() {
+	public String getInfo() {
         final StringBuilder ret = new StringBuilder(120);
         ret.append("Host            : ")
            .append(getHost().getName())
@@ -743,7 +742,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** DRBD attach. */
-    void attach(final Application.RunMode runMode) {
+    public void attach(final Application.RunMode runMode) {
         DRBD.attach(getHost(),
                     drbdVolumeInfo.getDrbdResourceInfo().getName(),
                     drbdVolumeInfo.getName(),
@@ -767,7 +766,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** DRBD disconnect. */
-    void disconnect(final Application.RunMode runMode) {
+    public void disconnect(final Application.RunMode runMode) {
         DRBD.disconnect(getHost(),
                         drbdVolumeInfo.getDrbdResourceInfo().getName(),
                         null,
@@ -913,7 +912,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Start on-line verification. */
-    void verify(final Application.RunMode runMode) {
+    public void verify(final Application.RunMode runMode) {
         DRBD.verify(getHost(),
                     drbdVolumeInfo.getDrbdResourceInfo().getName(),
                     drbdVolumeInfo.getName(),
@@ -1183,6 +1182,7 @@ public final class BlockDevInfo extends EditableInfo {
 
     /** TODO: dead code? */
     @Override
+	public
     boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
@@ -2416,7 +2416,7 @@ public final class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns whether this device is connected or wait-for-c via drbd. */
-    boolean isConnectedOrWF(final Application.RunMode runMode) {
+    public boolean isConnectedOrWF(final Application.RunMode runMode) {
         final DRBDtestData dtd = getDRBDtestData();
         if (dtd != null && Application.isTest(runMode)) {
             return isConnectedTest(dtd);

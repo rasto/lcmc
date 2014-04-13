@@ -22,7 +22,7 @@
 package lcmc.gui.resources.vms;
 
 import lcmc.gui.Browser;
-import lcmc.gui.resources.BlockDevInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.data.VMSXML;

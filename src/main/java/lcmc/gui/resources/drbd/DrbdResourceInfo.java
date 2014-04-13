@@ -19,13 +19,16 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import lcmc.Exceptions;
 import lcmc.data.*;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.NetInfo;
+import lcmc.gui.resources.ServiceInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.SpringUtilities;
@@ -58,6 +61,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.net.UnknownHostException;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
@@ -67,13 +71,11 @@ import javax.swing.SpringLayout;
 import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -171,7 +173,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     /**
      * Prepares a new {@code DrbdResourceInfo} object.
      */
-    DrbdResourceInfo(final String name,
+    public DrbdResourceInfo(final String name,
                      final Set<Host> hosts,
                      final Browser browser) {
         super(name, browser);
@@ -2030,7 +2032,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
 
     /** Stores values in the combo boxes in the component c. */
     @Override
-    protected void storeComboBoxValues(final String[] params) {
+	public void storeComboBoxValues(final String[] params) {
         super.storeComboBoxValues(params);
         storeHostAddresses();
         storeProxyInfo();
@@ -2212,7 +2214,7 @@ public final class DrbdResourceInfo extends DrbdGuiInfo {
     }
 
     /** Get proxy from ip combo box value. Null, if it's not a proxy. */
-    Host getProxyHost(final Host host, final boolean wizard) {
+    public Host getProxyHost(final Host host, final boolean wizard) {
         final Widget addrW;
         if (wizard) {
             addrW = addressComboBoxHashWizard.get(host);

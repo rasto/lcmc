@@ -26,7 +26,7 @@ import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.SSH;
@@ -34,6 +34,7 @@ import lcmc.utilities.SSH;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.JComponent;
+
 import lcmc.data.Application;
 
 /**

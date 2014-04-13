@@ -29,13 +29,14 @@ import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.resources.drbd.DrbdVolumeInfo;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.SpringLayout;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
