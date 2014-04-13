@@ -560,7 +560,8 @@ public final class HostInfo extends Info {
                     }
                 }
             };
-        final ButtonCallback allMigrateFromItemCallback =
+        if (cb != null) {
+            final ButtonCallback allMigrateFromItemCallback =
                                               cb.new ClMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
@@ -579,8 +580,9 @@ public final class HostInfo extends Info {
                         }
                     }
                 }
-        };
-        addMouseOverListener(allMigrateFromItem, allMigrateFromItemCallback);
+            };
+            addMouseOverListener(allMigrateFromItem, allMigrateFromItemCallback);
+        }
         items.add(allMigrateFromItem);
         /* Stop corosync/openais. */
         final MyMenuItem stopCorosyncItem =
