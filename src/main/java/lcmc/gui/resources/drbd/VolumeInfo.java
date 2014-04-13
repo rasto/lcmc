@@ -64,6 +64,7 @@ import java.util.LinkedHashMap;
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
 
+import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.CloneInfo;

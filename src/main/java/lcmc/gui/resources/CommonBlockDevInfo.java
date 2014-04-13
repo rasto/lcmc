@@ -19,11 +19,12 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui.resources.drbd;
+package lcmc.gui.resources;
 
 import lcmc.gui.Browser;
 import lcmc.gui.resources.crm.HbCategoryInfo;
 import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.CommonBlockDevice;
 import lcmc.utilities.Tools;
