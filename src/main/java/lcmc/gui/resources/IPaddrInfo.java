@@ -77,6 +77,9 @@ final class IPaddrInfo extends ServiceInfo {
         } else {
             return check;
         }
+        if (wi == null) {
+            return check;
+        }
         wi.setEditable(true);
         wi.selectSubnet();
         final String ip = wi.getStringValue();
