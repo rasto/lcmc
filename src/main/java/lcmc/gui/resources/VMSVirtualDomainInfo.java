@@ -2291,7 +2291,6 @@ public final class VMSVirtualDomainInfo extends EditableInfo {
                 mTransitionReadLock.lock();
                 try {
                     if (starting.isEmpty() || i >= ACTION_TIMEOUT) {
-                        mTransitionReadLock.unlock();
                         break;
                     }
                 } finally {
