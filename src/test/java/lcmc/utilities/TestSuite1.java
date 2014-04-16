@@ -52,9 +52,6 @@ import lcmc.data.Cluster;
 public final class TestSuite1 {
     /** Singleton. */
     private static TestSuite1 instance = null;
-    /** Whether to test interactive elements. ant -Dinteractive=true. */
-    public static final boolean INTERACTIVE =
-                        "true".equals(System.getProperty("test.interactive"));
     /** Whether to test version. ant -Dconnect=true. */
     public static final boolean CONNECT_LINBIT =
                         "true".equals(System.getProperty("test.connect"));

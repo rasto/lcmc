@@ -96,33 +96,12 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testError() {
-        if (TestSuite1.INTERACTIVE) {
-            LOG.error("test error a / just click ok");
-            assertEquals(TestSuite1.ERROR_STRING
-                         + "test error a / just click ok\n",
-                         TestSuite1.getStdout());
-            TestSuite1.clearStdout();
-        }
-    }
-
-    @Test
     public void testSSHError() {
         for (final Host host : TestSuite1.getHosts()) {
             LOG.sshError(host, "cmd a", "ans a", "stack trace a", 2);
             assertTrue(
                 TestSuite1.getStdout().indexOf("returned exit code 2") >= 0);
             TestSuite1.clearStdout();
-        }
-    }
-
-    @Test
-    public void testConfirmDialog() {
-        if (TestSuite1.INTERACTIVE) {
-            assertTrue(
-              Tools.confirmDialog("title a", "click yes", "yes (click)", "no"));
-            assertFalse(
-              Tools.confirmDialog("title a", "click no", "yes", "no (click)"));
         }
     }
 
@@ -149,13 +128,6 @@ public final class ToolsTest1 extends TestCase {
                          TestSuite1.getStdout());
         }
         TestSuite1.clearStdout();
-    }
-
-    @Test
-    public void testInfoDialog() {
-        if (TestSuite1.INTERACTIVE) {
-            Tools.infoDialog("info a", "info1 a", "info2 a / CLICK OK");
-        }
     }
 
     @Test
@@ -204,12 +176,10 @@ public final class ToolsTest1 extends TestCase {
     @Test
     public void testLoadFile() {
         for (float i = 0; i < 0.01 * TestSuite1.getFactor(); i++) {
-            assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK",
-                                      TestSuite1.INTERACTIVE));
+            assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK", false));
             final String testFile = "/tmp/lcmc-test-file";
             Tools.save(testFile, false);
-            final String file = Tools.loadFile(testFile,
-                                               TestSuite1.INTERACTIVE);
+            final String file = Tools.loadFile(testFile, false);
             assertNotNull(file);
             TestSuite1.clearStdout();
             assertFalse("".equals(file));
@@ -224,12 +194,6 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testGetDefault() {
-        if (TestSuite1.INTERACTIVE) {
-            assertEquals("JUNIT TEST JUNIT TEST, click ok",
-                         Tools.getDefault("JUNIT TEST JUNIT TEST, click ok"));
-            assertTrue(TestSuite1.getStdout().indexOf("unresolved") >= 0);
-            TestSuite1.clearStdout();
-        }
         assertEquals("", Tools.getDefault("SSH.PublicKey"));
         assertEquals("", Tools.getDefault("SSH.PublicKey"));
         assertEquals("22", Tools.getDefault("SSH.Port"));
@@ -237,35 +201,18 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testGetDefaultColor() {
-        if (TestSuite1.INTERACTIVE) {
-            assertEquals(
-                  java.awt.Color.WHITE,
-                  Tools.getDefaultColor("JUNIT TEST unknown color, click ok"));
-            TestSuite1.clearStdout();
-        }
         assertEquals(java.awt.Color.BLACK,
                      Tools.getDefaultColor("TerminalPanel.Background"));
     }
 
     @Test
     public void testGetDefaultInt() {
-        if (TestSuite1.INTERACTIVE) {
-            assertEquals(
-                      0,
-                      Tools.getDefaultInt("JUNIT TEST unknown int, click ok"));
-            TestSuite1.clearStdout();
-        }
         assertEquals(100000,
                      Tools.getDefaultInt("Score.Infinity"));
     }
 
     @Test
     public void testGetString() {
-        final String testString = "JUNIT TEST unknown string, click ok";
-        if (TestSuite1.INTERACTIVE) {
-            assertEquals(testString, Tools.getString(testString));
-            TestSuite1.clearStdout();
-        }
         assertEquals("Linux Cluster Management Console",
                      Tools.getString("DrbdMC.Title"));
     }
@@ -1152,13 +1099,6 @@ public final class ToolsTest1 extends TestCase {
             } catch (Exceptions.IllegalVersionException e) {
                 assertFalse(true);
             }
-        }
-    }
-
-    @Test
-    public void testOpenBrowser() {
-        if (TestSuite1.INTERACTIVE) {
-            Tools.openBrowser("http://www.google.com");
         }
     }
 
