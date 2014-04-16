@@ -325,7 +325,6 @@
 			<jvmarg value="-Xmx1024m"/>
 			<jvmarg value="-Xdebug"/>
 			<jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
-			<jvmarg value="-Dtest.connect=${connect}"/>
 			<jvmarg value="-Dtest.password=${password}"/>
 			<jvmarg value="-Dtest.dsa=${dsa}"/>
 			<jvmarg value="-Dtest.rsa=${rsa}"/>

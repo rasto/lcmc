@@ -1087,22 +1087,6 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testGetLatestVersion() {
-        if (TestSuite1.CONNECT_LINBIT) {
-            final String[] info = Tools.getLatestVersion();
-            assertNotNull(info);
-            assertNotNull(info[0]);
-            assertNotNull(info[1]);
-            try {
-                assertEquals(-1, Tools.compareVersions(info[0],
-                                                   Tools.getRelease()));
-            } catch (Exceptions.IllegalVersionException e) {
-                assertFalse(true);
-            }
-        }
-    }
-
-    @Test
     public void testIsNumber() {
         assertTrue(Tools.isNumber("1"));
         assertTrue(Tools.isNumber("-1"));

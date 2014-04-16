@@ -52,9 +52,6 @@ import lcmc.data.Cluster;
 public final class TestSuite1 {
     /** Singleton. */
     private static TestSuite1 instance = null;
-    /** Whether to test version. ant -Dconnect=true. */
-    public static final boolean CONNECT_LINBIT =
-                        "true".equals(System.getProperty("test.connect"));
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
     public static final boolean CLUSTER =
                         "true".equals(System.getProperty("test.cluster"));
@@ -160,11 +157,7 @@ public final class TestSuite1 {
     /** Adds test cluster to the GUI. */
     public static void initTestCluster() {
         if (Tools.getGUIData() == null) {
-            if (CONNECT_LINBIT) {
-                lcmc.LCMC.main(new String[]{});
-            } else {
-                lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
-            }
+            lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
         } else {
             return;
         }

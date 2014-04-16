@@ -181,7 +181,6 @@
                 <configuration>
                     <systemPropertyVariables>
                         <test.cluster>true</test.cluster>
-                        <test.connect>false</test.connect>
                         <test.count>2</test.count>
                         <test.password>rastislav</test.password>
                     </systemPropertyVariables>
