@@ -70,9 +70,6 @@ public final class ClusterBrowserTest1 extends TestCase {
             assertEquals("cdabc", buffer.toString());
         }
 
-        if (TestSuite1.QUICK) {
-            return;
-        }
         final List<String> files = new ArrayList<String>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");

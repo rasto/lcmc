@@ -184,7 +184,6 @@
                         <test.connect>false</test.connect>
                         <test.count>2</test.count>
                         <test.password>rastislav</test.password>
-                        <test.quick>false</test.quick>
                     </systemPropertyVariables>
                     <outputDirectory>${basedir}/target/checks/surefire-reports</outputDirectory>
                     <includes>

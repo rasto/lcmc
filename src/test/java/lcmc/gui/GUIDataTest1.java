@@ -27,9 +27,6 @@ public final class GUIDataTest1 extends TestCase {
     @Test
     public void testExpandTerminalSplitPane() {
         float count = 50 * TestSuite1.getFactor();
-        if (TestSuite1.QUICK) {
-            count = 3 * TestSuite1.getFactor();
-        }
         float errors = 0;
         for (int i = 0; i < count; i++) {
             Tools.getGUIData().expandTerminalSplitPane(1);

@@ -63,9 +63,6 @@ public final class TestSuite1 {
     public static final String PASSWORD = System.getProperty("test.password");
     public static final String ID_DSA_KEY = System.getProperty("test.dsa");
     public static final String ID_RSA_KEY = System.getProperty("test.rsa");
-    /** Skip tests that take long time. */
-    public static final boolean QUICK = "true".equals(
-                                            System.getProperty("test.quick"));
 
     public static final String INFO_STRING       = "INFO    : ";
     public static final String DEBUG_STRING      = "DEBUG";
