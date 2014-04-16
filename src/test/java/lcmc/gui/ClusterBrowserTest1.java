@@ -73,7 +73,6 @@ public final class ClusterBrowserTest1 extends TestCase {
         final List<String> files = new ArrayList<String>();
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
-        final int repeat = TestSuite1.getFactor();
         for (final String dirName : new String[]{
                     /* userHome + "/testdir/pacemaker/shell/regression", */
                     userHome + "/testdir/pacemaker/pengine/test10"}) {
@@ -85,7 +84,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                 final String file = f.getAbsolutePath();
                 if (file.length() > 3
                     && file.substring(file.length() - 4).equals(".xml")) {
-                    for (int i = 0; i < repeat; i++) {
+                    for (int i = 0; i < 3; i++) {
                         files.add(file);
                     }
                 }

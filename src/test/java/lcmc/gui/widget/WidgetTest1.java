@@ -16,7 +16,7 @@ public final class WidgetTest1 extends TestCase {
     @Override
     protected void setUp() {
         TestSuite1.initTest();
-        for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
+        for (int i = 0; i < 10; i++) {
             widget = WidgetFactory.createInstance(
                           Widget.GUESS_TYPE,
                           Widget.NO_DEFAULT,
@@ -40,7 +40,7 @@ public final class WidgetTest1 extends TestCase {
 
     @Test
     public void testReloadComboBox() {
-        for (int i = 0; i < TestSuite1.getFactor(); i++) {
+        for (int i = 0; i < 3; i++) {
             widget.reloadComboBox(null, new Value[]{new StringValue("a"),
                                                     new StringValue("b")});
 
@@ -62,40 +62,10 @@ public final class WidgetTest1 extends TestCase {
     }
 
     @Test
-    public void testSetEnabled() {
-        for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            //widget.setEnabled(null, false);
-            //widget.setEnabled(null, true);
-            //widget.setEnabled("a", false);
-            //widget.setEnabled("a", true);
-        }
-    }
-
-    @Test
-    public void testSetVisible() {
-        for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            //widget.setEnabled(null, false);
-            //widget.setEnabled(null, true);
-            //widget.setEnabled("a", false);
-            //widget.setEnabled("a", true);
-        }
-    }
-
-    @Test
     public void testSetToolTipText() {
-        for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            widget.setToolTipText(null);
-            widget.setToolTipText("");
-            widget.setToolTipText("x");
-        }
-    }
-
-    @Test
-    public void testSetLabelToolTipText() {
-        //for (int i = 0; i < TestSuite1.getFactor(); i++) {
-        //    widget.setLabelToolTipText(null);
-        //    widget.setLabelToolTipText("x");
-        //}
+        widget.setToolTipText(null);
+        widget.setToolTipText("");
+        widget.setToolTipText("x");
     }
 
     @Test
@@ -119,11 +89,9 @@ public final class WidgetTest1 extends TestCase {
 
     @Test
     public void testClear() {
-        for (int i = 0; i < TestSuite1.getFactor(); i++) {
-            widget.clear();
-            widget.reloadComboBox(null, new Value[]{new StringValue("a"),
-                                                    new StringValue("b"),
-                                                    new StringValue("c")});
-        }
+        widget.clear();
+        widget.reloadComboBox(null, new Value[]{new StringValue("a"),
+                                                new StringValue("b"),
+                                                new StringValue("c")});
     }
 }

@@ -26,7 +26,7 @@ public final class GUIDataTest1 extends TestCase {
     /** Tests, that the terminal area doesn't expand too much. */
     @Test
     public void testExpandTerminalSplitPane() {
-        float count = 50 * TestSuite1.getFactor();
+        float count = 200;
         float errors = 0;
         for (int i = 0; i < count; i++) {
             Tools.getGUIData().expandTerminalSplitPane(1);

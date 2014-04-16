@@ -107,7 +107,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testExecCommandProgressIndicator() {
-        for (int i = 0; i < 1 * TestSuite1.getFactor(); i++) {
+        for (int i = 0; i < 3; i++) {
             for (final Host host : TestSuite1.getHosts()) {
                 Tools.execCommandProgressIndicator(host,
                                                    "uname -a",
@@ -175,15 +175,13 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testLoadFile() {
-        for (float i = 0; i < 0.01 * TestSuite1.getFactor(); i++) {
-            assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK", false));
-            final String testFile = "/tmp/lcmc-test-file";
-            Tools.save(testFile, false);
-            final String file = Tools.loadFile(testFile, false);
-            assertNotNull(file);
-            TestSuite1.clearStdout();
-            assertFalse("".equals(file));
-        }
+        assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK", false));
+        final String testFile = "/tmp/lcmc-test-file";
+        Tools.save(testFile, false);
+        final String file = Tools.loadFile(testFile, false);
+        assertNotNull(file);
+        TestSuite1.clearStdout();
+        assertFalse("".equals(file));
     }
 
     @Test
@@ -626,7 +624,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testStartProgressIndicator() {
-        for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
+        for (int i = 0; i < 10; i++) {
             Tools.startProgressIndicator(null);
             Tools.startProgressIndicator("test");
             Tools.startProgressIndicator("test2");
@@ -661,7 +659,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testProgressIndicatorFailed() {
-        for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
+        for (int i = 0; i < 10; i++) {
             Tools.progressIndicatorFailed(null, "fail3");
             Tools.progressIndicatorFailed("name", "fail2");
             Tools.progressIndicatorFailed("name", null);
@@ -1148,7 +1146,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testGetRandomSecret() {
-        for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
+        for (int i = 0; i < 100; i++) {
             final String s = Tools.getRandomSecret(2000);
             assertTrue(s.length() == 2000);
             final int count = Tools.charCount(s, 'a');
@@ -1195,13 +1193,6 @@ public final class ToolsTest1 extends TestCase {
                      Tools.trimText(x20 + x20 + x20 + x20));
         assertEquals(x20 + x20 + x20 + x20 + "\n" + x20.trim(),
                      Tools.trimText(x20 + x20 + x20 + x20 + x20));
-    }
-
-    @Test
-    public void testWaitForSwing() {
-        for (int i = 0; i < 10 * TestSuite1.getFactor(); i++) {
-            Tools.waitForSwing();
-        }
     }
 
     @Test

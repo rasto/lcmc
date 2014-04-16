@@ -190,23 +190,21 @@ public final class TestSuite1 {
                 final String saveFile = Tools.getApplication().getSaveFile();
                 Tools.save(saveFile, false);
             }
-            for (int i = 0; i <= getFactor() / 100; i++) {
-                for (final Host host : HOSTS) {
-                    host.disconnect();
-                }
-                cluster.connect(null, true, i);
-                for (final Host host : HOSTS) {
-                    final boolean r = waitForCondition(
-                                            new Condition() {
-                                                @Override
-                                                public boolean passed() {
-                                                    return host.isConnected();
-                                                }
-                                            }, 300, 20000);
-                    if (!r) {
-                        error("could not establish connection to "
-                              + host.getName());
-                    }
+            for (final Host host : HOSTS) {
+                host.disconnect();
+            }
+            cluster.connect(null, true, 0);
+            for (final Host host : HOSTS) {
+                final boolean r = waitForCondition(
+                                        new Condition() {
+                                            @Override
+                                            public boolean passed() {
+                                                return host.isConnected();
+                                            }
+                                        }, 300, 20000);
+                if (!r) {
+                    error("could not establish connection to "
+                          + host.getName());
                 }
             }
             if (!Tools.getApplication().existsCluster(cluster)) {
@@ -269,14 +267,6 @@ public final class TestSuite1 {
     /** Returns test hosts. */
     public static List<Host> getHosts() {
         return HOSTS;
-    }
-
-    /** Returns factor for number of iteractions. */
-    public static int getFactor() {
-        if (FACTOR != null && Tools.isNumber(FACTOR)) {
-            return Integer.parseInt(FACTOR);
-        }
-        return 1;
     }
 
     public static List<String> getTest1Classes(final String path) {
