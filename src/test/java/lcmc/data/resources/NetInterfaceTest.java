@@ -1,41 +1,55 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.data.resources;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.net.UnknownHostException;
-import lcmc.utilities.TestSuite1;
 
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.testutils.TestSuite1;
 
-public final class NetInterfaceTest1 extends TestCase {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(NetInterfaceTest1.class);
+import org.junit.Before;
+import org.junit.Test;
+
+public final class NetInterfaceTest {
+
+    private final TestSuite1 testSuite = new TestSuite1();
+
     @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTest();
+    public void setUp() {
+        testSuite.initStdout();
+        testSuite.initMain();
     }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
 
     @Test
     public void testInit() {
         try {
-            NetInterface ni = new NetInterface("");
+            new NetInterface("");
         } catch (UnknownHostException e) {
             fail();
         }
-        assertTrue(TestSuite1.getStdout().contains("cannot parse"));
-        TestSuite1.clearStdout();
+        assertTrue(testSuite.getStdout().contains("cannot parse"));
+        testSuite.clearStdout();
         //lo ipv6 ::1 128
         //    lo ipv4 127.0.0.1 8
         try {
@@ -78,6 +92,6 @@ public final class NetInterfaceTest1 extends TestCase {
             fail();
         }
 
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
     }
 }

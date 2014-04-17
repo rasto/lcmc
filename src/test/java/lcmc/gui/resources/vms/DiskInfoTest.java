@@ -1,43 +1,30 @@
-package lcmc.gui.resources;
+package lcmc.gui.resources.vms;
 
-import junit.framework.TestCase;
-import lcmc.utilities.TestSuite1;
+import java.util.HashMap;
+import java.util.Map;
+
 import lcmc.data.VMSXML.DiskData;
 import lcmc.gui.resources.vms.DiskInfo;
+import lcmc.utilities.Tools;
+import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import mockit.Deencapsulation;
-
-public final class VMSDiskInfoTest1 extends TestCase {
-    //final DiskInfo vmsdi = new DiskInfo("", null, null);
+public final class DiskInfoTest {
+    private DiskInfo vmsdi;
     @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTest();
+    public void setUp() {
+        Tools.init();
+        vmsdi = new DiskInfo("", null, null);
     }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
 
     private String invokeFixSourceHostParams(final String names,
                                              final  String ports) {
         final Map<String, String> params = new HashMap<String, String>();
         params.put(DiskData.SOURCE_HOST_NAME, names);
         params.put(DiskData.SOURCE_HOST_PORT, ports);
-        Deencapsulation.invoke(DiskInfo.class,
-                               "fixSourceHostParams",
-                               params);
+        vmsdi.fixSourceHostParams(params);
         return params.get(DiskData.SOURCE_HOST_NAME)
                + ":" + params.get(DiskData.SOURCE_HOST_PORT);
     }

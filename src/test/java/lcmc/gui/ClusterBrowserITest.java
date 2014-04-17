@@ -1,39 +1,37 @@
 package lcmc.gui;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
 import lcmc.data.Application;
-
-import lcmc.utilities.TestSuite1;
-import lcmc.utilities.Tools;
 import lcmc.data.Host;
+import lcmc.testutils.TestSuite1;
+import lcmc.testutils.annotation.type.IntegrationTest;
+import lcmc.utilities.Tools;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
-public final class ClusterBrowserTest1 extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+@Category(IntegrationTest.class)
+public final class ClusterBrowserITest {
+
+    private final TestSuite1 testSuite = new TestSuite1();
+
     @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTest();
+    public void setUp() {
+        testSuite.initTestCluster();
     }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
 
     @Test
     public void testProcessClusterOutput() {
         final CountDownLatch nolatch = new CountDownLatch(0);
-        for (final Host host : TestSuite1.getHosts()) {
+        for (final Host host : testSuite.getHosts()) {
             final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
             assertNotNull("cb is null", cb);
 
@@ -84,15 +82,13 @@ public final class ClusterBrowserTest1 extends TestCase {
                 final String file = f.getAbsolutePath();
                 if (file.length() > 3
                     && file.substring(file.length() - 4).equals(".xml")) {
-                    for (int i = 0; i < 3; i++) {
-                        files.add(file);
-                    }
+                    files.add(file);
                 }
             }
         }
         String emptyCib = null;
         final StringBuilder nodes = new StringBuilder("<nodes>\n");
-        for (final Host host : TestSuite1.getHosts()) {
+        for (final Host host : testSuite.getHosts()) {
             nodes.append("  <node id=\"");
             nodes.append(host.getName());
             nodes.append("\" uname=\"");
@@ -101,7 +97,7 @@ public final class ClusterBrowserTest1 extends TestCase {
         }
         nodes.append("</nodes>\n");
         final StringBuilder status = new StringBuilder("<status>\n");
-        for (final Host host : TestSuite1.getHosts()) {
+        for (final Host host : testSuite.getHosts()) {
             status.append("<node_state id=\"");
             status.append(host.getName());
             status.append("\" uname=\"");
@@ -146,7 +142,7 @@ public final class ClusterBrowserTest1 extends TestCase {
             }
             final CountDownLatch firstTime = new CountDownLatch(0);
             final Application.RunMode runMode = Application.RunMode.LIVE;
-            for (final Host host : TestSuite1.getHosts()) {
+            for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
                 cb.processClusterOutput(cib,
@@ -159,7 +155,7 @@ public final class ClusterBrowserTest1 extends TestCase {
                 cb.getCRMGraph().repaint();
             }
             Tools.stopProgressIndicator(i + ": " + file);
-            for (final Host host : TestSuite1.getHosts()) {
+            for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 Tools.waitForSwing();
                 cb.processClusterOutput(emptyCib,
@@ -170,6 +166,6 @@ public final class ClusterBrowserTest1 extends TestCase {
                 Tools.waitForSwing();
             }
         }
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
     }
 }

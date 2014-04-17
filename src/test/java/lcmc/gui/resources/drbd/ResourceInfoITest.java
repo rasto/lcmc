@@ -1,38 +1,35 @@
-package lcmc.gui.resources;
+package lcmc.gui.resources.drbd;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import junit.framework.TestCase;
 import lcmc.data.Host;
-import lcmc.utilities.TestSuite1;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.testutils.TestSuite1;
+import lcmc.testutils.annotation.type.IntegrationTest;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Test;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-public final class DrbdResourceInfoTest1 extends TestCase {
+@Category(IntegrationTest.class)
+public final class ResourceInfoITest {
+
+    private final TestSuite1 testSuite = new TestSuite1();
+
     @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTest();
+    public void setUp() {
+        testSuite.initTestCluster();
     }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
 
     @Test
     public void testNotEqualNames() {
 
         final ClusterBrowser b =
-                TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
+                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
         final ResourceInfo r1 = new ResourceInfo("name1", null, b);
         final ResourceInfo r2 = new ResourceInfo("name2", null, b);
         assertFalse("not equal names", r1.equals(r2));
@@ -42,7 +39,7 @@ public final class DrbdResourceInfoTest1 extends TestCase {
     public void testEqualNames() {
 
         final ClusterBrowser b =
-                TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
+                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
         final ResourceInfo r1 = new ResourceInfo("name", null, b);
         final ResourceInfo r2 = new ResourceInfo("name", null, b);
         assertTrue("equal names", r1.equals(r2));
@@ -52,7 +49,7 @@ public final class DrbdResourceInfoTest1 extends TestCase {
     public void testNameNull() {
 
         final ClusterBrowser b =
-                TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
+                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
         final ResourceInfo r1 = new ResourceInfo("name", null, b);
         assertFalse("equal name null", r1.getName() == null);
     }
@@ -61,7 +58,7 @@ public final class DrbdResourceInfoTest1 extends TestCase {
     public void testEqualNamesNotEqualsHosts() {
 
         final ClusterBrowser b =
-                TestSuite1.getHosts().get(0).getBrowser().getClusterBrowser();
+                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
         
         final ResourceInfo r1 =
                 new ResourceInfo("name", new LinkedHashSet<Host>(

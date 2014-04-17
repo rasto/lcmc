@@ -1,21 +1,25 @@
 package lcmc.gui.widget;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
-import lcmc.utilities.TestSuite1;
-import lcmc.data.Application;
-import lcmc.data.Value;
-import lcmc.data.StringValue;
 import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.testutils.TestSuite1;
+import lcmc.testutils.annotation.type.GuiTest;
+import static org.junit.Assert.assertEquals;
 
-public final class WidgetTest1 extends TestCase {
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+@Category(GuiTest.class)
+public final class WidgetGTest {
+    private final TestSuite1 testSuite = new TestSuite1();
+
     private Widget widget;
     @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTest();
+    public void setUp() {
+        testSuite.initMain();
         for (int i = 0; i < 10; i++) {
             widget = WidgetFactory.createInstance(
                           Widget.GUESS_TYPE,
@@ -30,12 +34,6 @@ public final class WidgetTest1 extends TestCase {
                                          AccessMode.ADVANCED),
                           Widget.NO_BUTTON);
         }
-    }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
     }
 
     @Test

@@ -1,25 +1,11 @@
 package lcmc.utilities;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
 
-public final class DRBDTest1 extends TestCase {
-    @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTestCluster();
-        TestSuite1.initTest();
-    }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
+public final class DRBDTest {
 
     private void cvAssertTrue(final String x, final String y) {
         assertTrue(DRBD.compatibleVersions(x, y));

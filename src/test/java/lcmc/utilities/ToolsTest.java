@@ -1,48 +1,48 @@
 package lcmc.utilities;
 
-import junit.framework.TestCase;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.After;
-import org.junit.Before;
-import java.util.Collection;
-import java.util.Arrays;
-import java.util.List;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Vector;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.awt.Dimension;
-import javax.swing.JPanel;
-import javax.swing.JCheckBox;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.JPanel;
+
 import lcmc.Exceptions;
 import lcmc.data.Host;
-import mockit.Deencapsulation;
+import lcmc.testutils.TestSuite1;
 
-public final class ToolsTest1 extends TestCase {
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+public final class ToolsTest {
     /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(ToolsTest1.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ToolsTest.class);
+
+    private final TestSuite1 testSuite = new TestSuite1();
+
     @Before
-    @Override
-    protected void setUp() {
-        TestSuite1.initTestCluster();
-        TestSuite1.initTest();
+    public void setUp() {
+        testSuite.initStdout();
+        Tools.init();
     }
-
-    @After
-    @Override
-    protected void tearDown() {
-        assertEquals("", TestSuite1.getStdout());
-    }
-
-    /* ---- tests ----- */
 
     @Test
     public void testCreateImageIcon() {
         assertNull("not existing", Tools.createImageIcon("notexisting"));
-        assertFalse("".equals(TestSuite1.getStdout()));
-        TestSuite1.clearStdout();
+        assertFalse("".equals(testSuite.getStdout()));
+        testSuite.clearStdout();
         assertNotNull("existing", Tools.createImageIcon("startpage_head.jpg"));
     }
 
@@ -51,15 +51,15 @@ public final class ToolsTest1 extends TestCase {
         final String release = Tools.getRelease();
         assertNotNull("not null", release);
         assertFalse("not empty", "".equals(release));
-        TestSuite1.realPrintln("release: " + release);
+        testSuite.realPrintln("release: " + release);
     }
 
     @Test
     public void testInfo() {
         LOG.info("info a");
         assertEquals(TestSuite1.INFO_STRING + "info a\n",
-                     TestSuite1.getStdout());
-        TestSuite1.clearStdout();
+                     testSuite.getStdout());
+        testSuite.clearStdout();
     }
 
     @Test
@@ -71,53 +71,28 @@ public final class ToolsTest1 extends TestCase {
     public void testDebug() {
         LoggerFactory.setDebugLevel(1);
         LOG.debug("test a");
-        assertTrue(TestSuite1.getStdout().indexOf("test a") > 0);
-        TestSuite1.clearStdout();
+        assertTrue(testSuite.getStdout().indexOf("test a") > 0);
+        testSuite.clearStdout();
         LoggerFactory.setDebugLevel(0);
         LoggerFactory.decrementDebugLevel(); /* -1 */
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
         LOG.debug("test b");
-        assertEquals("", TestSuite1.getStdout());
+        assertEquals("", testSuite.getStdout());
         LoggerFactory.incrementDebugLevel(); /* 0 */
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
         LOG.debug("test c");
-        assertTrue(TestSuite1.getStdout().indexOf("test c") > 0);
-        TestSuite1.clearStdout();
+        assertTrue(testSuite.getStdout().indexOf("test c") > 0);
+        testSuite.clearStdout();
         LoggerFactory.setDebugLevel(1); /* 1 */
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
         LOG.debug2("test d2");
         LOG.debug1("test d1");
         LOG.debug("test d0");
-        assertFalse(TestSuite1.getStdout().contains("test d2"));
-        assertTrue(TestSuite1.getStdout().contains("test d1"));
-        assertTrue(TestSuite1.getStdout().contains("test d0"));
-        TestSuite1.clearStdout();
+        assertFalse(testSuite.getStdout().contains("test d2"));
+        assertTrue(testSuite.getStdout().contains("test d1"));
+        assertTrue(testSuite.getStdout().contains("test d0"));
+        testSuite.clearStdout();
         LoggerFactory.setDebugLevel(-1);
-    }
-
-    @Test
-    public void testSSHError() {
-        for (final Host host : TestSuite1.getHosts()) {
-            LOG.sshError(host, "cmd a", "ans a", "stack trace a", 2);
-            assertTrue(
-                TestSuite1.getStdout().indexOf("returned exit code 2") >= 0);
-            TestSuite1.clearStdout();
-        }
-    }
-
-    @Test
-    public void testExecCommandProgressIndicator() {
-        for (int i = 0; i < 3; i++) {
-            for (final Host host : TestSuite1.getHosts()) {
-                Tools.execCommandProgressIndicator(host,
-                                                   "uname -a",
-                                                   null, /* ExecCallback */
-                                                   true, /* outputVisible */
-                                                   "text h",
-                                                   1000); /* command timeout */
-            }
-        }
-        TestSuite1.clearStdout();
     }
 
     @Test
@@ -125,9 +100,9 @@ public final class ToolsTest1 extends TestCase {
         LOG.appWarning("warning a");
         if (Tools.getDefault("AppWarning").equals("y")) {
             assertEquals(TestSuite1.APPWARNING_STRING + "warning a\n",
-                         TestSuite1.getStdout());
+                         testSuite.getStdout());
         }
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
     }
 
     @Test
@@ -155,39 +130,17 @@ public final class ToolsTest1 extends TestCase {
         assertFalse(Tools.isIp("127.0.false.1"));
         assertFalse(Tools.isIp("127.false.0.1"));
         assertFalse(Tools.isIp("false.0.0.1"));
-
-        for (final Host host : TestSuite1.getHosts()) {
-            assertTrue(Tools.isIp(host.getIpAddress()));
-            assertFalse(Tools.isIp(host.getHostname()));
-        }
     }
 
     @Test
     public void testPrintStackTrace() {
         Tools.printStackTrace();
-        assertFalse("".equals(TestSuite1.getStdout()));
-        TestSuite1.clearStdout();
+        assertFalse("".equals(testSuite.getStdout()));
+        testSuite.clearStdout();
         Tools.printStackTrace("stack trace test");
-        assertTrue(TestSuite1.getStdout().startsWith("stack trace test"));
-        TestSuite1.clearStdout();
+        assertTrue(testSuite.getStdout().startsWith("stack trace test"));
+        testSuite.clearStdout();
         assertFalse("".equals(Tools.getStackTrace()));
-    }
-
-    @Test
-    public void testLoadFile() {
-        assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK", false));
-        final String testFile = "/tmp/lcmc-test-file";
-        Tools.save(testFile, false);
-        final String file = Tools.loadFile(testFile, false);
-        assertNotNull(file);
-        TestSuite1.clearStdout();
-        assertFalse("".equals(file));
-    }
-
-    @Test
-    public void testRemoveEverything() {
-        //TODO:
-        //Tools.removeEverything();
     }
 
     @Test
@@ -274,8 +227,8 @@ public final class ToolsTest1 extends TestCase {
                                           false));
         assertEquals(TestSuite1.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined\n",
-                     TestSuite1.getStdout());
-        TestSuite1.clearStdout();
+                     testSuite.getStdout());
+        testSuite.clearStdout();
 
         assertEquals("undefined2;;;undefined3",
                      Tools.getDistCommand("undefined2;;;undefined3",
@@ -289,8 +242,8 @@ public final class ToolsTest1 extends TestCase {
                      + "getDistCommand: unknown command: undefined2\n"
                      + TestSuite1.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined3\n",
-                     TestSuite1.getStdout());
-        TestSuite1.clearStdout();
+                     testSuite.getStdout());
+        testSuite.clearStdout();
         final lcmc.utilities.ConvertCmdCallback ccc =
                                     new lcmc.utilities.ConvertCmdCallback() {
             @Override
@@ -337,8 +290,8 @@ public final class ToolsTest1 extends TestCase {
                                           false));
         assertEquals(TestSuite1.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined4\n",
-                     TestSuite1.getStdout());
-        TestSuite1.clearStdout();
+                     testSuite.getStdout());
+        testSuite.clearStdout();
         assertNull(Tools.getDistCommand(null,
                                         "debian",
                                         "squeeze",
@@ -529,7 +482,7 @@ public final class ToolsTest1 extends TestCase {
 
         assertEquals("a", Tools.join(",", new String[]{"a"}, 1));
         assertEquals("", Tools.join(",", new String[]{}, 2));
-        assertEquals("", Tools.join(",", (String[]) null, 1));
+        assertEquals("", Tools.join(",", null, 1));
         assertEquals("a,b,c", Tools.join(",", new String[]{"a", "b", "c"}, 3));
         assertTrue(Tools.join(",", bigArray.toArray(
                     new String[bigArray.size()]), 500).length() == 1000 - 1);
@@ -620,58 +573,6 @@ public final class ToolsTest1 extends TestCase {
                      Tools.escapeConfig("text with \""));
         assertEquals("\"just\\\"\"",
                      Tools.escapeConfig("just\""));
-    }
-
-    @Test
-    public void testStartProgressIndicator() {
-        for (int i = 0; i < 10; i++) {
-            Tools.startProgressIndicator(null);
-            Tools.startProgressIndicator("test");
-            Tools.startProgressIndicator("test2");
-            Tools.startProgressIndicator("test3");
-            Tools.startProgressIndicator(null, "test4");
-            Tools.startProgressIndicator("name", "test4");
-            Tools.startProgressIndicator("name2", "test4");
-            Tools.startProgressIndicator("name2", null);
-            Tools.startProgressIndicator(null, null);
-            for (final Host host : TestSuite1.getHosts()) {
-                Tools.startProgressIndicator(host.getName(), "test");
-            }
-
-            for (final Host host : TestSuite1.getHosts()) {
-                Tools.stopProgressIndicator(host.getName(), "test");
-            }
-            Tools.stopProgressIndicator(null, null);
-            Tools.stopProgressIndicator("name2", null);
-            Tools.stopProgressIndicator("name2", "test4");
-            Tools.stopProgressIndicator("name", "test4");
-            Tools.stopProgressIndicator(null, "test4");
-            Tools.stopProgressIndicator("test3");
-            Tools.stopProgressIndicator("test2");
-            Tools.stopProgressIndicator("test");
-            Tools.stopProgressIndicator(null);
-        }
-    }
-
-    @Test
-    public void testStopProgressIndicator() {
-    }
-
-    @Test
-    public void testProgressIndicatorFailed() {
-        for (int i = 0; i < 10; i++) {
-            Tools.progressIndicatorFailed(null, "fail3");
-            Tools.progressIndicatorFailed("name", "fail2");
-            Tools.progressIndicatorFailed("name", null);
-            Tools.progressIndicatorFailed("fail1");
-            Tools.progressIndicatorFailed(null);
-
-            Tools.progressIndicatorFailed("fail two seconds", 2);
-            for (final Host host : TestSuite1.getHosts()) {
-                Tools.progressIndicatorFailed(host.getName(), "fail");
-            }
-        }
-        TestSuite1.clearStdout();
     }
 
     @Test
@@ -1040,30 +941,6 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testIsLinux() {
-        if (System.getProperty("os.name").indexOf("Windows") >= 0
-            || System.getProperty("os.name").indexOf("windows") >= 0) {
-            assertFalse(Tools.isLinux());
-        }
-        if (System.getProperty("os.name").indexOf("Linux") >= 0
-            || System.getProperty("os.name").indexOf("linux") >= 0) {
-            assertTrue(Tools.isLinux());
-        }
-    }
-
-    @Test
-    public void testIsWindows() {
-        if (System.getProperty("os.name").indexOf("Windows") >= 0
-            || System.getProperty("os.name").indexOf("windows") >= 0) {
-            assertTrue(Tools.isWindows());
-        }
-        if (System.getProperty("os.name").indexOf("Linux") >= 0
-            || System.getProperty("os.name").indexOf("linux") >= 0) {
-            assertFalse(Tools.isWindows());
-        }
-    }
-
-    @Test
     public void testGetFile() {
         final String testFile = "/help-progs/lcmc-gui-helper";
         assertTrue(Tools.getFile(testFile).indexOf("#!") == 0);
@@ -1075,7 +952,7 @@ public final class ToolsTest1 extends TestCase {
     public void testParseAutoArgs() {
         Tools.parseAutoArgs(null);
         Tools.parseAutoArgs("test");
-        TestSuite1.clearStdout();
+        testSuite.clearStdout();
     }
 
     @Test
@@ -1117,7 +994,7 @@ public final class ToolsTest1 extends TestCase {
 
     @Test
     public void testAreEqual() {
-        assertTrue(Tools.areEqual((String) null, (String) null));
+        assertTrue(Tools.areEqual(null, null));
         assertTrue(Tools.areEqual("", ""));
         assertTrue(Tools.areEqual("x", "x"));
 
@@ -1170,18 +1047,6 @@ public final class ToolsTest1 extends TestCase {
         } catch (java.net.UnknownHostException e) {
             fail();
         }
-        for (final Host host : TestSuite1.getHosts()) {
-            assertFalse(Tools.isLocalIp(host.getIpAddress()));
-        }
-    }
-
-    @Test
-    public void testGetUnixPath() {
-        assertEquals("/bin", Tools.getUnixPath("/bin"));
-        if (Tools.isWindows()) {
-            assertEquals("/bin/dir/file",
-                         Tools.getUnixPath("d:\\bin\\dir\\file"));
-        }
     }
 
     @Test
@@ -1223,17 +1088,6 @@ public final class ToolsTest1 extends TestCase {
     }
 
     @Test
-    public void testGetHostCheckBoxes() {
-        for (final Host host : TestSuite1.getHosts()) {
-            final Map<Host, JCheckBox> comps =
-                                    Tools.getHostCheckBoxes(host.getCluster());
-            assertNotNull(comps);
-            assertTrue(comps.size() == TestSuite1.getHosts().size());
-            assertTrue(comps.containsKey(host));
-        }
-    }
-
-    @Test
     public void testVersionBeforePacemaker() {
         final Host host = new Host();
         host.setPacemakerVersion("1.1.5");
@@ -1263,9 +1117,6 @@ public final class ToolsTest1 extends TestCase {
         host.setPacemakerVersion("1.0.9");
         host.setHeartbeatVersion(null);
         assertFalse(Tools.versionBeforePacemaker(host));
-        for (final Host h : TestSuite1.getHosts()) {
-            Tools.versionBeforePacemaker(h);
-        }
     }
 
     private String ssb(final String s) {
@@ -1290,25 +1141,6 @@ public final class ToolsTest1 extends TestCase {
     public void testGenerateVMMacAddress() {
        final String mac = Tools.generateVMMacAddress();
        assertEquals(mac.length(), 17);
-    }
-
-    public String invokeGetNameParts(Object name) {
-        if (name == null) {
-            name = String.class;
-        }
-        return Tools.join(",", (List<String>) Deencapsulation.invoke(
-                                                                Tools.class,
-                                                                "getNameParts",
-                                                                name));
-    }
-    @Test
-    public void testGetNameParts() {
-        assertEquals("22, aa ,11", invokeGetNameParts("22 aa 11"));
-        assertEquals("22", invokeGetNameParts("22"));
-        assertEquals("aa", invokeGetNameParts("aa"));
-        assertEquals("Cluster ,1", invokeGetNameParts("Cluster 1"));
-        assertEquals("", invokeGetNameParts(""));
-        assertEquals("", invokeGetNameParts(null));
     }
 
     @Test
