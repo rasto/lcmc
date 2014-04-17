@@ -652,7 +652,7 @@ public final class DiskInfo extends HardwareInfo {
      * Fix ports. Make the number of ports delimited with "," to match the host
      * names.
      */
-    private static void fixSourceHostParams(final Map<String, String> params) {
+    void fixSourceHostParams(final Map<String, String> params) {
         final String names = params.get(DiskData.SOURCE_HOST_NAME);
         String ports = params.get(DiskData.SOURCE_HOST_PORT);
         if (names == null) {
