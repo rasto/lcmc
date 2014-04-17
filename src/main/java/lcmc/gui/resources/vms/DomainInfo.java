@@ -2341,7 +2341,6 @@ public final class DomainInfo extends EditableInfo {
             mTransitionReadLock.lock();
             try {
                 if (shuttingdown.isEmpty() || i >= ACTION_TIMEOUT) {
-                    mTransitionReadLock.unlock();
                     break;
                 }
             } finally {
@@ -2420,7 +2419,6 @@ public final class DomainInfo extends EditableInfo {
                 mTransitionReadLock.lock();
                 try {
                     if (suspending.isEmpty() || i >= ACTION_TIMEOUT) {
-                        mTransitionReadLock.unlock();
                         break;
                     }
                 } finally {
@@ -2470,7 +2468,6 @@ public final class DomainInfo extends EditableInfo {
                 mTransitionReadLock.lock();
                 try {
                     if (resuming.isEmpty() || i >= ACTION_TIMEOUT) {
-                        mTransitionReadLock.unlock();
                         break;
                     }
                 } finally {
