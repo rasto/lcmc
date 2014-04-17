@@ -97,7 +97,7 @@ final class PcmkTest2 {
         checkTest("test2", 9);
 
         final int dum3PopX = dummy3X + 165;
-        final int dum3PopY = dummy3Y - 10;
+        final int dum3PopY = dummy3Y;
         for (int i = 0; i < 2; i++) {
             removeColocation(dum3PopX, dum3PopY);
 
@@ -136,7 +136,7 @@ final class PcmkTest2 {
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
-        final int dum4PopY = dummy4Y - 10;
+        final int dum4PopY = dummy4Y;
         removeConstraint(dum4PopX, dum4PopY);
         checkTest("test2", 11.6);
         moveTo(dummy4X + 20, dummy4Y + 5);
