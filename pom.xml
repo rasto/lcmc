@@ -15,8 +15,23 @@
         UTF-8
         </project.reporting.outputEncoding>
         <lib.src>${project.basedir}/src/lib</lib.src>
+        <junit.category.exclude>
+            lcmc.testutils.annotation.type.IntegrationTest
+        </junit.category.exclude>
     </properties>
-
+    <profiles>
+        <profile>
+            <id>FastTests</id>
+            <properties>
+                <junit.category.exclude>
+                    lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest
+                </junit.category.exclude>
+            </properties>
+        </profile>
+        <profile>
+            <id>GuiTests</id>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>net.sourceforge.collections</groupId>
@@ -184,7 +199,7 @@
                     <includes>
                         <include>**/*.class</include>
                         </includes>
-                        <excludedGroups>lcmc.testutils.annotation.type.IntegrationTest</excludedGroups>
+                        <excludedGroups>${junit.category.exclude}</excludedGroups>
                 </configuration>
             </plugin>
             <!-- failsafe -->
