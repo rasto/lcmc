@@ -21,34 +21,12 @@
  */
 package lcmc.gui.resources.drbd;
 
-import lcmc.Exceptions;
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.NetInfo;
-import lcmc.gui.resources.crm.ServiceInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.SpringUtilities;
-import lcmc.data.resources.DrbdResource;
-import lcmc.data.resources.NetInterface;
-import lcmc.data.DrbdXML.HostProxy;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.WidgetListener;
-import lcmc.configs.AppDefaults;
-
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.Color;
-import java.awt.event.ActionListener;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -60,24 +38,49 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.net.UnknownHostException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
+import lcmc.Exceptions;
+import lcmc.configs.AppDefaults;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.DRBDtestData;
+import lcmc.data.DrbdProxy;
+import lcmc.data.DrbdXML;
+import lcmc.data.DrbdXML.HostProxy;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.DrbdResource;
+import lcmc.data.resources.NetInterface;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.HostBrowser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.NetInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.widget.Check;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.WidgetListener;
 
 /**
  * this class holds info data, menus and configuration
@@ -2138,33 +2141,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Creates popup for the block device. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        for (final VolumeInfo dvi : drbdVolumes) {
-            final UpdatableItem volumesMenu = new MyMenu(
-                            dvi.toString(),
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void updateAndWait() {
-                    Tools.isSwingThread();
-                    removeAll();
-                    final Collection<UpdatableItem> volumeMenus =
-                                    new ArrayList<UpdatableItem>();
-                    for (final UpdatableItem u : dvi.createPopup()) {
-                        volumeMenus.add(u);
-                        u.updateAndWait();
-                    }
-                    for (final UpdatableItem u : volumeMenus) {
-                        add((JMenuItem) u);
-                    }
-                    super.updateAndWait();
-                }
-            };
-            items.add(volumesMenu);
-        }
-        return items;
+        final ResourceMenu resourceMenu = new ResourceMenu(this);
+        return resourceMenu.getPulldownMenu();
     }
 
     /** Sets that this drbd resource is used by crm. */

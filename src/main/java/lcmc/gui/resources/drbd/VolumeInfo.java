@@ -78,7 +78,7 @@ import lcmc.utilities.UpdatableItem;
 /**
  * This class holds info data of a DRBD volume.
  */
-public final class VolumeInfo extends EditableInfo
+public class VolumeInfo extends EditableInfo
                                   implements CommonDeviceInterface {
     /** Logger. */
     private static final Logger LOG =
