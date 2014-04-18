@@ -72,7 +72,7 @@ import lcmc.utilities.UpdatableItem;
 /**
  * This class holds info data for a block device.
  */
-public final class BlockDevInfo extends EditableInfo {
+public class BlockDevInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(BlockDevInfo.class);

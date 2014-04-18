@@ -100,7 +100,7 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class ClusterBrowser extends Browser {
+public class ClusterBrowser extends Browser {
     /** Logger. */
     private static final Logger LOG =
                                LoggerFactory.getLogger(ClusterBrowser.class);

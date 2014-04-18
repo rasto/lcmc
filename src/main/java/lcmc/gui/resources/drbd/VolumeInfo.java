@@ -21,49 +21,42 @@
  */
 package lcmc.gui.resources.drbd;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Tools;
-
-import javax.swing.JComponent;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.DRBD;
-import lcmc.data.resources.DrbdVolume;
-import lcmc.gui.dialog.cluster.DrbdLogs;
-import lcmc.Exceptions;
-import lcmc.AddDrbdSplitBrainDialog;
-import lcmc.gui.CRMGraph;
-import lcmc.utilities.ButtonCallback;
-
-import java.awt.geom.Point2D;
-import java.util.Map;
-import java.util.Comparator;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.net.UnknownHostException;
-
-import javax.swing.JPanel;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.CountDownLatch;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.AddDrbdSplitBrainDialog;
+import lcmc.Exceptions;
+import lcmc.data.Application;
+import lcmc.data.DRBDtestData;
+import lcmc.data.DrbdXML;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.DrbdVolume;
+import lcmc.gui.Browser;
+import lcmc.gui.CRMGraph;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
@@ -74,9 +67,13 @@ import lcmc.gui.resources.crm.GroupInfo;
 import lcmc.gui.resources.crm.LinbitDrbdInfo;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.widget.Check;
+import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds info data of a DRBD volume.
@@ -393,247 +390,10 @@ public final class VolumeInfo extends EditableInfo
     /** Returns the list of items for the popup menu for drbd volume. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final Application.RunMode runMode = Application.RunMode.LIVE;
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final VolumeInfo thisClass = this;
-
-        final MyMenuItem connectMenu = new MyMenuItem(
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
-            + ' ' + getDrbdResourceInfo().getName(),
-            null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
-
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect")
-            + ' ' + getDrbdResourceInfo().getName(),
-            null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-            new AccessMode(Application.AccessType.OP, true),
-            new AccessMode(Application.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return !isConnectedOrWF(runMode);
-            }
-
-            @Override
-            public String enablePredicate() {
-                if (!Tools.getApplication().isAdvancedMode()
-                    && getDrbdResourceInfo().isUsedByCRM()) {
-                    return IS_USED_BY_CRM_STRING;
-                }
-                if (isSyncing()) {
-                    return IS_SYNCING_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(
-                         Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
-                         + ' ' + getDrbdResourceInfo().getName())) {
-                    if (!destBDI.isConnectedOrWF(runMode)) {
-                        destBDI.connect(runMode);
-                    }
-                    if (!sourceBDI.isConnectedOrWF(runMode)) {
-                        sourceBDI.connect(runMode);
-                    }
-                } else {
-                    destBDI.disconnect(runMode);
-                    sourceBDI.disconnect(runMode);
-                }
-            }
-        };
-        final ButtonCallback connectItemCallback =
-               getBrowser().new DRBDMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                final BlockDevInfo bdi;
-                if (sourceBDI.getHost() == dcHost) {
-                    bdi = sourceBDI;
-                } else if (destBDI.getHost() == dcHost) {
-                    bdi = destBDI;
-                } else {
-                    return;
-                }
-                if (sourceBDI.isConnected(Application.RunMode.LIVE)
-                    && destBDI.isConnected(Application.RunMode.LIVE)) {
-                    bdi.disconnect(Application.RunMode.TEST);
-                } else {
-                    bdi.connect(Application.RunMode.TEST);
-                }
-            }
-        };
-        addMouseOverListener(connectMenu, connectItemCallback);
-        items.add(connectMenu);
-
-        final UpdatableItem resumeSync = new MyMenuItem(
-           Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync"),
-           null,
-           Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync.ToolTip"),
-
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
-           null,
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-           new AccessMode(Application.AccessType.OP, false),
-           new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return isPausedSync();
-            }
-
-            @Override
-            public String enablePredicate() {
-                if (!isSyncing()) {
-                    return "it is not syncing";
-                }
-                return null;
-            }
-            @Override
-            public void action() {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(thisClass);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(thisClass);
-                if (this.getText().equals(Tools.getString(
-                            "ClusterBrowser.Drbd.ResourceResumeSync"))) {
-                    if (destBDI.getBlockDevice().isPausedSync()) {
-                        destBDI.resumeSync(runMode);
-                    }
-                    if (sourceBDI.getBlockDevice().isPausedSync()) {
-                        sourceBDI.resumeSync(runMode);
-                    }
-                } else {
-                    sourceBDI.pauseSync(runMode);
-                    destBDI.pauseSync(runMode);
-                }
-            }
-        };
-        items.add(resumeSync);
-
-        /* resolve split-brain */
-        final UpdatableItem splitBrainMenu = new MyMenuItem(
-                Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain"),
-                null,
-                Tools.getString(
-                            "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (isSplitBrain()) {
-                    return null;
-                } else {
-                    return "";
-                }
-            }
-
-            @Override
-            public void action() {
-                resolveSplitBrain();
-            }
-        };
-        items.add(splitBrainMenu);
-
-        /* start online verification */
-        final UpdatableItem verifyMenu = new MyMenuItem(
-                Tools.getString("ClusterBrowser.Drbd.Verify"),
-                null,
-                Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (!isConnected(runMode)) {
-                    return "not connected";
-                }
-                if (isSyncing()) {
-                    return IS_SYNCING_STRING;
-                }
-                if (isVerifying()) {
-                    return IS_VERIFYING_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                verify(runMode);
-            }
-        };
-        items.add(verifyMenu);
-        /* remove resource */
-        final UpdatableItem removeResMenu = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
-                        ClusterBrowser.REMOVE_ICON,
-                        Tools.getString(
-                                "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public void action() {
-                /* this resourceInfo remove myself and this calls
-                   removeDrbdResource in this class, that removes the edge
-                   in the graph. */
-                removeMyself(runMode);
-            }
-
-            @Override
-            public String enablePredicate() {
-                final DrbdXML dxml = getBrowser().getDrbdXML();
-                if (!Tools.getApplication().isAdvancedMode()
-                    && getDrbdResourceInfo().isUsedByCRM()) {
-                    return IS_USED_BY_CRM_STRING;
-                } else if (dxml.isDrbdDisabled()) {
-                    return "disabled because of config";
-                }
-                return null;
-            }
-        };
-        items.add(removeResMenu);
-
-        /* view log */
-        final UpdatableItem viewLogMenu = new MyMenuItem(
-                           Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                           LOGFILE_ICON,
-                           null,
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                hidePopup();
-                final String dev = getDevice();
-                final DrbdLogs l = new DrbdLogs(getDrbdResourceInfo().getCluster(),
-                                          dev);
-                l.showDialog();
-            }
-        };
-        items.add(viewLogMenu);
-        return items;
+        final VolumeMenu volumeMenu = new VolumeMenu(this);
+        return volumeMenu.getPulldownMenu();
     }
-
+    
     /** Returns tool tip when mouse is over the volume edge. */
     @Override
     public String getToolTipForGraph(final Application.RunMode runMode) {

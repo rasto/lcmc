@@ -83,7 +83,7 @@ import lcmc.utilities.LoggerFactory;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-public final class ResourceInfo extends AbstractDrbdInfo {
+public class ResourceInfo extends AbstractDrbdInfo {
     /** Logger. */
     private static final Logger LOG =
                              LoggerFactory.getLogger(ResourceInfo.class);

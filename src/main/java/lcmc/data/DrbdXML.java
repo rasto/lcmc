@@ -66,7 +66,7 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class DrbdXML extends XML {
+public class DrbdXML extends XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXML.class);
     public static final String[] EMPTY_STRING = new String[0];
