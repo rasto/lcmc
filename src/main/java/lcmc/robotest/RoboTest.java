@@ -356,7 +356,7 @@ public final class RoboTest {
         aborted = false;
         info("start test " + index + " in 3 seconds");
         if (cluster != null) {
-            for (final Host host : cluster.getHosts()) {
+            for (final Host host : getClusterHosts()) {
                 host.getSSH().installTestFiles();
             }
             final Host firstHost = cluster.getHostsArray()[0];
@@ -872,7 +872,7 @@ public final class RoboTest {
 
     /** Check test. */
     static void checkTest(final String test, final double no) {
-        for (final Host host : cluster.getHosts()) {
+        for (final Host host : getClusterHosts()) {
             if (abortWithMouseMovement()) {
                 return;
             }
@@ -885,7 +885,7 @@ public final class RoboTest {
     /** Check DRBD test on the first two hosts. */
     static void checkDRBDTest(final String test, final double no) {
         int h = 1;
-        for (final Host host : cluster.getHosts()) {
+        for (final Host host : getClusterHosts()) {
             if (abortWithMouseMovement()) {
                 return;
             }
@@ -915,7 +915,7 @@ public final class RoboTest {
     static void checkVMTest(final String test,
                             final double no,
                             final String name) {
-        for (final Host host : cluster.getHosts()) {
+        for (final Host host : getClusterHosts()) {
             if (abortWithMouseMovement()) {
                 return;
             }
@@ -1805,7 +1805,7 @@ public final class RoboTest {
     }
 
     static void resetTerminalAreas() {
-        for (final Host h : cluster.getHosts()) {
+        for (final Host h : getClusterHosts()) {
             if (!aborted) {
                 h.getTerminalPanel().resetTerminalArea();
             }
@@ -1814,7 +1814,7 @@ public final class RoboTest {
 
     public static void info(final String text) {
         if (cluster != null) {
-            for (final Host h : cluster.getHosts()) {
+            for (final Host h : getClusterHosts()) {
                 h.getTerminalPanel().addCommandOutput(text + '\n');
             }
         }
@@ -1980,5 +1980,9 @@ public final class RoboTest {
             return 160;
         }
         return y;
+    }
+    
+    private static List<Host> getClusterHosts() {
+       return new ArrayList<Host>(cluster.getHosts());
     }
 }
