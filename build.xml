@@ -124,7 +124,6 @@
 		 target="1.6"
 		>
 		  <classpath>
-		   <pathelement location="${buildlib.dir}/jmockit-0.999.15.jar"/>
 		   <pathelement location="${buildlib.dir}/junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
@@ -164,7 +163,6 @@
 		   <pathelement location="${buildlib.dir}/vecmath.jar"/>
 		   <pathelement location="/usr/share/java/xml-commons-apis.jar"/>
 		   <pathelement location="/usr/share/java/xerces-j2.jar"/>
-		   <pathelement location="${buildlib.dir}/jmockit-0.999.15.jar"/>
 		   <pathelement location="${buildlib.dir}/junit.jar"/>
 		  </classpath>
 		  <compilerarg value="-g"/> 
@@ -330,7 +328,6 @@
 			<jvmarg value="-Dtest.rsa=${rsa}"/>
 			<classpath>
 				<pathelement path="${classes.dir}"/>
-				<pathelement location="${buildlib.dir}/jmockit-0.999.15.jar"/>
 				<pathelement location="${buildlib.dir}/junit.jar"/>
 			</classpath>
 		</java>
