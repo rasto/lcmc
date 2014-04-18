@@ -39,7 +39,7 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class BlockDevice extends Resource {
+public class BlockDevice extends Resource {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(BlockDevice.class);
