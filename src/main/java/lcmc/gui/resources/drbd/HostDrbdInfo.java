@@ -60,7 +60,7 @@ import lcmc.utilities.UpdatableItem;
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-public final class HostDrbdInfo extends Info {
+public class HostDrbdInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(HostDrbdInfo.class);

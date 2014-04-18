@@ -79,7 +79,7 @@ import lcmc.utilities.Unit;
  * @version $Id$
  *
  */
-public final class Host implements Comparable<Host>, Value {
+public class Host implements Comparable<Host>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     /** Name of the host. */

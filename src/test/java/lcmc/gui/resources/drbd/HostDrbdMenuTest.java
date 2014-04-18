@@ -1,12 +1,11 @@
 package lcmc.gui.resources.drbd;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import lcmc.data.Cluster;
 import lcmc.data.Host;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
@@ -15,22 +14,41 @@ import lcmc.utilities.UpdatableItem;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class HostDrbdMenuTest {
-    
+    static {
+        Tools.init();
+    }
+
     private HostDrbdMenu hostDrbdMenu;
+
+    @Mock
+    private Host hostStub;
+    @Mock
+    private HostDrbdInfo hostDrbdInfoStub;
+    @Mock
+    private HostBrowser hostBrowserStub;
+    @Mock
+    private ClusterBrowser clusterBrowserStub;
+
+    @Mock
+    private Host hostNoClusterStub;
+    @Mock
+    private HostDrbdInfo hostDrbdInfoNoClusterStub;
+    @Mock
+    private HostBrowser hostBrowserNoClusterStub;
 
     @Before
     public void setUp() {
-        Tools.init();
-
-        final Cluster cluster = new Cluster();
-        final Host host = new Host();
-        host.setCluster(cluster);
-        cluster.createClusterBrowser();
-        final HostDrbdInfo hostDrbdInfo =
-                                     new HostDrbdInfo(host, host.getBrowser());
-        hostDrbdMenu = new HostDrbdMenu(host, hostDrbdInfo);
+        when(hostDrbdInfoStub.getBrowser()).thenReturn(hostBrowserStub);
+        when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
+        hostDrbdMenu = new HostDrbdMenu(hostStub, hostDrbdInfoStub);
     }
 
     @Test
@@ -44,11 +62,12 @@ public class HostDrbdMenuTest {
     @Test
     @Category(GuiTest.class)
     public void menuWithOrWithoutClusterShoulBeTheSameSize() {
-        final Host host = new Host();
-        final HostDrbdInfo hostDrbdInfo =
-                                      new HostDrbdInfo(host, host.getBrowser());
+        when(hostDrbdInfoNoClusterStub.getBrowser())
+                                         .thenReturn(hostBrowserNoClusterStub);
+
         final HostDrbdMenu hostDrbdMenuNoCluster =
-                                           new HostDrbdMenu(host, hostDrbdInfo);
+                                    new HostDrbdMenu(hostNoClusterStub,
+                                                     hostDrbdInfoNoClusterStub);
         final List<UpdatableItem> itemsWithCluster =
                                                  hostDrbdMenu.getPulldownMenu();
 

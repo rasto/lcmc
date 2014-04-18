@@ -68,7 +68,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version $Id$
  *
  */
-public final class HostBrowser extends Browser {
+public class HostBrowser extends Browser {
     /** Net interfaces node in the menu. */
     private DefaultMutableTreeNode netInterfacesNode;
     /** Block devices sytems node in the menu. */
