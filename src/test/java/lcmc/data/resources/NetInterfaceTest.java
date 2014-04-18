@@ -27,6 +27,7 @@ import static org.junit.Assert.fail;
 import java.net.UnknownHostException;
 
 import lcmc.testutils.TestUtils;
+import lcmc.utilities.Tools;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public final class NetInterfaceTest {
     @Before
     public void setUp() {
         testSuite.initStdout();
-        testSuite.initMain();
+        Tools.init();
     }
 
     @Test
