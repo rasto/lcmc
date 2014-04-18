@@ -21,28 +21,13 @@
  */
 package lcmc.gui.resources.drbd;
 
-import lcmc.Exceptions;
-import lcmc.ProxyHostWizard;
-import lcmc.AddDrbdConfigDialog;
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.widget.Widget;
-import lcmc.data.resources.Resource;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.MyMenuItem;
-import lcmc.configs.AppDefaults;
-import lcmc.gui.dialog.cluster.DrbdLogs;
-
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.event.ActionListener;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,23 +37,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.net.UnknownHostException;
+import java.util.regex.Pattern;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import lcmc.EditClusterDialog;
+import lcmc.AddDrbdConfigDialog;
+import lcmc.Exceptions;
+import lcmc.configs.AppDefaults;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.DRBDtestData;
+import lcmc.data.DrbdXML;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.Resource;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Check;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -82,14 +83,16 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     private BlockDevInfo selectedBD = null;
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
+
+    private GlobalMenu globalMenu;
     /** Common proxy section. */
     private static final String SECTION_COMMON_PROXY = "proxy";
 
     /** DRBD icon. */
     private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
                              Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
-    /** Device thath matches all drbd devices in the log. */
-    private static final String ALL_LOGS_PATTERN = "/dev/drbd[0-9]*";
+    /** Device that matches all drbd devices in the log. */
+    static final String ALL_LOGS_PATTERN = "/dev/drbd[0-9]*";
     /** Icon of the cluster. */
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
@@ -99,6 +102,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         super(name, browser);
         setResource(new Resource(name));
         ((ClusterBrowser) browser).getDrbdGraph().setDrbdInfo(this);
+        globalMenu = new GlobalMenu(this);
     }
 
     /** Sets stored parameters. */
@@ -965,90 +969,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-
-        /** Add proxy host */
-        final UpdatableItem addProxyHostMenu = new MyMenuItem(
-                Tools.getString("GlobalInfo.AddProxyHost"),
-                null,
-                Tools.getString("GlobalInfo.AddProxyHost"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                addProxyHostWizard();
-            }
-        };
-        items.add(addProxyHostMenu);
-
-        /* cluster wizard */
-        final UpdatableItem clusterWizardItem =
-            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
-                           CLUSTER_ICON,
-                           null,
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    final EditClusterDialog dialog =
-                              new EditClusterDialog(getBrowser().getCluster());
-                    dialog.showDialogs();
-                }
-            };
-        items.add(clusterWizardItem);
-
-        /* Rescan LVM */
-        final UpdatableItem rescanLvmItem =
-            new MyMenuItem(Tools.getString("GlobalInfo.RescanLvm"),
-                           null, /* icon */
-                           null,
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    getBrowser().updateHWInfo(Host.UPDATE_LVM);
-                }
-            };
-        items.add(rescanLvmItem);
-
-
-        /* view log */
-        final UpdatableItem viewLogMenu = new MyMenuItem(
-                           Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                           LOGFILE_ICON,
-                           null,
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                hidePopup();
-                final DrbdLogs l = new DrbdLogs(getCluster(), ALL_LOGS_PATTERN);
-                l.showDialog();
-            }
-        };
-        items.add(viewLogMenu);
-        return items;
-    }
-
-    private void addProxyHostWizard() {
-        final Host proxyHost = new Host();
-        proxyHost.setCluster(getCluster());
-        final ProxyHostWizard w = new ProxyHostWizard(proxyHost, null);
-        w.showDialogs();
+        return globalMenu.getPulldownMenu();
     }
 
     /** Reset info panel. */
