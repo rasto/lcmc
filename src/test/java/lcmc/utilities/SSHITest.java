@@ -1,7 +1,7 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 
 import org.junit.Before;
@@ -11,7 +11,7 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class SSHITest {
 
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
 
     @Before
     public void setUp() {

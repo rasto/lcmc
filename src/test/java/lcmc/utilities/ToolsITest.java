@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 
 import lcmc.data.Host;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 
 import org.junit.Before;
@@ -21,7 +21,7 @@ public final class ToolsITest {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
 
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
     @Before
     public void setUp() {
         testSuite.initStdout();

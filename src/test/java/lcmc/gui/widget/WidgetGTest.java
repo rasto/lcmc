@@ -4,7 +4,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.GuiTest;
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +14,7 @@ import org.junit.experimental.categories.Category;
 
 @Category(GuiTest.class)
 public final class WidgetGTest {
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
 
     private Widget widget;
     @Before

@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +18,7 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class ResourceInfoITest {
 
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
 
     @Before
     public void setUp() {

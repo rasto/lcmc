@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.GuiTest;
 
 import org.junit.Before;
@@ -14,7 +14,7 @@ import org.junit.experimental.categories.Category;
 
 @Category(GuiTest.class)
 public final class ToolsGTest {
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
     @Before
     public void setUp() {
         testSuite.initMain();

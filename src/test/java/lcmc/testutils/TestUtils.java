@@ -49,7 +49,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
-public class TestSuite1 {
+public class TestUtils {
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
     public static final String PASSWORD;
     static {
@@ -209,15 +209,13 @@ public class TestSuite1 {
                     + host.getName());
             }
         }
-        //if (!Tools.getApplication().existsCluster(cluster)) {
-            Tools.getApplication().addClusterToClusters(cluster);
-            Tools.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.getGUIData().addClusterTab(cluster);
-                }
-            });
-        //}
+        Tools.getApplication().addClusterToClusters(cluster);
+        Tools.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                Tools.getGUIData().addClusterTab(cluster);
+            }
+        });
         
         Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
         final String saveFile = Tools.getApplication().getSaveFile();

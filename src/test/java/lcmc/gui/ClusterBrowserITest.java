@@ -8,7 +8,7 @@ import java.util.concurrent.CountDownLatch;
 
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
@@ -21,7 +21,7 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class ClusterBrowserITest {
 
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
 
     @Before
     public void setUp() {

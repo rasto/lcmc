@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
@@ -43,7 +43,7 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class HostITest {
 
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
 
     @Before
     public void setUp() {
@@ -128,7 +128,7 @@ public final class HostITest {
         for (final Host host : getHosts()) {
             assertTrue(host.getNetInterfaces().length > 0);
             assertNotNull(host.getNetInterfaces()[0]);
-            assertTrue(TestSuite1.noValueIsNull(host.getNetInterfaces()));
+            assertTrue(TestUtils.noValueIsNull(host.getNetInterfaces()));
         }
     }
 
@@ -136,7 +136,7 @@ public final class HostITest {
     public void testGetBridges() {
         for (final Host host : getHosts()) {
             assertTrue(host.getBridges().size() >= 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getBridges()));
+            assertTrue(TestUtils.noValueIsNull(host.getBridges()));
         }
     }
 
@@ -144,7 +144,7 @@ public final class HostITest {
     public void testGetBlockDevices() {
         for (final Host host : getHosts()) {
             assertTrue(host.getBlockDevices().length > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getBlockDevices()));
+            assertTrue(TestUtils.noValueIsNull(host.getBlockDevices()));
         }
     }
 
@@ -152,7 +152,7 @@ public final class HostITest {
     public void testGetBlockDeviceNames() {
         for (final Host host : getHosts()) {
             assertTrue(host.getBlockDevicesNames().size() > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getBlockDevicesNames()));
+            assertTrue(TestUtils.noValueIsNull(host.getBlockDevicesNames()));
             for (final String bd : host.getBlockDevicesNames()) {
                 assertTrue(host.getBlockDevice(bd) != null);
             }
@@ -165,7 +165,7 @@ public final class HostITest {
         for (final Host host : getHosts()) {
             otherBlockDevices =
                     host.getBlockDevicesNamesIntersection(otherBlockDevices);
-            assertTrue(TestSuite1.noValueIsNull(otherBlockDevices));
+            assertTrue(TestUtils.noValueIsNull(otherBlockDevices));
         }
         if (testSuite.getHosts().size() > 0) {
             assertNotNull(otherBlockDevices);
@@ -199,7 +199,7 @@ public final class HostITest {
         for (final Host host : getHosts()) {
             final List<String> ips = host.getIpsFromNetwork("192.168.133.0");
             assertTrue(!ips.isEmpty());
-            assertTrue(TestSuite1.noValueIsNull(ips));
+            assertTrue(TestUtils.noValueIsNull(ips));
             for (final String ip : ips) {
                 assertTrue(ip.startsWith("192.168.133."));
             }
@@ -210,10 +210,10 @@ public final class HostITest {
     public void testGetFileSystems() {
         for (final Host host : getHosts()) {
             assertTrue(host.getFileSystems().length > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getFileSystems()));
+            assertTrue(TestUtils.noValueIsNull(host.getFileSystems()));
 
             assertTrue(host.getFileSystemsList().size() > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getFileSystemsList()));
+            assertTrue(TestUtils.noValueIsNull(host.getFileSystemsList()));
         }
     }
 
@@ -221,7 +221,7 @@ public final class HostITest {
     public void testGetCryptoModules() {
         for (final Host host : getHosts()) {
             assertTrue(host.getCryptoModules().size() > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getCryptoModules()));
+            assertTrue(TestUtils.noValueIsNull(host.getCryptoModules()));
         }
     }
 
@@ -229,7 +229,7 @@ public final class HostITest {
     public void testGetQemuKeymaps() {
         for (final Host host : getHosts()) {
             assertTrue(host.getQemuKeymaps().size() >= 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getQemuKeymaps()));
+            assertTrue(TestUtils.noValueIsNull(host.getQemuKeymaps()));
         }
     }
 
@@ -237,7 +237,7 @@ public final class HostITest {
     public void testGetCPUMapsModels() {
         for (final Host host : getHosts()) {
             assertTrue(host.getCPUMapModels().size() > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getCPUMapModels()));
+            assertTrue(TestUtils.noValueIsNull(host.getCPUMapModels()));
         }
     }
 
@@ -245,7 +245,7 @@ public final class HostITest {
     public void testGetCPUMapVendor() {
         for (final Host host : getHosts()) {
             assertTrue(host.getCPUMapVendors().size() > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getCPUMapVendors()));
+            assertTrue(TestUtils.noValueIsNull(host.getCPUMapVendors()));
         }
     }
 
@@ -253,7 +253,7 @@ public final class HostITest {
     public void testGetMountPointsList() {
         for (final Host host : getHosts()) {
             assertTrue(host.getMountPointsList().size() > 0);
-            assertTrue(TestSuite1.noValueIsNull(host.getMountPointsList()));
+            assertTrue(TestUtils.noValueIsNull(host.getMountPointsList()));
         }
     }
 

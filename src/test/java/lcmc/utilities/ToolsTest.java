@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 
 import lcmc.Exceptions;
 import lcmc.data.Host;
-import lcmc.testutils.TestSuite1;
+import lcmc.testutils.TestUtils;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,7 +30,7 @@ public final class ToolsTest {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ToolsTest.class);
 
-    private final TestSuite1 testSuite = new TestSuite1();
+    private final TestUtils testSuite = new TestUtils();
 
     @Before
     public void setUp() {
@@ -57,7 +57,7 @@ public final class ToolsTest {
     @Test
     public void testInfo() {
         LOG.info("info a");
-        assertEquals(TestSuite1.INFO_STRING + "info a\n",
+        assertEquals(TestUtils.INFO_STRING + "info a\n",
                      testSuite.getStdout());
         testSuite.clearStdout();
     }
@@ -99,7 +99,7 @@ public final class ToolsTest {
     public void testAppWarning() {
         LOG.appWarning("warning a");
         if (Tools.getDefault("AppWarning").equals("y")) {
-            assertEquals(TestSuite1.APPWARNING_STRING + "warning a\n",
+            assertEquals(TestUtils.APPWARNING_STRING + "warning a\n",
                          testSuite.getStdout());
         }
         testSuite.clearStdout();
@@ -225,7 +225,7 @@ public final class ToolsTest {
                                           null,
                                           false,
                                           false));
-        assertEquals(TestSuite1.APPWARNING_STRING
+        assertEquals(TestUtils.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined\n",
                      testSuite.getStdout());
         testSuite.clearStdout();
@@ -238,9 +238,9 @@ public final class ToolsTest {
                                           null,
                                           false,
                                           false));
-        assertEquals(TestSuite1.APPWARNING_STRING
+        assertEquals(TestUtils.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined2\n"
-                     + TestSuite1.APPWARNING_STRING
+                     + TestUtils.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined3\n",
                      testSuite.getStdout());
         testSuite.clearStdout();
@@ -288,7 +288,7 @@ public final class ToolsTest {
                                           ccc,
                                           false,
                                           false));
-        assertEquals(TestSuite1.APPWARNING_STRING
+        assertEquals(TestUtils.APPWARNING_STRING
                      + "getDistCommand: unknown command: undefined4\n",
                      testSuite.getStdout());
         testSuite.clearStdout();
