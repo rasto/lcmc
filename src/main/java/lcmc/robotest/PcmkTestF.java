@@ -39,8 +39,6 @@ import static lcmc.robotest.RoboTest.setTimeouts;
 import static lcmc.robotest.RoboTest.slowFactor;
 import static lcmc.robotest.RoboTest.stopResource;
 import static lcmc.robotest.RoboTest.typeDummy;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -49,9 +47,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class PcmkTestF {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTestF.class);
-
     /** Cloned group. */
     static void start(final Cluster cluster, final int count) {
         slowFactor = 0.2f;

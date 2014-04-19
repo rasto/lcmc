@@ -40,8 +40,6 @@ import static lcmc.robotest.RoboTest.press;
 import static lcmc.robotest.RoboTest.rightClick;
 import static lcmc.robotest.RoboTest.sleep;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -50,9 +48,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class DrbdTest4 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(DrbdTest4.class);
-
     static void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
         slowFactor = 0.2f;

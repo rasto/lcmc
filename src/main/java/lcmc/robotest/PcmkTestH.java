@@ -34,8 +34,6 @@ import static lcmc.robotest.RoboTest.removeResource;
 import static lcmc.robotest.RoboTest.rightClick;
 import static lcmc.robotest.RoboTest.robot;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -44,9 +42,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class PcmkTestH {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTestH.class);
-
     /** Create ipmi resource. */
     private static void chooseIpmi(final int x, final int y, final boolean apply) {
         moveTo(x, y);

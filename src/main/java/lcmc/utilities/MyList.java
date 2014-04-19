@@ -97,7 +97,7 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         if (text == null) {
             return;
         }
-        if (text != null && text.isEmpty()) {
+        if (text.isEmpty()) {
             text = " "; /* can't be "" */
         }
         super.setToolTipText(text);

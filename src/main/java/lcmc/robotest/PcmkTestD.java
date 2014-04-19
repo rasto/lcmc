@@ -29,8 +29,6 @@ import static lcmc.robotest.RoboTest.leftClick;
 import static lcmc.robotest.RoboTest.moveTo;
 import static lcmc.robotest.RoboTest.removeResource;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -38,9 +36,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class PcmkTestD {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTestD.class);
-
     /** Pacemaker Leak tests. */
     static void start(final int count) {
         slowFactor = 0.2f;

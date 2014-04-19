@@ -181,7 +181,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    private final void updateToolTip() {
+    private void updateToolTip() {
         final String toolTipText = "<html>" + simulationToolTip + "<br>"
                             + checkToolTip + "</html>";
         if (toolTip != null && robot != null && toolTip.isShowing()) {
@@ -267,7 +267,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         final Shape rf2 = new Rectangle2D.Float(0.0f, 0.0f, getWidth(),
                 getHeight());
         final Shape rf1 = new Rectangle2D.Float(3.0f, getHeight() * 0.5f,
-                (float) getWidth() - 6, (float) (getHeight() * 0.5 - 3));
+                getWidth() - 6, (float) (getHeight() * 0.5 - 3));
         g2.setPaint(gp2);
         g2.fill(rf2);
         g2.setPaint(gp1);

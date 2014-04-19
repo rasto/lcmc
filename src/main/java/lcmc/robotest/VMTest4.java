@@ -33,8 +33,6 @@ import static lcmc.robotest.RoboTest.moveTo;
 import static lcmc.robotest.RoboTest.press;
 import static lcmc.robotest.RoboTest.sleep;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -42,9 +40,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class VMTest4 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(VMTest4.class);
-
     /** Cluster wizard locked until focus is lost. */
     static void start(final String vmTest, final int count) {
         slowFactor = 0.1f;

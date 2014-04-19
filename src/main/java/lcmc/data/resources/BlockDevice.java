@@ -143,7 +143,7 @@ public class BlockDevice extends Resource {
     }
 
     /** Updates the block device. */
-    public void update(final String line) {
+    public final void update(final String line) {
         final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
         if (cols.length < 2) {

@@ -31,8 +31,6 @@ import static lcmc.robotest.RoboTest.press;
 import static lcmc.robotest.RoboTest.sleep;
 import static lcmc.robotest.RoboTest.sleepNoFactor;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -41,9 +39,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class GUITest1 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(GUITest1.class);
-
     /** Host wizard locked until focus is lost. */
     static void start(final int count) {
         slowFactor = 0.2f;

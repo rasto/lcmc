@@ -34,8 +34,6 @@ import static lcmc.robotest.RoboTest.removePlaceHolder;
 import static lcmc.robotest.RoboTest.rightClick;
 import static lcmc.robotest.RoboTest.slowFactor;
 import static lcmc.robotest.RoboTest.stopEverything;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -44,9 +42,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class PcmkTest4 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTest4.class);
-
     static void start() {
         slowFactor = 0.6f;
         aborted = false;

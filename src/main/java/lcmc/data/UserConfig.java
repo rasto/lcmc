@@ -165,9 +165,7 @@ public final class UserConfig extends XML {
         try {
             t.transform(doms, sr);
         } catch (final TransformerException te) {
-            final IOException ioe = new IOException();
-            ioe.initCause(te);
-            throw ioe;
+            throw new IOException("saveXML: transform failed", te);
         }
         return "";
     }

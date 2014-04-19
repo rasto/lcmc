@@ -276,7 +276,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                ((MComboBox) getInternalComponent()).removeAllItems();
+                getInternalComponent().removeAllItems();
             }
         });
     }
@@ -284,7 +284,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Returns whether component is editable or not. */
     @Override
     public boolean isEditable() {
-        return ((MComboBox) getInternalComponent()).isEditable();
+        return getInternalComponent().isEditable();
     }
 
     /** Set item/value in the component and waits till it is set. */
@@ -344,7 +344,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
         addDocumentListener(getDocument(), wl);
-        ((MComboBox) getInternalComponent()).addItemListener(getItemListener(wl));
+        getInternalComponent().addItemListener(getItemListener(wl));
     }
 
     @Override

@@ -35,8 +35,6 @@ import static lcmc.robotest.RoboTest.resetTerminalAreas;
 import static lcmc.robotest.RoboTest.robot;
 import static lcmc.robotest.RoboTest.slowFactor;
 import static lcmc.robotest.RoboTest.stopResource;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -45,9 +43,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class PcmkTestB {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTestB.class);
-
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;

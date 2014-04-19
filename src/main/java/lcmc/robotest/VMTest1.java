@@ -37,8 +37,6 @@ import static lcmc.robotest.RoboTest.moveToMenu;
 import static lcmc.robotest.RoboTest.press;
 import static lcmc.robotest.RoboTest.rightClick;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -47,9 +45,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class VMTest1 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(VMTest1.class);
-
     static void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "kvm", count);
     }

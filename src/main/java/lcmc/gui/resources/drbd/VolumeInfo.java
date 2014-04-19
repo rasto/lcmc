@@ -547,10 +547,8 @@ public class VolumeInfo extends EditableInfo
                 cb.setDrbdXML(dxml);
             } catch (final Exceptions.DrbdConfigException dce) {
                 LOG.appError("removeMyselfNoConfirm: config failed", dce);
-                return;
             } catch (final UnknownHostException e) {
                 LOG.appError("removeMyselfNoConfirm: config failed", e);
-                return;
             } finally {
                 cb.drbdStatusUnlock();
             }

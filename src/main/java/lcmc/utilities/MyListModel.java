@@ -83,7 +83,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     private class FilterField extends JTextField implements DocumentListener {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
-        public FilterField(final String text) {
+        FilterField(final String text) {
             super(text);
             getDocument().addDocumentListener(this);
         }

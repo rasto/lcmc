@@ -28,8 +28,6 @@ import static lcmc.robotest.RoboTest.leftClick;
 import static lcmc.robotest.RoboTest.moveTo;
 import static lcmc.robotest.RoboTest.sleep;
 import static lcmc.robotest.RoboTest.slowFactor;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
@@ -38,9 +36,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class GUITest2 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(GUITest2.class);
-
     /** Cluster wizard locked until focus is lost. */
     static void start(final int count) {
         slowFactor = 0.2f;
