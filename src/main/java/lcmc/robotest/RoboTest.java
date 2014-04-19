@@ -1490,45 +1490,52 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        final List<Component> res = new ArrayList<Component>();
-        try {
-            findInside(Tools.getGUIData().getMainFrame(),
-                       Class.forName("javax.swing.JScrollPane$ScrollBar"),
-                       res);
-        } catch (final ClassNotFoundException e) {
-            Tools.printStackTrace("can't find the scrollbar");
-            return;
-        }
+
         Component scrollbar = null;
-        final Component app = Tools.getGUIData().getMainFrameContentPane();
-        final int mX =
-                  (int) app.getLocationOnScreen().getX() + app.getWidth() / 2;
-        final int mY =
-                  (int) app.getLocationOnScreen().getY() + app.getHeight() / 2;
         int scrollbarX = 0;
         int scrollbarY = 0;
-        for (final Component c : res) {
-            final Point2D p = c.getLocationOnScreen();
-            final int pX = (int) p.getX();
-            final int pY = (int) p.getY();
-            if (pX > mX && pY < mY) {
-                scrollbar = c;
-                scrollbarX = pX + c.getWidth() / 2;
-                scrollbarY = pY + c.getHeight() / 2;
+        int i = 0;
+        do {
+            final List<Component> res = new ArrayList<Component>();
+            try {
+                findInside(Tools.getGUIData().getMainFrame(),
+                           Class.forName("javax.swing.JScrollPane$ScrollBar"),
+                           res);
+            } catch (final ClassNotFoundException e) {
+                Tools.printStackTrace("can't find the scrollbar");
+                return;
             }
-        }
+            final Component app = Tools.getGUIData().getMainFrameContentPane();
+            final int mX =
+                      (int) app.getLocationOnScreen().getX() + app.getWidth() / 2;
+            final int mY =
+                      (int) app.getLocationOnScreen().getY() + app.getHeight() / 2;
+            for (final Component c : res) {
+                final Point2D p = c.getLocationOnScreen();
+                final int pX = (int) p.getX();
+                final int pY = (int) p.getY();
+                if (pX > mX && pY < mY) {
+                    scrollbar = c;
+                    scrollbarX = pX + c.getWidth() / 2;
+                    scrollbarY = pY + c.getHeight() / 2;
+                }
+            }
+            if (i > 3) {
+                break;
+            }
+            i++;
+        } while (scrollbar == null);
         if (scrollbar == null) {
             Tools.printStackTrace("can't find the scrollbar");
-        } else {
-            moveToAbs(scrollbarX, scrollbarY);
-            leftPress();
-            if (down) {
-                moveToAbs(scrollbarX, scrollbarY + delta);
-            } else {
-                moveToAbs(scrollbarX, scrollbarY - delta);
-            }
-            leftRelease();
         }
+        moveToAbs(scrollbarX, scrollbarY);
+        leftPress();
+        if (down) {
+            moveToAbs(scrollbarX, scrollbarY + delta);
+        } else {
+            moveToAbs(scrollbarX, scrollbarY - delta);
+        }
+        leftRelease();
     }
 
     private static Component getFocusedWindow() {
@@ -1835,13 +1842,26 @@ public final class RoboTest {
     public static void findInside(final Component component,
                                   final Class<?> clazz,
                                   final List<Component> results) {
+        int i = 0;
+        while (results.isEmpty() && i < 10) {
+            if (i > 0) {
+                Tools.sleep(1000);
+            }
+            findInside0(component, clazz, results);
+            i++;
+        }
+    }
+
+    private static void findInside0(final Component component,
+                                    final Class<?> clazz,
+                                    final List<Component> results) {
         if (component.getClass().equals(clazz)
                    && component.isShowing()) {
             results.add(component);
         }
         if (component instanceof Container) {
             for (final Component c : ((Container) component).getComponents()) {
-                findInside(c, clazz, results);
+                findInside0(c, clazz, results);
             }
         }
     }
