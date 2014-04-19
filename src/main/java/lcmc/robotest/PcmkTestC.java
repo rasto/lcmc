@@ -21,10 +21,22 @@
 package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Tools;
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+import static lcmc.robotest.RoboTest.checkTest;
+import static lcmc.robotest.RoboTest.disableStonith;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.removeResource;
+import static lcmc.robotest.RoboTest.resetTerminalAreas;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.robot;
+import static lcmc.robotest.RoboTest.slowFactor;
+import static lcmc.robotest.RoboTest.stopResource;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class is used to test the GUI.

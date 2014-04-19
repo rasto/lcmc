@@ -23,40 +23,43 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.Heartbeat;
-import lcmc.utilities.Openais;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.SSH;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.ExecCallback;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.ArrayList;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JLabel;
-import javax.swing.JComponent;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.Color;
-import javax.swing.border.TitledBorder;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
-import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import javax.swing.border.TitledBorder;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
-
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Corosync;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Openais;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.

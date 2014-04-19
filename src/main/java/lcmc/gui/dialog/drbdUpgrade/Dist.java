@@ -23,8 +23,8 @@
 package lcmc.gui.dialog.drbdUpgrade;
 
 import lcmc.data.Host;
-import lcmc.gui.dialog.host.DrbdLinbitAvailPackages;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.dialog.host.DrbdLinbitAvailPackages;
 
 /**
  * An implementation of a dialog where user can choose a distribution of the

@@ -21,10 +21,10 @@
 
 package lcmc.gui.resources.drbd;
 
+import lcmc.data.Host;
+import lcmc.data.resources.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
-import lcmc.data.resources.NetInterface;
-import lcmc.data.Host;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.

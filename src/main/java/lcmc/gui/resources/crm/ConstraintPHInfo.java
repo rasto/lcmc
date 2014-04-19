@@ -22,24 +22,22 @@
 
 package lcmc.gui.resources.crm;
 
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.data.Host;
-import lcmc.data.CRMXML;
-import lcmc.data.ClusterStatus;
-import lcmc.data.Application;
-import lcmc.data.Subtext;
-import lcmc.data.AccessMode;
-
-import javax.swing.JComponent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import javax.swing.JComponent;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
+import lcmc.data.Subtext;
 import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;

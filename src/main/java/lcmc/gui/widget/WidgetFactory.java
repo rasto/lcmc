@@ -20,14 +20,13 @@
 
 package lcmc.gui.widget;
 
-import lcmc.data.Value;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Unit;
-import lcmc.data.AccessMode;
 import java.util.Map;
-
+import lcmc.data.AccessMode;
+import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Unit;
 
 /**
  * @author Rasto Levrinc

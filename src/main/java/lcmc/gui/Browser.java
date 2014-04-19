@@ -22,15 +22,16 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.CategoryInfo;
-
-import javax.swing.JSplitPane;
-import javax.swing.JComponent;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.ImageIcon;
-import javax.swing.JTree;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,17 +39,12 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import lcmc.data.Application;
-
+import lcmc.gui.resources.CategoryInfo;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows

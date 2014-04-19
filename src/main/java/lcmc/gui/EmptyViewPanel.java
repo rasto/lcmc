@@ -22,27 +22,23 @@
 
 package lcmc.gui;
 
-import lcmc.AddClusterDialog;
-import lcmc.AddHostDialog;
-import lcmc.utilities.Tools;
-import lcmc.utilities.AllHostsUpdatable;
-import lcmc.utilities.MyButton;
-import lcmc.data.Host;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-
-import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.CardLayout;
-
-import java.awt.event.ActionListener;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-
+import java.awt.event.ActionListener;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import lcmc.AddClusterDialog;
+import lcmc.AddHostDialog;
+import lcmc.data.Host;
+import lcmc.utilities.AllHostsUpdatable;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.

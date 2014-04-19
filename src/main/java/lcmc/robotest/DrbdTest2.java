@@ -21,11 +21,23 @@
 package lcmc.robotest;
 
 import lcmc.data.Cluster;
-import static lcmc.robotest.RoboTest.*;
-import static lcmc.robotest.DrbdTest1.*;
-import lcmc.utilities.Tools;
+import static lcmc.robotest.DrbdTest1.addBlockDevice;
+import static lcmc.robotest.DrbdTest1.addDrbdResource;
+import static lcmc.robotest.DrbdTest1.addDrbdVolume;
+import static lcmc.robotest.DrbdTest1.addFileSystem;
+import static lcmc.robotest.DrbdTest1.addMetaData;
+import static lcmc.robotest.DrbdTest1.chooseDrbdResource;
+import static lcmc.robotest.DrbdTest1.removeDrbdVolume;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkDRBDTest;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class is used to test the GUI.

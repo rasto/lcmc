@@ -22,7 +22,6 @@
 
 package lcmc.testutils;
 
-import static org.junit.Assert.assertEquals;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,12 +34,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.gui.TerminalPanel;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import static org.junit.Assert.assertEquals;
 
 /**
  * This class provides tools for testing.

@@ -21,13 +21,13 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.Host;
-import lcmc.data.resources.Service;
-import lcmc.gui.widget.Widget;
 import java.util.Map;
 import javax.swing.JPanel;
 import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.resources.Service;
 import lcmc.gui.widget.Check;
+import lcmc.gui.widget.Widget;
 
 /**
  * Interface for either order or colocation constraint.

@@ -22,13 +22,13 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
-import lcmc.gui.dialog.WizardDialog;
 import java.awt.Color;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.data.Cluster;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.utilities.Tools;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish

@@ -1,17 +1,13 @@
 package lcmc.utilities;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Map;
-
 import javax.swing.JCheckBox;
-
 import lcmc.data.Host;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

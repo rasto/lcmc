@@ -34,21 +34,20 @@ import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Http;
-import lcmc.gui.ClusterBrowser;
-import lcmc.data.ClusterStatus;
-import lcmc.data.DrbdXML;
-import lcmc.data.VMSXML;
-import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import lcmc.data.Cluster;
+import lcmc.data.ClusterStatus;
+import lcmc.data.DrbdXML;
 import lcmc.data.Host;
-
+import lcmc.data.VMSXML;
+import lcmc.gui.ClusterBrowser;
+import lcmc.utilities.Http;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a bug report dialog.

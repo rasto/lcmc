@@ -21,24 +21,8 @@
  */
 package lcmc.gui.resources.vms;
 
-import lcmc.gui.Browser;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.VMSXML;
-import lcmc.data.VMSXML.DiskData;
-import lcmc.data.Host;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,14 +34,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
+import lcmc.data.VMSXML.DiskData;
 import lcmc.data.Value;
-
-import org.w3c.dom.Node;
-
+import lcmc.gui.Browser;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Disks.

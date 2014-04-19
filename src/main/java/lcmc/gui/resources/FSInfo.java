@@ -21,15 +21,13 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
-
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
-
 import lcmc.data.Application;
+import lcmc.gui.Browser;
+import lcmc.gui.HostBrowser;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info data for a filesystem.

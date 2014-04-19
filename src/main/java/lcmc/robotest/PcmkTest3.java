@@ -20,13 +20,25 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
 import java.awt.event.KeyEvent;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import lcmc.utilities.Tools;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkNumberOfVertices;
+import static lcmc.robotest.RoboTest.checkTest;
+import static lcmc.robotest.RoboTest.disableStonith;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.removeEverything;
+import static lcmc.robotest.RoboTest.resetTerminalAreas;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.slowFactor;
+import static lcmc.robotest.RoboTest.stopEverything;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class is used to test the GUI.

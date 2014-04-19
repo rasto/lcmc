@@ -3,9 +3,7 @@ package lcmc.gui.resources.drbd;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import javax.swing.Action;
-
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.utilities.MyMenu;

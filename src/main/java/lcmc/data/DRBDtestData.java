@@ -22,10 +22,10 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.utilities.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**

@@ -21,20 +21,8 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.CRM;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyList;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.MyListModel;
-import lcmc.utilities.ButtonCallback;
-
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,23 +31,38 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-
-import javax.swing.JDialog;
-import javax.swing.ImageIcon;
-import javax.swing.JMenuItem;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JCheckBox;
-
-import java.awt.geom.Point2D;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import java.util.regex.Matcher;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.tree.DefaultMutableTreeNode;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.ResourceAgent;
+import lcmc.data.Subtext;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Check;
-import lcmc.utilities.MyButton;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.MyList;
+import lcmc.utilities.MyListModel;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways

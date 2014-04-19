@@ -21,30 +21,11 @@
  */
 package lcmc.gui.resources.vms;
 
-import lcmc.AddVMConfigDialog;
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.CategoryInfo;
-import lcmc.gui.resources.Info;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.UpdatableItem;
-
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.tree.DefaultMutableTreeNode;
-
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +34,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import javax.swing.AbstractButton;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.tree.DefaultMutableTreeNode;
+import lcmc.AddVMConfigDialog;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.VMSXML;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.HostBrowser;
+import lcmc.gui.resources.CategoryInfo;
+import lcmc.gui.resources.Info;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class shows a list of virtual machines.

@@ -23,13 +23,12 @@
 package lcmc.gui;
 
 import java.util.TreeSet;
-import lcmc.utilities.Tools;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.gui.resources.AllHostsInfo;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.gui.resources.AllHostsInfo;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow

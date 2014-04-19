@@ -22,12 +22,12 @@
 
 package lcmc.utilities;
 
+import java.awt.Color;
+import java.awt.Component;
 import javax.swing.AbstractButton;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
-import java.awt.Component;
-import java.awt.Color;
 
 /**
  * Cells with jlabels, widths and colors.

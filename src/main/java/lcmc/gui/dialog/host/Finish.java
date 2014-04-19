@@ -22,19 +22,18 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.data.Host;
-import lcmc.AddClusterDialog;
-import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Dimension;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.AddClusterDialog;
+import lcmc.data.Host;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * Host finish dialog with buttons to configure next host or configure the

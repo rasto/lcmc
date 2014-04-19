@@ -21,43 +21,16 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.EditableInfo;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.widget.TextfieldWithUnit;
-
-import java.awt.geom.Point2D;
-
-import lcmc.data.resources.Service;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.Unit;
-import lcmc.utilities.Tools;
-import lcmc.utilities.CRM;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.MyList;
-import lcmc.utilities.MyListModel;
-import lcmc.utilities.WidgetListener;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.dialog.pacemaker.ServiceLogs;
-import lcmc.gui.dialog.EditConfig;
-
-import java.awt.Color;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Dimension;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -69,32 +42,62 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.BoxLayout;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JMenuBar;
-import javax.swing.JScrollPane;
-import javax.swing.JCheckBox;
-import javax.swing.SpringLayout;
-import javax.swing.AbstractButton;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
-
+import java.util.regex.Matcher;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import javax.swing.tree.DefaultMutableTreeNode;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.HostLocation;
+import lcmc.data.PtestData;
+import lcmc.data.ResourceAgent;
+import lcmc.data.StringValue;
+import lcmc.data.Subtext;
+import lcmc.data.Value;
+import lcmc.data.resources.Service;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.EditConfig;
+import lcmc.gui.dialog.pacemaker.ServiceLogs;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Check;
+import lcmc.gui.widget.TextfieldWithUnit;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyList;
+import lcmc.utilities.MyListModel;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.WidgetListener;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class holds info data for one hearteat service and allows to enter

@@ -22,39 +22,35 @@
 
 package lcmc.robotest;
 
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.configs.AppDefaults;
-import lcmc.gui.DrbdGraph;
-import lcmc.gui.CRMGraph;
-import lcmc.gui.resources.Info;
-
 import java.awt.AWTException;
-import java.awt.IllegalComponentStateException;
-import java.awt.Robot;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.MouseInfo;
-import java.awt.geom.Point2D;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.IllegalComponentStateException;
+import java.awt.MouseInfo;
+import java.awt.Robot;
 import java.awt.Window;
-
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JCheckBox;
-import javax.swing.JTree;
-import javax.swing.JLabel;
-import javax.swing.AbstractButton;
-
-import java.util.List;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
-
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JTree;
+import lcmc.configs.AppDefaults;
 import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.gui.CRMGraph;
+import lcmc.gui.DrbdGraph;
+import lcmc.gui.resources.Info;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;

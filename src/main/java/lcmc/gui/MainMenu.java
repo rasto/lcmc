@@ -24,27 +24,16 @@
 package lcmc.gui;
 
 import java.awt.Color;
-
-import lcmc.data.Application;
-import lcmc.utilities.Tools;
-import lcmc.data.AccessMode;
-import lcmc.AddHostDialog;
-import lcmc.AddClusterDialog;
-import lcmc.gui.dialog.About;
-import lcmc.gui.dialog.BugReport;
-import lcmc.data.Host;
-
-import java.awt.event.ActionListener;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-
-import java.util.Map;
+import java.io.File;
 import java.util.HashMap;
-
+import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -62,15 +51,21 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.Border;
-import javax.swing.filechooser.FileFilter;
-import java.io.File;
 import javax.swing.border.LineBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.filechooser.FileFilter;
+import lcmc.AddClusterDialog;
+import lcmc.AddHostDialog;
 import lcmc.Exceptions;
-
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.gui.dialog.About;
+import lcmc.gui.dialog.BugReport;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a menu panel.

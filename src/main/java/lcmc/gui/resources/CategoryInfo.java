@@ -21,14 +21,13 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.BoxLayout;
 import lcmc.data.Application;
+import lcmc.gui.Browser;
 
 
 /**

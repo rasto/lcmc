@@ -25,7 +25,6 @@ package lcmc.data.resources;
 
 import lcmc.data.Application;
 import lcmc.data.StringValue;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

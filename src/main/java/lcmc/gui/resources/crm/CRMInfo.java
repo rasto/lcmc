@@ -22,11 +22,11 @@
 
 package lcmc.gui.resources.crm;
 
-import lcmc.gui.Browser;
-import lcmc.utilities.Tools;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import lcmc.data.Application;
+import lcmc.gui.Browser;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds data that describe the crm as whole.

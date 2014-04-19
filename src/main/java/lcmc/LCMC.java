@@ -26,46 +26,44 @@
  */
 package lcmc;
 
-import lcmc.data.Application;
-import lcmc.gui.MainPanel;
-import lcmc.gui.MainMenu;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.ProgressIndicatorPanel;
-import lcmc.data.HostOptions;
-import lcmc.utilities.Tools;
-import lcmc.robotest.RoboTest;
-import lcmc.configs.AppDefaults;
-
+import java.awt.Container;
+import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.ColorUIResource;
-import javax.swing.JMenuBar;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.Container;
-import java.awt.Image;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.PosixParser;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.HelpFormatter;
-
+import lcmc.configs.AppDefaults;
+import lcmc.data.Application;
+import lcmc.data.HostOptions;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.MainMenu;
+import lcmc.gui.MainPanel;
+import lcmc.gui.ProgressIndicatorPanel;
+import lcmc.robotest.RoboTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.

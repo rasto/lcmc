@@ -22,31 +22,38 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.Unit;
-import lcmc.robotest.RoboTest;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.Exceptions;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.resources.crm.ServicesInfo;
-import lcmc.Exceptions;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-
+import lcmc.robotest.RoboTest;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class parses ocf crm xml, stores information like

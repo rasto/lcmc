@@ -23,24 +23,23 @@
 
 package lcmc.gui;
 
-import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.robotest.RoboTest;
-import lcmc.utilities.SSH;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-
-import javax.swing.event.CaretListener;
-import javax.swing.event.CaretEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.Dimension;
-
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -50,17 +49,13 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-
-import java.awt.Font;
-import java.awt.Color;
-import java.awt.BorderLayout;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
+import lcmc.data.Host;
+import lcmc.robotest.RoboTest;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a terminal panel that show commands and output from

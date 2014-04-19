@@ -20,54 +20,47 @@
 
 package lcmc.gui.widget;
 
-import lcmc.data.Value;
-import lcmc.utilities.Tools;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.WidgetListener;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JRootPane;
-import javax.swing.SwingUtilities;
-import javax.swing.JButton;
-import javax.swing.text.Document;
-import javax.swing.JLabel;
-import javax.swing.Box;
-import javax.swing.SpringLayout;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.BadLocationException;
-
 import java.awt.BorderLayout;
-
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
-import java.awt.Container;
-
-import java.awt.Component;
-
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.ArrayList;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a field where user can enter new value. The

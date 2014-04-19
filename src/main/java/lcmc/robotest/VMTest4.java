@@ -24,7 +24,15 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import lcmc.gui.widget.GenericWidget.MTextField;
-import static lcmc.robotest.RoboTest.*;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.getAppPosition;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.isColor;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

@@ -22,21 +22,24 @@
 
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.Service;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
-import lcmc.data.resources.Service;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.regex.Matcher;
-
-import lcmc.gui.widget.Check;
 
 /**
  * Object that holds a colocation constraint information.

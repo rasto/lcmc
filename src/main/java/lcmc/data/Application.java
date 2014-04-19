@@ -22,20 +22,19 @@
 
 package lcmc.data;
 
-import java.io.IOException;
-import java.io.File;
-import java.util.EnumMap;
-import lcmc.utilities.Tools;
-import lcmc.robotest.RoboTest;
 import ch.ethz.ssh2.KnownHosts;
-import org.apache.commons.collections15.map.MultiKeyMap;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
-
+import java.util.List;
+import java.util.Map;
+import lcmc.robotest.RoboTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * Application

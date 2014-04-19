@@ -23,36 +23,31 @@
 
 package lcmc.gui;
 
-import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTabbedPane;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicTabbedPaneUI;
-
-
-import java.awt.GridLayout;
-import java.awt.Component;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-
-import java.util.Map;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
-
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
+import lcmc.data.Cluster;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,

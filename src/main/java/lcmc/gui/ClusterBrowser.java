@@ -21,27 +21,49 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
-import lcmc.data.PtestData;
-import lcmc.data.DRBDtestData;
-import lcmc.data.Host;
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
 import lcmc.data.Cluster;
 import lcmc.data.ClusterStatus;
-import lcmc.data.CRMXML;
+import lcmc.data.DRBDtestData;
 import lcmc.data.DrbdXML;
+import lcmc.data.Host;
+import lcmc.data.PtestData;
+import lcmc.data.ResourceAgent;
+import lcmc.data.StringValue;
 import lcmc.data.VMSXML;
-import lcmc.data.Application;
-import lcmc.utilities.NewOutputCallback;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Heartbeat;
-import lcmc.utilities.CRM;
-import lcmc.data.resources.Service;
+import lcmc.data.Value;
 import lcmc.data.resources.Network;
+import lcmc.data.resources.Service;
+import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.ClusterHostsInfo;
 import lcmc.gui.resources.CommonBlockDevInfo;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.NetworkInfo;
 import lcmc.gui.resources.crm.AvailableServiceInfo;
 import lcmc.gui.resources.crm.AvailableServicesInfo;
@@ -57,38 +79,22 @@ import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.resources.vms.HardwareInfo;
 import lcmc.gui.resources.vms.VMListInfo;
-import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.data.ResourceAgent;
-import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.ButtonCallback;
-
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.concurrent.CountDownLatch;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-import org.apache.commons.collections15.map.LinkedMap;
-import org.apache.commons.collections15.keyvalue.MultiKey;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import lcmc.utilities.CRM;
+import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.NewOutputCallback;
+import lcmc.utilities.Tools;
+import org.apache.commons.collections15.keyvalue.MultiKey;
+import org.apache.commons.collections15.map.LinkedMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 
 /**

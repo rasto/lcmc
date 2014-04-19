@@ -22,10 +22,18 @@ package lcmc.robotest;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Tools;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.isColor;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.sleepNoFactor;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class is used to test the GUI.

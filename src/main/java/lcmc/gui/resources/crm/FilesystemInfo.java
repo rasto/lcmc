@@ -23,27 +23,24 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import lcmc.data.ResourceAgent;
-import lcmc.data.Host;
-import lcmc.data.AccessMode;
+import java.util.Map;
 import lcmc.configs.DistResource;
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.ResourceAgent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.Browser;
-
-import java.util.Map;
-
-import lcmc.data.Application;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
-import lcmc.gui.widget.Check;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * This class holds info about Filesystem service. It is treated in special

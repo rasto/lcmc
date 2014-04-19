@@ -23,19 +23,7 @@
 
 package lcmc.data;
 
-import lcmc.gui.DrbdGraph;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.ProxyNetInfo;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.SSH;
-import lcmc.Exceptions;
-import lcmc.utilities.Unit;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,16 +33,24 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-import java.math.BigInteger;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-import org.apache.commons.collections15.map.LinkedMap;
-import org.apache.commons.collections15.keyvalue.MultiKey;
-
+import java.util.regex.Pattern;
+import lcmc.Exceptions;
+import lcmc.gui.DrbdGraph;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.ProxyNetInfo;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import org.apache.commons.collections15.keyvalue.MultiKey;
+import org.apache.commons.collections15.map.LinkedMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the

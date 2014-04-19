@@ -23,25 +23,26 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.

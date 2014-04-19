@@ -7,7 +7,6 @@ import lcmc.data.Value;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.GuiTest;
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

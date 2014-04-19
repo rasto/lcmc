@@ -23,21 +23,19 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.MyButton;
-import javax.swing.JProgressBar;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Dimension;
-
-import lcmc.utilities.Tools;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.TitledBorder;
 import lcmc.utilities.CancelCallback;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * This class creates titled pane with progress bar and functions that update

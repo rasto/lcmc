@@ -3,7 +3,6 @@ package lcmc.utilities;
 import lcmc.data.Host;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

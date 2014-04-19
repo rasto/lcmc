@@ -22,28 +22,25 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
+import java.awt.Component;
+import java.net.UnknownHostException;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.Exceptions;
+import lcmc.data.Application;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.ClusterBrowser;
-import lcmc.Exceptions;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.SpringLayout;
-import javax.swing.BoxLayout;
-
-import java.awt.Component;
-import java.net.UnknownHostException;
-
-import lcmc.data.Application;
+import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd block device

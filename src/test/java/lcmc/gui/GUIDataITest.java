@@ -5,7 +5,6 @@ import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.utilities.Tools;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

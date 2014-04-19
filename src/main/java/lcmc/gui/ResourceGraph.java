@@ -22,54 +22,52 @@
 
 package lcmc.gui;
 
-import edu.uci.ics.jung.visualization.renderers.Renderer;
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.Info;
-import lcmc.utilities.MyMenuItem;
-import lcmc.data.Host;
-import lcmc.data.Subtext;
-
+import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
+import edu.uci.ics.jung.algorithms.layout.StaticLayout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Context;
 import edu.uci.ics.jung.graph.util.Pair;
-import edu.uci.ics.jung.visualization.decorators
-                                     .ConstantDirectionalEdgeValueTransformer;
+import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
+import edu.uci.ics.jung.visualization.Layer;
+import edu.uci.ics.jung.visualization.RenderContext;
+import edu.uci.ics.jung.visualization.VisualizationServer;
+import edu.uci.ics.jung.visualization.VisualizationViewer;
+import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
+import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.GraphMouseListener;
+import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
+import edu.uci.ics.jung.visualization.control.ScalingGraphMousePlugin;
+import edu.uci.ics.jung.visualization.control.ViewScalingControl;
+import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
 import edu.uci.ics.jung.visualization.decorators.AbstractVertexShapeTransformer;
+import edu.uci.ics.jung.visualization.decorators.ConstantDirectionalEdgeValueTransformer;
+import edu.uci.ics.jung.visualization.decorators.DirectionalEdgeArrowTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableEdgePaintTransformer;
-import
-     edu.uci.ics.jung.visualization.decorators.DirectionalEdgeArrowTransformer;
 import edu.uci.ics.jung.visualization.decorators.PickableVertexPaintTransformer;
-
+import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
 import edu.uci.ics.jung.visualization.picking.PickedInfo;
 import edu.uci.ics.jung.visualization.picking.PickedState;
-import edu.uci.ics.jung.visualization.control.GraphMouseListener;
-
-import edu.uci.ics.jung.visualization.renderers.BasicVertexRenderer;
-import edu.uci.ics.jung.visualization.VisualizationViewer;
-import edu.uci.ics.jung.visualization.VisualizationServer;
 import edu.uci.ics.jung.visualization.picking.ShapePickSupport;
-import edu.uci.ics.jung.algorithms.layout.StaticLayout;
-import edu.uci.ics.jung.visualization.GraphZoomScrollPane;
-import edu.uci.ics.jung.visualization.RenderContext;
+import edu.uci.ics.jung.visualization.renderers.BasicVertexRenderer;
+import edu.uci.ics.jung.visualization.renderers.Renderer;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-import edu.uci.ics.jung.visualization.control.ModalGraphMouse;
-import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
-import edu.uci.ics.jung.visualization.control.ViewScalingControl;
-import edu.uci.ics.jung.visualization.control.AbstractPopupGraphMousePlugin;
-import edu.uci.ics.jung.visualization.control.ScalingGraphMousePlugin;
-import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
-import edu.uci.ics.jung.visualization.decorators.ToStringLabeller;
-import edu.uci.ics.jung.visualization.decorators.AbstractEdgeShapeTransformer;
-import edu.uci.ics.jung.visualization.Layer;
-
-import java.awt.Shape;
 import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GradientPaint;
-import java.awt.event.MouseWheelListener;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -78,32 +76,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
-import java.awt.event.MouseEvent;
-import java.awt.Paint;
-import javax.swing.JPopupMenu;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.JScrollBar;
-
-import java.awt.geom.Area;
-
-import java.awt.Font;
-import java.awt.font.TextLayout;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
-import org.apache.commons.collections15.Transformer;
-import org.apache.commons.collections15.TransformerUtils;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
 import lcmc.data.Application;
-
+import lcmc.data.Host;
+import lcmc.data.Subtext;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import org.apache.commons.collections15.Transformer;
+import org.apache.commons.collections15.TransformerUtils;
 
 /**
  * This class creates graph and provides methods for scaling etc.,

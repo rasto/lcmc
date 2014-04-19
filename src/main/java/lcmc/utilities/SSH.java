@@ -22,29 +22,25 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
-import lcmc.gui.SSHGui;
-import lcmc.gui.ProgressBar;
-import lcmc.configs.DistResource;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.ServerHostKeyVerifier;
-import ch.ethz.ssh2.InteractiveCallback;
-import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.ChannelCondition;
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.InteractiveCallback;
 import ch.ethz.ssh2.KnownHosts;
 import ch.ethz.ssh2.LocalPortForwarder;
 import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.ServerHostKeyVerifier;
+import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.channel.ChannelManager;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.InterruptedException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.configs.DistResource;
+import lcmc.data.Host;
+import lcmc.gui.ProgressBar;
+import lcmc.gui.SSHGui;
 
 /**
  * Verifying server hostkeys with an existing known_hosts file

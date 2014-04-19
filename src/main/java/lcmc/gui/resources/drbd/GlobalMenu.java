@@ -22,7 +22,6 @@ package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lcmc.EditClusterDialog;
 import lcmc.ProxyHostWizard;
 import lcmc.data.AccessMode;

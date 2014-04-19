@@ -23,17 +23,15 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd volume

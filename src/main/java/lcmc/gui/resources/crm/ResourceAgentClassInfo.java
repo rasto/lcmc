@@ -21,22 +21,22 @@
  */
 package lcmc.gui.resources.crm;
 
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.data.ResourceAgent;
-import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.awt.FlowLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds the information about resource agent class and its

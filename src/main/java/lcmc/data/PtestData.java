@@ -22,14 +22,14 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.CRM;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.utilities.CRM;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds data that were retrieved from ptest command.

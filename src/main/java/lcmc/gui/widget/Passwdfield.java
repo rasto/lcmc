@@ -20,16 +20,15 @@
 
 package lcmc.gui.widget;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
-import lcmc.utilities.PatternDocument;
-import lcmc.data.AccessMode;
-import lcmc.utilities.MyButton;
-
 import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import lcmc.data.AccessMode;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.PatternDocument;
 
 /**
  * An implementation of a field where user can enter new value. The

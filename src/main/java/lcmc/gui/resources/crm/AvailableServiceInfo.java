@@ -21,22 +21,25 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Tools;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,

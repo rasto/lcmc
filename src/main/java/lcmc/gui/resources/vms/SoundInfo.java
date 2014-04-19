@@ -21,27 +21,25 @@
  */
 package lcmc.gui.resources.vms;
 
-import lcmc.gui.Browser;
-import lcmc.gui.widget.Widget;
-import lcmc.data.VMSXML;
-import lcmc.data.VMSXML.SoundData;
-import lcmc.data.Host;
-import lcmc.data.Application;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
+import lcmc.data.VMSXML.SoundData;
 import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 import org.w3c.dom.Node;
 
 /**

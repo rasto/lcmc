@@ -20,43 +20,45 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JMenuBar;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.PtestData;
+import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.Openais;
-import lcmc.utilities.Heartbeat;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.BoxLayout;
-import javax.swing.JMenuBar;
-import javax.swing.AbstractButton;
-import javax.swing.JColorChooser;
-
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Color;
-import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.concurrent.CountDownLatch;
-
 import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.Corosync;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Openais;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class provides menus for service and host multi selection.

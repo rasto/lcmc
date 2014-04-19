@@ -23,13 +23,12 @@
 
 package lcmc.gui.dialog;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
-
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.HashSet;
 
 /**
  * An implementation of an dialog with log files from many hosts.

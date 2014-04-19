@@ -20,22 +20,22 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.data.Host;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.gui.widget.TextfieldWithUnit;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.Unit;
-import java.util.Map;
-import java.util.HashMap;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.TextfieldWithUnit;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
 
 /**
  * An implementation of an dialog with log files.

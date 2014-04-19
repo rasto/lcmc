@@ -23,53 +23,54 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.*;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Openais;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
-import lcmc.data.resources.NetInterface;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.Exceptions.IllegalVersionException;
-
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.lang.InterruptedException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.regex.Pattern;
+import java.util.List;
 import java.util.regex.Matcher;
-
-import javax.swing.JPanel;
+import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.SpringLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import javax.swing.JComponent;
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.SpringLayout;
+import lcmc.Exceptions.IllegalVersionException;
+import lcmc.data.AccessMode;
+import lcmc.data.AisCastAddress;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.NetInterface;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
-
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Corosync;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Openais;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all

@@ -22,15 +22,15 @@
 
 package lcmc.data;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.LinkedHashSet;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import lcmc.utilities.Tools;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds a set of all clusters.

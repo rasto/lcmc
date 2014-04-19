@@ -21,11 +21,11 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.NewHost;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of

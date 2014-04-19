@@ -23,21 +23,19 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.SSH;
-import lcmc.data.CRMXML.ResStatus;
-
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
-import org.apache.commons.collections15.map.MultiKeyMap;
-
+import java.util.Map;
+import java.util.Set;
+import lcmc.data.CRMXML.ResStatus;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class parses pacemaker/heartbeat status, stores information

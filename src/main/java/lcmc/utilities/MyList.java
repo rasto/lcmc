@@ -24,22 +24,21 @@ package lcmc.utilities;
 
 import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import javax.swing.JList;
 import javax.swing.JToolTip;
 import javax.swing.ListModel;
-
-import java.awt.event.MouseEvent;
-import java.awt.MouseInfo;
-import java.awt.Robot;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 
 /**
  * A Jlist with updatable tooltips.

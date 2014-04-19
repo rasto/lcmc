@@ -23,17 +23,16 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import lcmc.gui.Browser;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.ResourceAgent;
-import lcmc.data.AccessMode;
-import lcmc.utilities.Tools;
-
 import java.util.Map;
+import lcmc.data.AccessMode;
+import lcmc.data.ResourceAgent;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.Browser;
 import lcmc.gui.widget.Check;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a

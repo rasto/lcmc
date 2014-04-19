@@ -2,15 +2,12 @@ package lcmc.gui.resources.drbd;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

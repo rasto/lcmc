@@ -23,34 +23,31 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.configs.AppDefaults;
+import lcmc.data.DrbdXML;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
-import lcmc.configs.AppDefaults;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.data.Host;
-import lcmc.data.DrbdXML;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import lcmc.data.StringValue;
-import lcmc.data.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd resource

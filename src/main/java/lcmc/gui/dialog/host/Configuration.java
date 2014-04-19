@@ -23,28 +23,27 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
+import java.awt.Component;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
 import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.widget.Check;
-import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import java.awt.Component;
-import java.util.List;
-import java.util.ArrayList;
-
-import java.net.UnknownHostException;
-import java.net.InetAddress;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up

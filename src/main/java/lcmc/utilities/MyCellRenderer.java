@@ -22,6 +22,9 @@
 
 package lcmc.utilities;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Insets;
 import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -30,9 +33,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
-import java.awt.Component;
-import java.awt.Color;
-import java.awt.Insets;
 
 /**
  * Cells with jlabels, widths and colors.

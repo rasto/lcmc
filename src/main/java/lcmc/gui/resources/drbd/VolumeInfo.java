@@ -39,12 +39,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
-
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import lcmc.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
 import lcmc.data.Application;

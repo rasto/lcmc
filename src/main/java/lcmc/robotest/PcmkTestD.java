@@ -20,7 +20,15 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
+import static lcmc.robotest.RoboTest.CLONE_RADIO_Y;
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.chooseDummy;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.removeResource;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

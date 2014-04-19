@@ -23,37 +23,32 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.ImageIcon;
+import javax.swing.JPopupMenu;
+import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.Subtext;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
 import lcmc.gui.resources.drbd.MultiSelectionInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.resources.drbd.HostDrbdInfo;
-
-import java.awt.Shape;
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.BasicStroke;
-
-import edu.uci.ics.jung.graph.DirectedSparseGraph;
-import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
-import javax.swing.JPopupMenu;
-
-import lcmc.data.Application;
+import lcmc.utilities.Tools;
 
 /**
  * This class creates graph and provides methods to add new block device

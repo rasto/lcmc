@@ -3,9 +3,7 @@ package lcmc.gui.resources.drbd;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JColorChooser;
-
 import lcmc.EditHostDialog;
 import lcmc.ProxyHostWizard;
 import lcmc.data.AccessMode;
@@ -15,9 +13,9 @@ import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.dialog.drbd.DrbdsLog;
-import lcmc.gui.resources.Info;
-import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.LVCreate;
+import lcmc.gui.dialog.lvm.VGCreate;
+import lcmc.gui.resources.Info;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.MyMenu;

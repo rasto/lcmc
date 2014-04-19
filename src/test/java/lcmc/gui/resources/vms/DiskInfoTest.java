@@ -2,12 +2,9 @@ package lcmc.gui.resources.vms;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import lcmc.data.VMSXML.DiskData;
-import lcmc.gui.resources.vms.DiskInfo;
 import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 

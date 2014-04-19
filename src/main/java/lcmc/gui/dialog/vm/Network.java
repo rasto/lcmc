@@ -23,22 +23,19 @@
 
 package lcmc.gui.dialog.vm;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.vms.InterfaceInfo;
-import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.widget.Widget;
-import lcmc.data.VMSXML.InterfaceData;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
-
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML.InterfaceData;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.gui.resources.vms.InterfaceInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.

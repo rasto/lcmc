@@ -21,38 +21,19 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyMenuItem;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.crm.ConstraintPHInfo;
-import lcmc.gui.resources.crm.GroupInfo;
-import lcmc.gui.resources.crm.HbConnectionInfo;
-import lcmc.gui.resources.crm.HostInfo;
-import lcmc.gui.resources.crm.PcmkMultiSelectionInfo;
-import lcmc.gui.resources.crm.ServiceInfo;
-import lcmc.data.Subtext;
-import lcmc.data.Host;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-import edu.uci.ics.jung.graph.util.Pair;
-
-import java.awt.Shape;
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.GradientPaint;
 import java.awt.BasicStroke;
-
-import javax.swing.JMenu;
-import javax.swing.ImageIcon;
-
-import edu.uci.ics.jung.visualization.Layer;
-
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,8 +47,22 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.Subtext;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.crm.ConstraintPHInfo;
+import lcmc.gui.resources.crm.GroupInfo;
+import lcmc.gui.resources.crm.HbConnectionInfo;
+import lcmc.gui.resources.crm.HostInfo;
+import lcmc.gui.resources.crm.PcmkMultiSelectionInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,

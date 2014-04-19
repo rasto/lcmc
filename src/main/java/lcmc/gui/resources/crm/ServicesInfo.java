@@ -22,31 +22,12 @@
 
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.EditableInfo;
-import lcmc.gui.resources.Info;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.CRMGraph;
-import lcmc.gui.dialog.ClusterLogs;
-import lcmc.data.resources.Resource;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.CRM;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.MyList;
-import lcmc.utilities.MyListModel;
-import lcmc.Exceptions;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
-import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -56,21 +37,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
-
 import lcmc.EditClusterDialog;
+import lcmc.Exceptions;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.PtestData;
+import lcmc.data.ResourceAgent;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.Resource;
+import lcmc.gui.Browser;
+import lcmc.gui.CRMGraph;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.dialog.ClusterLogs;
+import lcmc.gui.resources.EditableInfo;
+import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Check;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyList;
+import lcmc.utilities.MyListModel;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds info data for services view and global heartbeat

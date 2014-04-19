@@ -1,24 +1,20 @@
 package lcmc.gui.resources.drbd;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.List;
-
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-
 import static org.mockito.Mockito.when;
+import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HostDrbdMenuTest {

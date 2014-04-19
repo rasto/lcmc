@@ -23,22 +23,21 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Host;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JPanel;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.utilities.CancelCallback;
-import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.data.Host;
+import lcmc.data.Value;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-
-import javax.swing.JPanel;
-import java.util.List;
-import java.util.ArrayList;
-import lcmc.data.Value;
-import lcmc.gui.widget.Check;
+import lcmc.utilities.CancelCallback;
+import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;

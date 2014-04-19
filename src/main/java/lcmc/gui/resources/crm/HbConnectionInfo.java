@@ -21,42 +21,44 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.Tools;
-import lcmc.utilities.CRM;
-import lcmc.utilities.MyMenuItem;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.SpringLayout;
-
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import javax.swing.tree.DefaultMutableTreeNode;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.PtestData;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Check;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class describes a connection between two heartbeat services.

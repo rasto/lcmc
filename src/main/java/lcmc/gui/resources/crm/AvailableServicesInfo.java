@@ -21,12 +21,12 @@
  */
 package lcmc.gui.resources.crm;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * This class holds the information about available resource agent classes.

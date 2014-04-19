@@ -23,31 +23,26 @@
 
 package lcmc.gui;
 
-import lcmc.gui.resources.Info;
-import lcmc.utilities.Tools;
-
-import java.awt.Dimension;
-
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-
-import javax.swing.JTree;
-import javax.swing.tree.TreeSelectionModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeModelEvent;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+import lcmc.gui.resources.Info;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a host view with tree of resources. This view is used

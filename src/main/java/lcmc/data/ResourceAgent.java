@@ -22,10 +22,6 @@
 
 package lcmc.data;
 
-import lcmc.gui.widget.Widget;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.crm.ServiceInfo;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,11 +30,12 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.widget.Widget;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class describes a resource agent with its name and class.

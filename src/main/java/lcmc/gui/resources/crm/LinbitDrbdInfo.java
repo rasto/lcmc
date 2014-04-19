@@ -21,14 +21,12 @@
  */
 package lcmc.gui.resources.crm;
 
+import java.util.Map;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.data.ResourceAgent;
-import lcmc.data.Host;
-
-import java.util.Map;
-
-import lcmc.data.Application;
 
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is

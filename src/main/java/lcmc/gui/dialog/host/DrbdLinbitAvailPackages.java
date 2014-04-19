@@ -22,31 +22,32 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.*;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.utilities.SSH.ExecCommandThread;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.List;
 import java.util.Arrays;
-import javax.swing.BoxLayout;
+import java.util.List;
 import javax.swing.Box;
-
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where user can choose a distribution of the

@@ -22,9 +22,6 @@
 
 package lcmc.utilities;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JToolTip;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -37,11 +34,12 @@ import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.Shape;
-import java.awt.geom.Point2D;
-
-import java.awt.geom.Rectangle2D;
 import java.awt.event.ActionEvent;
-
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JToolTip;
 import lcmc.gui.widget.Check;
 
 /**

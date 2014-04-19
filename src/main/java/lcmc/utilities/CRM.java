@@ -22,21 +22,21 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
-import lcmc.data.HostLocation;
-import lcmc.data.CRMXML;
-import lcmc.configs.DistResource;
-import java.util.Map;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
-import java.util.UUID;
+import lcmc.configs.DistResource;
 import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.Host;
+import lcmc.data.HostLocation;
 import lcmc.utilities.SSH.SSHOutput;
 
 /**

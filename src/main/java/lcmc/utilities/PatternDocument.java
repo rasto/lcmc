@@ -22,11 +22,9 @@
 
 package lcmc.utilities;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.AttributeSet;
-// import java.util.regex.Matcher;
 import java.util.Map;
-
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 
 /**

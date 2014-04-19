@@ -28,27 +28,19 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.configs.AppDefaults;
-
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
-import java.awt.Font;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
-
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,9 +49,13 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import lcmc.configs.AppDefaults;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An infinite progress panel displays a rotating figure and

@@ -21,20 +21,25 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.ResourceAgent;
+import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.

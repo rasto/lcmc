@@ -23,8 +23,8 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.VolumeInfo;
 
 /**
  * DrbdConfig super class from which all the drbd config wizards can be

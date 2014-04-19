@@ -23,24 +23,25 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.Component;
-
-import lcmc.data.*;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
-
-import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where available versions of drbd will be

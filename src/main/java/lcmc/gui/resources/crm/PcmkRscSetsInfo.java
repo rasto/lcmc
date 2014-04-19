@@ -21,19 +21,6 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.SpringUtilities;
-import lcmc.data.Host;
-import lcmc.data.CRMXML;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.CRM;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,8 +31,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.Host;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Check;
+import lcmc.utilities.CRM;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class describes a connection between two heartbeat services.

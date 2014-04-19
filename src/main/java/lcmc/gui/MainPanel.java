@@ -23,18 +23,15 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.data.Host;
-
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import java.awt.event.HierarchyEvent;
-
 import java.awt.BorderLayout;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import lcmc.data.Host;
+import lcmc.utilities.Tools;
 
 /**
  * @author rasto

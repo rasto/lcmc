@@ -23,11 +23,10 @@
 
 package lcmc.gui.dialog.lvm;
 
+import javax.swing.JComponent;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.utilities.Unit;
-
-import javax.swing.JComponent;
 
 /** LVM dialogs. */
 class LV extends WizardDialog {

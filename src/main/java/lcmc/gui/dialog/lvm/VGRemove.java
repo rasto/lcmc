@@ -22,30 +22,12 @@
 
 package lcmc.gui.dialog.lvm;
 
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.LVM;
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.resources.BlockDevice;
-import lcmc.gui.Browser;
-
 import java.awt.Dimension;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SpringLayout;
-import javax.swing.JLabel;
-import javax.swing.JCheckBox;
-
 import java.awt.FlowLayout;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -54,8 +36,22 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
 import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.resources.BlockDevice;
+import lcmc.gui.Browser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.utilities.LVM;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * This class implements VG Remove dialog.

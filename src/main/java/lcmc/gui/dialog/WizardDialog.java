@@ -23,24 +23,23 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.CancelCallback;
-import lcmc.gui.ProgressBar;
-
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.gui.ProgressBar;
 import lcmc.gui.widget.Check;
+import lcmc.utilities.CancelCallback;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a wizard dialog with next, back, finish and cancel

@@ -22,10 +22,10 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
-import lcmc.configs.DistResource;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import lcmc.configs.DistResource;
+import lcmc.data.Host;
 
 /**
  * This class provides virsh commands.

@@ -21,12 +21,11 @@
  */
 package lcmc.gui.resources.crm;
 
+import javax.swing.JPanel;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.utilities.Tools;
-
-import javax.swing.JPanel;
 /**
  * This class is used for all kind of categories in the heartbeat
  * hierarchy. Its point is to show heartbeat graph all the time, ane

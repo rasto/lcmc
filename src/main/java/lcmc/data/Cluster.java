@@ -22,14 +22,6 @@
 
 package lcmc.data;
 
-import lcmc.gui.ClusterTab;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.SSHGui;
-import lcmc.data.resources.BlockDevice;
-import lcmc.data.resources.Network;
-import lcmc.utilities.Tools;
-import lcmc.Exceptions;
-
 import java.awt.Color;
 import java.awt.Window;
 import java.util.ArrayList;
@@ -38,9 +30,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import lcmc.Exceptions;
+import lcmc.data.resources.BlockDevice;
+import lcmc.data.resources.Network;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.ClusterTab;
+import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds cluster data and implementation of cluster related

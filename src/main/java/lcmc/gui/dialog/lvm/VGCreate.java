@@ -22,26 +22,12 @@
 
 package lcmc.gui.dialog.lvm;
 
-import lcmc.data.Host;
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
-import lcmc.data.Cluster;
-import lcmc.data.resources.BlockDevice;
-import lcmc.gui.Browser;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import lcmc.utilities.LVM;
-
-import java.awt.FlowLayout;
 import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,15 +35,26 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
+import lcmc.data.resources.BlockDevice;
+import lcmc.gui.Browser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.LVM;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /** Create VG dialog. */
 public final class VGCreate extends LV {

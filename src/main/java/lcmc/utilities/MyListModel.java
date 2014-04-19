@@ -22,14 +22,14 @@
 
 package lcmc.utilities;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 import javax.swing.AbstractListModel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.util.Collection;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * A ListModel with filtered items.

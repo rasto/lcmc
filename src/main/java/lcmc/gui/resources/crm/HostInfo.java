@@ -22,54 +22,57 @@
 
 package lcmc.gui.resources.crm;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JColorChooser;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SpringLayout;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 import lcmc.EditHostDialog;
-import lcmc.data.*;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.PtestData;
+import lcmc.data.Subtext;
 import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
+import lcmc.gui.CRMGraph;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.HostBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.HostLogs;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.CRM;
-import lcmc.utilities.SSH;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.Openais;
-import lcmc.utilities.Heartbeat;
 import lcmc.utilities.ButtonCallback;
-import lcmc.gui.CRMGraph;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.concurrent.CountDownLatch;
-import java.awt.Font;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Color;
-
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SpringLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JColorChooser;
-import javax.swing.text.Document;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.JLabel;
-
+import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.Corosync;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Openais;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds info data for a host.

@@ -21,48 +21,47 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.widget.Label;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
-import lcmc.utilities.WidgetListener;
-import lcmc.data.resources.Resource;
-import lcmc.gui.SpringUtilities;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
-import javax.swing.SpringLayout;
-import javax.swing.BoxLayout;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.collections15.map.MultiKeyMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import javax.swing.border.TitledBorder;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.Value;
+import lcmc.data.resources.Resource;
+import lcmc.gui.Browser;
+import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Check;
-
+import lcmc.gui.widget.Label;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.WidgetListener;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info

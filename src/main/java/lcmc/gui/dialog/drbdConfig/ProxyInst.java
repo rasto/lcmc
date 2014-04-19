@@ -20,22 +20,20 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ConvertCmdCallback;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
-
-import lcmc.data.Application;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.

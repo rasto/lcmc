@@ -19,21 +19,8 @@
  */
 package lcmc.gui.resources.vms;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.data.VMSXML.FilesystemData;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +29,22 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
+import lcmc.data.VMSXML.FilesystemData;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 import org.w3c.dom.Node;
 
 /**

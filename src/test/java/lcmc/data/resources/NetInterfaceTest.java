@@ -20,15 +20,12 @@
 
 package lcmc.data.resources;
 
+import java.net.UnknownHostException;
+import lcmc.testutils.TestUtils;
+import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.net.UnknownHostException;
-
-import lcmc.testutils.TestUtils;
-import lcmc.utilities.Tools;
-
 import org.junit.Before;
 import org.junit.Test;
 

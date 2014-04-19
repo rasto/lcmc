@@ -22,18 +22,17 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
-import lcmc.configs.DistResource;
-import lcmc.Exceptions.IllegalVersionException;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.Exceptions.IllegalVersionException;
+import lcmc.configs.DistResource;
 import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.utilities.SSH.SSHOutput;
 
 /**

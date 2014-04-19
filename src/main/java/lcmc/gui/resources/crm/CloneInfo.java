@@ -21,25 +21,31 @@
  */
 package lcmc.gui.resources.crm;
 
-import lcmc.data.*;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import javax.swing.JComponent;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
-
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.ClusterStatus;
+import lcmc.data.Host;
+import lcmc.data.HostLocation;
+import lcmc.data.ResourceAgent;
+import lcmc.data.Subtext;
+import lcmc.data.Value;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;

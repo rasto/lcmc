@@ -23,12 +23,12 @@
 
 package lcmc.gui.dialog.drbd;
 
-import lcmc.data.Host;
-import lcmc.gui.dialog.HostLogs;
-import java.util.Map;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import lcmc.data.Host;
+import lcmc.gui.dialog.HostLogs;
 
 /**
  * An implementation of an dialog with log files.
