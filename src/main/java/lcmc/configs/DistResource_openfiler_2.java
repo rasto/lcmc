@@ -31,14 +31,14 @@ import java.util.ListResourceBundle;
 public final class DistResource_openfiler_2
                                     extends ListResourceBundle {
 
+    /** Contents. */
+    private static final Object[][] contents = {
+        {"Support",            "openfiler-2"},
+    };
+
     /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);
     }
-
-    /** Contents. */
-    private static final Object[][] contents = {
-        {"Support",            "openfiler-2"},
-    };
 }

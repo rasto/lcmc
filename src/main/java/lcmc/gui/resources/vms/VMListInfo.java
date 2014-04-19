@@ -58,12 +58,6 @@ import java.util.TreeSet;
  * This class shows a list of virtual machines.
  */
 public final class VMListInfo extends CategoryInfo {
-    /** On what raw is the vms virtual domain info object. */
-    private volatile Map<String, DomainInfo> domainToInfo =
-                                   new HashMap<String, DomainInfo>();
-    /** Colors for some rows. */
-    private volatile Map<String, Color> domainToColor =
-                                                  new HashMap<String, Color>();
     /** Default widths for columns. */
     private static final Map<Integer, Integer> DEFAULT_WIDTHS =
             Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
@@ -71,6 +65,12 @@ public final class VMListInfo extends CategoryInfo {
             {
                 put(4, 80); /* remove button column */
             }});
+    /** On what raw is the vms virtual domain info object. */
+    private volatile Map<String, DomainInfo> domainToInfo =
+                                   new HashMap<String, DomainInfo>();
+    /** Colors for some rows. */
+    private volatile Map<String, Color> domainToColor =
+                                                  new HashMap<String, Color>();
     /** Creates the new VMListInfo object with name of the category. */
     public VMListInfo(final String name, final Browser browser) {
         super(name, browser);

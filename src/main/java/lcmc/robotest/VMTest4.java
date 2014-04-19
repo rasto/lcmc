@@ -37,11 +37,6 @@ final class VMTest4 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(VMTest4.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private VMTest4() {
-        /* Cannot be instantiated. */
-    }
-
     /** Cluster wizard locked until focus is lost. */
     static void start(final String vmTest, final int count) {
         slowFactor = 0.1f;
@@ -80,5 +75,10 @@ final class VMTest4 {
             moveTo("Cancel"); /* cancel */
             leftClick();
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private VMTest4() {
+        /* Cannot be instantiated. */
     }
 }

@@ -38,6 +38,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceMenuTest {
+    static {
+        Tools.init();
+    }
     @Mock
     private ResourceInfo resourceInfoStub;
     @Mock
@@ -46,10 +49,6 @@ public class ResourceMenuTest {
     private VolumeInfo drbdVolumeTwoStub;
 
     private ResourceMenu sut;
-
-    static {
-        Tools.init();
-    }
 
     @Before
     public void setUp() {

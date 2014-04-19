@@ -169,31 +169,25 @@ public final class LCMC extends JPanel {
     /** The --check-swing. */
     private static final String CHECK_SWING_OP = "check-swing";
 
-    /**
-     * Private constructor.
-     */
-    private LCMC() {
-        /* no instantiation possible. */
-    }
     /** Create the GUI and show it. */
     protected static void createAndShowGUI(final Container mainFrame) {
         final List<Object> buttonGradient = Arrays.asList(
-          new Object[]{
-               0.5f,
+            new Object[]{
+                0.5f,
                1.0f,
                new ColorUIResource(0xFFFFFF),
                new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                new ColorUIResource(ClusterBrowser.BUTTON_PANEL_BACKGROUND)});
         final List<Object> checkboxGradient = Arrays.asList(
-          new Object[]{0.3f,
+            new Object[]{0.3f,
                        0.0f,
                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                        new ColorUIResource(ClusterBrowser.PANEL_BACKGROUND),
                        new ColorUIResource(0xFFFFFF)});
         ToolTipManager.sharedInstance().setInitialDelay(
-                                                    TOOLTIP_INITIAL_DELAY);
+            TOOLTIP_INITIAL_DELAY);
         ToolTipManager.sharedInstance().setDismissDelay(
-                                                    TOOLTIP_DISMISS_DELAY);
+            TOOLTIP_DISMISS_DELAY);
         UIManager.put("TableHeader.background",
                       Tools.getDefaultColor("DrbdMC.TableHeader"));
         UIManager.put("TableHeader.font",
@@ -221,18 +215,17 @@ public final class LCMC extends JPanel {
                       ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         UIManager.put("Panel.background",
                       ClusterBrowser.PANEL_BACKGROUND);
-
-
+        
+        
         /* Create and set up the window. */
         Tools.getGUIData().setMainFrame(mainFrame);
-
-
+        
+        
         /* Display the window. */
         mainFrame.setSize(Tools.getDefaultInt("DrbdMC.width"),
                           Tools.getDefaultInt("DrbdMC.height"));
         mainFrame.setVisible(true);
     }
-
     /** Returns the main panel. */
     protected static JPanel getMainPanel() {
         final JPanel mainPanel = new MainPanel();
@@ -252,21 +245,9 @@ public final class LCMC extends JPanel {
     /** Returns the main glass pane. */
     protected static ProgressIndicatorPanel getMainGlassPane() {
         final ProgressIndicatorPanel mainGlassPane =
-                                             new ProgressIndicatorPanel();
+            new ProgressIndicatorPanel();
         Tools.getGUIData().setMainGlassPane(mainGlassPane);
         return mainGlassPane;
-    }
-
-    /** Adds te exit listener and disconnects all hosts prior to exiting. */
-    public static class ExitListener extends WindowAdapter {
-        /**
-         * Called when window is closed.
-         */
-        @Override
-        public final void windowClosing(final WindowEvent event) {
-            cleanupBeforeClosing();
-            System.exit(0);
-        }
     }
 
     /** Cleanup before closing. */
@@ -304,20 +285,20 @@ public final class LCMC extends JPanel {
                     @Override
                     protected ColorUIResource getPrimary1() {
                         return new ColorUIResource(
-                                            ClusterBrowser.STATUS_BACKGROUND);
+                            ClusterBrowser.STATUS_BACKGROUND);
                     }
 
                     /** unknown to me */
                     @Override
                     protected ColorUIResource getPrimary2() {
                         return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
+                            ClusterBrowser.PANEL_BACKGROUND);
                     }
                     /** unknown to me */
                     @Override
                     protected ColorUIResource getPrimary3() {
                         return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
+                            ClusterBrowser.PANEL_BACKGROUND);
                     }
                     /** Button and other borders. */
                     @Override
@@ -327,13 +308,13 @@ public final class LCMC extends JPanel {
                     @Override
                     protected ColorUIResource getSecondary2() {
                         return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
+                            ClusterBrowser.PANEL_BACKGROUND);
                     }
                     /** Split pane divider. Line in the main menu. */
                     @Override
                     protected ColorUIResource getSecondary3() {
                         return new ColorUIResource(
-                                            ClusterBrowser.PANEL_BACKGROUND);
+                            ClusterBrowser.PANEL_BACKGROUND);
                     }
                 }
             );
@@ -368,11 +349,11 @@ public final class LCMC extends JPanel {
                           OP_MODE_OP,
                           true,
                           "operating mode. <arg> can be:\n"
-                          + "ro - read only\n"
-                          + "op - operator\n"
-                          + "admin - administrator");
+                              + "ro - read only\n"
+                              + "op - operator\n"
+                              + "admin - administrator");
         options.addOption(null, NOLRM_OP, false,
-                          "do not show removed resources from LRM.");
+                                          "do not show removed resources from LRM.");
         options.addOption("v", VERSION_OP, false, "print version");
         options.addOption(null, AUTO_OP, true, "ADVANCED USE: for testing");
         options.addOption(null, PCMKTEST_OP, true, "ADVANCED USE: for testing");
@@ -384,7 +365,7 @@ public final class LCMC extends JPanel {
                           false,
                           "disable upgrade check");
         options.addOption(
-                      null,
+            null,
                       NO_PLUGIN_CHECK_OP,
                       false,
                       "disable plugin check, DEPRECATED: there are no plugins");
@@ -395,7 +376,7 @@ public final class LCMC extends JPanel {
                           BIGDRBDCONF_OP,
                           false,
                           "create one big drbd.conf, instead of many"
-                          + " files in drbd.d/ directory");
+                              + " files in drbd.d/ directory");
         options.addOption(null,
                           STAGING_DRBD_OP,
                           false,
@@ -429,17 +410,17 @@ public final class LCMC extends JPanel {
                           true,
                           "location of id_rsa file ($HOME/.ssh/id_rsa)");
         options.addOption(
-                     null,
+            null,
                      KNOWN_HOSTS_OP,
                      true,
                      "location of known_hosts file ($HOME/.ssh/known_hosts)");
         options.addOption(
-                     null,
+            null,
                      OUT_OP,
                      true,
                      "where to redirect the standard out");
         options.addOption(
-                     null,
+            null,
                      DEBUG_OP,
                      true,
                      "debug level, 0 - none, 3 - all");
@@ -448,10 +429,10 @@ public final class LCMC extends JPanel {
                           true,
                           "define a cluster");
         final Option hostOp =
-                new Option("h",
-                           HOST_OP,
-                           true,
-                           "define a cluster, used with --cluster option");
+            new Option("h",
+                HOST_OP,
+                true,
+                "define a cluster, used with --cluster option");
         hostOp.setArgs(10000);
         options.addOption(hostOp);
         options.addOption(null,
@@ -487,12 +468,12 @@ public final class LCMC extends JPanel {
                           false,
                           "don't embed applet in the browser");
         options.addOption(
-                      null,
+            null,
                       CMD_LOG_OP,
                       false,
                       "Log executed commands to the lcmc.log on the servers");
         options.addOption(
-                      null,
+            null,
                       CHECK_SWING_OP,
                       false,
                       "ADVANCED USE: for testing");
@@ -505,7 +486,7 @@ public final class LCMC extends JPanel {
                 if (out != null) {
                     try {
                         System.setOut(
-                                    new PrintStream(new FileOutputStream(out)));
+                            new PrintStream(new FileOutputStream(out)));
                     } catch (final FileNotFoundException e) {
                         System.exit(2);
                     }
@@ -517,7 +498,7 @@ public final class LCMC extends JPanel {
                     LoggerFactory.setDebugLevel(Integer.parseInt(level));
                 } else {
                     throw new ParseException(
-                                        "cannot parse debug level: " + level);
+                        "cannot parse debug level: " + level);
                 }
             }
             boolean tightvnc = cmd.hasOption(TIGHTVNC_OP);
@@ -538,19 +519,19 @@ public final class LCMC extends JPanel {
             Tools.getApplication().setRealvnc(realvnc);
 
             Tools.getApplication().setUpgradeCheckEnabled(
-                                          !cmd.hasOption(NO_UPGRADE_CHECK_OP));
+                !cmd.hasOption(NO_UPGRADE_CHECK_OP));
             Tools.getApplication().setBigDRBDConf(
-                                                cmd.hasOption(BIGDRBDCONF_OP));
+                cmd.hasOption(BIGDRBDCONF_OP));
             Tools.getApplication().setStagingDrbd(
-                                               cmd.hasOption(STAGING_DRBD_OP));
+                cmd.hasOption(STAGING_DRBD_OP));
             Tools.getApplication().setStagingPacemaker(
-                                          cmd.hasOption(STAGING_PACEMAKER_OP));
+                cmd.hasOption(STAGING_PACEMAKER_OP));
             Tools.getApplication().setNoLRM(cmd.hasOption(NOLRM_OP));
             Tools.getApplication().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             Tools.getApplication().setOneHostCluster(
-                                           cmd.hasOption(ONE_HOST_CLUSTER_OP));
+                cmd.hasOption(ONE_HOST_CLUSTER_OP));
             Tools.getApplication().setNoPassphrase(
-                                           cmd.hasOption(NO_PASSPHRASE_OP));
+                cmd.hasOption(NO_PASSPHRASE_OP));
             if (cmd.hasOption(EMBED_OP)) {
                 Tools.getApplication().setEmbed(true);
             }
@@ -578,13 +559,13 @@ public final class LCMC extends JPanel {
             final String idRsaPath = cmd.getOptionValue(ID_RSA_OP,
                                                         pwd + "/.ssh/id_rsa");
             final String knownHostsPath = cmd.getOptionValue(
-                                                    KNOWN_HOSTS_OP,
+                KNOWN_HOSTS_OP,
                                                     pwd + "/.ssh/known_hosts");
             Tools.getApplication().setIdDSAPath(idDsaPath);
             Tools.getApplication().setIdRSAPath(idRsaPath);
             Tools.getApplication().setKnownHostPath(knownHostsPath);
-
-
+            
+            
             final String opMode = cmd.getOptionValue(OP_MODE_OP);
             autoArgs = cmd.getOptionValue(AUTO_OP);
             if (cmd.hasOption(HELP_OP)) {
@@ -601,16 +582,16 @@ public final class LCMC extends JPanel {
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
                 Tools.getApplication().setAccessType(Application.AccessType.RO);
                 Tools.getApplication().setMaxAccessType(
-                                                    Application.AccessType.RO);
+                    Application.AccessType.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
                 Tools.getApplication().setAccessType(Application.AccessType.OP);
                 Tools.getApplication().setMaxAccessType(
-                                                    Application.AccessType.OP);
+                    Application.AccessType.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
                 Tools.getApplication().setAccessType(
-                                          Application.AccessType.ADMIN);
+                    Application.AccessType.ADMIN);
                 Tools.getApplication().setMaxAccessType(
-                                          Application.AccessType.ADMIN);
+                    Application.AccessType.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
@@ -620,15 +601,15 @@ public final class LCMC extends JPanel {
             }
             if (cmd.hasOption(RESTORE_MOUSE_OP)) {
                 /* restore mouse if it is stuck in pressed state, during
-                 * robot tests. */
+                * robot tests. */
                 RoboTest.restoreMouse();
             }
             final String vncPortOffsetString =
-                                        cmd.getOptionValue(VNC_PORT_OFFSET_OP);
+                cmd.getOptionValue(VNC_PORT_OFFSET_OP);
             if (vncPortOffsetString != null
                 && Tools.isNumber(vncPortOffsetString)) {
                 Tools.getApplication().setVncPortOffset(
-                                        Integer.parseInt(vncPortOffsetString));
+                    Integer.parseInt(vncPortOffsetString));
             }
             Tools.getApplication().setAnimFPS(fps);
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
@@ -644,20 +625,19 @@ public final class LCMC extends JPanel {
     }
 
     /** Parse cluster options and create cluster button. */
-    private static void parseClusterOptions(final CommandLine cmd)
-    throws ParseException {
+    private static void parseClusterOptions(final CommandLine cmd) throws ParseException {
         String clusterName = null;
         List<HostOptions> hostsOptions = null;
         final Map<String, List<HostOptions>> clusters =
-                            new LinkedHashMap<String, List<HostOptions>>();
+            new LinkedHashMap<String, List<HostOptions>>();
         for (final Option option : cmd.getOptions()) {
             final String op = option.getLongOpt();
             if (CLUSTER_OP.equals(op)) {
                 clusterName = option.getValue();
                 if (clusterName == null) {
                     throw new ParseException(
-                                "could not parse " + CLUSTER_OP + " option");
-
+                        "could not parse " + CLUSTER_OP + " option");
+                    
                 }
                 clusters.put(clusterName, new ArrayList<HostOptions>());
             } else if (HOST_OP.equals(op)) {
@@ -668,7 +648,7 @@ public final class LCMC extends JPanel {
                 }
                 if (hostNames == null) {
                     throw new ParseException(
-                                    "could not parse " + HOST_OP + " option");
+                        "could not parse " + HOST_OP + " option");
                 }
                 hostsOptions = new ArrayList<HostOptions>();
                 for (final String hostNameEntered : hostNames) {
@@ -680,7 +660,7 @@ public final class LCMC extends JPanel {
                         port = he[1];
                         if (port != null && port.isEmpty() || !Tools.isNumber(port)) {
                             throw new ParseException(
-                                    "could not parse " + HOST_OP + " option");
+                                "could not parse " + HOST_OP + " option");
                         }
                     } else {
                         hostName = hostNameEntered;
@@ -695,7 +675,7 @@ public final class LCMC extends JPanel {
             } else if (SUDO_OP.equals(op)) {
                 if (hostsOptions == null) {
                     throw new ParseException(
-                                SUDO_OP + " must be defined after " + HOST_OP);
+                        SUDO_OP + " must be defined after " + HOST_OP);
                 }
                 for (final HostOptions ho : hostsOptions) {
                     ho.setSudo(true);
@@ -703,12 +683,12 @@ public final class LCMC extends JPanel {
             } else if (USER_OP.equals(op)) {
                 if (hostsOptions == null) {
                     throw new ParseException(
-                                USER_OP + " must be defined after " + HOST_OP);
+                        USER_OP + " must be defined after " + HOST_OP);
                 }
                 final String userName = option.getValue();
                 if (userName == null) {
                     throw new ParseException(
-                                    "could not parse " + USER_OP + " option");
+                        "could not parse " + USER_OP + " option");
                 }
                 for (final HostOptions ho : hostsOptions) {
                     ho.setUser(userName);
@@ -716,12 +696,12 @@ public final class LCMC extends JPanel {
             } else if (PORT_OP.equals(op)) {
                 if (hostsOptions == null) {
                     throw new ParseException(
-                                PORT_OP + " must be defined after " + HOST_OP);
+                        PORT_OP + " must be defined after " + HOST_OP);
                 }
                 final String port = option.getValue();
                 if (port == null) {
                     throw new ParseException(
-                                    "could not parse " + PORT_OP + " option");
+                        "could not parse " + PORT_OP + " option");
                 }
                 for (final HostOptions ho : hostsOptions) {
                     ho.setPort(port);
@@ -730,25 +710,25 @@ public final class LCMC extends JPanel {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
                     Tools.getApplication().setAutoTest(
-                       new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
+                        new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
                 }
             } else if (DRBDTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
                     Tools.getApplication().setAutoTest(
-                       new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
+                        new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
                 }
             } else if (VMTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
                     Tools.getApplication().setAutoTest(
-                       new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
+                        new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
                 }
             } else if (GUITEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
                     Tools.getApplication().setAutoTest(
-                       new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
+                        new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
                 }
             }
         }
@@ -756,7 +736,7 @@ public final class LCMC extends JPanel {
             for (final HostOptions hostOptions : clusterEntry.getValue()) {
                 if (hostsOptions.size() < 1
                     || hostsOptions.size() == 1
-                        && !Tools.getApplication().isOneHostCluster()) {
+                       && !Tools.getApplication().isOneHostCluster()) {
                     throw new ParseException("not enough hosts for cluster: "
                                              + clusterEntry.getKey());
                 }
@@ -773,7 +753,7 @@ public final class LCMC extends JPanel {
     public static void main(final String[] args) {
         Tools.init();
         final JFrame mainFrame = new JFrame(
-               Tools.getString("DrbdMC.Title") + ' ' + Tools.getRelease());
+            Tools.getString("DrbdMC.Title") + ' ' + Tools.getRelease());
         final List<Image> il = new ArrayList<Image>();
         for (final String iconS : new String[]{"LCMC.AppIcon32",
                                                "LCMC.AppIcon48",
@@ -808,5 +788,24 @@ public final class LCMC extends JPanel {
         mainFrame.addWindowListener(new ExitListener());
         mainFrame.setJMenuBar(getMenuBar());
         mainFrame.setContentPane(getMainPanel());
+    }
+
+    /**
+     * Private constructor.
+     */
+    private LCMC() {
+        /* no instantiation possible. */
+    }
+
+    /** Adds te exit listener and disconnects all hosts prior to exiting. */
+    public static class ExitListener extends WindowAdapter {
+        /**
+         * Called when window is closed.
+         */
+        @Override
+        public final void windowClosing(final WindowEvent event) {
+            cleanupBeforeClosing();
+            System.exit(0);
+        }
     }
 }

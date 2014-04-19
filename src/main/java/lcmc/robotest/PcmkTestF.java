@@ -37,11 +37,6 @@ final class PcmkTestF {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTestF.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestF() {
-        /* Cannot be instantiated. */
-    }
-
     /** Cloned group. */
     static void start(final Cluster cluster, final int count) {
         slowFactor = 0.2f;
@@ -95,5 +90,10 @@ final class PcmkTestF {
         removeResource(gx, gy, CONFIRM_REMOVE);
         resetTerminalAreas();
         System.gc();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestF() {
+        /* Cannot be instantiated. */
     }
 }

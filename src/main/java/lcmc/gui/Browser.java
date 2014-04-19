@@ -63,15 +63,6 @@ import lcmc.utilities.LoggerFactory;
 public class Browser {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Browser.class);
-    /** Tree model of the menu tree. */
-    private DefaultTreeModel treeModel;
-    /** Top of the menu tree. */
-    private DefaultMutableTreeNode treeTop;
-    /** Tree. */
-    private JTree tree;
-
-    /** Split pane next to the menu. */
-    private JSplitPane infoPanelSplitPane;
     /** Icon fot the categories. */
     public static final ImageIcon CATEGORY_ICON =
             Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
@@ -93,6 +84,15 @@ public class Browser {
     /** Color of the status backgrounds. */
     public static final Color STATUS_BACKGROUND =
                           Tools.getDefaultColor("ViewPanel.Status.Background");
+    /** Tree model of the menu tree. */
+    private DefaultTreeModel treeModel;
+    /** Top of the menu tree. */
+    private DefaultMutableTreeNode treeTop;
+    /** Tree. */
+    private JTree tree;
+
+    /** Split pane next to the menu. */
+    private JSplitPane infoPanelSplitPane;
     /** DRBD test lock. */
     private final Lock mDRBDtestLock = new ReentrantLock();
 
@@ -273,6 +273,39 @@ public class Browser {
         return new CellRenderer();
     }
 
+    /** Acquire drbd test lock. */
+    public final void drbdtestLockAcquire() {
+        mDRBDtestLock.lock();
+    }
+
+    /** Release drbd test lock. */
+    public final void drbdtestLockRelease() {
+        mDRBDtestLock.unlock();
+    }
+
+    /** Selects specified path. */
+    protected void selectPath(final Object[] path) {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                final TreePath tp = new TreePath(path);
+                getTree().expandPath(tp);
+                getTree().setSelectionPath(tp);
+            }
+        });
+    }
+
+    /** Add node. */
+    public final void addNode(final DefaultMutableTreeNode node,
+                              final MutableTreeNode child) {
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+              node.add(child);
+            }
+        });
+    }
+
     /** Renders the cells for the menu. */
     private static class CellRenderer extends DefaultTreeCellRenderer {
         /** Serial version UUID. */
@@ -329,38 +362,5 @@ public class Browser {
 
             return this;
         }
-    }
-
-    /** Acquire drbd test lock. */
-    public final void drbdtestLockAcquire() {
-        mDRBDtestLock.lock();
-    }
-
-    /** Release drbd test lock. */
-    public final void drbdtestLockRelease() {
-        mDRBDtestLock.unlock();
-    }
-
-    /** Selects specified path. */
-    protected void selectPath(final Object[] path) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-            @Override
-            public void run() {
-                final TreePath tp = new TreePath(path);
-                getTree().expandPath(tp);
-                getTree().setSelectionPath(tp);
-            }
-        });
-    }
-
-    /** Add node. */
-    public final void addNode(final DefaultMutableTreeNode node,
-                              final MutableTreeNode child) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-            @Override
-            public void run() {
-              node.add(child);
-            }
-        });
     }
 }

@@ -55,6 +55,9 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Default background color. */
     private static final Color DEFAULT_COLOR =
                            Tools.getDefaultColor("DefaultButton.Background");
+    /** Screen device. */
+    private static final GraphicsDevice SCREEN_DEVICE =
+     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Second color in the gradient. */
     private Color color2 = DEFAULT_COLOR;
     /** Robot to move a mouse a little if a tooltip has changed. */
@@ -65,9 +68,6 @@ public class MyButton extends JButton implements ComponentWithTest {
     private String simulationToolTip = "";
     /** Tooltip about changed/incorrect fields. */
     private String checkToolTip = "";
-    /** Screen device. */
-    private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 

@@ -83,18 +83,6 @@ public class VolumeInfo extends EditableInfo
     /** Logger. */
     private static final Logger LOG =
                                LoggerFactory.getLogger(VolumeInfo.class);
-    /** Drbd resource in which is this volume defined. */
-    private final ResourceInfo resourceInfo;
-    /** Block devices that are in this DRBD volume. */
-    private final List<BlockDevInfo> blockDevInfos;
-    /** Device name. TODO: */
-    private String device;
-    /** Last created filesystem. */
-    private String createdFs = null;
-    /** Cache for getInfoPanel method. */
-    private JComponent infoPanel = null;
-    /** Hosts. */
-    private final Set<Host> hosts;
     /** Name of the drbd device parameter. */
     static final String DRBD_VOL_PARAM_DEV = "device";
     /** Name of the drbd volume number parameter. */
@@ -154,12 +142,33 @@ public class VolumeInfo extends EditableInfo
                 }});
     private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
+    /** Returns sorted hosts from the specified blockdevices. */
+    public static Set<Host> getHostsFromBlockDevices(final Iterable<BlockDevInfo> bdis) {
+        final Set<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
+            @Override
+            public int compare(final Host o1, final Host o2) {
+                return o1.getName().compareToIgnoreCase(o2.getName());
+            }
+        });
+        for (final BlockDevInfo bdi : bdis) {
+            hosts.add(bdi.getHost());
+        }
+        return hosts;
+    }
+    /** Drbd resource in which is this volume defined. */
+    private final ResourceInfo resourceInfo;
+    /** Block devices that are in this DRBD volume. */
+    private final List<BlockDevInfo> blockDevInfos;
+    /** Device name. TODO: */
+    private String device;
+    /** Last created filesystem. */
+    private String createdFs = null;
+    /** Cache for getInfoPanel method. */
+    private JComponent infoPanel = null;
+    /** Hosts. */
+    private final Set<Host> hosts;
     /** Prepares a new {@code VolumeInfo} object. */
-    VolumeInfo(final String name,
-                   final String device,
-                   final ResourceInfo resourceInfo,
-                   final List<BlockDevInfo> blockDevInfos,
-                   final Browser browser) {
+    VolumeInfo(final String name, final String device, final ResourceInfo resourceInfo, final List<BlockDevInfo> blockDevInfos, final Browser browser) {
         super(name, browser);
         assert (resourceInfo != null);
         assert (blockDevInfos.size() >= 2);
@@ -172,6 +181,7 @@ public class VolumeInfo extends EditableInfo
         getResource().setValue(DRBD_VOL_PARAM_DEV, new StringValue(device));
         getResource().setNew(true);
     }
+
     /** Returns info panel. */
     @Override
     public JComponent getInfoPanel() {
@@ -216,9 +226,9 @@ public class VolumeInfo extends EditableInfo
                 }
                 mouseStillOver = true;
                 component.setToolTipText(
-                       Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                    Tools.getString("ClusterBrowser.StartingDRBDtest"));
                 component.setToolTipBackground(Tools.getDefaultColor(
-                                "ClusterBrowser.Test.Tooltip.Background"));
+                    "ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
                     return;
@@ -230,7 +240,7 @@ public class VolumeInfo extends EditableInfo
                 getBrowser().drbdtestLockAcquire();
                 getBrowser().setDRBDtestData(null);
                 final Map<Host, String> testOutput =
-                                            new LinkedHashMap<Host, String>();
+                    new LinkedHashMap<Host, String>();
                 try {
                     getDrbdInfo().createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -331,8 +341,8 @@ public class VolumeInfo extends EditableInfo
                 }
             }
         );
-
-
+        
+        
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
 
@@ -343,7 +353,7 @@ public class VolumeInfo extends EditableInfo
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
-              Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth")
+            Tools.getDefaultInt("ClusterBrowser.DrbdResLabelWidth")
               + Tools.getDefaultInt("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
@@ -375,10 +385,10 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Returns true if this is first block dev info. */
-    public boolean isFirstBlockDevInfo(final BlockDevInfo bdi) {
-        return getFirstBlockDevInfo() == bdi;
-    }
-
+        public boolean isFirstBlockDevInfo(final BlockDevInfo bdi) {
+            return getFirstBlockDevInfo() == bdi;
+        }
+    
     /** Returns the list of items for the popup menu for drbd volume. */
     @Override
     public List<UpdatableItem> createPopup() {
@@ -398,9 +408,9 @@ public class VolumeInfo extends EditableInfo
         if (isSyncing()) {
             final String spString = getSyncedProgress();
             final String bsString = getFirstBlockDevInfo()
-                                            .getBlockDevice().getBlockSize();
+                .getBlockDevice().getBlockSize();
             final Value rateValue =
-                         getDrbdResourceInfo().getResource().getValue("rate");
+                getDrbdResourceInfo().getResource().getValue("rate");
             if (spString != null && bsString != null && rateValue != null) {
                 final double sp = Double.parseDouble(spString);
                 final double bs = Double.parseDouble(bsString);
@@ -441,15 +451,15 @@ public class VolumeInfo extends EditableInfo
         Tools.isNotSwingThread();
         final ClusterBrowser clusterBrowser = getBrowser();
         Tools.invokeLater(new Runnable() {
-             @Override
-             public void run() {
+            @Override
+            public void run() {
                 removeMyselfNoConfirm0(runMode, clusterBrowser);
                 clusterBrowser.updateDrbdResources();
                 if (Application.isLive(runMode)) {
                     removeNode();
                 }
                 clusterBrowser.getDrbdGraph().scale();
-             }
+            }
         });
     }
 
@@ -457,112 +467,111 @@ public class VolumeInfo extends EditableInfo
      * Removes this object from jtree and from list of drbd volume
      * infos without confirmation dialog.
      */
-    private void removeMyselfNoConfirm0(final Application.RunMode runMode,
-                                        final ClusterBrowser cb) {
-        cb.drbdStatusLock();
-        cb.getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
-                                               getDevice(),
-                                               getName());
-        cb.getDrbdGraph().removeDrbdVolume(this);
-        final Set<Host> hosts0 = getHosts();
-        final boolean lastVolume =
-                                getDrbdResourceInfo().removeDrbdVolume(this);
-        if (getDrbdVolume().isCommited()) {
-            for (final Host host : hosts0) {
-                DRBD.setSecondary(host,
+        private void removeMyselfNoConfirm0(final Application.RunMode runMode, final ClusterBrowser cb) {
+            cb.drbdStatusLock();
+            cb.getDrbdXML().removeVolume(getDrbdResourceInfo().getName(),
+                                     getDevice(),
+                                     getName());
+            cb.getDrbdGraph().removeDrbdVolume(this);
+            final Set<Host> hosts0 = getHosts();
+            final boolean lastVolume =
+                getDrbdResourceInfo().removeDrbdVolume(this);
+            if (getDrbdVolume().isCommited()) {
+                for (final Host host : hosts0) {
+                    DRBD.setSecondary(host,
                                   getDrbdResourceInfo().getName(),
                                   getName(),
                                   runMode);
-                if (!host.hasVolumes()) {
-                    DRBD.disconnect(host,
+                    if (!host.hasVolumes()) {
+                        DRBD.disconnect(host,
                                     getDrbdResourceInfo().getName(),
                                     null,
                                     runMode);
-                }
-                for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                    if (bdi.getHost() == host) {
-                        if (bdi.getBlockDevice().isAttached()) {
-                            DRBD.detach(host,
+                    }
+                    for (final BlockDevInfo bdi : getBlockDevInfos()) {
+                        if (bdi.getHost() == host) {
+                            if (bdi.getBlockDevice().isAttached()) {
+                                DRBD.detach(host,
                                         getDrbdResourceInfo().getName(),
                                         getName(),
                                         runMode);
+                            }
+                            break;
                         }
-                        break;
                     }
-                }
-                if (host.hasVolumes()) {
-                    DRBD.delMinor(host, getDevice(), runMode);
-                    if (lastVolume) {
-                        DRBD.delConnection(host,
+                    if (host.hasVolumes()) {
+                        DRBD.delMinor(host, getDevice(), runMode);
+                        if (lastVolume) {
+                            DRBD.delConnection(host,
                                            getDrbdResourceInfo().getName(),
                                            runMode);
+                        }
                     }
                 }
             }
-        }
-        super.removeMyself(runMode);
-        cb.reload(cb.getDrbdNode(), true);
-        cb.getDrbdDevHash().remove(getDevice());
-        cb.putDrbdDevHash();
-        for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            bdi.removeFromDrbd();
-            bdi.removeMyself(runMode);
-        }
-        if (lastVolume) {
-            final ResourceInfo dri = getDrbdResourceInfo();
+            super.removeMyself(runMode);
+            cb.reload(cb.getDrbdNode(), true);
+            cb.getDrbdDevHash().remove(getDevice());
+            cb.putDrbdDevHash();
             for (final BlockDevInfo bdi : getBlockDevInfos()) {
-                if (dri.isProxy(bdi.getHost())) {
-                    DRBD.proxyDown(bdi.getHost(),
+                bdi.removeFromDrbd();
+                bdi.removeMyself(runMode);
+            }
+            if (lastVolume) {
+                final ResourceInfo dri = getDrbdResourceInfo();
+                for (final BlockDevInfo bdi : getBlockDevInfos()) {
+                    if (dri.isProxy(bdi.getHost())) {
+                        DRBD.proxyDown(bdi.getHost(),
                                    dri.getName(),
                                    null,
                                    runMode);
+                    }
                 }
+                dri.removeMyself(runMode);
             }
-            dri.removeMyself(runMode);
-        }
-        cb.updateCommonBlockDevices();
-
-        try {
-            getDrbdInfo().createDrbdConfig(runMode);
-            getDrbdInfo().setSelectedNode(null);
-            getDrbdInfo().selectMyself();
-            cb.getDrbdGraph().updatePopupMenus();
-            cb.resetFilesystems();
-
-            final DrbdXML dxml = new DrbdXML(hosts0.toArray(new Host[hosts0.size()]),
-                                             cb.getDrbdParameters());
-            for (final Host host : hosts0) {
-                final String conf = dxml.getConfig(host);
-                if (conf != null) {
-                    dxml.update(conf);
+            cb.updateCommonBlockDevices();
+            
+            try {
+                getDrbdInfo().createDrbdConfig(runMode);
+                getDrbdInfo().setSelectedNode(null);
+                getDrbdInfo().selectMyself();
+                cb.getDrbdGraph().updatePopupMenus();
+                cb.resetFilesystems();
+                
+                final DrbdXML dxml = new DrbdXML(hosts0.toArray(new Host[hosts0.size()]),
+                    cb.getDrbdParameters());
+                for (final Host host : hosts0) {
+                    final String conf = dxml.getConfig(host);
+                    if (conf != null) {
+                        dxml.update(conf);
+                    }
                 }
+                cb.setDrbdXML(dxml);
+            } catch (final Exceptions.DrbdConfigException dce) {
+                LOG.appError("removeMyselfNoConfirm: config failed", dce);
+                return;
+            } catch (final UnknownHostException e) {
+                LOG.appError("removeMyselfNoConfirm: config failed", e);
+                return;
+            } finally {
+                cb.drbdStatusUnlock();
             }
-            cb.setDrbdXML(dxml);
-        } catch (final Exceptions.DrbdConfigException dce) {
-            LOG.appError("removeMyselfNoConfirm: config failed", dce);
-            return;
-        } catch (final UnknownHostException e) {
-            LOG.appError("removeMyselfNoConfirm: config failed", e);
-            return;
-        } finally {
-            cb.drbdStatusUnlock();
         }
-    }
 
     /** Removes this drbd resource with confirmation dialog. */
-    @Override
+        @Override
     public void removeMyself(final Application.RunMode runMode) {
         if (!getDrbdVolume().isCommited()) {
             removeMyselfNoConfirm(runMode);
             return;
         }
         String desc = Tools.getString(
-                       "ClusterBrowser.confirmRemoveDrbdResource.Description");
+            "ClusterBrowser.confirmRemoveDrbdResource.Description");
         desc = desc.replaceAll(
-             "@RESOURCE@",
+            "@RESOURCE@",
              Matcher.quoteReplacement(getDrbdResourceInfo() + "/" + getName()));
         if (Tools.confirmDialog(
-              Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
+            Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
               desc,
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Yes"),
               Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.No"))) {
@@ -571,30 +580,30 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Returns drbd resource info object. */
-    public ResourceInfo getDrbdResourceInfo() {
-        return resourceInfo;
-    }
+        public ResourceInfo getDrbdResourceInfo() {
+            return resourceInfo;
+        }
 
     /** Returns device name, like /dev/drbd0. */
-    @Override
+        @Override
     public String getDevice() {
         return device;
     }
 
     /** Return DRBD device in /dev/drbd/by-res...form. */
-    public String getDeviceByRes() {
-        if (getDrbdInfo().atLeastVersion("8.4")) {
-            return BY_RES_DEV_DIR
+        public String getDeviceByRes() {
+            if (getDrbdInfo().atLeastVersion("8.4")) {
+                return BY_RES_DEV_DIR
                    + getDrbdResourceInfo().getName()
                    + '/'
                    + getName();
-        } else {
-            return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
+            } else {
+                return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
+            }
         }
-    }
 
     /** Returns the last created filesystem. */
-    @Override
+        @Override
     public String getCreatedFs() {
         return createdFs;
     }
@@ -645,6 +654,7 @@ public class VolumeInfo extends EditableInfo
         return false;
     }
 
+
     /**
      * Returns whether the resources are connected or waiting for connection.
      */
@@ -657,7 +667,6 @@ public class VolumeInfo extends EditableInfo
         return true;
     }
 
-
     /** Returns whether the cluster is being verified. */
     public boolean isVerifying() {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
@@ -669,25 +678,25 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Returns other block device in the drbd cluster. */
-    public BlockDevInfo getOtherBlockDevInfo(final BlockDevInfo thisBDI) {
-        if (thisBDI.equals(getFirstBlockDevInfo())) {
-            return getSecondBlockDevInfo();
-        }
-        for (final BlockDevInfo bdi : getBlockDevInfos()) {
-            if (bdi == getFirstBlockDevInfo()) {
-                /* skip first */
-                continue;
+        public BlockDevInfo getOtherBlockDevInfo(final BlockDevInfo thisBDI) {
+            if (thisBDI.equals(getFirstBlockDevInfo())) {
+                return getSecondBlockDevInfo();
             }
-            if (thisBDI.equals(bdi)) {
-                return getFirstBlockDevInfo();
+            for (final BlockDevInfo bdi : getBlockDevInfos()) {
+                if (bdi == getFirstBlockDevInfo()) {
+                    /* skip first */
+                    continue;
+                }
+                if (thisBDI.equals(bdi)) {
+                    return getFirstBlockDevInfo();
+                }
+                
             }
-
+            return null;
         }
-        return null;
-    }
 
     /** Returns how much diskspace is used on the primary. */
-    @Override
+        @Override
     public int getUsed() {
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             if (bdi.getBlockDevice().isPrimary()) {
@@ -716,9 +725,7 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Remove drbddisk heartbeat service. */
-    public void removeDrbdDisk(final FilesystemInfo fi,
-                        final Host dcHost,
-                        final Application.RunMode runMode) {
+    public void removeDrbdDisk(final FilesystemInfo fi, final Host dcHost, final Application.RunMode runMode) {
         final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
         if (drbddiskInfo != null) {
             drbddiskInfo.removeMyselfNoConfirm(dcHost, runMode);
@@ -726,9 +733,7 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Remove drbddisk heartbeat service. */
-    public void removeLinbitDrbd(final FilesystemInfo fi,
-                                 final Host dcHost,
-                                 final Application.RunMode runMode) {
+    public void removeLinbitDrbd(final FilesystemInfo fi, final Host dcHost, final Application.RunMode runMode) {
         final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
         if (linbitDrbdInfo != null) {
             linbitDrbdInfo.removeMyselfNoConfirm(dcHost, runMode);
@@ -736,15 +741,12 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Adds old style drbddisk service in the heartbeat and graph. */
-    public void addDrbdDisk(final FilesystemInfo fi,
-                            final Host dcHost,
-                            final String drbdId,
-                            final Application.RunMode runMode) {
+    public void addDrbdDisk(final FilesystemInfo fi, final Host dcHost, final String drbdId, final Application.RunMode runMode) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
         final DrbddiskInfo di =
             (DrbddiskInfo) getBrowser().getServicesInfo().addServicePanel(
-                                    getBrowser().getCRMXML().getHbDrbddisk(),
+                getBrowser().getCRMXML().getHbDrbddisk(),
                                     p,
                                     true,
                                     drbdId,
@@ -763,7 +765,7 @@ public class VolumeInfo extends EditableInfo
         }
         di.waitForInfoPanel();
         di.getWidget("1", null).setValueAndWait(
-                                            new StringValue(getDrbdResourceInfo().getName()));
+            new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, runMode);
         di.getResource().setNew(false);
         Tools.invokeLater(new Runnable() {
@@ -775,15 +777,12 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Adds linbit::drbd service in the pacemaker graph. */
-    public void addLinbitDrbd(final FilesystemInfo fi,
-                       final Host dcHost,
-                       final String drbdId,
-                       final Application.RunMode runMode) {
+    public void addLinbitDrbd(final FilesystemInfo fi, final Host dcHost, final String drbdId, final Application.RunMode runMode) {
         final Point2D p = null;
         final CRMGraph crmg = getBrowser().getCRMGraph();
         final LinbitDrbdInfo ldi =
-         (LinbitDrbdInfo) getBrowser().getServicesInfo().addServicePanel(
-                                     getBrowser().getCRMXML().getHbLinbitDrbd(),
+            (LinbitDrbdInfo) getBrowser().getServicesInfo().addServicePanel(
+                getBrowser().getCRMXML().getHbLinbitDrbd(),
                                      p,
                                      true,
                                      drbdId,
@@ -806,7 +805,7 @@ public class VolumeInfo extends EditableInfo
         /* this must be executed after the getInfoPanel is executed. */
         ldi.waitForInfoPanel();
         ldi.getWidget("drbd_resource", null).setValueAndWait(
-                                            new StringValue(getDrbdResourceInfo().getName()));
+            new StringValue(getDrbdResourceInfo().getName()));
         /* apply gets parents from graph and adds colocations. */
         Tools.waitForSwing();
         ldi.apply(dcHost, runMode);
@@ -837,22 +836,8 @@ public class VolumeInfo extends EditableInfo
     }
 
     /** Returns both hosts of the drbd connection, sorted alphabeticaly. */
-    public Set<Host> getHosts() {
-        return hosts;
-    }
-
-    /** Returns sorted hosts from the specified blockdevices. */
-    public static Set<Host> getHostsFromBlockDevices(
-                                               final Iterable<BlockDevInfo> bdis) {
-        final Set<Host> hosts = new TreeSet<Host>(new Comparator<Host>() {
-            @Override
-            public int compare(final Host o1, final Host o2) {
-                return o1.getName().compareToIgnoreCase(o2.getName());
-            }
-        });
-        for (final BlockDevInfo bdi : bdis) {
-            hosts.add(bdi.getHost());
-        }
+    public Set<Host> getHosts(
+                                               ) {
         return hosts;
     }
 

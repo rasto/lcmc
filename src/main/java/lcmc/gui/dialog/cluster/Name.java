@@ -47,10 +47,10 @@ import lcmc.data.StringValue;
  *
  */
 public final class Name extends DialogCluster {
-    /** Name field. */
-    private Widget nameField;
     /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
+    /** Name field. */
+    private Widget nameField;
 
     /** Prepares a new {@code Name} object. */
     public Name(final WizardDialog previousDialog, final Cluster cluster) {

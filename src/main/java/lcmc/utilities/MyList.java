@@ -49,13 +49,13 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
     private static final Logger LOG = LoggerFactory.getLogger(MyList.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Screen device. */
+    private static final GraphicsDevice SCREEN_DEVICE =
+     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tools tip object. */
     private JToolTip toolTip;
     /** Robot to move a mouse a little if a tooltip has changed. */
     private final Robot robot;
-    /** Screen device. */
-    private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 

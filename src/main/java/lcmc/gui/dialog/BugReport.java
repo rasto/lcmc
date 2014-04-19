@@ -61,6 +61,14 @@ public final class BugReport extends ConfigDialog {
     private static final Logger LOG =
                                     LoggerFactory.getLogger(BugReport.class);
 
+    private static final String CONFIG_CIB = "pcmk configs";
+    private static final String CONFIG_DRBD = "DRBD configs";
+    private static final String CONFIG_LIBVIRT = "libvirt configs";
+    private static final String GENERATED_DELIM = "=== configs ===";
+    private static final String LOG_BUFFER_DELIM = "=== logs ===";
+    public static final Cluster UNKNOWN_CLUSTER = null;
+    public static final String NO_ERROR_TEXT = null;
+
     /** Cluster. Can be null, if unknown. */
     private final Cluster cluster;
     /** Error text, exceptions. Can be null. */
@@ -74,14 +82,6 @@ public final class BugReport extends ConfigDialog {
                                             new HashMap<Cluster, JCheckBox>();
     /** The whole log buffer. */
     private final String logs;
-
-    private static final String CONFIG_CIB = "pcmk configs";
-    private static final String CONFIG_DRBD = "DRBD configs";
-    private static final String CONFIG_LIBVIRT = "libvirt configs";
-    private static final String GENERATED_DELIM = "=== configs ===";
-    private static final String LOG_BUFFER_DELIM = "=== logs ===";
-    public static final Cluster UNKNOWN_CLUSTER = null;
-    public static final String NO_ERROR_TEXT = null;
 
     /** Prepares a new {@code BugReport} object. */
     public BugReport(final Cluster cluster, final String errorText) {

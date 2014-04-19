@@ -62,6 +62,25 @@ import java.util.ArrayList;
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+
+    private static Unit addItems(final Collection<Unit> comboList,
+                                     final Unit selectedValue,
+                                     final Unit[] items) {
+        Unit selectedUnit = null;
+        if (items != null) {
+            for (final Unit item : items) {
+                if (item.equals(selectedValue)) {
+                    selectedUnit = item;
+                }
+                comboList.add(item);
+            }
+            if (selectedUnit == null && selectedValue != null) {
+                comboList.add(selectedValue);
+                selectedUnit = selectedValue;
+            }
+        }
+        return selectedUnit;
+    }
     /** Text field in widget with units. */
     private final JTextField textFieldPart;
     /** Combo box with units. */
@@ -349,24 +368,5 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         for (final ItemListener il : unitComboBox.getItemListeners()) {
             unitComboBox.removeItemListener(il);
         }
-    }
-
-    private static Unit addItems(final Collection<Unit> comboList,
-                                     final Unit selectedValue,
-                                     final Unit[] items) {
-        Unit selectedUnit = null;
-        if (items != null) {
-            for (final Unit item : items) {
-                if (item.equals(selectedValue)) {
-                    selectedUnit = item;
-                }
-                comboList.add(item);
-            }
-            if (selectedUnit == null && selectedValue != null) {
-                comboList.add(selectedValue);
-                selectedUnit = selectedValue;
-            }
-        }
-        return selectedUnit;
     }
 }

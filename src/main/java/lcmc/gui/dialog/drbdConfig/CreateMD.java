@@ -60,14 +60,14 @@ import lcmc.data.Value;
  *
  */
 final class CreateMD extends DrbdConfig {
-    /** Metadata pulldown choices. */
-    private Widget metadataWi;
-    /** Make Meta-Data button. */
-    private final MyButton makeMDButton = new MyButton();
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
     /** Return code of the create md command if fs is already there. */
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
+    /** Metadata pulldown choices. */
+    private Widget metadataWi;
+    /** Make Meta-Data button. */
+    private final MyButton makeMDButton = new MyButton();
 
     /** Prepares a new {@code CreateMD} object. */
     CreateMD(final WizardDialog previousDialog,

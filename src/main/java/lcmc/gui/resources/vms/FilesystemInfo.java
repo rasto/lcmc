@@ -49,14 +49,6 @@ import org.w3c.dom.Node;
  * This class holds info about Virtual filesystem.
  */
 public final class FilesystemInfo extends HardwareInfo {
-    /** Source file combo box, so that it can be disabled, depending on type. */
-    private final Map<String, Widget> sourceDirWi =
-                                            new HashMap<String, Widget>();
-    /** Source block combo box, so that it can be disabled, depending on type.*/
-    private final Map<String, Widget> sourceNameWi =
-                                            new HashMap<String, Widget>();
-    /** Choices for source directories. */
-    private final Value[] sourceDirs;
     /** Parameters. */
     private static final String[] PARAMETERS = {FilesystemData.TYPE,
                                                 FilesystemData.SOURCE_DIR,
@@ -73,21 +65,9 @@ public final class FilesystemInfo extends HardwareInfo {
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
                                        new HashMap<String, Widget.Type>();
-    static {
-        FIELD_TYPES.put(FilesystemData.TYPE, Widget.Type.RADIOGROUP);
-        FIELD_TYPES.put(FilesystemData.SOURCE_DIR, Widget.Type.COMBOBOX);
-        FIELD_TYPES.put(FilesystemData.SOURCE_NAME, Widget.Type.TEXTFIELD);
-        FIELD_TYPES.put(FilesystemData.TARGET_DIR, Widget.Type.COMBOBOX);
-    }
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
-    static {
-        SHORTNAME_MAP.put(FilesystemData.TYPE, "Type");
-        SHORTNAME_MAP.put(FilesystemData.SOURCE_DIR, "Source Dir");
-        SHORTNAME_MAP.put(FilesystemData.SOURCE_NAME, "Source Name");
-        SHORTNAME_MAP.put(FilesystemData.TARGET_DIR, "Target Dir");
-    }
 
     /** Preferred values. */
     private static final Map<String, Value> PREFERRED_MAP =
@@ -105,12 +85,50 @@ public final class FilesystemInfo extends HardwareInfo {
     private static final String LXC_SOURCE_DIR = "/var/lib/lxc";
 
     static {
+        FIELD_TYPES.put(FilesystemData.TYPE, Widget.Type.RADIOGROUP);
+        FIELD_TYPES.put(FilesystemData.SOURCE_DIR, Widget.Type.COMBOBOX);
+        FIELD_TYPES.put(FilesystemData.SOURCE_NAME, Widget.Type.TEXTFIELD);
+        FIELD_TYPES.put(FilesystemData.TARGET_DIR, Widget.Type.COMBOBOX);
+    }
+    static {
+        SHORTNAME_MAP.put(FilesystemData.TYPE, "Type");
+        SHORTNAME_MAP.put(FilesystemData.SOURCE_DIR, "Source Dir");
+        SHORTNAME_MAP.put(FilesystemData.SOURCE_NAME, "Source Name");
+        SHORTNAME_MAP.put(FilesystemData.TARGET_DIR, "Target Dir");
+    }
+    static {
         POSSIBLE_VALUES.put(FilesystemData.TYPE,
                             new Value[]{MOUNT_TYPE, TEMPLATE_TYPE});
         POSSIBLE_VALUES.put(FilesystemData.TARGET_DIR, new Value[]{new StringValue("/")});
         PREFERRED_MAP.put(FilesystemData.TYPE, new StringValue("mount"));
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));
     }
+
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Filesystem");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addFilesystemPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+    /** Source file combo box, so that it can be disabled, depending on type. */
+    private final Map<String, Widget> sourceDirWi =
+                                            new HashMap<String, Widget>();
+    /** Source block combo box, so that it can be disabled, depending on type.*/
+    private final Map<String, Widget> sourceNameWi =
+                                            new HashMap<String, Widget>();
+    /** Choices for source directories. */
+    private final Value[] sourceDirs;
     /** Table panel. */
     private JComponent tablePanel = null;
 
@@ -502,43 +520,23 @@ public final class FilesystemInfo extends HardwareInfo {
         return null;
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Filesystem");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addFilesystemPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
-
     /** Returns combo box for parameter. */
     @Override
-    protected Widget createWidget(final String param,
-                                  final String prefix,
-                                  final int width) {
+    protected Widget createWidget(final String param, final String prefix, final int width) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
             final Value sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
             final MyButton fileChooserBtn = new MyButton("Browse...");
             fileChooserBtn.miniButton();
             final String regexp = ".*[^/]?$";
             final Widget paramWi = WidgetFactory.createInstance(
-                                     getFieldType(param),
+                getFieldType(param),
                                      sourceDir,
                                      getParamPossibleChoices(param),
                                      regexp,
                                      width,
                                      Widget.NO_ABBRV,
                                      new AccessMode(getAccessType(param),
-                                                    false), /* only adv. mode */
+                                         false), /* only adv. mode */
                                      fileChooserBtn);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {
@@ -575,14 +573,14 @@ public final class FilesystemInfo extends HardwareInfo {
         } else if (FilesystemData.SOURCE_NAME.equals(param)) {
             final Value sourceName = getParamSaved(FilesystemData.SOURCE_NAME);
             final Widget paramWi = WidgetFactory.createInstance(
-                                    getFieldType(param),
+                getFieldType(param),
                                     sourceName,
                                     getParamPossibleChoices(param),
                                     Widget.NO_REGEXP,
                                     width,
                                     Widget.NO_ABBRV,
                                     new AccessMode(getAccessType(param),
-                                                   false), /* only adv. mode */
+                                        false), /* only adv. mode */
                                     Widget.NO_BUTTON);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {

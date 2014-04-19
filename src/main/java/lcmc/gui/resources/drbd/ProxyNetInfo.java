@@ -30,45 +30,11 @@ import lcmc.data.Host;
  * This class holds info data for a net interface on a drbd proxy host.
  */
 public final class ProxyNetInfo extends NetInfo {
-    /** Proxy host. */
-    private final Host proxyHost;
     /** Prefix in the host address field indicating a proxy address. */
     public static final String PROXY_PREFIX = "proxy: ";
 
-    /** Prepares a new {@code NetProxyInfo} object. */
-    public ProxyNetInfo(final NetInfo netInfo,
-                        final Browser browser,
-                        final Host proxyHost) {
-        super(netInfo.getName(), netInfo.getNetInterface(), browser);
-        this.proxyHost = proxyHost;
-    }
-
-    /** Prepares a new {@code NetProxyInfo} object. */
-    public ProxyNetInfo(final String name,
-                        final NetInterface netInterface,
-                        final Browser browser,
-                        final Host proxyHost) {
-        super(name, netInterface, browser);
-        this.proxyHost = proxyHost;
-    }
-
-    /** Returns string representation of the net interface. */
-    @Override
-    public String toString() {
-        final String ip = super.getInternalValue();
-        String proxyHostName = null;
-        if (proxyHost != null) {
-            proxyHostName = proxyHost.getName();
-        }
-        return displayString(ip,
-                             getBrowser().getHost().getName(),
-                             proxyHostName);
-    }
-
     /** Reformat to the form that appears in the GUI. */
-    public static String displayString(final String someIp,
-                                       final String someHost,
-                                       final String someProxyHost) {
+    public static String displayString(final String someIp, final String someHost, final String someProxyHost) {
         final StringBuilder s = new StringBuilder(PROXY_PREFIX);
         if (someIp != null) {
             s.append(someIp);
@@ -78,6 +44,33 @@ public final class ProxyNetInfo extends NetInfo {
             s.append(someProxyHost);
         }
         return s.toString();
+    }
+    /** Proxy host. */
+    private final Host proxyHost;
+
+    /** Prepares a new {@code NetProxyInfo} object. */
+    public ProxyNetInfo(final NetInfo netInfo, final Browser browser, final Host proxyHost) {
+        super(netInfo.getName(), netInfo.getNetInterface(), browser);
+        this.proxyHost = proxyHost;
+    }
+
+    /** Prepares a new {@code NetProxyInfo} object. */
+        public ProxyNetInfo(final String name, final NetInterface netInterface, final Browser browser, final Host proxyHost) {
+            super(name, netInterface, browser);
+            this.proxyHost = proxyHost;
+        }
+
+    /** Returns string representation of the net interface. */
+        @Override
+    public String toString() {
+        final String ip = super.getInternalValue();
+        String proxyHostName = null;
+        if (proxyHost != null) {
+            proxyHostName = proxyHost.getName();
+        }
+        return displayString(ip,
+                             getBrowser().getHost().getName(),
+                             proxyHostName);
     }
 
     /** Return proxy host. */

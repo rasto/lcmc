@@ -57,10 +57,6 @@ final class SoundInfo extends HardwareInfo {
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
-    static {
-        FIELD_TYPES.put(SoundData.MODEL, Widget.Type.RADIOGROUP);
-        SHORTNAME_MAP.put(SoundData.MODEL, "Model");
-    }
 
     /** Whether the parameter is required. */
     private static final Collection<String> IS_REQUIRED =
@@ -70,11 +66,33 @@ final class SoundInfo extends HardwareInfo {
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
     static {
+        FIELD_TYPES.put(SoundData.MODEL, Widget.Type.RADIOGROUP);
+        SHORTNAME_MAP.put(SoundData.MODEL, "Model");
+    }
+    static {
         POSSIBLE_VALUES.put(SoundData.MODEL,
                             new Value[]{new StringValue("ac97"),
-                                         new StringValue("es1370"),
-                                         new StringValue("pcspk"),
-                                         new StringValue("sb16")});
+                                        new StringValue("es1370"),
+                                        new StringValue("pcspk"),
+                                        new StringValue("sb16")});
+    }
+
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Sound Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addSoundsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -388,30 +406,9 @@ final class SoundInfo extends HardwareInfo {
         return null;
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Sound Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addSoundsPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
-
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
-                             final Node node,
-                             final String domainName,
-                             final Map<String, String> params) {
+    protected void modifyXML(final VMSXML vmsxml, final Node node, final String domainName, final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifySoundXML(node, domainName, params);
         }

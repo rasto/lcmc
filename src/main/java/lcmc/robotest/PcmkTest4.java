@@ -34,11 +34,6 @@ final class PcmkTest4 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest4.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest4() {
-        /* Cannot be instantiated. */
-    }
-
     static void start() {
         slowFactor = 0.6f;
         aborted = false;
@@ -122,5 +117,10 @@ final class PcmkTest4 {
         removeEverything();
         removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
         removePlaceHolder(ph2X, ph2Y, !CONFIRM_REMOVE);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest4() {
+        /* Cannot be instantiated. */
     }
 }

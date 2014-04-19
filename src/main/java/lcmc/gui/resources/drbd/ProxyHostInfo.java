@@ -58,11 +58,11 @@ public class ProxyHostInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(ProxyHostInfo.class);
-    /** Host data. */
-    private final Host host;
     /** Name prefix that appears in the menu. */
     private static final String NAME_PREFIX =
                                     Tools.getString("ProxyHostInfo.NameInfo");
+    /** Host data. */
+    private final Host host;
     /** Prepares a new {@code ProxyHostInfo} object. */
     public ProxyHostInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);

@@ -53,8 +53,6 @@ import javax.swing.ImageIcon;
 final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Browser. */
-    private final transient EmptyBrowser browser;
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -69,6 +67,8 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                                                     new Dimension(300, 100);
     /** Logo panel for card layout. */
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
+    /** Browser. */
+    private final transient EmptyBrowser browser;
     /**
      * Prepares a new {@code ClusterViewPanel} object.
      */

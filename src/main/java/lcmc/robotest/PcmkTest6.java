@@ -33,19 +33,14 @@ final class PcmkTest6 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest6.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest6() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final int count) {
         slowFactor = 0.2f;
         aborted = false;
 
         final int ph1X = 315;
         final int ph1Y = 346;
-
-
+        
+        
         //disableStonith();
         /* create 2 dummies */
         //checkTest("test5", 1);
@@ -72,5 +67,10 @@ final class PcmkTest6 {
         stopEverything();
         removeEverything();
         resetTerminalAreas();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest6() {
+        /* Cannot be instantiated. */
     }
 }

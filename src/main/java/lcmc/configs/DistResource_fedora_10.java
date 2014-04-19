@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_fedora_10 extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support", "fedora-10"},
@@ -159,4 +153,10 @@ public final class DistResource_fedora_10 extends ListResourceBundle {
          "if ! " + DistResource.SUDO + "/etc/init.d/heartbeat status >/dev/null 2>&1; then "
          + DistResource.SUDO + "/etc/init.d/heartbeat start; fi"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

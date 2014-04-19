@@ -44,14 +44,14 @@ import java.awt.BorderLayout;
  *
  */
 public class LinbitLogin extends DialogHost {
+    /** Width of the check boxes. */
+    private static final int CHECKBOX_WIDTH = 120;
     /** Field with user name. */
     private Widget downloadUserField;
     /** Field with password. */
     private Widget downloadPasswordField;
     /** Checkbox to save the info. */
     private JCheckBox saveCheckBox;
-    /** Width of the check boxes. */
-    private static final int CHECKBOX_WIDTH = 120;
 
     /** Prepares a new {@code LinbitLogin} object. */
     public LinbitLogin(final WizardDialog previousDialog,

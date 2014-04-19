@@ -60,6 +60,10 @@ public class Configuration extends DialogHost {
                                  LoggerFactory.getLogger(Configuration.class);
     /** Maximum hops. */
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
+    /** Width of the combo boxes. */
+    private static final int COMBO_BOX_WIDTH = 180;
+    /** DNS timeout. */
+    private static final int DNS_TIMEOUT = 5000;
     /** Hostname fields. */
     private final Widget[] hostnameField = new Widget[MAX_HOPS];
     /** Ip fields. */
@@ -68,10 +72,6 @@ public class Configuration extends DialogHost {
     private String[] hostnames = new String[MAX_HOPS];
     /** Whether the hostname was ok. */
     private volatile boolean hostnameOk = false;
-    /** Width of the combo boxes. */
-    private static final int COMBO_BOX_WIDTH = 180;
-    /** DNS timeout. */
-    private static final int DNS_TIMEOUT = 5000;
 
     /** Prepares a new {@code Configuration} object. */
     public Configuration(final WizardDialog previousDialog,
@@ -190,61 +190,6 @@ public class Configuration extends DialogHost {
         hostnameField[hop].setValue(new StringValue(hostname));
         LOG.debug1("checkDNS: got " + hostname + " (" + ip + ')');
         return true;
-    }
-
-    /**
-     * Class that implements check dns thread.
-     */
-    private class CheckDNSThread extends Thread {
-        /** Number of hops. */
-        private final int hop;
-        /** Host names as entered by user. */
-        private final String hostnameEntered;
-
-        /**
-         * Prepares a new {@code CheckDNSThread} object, with number of
-         * hops and host names delimited with commas.
-         */
-        CheckDNSThread(final int hop, final String hostnameEntered) {
-            super();
-            this.hop = hop;
-            this.hostnameEntered = hostnameEntered;
-        }
-
-        /** Runs the check dns thread. */
-        @Override
-        public void run() {
-            answerPaneSetText(
-                        Tools.getString("Dialog.Host.Configuration.DNSLookup"));
-            hostnameOk = checkDNS(hop, hostnameEntered);
-            if (hostnameOk) {
-                answerPaneSetText(
-                    Tools.getString("Dialog.Host.Configuration.DNSLookupOk"));
-            } else {
-                printErrorAndRetry(
-                   Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
-            }
-            final Value[] items = StringValue.getValues(getHost().getIps(hop));
-            if (items != null) {
-                Tools.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        final String savedIp = getHost().getIp(hop);
-                        final Value defaultIp;
-                        if (savedIp == null && items.length > 0) {
-                            defaultIp = items[0];
-                        } else {
-                            defaultIp = new StringValue(savedIp);
-                        }
-                        ipCombo[hop].reloadComboBox(defaultIp, items);
-
-                        if (items.length > 1) {
-                            ipCombo[hop].setEnabled(true);
-                        }
-                    }
-                });
-            }
-        }
     }
 
     /** Returns number of hops. */
@@ -409,5 +354,60 @@ public class Configuration extends DialogHost {
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad
         return pane;
+    }
+
+    /**
+     * Class that implements check dns thread.
+     */
+    private class CheckDNSThread extends Thread {
+        /** Number of hops. */
+        private final int hop;
+        /** Host names as entered by user. */
+        private final String hostnameEntered;
+
+        /**
+         * Prepares a new {@code CheckDNSThread} object, with number of
+         * hops and host names delimited with commas.
+         */
+        CheckDNSThread(final int hop, final String hostnameEntered) {
+            super();
+            this.hop = hop;
+            this.hostnameEntered = hostnameEntered;
+        }
+
+        /** Runs the check dns thread. */
+        @Override
+        public void run() {
+            answerPaneSetText(
+                        Tools.getString("Dialog.Host.Configuration.DNSLookup"));
+            hostnameOk = checkDNS(hop, hostnameEntered);
+            if (hostnameOk) {
+                answerPaneSetText(
+                    Tools.getString("Dialog.Host.Configuration.DNSLookupOk"));
+            } else {
+                printErrorAndRetry(
+                   Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
+            }
+            final Value[] items = StringValue.getValues(getHost().getIps(hop));
+            if (items != null) {
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        final String savedIp = getHost().getIp(hop);
+                        final Value defaultIp;
+                        if (savedIp == null && items.length > 0) {
+                            defaultIp = items[0];
+                        } else {
+                            defaultIp = new StringValue(savedIp);
+                        }
+                        ipCombo[hop].reloadComboBox(defaultIp, items);
+
+                        if (items.length > 1) {
+                            ipCombo[hop].setEnabled(true);
+                        }
+                    }
+                });
+            }
+        }
     }
 }

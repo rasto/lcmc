@@ -65,14 +65,27 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Scrollbar max rows. */
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
 
+    /** Add items to the combo box. */
+    protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
+        Value selectedValueInfo = null;
+        if (items != null) {
+            for (final Value item : items) {
+                if (Tools.areEqual(item, selectedValue)) {
+                    selectedValueInfo = item;
+                }
+                comboList.add(item);
+            }
+            if (selectedValueInfo == null && selectedValue != null) {
+                comboList.add(selectedValue);
+                selectedValueInfo = selectedValue;
+            }
+        }
+        return selectedValueInfo;
+    }
+
     /** Prepares a new {@code ComboBox} object. */
-    public ComboBox(final Value selectedValue,
-                    final Value[] items,
-                    final String regexp,
-                    final int width,
-                    final Map<String, String> abbreviations,
-                    final AccessMode enableAccessMode,
-                    final MyButton fieldButton) {
+    public ComboBox(
+        final Value selectedValue, final Value[] items, final String regexp, final int width, final Map<String, String> abbreviations, final AccessMode enableAccessMode, final MyButton fieldButton) {
         super(regexp,
               enableAccessMode,
               fieldButton);
@@ -84,20 +97,16 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     /** Returns combo box with items in the combo and selectedValue on top. */
-    private MComboBox<Value> getComboBox(
-                                  final Value selectedValue,
-                                  final Value[] items,
-                                  final String regexp,
-                                  final Map<String, String> abbreviations) {
+    private MComboBox<Value> getComboBox(final Value selectedValue, final Value[] items, final String regexp, final Map<String, String> abbreviations) {
         final List<Value> comboList = new ArrayList<Value>();
 
         final Value selectedValueInfo = addItems(comboList,
-                                                  selectedValue,
-                                                  items);
+                                                 selectedValue,
+                                                 items);
         final MComboBox<Value> cb = new MComboBox<Value>(comboList.toArray(
-                                            new Value[comboList.size()]));
+            new Value[comboList.size()]));
         final JTextComponent editor =
-                        (JTextComponent) cb.getEditor().getEditorComponent();
+            (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
@@ -127,24 +136,23 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     /** Returns true if combo box has changed. */
-    private boolean hasComboBoxChanged(final Value[] items) {
-        final MComboBox<Value> cb = getInternalComponent();
-        if (items.length != cb.getItemCount()) {
-            return true;
-        }
-
-        for (int i = 0; i < items.length; i++) {
-            if (!Tools.areEqual(items[i], cb.getItemAt(i))) {
+        private boolean hasComboBoxChanged(final Value[] items) {
+            final MComboBox<Value> cb = getInternalComponent();
+            if (items.length != cb.getItemCount()) {
                 return true;
             }
+            
+            for (int i = 0; i < items.length; i++) {
+                if (!Tools.areEqual(items[i], cb.getItemAt(i))) {
+                    return true;
+                }
+            }
+            return false;
         }
-        return false;
-    }
 
     /** Reloads combo box with items and selects supplied value. */
-    @Override
-    public void reloadComboBox(final Value selectedValue,
-                               final Value[] items) {
+        @Override
+    public void reloadComboBox(final Value selectedValue, final Value[] items) {
         final String stackTrace = Tools.getStackTrace();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
@@ -154,13 +162,13 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                 if (selectedObject != null
                     && !(selectedObject instanceof Value)) {
                     LOG.appError("reloadComboBox: selected item not a value: " + selectedObject
-                        + ", stacktrance: " + stackTrace);
+                                 + ", stacktrance: " + stackTrace);
                 }
                 final Value selectedItem = (Value) selectedObject;
                 boolean selectedChanged = false;
                 if (selectedValue == null
                     && selectedItem != null
-                         && !selectedItem.isNothingSelected()) {
+                    && !selectedItem.isNothingSelected()) {
                     selectedChanged = true;
                 } else if (selectedValue != null
                            && !selectedValue.equals(selectedItem)) {
@@ -176,9 +184,9 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
 
                 final Collection<Value> comboList = new ArrayList<Value>();
                 final Value selectedValueInfo = addItems(comboList,
-                                                          selectedValue,
-                                                          items);
-
+                                                         selectedValue,
+                                                         items);
+                
                 if (itemsChanged) {
                     final Collection<Value> itemCache = new HashSet<Value>();
                     cb.setSelectedIndex(-1);
@@ -195,26 +203,6 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                 }
             }
         });
-    }
-
-    /** Add items to the combo box. */
-    protected static Value addItems(final Collection<Value> comboList,
-                                     final Value selectedValue,
-                                     final Value[] items) {
-        Value selectedValueInfo = null;
-        if (items != null) {
-            for (final Value item : items) {
-                if (Tools.areEqual(item, selectedValue)) {
-                    selectedValueInfo = item;
-                }
-                comboList.add(item);
-            }
-            if (selectedValueInfo == null && selectedValue != null) {
-                comboList.add(selectedValue);
-                selectedValueInfo = selectedValue;
-            }
-        }
-        return selectedValueInfo;
     }
 
     /** Set combo box editable. */

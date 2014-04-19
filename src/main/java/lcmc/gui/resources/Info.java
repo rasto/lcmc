@@ -94,6 +94,11 @@ import lcmc.utilities.LoggerFactory;
 public class Info implements Comparable<Info>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
+    /** Amount of frames per second. */
+    private static final float FPS = Tools.getApplication().getAnimFPS();
+    /** Log file icon. */
+    public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
+                                  Tools.getDefault("Info.LogIcon"));
     /** Menu node of this object. */
     private DefaultMutableTreeNode node = null;
     /** Name of the object. */
@@ -101,8 +106,6 @@ public class Info implements Comparable<Info>, Value {
     /** Resource object as found in data/resources associated with this
      * object. */
     private Resource resource;
-    /** Amount of frames per second. */
-    private static final float FPS = Tools.getApplication().getAnimFPS();
     /** TODL: Checking for leak. */
     private int maxMenuList = 0;
 
@@ -135,9 +138,6 @@ public class Info implements Comparable<Info>, Value {
     /** Table models. */
     private final Map<String, DefaultTableModel> tableModels =
                                     new HashMap<String, DefaultTableModel>();
-    /** Log file icon. */
-    public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
-                                  Tools.getDefault("Info.LogIcon"));
     /** Hash from component to the edit access mode. */
     private final Map<JTextComponent, AccessMode> componentToEditAccessMode =
                                      new HashMap<JTextComponent, AccessMode>();

@@ -90,6 +90,25 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Logger. */
     private static final Logger LOG =
                              LoggerFactory.getLogger(ResourceInfo.class);
+    /** Name of the drbd resource name parameter. */
+    static final String DRBD_RES_PARAM_NAME = "name";
+    /** Proxy section. */
+    private static final String SECTION_PROXY = "proxy";
+    /** Proxy ports section. */
+    private static final String SECTION_PROXY_PORTS =
+                                 Tools.getString("ResourceInfo.ProxyPorts");
+    /** Default DRBD proxy protocol. */
+    private static final Value PROXY_DEFAULT_PROTOCOL = DrbdXML.PROTOCOL_A;
+    /** Default DRBD proxy ping timeout. */
+    private static final Value PROXY_DEFAULT_PING_TIMEOUT = new StringValue("100");
+
+    /** Parse ip and host name. */
+    public static final Pattern DRBDP_ADDRESS =
+       Pattern.compile('^' + ProxyNetInfo.PROXY_PREFIX
+                       + "(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\s+\\S+\\s+(\\S+))$");
+
+    public static final String FAMILY_SDP = "sdp";
+    public static final String FAMILY_SSOCKS = "ssocks";
     /** List of volumes. */
     private final Set<VolumeInfo> drbdVolumes =
                                         new LinkedHashSet<VolumeInfo>();
@@ -101,8 +120,6 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private JComponent infoPanel = null;
     /** Whether the meta-data has to be created or not. */
     private boolean haveToCreateMD = false;
-    /** Name of the drbd resource name parameter. */
-    static final String DRBD_RES_PARAM_NAME = "name";
     /** A map from host to the combobox with addresses. */
     private Map<Host, Widget> addressComboBoxHash =
                                              new HashMap<Host, Widget>();
@@ -156,23 +173,6 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private final Set<Host> hosts;
     /** Selected proxy hosts for this resource. */
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
-    /** Proxy section. */
-    private static final String SECTION_PROXY = "proxy";
-    /** Proxy ports section. */
-    private static final String SECTION_PROXY_PORTS =
-                                 Tools.getString("ResourceInfo.ProxyPorts");
-    /** Default DRBD proxy protocol. */
-    private static final Value PROXY_DEFAULT_PROTOCOL = DrbdXML.PROTOCOL_A;
-    /** Default DRBD proxy ping timeout. */
-    private static final Value PROXY_DEFAULT_PING_TIMEOUT = new StringValue("100");
-
-    /** Parse ip and host name. */
-    public static final Pattern DRBDP_ADDRESS =
-       Pattern.compile('^' + ProxyNetInfo.PROXY_PREFIX
-                       + "(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\s+\\S+\\s+(\\S+))$");
-
-    public static final String FAMILY_SDP = "sdp";
-    public static final String FAMILY_SSOCKS = "ssocks";
     /**
      * Prepares a new {@code ResourceInfo} object.
      */

@@ -56,6 +56,9 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                                    LoggerFactory.getLogger(MyMenuItem.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Screen device. */
+    private static final GraphicsDevice SCREEN_DEVICE =
+     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Text of the item. */
     private String text1;
     /** Icon of the item. */
@@ -74,9 +77,6 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private Point2D pos;
     /** Robot to move a mouse a little if a tooltip has changed. */
     private final Robot robot;
-    /** Screen device. */
-    private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tooltip background color. */
     private Color toolTipBackground = null;
     /** Access Type for this component to become enabled. */

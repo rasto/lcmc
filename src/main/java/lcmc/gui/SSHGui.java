@@ -63,14 +63,14 @@ import lcmc.utilities.LoggerFactory;
 public final class SSHGui {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSHGui.class);
+    /** Default length of fields. */
+    private static final int DEFAULT_FIELD_LENGTH = 20;
     /** Root pane on which the dialogs are comming to. */
     private final Container rootPane;
     /** Host data object. */
     private final Host host;
     /** Progress bar. */
     private final ProgressBar progressBar;
-    /** Default length of fields. */
-    private static final int DEFAULT_FIELD_LENGTH = 20;
 
     /** Prepares a new {@code SSHGui} object. */
     public SSHGui(final Container rootPane,

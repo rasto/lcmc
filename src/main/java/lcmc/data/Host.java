@@ -82,6 +82,73 @@ import lcmc.utilities.Unit;
 public class Host implements Comparable<Host>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String NOT_CONNECTED_STRING =
+                                                   "not connected to the host";
+    /** String that is displayed as a tool tip for disabled menu item. */
+    public static final String PROXY_NOT_CONNECTED_STRING =
+                                             "not connected to the proxy host";
+    /** Block device with number pattern. */
+    public static final Pattern BDP = Pattern.compile("(\\D+)\\d+");
+    /** DRBD bd pattern. */
+    public static final Pattern DRBDP = Pattern.compile(".*\\/drbd\\d+$");
+    /** Block device / used pattern. */
+    public static final Pattern DISK_SPACE_P =
+                                            Pattern.compile("^(.*) (\\d+)$");
+    /** Timeout after which the connection is considered to be dead. */
+    private static final int PING_TIMEOUT           = 40000;
+    private static final int DRBD_EVENTS_TIMEOUT    = 40000;
+    private static final int CLUSTER_EVENTS_TIMEOUT = 40000;
+    private static final int HW_INFO_TIMEOUT        = 40000;
+
+    public static final String DEFAULT_HOSTNAME = "unknown";
+
+    /** Choices for gui drop down menus. */
+    public static final String VM_FILESYSTEM_SOURCE_DIR_LXC =
+                                                "vm.filesystem.source.dir.lxc";
+
+    /** Root user name. */
+    public static final String ROOT_USER = "root";
+    /** Default SSH port. */
+    public static final String DEFAULT_SSH_PORT = "22";
+    /** Log commands on the servers. */
+    private static final String GUI_HELPER_CMD_LOG_OP = "--cmd-log";
+
+    private static final String NET_INFO            = "net-info";
+    private static final String BRIDGE_INFO         = "bridge-info";
+    private static final String DISK_INFO           = "disk-info";
+    private static final String DISK_SPACE          = "disk-space";
+    private static final String VG_INFO             = "vg-info";
+    private static final String FILESYSTEMS_INFO    = "filesystems-info";
+    private static final String CRYPTO_INFO         = "crypto-info";
+    private static final String QEMU_KEYMAPS_INFO   = "qemu-keymaps-info";
+    private static final String CPU_MAP_MODEL_INFO  = "cpu-map-model-info";
+    private static final String CPU_MAP_VENDOR_INFO = "cpu-map-vendor-info";
+    private static final String MOUNT_POINTS_INFO   = "mount-points-info";
+    private static final String GUI_INFO            = "gui-info";
+    private static final String INSTALLATION_INFO   = "installation-info";
+    private static final String GUI_OPTIONS_INFO    = "gui-options-info";
+    private static final String VERSION_INFO        = "version-info";
+    private static final String DRBD_PROXY_INFO     = "drbd-proxy-info";
+
+    private static final Collection<String> INFO_TYPES =
+             new HashSet<String>(Arrays.asList(new String[]{NET_INFO,
+                                                            BRIDGE_INFO,
+                                                            DISK_INFO,
+                                                            DISK_SPACE,
+                                                            VG_INFO,
+                                                            FILESYSTEMS_INFO,
+                                                            CRYPTO_INFO,
+                                                            QEMU_KEYMAPS_INFO,
+                                                            CPU_MAP_MODEL_INFO,
+                                                            CPU_MAP_VENDOR_INFO,
+                                                            MOUNT_POINTS_INFO,
+                                                            GUI_INFO,
+                                                            INSTALLATION_INFO,
+                                                            GUI_OPTIONS_INFO,
+                                                            VERSION_INFO,
+                                                            DRBD_PROXY_INFO}));
+    public static final boolean UPDATE_LVM = true;
     /** Name of the host. */
     private String name;
     /** Hostname as entered by the user. Could be ipAddress, hostname with or without
@@ -275,19 +342,6 @@ public class Host implements Comparable<Host>, Value {
     private Boolean corosyncHeartbeatRunning = null;
     /** Libvirt version. */
     private String libvirtVersion = null;
-    /** String that is displayed as a tool tip for disabled menu item. */
-    public static final String NOT_CONNECTED_STRING =
-                                                   "not connected to the host";
-    /** String that is displayed as a tool tip for disabled menu item. */
-    public static final String PROXY_NOT_CONNECTED_STRING =
-                                             "not connected to the proxy host";
-    /** Block device with number pattern. */
-    public static final Pattern BDP = Pattern.compile("(\\D+)\\d+");
-    /** DRBD bd pattern. */
-    public static final Pattern DRBDP = Pattern.compile(".*\\/drbd\\d+$");
-    /** Block device / used pattern. */
-    public static final Pattern DISK_SPACE_P =
-                                            Pattern.compile("^(.*) (\\d+)$");
     /** Physical volumes on this host. */
     private List<BlockDevice> physicalVolumes = new ArrayList<BlockDevice>();
     /** Volume group information on this host. */
@@ -312,60 +366,6 @@ public class Host implements Comparable<Host>, Value {
     private boolean inCluster = false;
     /** Whether dist info was already logged. */
     private boolean distInfoLogged = false;
-    /** Timeout after which the connection is considered to be dead. */
-    private static final int PING_TIMEOUT           = 40000;
-    private static final int DRBD_EVENTS_TIMEOUT    = 40000;
-    private static final int CLUSTER_EVENTS_TIMEOUT = 40000;
-    private static final int HW_INFO_TIMEOUT        = 40000;
-
-    public static final String DEFAULT_HOSTNAME = "unknown";
-
-    /** Choices for gui drop down menus. */
-    public static final String VM_FILESYSTEM_SOURCE_DIR_LXC =
-                                                "vm.filesystem.source.dir.lxc";
-
-    /** Root user name. */
-    public static final String ROOT_USER = "root";
-    /** Default SSH port. */
-    public static final String DEFAULT_SSH_PORT = "22";
-    /** Log commands on the servers. */
-    private static final String GUI_HELPER_CMD_LOG_OP = "--cmd-log";
-
-    private static final String NET_INFO            = "net-info";
-    private static final String BRIDGE_INFO         = "bridge-info";
-    private static final String DISK_INFO           = "disk-info";
-    private static final String DISK_SPACE          = "disk-space";
-    private static final String VG_INFO             = "vg-info";
-    private static final String FILESYSTEMS_INFO    = "filesystems-info";
-    private static final String CRYPTO_INFO         = "crypto-info";
-    private static final String QEMU_KEYMAPS_INFO   = "qemu-keymaps-info";
-    private static final String CPU_MAP_MODEL_INFO  = "cpu-map-model-info";
-    private static final String CPU_MAP_VENDOR_INFO = "cpu-map-vendor-info";
-    private static final String MOUNT_POINTS_INFO   = "mount-points-info";
-    private static final String GUI_INFO            = "gui-info";
-    private static final String INSTALLATION_INFO   = "installation-info";
-    private static final String GUI_OPTIONS_INFO    = "gui-options-info";
-    private static final String VERSION_INFO        = "version-info";
-    private static final String DRBD_PROXY_INFO     = "drbd-proxy-info";
-
-    private static final Collection<String> INFO_TYPES =
-             new HashSet<String>(Arrays.asList(new String[]{NET_INFO,
-                                                            BRIDGE_INFO,
-                                                            DISK_INFO,
-                                                            DISK_SPACE,
-                                                            VG_INFO,
-                                                            FILESYSTEMS_INFO,
-                                                            CRYPTO_INFO,
-                                                            QEMU_KEYMAPS_INFO,
-                                                            CPU_MAP_MODEL_INFO,
-                                                            CPU_MAP_VENDOR_INFO,
-                                                            MOUNT_POINTS_INFO,
-                                                            GUI_INFO,
-                                                            INSTALLATION_INFO,
-                                                            GUI_OPTIONS_INFO,
-                                                            VERSION_INFO,
-                                                            DRBD_PROXY_INFO}));
-    public static final boolean UPDATE_LVM = true;
     /**
      * Prepares a new {@code Host} object. Initializes host browser and
      * host's resources.

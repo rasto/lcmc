@@ -86,13 +86,6 @@ public class HbConnectionInfo extends EditableInfo {
     /** List of order ids. */
     private final Map<String, HbOrderInfo> orderIds =
                                       new LinkedHashMap<String, HbOrderInfo>();
-    /** Colocation Score type. */
-    public enum ColScoreType { MIXED,
-                               INFINITY,
-                               MINUS_INFINITY,
-                               IS_NULL,
-                               NEGATIVE,
-                               POSITIVE }
 
     /** Prepares a new {@code HbConnectionInfo} object. */
     public HbConnectionInfo(final Browser browser) {
@@ -1071,4 +1064,11 @@ public class HbConnectionInfo extends EditableInfo {
             c.revert();
         }
     }
+    /** Colocation Score type. */
+    public enum ColScoreType { MIXED,
+                               INFINITY,
+                               MINUS_INFINITY,
+                               IS_NULL,
+                               NEGATIVE,
+                               POSITIVE }
 }

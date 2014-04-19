@@ -60,6 +60,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                       LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
+    /** No match string. */
+    private static final String NO_MATCH_STRING = "No Match";
+    /** Newline. */
+    private static final String NEWLINE = "\\r?\\n";
+    /** Height of the choice boxes. */
+    private static final int CHOICE_BOX_HEIGHT = 30;
     /** Combo box with distributions. */
     private Widget drbdDistCombo = null;
     /** Combo box with available kernel versions for this distribution. */
@@ -73,12 +79,6 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private List<String> drbdKernelDirItems = null;
     /** List of items in the arch combo. */
     private List<String> drbdArchItems = null;
-    /** No match string. */
-    private static final String NO_MATCH_STRING = "No Match";
-    /** Newline. */
-    private static final String NEWLINE = "\\r?\\n";
-    /** Height of the choice boxes. */
-    private static final int CHOICE_BOX_HEIGHT = 30;
 
     /** Prepares a new {@code DrbdLinbitAvailPackages} object. */
     public DrbdLinbitAvailPackages(final WizardDialog previousDialog,

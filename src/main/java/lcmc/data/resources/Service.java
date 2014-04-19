@@ -39,6 +39,23 @@ import lcmc.utilities.LoggerFactory;
 public class Service extends Resource {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Service.class);
+    /** Heartbeat id prefix for resource. */
+    public static final String RES_ID_PREFIX = "res_";
+    /** Heartbeat id prefix for stonith device. */
+    public static final String STONITH_ID_PREFIX = "stonith_";
+    /** Heartbeat id prefix for group. */
+    public static final String GRP_ID_PREFIX = "grp_";
+    /** Pacemaker id prefix for clone. */
+    public static final String CL_ID_PREFIX = "cl_";
+    /** Pacemaker id prefix for master/slave. */
+    public static final String MS_ID_PREFIX = "ms_";
+    /** Name of the clone set pacemaker object. */
+    private static final String CLONE_SET_NAME = Application.PM_CLONE_SET_NAME;
+    /** Name of the master / slave set pacemaker object. */
+    private static final String MASTER_SLAVE_SET_NAME =
+                                        Application.PM_MASTER_SLAVE_SET_NAME;
+    /** Name of the group pacemaker object. */
+    private static final String GROUP_NAME = Application.PM_GROUP_NAME;
     /** Id is crmId whithout name of the service. */
     private String id = null;
     /** Heartbeat id of this service. */
@@ -59,23 +76,6 @@ public class Service extends Resource {
     private boolean master = false;
     /** Whether this service is stonith device. */
     private boolean stonith = false;
-    /** Heartbeat id prefix for resource. */
-    public static final String RES_ID_PREFIX = "res_";
-    /** Heartbeat id prefix for stonith device. */
-    public static final String STONITH_ID_PREFIX = "stonith_";
-    /** Heartbeat id prefix for group. */
-    public static final String GRP_ID_PREFIX = "grp_";
-    /** Pacemaker id prefix for clone. */
-    public static final String CL_ID_PREFIX = "cl_";
-    /** Pacemaker id prefix for master/slave. */
-    public static final String MS_ID_PREFIX = "ms_";
-    /** Name of the clone set pacemaker object. */
-    private static final String CLONE_SET_NAME = Application.PM_CLONE_SET_NAME;
-    /** Name of the master / slave set pacemaker object. */
-    private static final String MASTER_SLAVE_SET_NAME =
-                                        Application.PM_MASTER_SLAVE_SET_NAME;
-    /** Name of the group pacemaker object. */
-    private static final String GROUP_NAME = Application.PM_GROUP_NAME;
 
     /**
      * Prepares a new {@code Service} object.

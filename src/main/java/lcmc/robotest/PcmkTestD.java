@@ -33,11 +33,6 @@ final class PcmkTestD {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTestD.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestD() {
-        /* Cannot be instantiated. */
-    }
-
     /** Pacemaker Leak tests. */
     static void start(final int count) {
         slowFactor = 0.2f;
@@ -82,5 +77,10 @@ final class PcmkTestD {
             }
         }
         removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestD() {
+        /* Cannot be instantiated. */
     }
 }

@@ -78,54 +78,6 @@ import javax.swing.JPopupMenu;
  *
  */
 public final class CRMGraph extends ResourceGraph {
-    /** List with edges that are order constraints. */
-    private final Collection<Edge> edgeIsOrderList = new HashSet<Edge>();
-    /** List with edges that should be kept as order constraints. */
-    private final Collection<Edge> keepEdgeIsOrderList = new HashSet<Edge>();
-    /** List with edges that are colocation constraints. */
-    private final Collection<Edge> edgeIsColocationList = new HashSet<Edge>();
-    /** List with edges that should be kept as colocation constraints. */
-    private final Collection<Edge> keepEdgeIsColocationList = new HashSet<Edge>();
-    /** Vertex is present lock. */
-    private final Lock mVertexIsPresentListLock = new ReentrantLock();
-    /** List with vertices that are present. */
-    private Set<Vertex> vertexIsPresentList = new HashSet<Vertex>();
-    /** Map from vertex to 'Add service' menu. */
-    private final Map<Vertex, JMenu> vertexToAddServiceMap =
-                                                new HashMap<Vertex, JMenu>();
-    /** Map from vertex to 'Add existing service' menu. */
-    private final Map<Vertex, JMenu> vertexToAddExistingServiceMap =
-                                                new HashMap<Vertex, JMenu>();
-    /** Map from edge to the hb connection info of this constraint. */
-    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap =
-                                new LinkedHashMap<Edge, HbConnectionInfo>();
-    /** Map from hb connection info to the edge. */
-    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
-                                new LinkedHashMap<HbConnectionInfo, Edge>();
-    /** Pcmk connection lock. */
-    private final ReadWriteLock mHbConnectionLock =
-                                                  new ReentrantReadWriteLock();
-    /** Pcmk connection read lock. */
-    private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
-    /** Pcmk connection write lock. */
-    private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
-    /** Map from the vertex to the host. */
-    private final Map<Vertex, HostInfo> vertexToHostMap =
-                                         new LinkedHashMap<Vertex, HostInfo>();
-    /** Map from the host to the vertex. */
-    private final Map<Info, Vertex> hostToVertexMap =
-                                         new LinkedHashMap<Info, Vertex>();
-    /** Map from the vertex to the constraint placeholder. */
-    private final Map<Vertex, ConstraintPHInfo> vertexToConstraintPHMap =
-                                 new HashMap<Vertex, ConstraintPHInfo>();
-    /** Map from the host to the vertex. */
-    private final Map<Info, Vertex> constraintPHToVertexMap =
-                                         new HashMap<Info, Vertex>();
-
-    /** The first X position of the host. */
-    private int hostDefaultXPos = 10;
-    /** Interval beetween two animation frames. */
-    private Info multiSelectionInfo = null;
     /** X position of a new block device. */
     private static final int BD_X_POS = 15;
     /** Y position of the host. */
@@ -175,6 +127,54 @@ public final class CRMGraph extends ResourceGraph {
     private static final ImageIcon SERVICE_MIGRATED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
                                               "CRMGraph.ServiceMigratedIcon"));
+    /** List with edges that are order constraints. */
+    private final Collection<Edge> edgeIsOrderList = new HashSet<Edge>();
+    /** List with edges that should be kept as order constraints. */
+    private final Collection<Edge> keepEdgeIsOrderList = new HashSet<Edge>();
+    /** List with edges that are colocation constraints. */
+    private final Collection<Edge> edgeIsColocationList = new HashSet<Edge>();
+    /** List with edges that should be kept as colocation constraints. */
+    private final Collection<Edge> keepEdgeIsColocationList = new HashSet<Edge>();
+    /** Vertex is present lock. */
+    private final Lock mVertexIsPresentListLock = new ReentrantLock();
+    /** List with vertices that are present. */
+    private Set<Vertex> vertexIsPresentList = new HashSet<Vertex>();
+    /** Map from vertex to 'Add service' menu. */
+    private final Map<Vertex, JMenu> vertexToAddServiceMap =
+                                                new HashMap<Vertex, JMenu>();
+    /** Map from vertex to 'Add existing service' menu. */
+    private final Map<Vertex, JMenu> vertexToAddExistingServiceMap =
+                                                new HashMap<Vertex, JMenu>();
+    /** Map from edge to the hb connection info of this constraint. */
+    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap =
+                                new LinkedHashMap<Edge, HbConnectionInfo>();
+    /** Map from hb connection info to the edge. */
+    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
+                                new LinkedHashMap<HbConnectionInfo, Edge>();
+    /** Pcmk connection lock. */
+    private final ReadWriteLock mHbConnectionLock =
+                                                  new ReentrantReadWriteLock();
+    /** Pcmk connection read lock. */
+    private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
+    /** Pcmk connection write lock. */
+    private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
+    /** Map from the vertex to the host. */
+    private final Map<Vertex, HostInfo> vertexToHostMap =
+                                         new LinkedHashMap<Vertex, HostInfo>();
+    /** Map from the host to the vertex. */
+    private final Map<Info, Vertex> hostToVertexMap =
+                                         new LinkedHashMap<Info, Vertex>();
+    /** Map from the vertex to the constraint placeholder. */
+    private final Map<Vertex, ConstraintPHInfo> vertexToConstraintPHMap =
+                                 new HashMap<Vertex, ConstraintPHInfo>();
+    /** Map from the host to the vertex. */
+    private final Map<Info, Vertex> constraintPHToVertexMap =
+                                         new HashMap<Info, Vertex>();
+
+    /** The first X position of the host. */
+    private int hostDefaultXPos = 10;
+    /** Interval beetween two animation frames. */
+    private Info multiSelectionInfo = null;
     /** Prepares a new {@code CRMGraph} object. */
     CRMGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);

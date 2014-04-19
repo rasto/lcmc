@@ -84,11 +84,15 @@ public final class MainMenu extends JPanel implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(MainMenu.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Menu bar. */
-    private final JMenuBar menuBar;
     /** Look and feel map. */
     private static final Map<String, String> LOOK_AND_FEEL_MAP =
                                                 new HashMap<String, String>();
+
+    /** Host icon. */
+    private static final ImageIcon HOST_ICON =
+                Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
+    /** Menu bar. */
+    private final JMenuBar menuBar;
     /**
      * because glassPane does not capture key events in my version of java,
      * the menu must turned off explicitly. */
@@ -109,10 +113,6 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String infoText = null;
     /** Info text panel. */
     private final JPanel infoTextPanel = new JPanel();
-
-    /** Host icon. */
-    private static final ImageIcon HOST_ICON =
-                Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
 
     /** Prepares a new {@code MainMenu} object with main menu. */
     public MainMenu() {

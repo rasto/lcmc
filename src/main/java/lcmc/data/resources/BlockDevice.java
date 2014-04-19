@@ -43,6 +43,38 @@ public class BlockDevice extends Resource {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(BlockDevice.class);
+    /** States that means that we are connected. */
+    private static final Set<String> CONNECTED_STATES =
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                           "Connected",
+                                                           "SyncTarget",
+                                                           "SyncSource",
+                                                           "StartingSyncS",
+                                                           "StartingSyncT",
+                                                           "WFBitMapS",
+                                                           "WFBitMapT",
+                                                           "WFSyncUUID",
+                                                           "PausedSyncS",
+                                                           "PausedSyncT",
+                                                           "VerifyS",
+                                                           "VerifyT")));
+
+    /** Syncing states. */
+    private static final Set<String> SYNCING_STATES =
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            "SyncTarget",
+                                                            "SyncSource",
+                                                            "PausedSyncS",
+                                                            "PausedSyncT")));
+
+    private static final String TOKEN_UUID    = "uuid";
+    private static final String TOKEN_SIZE    = "size";
+    private static final String TOKEN_MP      = "mp";
+    private static final String TOKEN_FS      = "fs";
+    private static final String TOKEN_VG      = "vg";
+    private static final String TOKEN_LV      = "lv";
+    private static final String TOKEN_PV      = "pv";
+    private static final String TOKEN_DISK_ID = "disk-id";
     /** Block size in blocks. */
     private String blockSize;
     /** Disk UUID. */
@@ -91,38 +123,6 @@ public class BlockDevice extends Resource {
     private BlockDevice drbdBlockDevice = null;
     /* Backing disk that is used in drbd config. */
     private String drbdBackingDisk = null;
-    /** States that means that we are connected. */
-    private static final Set<String> CONNECTED_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                                                           "Connected",
-                                                           "SyncTarget",
-                                                           "SyncSource",
-                                                           "StartingSyncS",
-                                                           "StartingSyncT",
-                                                           "WFBitMapS",
-                                                           "WFBitMapT",
-                                                           "WFSyncUUID",
-                                                           "PausedSyncS",
-                                                           "PausedSyncT",
-                                                           "VerifyS",
-                                                           "VerifyT")));
-
-    /** Syncing states. */
-    private static final Set<String> SYNCING_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                                                            "SyncTarget",
-                                                            "SyncSource",
-                                                            "PausedSyncS",
-                                                            "PausedSyncT")));
-
-    private static final String TOKEN_UUID    = "uuid";
-    private static final String TOKEN_SIZE    = "size";
-    private static final String TOKEN_MP      = "mp";
-    private static final String TOKEN_FS      = "fs";
-    private static final String TOKEN_VG      = "vg";
-    private static final String TOKEN_LV      = "lv";
-    private static final String TOKEN_PV      = "pv";
-    private static final String TOKEN_DISK_ID = "disk-id";
 
     /**
      * Creates a new {@code BlockDevice} object.

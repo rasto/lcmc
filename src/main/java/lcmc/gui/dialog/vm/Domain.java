@@ -45,9 +45,6 @@ import java.awt.Dimension;
  *
  */
 public final class Domain extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
-    private Widget domainNameWi;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VMSXML.VM_PARAM_DOMAIN_TYPE,
                                             VMSXML.VM_PARAM_NAME,
@@ -62,6 +59,9 @@ public final class Domain extends VMConfig {
                                             VMSXML.VM_PARAM_INIT,
                                             VMSXML.VM_PARAM_TYPE_ARCH,
                                             VMSXML.VM_PARAM_TYPE_MACHINE};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
+    private Widget domainNameWi;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 

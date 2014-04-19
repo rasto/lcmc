@@ -40,11 +40,6 @@ final class PcmkTest1 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest1.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest1() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final Cluster cluster) {
         RoboTest.slowFactor = 0.4f;
         RoboTest.aborted = false;
@@ -621,7 +616,7 @@ final class PcmkTest1 {
         moveTo(ipX, ipY);
         rightClick();
         moveTo(
-             Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
+            Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
         leftClick();
         checkTest(testName, 28.4);
         moveTo(700, 520); /* reset selection */
@@ -644,5 +639,10 @@ final class PcmkTest1 {
             removeEverything();
         }
         checkTest(testName, 1);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest1() {
+        /* Cannot be instantiated. */
     }
 }

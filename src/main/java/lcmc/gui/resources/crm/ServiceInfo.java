@@ -107,60 +107,6 @@ public class ServiceInfo extends EditableInfo {
 
     /** Nothing selected */
     private static final Value NOTHING_SELECTED_VALUE = new StringValue();
-    /** A map from host to the combobox with scores. */
-    private final Map<HostInfo, Widget> scoreComboBoxHash =
-                                          new HashMap<HostInfo, Widget>();
-    /** A map from host to stored score. */
-    private final Map<HostInfo, HostLocation> savedHostLocations =
-                                         new HashMap<HostInfo, HostLocation>();
-    /** A combobox with pingd constraint. */
-    private Widget pingComboBox = null;
-    /** Saved ping constraint. */
-    private Value savedPingOperation = NOTHING_SELECTED_VALUE;
-    /** Saved meta attrs id. */
-    private String savedMetaAttrsId = null;
-    /** Saved operations id. */
-    private String savedOperationsId = null;
-    /** A map from operation to the stored value. First key is
-     * operation name like "start" and second key is parameter like
-     * "timeout". */
-    private final MultiKeyMap<String, Value> savedOperation =
-                                             new MultiKeyMap<String, Value>();
-    /** Whether id-ref for meta-attributes is used. */
-    private ServiceInfo savedMetaAttrInfoRef = null;
-    /** Combo box with same as operations option. */
-    private Widget sameAsMetaAttrsWi = null;
-    /** Whether id-ref for operations is used. */
-    private ServiceInfo savedOperationIdRef = null;
-    /** Combo box with same as operations option. */
-    private Widget sameAsOperationsWi = null;
-    /** Saved operations lock. */
-    private final Lock mSavedOperationsLock = new ReentrantLock();
-    /** Operations combo box hash lock. */
-    private final ReadWriteLock mOperationsComboBoxHashLock =
-                                                  new ReentrantReadWriteLock();
-    /** Operations combo box hash read lock. */
-    private final Lock mOperationsComboBoxHashReadLock =
-                                        mOperationsComboBoxHashLock.readLock();
-    /** Operations combo box hash write lock. */
-    private final Lock mOperationsComboBoxHashWriteLock =
-                                       mOperationsComboBoxHashLock.writeLock();
-    /** A map from operation to its combo box. */
-    private final MultiKeyMap<String, Widget> operationsComboBoxHash =
-                                        new MultiKeyMap<String, Widget>();
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
-    /** Group info object of the group this service is in or null, if it is
-     * not in any group. */
-    private GroupInfo groupInfo = null;
-    /** Master/Slave info object, if is null, it is not master/slave
-     * resource. */
-    private volatile CloneInfo cloneInfo = null;
-    /** ResourceAgent object of the service, with name, ocf informations
-     * etc. */
-    private final ResourceAgent resourceAgent;
-    /** Radio buttons for clone/master/slave primitive resources. */
-    private Widget typeRadioGroup;
     /** Default values item in the "same as" scrolling list in meta
         attributes.*/
     private static final Value META_ATTRS_DEFAULT_VALUES =
@@ -269,6 +215,60 @@ public class ServiceInfo extends EditableInfo {
         PING_ATTRIBUTES.put("eq0", new StringValue("eq0", "no ping: stop")); /* eq 0 */
         PING_ATTRIBUTES.put("defined", new StringValue("defined", "most connections"));
     }
+    /** A map from host to the combobox with scores. */
+    private final Map<HostInfo, Widget> scoreComboBoxHash =
+                                          new HashMap<HostInfo, Widget>();
+    /** A map from host to stored score. */
+    private final Map<HostInfo, HostLocation> savedHostLocations =
+                                         new HashMap<HostInfo, HostLocation>();
+    /** A combobox with pingd constraint. */
+    private Widget pingComboBox = null;
+    /** Saved ping constraint. */
+    private Value savedPingOperation = NOTHING_SELECTED_VALUE;
+    /** Saved meta attrs id. */
+    private String savedMetaAttrsId = null;
+    /** Saved operations id. */
+    private String savedOperationsId = null;
+    /** A map from operation to the stored value. First key is
+     * operation name like "start" and second key is parameter like
+     * "timeout". */
+    private final MultiKeyMap<String, Value> savedOperation =
+                                             new MultiKeyMap<String, Value>();
+    /** Whether id-ref for meta-attributes is used. */
+    private ServiceInfo savedMetaAttrInfoRef = null;
+    /** Combo box with same as operations option. */
+    private Widget sameAsMetaAttrsWi = null;
+    /** Whether id-ref for operations is used. */
+    private ServiceInfo savedOperationIdRef = null;
+    /** Combo box with same as operations option. */
+    private Widget sameAsOperationsWi = null;
+    /** Saved operations lock. */
+    private final Lock mSavedOperationsLock = new ReentrantLock();
+    /** Operations combo box hash lock. */
+    private final ReadWriteLock mOperationsComboBoxHashLock =
+                                                  new ReentrantReadWriteLock();
+    /** Operations combo box hash read lock. */
+    private final Lock mOperationsComboBoxHashReadLock =
+                                        mOperationsComboBoxHashLock.readLock();
+    /** Operations combo box hash write lock. */
+    private final Lock mOperationsComboBoxHashWriteLock =
+                                       mOperationsComboBoxHashLock.writeLock();
+    /** A map from operation to its combo box. */
+    private final MultiKeyMap<String, Widget> operationsComboBoxHash =
+                                        new MultiKeyMap<String, Widget>();
+    /** Cache for the info panel. */
+    private JComponent infoPanel = null;
+    /** Group info object of the group this service is in or null, if it is
+     * not in any group. */
+    private GroupInfo groupInfo = null;
+    /** Master/Slave info object, if is null, it is not master/slave
+     * resource. */
+    private volatile CloneInfo cloneInfo = null;
+    /** ResourceAgent object of the service, with name, ocf informations
+     * etc. */
+    private final ResourceAgent resourceAgent;
+    /** Radio buttons for clone/master/slave primitive resources. */
+    private Widget typeRadioGroup;
 
     /**
      * Prepares a new {@code ServiceInfo} object and creates

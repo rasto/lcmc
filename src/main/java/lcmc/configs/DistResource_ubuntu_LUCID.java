@@ -31,15 +31,15 @@ import java.util.ListResourceBundle;
 public final class DistResource_ubuntu_LUCID
                                     extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-LUCID"},
         {"distributiondir",    "ubuntu-lucid"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

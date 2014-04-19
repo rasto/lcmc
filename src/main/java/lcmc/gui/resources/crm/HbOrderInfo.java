@@ -49,15 +49,15 @@ final class HbOrderInfo extends EditableInfo
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(HbOrderInfo.class);
+    /** Text of disabled item. */
+    public static final String NOT_AVAIL_FOR_PCMK_VERSION =
+                    Tools.getString("HbOrderInfo.NotAvailableForThisVersion");
     /** Parent resource in order constraint. */
     private ServiceInfo serviceInfoParent;
     /** Child resource in order constraint. */
     private ServiceInfo serviceInfoChild;
     /** Connection that keeps this constraint. */
     private final HbConnectionInfo connectionInfo;
-    /** Text of disabled item. */
-    public static final String NOT_AVAIL_FOR_PCMK_VERSION =
-                    Tools.getString("HbOrderInfo.NotAvailableForThisVersion");
 
     /** Prepares a new {@code HbOrderInfo} object. */
     HbOrderInfo(final HbConnectionInfo connectionInfo,

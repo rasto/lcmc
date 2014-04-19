@@ -98,14 +98,26 @@ public final class ProgressIndicatorPanel extends JComponent
                         LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    /** Ramp delay stop. */
+    private static final int RAMP_DELAY_STOP  = 1000;
+    /** Amount of frames per second. */
+    private static final float FPS = Tools.getApplication().getAnimFPS();
+    /** Cancel button icon. */
+    private static final ImageIcon CANCEL_ICON =
+                                Tools.createImageIcon(Tools.getDefault(
+                                        "ProgressIndicatorPanel.CancelIcon"));
+    /** Maximum alpha level. */
+    private static final int MAX_ALPHA_LEVEL = 255;
+    /** Veil color. */
+    private static final Color VEIL2_COLOR = Browser.STATUS_BACKGROUND;
+    /** Text color. */
+    private static final Color VEIL_COLOR = Browser.PANEL_BACKGROUND;
     /** Notifies whether the animation is running or not. */
     private boolean started    = false;
     /** Alpha level of the veil, used for fade in/out. */
     private volatile int alphaLevel = 0;
     /** Duration of the veil's fade in/out. */
     private int rampDelay  = 1000;
-    /** Ramp delay stop. */
-    private static final int RAMP_DELAY_STOP  = 1000;
     /** Alpha level of the veil. */
     private float shield     = 0.80f;
     /** Message displayed. */
@@ -116,18 +128,12 @@ public final class ProgressIndicatorPanel extends JComponent
                                               new HashMap<String, Point2D>();
     /** List of failed commands. */
     private final Collection<String> failuresMap = new LinkedList<String>();
-    /** Amount of frames per second. */
-    private static final float FPS = Tools.getApplication().getAnimFPS();
     /** Rendering hints to set anti aliasing. */
     private RenderingHints hints = null;
     /** Lock for the animator. */
     private final Lock mAnimatorLock = new ReentrantLock();
     /** Lock for manipulating the text array. */
     private final Lock mTextsLock = new ReentrantLock();
-    /** Cancel button icon. */
-    private static final ImageIcon CANCEL_ICON =
-                                Tools.createImageIcon(Tools.getDefault(
-                                        "ProgressIndicatorPanel.CancelIcon"));
     /** Cancel button. TODO: not used. */
     private final MyButton cancelButton = new MyButton(
                 Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
@@ -140,12 +146,6 @@ public final class ProgressIndicatorPanel extends JComponent
     private int oldHeight = getHeight();
     /** Beginning position of the bar. */
     private double barPos = -1;
-    /** Maximum alpha level. */
-    private static final int MAX_ALPHA_LEVEL = 255;
-    /** Veil color. */
-    private static final Color VEIL2_COLOR = Browser.STATUS_BACKGROUND;
-    /** Text color. */
-    private static final Color VEIL_COLOR = Browser.PANEL_BACKGROUND;
 
     /**
      * Creates a new progress panel with default values:<br />
@@ -393,6 +393,54 @@ public final class ProgressIndicatorPanel extends JComponent
 
     }
 
+    /** Mouse clicked. */
+    @Override
+    public void mouseClicked(final MouseEvent e) {
+        /* do nothing */
+    }
+
+    /** Mouse pressed. */
+    @Override
+    public void mousePressed(final MouseEvent e) {
+        /* do nothing */
+    }
+
+    /** Mouse released. */
+    @Override
+    public void mouseReleased(final MouseEvent e) {
+        /* do nothing */
+    }
+
+    /** Mouse entered. */
+    @Override
+    public void mouseEntered(final MouseEvent e) {
+        /* do nothing */
+    }
+
+    /** Mouse exited. */
+    @Override
+    public void mouseExited(final MouseEvent e) {
+        /* do nothing */
+    }
+
+    /** Key pressed. */
+    @Override
+    public void keyPressed(final KeyEvent e) {
+        /* do nothing */
+    }
+
+    /** Key released. */
+    @Override
+    public void keyReleased(final KeyEvent e) {
+        /* do nothing */
+    }
+
+    /** Key typed. */
+    @Override
+    public void keyTyped(final KeyEvent e) {
+        /* do nothing */
+    }
+
     /** Animation thread. */
     private class Animator implements Runnable {
         /** Whether the alpha level goes up or down. */
@@ -494,53 +542,5 @@ public final class ProgressIndicatorPanel extends JComponent
             started = false;
             LOG.debug1("run: animator end");
         }
-    }
-
-    /** Mouse clicked. */
-    @Override
-    public void mouseClicked(final MouseEvent e) {
-        /* do nothing */
-    }
-
-    /** Mouse pressed. */
-    @Override
-    public void mousePressed(final MouseEvent e) {
-        /* do nothing */
-    }
-
-    /** Mouse released. */
-    @Override
-    public void mouseReleased(final MouseEvent e) {
-        /* do nothing */
-    }
-
-    /** Mouse entered. */
-    @Override
-    public void mouseEntered(final MouseEvent e) {
-        /* do nothing */
-    }
-
-    /** Mouse exited. */
-    @Override
-    public void mouseExited(final MouseEvent e) {
-        /* do nothing */
-    }
-
-    /** Key pressed. */
-    @Override
-    public void keyPressed(final KeyEvent e) {
-        /* do nothing */
-    }
-
-    /** Key released. */
-    @Override
-    public void keyReleased(final KeyEvent e) {
-        /* do nothing */
-    }
-
-    /** Key typed. */
-    @Override
-    public void keyTyped(final KeyEvent e) {
-        /* do nothing */
     }
 }

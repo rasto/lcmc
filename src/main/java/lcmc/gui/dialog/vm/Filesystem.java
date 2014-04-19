@@ -43,13 +43,13 @@ import java.awt.Dimension;
  * @version $Id$
  */
 final class Filesystem extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {FilesystemData.TYPE,
                                             FilesystemData.SOURCE_DIR,
                                             FilesystemData.SOURCE_NAME,
                                             FilesystemData.TARGET_DIR};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS filesystem info object. */
     private FilesystemInfo vmsfi = null;
     /** Next dialog object. */

@@ -52,29 +52,8 @@ import lcmc.utilities.Tools;
 public class TestUtils {
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
     public static final String PASSWORD;
-    static {
-        if (System.getProperty("test.password") == null) {
-            PASSWORD = "rastislav";
-        } else {
-            PASSWORD = System.getProperty("test.password");
-        }
-    }
     public static final String ID_DSA_KEY;
-    static {
-        if (System.getProperty("test.dsa") == null) {
-            ID_DSA_KEY = "rastislav";
-        } else {
-            ID_DSA_KEY = System.getProperty("test.dsa");
-        }
-    }
     public static final String ID_RSA_KEY;
-    static {
-        if (System.getProperty("test.rsa") == null) {
-            ID_RSA_KEY = "rastislav";
-        } else {
-            ID_RSA_KEY = System.getProperty("test.rsa");
-        }
-    }
 
     public static final String INFO_STRING       = "INFO    : ";
     public static final String DEBUG_STRING      = "DEBUG";
@@ -87,6 +66,59 @@ public class TestUtils {
                                             System.getenv("LCMC_TEST_HOSTNAME");
     public static final String TEST_USERNAME =
                                             System.getenv("LCMC_TEST_USERNAME");
+
+    private static volatile boolean clusterLoaded = false;
+    static {
+        if (System.getProperty("test.password") == null) {
+            PASSWORD = "rastislav";
+        } else {
+            PASSWORD = System.getProperty("test.password");
+        }
+    }
+    static {
+        if (System.getProperty("test.dsa") == null) {
+            ID_DSA_KEY = "rastislav";
+        } else {
+            ID_DSA_KEY = System.getProperty("test.dsa");
+        }
+    }
+    static {
+        if (System.getProperty("test.rsa") == null) {
+            ID_RSA_KEY = "rastislav";
+        } else {
+            ID_RSA_KEY = System.getProperty("test.rsa");
+        }
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final List<T> list) {
+        for (final T o : list) {
+            if (o == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final Set<T> list) {
+        for (final T o : list) {
+            if (o == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Check that not even one value is null. */
+    public static <T> boolean noValueIsNull(final T[] strings) {
+        for (final T s : strings) {
+            if (s == null) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private final PrintStream realOut = new PrintStream(
                                     new FileOutputStream(FileDescriptor.out));
@@ -111,8 +143,6 @@ public class TestUtils {
              write(b, 0, b.length);
          }
     };
-
-    private static volatile boolean clusterLoaded = false;
 
     /** Clears stdout. Call it, if something writes to stdout. */
     public void clearStdout() {
@@ -289,36 +319,6 @@ public class TestUtils {
                 return false;
             }
             if (map.get(key) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final List<T> list) {
-        for (final T o : list) {
-            if (o == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final Set<T> list) {
-        for (final T o : list) {
-            if (o == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final T[] strings) {
-        for (final T s : strings) {
-            if (s == null) {
                 return false;
             }
         }

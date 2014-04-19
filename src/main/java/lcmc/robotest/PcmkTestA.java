@@ -31,11 +31,6 @@ import static lcmc.robotest.RoboTest.*;
  */
 final class PcmkTestA {
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestA() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
@@ -83,5 +78,10 @@ final class PcmkTestA {
             resetTerminalAreas();
         }
         System.gc();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestA() {
+        /* Cannot be instantiated. */
     }
 }

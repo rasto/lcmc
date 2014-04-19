@@ -41,9 +41,26 @@ import org.w3c.dom.Node;
  * This class holds info about virtual parallel device.
  */
 final class ParallelInfo extends ParallelSerialInfo {
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Parallel Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addParallelsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
     /** Creates the ParallelInfo object. */
-    ParallelInfo(final String name, final Browser browser,
-                   final DomainInfo vmsVirtualDomainInfo) {
+    ParallelInfo(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
@@ -57,7 +74,7 @@ final class ParallelInfo extends ParallelSerialInfo {
                 return new Object[][]{};
             }
             return new Object[][]{getVMSVirtualDomainInfo().getParallelDataRow(
-                                getName(),
+                getName(),
                                 null,
                                 getVMSVirtualDomainInfo().getParallels(),
                                 true)};
@@ -67,41 +84,41 @@ final class ParallelInfo extends ParallelSerialInfo {
 
     /** Updates parameters. */
     @Override
-    void updateParameters() {
-        final Map<String, ParallelData> parallels =
-                              getVMSVirtualDomainInfo().getParallels();
-        if (parallels != null) {
-            final ParallelData parallelData = parallels.get(getName());
-            if (parallelData != null) {
-                for (final String param : getParametersFromXML()) {
-                    final Value oldValue = getParamSaved(param);
-                    Value value = getParamSaved(param);
-                    final Widget wi = getWidget(param, null);
-                    for (final Host h
-                            : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
-                            final Value savedValue =
-                                                  parallelData.getValue(param);
-                            if (savedValue != null) {
-                                value = savedValue;
-                            }
-                        }
-                    }
-                    if (!Tools.areEqual(value, oldValue)) {
-                        getResource().setValue(param, value);
-                        if (wi != null) {
-                            /* only if it is not changed by user. */
-                            wi.setValue(value);
-                        }
-                    }
-                }
-            }
-        }
-        updateTable(DomainInfo.HEADER_TABLE);
-        updateTable(DomainInfo.PARALLEL_TABLE);
-        checkResourceFields(null, getParametersFromXML());
-    }
+         void updateParameters() {
+         final Map<String, ParallelData> parallels =
+             getVMSVirtualDomainInfo().getParallels();
+         if (parallels != null) {
+             final ParallelData parallelData = parallels.get(getName());
+             if (parallelData != null) {
+                 for (final String param : getParametersFromXML()) {
+                     final Value oldValue = getParamSaved(param);
+                     Value value = getParamSaved(param);
+                     final Widget wi = getWidget(param, null);
+                     for (final Host h
+                         : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
+                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                         if (vmsxml != null) {
+                             final Value savedValue =
+                                 parallelData.getValue(param);
+                             if (savedValue != null) {
+                                 value = savedValue;
+                             }
+                         }
+                     }
+                     if (!Tools.areEqual(value, oldValue)) {
+                         getResource().setValue(param, value);
+                         if (wi != null) {
+                             /* only if it is not changed by user. */
+                             wi.setValue(value);
+                         }
+                     }
+                 }
+             }
+         }
+         updateTable(DomainInfo.HEADER_TABLE);
+         updateTable(DomainInfo.PARALLEL_TABLE);
+         checkResourceFields(null, getParametersFromXML());
+     }
 
     /** Returns string representation. */
     @Override
@@ -127,17 +144,17 @@ final class ParallelInfo extends ParallelSerialInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                    new HashMap<String, String>();
                 parameters.put(ParallelData.SAVED_TYPE,
                                getParamSaved(ParallelData.TYPE).getValueForConfig());
                 vmsxml.removeParallelXML(
-                                    getVMSVirtualDomainInfo().getDomainName(),
+                    getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
         getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+            getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -145,24 +162,6 @@ final class ParallelInfo extends ParallelSerialInfo {
     @Override
     protected MyButton getNewBtn0(final DomainInfo vdi) {
         return getNewBtn(vdi);
-    }
-
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Parallel Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addParallelsPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
     }
 
     /** Modify device xml. */

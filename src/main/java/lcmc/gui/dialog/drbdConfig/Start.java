@@ -52,10 +52,10 @@ import java.util.Arrays;
  *
  */
 public final class Start extends WizardDialog {
-    /** DRBD resource pulldown menu. */
-    private Widget drbdResourceWi;
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
+    /** DRBD resource pulldown menu. */
+    private Widget drbdResourceWi;
     /** DRBD info object. */
     private final GlobalInfo globalInfo;
     /** The first block device info object. */

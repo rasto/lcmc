@@ -44,6 +44,32 @@ public final class NetInterface extends Resource implements Value {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(NetInterface.class);
+
+    //private int getNumericIp(final String ip) {
+    //    final String[] ipParts = ip.split("\\.");
+    //    int numericIp = 0;
+    //    for (final String ipPart : ipParts) {
+    //        numericIp = (numericIp << 8) + new Integer(ipPart);
+    //    }
+    //    return numericIp;
+    //}
+
+    private static String getSymbolicIp(BigInteger numericIp,
+                                        final int size) {
+        final byte[] addr = new byte[size];
+        for (int i = size - 1; i >= 0; i--) {
+            final byte a = (byte) numericIp.and(
+                                new BigInteger(Long.toString(0xff))).intValue();
+            numericIp = numericIp.shiftRight(8);
+            addr[i] = a;
+        }
+        try {
+            return InetAddress.getByAddress(addr).getHostAddress();
+        } catch (final UnknownHostException e) {
+            LOG.appWarning("getSymbolicIp: unkonwn host: " + addr);
+            return null;
+        }
+    }
     /** Ip address. */
     private final String ip;
     /** Cidr. */
@@ -52,10 +78,6 @@ public final class NetInterface extends Resource implements Value {
     private final String networkIp;
     /** Whether it is a bridge. */
     private final boolean bridge;
-
-
-    /** Address family. */
-    public enum AF {IPV4, IPV6, SSOCKS, SDP};
     /** Address family. */
     private final AF af;
     private final String IPV6_STRING = "ipv6";
@@ -157,32 +179,6 @@ public final class NetInterface extends Resource implements Value {
         return numericIp;
     }
 
-    //private int getNumericIp(final String ip) {
-    //    final String[] ipParts = ip.split("\\.");
-    //    int numericIp = 0;
-    //    for (final String ipPart : ipParts) {
-    //        numericIp = (numericIp << 8) + new Integer(ipPart);
-    //    }
-    //    return numericIp;
-    //}
-
-    private static String getSymbolicIp(BigInteger numericIp,
-                                        final int size) {
-        final byte[] addr = new byte[size];
-        for (int i = size - 1; i >= 0; i--) {
-            final byte a = (byte) numericIp.and(
-                                new BigInteger(Long.toString(0xff))).intValue();
-            numericIp = numericIp.shiftRight(8);
-            addr[i] = a;
-        }
-        try {
-            return InetAddress.getByAddress(addr).getHostAddress();
-        } catch (final UnknownHostException e) {
-            LOG.appWarning("getSymbolicIp: unkonwn host: " + addr);
-            return null;
-        }
-    }
-
     /** Returns ip. */
     public String getIp() {
         return ip;
@@ -194,34 +190,8 @@ public final class NetInterface extends Resource implements Value {
     }
 
     ///**
-    // * Returns network ip. The ip has '*' instead of bytes, that are
-    // * not part of the network. e.g. 192.168.1.1 and mask 255.255.255.0 gives
-    // * 192.168.1.*
-    // */
-    //public final String getNetworkIp() {
-    //    if (netMask == null) {
-    //        return null;
-    //    }
-    //    final String[] ipParts = ip.split("\\.");
-    //    final String[] netMaskParts = netMask.split("\\.");
-    //    if (ipParts.length != 4 && netMaskParts.length != 4) {
-    //        return "";
-    //    }
-    //    final String[] networkIpParts = new String[4];
-    //    for (int i = 0; i < 4; i++) {
-    //        if (netMaskParts[i].equals("255")) {
-    //            networkIpParts[i] = ipParts[i];
-    //        } else {
-    //            networkIpParts[i] = "*";
-    //        }
-    //    }
-    //    return Tools.join(".", networkIpParts);
-    //}
 
-    /**
-     * Returns first ip in the network.
-     * e.g. 192.168.1.1 and mask 255.255.255.0 gives 192.168.1.0.
-     */
+    // * Returns network ip. The ip has '*' instead of bytes, that are
     public String getNetworkIp() {
         return networkIp;
     }
@@ -241,27 +211,10 @@ public final class NetInterface extends Resource implements Value {
     }
 
     /** Returns bindnetaddr. */
-    public String getBindnetaddr() {
-        return networkIp;
-    }
+        public String getBindnetaddr() {
+            return networkIp;
+        }
     ///** Returns bindnetaddr. */
-    //public String getBindnetaddr() {
-    //    final String[] ipParts = ip.split("\\.");
-    //    if (netMask == null) {
-    //        return null;
-    //    }
-    //    final String[] netMaskParts = netMask.split("\\.");
-    //    String[] networkIpParts = new String[4];
-    //    if (ipParts.length != 4 && netMaskParts.length != 4) {
-    //        return "";
-    //    }
-    //    for (int i = 0; i < 4; i++) {
-    //        networkIpParts[i] =
-    //                     Integer.toString(Integer.parseInt(ipParts[i])
-    //                                      & Integer.parseInt(netMaskParts[i]));
-    //    }
-    //    return Tools.join(".", networkIpParts);
-    //}
 
     /** Returns whether it is a bridge. */
     public boolean isBridge() {
@@ -302,4 +255,8 @@ public final class NetInterface extends Resource implements Value {
     public String getNothingSelected() {
         return NOTHING_SELECTED;
     }
+
+
+    /** Address family. */
+    public enum AF {IPV4, IPV6, SSOCKS, SDP};
 }

@@ -44,8 +44,6 @@ import java.awt.Dimension;
  * @version $Id$
  */
 final class Display extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {GraphicsData.TYPE,
                                             GraphicsData.PORT,
@@ -54,6 +52,8 @@ final class Display extends VMConfig {
                                             GraphicsData.KEYMAP,
                                             GraphicsData.DISPLAY,
                                             GraphicsData.XAUTH};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS graphics info object. */
     private GraphicsInfo vmsgi = null;
     /** Next dialog object. */

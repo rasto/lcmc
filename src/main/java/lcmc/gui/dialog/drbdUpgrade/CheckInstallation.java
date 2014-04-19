@@ -47,8 +47,6 @@ import java.awt.event.ActionEvent;
  *
  */
 final class CheckInstallation extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
     /** Drbd label. */
     private static final JLabel DRBD_LABEL = new JLabel(": " + Tools.getString(
                                 "Dialog.Host.CheckInstallation.CheckingDrbd"));
@@ -74,6 +72,8 @@ final class CheckInstallation extends DialogHost {
               Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
     /** Drbd icon wrapped in a JLabel. */
     private static final JLabel DRBD_ICON = new JLabel(CHECKING_ICON);
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
     /** Whether drbd was installed without failure. */
     private boolean drbdOk = false;
 

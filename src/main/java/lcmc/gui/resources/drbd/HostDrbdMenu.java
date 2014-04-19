@@ -26,8 +26,6 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
 public class HostDrbdMenu {
-    private final Host host;
-    private final HostDrbdInfo hostDrbdInfo;
 
     /** LVM menu. */
     private static final String LVM_MENU = "LVM";
@@ -41,6 +39,8 @@ public class HostDrbdMenu {
     /** Description create LV. */
     private static final String LV_CREATE_MENU_DESCRIPTION =
                                                     "Create a logical volume.";
+    private final Host host;
+    private final HostDrbdInfo hostDrbdInfo;
 
     public HostDrbdMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
         this.host = host;

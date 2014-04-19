@@ -40,8 +40,6 @@ import java.util.regex.Matcher;
  * This class holds info about VirtualDomain service in the cluster menu.
  */
 public final class VirtualDomainInfo extends ServiceInfo {
-    /** VirtualDomain in the VMs menu. */
-    private DomainInfo vmsVirtualDomainInfo = null;
     /** Pattern that captures a name from xml file name. */
     static final Pattern LIBVIRT_CONF_PATTERN =
                                             Pattern.compile(".*?([^/]+).xml$");
@@ -56,6 +54,8 @@ public final class VirtualDomainInfo extends ServiceInfo {
                                                 new StringValue("openvz:///system"),
                                                 new StringValue("uml:///system")};
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
+    /** VirtualDomain in the VMs menu. */
+    private DomainInfo vmsVirtualDomainInfo = null;
 
     /** Creates the VirtualDomainInfo object. */
     public VirtualDomainInfo(final String name,

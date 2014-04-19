@@ -52,18 +52,6 @@ import org.w3c.dom.Node;
  * This class holds info about virtual graphics displays.
  */
 public final class GraphicsInfo extends HardwareInfo {
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> portWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> listenWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> passwdWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> keymapWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> displayWi = new HashMap<String, Widget>();
-    /** Combo box that can be made invisible. */
-    private final Map<String, Widget> xauthWi = new HashMap<String, Widget>();
 
     /** Parameters. AUTOPORT is generated */
     private static final String[] PARAMETERS = {GraphicsData.TYPE,
@@ -137,6 +125,36 @@ public final class GraphicsInfo extends HardwareInfo {
                                         new StringValue("5900", "5900"),
                                         new StringValue("5901", "5901")});
     }
+
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Graphics Display");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addGraphicsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+    /** Combo box that can be made invisible. */
+    private final Map<String, Widget> portWi = new HashMap<String, Widget>();
+    /** Combo box that can be made invisible. */
+    private final Map<String, Widget> listenWi = new HashMap<String, Widget>();
+    /** Combo box that can be made invisible. */
+    private final Map<String, Widget> passwdWi = new HashMap<String, Widget>();
+    /** Combo box that can be made invisible. */
+    private final Map<String, Widget> keymapWi = new HashMap<String, Widget>();
+    /** Combo box that can be made invisible. */
+    private final Map<String, Widget> displayWi = new HashMap<String, Widget>();
+    /** Combo box that can be made invisible. */
+    private final Map<String, Widget> xauthWi = new HashMap<String, Widget>();
     /** Table panel. */
     private JComponent tablePanel = null;
     /** Creates the GraphicsInfo object. */
@@ -574,29 +592,9 @@ public final class GraphicsInfo extends HardwareInfo {
         return null;
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Graphics Display");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addGraphicsPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
-
     /** Returns combo box for parameter. */
     @Override
-    protected Widget createWidget(final String param,
-                                  final String prefix,
-                                  final int width) {
+    protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget paramWi = super.createWidget(param, prefix, width);
         if (GraphicsData.PORT.equals(param)) {
             if (prefix == null) {
@@ -640,10 +638,7 @@ public final class GraphicsInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
-                             final Node node,
-                             final String domainName,
-                             final Map<String, String> params) {
+    protected void modifyXML(final VMSXML vmsxml, final Node node, final String domainName, final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifyGraphicsXML(node, domainName, params);
         }

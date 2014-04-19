@@ -60,9 +60,6 @@ import java.util.Map;
  *
  */
 final class ClusterHosts extends DialogCluster {
-    /** Map from checkboxes to the host, which they choose. */
-    private final Map<JCheckBox, Host> checkBoxToHost =
-                                    new LinkedHashMap<JCheckBox, Host>();
     /** Host checked icon. */
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
@@ -71,6 +68,9 @@ final class ClusterHosts extends DialogCluster {
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
     ///** Whether the scrolling pane was already moved. */
     //private volatile boolean alreadyMoved = false;
+    /** Map from checkboxes to the host, which they choose. */
+    private final Map<JCheckBox, Host> checkBoxToHost =
+                                    new LinkedHashMap<JCheckBox, Host>();
 
     /** Prepares a new {@code ClusterHosts} object. */
     ClusterHosts(final WizardDialog previousDialog,

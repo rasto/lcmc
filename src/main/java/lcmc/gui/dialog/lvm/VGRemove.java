@@ -66,15 +66,15 @@ import lcmc.data.Application;
 public final class VGRemove extends LV {
     /** Remove VG timeout. */
     private static final int REMOVE_TIMEOUT = 5000;
+    /** Description. */
+    private static final String VG_REMOVE_DESCRIPTION =
+                                                     "Remove a volume group.";
     /** Block device info object. */
     private final MyButton removeButton = new MyButton("Remove VG");
     private final List<BlockDevInfo> blockDevInfos =
                                                 new ArrayList<BlockDevInfo>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private final boolean multiSelection;
-    /** Description. */
-    private static final String VG_REMOVE_DESCRIPTION =
-                                                     "Remove a volume group.";
     /** Remove new VGRemove object. */
     public VGRemove(final BlockDevInfo bdi) {
         super(null);
@@ -226,6 +226,24 @@ public final class VGRemove extends LV {
         return pane;
     }
 
+    /** Remove VG. */
+    private boolean vgRemove(final Host host,
+                             final String vgName) {
+        final boolean ret = LVM.vgRemove(host, vgName, Application.RunMode.LIVE);
+        if (ret) {
+            answerPaneAddText("Volume group "
+                              + vgName
+                              + " was successfully removed "
+                              + " on " + host.getName() + '.');
+        } else {
+            answerPaneAddTextError("Removing volume group "
+                                    + vgName
+                                    + " on " + host.getName()
+                                    + " failed.");
+        }
+        return ret;
+    }
+
     /** Remove action listener. */
     private class RemoveActionListener implements ActionListener {
         @Override
@@ -247,7 +265,7 @@ public final class VGRemove extends LV {
                     if (multiSelection) {
                         final Map<Host, Set<String>> vgNames = getVGNames();
                         for (final Map.Entry<Host, Set<String>> entry
-                                                        : vgNames.entrySet()) {
+                            : vgNames.entrySet()) {
                             final Host h = entry.getKey();
                             for (final String vgName : entry.getValue()) {
                                 if (hostCheckBoxes.get(h).isSelected()) {
@@ -262,7 +280,7 @@ public final class VGRemove extends LV {
                         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                             if (hostEntry.getValue().isSelected()) {
                                 final boolean ret =
-                                   vgRemove(hostEntry.getKey(), getVGName(blockDevInfos.get(0)));
+                                    vgRemove(hostEntry.getKey(), getVGName(blockDevInfos.get(0)));
                                 if (!ret) {
                                     oneFailed = true;
                                 }
@@ -272,8 +290,8 @@ public final class VGRemove extends LV {
                     for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                         if (hostEntry.getValue().isSelected()) {
                             hostEntry.getKey().getBrowser().getClusterBrowser().updateHWInfo(
-                                    hostEntry.getKey(),
-                                                           Host.UPDATE_LVM);
+                                hostEntry.getKey(),
+                                    Host.UPDATE_LVM);
                         }
                     }
                     enableComponents();
@@ -293,24 +311,6 @@ public final class VGRemove extends LV {
             });
             thread.start();
         }
-    }
-
-    /** Remove VG. */
-    private boolean vgRemove(final Host host,
-                             final String vgName) {
-        final boolean ret = LVM.vgRemove(host, vgName, Application.RunMode.LIVE);
-        if (ret) {
-            answerPaneAddText("Volume group "
-                              + vgName
-                              + " was successfully removed "
-                              + " on " + host.getName() + '.');
-        } else {
-            answerPaneAddTextError("Removing volume group "
-                                    + vgName
-                                    + " on " + host.getName()
-                                    + " failed.");
-        }
-        return ret;
     }
 
     /** Size combo box item listener. */

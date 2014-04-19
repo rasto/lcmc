@@ -80,11 +80,11 @@ public final class ServicesInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(ServicesInfo.class);
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
     /** Icon of the cluster. */
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
+    /** Cache for the info panel. */
+    private JComponent infoPanel = null;
 
     /** Prepares a new {@code ServicesInfo} object. */
     public ServicesInfo(final String name, final Browser browser) {

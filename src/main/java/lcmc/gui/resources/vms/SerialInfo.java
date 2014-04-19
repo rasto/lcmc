@@ -41,9 +41,26 @@ import org.w3c.dom.Node;
  * This class holds info about virtual serial device.
  */
 final class SerialInfo extends ParallelSerialInfo {
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Serial Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addSerialsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
     /** Creates the SerialInfo object. */
-    SerialInfo(final String name, final Browser browser,
-                  final DomainInfo vmsVirtualDomainInfo) {
+    SerialInfo(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super(name, browser, vmsVirtualDomainInfo);
     }
 
@@ -57,7 +74,7 @@ final class SerialInfo extends ParallelSerialInfo {
                 return new Object[][]{};
             }
             return new Object[][]{getVMSVirtualDomainInfo().getSerialDataRow(
-                                getName(),
+                getName(),
                                 null,
                                 getVMSVirtualDomainInfo().getSerials(),
                                 true)};
@@ -67,41 +84,41 @@ final class SerialInfo extends ParallelSerialInfo {
 
     /** Updates parameters. */
     @Override
-    void updateParameters() {
-        final Map<String, SerialData> serials =
-                              getVMSVirtualDomainInfo().getSerials();
-        if (serials != null) {
-            final SerialData serialData = serials.get(getName());
-            if (serialData != null) {
-                for (final String param : getParametersFromXML()) {
-                    final Value oldValue = getParamSaved(param);
-                    Value value = getParamSaved(param);
-                    final Widget wi = getWidget(param, null);
-                    for (final Host h
-                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
-                            final Value savedValue =
-                                                  serialData.getValue(param);
-                            if (savedValue != null) {
-                                value = savedValue;
-                            }
-                        }
-                    }
-                    if (!Tools.areEqual(value, oldValue)) {
-                        getResource().setValue(param, value);
-                        if (wi != null) {
-                            /* only if it is not changed by user. */
-                            wi.setValue(value);
-                        }
-                    }
-                }
-            }
-        }
-        updateTable(DomainInfo.HEADER_TABLE);
-        updateTable(DomainInfo.SERIAL_TABLE);
-        checkResourceFields(null, getParametersFromXML());
-    }
+         void updateParameters() {
+         final Map<String, SerialData> serials =
+             getVMSVirtualDomainInfo().getSerials();
+         if (serials != null) {
+             final SerialData serialData = serials.get(getName());
+             if (serialData != null) {
+                 for (final String param : getParametersFromXML()) {
+                     final Value oldValue = getParamSaved(param);
+                     Value value = getParamSaved(param);
+                     final Widget wi = getWidget(param, null);
+                     for (final Host h
+                         : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
+                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                         if (vmsxml != null) {
+                             final Value savedValue =
+                                 serialData.getValue(param);
+                             if (savedValue != null) {
+                                 value = savedValue;
+                             }
+                         }
+                     }
+                     if (!Tools.areEqual(value, oldValue)) {
+                         getResource().setValue(param, value);
+                         if (wi != null) {
+                             /* only if it is not changed by user. */
+                             wi.setValue(value);
+                         }
+                     }
+                 }
+             }
+         }
+         updateTable(DomainInfo.HEADER_TABLE);
+         updateTable(DomainInfo.SERIAL_TABLE);
+         checkResourceFields(null, getParametersFromXML());
+     }
 
     /** Returns string representation. */
     @Override
@@ -127,17 +144,17 @@ final class SerialInfo extends ParallelSerialInfo {
             final VMSXML vmsxml = getBrowser().getVMSXML(h);
             if (vmsxml != null) {
                 final Map<String, String> parameters =
-                                                new HashMap<String, String>();
+                    new HashMap<String, String>();
                 parameters.put(SerialData.SAVED_TYPE,
                                getParamSaved(SerialData.TYPE).getValueForConfig());
                 vmsxml.removeSerialXML(
-                                    getVMSVirtualDomainInfo().getDomainName(),
+                    getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
         getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+            getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -145,24 +162,6 @@ final class SerialInfo extends ParallelSerialInfo {
     @Override
     protected MyButton getNewBtn0(final DomainInfo vdi) {
         return getNewBtn(vdi);
-    }
-
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Serial Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addSerialsPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
     }
 
     /** Modify device xml. */

@@ -35,11 +35,11 @@ import lcmc.data.Application;
  * This class holds info data for a filesystem.
  */
 public final class FSInfo extends Info {
-    /** cached output from the modinfo command for the info panel. */
-    private String modinfo = null;
     /** File system icon. */
     private static final ImageIcon FS_ICON = Tools.createImageIcon(
                                Tools.getDefault("HostBrowser.FileSystemIcon"));
+    /** cached output from the modinfo command for the info panel. */
+    private String modinfo = null;
     /** Prepares a new {@code FSInfo} object. */
     public FSInfo(final String name, final Browser browser) {
         super(name, browser);

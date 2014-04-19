@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_openfiler extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",                       "openfiler"},
@@ -59,4 +53,10 @@ public final class DistResource_openfiler extends ListResourceBundle {
         {"Openais.deleteFromRc",
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

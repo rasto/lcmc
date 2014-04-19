@@ -52,6 +52,14 @@ import lcmc.utilities.MyButton;
  *
  */
 public class NewHost extends DialogHost {
+    /** Normal widths of the fields. */
+    private static final int FIELD_WIDTH = 120;
+    /** Widths of the fields if hops are used. */
+    private static final int BIG_FIELD_WIDTH = 400;
+    /** Default ssh user. */
+    private static final String SSH_ROOT_USER = Tools.getDefault("SSH.User");
+    /** Default ssh port. */
+    private static final String SSH_PORT = Tools.getDefault("SSH.Port");
     /** hostField can be ip or hostname with or without domainname. */
     private Widget hostField;
     /** User name field. */
@@ -62,14 +70,6 @@ public class NewHost extends DialogHost {
     private Widget useSudoField;
     /** Whether the fields are big (if more hops are being used). */
     private boolean bigFields = false;
-    /** Normal widths of the fields. */
-    private static final int FIELD_WIDTH = 120;
-    /** Widths of the fields if hops are used. */
-    private static final int BIG_FIELD_WIDTH = 400;
-    /** Default ssh user. */
-    private static final String SSH_ROOT_USER = Tools.getDefault("SSH.User");
-    /** Default ssh port. */
-    private static final String SSH_PORT = Tools.getDefault("SSH.Port");
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
 

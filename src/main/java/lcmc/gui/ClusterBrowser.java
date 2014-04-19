@@ -104,6 +104,147 @@ public class ClusterBrowser extends Browser {
     /** Logger. */
     private static final Logger LOG =
                                LoggerFactory.getLogger(ClusterBrowser.class);
+    /** Remove icon. */
+    public static final ImageIcon REMOVE_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("ClusterBrowser.RemoveIcon"));
+    /** Remove icon small. */
+    public static final ImageIcon REMOVE_ICON_SMALL =
+        Tools.createImageIcon(
+                Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
+
+    /** Hash that holds all hb classes with descriptions that appear in the
+     * pull down menus. */
+    public static final Map<String, String> HB_CLASS_MENU =
+                                                new HashMap<String, String>();
+    /** Width of the label in the info panel. */
+    public static final int SERVICE_LABEL_WIDTH =
+                    Tools.getDefaultSize("ClusterBrowser.ServiceLabelWidth");
+    /** Width of the field in the info panel. */
+    public static final int SERVICE_FIELD_WIDTH =
+                    Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
+    /** Color for stopped services. */
+    public static final Color FILL_PAINT_STOPPED =
+                      Tools.getDefaultColor("CRMGraph.FillPaintStopped");
+    /** Identation. */
+    public static final String IDENT_4 = "    ";
+    /** Name of the boolean type in drbd. */
+    public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
+    /** String array with all hb classes. */
+    public static final Collection<String> HB_CLASSES = new ArrayList<String>();
+
+    /** Hb start operation. */
+    private static final String HB_OP_START = "start";
+    /** Hb stop operation. */
+    private static final String HB_OP_STOP = "stop";
+    /** Hb status operation. */
+    private static final String HB_OP_STATUS = "status";
+    /** Hb monitor operation. */
+    private static final String HB_OP_MONITOR = "monitor";
+    /** Hb meta-data operation. */
+    private static final String HB_OP_META_DATA = "meta-data";
+    /** Hb validate-all operation. */
+    private static final String HB_OP_VALIDATE_ALL = "validate-all";
+    /** Promote operation. */
+    public static final String HB_OP_PROMOTE = "promote";
+    /** Demote operation. */
+    public static final String HB_OP_DEMOTE = "demote";
+
+    /** Hb desc parameter. */
+    private static final String HB_PAR_DESC = "description";
+    /** Hb interval parameter. */
+    private static final String HB_PAR_INTERVAL = "interval";
+    /** Hb timeout parameter. */
+    private static final String HB_PAR_TIMEOUT = "timeout";
+    /** Hb start-delay parameter. */
+    private static final String HB_PAR_START_DELAY = "start-delay";
+    /** Hb disabled parameter. */
+    private static final String HB_PAR_DISABLED = "disabled";
+    /** Hb role parameter. */
+    private static final String HB_PAR_ROLE = "role";
+    /** Hb prereq parameter. */
+    private static final String HB_PAR_PREREQ = "prereq";
+    /** Hb on-fail parameter. */
+    private static final String HB_PAR_ON_FAIL = "on-fail";
+    /** String array with all hb operations. */
+    public static final String[] HB_OPERATIONS = {HB_OP_START,
+                                                  HB_OP_PROMOTE,
+                                                  HB_OP_DEMOTE,
+                                                  HB_OP_STOP,
+                                                  HB_OP_STATUS,
+                                                  HB_OP_MONITOR,
+                                                  HB_OP_META_DATA,
+                                                  HB_OP_VALIDATE_ALL};
+    /** Operations that should not have default values. */
+    public static final Collection<String> HB_OP_IGNORE_DEFAULT =
+                                                      new ArrayList<String>();
+    /** All parameters for the hb operations, so that it is possible to create
+     * arguments for up_rsc_full_ops. */
+    public static final String[] HB_OPERATION_PARAM_LIST = {
+                                                        HB_PAR_DESC,
+                                                        HB_PAR_INTERVAL,
+                                                        HB_PAR_TIMEOUT,
+                                                        CRMXML.PAR_CHECK_LEVEL,
+                                                        HB_PAR_START_DELAY,
+                                                        HB_PAR_DISABLED,
+                                                        HB_PAR_ROLE,
+                                                        HB_PAR_PREREQ,
+                                                        HB_PAR_ON_FAIL};
+    /** Starting ptest tooltip. */
+    public static final String STARTING_PTEST_TOOLTIP =
+                                Tools.getString("ClusterBrowser.StartingPtest");
+    /** Cluster status error string. */
+    private static final String CLUSTER_STATUS_ERROR =
+                                  "---start---\r\nerror\r\n\r\n---done---\r\n";
+    /** Small cluster icon. */
+    static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
+                          Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
+    /** String that appears as a tooltip in menu items if status was disabled.*/
+    public static final String UNKNOWN_CLUSTER_STATUS_STRING =
+                                                     "unknown cluster status";
+    /** Default operation parameters. */
+    private static final Collection<String> DEFAULT_OP_PARAMS =
+                                       new ArrayList<String>(
+                                               Arrays.asList(HB_PAR_TIMEOUT,
+                                                             HB_PAR_INTERVAL));
+    private static final String RESET_STRING = "---reset---\r\n";
+    private static final int RESET_STRING_LEN = RESET_STRING.length();
+    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4. */
+    private static final Pattern BY_RES_PATTERN =
+                    Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
+    static {
+        HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
+        HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
+                          "Heartbeat 1 RAs (deprecated)");
+        HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
+        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS,
+                          "Upstart/Systemd Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.SYSTEMD_CLASS, "Systemd Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.UPSTART_CLASS, "Upstart Scripts");
+    }
+    static {
+        HB_CLASSES.add(ResourceAgent.OCF_CLASS);
+        HB_CLASSES.add(ResourceAgent.HEARTBEAT_CLASS);
+        for (final String c : ResourceAgent.SERVICE_CLASSES) {
+            HB_CLASSES.add(c);
+        }
+        HB_CLASSES.add(ResourceAgent.STONITH_CLASS);
+    }
+    static {
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_META_DATA);
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_VALIDATE_ALL);
+    }
+
+    /** Return name of the classes in the menu. */
+    public static String getClassMenu(final String cl) {
+        final String name = HB_CLASS_MENU.get(cl);
+        if (name == null) {
+            return Tools.ucfirst(cl) + " scripts";
+        }
+        return name;
+    }
     /**
      * Cluster object that holds data of the cluster. (One Browser belongs to
      * one cluster).
@@ -204,104 +345,6 @@ public class ClusterBrowser extends Browser {
     private RscDefaultsInfo rscDefaultsInfo = null;
     /** Global hb status lock. */
     private final Lock mClStatusLock = new ReentrantLock();
-    /** Remove icon. */
-    public static final ImageIcon REMOVE_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.RemoveIcon"));
-    /** Remove icon small. */
-    public static final ImageIcon REMOVE_ICON_SMALL =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
-
-    /** Hash that holds all hb classes with descriptions that appear in the
-     * pull down menus. */
-    public static final Map<String, String> HB_CLASS_MENU =
-                                                new HashMap<String, String>();
-    static {
-        HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
-        HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
-                          "Heartbeat 1 RAs (deprecated)");
-        HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
-        HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
-        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS,
-                          "Upstart/Systemd Scripts");
-        HB_CLASS_MENU.put(ResourceAgent.SYSTEMD_CLASS, "Systemd Scripts");
-        HB_CLASS_MENU.put(ResourceAgent.UPSTART_CLASS, "Upstart Scripts");
-    }
-    /** Width of the label in the info panel. */
-    public static final int SERVICE_LABEL_WIDTH =
-                    Tools.getDefaultSize("ClusterBrowser.ServiceLabelWidth");
-    /** Width of the field in the info panel. */
-    public static final int SERVICE_FIELD_WIDTH =
-                    Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
-    /** Color for stopped services. */
-    public static final Color FILL_PAINT_STOPPED =
-                      Tools.getDefaultColor("CRMGraph.FillPaintStopped");
-    /** Identation. */
-    public static final String IDENT_4 = "    ";
-    /** Name of the boolean type in drbd. */
-    public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
-    /** String array with all hb classes. */
-    public static final Collection<String> HB_CLASSES = new ArrayList<String>();
-    static {
-        HB_CLASSES.add(ResourceAgent.OCF_CLASS);
-        HB_CLASSES.add(ResourceAgent.HEARTBEAT_CLASS);
-        for (final String c : ResourceAgent.SERVICE_CLASSES) {
-            HB_CLASSES.add(c);
-        }
-        HB_CLASSES.add(ResourceAgent.STONITH_CLASS);
-    }
-
-    /** Hb start operation. */
-    private static final String HB_OP_START = "start";
-    /** Hb stop operation. */
-    private static final String HB_OP_STOP = "stop";
-    /** Hb status operation. */
-    private static final String HB_OP_STATUS = "status";
-    /** Hb monitor operation. */
-    private static final String HB_OP_MONITOR = "monitor";
-    /** Hb meta-data operation. */
-    private static final String HB_OP_META_DATA = "meta-data";
-    /** Hb validate-all operation. */
-    private static final String HB_OP_VALIDATE_ALL = "validate-all";
-    /** Promote operation. */
-    public static final String HB_OP_PROMOTE = "promote";
-    /** Demote operation. */
-    public static final String HB_OP_DEMOTE = "demote";
-
-    /** Hb desc parameter. */
-    private static final String HB_PAR_DESC = "description";
-    /** Hb interval parameter. */
-    private static final String HB_PAR_INTERVAL = "interval";
-    /** Hb timeout parameter. */
-    private static final String HB_PAR_TIMEOUT = "timeout";
-    /** Hb start-delay parameter. */
-    private static final String HB_PAR_START_DELAY = "start-delay";
-    /** Hb disabled parameter. */
-    private static final String HB_PAR_DISABLED = "disabled";
-    /** Hb role parameter. */
-    private static final String HB_PAR_ROLE = "role";
-    /** Hb prereq parameter. */
-    private static final String HB_PAR_PREREQ = "prereq";
-    /** Hb on-fail parameter. */
-    private static final String HB_PAR_ON_FAIL = "on-fail";
-    /** String array with all hb operations. */
-    public static final String[] HB_OPERATIONS = {HB_OP_START,
-                                                  HB_OP_PROMOTE,
-                                                  HB_OP_DEMOTE,
-                                                  HB_OP_STOP,
-                                                  HB_OP_STATUS,
-                                                  HB_OP_MONITOR,
-                                                  HB_OP_META_DATA,
-                                                  HB_OP_VALIDATE_ALL};
-    /** Operations that should not have default values. */
-    public static final Collection<String> HB_OP_IGNORE_DEFAULT =
-                                                      new ArrayList<String>();
-    static {
-        HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
-        HB_OP_IGNORE_DEFAULT.add(HB_OP_META_DATA);
-        HB_OP_IGNORE_DEFAULT.add(HB_OP_VALIDATE_ALL);
-    }
     /** Parameters for the hb operations. */
     private final Map<String, List<String>> crmOperationParams =
                                      new LinkedHashMap<String, List<String>>();
@@ -312,40 +355,6 @@ public class ClusterBrowser extends Browser {
     /** Map with drbd parameters for every host. */
     private final Map<Host, String> drbdParameters =
                                                   new HashMap<Host, String>();
-    /** All parameters for the hb operations, so that it is possible to create
-     * arguments for up_rsc_full_ops. */
-    public static final String[] HB_OPERATION_PARAM_LIST = {
-                                                        HB_PAR_DESC,
-                                                        HB_PAR_INTERVAL,
-                                                        HB_PAR_TIMEOUT,
-                                                        CRMXML.PAR_CHECK_LEVEL,
-                                                        HB_PAR_START_DELAY,
-                                                        HB_PAR_DISABLED,
-                                                        HB_PAR_ROLE,
-                                                        HB_PAR_PREREQ,
-                                                        HB_PAR_ON_FAIL};
-    /** Starting ptest tooltip. */
-    public static final String STARTING_PTEST_TOOLTIP =
-                                Tools.getString("ClusterBrowser.StartingPtest");
-    /** Cluster status error string. */
-    private static final String CLUSTER_STATUS_ERROR =
-                                  "---start---\r\nerror\r\n\r\n---done---\r\n";
-    /** Small cluster icon. */
-    static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
-                          Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
-    /** String that appears as a tooltip in menu items if status was disabled.*/
-    public static final String UNKNOWN_CLUSTER_STATUS_STRING =
-                                                     "unknown cluster status";
-    /** Default operation parameters. */
-    private static final Collection<String> DEFAULT_OP_PARAMS =
-                                       new ArrayList<String>(
-                                               Arrays.asList(HB_PAR_TIMEOUT,
-                                                             HB_PAR_INTERVAL));
-    private static final String RESET_STRING = "---reset---\r\n";
-    private static final int RESET_STRING_LEN = RESET_STRING.length();
-    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4. */
-    private static final Pattern BY_RES_PATTERN =
-                    Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
     /** Prepares a new {@code CusterBrowser} object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
@@ -2180,158 +2189,6 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    /** Callback to service menu items, that show ptest results in tooltips. */
-    public abstract class ClMenuItemCallback implements ButtonCallback {
-        /** Host if over a menu item that belongs to a host. */
-        private final Host menuHost;
-        /** Whether the mouse is still over. */
-        private volatile boolean mouseStillOver = false;
-
-        /** Creates new ClMenuItemCallback object. */
-        public ClMenuItemCallback(final Host menuHost) {
-            this.menuHost = menuHost;
-        }
-
-        /** Can be overwritten to disable the whole thing. */
-        @Override
-        public boolean isEnabled() {
-            if (clusterStatus == null) {
-                return false;
-            }
-            final Host h;
-            if (menuHost == null) {
-                h = getDCHost();
-            } else {
-                h = menuHost;
-            }
-            return !Tools.versionBeforePacemaker(h);
-        }
-
-        /** Mouse out, stops animation. */
-        @Override
-        public final void mouseOut(final ComponentWithTest component) {
-            if (isEnabled()) {
-                mouseStillOver = false;
-                crmGraph.stopTestAnimation((JComponent) component);
-                component.setToolTipText("");
-            }
-        }
-
-        /** Mouse over, starts animation, calls action() and sets tooltip. */
-        @Override
-        public final void mouseOver(final ComponentWithTest component) {
-            if (isEnabled()) {
-                mouseStillOver = true;
-                component.setToolTipText(STARTING_PTEST_TOOLTIP);
-                component.setToolTipBackground(
-                  Tools.getDefaultColor(
-                                   "ClusterBrowser.Test.Tooltip.Background"));
-                Tools.sleep(250);
-                if (!mouseStillOver) {
-                    return;
-                }
-                mouseStillOver = false;
-                final CountDownLatch startTestLatch = new CountDownLatch(1);
-                crmGraph.startTestAnimation((JComponent) component,
-                                            startTestLatch);
-                ptestLockAcquire();
-                try {
-                    clusterStatus.setPtestData(null);
-                    final Host h;
-                    if (menuHost == null) {
-                        h = getDCHost();
-                    } else {
-                        h = menuHost;
-                    }
-                    action(h);
-                    final PtestData ptestData = new PtestData(CRM.getPtest(h));
-                    component.setToolTipText(ptestData.getToolTip());
-                    clusterStatus.setPtestData(ptestData);
-                } finally {
-                    ptestLockRelease();
-                }
-                startTestLatch.countDown();
-            }
-        }
-
-        /** Action that is caried out on the host. */
-        protected abstract void action(final Host dcHost);
-    }
-
-    /** Callback to service menu items, that show ptest results in tooltips. */
-    public abstract class DRBDMenuItemCallback implements ButtonCallback {
-        /** Host if over a menu item that belongs to a host. */
-        private final Host menuHost;
-        /** Whether the mouse is still over. */
-        private volatile boolean mouseStillOver = false;
-
-        /** Creates new DRBDMenuItemCallback object. */
-        public DRBDMenuItemCallback(final Host menuHost) {
-            this.menuHost = menuHost;
-        }
-
-        /** Whether the whole thing should be enabled. */
-        @Override
-        public final boolean isEnabled() {
-            return true;
-        }
-
-        /** Mouse out, stops animation. */
-        @Override
-        public final void mouseOut(final ComponentWithTest component) {
-            if (!isEnabled()) {
-                return;
-            }
-            mouseStillOver = false;
-            drbdGraph.stopTestAnimation((JComponent) component);
-            component.setToolTipText("");
-        }
-
-        /** Mouse over, starts animation, calls action() and sets tooltip. */
-        @Override
-        public final void mouseOver(final ComponentWithTest component) {
-            if (!isEnabled()) {
-                return;
-            }
-            mouseStillOver = true;
-            component.setToolTipText(
-                          Tools.getString("ClusterBrowser.StartingDRBDtest"));
-            component.setToolTipBackground(
-              Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
-            Tools.sleep(250);
-            if (!mouseStillOver) {
-                return;
-            }
-            mouseStillOver = false;
-            final CountDownLatch startTestLatch = new CountDownLatch(1);
-            drbdGraph.startTestAnimation((JComponent) component,
-                                         startTestLatch);
-            drbdtestLockAcquire();
-            final Map<Host, String> testOutput =
-                                             new LinkedHashMap<Host, String>();
-            if (menuHost == null) {
-                for (final Host h : cluster.getHostsArray()) {
-                    action(h);
-                    testOutput.put(h, DRBD.getDRBDtest());
-                }
-            } else {
-                action(menuHost);
-                testOutput.put(menuHost, DRBD.getDRBDtest());
-            }
-            final DRBDtestData dtd = new DRBDtestData(testOutput);
-            component.setToolTipText(dtd.getToolTip());
-            drbdtestdataLockAcquire();
-            drbdtestData = dtd;
-            drbdtestdataLockRelease();
-            //clusterStatus.setPtestData(ptestData);
-            drbdtestLockRelease();
-            startTestLatch.countDown();
-        }
-
-        /** Action that is caried out on the host. */
-        protected abstract void action(final Host dcHost);
-    }
-
     /**
      * Returns common file systems on all nodes as StringValue array.
      * The defaultValue is stored as the first item in the array.
@@ -2694,15 +2551,6 @@ public class ClusterBrowser extends Browser {
         mClStatusLock.unlock();
     }
 
-    /** Return name of the classes in the menu. */
-    public static String getClassMenu(final String cl) {
-        final String name = HB_CLASS_MENU.get(cl);
-        if (name == null) {
-            return Tools.ucfirst(cl) + " scripts";
-        }
-        return name;
-    }
-
     /** Return null if DRBD info is availble, or the reason why not. */
     public String isDrbdAvailable(final Host host) {
         if (drbdParameters.get(host) == null) {
@@ -2715,5 +2563,157 @@ public class ClusterBrowser extends Browser {
                    + host.getDrbdModuleVersion();
         }
         return null;
+    }
+
+    /** Callback to service menu items, that show ptest results in tooltips. */
+    public abstract class ClMenuItemCallback implements ButtonCallback {
+        /** Host if over a menu item that belongs to a host. */
+        private final Host menuHost;
+        /** Whether the mouse is still over. */
+        private volatile boolean mouseStillOver = false;
+
+        /** Creates new ClMenuItemCallback object. */
+        public ClMenuItemCallback(final Host menuHost) {
+            this.menuHost = menuHost;
+        }
+
+        /** Can be overwritten to disable the whole thing. */
+        @Override
+        public boolean isEnabled() {
+            if (clusterStatus == null) {
+                return false;
+            }
+            final Host h;
+            if (menuHost == null) {
+                h = getDCHost();
+            } else {
+                h = menuHost;
+            }
+            return !Tools.versionBeforePacemaker(h);
+        }
+
+        /** Mouse out, stops animation. */
+        @Override
+        public final void mouseOut(final ComponentWithTest component) {
+            if (isEnabled()) {
+                mouseStillOver = false;
+                crmGraph.stopTestAnimation((JComponent) component);
+                component.setToolTipText("");
+            }
+        }
+
+        /** Mouse over, starts animation, calls action() and sets tooltip. */
+        @Override
+        public final void mouseOver(final ComponentWithTest component) {
+            if (isEnabled()) {
+                mouseStillOver = true;
+                component.setToolTipText(STARTING_PTEST_TOOLTIP);
+                component.setToolTipBackground(
+                  Tools.getDefaultColor(
+                                   "ClusterBrowser.Test.Tooltip.Background"));
+                Tools.sleep(250);
+                if (!mouseStillOver) {
+                    return;
+                }
+                mouseStillOver = false;
+                final CountDownLatch startTestLatch = new CountDownLatch(1);
+                crmGraph.startTestAnimation((JComponent) component,
+                                            startTestLatch);
+                ptestLockAcquire();
+                try {
+                    clusterStatus.setPtestData(null);
+                    final Host h;
+                    if (menuHost == null) {
+                        h = getDCHost();
+                    } else {
+                        h = menuHost;
+                    }
+                    action(h);
+                    final PtestData ptestData = new PtestData(CRM.getPtest(h));
+                    component.setToolTipText(ptestData.getToolTip());
+                    clusterStatus.setPtestData(ptestData);
+                } finally {
+                    ptestLockRelease();
+                }
+                startTestLatch.countDown();
+            }
+        }
+
+        /** Action that is caried out on the host. */
+        protected abstract void action(final Host dcHost);
+    }
+
+    /** Callback to service menu items, that show ptest results in tooltips. */
+    public abstract class DRBDMenuItemCallback implements ButtonCallback {
+        /** Host if over a menu item that belongs to a host. */
+        private final Host menuHost;
+        /** Whether the mouse is still over. */
+        private volatile boolean mouseStillOver = false;
+
+        /** Creates new DRBDMenuItemCallback object. */
+        public DRBDMenuItemCallback(final Host menuHost) {
+            this.menuHost = menuHost;
+        }
+
+        /** Whether the whole thing should be enabled. */
+        @Override
+        public final boolean isEnabled() {
+            return true;
+        }
+
+        /** Mouse out, stops animation. */
+        @Override
+        public final void mouseOut(final ComponentWithTest component) {
+            if (!isEnabled()) {
+                return;
+            }
+            mouseStillOver = false;
+            drbdGraph.stopTestAnimation((JComponent) component);
+            component.setToolTipText("");
+        }
+
+        /** Mouse over, starts animation, calls action() and sets tooltip. */
+        @Override
+        public final void mouseOver(final ComponentWithTest component) {
+            if (!isEnabled()) {
+                return;
+            }
+            mouseStillOver = true;
+            component.setToolTipText(
+                          Tools.getString("ClusterBrowser.StartingDRBDtest"));
+            component.setToolTipBackground(
+              Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
+            Tools.sleep(250);
+            if (!mouseStillOver) {
+                return;
+            }
+            mouseStillOver = false;
+            final CountDownLatch startTestLatch = new CountDownLatch(1);
+            drbdGraph.startTestAnimation((JComponent) component,
+                                         startTestLatch);
+            drbdtestLockAcquire();
+            final Map<Host, String> testOutput =
+                                             new LinkedHashMap<Host, String>();
+            if (menuHost == null) {
+                for (final Host h : cluster.getHostsArray()) {
+                    action(h);
+                    testOutput.put(h, DRBD.getDRBDtest());
+                }
+            } else {
+                action(menuHost);
+                testOutput.put(menuHost, DRBD.getDRBDtest());
+            }
+            final DRBDtestData dtd = new DRBDtestData(testOutput);
+            component.setToolTipText(dtd.getToolTip());
+            drbdtestdataLockAcquire();
+            drbdtestData = dtd;
+            drbdtestdataLockRelease();
+            //clusterStatus.setPtestData(ptestData);
+            drbdtestLockRelease();
+            startTestLatch.countDown();
+        }
+
+        /** Action that is caried out on the host. */
+        protected abstract void action(final Host dcHost);
     }
 }

@@ -64,6 +64,34 @@ import lcmc.data.Application;
  *
  */
 public final class DrbdGraph extends ResourceGraph {
+
+    /** Horizontal step in pixels by which the block devices are drawn in
+     * the graph. */
+    private static final int BD_STEP_Y = 60;
+    /** Y position of the host. */
+    private static final int HOST_Y_POS = 40;
+    /** Vertical step in pixels by which the hosts are drawn in the graph. */
+    private static final int HOST_STEP_X = 280;
+    /** Block device vertex size. */
+    private static final int VERTEX_SIZE_BD = 200;
+    /** Host vertex size. */
+    private static final int VERTEX_SIZE_HOST = 150;
+    /** Height of the host vertices. */
+    private static final int HOST_VERTEX_HEIGHT = 50;
+    /** Height of the block device vertices. */
+    private static final int VERTEX_HEIGHT = 50;
+
+    /** Maximum length of the label in the vertex, after which the string will
+     * be cut. */
+    private static final int MAX_VERTEX_STRING_LENGTH = 18;
+    /** Postion offset of block devices from the host x position. */
+    private static final int BD_X_OFFSET = 15;
+    /** Minimum vertical position. */
+    private static final int MIN_Y_POS = 20;
+    /** Maximum horizontal position. */
+    private static final int MAX_X_POS = 2600;
+    /** Maximum vertical position. */
+    private static final int MAX_Y_POS = 2600;
     /** Map from vertex to host. */
     private final Map<Vertex, HostDrbdInfo> vertexToHostMap =
                                  new LinkedHashMap<Vertex, HostDrbdInfo>();
@@ -91,36 +119,8 @@ public final class DrbdGraph extends ResourceGraph {
     /** Interval beetween two animation frames. */
     private Info multiSelectionInfo = null;
 
-    /** Horizontal step in pixels by which the block devices are drawn in
-     * the graph. */
-    private static final int BD_STEP_Y = 60;
-    /** Y position of the host. */
-    private static final int HOST_Y_POS = 40;
-    /** Vertical step in pixels by which the hosts are drawn in the graph. */
-    private static final int HOST_STEP_X = 280;
-    /** Block device vertex size. */
-    private static final int VERTEX_SIZE_BD = 200;
-    /** Host vertex size. */
-    private static final int VERTEX_SIZE_HOST = 150;
-    /** Height of the host vertices. */
-    private static final int HOST_VERTEX_HEIGHT = 50;
-    /** Height of the block device vertices. */
-    private static final int VERTEX_HEIGHT = 50;
-
-    /** Maximum length of the label in the vertex, after which the string will
-     * be cut. */
-    private static final int MAX_VERTEX_STRING_LENGTH = 18;
-    /** Postion offset of block devices from the host x position. */
-    private static final int BD_X_OFFSET = 15;
-
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
-    /** Minimum vertical position. */
-    private static final int MIN_Y_POS = 20;
-    /** Maximum horizontal position. */
-    private static final int MAX_X_POS = 2600;
-    /** Maximum vertical position. */
-    private static final int MAX_Y_POS = 2600;
 
     /** Prepares a new {@code DrbdGraph} object. */
     public DrbdGraph(final ClusterBrowser clusterBrowser) {

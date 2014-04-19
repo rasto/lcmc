@@ -47,8 +47,6 @@ import lcmc.data.StringValue;
  * @version $Id$
  */
 final class Network extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {InterfaceData.TYPE,
                                             InterfaceData.MAC_ADDRESS,
@@ -56,6 +54,8 @@ final class Network extends VMConfig {
                                             InterfaceData.SOURCE_BRIDGE,
                                             InterfaceData.SCRIPT_PATH,
                                             InterfaceData.MODEL_TYPE};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS interface info object. */
     private InterfaceInfo vmsii = null;
     /** Next dialog object. */

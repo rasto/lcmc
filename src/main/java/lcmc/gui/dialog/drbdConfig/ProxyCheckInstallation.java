@@ -46,18 +46,6 @@ import java.awt.event.ActionEvent;
  *
  */
 final class ProxyCheckInstallation extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
-
-    /** Checking proxy label. */
-    private final JLabel proxyLabel = new JLabel(
-          ": " + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
-
-    /** Install/Upgrade proxy button. */
-    private final MyButton proxyButton = new MyButton(
-            Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
-    /** Proxy installation method. */
-    private Widget proxyInstMethodWi;
 
     /** Checking icon. */
     private static final ImageIcon CHECKING_ICON =
@@ -74,6 +62,18 @@ final class ProxyCheckInstallation extends DialogHost {
 
     private static final String PROXY_PREFIX = "ProxyInst";
     private static final String PROXY_AUTO_OPTION = "proxyinst";
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
+
+    /** Checking proxy label. */
+    private final JLabel proxyLabel = new JLabel(
+          ": " + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
+
+    /** Install/Upgrade proxy button. */
+    private final MyButton proxyButton = new MyButton(
+            Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
+    /** Proxy installation method. */
+    private Widget proxyInstMethodWi;
 
     /** Proxy icon: checking ... */
     private final JLabel proxyIcon = new JLabel(CHECKING_ICON);

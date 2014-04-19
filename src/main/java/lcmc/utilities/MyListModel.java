@@ -37,10 +37,10 @@ import java.util.Locale;
 public final class MyListModel<E> extends AbstractListModel<E> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    private static final String START_TEXT = "type to search...";
 
     private final Collection<E> items = new ArrayList<E>();
     private final List<E> filteredItems = new ArrayList<E>();
-    private static final String START_TEXT = "type to search...";
     private final FilterField filterField = new FilterField(START_TEXT);
 
     FilterField getFilterField() {

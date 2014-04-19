@@ -35,11 +35,6 @@ final class GUITest2 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(GUITest2.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private GUITest2() {
-        /* Cannot be instantiated. */
-    }
-
     /** Cluster wizard locked until focus is lost. */
     static void start(final int count) {
         slowFactor = 0.2f;
@@ -62,5 +57,10 @@ final class GUITest2 {
             leftClick();
             sleep(1000);
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private GUITest2() {
+        /* Cannot be instantiated. */
     }
 }

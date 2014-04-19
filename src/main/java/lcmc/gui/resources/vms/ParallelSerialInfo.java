@@ -65,82 +65,12 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Parameters map. */
     private static final Map<String, List<String>> PARAMETERS_MAP =
                                            new HashMap<String, List<String>>();
-    static {
-        PARAMETERS_MAP.put("dev", Arrays.asList(
-                                              ParallelSerialData.TYPE,
-                                              ParallelSerialData.SOURCE_PATH,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("file", Arrays.asList(ParallelSerialData.TYPE,
-                                              ParallelSerialData.SOURCE_PATH,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("null", Arrays.asList(
-                                              ParallelSerialData.TYPE,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("pipe", Arrays.asList(
-                                              ParallelSerialData.TYPE,
-                                              ParallelSerialData.SOURCE_PATH,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("pty", Arrays.asList(
-                                              ParallelSerialData.TYPE,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("stdio", Arrays.asList(
-                                              ParallelSerialData.TYPE,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("tcp", Arrays.asList(
-                                   ParallelSerialData.TYPE,
-                                   ParallelSerialData.SOURCE_MODE, /* one or
-                                                                     another */
-                                   ParallelSerialData.BIND_SOURCE_HOST,
-                                   ParallelSerialData.BIND_SOURCE_SERVICE,
-                                   ParallelSerialData.CONNECT_SOURCE_HOST,
-                                   ParallelSerialData.CONNECT_SOURCE_SERVICE,
-                                   ParallelSerialData.PROTOCOL_TYPE,
-                                   ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("udp", Arrays.asList(
-                                     ParallelSerialData.TYPE,
-                                     ParallelSerialData.BIND_SOURCE_HOST,
-                                     ParallelSerialData.BIND_SOURCE_SERVICE,
-                                     ParallelSerialData.CONNECT_SOURCE_HOST,
-                                     ParallelSerialData.CONNECT_SOURCE_SERVICE,
-                                     ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("unix", Arrays.asList(
-                                              ParallelSerialData.TYPE,
-                                              ParallelSerialData.SOURCE_MODE,
-                                              ParallelSerialData.SOURCE_PATH,
-                                              ParallelSerialData.TARGET_PORT));
-
-        PARAMETERS_MAP.put("vc", Arrays.asList(ParallelSerialData.TYPE,
-                                               ParallelSerialData.TARGET_PORT));
-    }
     /** Field type. */
     private static final Map<String, Widget.Type> FIELD_TYPES =
                                        new HashMap<String, Widget.Type>();
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
-    static {
-        SHORTNAME_MAP.put(ParallelSerialData.TYPE, "Type");
-        SHORTNAME_MAP.put(ParallelSerialData.SOURCE_PATH, "Source Path");
-        SHORTNAME_MAP.put(ParallelSerialData.SOURCE_MODE, "Mode");
-        SHORTNAME_MAP.put(ParallelSerialData.BIND_SOURCE_HOST, "Server");
-        SHORTNAME_MAP.put(ParallelSerialData.BIND_SOURCE_SERVICE,
-                          "Server Port");
-        SHORTNAME_MAP.put(ParallelSerialData.CONNECT_SOURCE_HOST, "Client");
-        SHORTNAME_MAP.put(ParallelSerialData.CONNECT_SOURCE_SERVICE,
-                          "Client Port");
-        SHORTNAME_MAP.put(ParallelSerialData.PROTOCOL_TYPE, "Protocol");
-        SHORTNAME_MAP.put(ParallelSerialData.TARGET_PORT, "Target Port");
-        FIELD_TYPES.put(ParallelSerialData.PROTOCOL_TYPE,
-                        Widget.Type.RADIOGROUP);
-    }
 
     /** Whether the parameter is required. */
     private static final Collection<String> IS_REQUIRED =
@@ -156,6 +86,67 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Possible values. */
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                            new HashMap<String, Value[]>();
+    static {
+        PARAMETERS_MAP.put("dev", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("file", Arrays.asList(ParallelSerialData.TYPE,
+                                                 ParallelSerialData.SOURCE_PATH,
+                                                 ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("null", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                              ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("pipe", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("pty", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                              ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("stdio", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                              ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("tcp", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                   ParallelSerialData.SOURCE_MODE, /* one or
+                                   another */
+                                   ParallelSerialData.BIND_SOURCE_HOST,
+                                   ParallelSerialData.BIND_SOURCE_SERVICE,
+                                   ParallelSerialData.CONNECT_SOURCE_HOST,
+                                   ParallelSerialData.CONNECT_SOURCE_SERVICE,
+                                   ParallelSerialData.PROTOCOL_TYPE,
+                                   ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("udp", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                     ParallelSerialData.BIND_SOURCE_HOST,
+                                     ParallelSerialData.BIND_SOURCE_SERVICE,
+                                     ParallelSerialData.CONNECT_SOURCE_HOST,
+                                     ParallelSerialData.CONNECT_SOURCE_SERVICE,
+                                     ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("unix", Arrays.asList(
+            ParallelSerialData.TYPE,
+                                              ParallelSerialData.SOURCE_MODE,
+                                              ParallelSerialData.SOURCE_PATH,
+                                              ParallelSerialData.TARGET_PORT));
+        PARAMETERS_MAP.put("vc", Arrays.asList(ParallelSerialData.TYPE,
+                                               ParallelSerialData.TARGET_PORT));
+    }
+    static {
+        SHORTNAME_MAP.put(ParallelSerialData.TYPE, "Type");
+        SHORTNAME_MAP.put(ParallelSerialData.SOURCE_PATH, "Source Path");
+        SHORTNAME_MAP.put(ParallelSerialData.SOURCE_MODE, "Mode");
+        SHORTNAME_MAP.put(ParallelSerialData.BIND_SOURCE_HOST, "Server");
+        SHORTNAME_MAP.put(ParallelSerialData.BIND_SOURCE_SERVICE,
+                          "Server Port");
+        SHORTNAME_MAP.put(ParallelSerialData.CONNECT_SOURCE_HOST, "Client");
+        SHORTNAME_MAP.put(ParallelSerialData.CONNECT_SOURCE_SERVICE,
+                          "Client Port");
+        SHORTNAME_MAP.put(ParallelSerialData.PROTOCOL_TYPE, "Protocol");
+        SHORTNAME_MAP.put(ParallelSerialData.TARGET_PORT, "Target Port");
+        FIELD_TYPES.put(ParallelSerialData.PROTOCOL_TYPE,
+                        Widget.Type.RADIOGROUP);
+    }
     static {
         POSSIBLE_VALUES.put(
             ParallelSerialData.TYPE,

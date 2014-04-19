@@ -60,13 +60,13 @@ public final class SplitBrain extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(SplitBrain.class);
+    /** Width of the combo box. */
+    private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
     private Widget hostWi;
     /** Resolve split brain button. */
     private final MyButton resolveButton = new MyButton(
                     Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
-    /** Width of the combo box. */
-    private static final int COMBOBOX_WIDTH = 160;
 
     /** Prepares a new {@code SplitBrain} object. */
     public SplitBrain(final WizardDialog previousDialog,

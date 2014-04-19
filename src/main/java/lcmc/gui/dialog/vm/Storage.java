@@ -47,8 +47,6 @@ import lcmc.data.StringValue;
  * @version $Id$
  */
 final class Storage extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
@@ -67,6 +65,8 @@ final class Storage extends VMConfig {
                                             DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE,
                                             DiskData.DRIVER_CACHE};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS disk info object. */
     private DiskInfo vmsdi = null;
     /** Next dialog object. */

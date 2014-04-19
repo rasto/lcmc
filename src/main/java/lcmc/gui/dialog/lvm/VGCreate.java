@@ -61,6 +61,11 @@ import lcmc.data.StringValue;
 
 /** Create VG dialog. */
 public final class VGCreate extends LV {
+    /** Description create VG. */
+    private static final String VG_CREATE_DESCRIPTION =
+                                                    "Create a volume group.";
+    /** VG create timeout. */
+    private static final int CREATE_TIMEOUT = 5000;
     private final Host host;
     /** Selected block device, can be null. */
     private final Collection<BlockDevInfo> selectedBlockDevInfos =
@@ -69,11 +74,6 @@ public final class VGCreate extends LV {
     private Widget vgNameWi;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
-    /** Description create VG. */
-    private static final String VG_CREATE_DESCRIPTION =
-                                                    "Create a volume group.";
-    /** VG create timeout. */
-    private static final int CREATE_TIMEOUT = 5000;
 
     /** Create new VGCreate object. */
     public VGCreate(final Host host) {
@@ -304,6 +304,34 @@ public final class VGCreate extends LV {
         return pane;
     }
 
+    /** Create VG. */
+    private boolean vgCreate(final Host host,
+                             final String vgName,
+                             final Collection<String> pvNames) {
+        for (final String pv : pvNames) {
+            final BlockDevInfo bdi =
+                host.getBrowser().getDrbdGraph().findBlockDevInfo(
+                                                             host.getName(),
+                                                             pv);
+            if (bdi != null) {
+                bdi.getBlockDevice().setVolumeGroupOnPhysicalVolume(vgName);
+                bdi.getBrowser().getDrbdGraph().startAnimation(bdi);
+            }
+        }
+        final boolean ret = LVM.vgCreate(host, vgName, pvNames, Application.RunMode.LIVE);
+        if (ret) {
+            answerPaneAddText("Volume group "
+                              + vgName
+                              + " was successfully created "
+                              + " on " + host.getName() + '.');
+        } else {
+            answerPaneAddTextError("Creating of volume group "
+                                   + vgName
+                                   + " failed.");
+        }
+        return ret;
+    }
+
     /** Size combo box item listener. */
     private class ItemChangeListener implements ItemListener {
         /** Whether to check buttons on both select and deselect. */
@@ -384,33 +412,5 @@ public final class VGCreate extends LV {
                 }
             }
         }
-    }
-
-    /** Create VG. */
-    private boolean vgCreate(final Host host,
-                             final String vgName,
-                             final Collection<String> pvNames) {
-        for (final String pv : pvNames) {
-            final BlockDevInfo bdi =
-                host.getBrowser().getDrbdGraph().findBlockDevInfo(
-                                                             host.getName(),
-                                                             pv);
-            if (bdi != null) {
-                bdi.getBlockDevice().setVolumeGroupOnPhysicalVolume(vgName);
-                bdi.getBrowser().getDrbdGraph().startAnimation(bdi);
-            }
-        }
-        final boolean ret = LVM.vgCreate(host, vgName, pvNames, Application.RunMode.LIVE);
-        if (ret) {
-            answerPaneAddText("Volume group "
-                              + vgName
-                              + " was successfully created "
-                              + " on " + host.getName() + '.');
-        } else {
-            answerPaneAddTextError("Creating of volume group "
-                                   + vgName
-                                   + " failed.");
-        }
-        return ret;
     }
 }

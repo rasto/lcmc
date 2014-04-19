@@ -80,12 +80,6 @@ import lcmc.utilities.UpdatableItem;
 public final class GlobalInfo extends AbstractDrbdInfo {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(GlobalInfo.class);
-    /** Selected block device. */
-    private BlockDevInfo selectedBD = null;
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
-
-    private GlobalMenu globalMenu;
     /** Common proxy section. */
     private static final String SECTION_COMMON_PROXY = "proxy";
 
@@ -97,6 +91,12 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     /** Icon of the cluster. */
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
+    /** Selected block device. */
+    private BlockDevInfo selectedBD = null;
+    /** Cache for the info panel. */
+    private JComponent infoPanel = null;
+
+    private GlobalMenu globalMenu;
 
     /** Prepares a new {@code GlobalInfo} object. */
     public GlobalInfo(final String name, final Browser browser) {

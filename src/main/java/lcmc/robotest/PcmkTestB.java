@@ -35,11 +35,6 @@ final class PcmkTestB {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTestB.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestB() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
@@ -75,5 +70,10 @@ final class PcmkTestB {
             resetTerminalAreas();
         }
         System.gc();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestB() {
+        /* Cannot be instantiated. */
     }
 }

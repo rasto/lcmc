@@ -60,8 +60,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ViewPanel extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** This view split pane. */
-    private JSplitPane viewSP = null;
     /** Minimum size of the menu tree. */
     private static final Dimension MENU_TREE_MIN_SIZE = new Dimension(200, 200);
     /** Minimum size of the info panel. */
@@ -71,6 +69,8 @@ public class ViewPanel extends JPanel {
     private static final Dimension MENU_TREE_SIZE = new Dimension(400, 200);
     /** Location of the divider in the split pane. */
     private static final int DIVIDER_LOCATION   = 200;
+    /** This view split pane. */
+    private JSplitPane viewSP = null;
     /** Disabled during load. It disables the menu expanding.*/
     private volatile boolean disabledDuringLoad = true;
     /** Update VMS lock. */

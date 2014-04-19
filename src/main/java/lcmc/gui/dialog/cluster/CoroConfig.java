@@ -83,6 +83,32 @@ final class CoroConfig extends DialogCluster {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(CoroConfig.class);
+    /** Multicast type string. */
+    private static final Value MCAST_TYPE = new StringValue("mcast");
+    /** Width of the address combobox. */
+    private static final int ADDR_COMBOBOX_WIDTH = 100;
+    /** Width of the port combobox. */
+    private static final int PORT_COMBOBOX_WIDTH = 60;
+    /** Width of the type combobox. */
+    private static final int TYPE_COMBOBOX_WIDTH = 80;
+    /** Width of the interface combobox. */
+    private static final int INTF_COMBOBOX_WIDTH = 80;
+    /** Width of the remove button. */
+    private static final int REMOVE_BUTTON_WIDTH  = 100;
+    /** Height of the remove button. */
+    private static final int REMOVE_BUTTON_HEIGHT = 14;
+    /** Checkbox text (Edit the config). */
+    private static final String EDIT_CONFIG_STRING = Tools.getString(
+                             "Dialog.Cluster.CoroConfig.Checkbox.EditConfig");
+    /** Checkbox text (See existing). */
+    private static final String SEE_EXISTING_STRING = Tools.getString(
+                             "Dialog.Cluster.CoroConfig.Checkbox.SeeExisting");
+    /** openais read error string. */
+    private static final String AIS_CONF_ERROR_STRING = "error: read error";
+    /** Newline. */
+    private static final String NEWLINE = "\\r?\\n";
+    /** Tabulator made from spaces. */
+    private static final String SPACE_TAB = "        ";
     /** Panel for mcast addresses. */
     private JPanel mcast;
     /** Set of mcast etc. addresses. */
@@ -114,32 +140,6 @@ final class CoroConfig extends DialogCluster {
     private final JPanel configPanel = new JPanel();
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
-    /** Multicast type string. */
-    private static final Value MCAST_TYPE = new StringValue("mcast");
-    /** Width of the address combobox. */
-    private static final int ADDR_COMBOBOX_WIDTH = 100;
-    /** Width of the port combobox. */
-    private static final int PORT_COMBOBOX_WIDTH = 60;
-    /** Width of the type combobox. */
-    private static final int TYPE_COMBOBOX_WIDTH = 80;
-    /** Width of the interface combobox. */
-    private static final int INTF_COMBOBOX_WIDTH = 80;
-    /** Width of the remove button. */
-    private static final int REMOVE_BUTTON_WIDTH  = 100;
-    /** Height of the remove button. */
-    private static final int REMOVE_BUTTON_HEIGHT = 14;
-    /** Checkbox text (Edit the config). */
-    private static final String EDIT_CONFIG_STRING = Tools.getString(
-                             "Dialog.Cluster.CoroConfig.Checkbox.EditConfig");
-    /** Checkbox text (See existing). */
-    private static final String SEE_EXISTING_STRING = Tools.getString(
-                             "Dialog.Cluster.CoroConfig.Checkbox.SeeExisting");
-    /** openais read error string. */
-    private static final String AIS_CONF_ERROR_STRING = "error: read error";
-    /** Newline. */
-    private static final String NEWLINE = "\\r?\\n";
-    /** Tabulator made from spaces. */
-    private static final String SPACE_TAB = "        ";
     /** Config scroll pane. */
     private volatile JScrollPane configScrollPane = null;
     /** Whether the config pane was already moved to the position. */

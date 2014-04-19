@@ -34,11 +34,6 @@ final class PcmkTestE {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTestE.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestE() {
-        /* Cannot be instantiated. */
-    }
-
     /** Host wizard deadlock. */
     static void start(final int count) {
         slowFactor = 0.2f;
@@ -55,5 +50,10 @@ final class PcmkTestE {
             moveTo(Tools.getString("Dialog.Dialog.Cancel"));
             leftClick();
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestE() {
+        /* Cannot be instantiated. */
     }
 }

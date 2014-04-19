@@ -57,15 +57,15 @@ import lcmc.data.Value;
 public final class LVSnapshot extends LV {
     /** LV Snapshot timeout. */
     private static final int SNAPSHOT_TIMEOUT = 5000;
+    /** Description LV snapshot. */
+    private static final String SNAPSHOT_DESCRIPTION =
+                                    "Create a snapshot of the logical volume.";
     /** Block device info object. */
     private final BlockDevInfo blockDevInfo;
     private final MyButton snapshotButton = new MyButton("Create Snapshot");
     private Widget lvNameWi;
     private Widget sizeWi;
     private Widget maxSizeWi;
-    /** Description LV snapshot. */
-    private static final String SNAPSHOT_DESCRIPTION =
-                                    "Create a snapshot of the logical volume.";
     /** Create new LVSnapshot object. */
     public LVSnapshot(final BlockDevInfo blockDevInfo) {
         super(null);
@@ -101,40 +101,6 @@ public final class LVSnapshot extends LV {
     /** Enables and disabled buttons. */
     protected void checkButtons() {
         Tools.invokeLater(new EnableSnapshotRunnable(true));
-    }
-
-    private class EnableSnapshotRunnable implements Runnable {
-        private final boolean enable;
-        EnableSnapshotRunnable(final boolean enable) {
-            super();
-            this.enable = enable;
-        }
-
-        @Override
-        public void run() {
-            boolean e = enable;
-            if (enable) {
-                final long size = VMSXML.convertToKilobytes(
-                                                  sizeWi.getValue());
-                final long maxSize = VMSXML.convertToKilobytes(
-                                               maxSizeWi.getValue());
-                if (size > maxSize) {
-                    e = false;
-                } else if (size <= 0) {
-                    e = false;
-                } else {
-                    final Set<String> lvs =
-                        blockDevInfo.getHost()
-                                    .getLogicalVolumesFromVolumeGroup(
-                           blockDevInfo.getBlockDevice().getVolumeGroup());
-                    if (lvs != null
-                        && lvs.contains(lvNameWi.getStringValue())) {
-                        e = false;
-                    }
-                }
-            }
-            snapshotButton.setEnabled(e);
-        }
     }
 
     private void setComboBoxes() {
@@ -303,5 +269,39 @@ public final class LVSnapshot extends LV {
         final long free =
            blockDevInfo.getHost().getFreeInVolumeGroup(volumeGroup) / 1024;
         return Long.toString(free);
+    }
+
+    private class EnableSnapshotRunnable implements Runnable {
+        private final boolean enable;
+        EnableSnapshotRunnable(final boolean enable) {
+            super();
+            this.enable = enable;
+        }
+
+        @Override
+        public void run() {
+            boolean e = enable;
+            if (enable) {
+                final long size = VMSXML.convertToKilobytes(
+                                                  sizeWi.getValue());
+                final long maxSize = VMSXML.convertToKilobytes(
+                                               maxSizeWi.getValue());
+                if (size > maxSize) {
+                    e = false;
+                } else if (size <= 0) {
+                    e = false;
+                } else {
+                    final Set<String> lvs =
+                        blockDevInfo.getHost()
+                                    .getLogicalVolumesFromVolumeGroup(
+                           blockDevInfo.getBlockDevice().getVolumeGroup());
+                    if (lvs != null
+                        && lvs.contains(lvNameWi.getStringValue())) {
+                        e = false;
+                    }
+                }
+            }
+            snapshotButton.setEnabled(e);
+        }
     }
 }

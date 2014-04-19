@@ -78,8 +78,6 @@ import lcmc.utilities.LoggerFactory;
 public final class HostInfo extends Info {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
-    /** Host data. */
-    private final Host host;
     /** Host standby icon. */
     static final ImageIcon HOST_STANDBY_ICON =
      Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
@@ -130,6 +128,8 @@ public final class HostInfo extends Info {
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
+    /** Host data. */
+    private final Host host;
     /** whether crm info is showing. */
     private volatile boolean crmInfo = false;
     /** whether crm show is in progress. */

@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_redhat extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support", "redhat"},
@@ -187,4 +181,10 @@ public final class DistResource_redhat extends ListResourceBundle {
         {"ProxyCheck.version",
          "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

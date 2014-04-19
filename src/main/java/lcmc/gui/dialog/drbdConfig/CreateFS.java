@@ -61,17 +61,6 @@ import lcmc.utilities.LoggerFactory;
 final class CreateFS extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
-    /** Pull down menu with hosts (or no host). */
-    private Widget hostW;
-    /** Pull down menu with file systems. */
-    private Widget filesystemW;
-    /** Whether to skip the initial full sync. */
-    private Widget skipSyncW;
-    /** Whether to skip the initial full sync label. */
-    private JLabel skipSyncLabel;
-    /** Make file system button. */
-    private final MyButton makeFsButton = new MyButton(
-                Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
     /** No host string. (none) */
     private static final Value NO_HOST_STRING =
                     new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
@@ -84,6 +73,17 @@ final class CreateFS extends DrbdConfig {
     private static final Value SKIP_SYNC_FALSE = new StringValue("false");
     /** Skip sync true. */
     private static final Value SKIP_SYNC_TRUE = new StringValue("true");
+    /** Pull down menu with hosts (or no host). */
+    private Widget hostW;
+    /** Pull down menu with file systems. */
+    private Widget filesystemW;
+    /** Whether to skip the initial full sync. */
+    private Widget skipSyncW;
+    /** Whether to skip the initial full sync label. */
+    private JLabel skipSyncLabel;
+    /** Make file system button. */
+    private final MyButton makeFsButton = new MyButton(
+                Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
 
     /** Prepares a new {@code CreateFS} object. */
     CreateFS(final WizardDialog previousDialog,

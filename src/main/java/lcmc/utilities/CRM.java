@@ -65,17 +65,8 @@ public final class CRM {
     public static final String LCMC_TEST_FILE = "/tmp/lcmc-test-"
                                                 + UUID.randomUUID()
                                                 + ".xml";
-    /**
-     * No instantiation.
-     */
-    private CRM() {
-        /* empty */
-    }
-
     /** Returns cibadmin command. */
-    public static String getCibCommand(final String command,
-                                       final String objType,
-                                       final String xml) {
+    public static String getCibCommand(final String command, final String objType, final String xml) {
         final StringBuilder cmd = new StringBuilder(300);
         cmd.append(DistResource.SUDO + "/usr/sbin/cibadmin --obj_type ");
         cmd.append(objType);
@@ -87,10 +78,7 @@ public final class CRM {
     }
 
     /** Executes specified command on the host. */
-    private static SSHOutput execCommand(final Host host,
-                                             final String command,
-                                             final boolean outputVisible,
-                                             final Application.RunMode runMode) {
+    private static SSHOutput execCommand(final Host host, final String command, final boolean outputVisible, final Application.RunMode runMode) {
         M_PTEST_WRITELOCK.lock();
         try {
             ptestOutput = null;
@@ -99,7 +87,7 @@ public final class CRM {
         }
         if (Application.isTest(runMode)) {
             final String testCmd =
-             "if [ ! -e " + LCMC_TEST_FILE + " ]; "
+                "if [ ! -e " + LCMC_TEST_FILE + " ]; "
              + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
              + LCMC_TEST_FILE + ";fi;"
              + "export CIB_file=" + LCMC_TEST_FILE + ';';
@@ -111,7 +99,7 @@ public final class CRM {
         } else {
             LOG.debug1("execCommand: crm command: " + command);
             return Tools.execCommandProgressIndicator(
-                                    host,
+                host,
                                     command,
                                     null,
                                     outputVisible,
@@ -131,7 +119,7 @@ public final class CRM {
             M_PTEST_READLOCK.unlock();
         }
         final String command =
-                "export PROG=/usr/sbin/crm_simulate;"
+            "export PROG=/usr/sbin/crm_simulate;"
                 + "if [ -e /usr/sbin/ptest ];"
                 + " then export PROG=/usr/sbin/ptest; "
                 + "fi;"
@@ -142,7 +130,7 @@ public final class CRM {
                 + "';cat " + LCMC_TEST_FILE + " 2>/dev/null;"
                 + "mv -f " + LCMC_TEST_FILE + "{,.last} 2>/dev/null";
         final SSHOutput output = Tools.execCommand(
-                                                host,
+            host,
                                                 command,
                                                 null,
                                                 false,
@@ -160,20 +148,7 @@ public final class CRM {
     }
 
     /** Returns xml of a primitive. */
-    private static String getPrimitiveXML(
-                           final Host host,
-                           final String resId,
-                           final Map<String, String> pacemakerResAttrs,
-                           final Map<String, String> pacemakerResArgs,
-                           final Map<String, String> pacemakerMetaArgs,
-                           String instanceAttrId,
-                           final Map<String, String> nvpairIdsHash,
-                           final Map<String, Map<String, String>> pacemakerOps,
-                           String operationsId,
-                           final String metaAttrsRefId,
-                           final String operationsRefId,
-                           final boolean stonith,
-                           final Application.RunMode runMode) {
+    private static String getPrimitiveXML(final Host host, final String resId, final Map<String, String> pacemakerResAttrs, final Map<String, String> pacemakerResArgs, final Map<String, String> pacemakerMetaArgs, String instanceAttrId, final Map<String, String> nvpairIdsHash, final Map<String, Map<String, String>> pacemakerOps, String operationsId, final String metaAttrsRefId, final String operationsRefId, final boolean stonith, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         if (resId != null) {
             if (instanceAttrId == null) {
@@ -209,7 +184,7 @@ public final class CRM {
                     final String newParamName;
                     if (stonith
                         && CRMXML.STONITH_PRIORITY_INSTANCE_ATTR.equals(
-                                                                  paramName)) {
+                            paramName)) {
                         newParamName = "priority";
                     } else {
                         newParamName = paramName;
@@ -302,27 +277,8 @@ public final class CRM {
 
     /** Adds or updates resource in the CIB. */
     public static boolean setParameters(
-                           final Host host,
-                           final String command, /* -R or -C */
-                           final String resId,
-                           final String cloneId,
-                           final boolean master,
-                           final Map<String, String> cloneMetaArgs,
-                           final Map<String, String> groupMetaArgs,
-                           final String groupId,
-                           final Map<String, String> pacemakerResAttrs,
-                           final Map<String, String> pacemakerResArgs,
-                           final Map<String, String> pacemakerMetaArgs,
-                           final String instanceAttrId,
-                           final Map<String, String> nvpairIdsHash,
-                           final Map<String, Map<String, String>> pacemakerOps,
-                           final String operationsId,
-                           final String metaAttrsRefId,
-                           final String cloneMetaAttrsRefId,
-                           final String groupMetaAttrsRefId,
-                           final String operationsRefId,
-                           final boolean stonith,
-                           final Application.RunMode runMode) {
+        final Host host, final String command, /* -R or -C */
+                                            final String resId, final String cloneId, final boolean master, final Map<String, String> cloneMetaArgs, final Map<String, String> groupMetaArgs, final String groupId, final Map<String, String> pacemakerResAttrs, final Map<String, String> pacemakerResArgs, final Map<String, String> pacemakerMetaArgs, final String instanceAttrId, final Map<String, String> nvpairIdsHash, final Map<String, Map<String, String>> pacemakerOps, final String operationsId, final String metaAttrsRefId, final String cloneMetaAttrsRefId, final String groupMetaAttrsRefId, final String operationsRefId, final boolean stonith, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
         if (cloneId != null) {
@@ -386,37 +342,17 @@ public final class CRM {
         xml.append('\'');
 
         final SSHOutput ret = execCommand(host,
-                                              getCibCommand(command,
+                                          getCibCommand(command,
                                                             "resources",
                                                             xml.toString()),
-                                              true,
-                                              runMode);
+                                          true,
+                                          runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Replaces the whole group. */
     public static boolean replaceGroup(
-               final boolean createGroup,
-               final Host host,
-               final String cloneId,
-               final boolean master,
-               final Map<String, String> cloneMetaArgs,
-               final String cloneMetaAttrsRefId,
-               final Iterable<String> resourceIds,
-               final Map<String, String> groupMetaArgs,
-               final String groupId,
-               final Map<String, Map<String, String>> pacemakerResAttrs,
-               final Map<String, Map<String, String>> pacemakerResArgs,
-               final Map<String, Map<String, String>> pacemakerMetaArgs,
-               final Map<String, String> instanceAttrId,
-               final Map<String, Map<String, String>> nvpairIdsHash,
-               final Map<String, Map<String, Map<String, String>>> pacemakerOps,
-               final Map<String, String> operationsId,
-               final Map<String, String> metaAttrsRefId,
-               final String groupMetaAttrsRefId,
-               final Map<String, String> operationsRefId,
-               final Map<String, Boolean> stonith,
-               final Application.RunMode runMode) {
+        final boolean createGroup, final Host host, final String cloneId, final boolean master, final Map<String, String> cloneMetaArgs, final String cloneMetaAttrsRefId, final Iterable<String> resourceIds, final Map<String, String> groupMetaArgs, final String groupId, final Map<String, Map<String, String>> pacemakerResAttrs, final Map<String, Map<String, String>> pacemakerResArgs, final Map<String, Map<String, String>> pacemakerMetaArgs, final Map<String, String> instanceAttrId, final Map<String, Map<String, String>> nvpairIdsHash, final Map<String, Map<String, Map<String, String>>> pacemakerOps, final Map<String, String> operationsId, final Map<String, String> metaAttrsRefId, final String groupMetaAttrsRefId, final Map<String, String> operationsRefId, final Map<String, Boolean> stonith, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(720);
         xml.append('\'');
         if (cloneId != null) {
@@ -481,11 +417,11 @@ public final class CRM {
         }
 
         final SSHOutput ret = execCommand(host,
-                                              getCibCommand(cibadminOpt,
+                                          getCibCommand(cibadminOpt,
                                                             "resources",
                                                             xml.toString()),
-                                              true,
-                                              runMode);
+                                          true,
+                                          runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -495,12 +431,7 @@ public final class CRM {
      * colocation or order but not both defined.
      */
     public static void setOrderAndColocation(
-                                final Host host,
-                                final String resId,
-                                final String[] parents,
-                                final List<Map<String, String>> colAttrsList,
-                                final List<Map<String, String>> ordAttrsList,
-                                final Application.RunMode runMode) {
+        final Host host, final String resId, final String[] parents, final List<Map<String, String>> colAttrsList, final List<Map<String, String>> ordAttrsList, final Application.RunMode runMode) {
         for (int i = 0; i < parents.length; i++) {
             if (colAttrsList.get(i) != null) {
                 addColocation(host,
@@ -522,9 +453,8 @@ public final class CRM {
     }
 
     /** Returns one resource set xml. */
-    private static String getOneRscSet(final String rscSetId,
-                                       final CRMXML.RscSet rscSet,
-                                       Map<String, String> attrs) {
+    private static String getOneRscSet(
+        final String rscSetId, final CRMXML.RscSet rscSet, Map<String, String> attrs) {
         final StringBuilder xml = new StringBuilder(120);
         xml.append("<resource_set id=\"");
         xml.append(rscSetId);
@@ -567,19 +497,11 @@ public final class CRM {
     }
 
     /** Sets resource set. */
-    public static boolean setRscSet(final Host host,
-                                    final String colId,
-                                    final boolean createCol,
-                                    final String ordId,
-                                    final boolean createOrd,
-                                    final Map<
-                                           CRMXML.RscSet,
-                                           Map<String, String>> rscSetsColAttrs,
-                                    final Map<
-                                           CRMXML.RscSet,
-                                           Map<String, String>> rscSetsOrdAttrs,
-                                    final Map<String, String> attrs,
-                                    final Application.RunMode runMode) {
+    public static boolean setRscSet(final Host host, final String colId, final boolean createCol, final String ordId, final boolean createOrd, final Map<
+        CRMXML.RscSet,
+        Map<String, String>> rscSetsColAttrs, final Map<
+                                               CRMXML.RscSet,
+                                               Map<String, String>> rscSetsOrdAttrs, final Map<String, String> attrs, final Application.RunMode runMode) {
         if (colId != null) {
             if (rscSetsColAttrs.isEmpty()) {
                 return removeColocation(host, colId, runMode);
@@ -623,14 +545,7 @@ public final class CRM {
     }
 
     /** Sets resource set that is either colocation or order. */
-    private static boolean setRscSetConstraint(
-                    final Host host,
-                    final String tag,
-                    final String constraintId,
-                    final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs,
-                    final Map<String, String> attrs,
-                    final String cibadminOpt,
-                    final Application.RunMode runMode) {
+    private static boolean setRscSetConstraint(final Host host, final String tag, final String constraintId, final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs, final Map<String, String> attrs, final String cibadminOpt, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<");
         xml.append(tag);
@@ -651,8 +566,8 @@ public final class CRM {
         for (final Map.Entry<CRMXML.RscSet, Map<String, String>> rscSetsEntry : rscSetsAttrs.entrySet()) {
             if (rscSetsEntry.getKey() != null) {
                 xml.append(getOneRscSet(constraintId + '-' + rsId,
-                        rscSetsEntry.getKey(),
-                        rscSetsEntry.getValue()));
+                                        rscSetsEntry.getKey(),
+                                        rscSetsEntry.getValue()));
                 rsId++;
             }
         }
@@ -668,14 +583,8 @@ public final class CRM {
     }
 
     /** Returns xml for location xml. */
-    private static String getLocationXML(final String resId,
-                                         final String onHost,
-                                         final String attribute,
-                                         final String score,
-                                         final String scoreAttribute,
-                                         final String op,
-                                         final String role,
-                                         final String locationId) {
+    private static String getLocationXML(
+        final String resId, final String onHost, final String attribute, final String score, final String scoreAttribute, final String op, final String role, final String locationId) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_location id=\"");
         xml.append(locationId);
@@ -733,12 +642,7 @@ public final class CRM {
     }
 
     /** Sets location constraint. */
-    public static boolean setLocation(final Host host,
-                                      final String resId,
-                                      final String onHost,
-                                      final HostLocation hostLocation,
-                                      String locationId,
-                                      final Application.RunMode runMode) {
+    public static boolean setLocation(final Host host, final String resId, final String onHost, final HostLocation hostLocation, String locationId, final Application.RunMode runMode) {
         String command = "-U";
         if (locationId == null) {
             locationId = "loc_" + resId + '_' + onHost;
@@ -767,7 +671,7 @@ public final class CRM {
                                           role,
                                           locationId);
         final SSHOutput ret = execCommand(
-                                    host,
+            host,
                                     getCibCommand(command, "constraints", xml),
                                     true,
                                     runMode);
@@ -775,11 +679,7 @@ public final class CRM {
     }
 
     /** Sets ping location constraint. */
-    public static boolean setPingLocation(final Host host,
-                                          final String resId,
-                                          final String ruleType,
-                                          String locationId,
-                                          final Application.RunMode runMode) {
+    public static boolean setPingLocation(final Host host, final String resId, final String ruleType, String locationId, final Application.RunMode runMode) {
         String op = null;
         String value = null;
         String score = null;
@@ -810,7 +710,7 @@ public final class CRM {
                                           null, /* role */
                                           locationId);
         final SSHOutput ret = execCommand(
-                                    host,
+            host,
                                     getCibCommand(command, "constraints", xml),
                                     true,
                                     runMode);
@@ -818,10 +718,7 @@ public final class CRM {
     }
 
     /** Removes location constraint. */
-    public static boolean removeLocation(final Host host,
-                                         final String locationId,
-                                         final String resId,
-                                         final Application.RunMode runMode) {
+    public static boolean removeLocation(final Host host, final String locationId, final String resId, final Application.RunMode runMode) {
         final String xml = getLocationXML(resId,
                                           null,
                                           null,
@@ -839,12 +736,7 @@ public final class CRM {
      * Removes a resource from crm. If heartbeat id is null and group id is
      * not, the whole group will be removed.
      */
-    public static boolean removeResource(final Host host,
-                                         final String resId,
-                                         final String groupId,
-                                         final String cloneId,
-                                         final boolean master,
-                                         final Application.RunMode runMode) {
+    public static boolean removeResource(final Host host, final String resId, final String groupId, final String cloneId, final boolean master, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
         if (cloneId != null) {
@@ -862,7 +754,7 @@ public final class CRM {
         }
         if (groupId != null) {
             /* when removing the last resource in a group, remove the
-             * whole group. */
+            * whole group. */
             xml.append("<group id=\"");
             xml.append(groupId);
             xml.append("\">");
@@ -895,10 +787,7 @@ public final class CRM {
     }
 
     /** Cleans up resource in crm. */
-    public static boolean cleanupResource(final Host host,
-                                          final String resId,
-                                          final Host[] clusterHosts,
-                                          final Application.RunMode runMode) {
+    public static boolean cleanupResource(final Host host, final String resId, final Host[] clusterHosts, final Application.RunMode runMode) {
         if (Application.isTest(runMode)) {
             return true;
         }
@@ -908,7 +797,7 @@ public final class CRM {
         for (final Host clusterHost : clusterHosts) {
             replaceHash.put("@HOST@", clusterHost.getName());
             final String command =
-                      host.getDistCommand("CRM.cleanupResource",
+                host.getDistCommand("CRM.cleanupResource",
                                           replaceHash);
             execCommand(host, command, true, runMode);
         }
@@ -916,9 +805,7 @@ public final class CRM {
     }
 
     /** Starts resource. */
-    public static boolean startResource(final Host host,
-                                        final String resId,
-                                        final Application.RunMode runMode) {
+    public static boolean startResource(final Host host, final String resId, final Application.RunMode runMode) {
         String cmd = "CRM.startResource";
         if (Tools.versionBeforePacemaker(host)) {
             cmd = "CRM.2.1.4.startResource";
@@ -931,10 +818,7 @@ public final class CRM {
     }
 
     /** Returns meta attributes xml. */
-    private static String getMetaAttributes(final Host host,
-                                           final String resId,
-                                           final Map<String, String> attrs,
-                                           final String metaAttrsRefId) {
+    private static String getMetaAttributes(final Host host, final String resId, final Map<String, String> attrs, final String metaAttrsRefId) {
         final StringBuilder xml = new StringBuilder(360);
         String idPostfix = "-meta_attributes";
         if (Tools.versionBeforePacemaker(host)) {
@@ -977,10 +861,7 @@ public final class CRM {
     }
 
     /** Sets whether the service should be managed or not. */
-    public static boolean setManaged(final Host host,
-                                     final String resId,
-                                     final boolean isManaged,
-                                     final Application.RunMode runMode) {
+    public static boolean setManaged(final Host host, final String resId, final boolean isManaged, final Application.RunMode runMode) {
         final String label;
         if (isManaged) {
             label = ".isManagedOn";
@@ -1000,9 +881,7 @@ public final class CRM {
     }
 
     /** Stops resource. */
-    public static boolean stopResource(final Host host,
-                                       final String resId,
-                                       final Application.RunMode runMode) {
+    public static boolean stopResource(final Host host, final String resId, final Application.RunMode runMode) {
         if (resId == null) {
             return false;
         }
@@ -1019,10 +898,7 @@ public final class CRM {
     }
 
     /** Migrates resource to the specified host. */
-    public static boolean migrateResource(final Host host,
-                                          final String resId,
-                                          final String onHost,
-                                          final Application.RunMode runMode) {
+    public static boolean migrateResource(final Host host, final String resId, final String onHost, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         replaceHash.put("@HOST@", onHost);
@@ -1034,9 +910,7 @@ public final class CRM {
     }
 
     /** Migrates resource from where it is running. */
-    public static boolean migrateFromResource(final Host host,
-                                              final String resId,
-                                              final Application.RunMode runMode) {
+    public static boolean migrateFromResource(final Host host, final String resId, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand("CRM.migrateFromResource",
@@ -1047,10 +921,7 @@ public final class CRM {
     }
 
     /** Migrates resource to the specified host. */
-    public static boolean forceMigrateResource(final Host host,
-                                               final String resId,
-                                               final String onHost,
-                                               final Application.RunMode runMode) {
+    public static boolean forceMigrateResource(final Host host, final String resId, final String onHost, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         replaceHash.put("@HOST@", onHost);
@@ -1062,25 +933,18 @@ public final class CRM {
     }
 
     /** Unmigrates resource that was previously migrated. */
-    public static boolean unmigrateResource(final Host host,
-                                            final String resId,
-                                            final Application.RunMode runMode) {
+    public static boolean unmigrateResource(final Host host, final String resId, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand(
-                                             "CRM.unmigrateResource",
+            "CRM.unmigrateResource",
                                              replaceHash);
         final SSHOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Sets global heartbeat parameters. */
-    public static boolean setGlobalParameters(
-                                        final Host host,
-                                        final Map<String, String> args,
-                                        final Map<String, String> rdiMetaArgs,
-                                        String rscDefaultsId,
-                                        final Application.RunMode runMode) {
+    public static boolean setGlobalParameters(final Host host, final Map<String, String> args, final Map<String, String> rdiMetaArgs, String rscDefaultsId, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append(
             "'<crm_config><cluster_property_set id=\"cib-bootstrap-options\">");
@@ -1104,7 +968,7 @@ public final class CRM {
         }
         xml.append("</cluster_property_set></crm_config>'");
         final StringBuilder command = new StringBuilder(getCibCommand(
-                                                               "-R",
+            "-R",
                                                                "crm_config",
                                                                xml.toString()));
         if (rdiMetaArgs != null
@@ -1136,14 +1000,13 @@ public final class CRM {
                                          rscdXML.toString()));
         }
         final SSHOutput ret =
-                        execCommand(host, command.toString(), true, runMode);
+            execCommand(host, command.toString(), true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Removes colocation with specified colocation id. */
-    public static boolean removeColocation(final Host host,
-                                           final String colocationId,
-                                           final Application.RunMode runMode) {
+    public static boolean removeColocation(
+        final Host host, final String colocationId, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_colocation id=\"");
         xml.append(colocationId);
@@ -1156,12 +1019,7 @@ public final class CRM {
     }
 
     /** Adds colocation between service with resId and parentHbId. */
-    public static boolean addColocation(final Host host,
-                                        final String colId,
-                                        final String resId,
-                                        final String parentHbId,
-                                        Map<String, String> attrs,
-                                        final Application.RunMode runMode) {
+    public static boolean addColocation(final Host host, final String colId, final String resId, final String parentHbId, Map<String, String> attrs, final Application.RunMode runMode) {
         if (parentHbId == null) {
             return false;
         }
@@ -1214,9 +1072,7 @@ public final class CRM {
     }
 
     /** Removes order constraint with specified order id. */
-    public static boolean removeOrder(final Host host,
-                                      final String orderId,
-                                      final Application.RunMode runMode) {
+    public static boolean removeOrder(final Host host, final String orderId, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<rsc_order id=\"");
         xml.append(orderId);
@@ -1229,12 +1085,7 @@ public final class CRM {
     }
 
     /** Adds order constraint. */
-    public static boolean addOrder(final Host host,
-                                   final String ordId,
-                                   final String parentHbId,
-                                   final String resId,
-                                   Map<String, String> attrs,
-                                   final Application.RunMode runMode) {
+    public static boolean addOrder(final Host host, final String ordId, final String parentHbId, final String resId, Map<String, String> attrs, final Application.RunMode runMode) {
         final String orderId;
         final String cibadminOpt;
         if (ordId == null) {
@@ -1280,9 +1131,7 @@ public final class CRM {
     }
 
     /** Makes heartbeat stand by. */
-    public static boolean standByOn(final Host host,
-                                    final Host standByHost,
-                                    final Application.RunMode runMode) {
+    public static boolean standByOn(final Host host, final Host standByHost, final Application.RunMode runMode) {
         String cmd = "CRM.standByOn";
         if (Tools.versionBeforePacemaker(host)) {
             cmd = "CRM.2.1.4.standByOn";
@@ -1295,9 +1144,7 @@ public final class CRM {
     }
 
     /** Undoes heartbeat stand by. */
-    public static boolean standByOff(final Host host,
-                                     final Host standByHost,
-                                     final Application.RunMode runMode) {
+    public static boolean standByOff(final Host host, final Host standByHost, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         String cmd = "CRM.standByOff";
         if (Tools.versionBeforePacemaker(host)) {
@@ -1310,8 +1157,7 @@ public final class CRM {
     }
 
     /** Erase config. */
-    public static boolean erase(final Host host,
-                                final Application.RunMode runMode) {
+    public static boolean erase(final Host host, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = Collections.emptyMap();
         final String command = host.getDistCommand("CRM.erase", replaceHash);
         final SSHOutput ret = execCommand(host, command, true, runMode);
@@ -1319,12 +1165,10 @@ public final class CRM {
     }
 
     /** crm configure commit. */
-    public static String crmConfigureCommit(final Host host,
-                                             final String config,
-                                             final Application.RunMode runMode) {
+    public static String crmConfigureCommit(final Host host, final String config, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@",
-            Tools.escapeQuotes(Matcher.quoteReplacement(config), 1));
+                        Tools.escapeQuotes(Matcher.quoteReplacement(config), 1));
         final String command = host.getDistCommand("CRM.configureCommit",
                                                    replaceHash);
         final SSHOutput ret = execCommand(host, command, true, runMode);
@@ -1332,5 +1176,12 @@ public final class CRM {
             return ret.getOutput();
         }
         return "error";
+    }
+
+    /**
+     * No instantiation.
+     */
+    private CRM() {
+        /* empty */
     }
 }

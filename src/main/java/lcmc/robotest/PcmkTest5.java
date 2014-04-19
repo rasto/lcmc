@@ -34,17 +34,12 @@ final class PcmkTest5 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest5.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest5() {
-        /* Cannot be instantiated. */
-    }
-
     @SuppressWarnings("TooBroadScope")
     static void start(final int count) {
         slowFactor = 0.2f;
         aborted = false;
-
-
+        
+        
         disableStonith();
         /* create 2 dummies */
         checkTest("test5", 1);
@@ -107,4 +102,9 @@ final class PcmkTest5 {
         removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
         checkTest("test5", 1);
     }
+
+    /** Private constructor, cannot be instantiated. */
+        private PcmkTest5() {
+            /* Cannot be instantiated. */
+        }
 }

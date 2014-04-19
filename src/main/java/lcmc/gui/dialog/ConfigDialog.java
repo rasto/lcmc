@@ -78,6 +78,8 @@ import java.beans.PropertyChangeListener;
  * @version $Id$
  */
 public abstract class ConfigDialog {
+    /** Size of the imput pane. */
+    private static final int INPUT_PANE_HEIGHT = 200;
     /** The whole option pane. */
     private volatile JOptionPane optionPane;
     /** dialog panel. */
@@ -94,8 +96,6 @@ public abstract class ConfigDialog {
     /** Components that were disabled and can be enabled later. */
     private final Collection<Component> disabledComponents =
                                                 new ArrayList<Component>();
-    /** Size of the imput pane. */
-    private static final int INPUT_PANE_HEIGHT = 200;
     /** Gate to synchronize the non-modal dialog and the answer.*/
     private CountDownLatch dialogGate;
     /** Skip button, can be null, if there is no skip button. */
@@ -671,31 +671,6 @@ public abstract class ConfigDialog {
         /* Does nothing by default. */
     }
 
-    /**
-     * Action listener for custom buttons.
-     */
-    class OptionPaneActionListener implements ActionListener {
-        /**
-         * Action performered on custom button.
-         */
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            optionPane.setValue(
-                                      ((AbstractButton) e.getSource()).getText());
-                        }
-                    });
-                }
-            });
-            t.start();
-        }
-    }
-
     /** Returns panel with checkbox. */
     protected final JPanel getComponentPanel(final String text,
                                              final Component component) {
@@ -717,5 +692,31 @@ public abstract class ConfigDialog {
     /** Add the compoment to the options. */
     protected final void addToOptions(final JComponent c) {
         additionalOptions.add(c);
+    }
+
+    /**
+     * Action listener for custom buttons.
+     */
+    class OptionPaneActionListener implements ActionListener {
+
+        /**
+         * Action performered on custom button.
+         */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            final Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Tools.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            optionPane.setValue(
+                                ((AbstractButton) e.getSource()).getText());
+                        }
+                    });
+                }
+            });
+            t.start();
+        }
     }
 }

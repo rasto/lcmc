@@ -79,16 +79,9 @@ import org.w3c.dom.Node;
 public abstract class HardwareInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HardwareInfo.class);
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
-    /** VMS virtual domain info object. */
-    private final DomainInfo vmsVirtualDomainInfo;
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                                  Tools.getDefault("BackIcon"));
-    /** Cache for files. */
-    private final Map<String, LinuxFile> linuxFileCache =
-                                            new HashMap<String, LinuxFile>();
     /** Pattern that parses stat output. */
     private static final Pattern STAT_PATTERN = Pattern.compile(
                                                        "(.).{9}\\s+(\\d+)\\s+"
@@ -98,6 +91,13 @@ public abstract class HardwareInfo extends EditableInfo {
     protected static final boolean FILECHOOSER_DIR_ONLY = true;
     protected static final boolean FILECHOOSER_FILE_ONLY =
                                                         !FILECHOOSER_DIR_ONLY;
+    /** Cache for the info panel. */
+    private JComponent infoPanel = null;
+    /** VMS virtual domain info object. */
+    private final DomainInfo vmsVirtualDomainInfo;
+    /** Cache for files. */
+    private final Map<String, LinuxFile> linuxFileCache =
+                                            new HashMap<String, LinuxFile>();
 
     /** Creates the HardwareInfo object. */
     HardwareInfo(final String name,

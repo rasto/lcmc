@@ -44,11 +44,21 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public final class CmdLog extends HostLogs {
+    private static final Value DEFAULT_TIME = new StringValue("5m");
+
+    /** Time units. */
+    protected static Unit[] getUnits() {
+        return new Unit[]{
+                   new Unit("s", "s", "second", "seconds"),
+                   new Unit("m", "m", "minute", "minutes"),
+                   new Unit("h", "h", "hour",   "hours"),
+                   new Unit("d", "d", "day",    "days")
+       };
+    }
     /** Command to retrieve the logs. */
     private String command = "CmdLog.Processed";
     /** Time in minutes of the logs. */
     private TextfieldWithUnit timeTF;
-    private static final Value DEFAULT_TIME = new StringValue("5m");
 
     /** Prepares a new {@code CmdLog} object. */
     public CmdLog(final Host host) {
@@ -107,16 +117,6 @@ public final class CmdLog extends HostLogs {
                                         Tools.getString("CmdLog.Last.Label")),
                                 timeTF,
                                 getRefreshBtn()};
-    }
-
-    /** Time units. */
-    protected static Unit[] getUnits() {
-        return new Unit[]{
-                   new Unit("s", "s", "second", "seconds"),
-                   new Unit("m", "m", "minute", "minutes"),
-                   new Unit("h", "h", "hour",   "hours"),
-                   new Unit("d", "d", "day",    "days")
-       };
     }
 
     /** Options for the log command. */

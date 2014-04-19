@@ -45,10 +45,6 @@ import java.awt.Dimension;
  *
  */
 final class Finish extends DialogHost {
-    /** Add another host button. */
-    private MyButton addAnotherHostButton;
-    /** Configure cluster button. */
-    private MyButton confClusterButton;
     /** Host icon for add another host button. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(
                             Tools.getDefault("Dialog.Host.Finish.HostIcon"));
@@ -57,6 +53,10 @@ final class Finish extends DialogHost {
                             Tools.getDefault("Dialog.Host.Finish.ClusterIcon"));
     /** Dimensions of the buttons. */
     private static final Dimension BUTTON_DIMENSION = new Dimension(300, 100);
+    /** Add another host button. */
+    private MyButton addAnotherHostButton;
+    /** Configure cluster button. */
+    private MyButton confClusterButton;
     /** Save checkbox. */
     private final JCheckBox saveCB = new JCheckBox(
                                     Tools.getString("Dialog.Host.Finish.Save"),

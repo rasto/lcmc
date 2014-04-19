@@ -134,6 +134,36 @@ final class HbConfig extends DialogCluster {
     /** Option sizes. */
     private static final Map<String, Integer> OPTION_SIZES =
                                                 new HashMap<String, Integer>();
+    /** Multicast type string. */
+    private static final Value MCAST_TYPE = new StringValue("mcast");
+    /** Broadcast type string. */
+    private static final Value BCAST_TYPE = new StringValue("bcast");
+    /** Unicast type string. */
+    private static final Value UCAST_TYPE = new StringValue("ucast");
+    /** Serial type. */
+    private static final Value SERIAL_TYPE = new StringValue("serial");
+    /** Width of the address combobox. */
+    private static final int ADDR_COMBOBOX_WIDTH = 160;
+    /** Width of the link combobox. */
+    private static final int LINK_COMBOBOX_WIDTH = 130;
+    /** Width of the type combobox. */
+    private static final int TYPE_COMBOBOX_WIDTH = 80;
+    /** Width of the interface combobox. */
+    private static final int INTF_COMBOBOX_WIDTH = 80;
+    /** Width of the remove button. */
+    private static final int REMOVE_BUTTON_WIDTH  = 100;
+    /** Height of the remove button. */
+    private static final int REMOVE_BUTTON_HEIGHT = 14;
+    /** Checkbox text (Edit the config). */
+    private static final String EDIT_CONFIG_STRING = Tools.getString(
+                               "Dialog.Cluster.HbConfig.Checkbox.EditConfig");
+    /** Checkbox text (See existing). */
+    private static final String SEE_EXISTING_STRING = Tools.getString(
+                               "Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
+    /** /etc/ha.d/ha.cf read error string. */
+    private static final String HA_CF_ERROR_STRING = "error: read error";
+    /** Newline. */
+    private static final String NEWLINE = "\\r?\\n";
     static {
         //OPTION_TYPES.put(CRM, Widget.Type.COMBOBOX);
         OPTION_REGEXPS.put(KEEPALIVE, "\\d*");
@@ -214,36 +244,6 @@ final class HbConfig extends DialogCluster {
     private final JPanel configPanel = new JPanel();
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
-    /** Multicast type string. */
-    private static final Value MCAST_TYPE = new StringValue("mcast");
-    /** Broadcast type string. */
-    private static final Value BCAST_TYPE = new StringValue("bcast");
-    /** Unicast type string. */
-    private static final Value UCAST_TYPE = new StringValue("ucast");
-    /** Serial type. */
-    private static final Value SERIAL_TYPE = new StringValue("serial");
-    /** Width of the address combobox. */
-    private static final int ADDR_COMBOBOX_WIDTH = 160;
-    /** Width of the link combobox. */
-    private static final int LINK_COMBOBOX_WIDTH = 130;
-    /** Width of the type combobox. */
-    private static final int TYPE_COMBOBOX_WIDTH = 80;
-    /** Width of the interface combobox. */
-    private static final int INTF_COMBOBOX_WIDTH = 80;
-    /** Width of the remove button. */
-    private static final int REMOVE_BUTTON_WIDTH  = 100;
-    /** Height of the remove button. */
-    private static final int REMOVE_BUTTON_HEIGHT = 14;
-    /** Checkbox text (Edit the config). */
-    private static final String EDIT_CONFIG_STRING = Tools.getString(
-                               "Dialog.Cluster.HbConfig.Checkbox.EditConfig");
-    /** Checkbox text (See existing). */
-    private static final String SEE_EXISTING_STRING = Tools.getString(
-                               "Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
-    /** /etc/ha.d/ha.cf read error string. */
-    private static final String HA_CF_ERROR_STRING = "error: read error";
-    /** Newline. */
-    private static final String NEWLINE = "\\r?\\n";
     /** Config scroll pane. */
     private volatile JScrollPane configScrollPane = null;
     /** Whether the config pane was already moved to the position. */

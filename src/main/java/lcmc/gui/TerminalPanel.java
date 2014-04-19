@@ -76,37 +76,6 @@ public final class TerminalPanel extends JScrollPane {
                                 LoggerFactory.getLogger(TerminalPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Host data object. */
-    private final Host host;
-    /** Text pane with terminal area. */
-    private final JTextPane terminalArea;
-    /** Color for commands. */
-    private final MutableAttributeSet commandColor;
-    /** Color for errors. */
-    private final MutableAttributeSet errorColor;
-    /** Color for output. */
-    private final MutableAttributeSet outputColor;
-    /** Color for prompt. */
-    private final MutableAttributeSet promptColor;
-    /** Offset of a command. */
-    private int commandOffset = 0;
-    /** User command. */
-    private boolean userCommand = false;
-    /** Whether typing in the commands is enabled. */
-    private boolean editEnabled = false;
-    /** Begining of the previous line. */
-    private int prevLine = 0;
-    /** Position of the cursor in the text. */
-    private int pos = 0;
-    /** Position in terminal area lock. */
-    private final Lock mPosLock = new ReentrantLock();
-    /** Maximum position of the cursor in the text. */
-    private int maxPos = 0;
-    /** Terminal output colors. */
-    private final Map<String, Color> terminalColor =
-                                            new HashMap<String, Color>();
-    /** Default text color of the output in the terminal. */
-    private final Color defaultOutputColor;
 
     /** Command to list all the cheats. */
     private static final String CHEAT_LIST  = "cheatlist";
@@ -151,25 +120,25 @@ public final class TerminalPanel extends JScrollPane {
     /** Starts tests. */
     private static final Map<String, RoboTest.Test> TESTS =
                                           new HashMap<String, RoboTest.Test>();
-    static {
-        for (final RoboTest.Type type : new RoboTest.Type[]{
-                                                          RoboTest.Type.PCMK,
-                                                          RoboTest.Type.DRBD,
-                                                          RoboTest.Type.VM,
-                                                          RoboTest.Type.GUI}) {
-            for (final char index : new Character[]{
-                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}) {
-                TESTS.put(type.getTestName() + index,
-                          new RoboTest.Test(type, index));
-            }
-        }
-    }
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
     private static final Map<String, Integer> CHEATS_MAP =
                                      new LinkedHashMap<String, Integer>();
+    static {
+        for (final RoboTest.Type type : new RoboTest.Type[]{
+            RoboTest.Type.PCMK,
+                                                          RoboTest.Type.DRBD,
+                                                          RoboTest.Type.VM,
+                                                          RoboTest.Type.GUI}) {
+            for (final char index : new Character[]{
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                                                                     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}) {
+                TESTS.put(type.getTestName() + index,
+                          new RoboTest.Test(type, index));
+            }
+        }
+    }
     static {
         CHEATS_MAP.put(CHEAT_LIST, 0);
         CHEATS_MAP.put(GOD_OFF, 0); /* off must be before on */
@@ -195,6 +164,37 @@ public final class TerminalPanel extends JScrollPane {
         }
         CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
     }
+    /** Host data object. */
+    private final Host host;
+    /** Text pane with terminal area. */
+    private final JTextPane terminalArea;
+    /** Color for commands. */
+    private final MutableAttributeSet commandColor;
+    /** Color for errors. */
+    private final MutableAttributeSet errorColor;
+    /** Color for output. */
+    private final MutableAttributeSet outputColor;
+    /** Color for prompt. */
+    private final MutableAttributeSet promptColor;
+    /** Offset of a command. */
+    private int commandOffset = 0;
+    /** User command. */
+    private boolean userCommand = false;
+    /** Whether typing in the commands is enabled. */
+    private boolean editEnabled = false;
+    /** Begining of the previous line. */
+    private int prevLine = 0;
+    /** Position of the cursor in the text. */
+    private int pos = 0;
+    /** Position in terminal area lock. */
+    private final Lock mPosLock = new ReentrantLock();
+    /** Maximum position of the cursor in the text. */
+    private int maxPos = 0;
+    /** Terminal output colors. */
+    private final Map<String, Color> terminalColor =
+                                            new HashMap<String, Color>();
+    /** Default text color of the output in the terminal. */
+    private final Color defaultOutputColor;
 
 
     /** Prepares a new {@code TerminalPanel} object. */
@@ -580,94 +580,6 @@ public final class TerminalPanel extends JScrollPane {
         });
     }
 
-
-    /**
-     * This class overwrites the DefaultStyledDocument in order to add godmode
-     * feature.
-     */
-    class MyDocument extends DefaultStyledDocument {
-        /** Serial version UID. */
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * Is called while a string is inserted. It checks if a cheat code is
-         * in the string. */
-        @Override
-        public void insertString(int offs,
-                                 final String str,
-                                 final AttributeSet a)
-            throws BadLocationException {
-            mPosLock.lock();
-            if (offs < commandOffset) {
-                terminalArea.setCaretPosition(commandOffset);
-                offs = commandOffset;
-            }
-            if (userCommand) {
-                if (editEnabled) {
-                    if (str.charAt(str.length() - 1) == '\n') {
-                        final int end = terminalArea.getDocument().getLength();
-                        super.insertString(end, "\n", commandColor);
-                        final String command =
-                                (getText(commandOffset,
-                                         end - commandOffset) + str).trim();
-                        prevLine = end + 1;
-                        pos = end;
-                        maxPos = end;
-                        execCommand(command);
-                    } else {
-                        super.insertString(offs, str, commandColor);
-                    }
-                }
-                for (final Map.Entry<String, Integer> cheatEntry : CHEATS_MAP.entrySet()) {
-                    int cheatPos = cheatEntry.getValue();
-                    if (str.equals(cheatEntry.getKey().substring(cheatPos, cheatPos + 1))) {
-                        cheatPos++;
-                        CHEATS_MAP.put(cheatEntry.getKey(), cheatPos);
-                        if (cheatPos == cheatEntry.getKey().length()) {
-                            for (final String ch : CHEATS_MAP.keySet()) {
-                                CHEATS_MAP.put(ch, 0);
-                            }
-                            startCheat(cheatEntry.getKey());
-                        }
-                    } else {
-                        CHEATS_MAP.put(cheatEntry.getKey(), 0);
-                    }
-                }
-            } else {
-                super.insertString(offs, str, a);
-            }
-            mPosLock.unlock();
-        }
-
-        /** Is called while characters is removed. */
-        @Override
-        public void remove(final int offs,
-                           final int len) throws BadLocationException {
-            mPosLock.lock();
-            try {
-                if (offs >= commandOffset) {
-                    for (final Map.Entry<String, Integer> cheatEntry : CHEATS_MAP.entrySet()) {
-                        final int cheatPos = cheatEntry.getValue();
-                        if (cheatPos > 0) {
-                            CHEATS_MAP.put(cheatEntry.getKey(), cheatPos - 1);
-                        }
-                    }
-                    if (editEnabled) {
-                        super.remove(offs, len);
-                    }
-                }
-            } finally {
-                mPosLock.unlock();
-            }
-        }
-
-        /** Same as remove. */
-        void removeForced(final int offs, final int len)
-        throws BadLocationException {
-            super.remove(offs, len);
-        }
-    }
-
     /** Starts action after cheat was entered. */
     private void startCheat(final String cheat) {
         if (!editEnabled) {
@@ -758,6 +670,94 @@ public final class TerminalPanel extends JScrollPane {
             } catch (final BadLocationException e) {
                 LOG.appWarning("resetTerminalArea: " + e);
             }
+        }
+    }
+
+    /**
+     * This class overwrites the DefaultStyledDocument in order to add godmode
+     * feature.
+     */
+    class MyDocument extends DefaultStyledDocument {
+
+        /** Serial version UID. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Is called while a string is inserted. It checks if a cheat code is
+         * in the string. */
+        @Override
+        public void insertString(int offs,
+                                 final String str,
+                                 final AttributeSet a)
+            throws BadLocationException {
+            mPosLock.lock();
+            if (offs < commandOffset) {
+                terminalArea.setCaretPosition(commandOffset);
+                offs = commandOffset;
+            }
+            if (userCommand) {
+                if (editEnabled) {
+                    if (str.charAt(str.length() - 1) == '\n') {
+                        final int end = terminalArea.getDocument().getLength();
+                        super.insertString(end, "\n", commandColor);
+                        final String command =
+                            (getText(commandOffset,
+                                         end - commandOffset) + str).trim();
+                        prevLine = end + 1;
+                        pos = end;
+                        maxPos = end;
+                        execCommand(command);
+                    } else {
+                        super.insertString(offs, str, commandColor);
+                    }
+                }
+                for (final Map.Entry<String, Integer> cheatEntry : CHEATS_MAP.entrySet()) {
+                    int cheatPos = cheatEntry.getValue();
+                    if (str.equals(cheatEntry.getKey().substring(cheatPos, cheatPos + 1))) {
+                        cheatPos++;
+                        CHEATS_MAP.put(cheatEntry.getKey(), cheatPos);
+                        if (cheatPos == cheatEntry.getKey().length()) {
+                            for (final String ch : CHEATS_MAP.keySet()) {
+                                CHEATS_MAP.put(ch, 0);
+                            }
+                            startCheat(cheatEntry.getKey());
+                        }
+                    } else {
+                        CHEATS_MAP.put(cheatEntry.getKey(), 0);
+                    }
+                }
+            } else {
+                super.insertString(offs, str, a);
+            }
+            mPosLock.unlock();
+        }
+
+        /** Is called while characters is removed. */
+        @Override
+        public void remove(final int offs,
+                           final int len) throws BadLocationException {
+            mPosLock.lock();
+            try {
+                if (offs >= commandOffset) {
+                    for (final Map.Entry<String, Integer> cheatEntry : CHEATS_MAP.entrySet()) {
+                        final int cheatPos = cheatEntry.getValue();
+                        if (cheatPos > 0) {
+                            CHEATS_MAP.put(cheatEntry.getKey(), cheatPos - 1);
+                        }
+                    }
+                    if (editEnabled) {
+                        super.remove(offs, len);
+                    }
+                }
+            } finally {
+                mPosLock.unlock();
+            }
+        }
+
+        /** Same as remove. */
+        void removeForced(final int offs, final int len)
+            throws BadLocationException {
+            super.remove(offs, len);
         }
     }
 }

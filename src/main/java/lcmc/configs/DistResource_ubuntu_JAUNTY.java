@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_ubuntu_JAUNTY
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-JAUNTY"},
@@ -54,4 +48,10 @@ public final class DistResource_ubuntu_JAUNTY
         {"PmInst.install.text.1",
          ""},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

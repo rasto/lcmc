@@ -53,14 +53,6 @@ import org.w3c.dom.Node;
  * This class holds info about Virtual Interfaces.
  */
 public final class InterfaceInfo extends HardwareInfo {
-    /** Source network combo box, so that it can be disabled, depending on
-     * type. */
-    private final Map<String, Widget> sourceNetworkWi =
-                                            new HashMap<String, Widget>();
-    /** Source bridge combo box, so that it can be disabled, depending on
-     * type. */
-    private final Map<String, Widget> sourceBridgeWi =
-                                            new HashMap<String, Widget>();
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
                                                 InterfaceData.MAC_ADDRESS,
@@ -91,16 +83,6 @@ public final class InterfaceInfo extends HardwareInfo {
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
-    static {
-        FIELD_TYPES.put(InterfaceData.TYPE, Widget.Type.RADIOGROUP);
-        SHORTNAME_MAP.put(InterfaceData.TYPE, "Type");
-        SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
-        SHORTNAME_MAP.put(InterfaceData.SOURCE_NETWORK, "Source Network");
-        SHORTNAME_MAP.put(InterfaceData.SOURCE_BRIDGE, "Source Bridge");
-        SHORTNAME_MAP.put(InterfaceData.SCRIPT_PATH, "Script Path");
-        SHORTNAME_MAP.put(InterfaceData.TARGET_DEV, "Target Device");
-        SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
-    }
 
     /** Whether the parameter is editable only in advanced mode. */
     private static final Collection<String> IS_ENABLED_ONLY_IN_ADVANCED =
@@ -127,6 +109,16 @@ public final class InterfaceInfo extends HardwareInfo {
     public static final Value TYPE_BRIDGE = new StringValue("bridge");
 
     static {
+        FIELD_TYPES.put(InterfaceData.TYPE, Widget.Type.RADIOGROUP);
+        SHORTNAME_MAP.put(InterfaceData.TYPE, "Type");
+        SHORTNAME_MAP.put(InterfaceData.MAC_ADDRESS, "Mac Address");
+        SHORTNAME_MAP.put(InterfaceData.SOURCE_NETWORK, "Source Network");
+        SHORTNAME_MAP.put(InterfaceData.SOURCE_BRIDGE, "Source Bridge");
+        SHORTNAME_MAP.put(InterfaceData.SCRIPT_PATH, "Script Path");
+        SHORTNAME_MAP.put(InterfaceData.TARGET_DEV, "Target Device");
+        SHORTNAME_MAP.put(InterfaceData.MODEL_TYPE, "Model Type");
+    }
+    static {
         PREFERRED_MAP.put(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
         POSSIBLE_VALUES.put(InterfaceData.MODEL_TYPE,
                             new Value[]{new StringValue(),
@@ -142,6 +134,32 @@ public final class InterfaceInfo extends HardwareInfo {
                             new Value[]{new StringValue(),
                                         new StringValue("/etc/xen/scripts/vif-bridge")});
     }
+
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Interface");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addInterfacePanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+    /** Source network combo box, so that it can be disabled, depending on
+     * type. */
+    private final Map<String, Widget> sourceNetworkWi =
+                                            new HashMap<String, Widget>();
+    /** Source bridge combo box, so that it can be disabled, depending on
+     * type. */
+    private final Map<String, Widget> sourceBridgeWi =
+                                            new HashMap<String, Widget>();
     /** Table panel. */
     private JComponent tablePanel = null;
     /** Creates the InterfaceInfo object. */
@@ -586,24 +604,6 @@ public final class InterfaceInfo extends HardwareInfo {
     @Override
     protected String isRemoveable() {
         return null;
-    }
-
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Interface");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addInterfacePanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
     }
 
     /** Returns real parameters. */

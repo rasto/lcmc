@@ -42,22 +42,12 @@ final class VMTest1 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(VMTest1.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private VMTest1() {
-        /* Cannot be instantiated. */
-    }
-
-    static void start(final Cluster cluster,
-                      final String vmTest,
-                      final int count) {
+    static void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "kvm", count);
     }
 
     /** VM Test 1. */
-    static void startVMTest(final Cluster cluster,
-                            final String vmTest,
-                            final String type,
-                            final int count) {
+    static void startVMTest(final Cluster cluster, final String vmTest, final String type, final int count) {
         slowFactor = 0.1f;
         aborted = false;
         String name = "dmc";
@@ -363,5 +353,10 @@ final class VMTest1 {
             leftClick();
             Tools.sleep(500);
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private VMTest1() {
+        /* Cannot be instantiated. */
     }
 }

@@ -596,91 +596,6 @@ implements Widget {
                                           final Color compColor) {
     }
 
-    /** Workaround for jcombobox so that it works with default button. */
-    static class ActivateDefaultButtonListener<E> extends KeyAdapter
-                                               implements ActionListener {
-        /** Combobox, that should work with default button. */
-        private final JComboBox<E> box;
-
-        /** Creates new ActivateDefaultButtonListener. */
-        ActivateDefaultButtonListener(final JComboBox<E> box) {
-            super();
-            this.box = box;
-        }
-
-        /** Is called when a key was pressed. */
-        @Override
-        public void keyPressed(final KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                /* Simulte click on default button. */
-                doClick(e);
-            }
-        }
-
-        /** Is called when an action was performed. */
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            doClick(e);
-        }
-
-        /** Do click. */
-        private void doClick(final EventObject e) {
-            final Component c = (Component) e.getSource();
-
-            final JRootPane rootPane = SwingUtilities.getRootPane(c);
-
-            if (rootPane != null) {
-                final JButton defaultButton = rootPane.getDefaultButton();
-
-                if (defaultButton != null && !box.isPopupVisible()) {
-                    final Object selection = box.getEditor().getItem();
-                    box.setSelectedItem(selection);
-                    defaultButton.doClick();
-                }
-            }
-        }
-    }
-
-    /**
-     * TextField that selects all when focused.
-     */
-    public static final class MTextField extends JTextField {
-        /** Serial Version UID. */
-        private static final long serialVersionUID = 1L;
-        /** To select all only once. */
-        private volatile boolean selected = false;
-
-        /** Creates a new MTextField object. */
-        public MTextField(final String text) {
-            super(text);
-        }
-
-        /** Creates a new MTextField object. */
-        public MTextField(final String text,
-                          final int columns) {
-            super(text, columns);
-        }
-
-        /** Creates a new MTextField object. */
-        MTextField(final Document doc,
-                   final String text,
-                   final int columns) {
-            super(doc, text, columns);
-        }
-
-        /** Focus event. */
-        @Override
-        protected void processFocusEvent(final FocusEvent e) {
-            super.processFocusEvent(e);
-            if (!selected) {
-                selected = true;
-                if (e.getID() == FocusEvent.FOCUS_GAINED) {
-                    selectAll();
-                }
-            }
-        }
-    }
-
     /** Sets flag that determines whether the combo box is always editable. */
     @Override
     public final void setAlwaysEditable(final boolean alwaysEditable) {
@@ -886,5 +801,90 @@ implements Widget {
 
     @Override
     public void setText(final String text) {
+    }
+
+    /** Workaround for jcombobox so that it works with default button. */
+    static class ActivateDefaultButtonListener<E> extends KeyAdapter
+                                               implements ActionListener {
+        /** Combobox, that should work with default button. */
+        private final JComboBox<E> box;
+
+        /** Creates new ActivateDefaultButtonListener. */
+        ActivateDefaultButtonListener(final JComboBox<E> box) {
+            super();
+            this.box = box;
+        }
+
+        /** Is called when a key was pressed. */
+        @Override
+        public void keyPressed(final KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                /* Simulte click on default button. */
+                doClick(e);
+            }
+        }
+
+        /** Is called when an action was performed. */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            doClick(e);
+        }
+
+        /** Do click. */
+        private void doClick(final EventObject e) {
+            final Component c = (Component) e.getSource();
+
+            final JRootPane rootPane = SwingUtilities.getRootPane(c);
+
+            if (rootPane != null) {
+                final JButton defaultButton = rootPane.getDefaultButton();
+
+                if (defaultButton != null && !box.isPopupVisible()) {
+                    final Object selection = box.getEditor().getItem();
+                    box.setSelectedItem(selection);
+                    defaultButton.doClick();
+                }
+            }
+        }
+    }
+
+    /**
+     * TextField that selects all when focused.
+     */
+    public static final class MTextField extends JTextField {
+        /** Serial Version UID. */
+        private static final long serialVersionUID = 1L;
+        /** To select all only once. */
+        private volatile boolean selected = false;
+
+        /** Creates a new MTextField object. */
+        public MTextField(final String text) {
+            super(text);
+        }
+
+        /** Creates a new MTextField object. */
+        public MTextField(final String text,
+                          final int columns) {
+            super(text, columns);
+        }
+
+        /** Creates a new MTextField object. */
+        MTextField(final Document doc,
+                   final String text,
+                   final int columns) {
+            super(doc, text, columns);
+        }
+
+        /** Focus event. */
+        @Override
+        protected void processFocusEvent(final FocusEvent e) {
+            super.processFocusEvent(e);
+            if (!selected) {
+                selected = true;
+                if (e.getID() == FocusEvent.FOCUS_GAINED) {
+                    selectAll();
+                }
+            }
+        }
     }
 }

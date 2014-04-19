@@ -53,9 +53,6 @@ import lcmc.gui.widget.Check;
  *
  */
 public abstract class WizardDialog extends ConfigDialog {
-    /** Previous dialog object. A dialog that will be displayed after
-     * clicking on the back button */
-    private WizardDialog previousDialog;
     /** Cancel icon. */
     static final ImageIcon CANCEL_ICON =
             Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.CancelIcon"));
@@ -68,6 +65,9 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Back icon. */
     private static final ImageIcon BACK_ICON =
             Tools.createImageIcon(Tools.getDefault("Dialog.Dialog.BackIcon"));
+    /** Previous dialog object. A dialog that will be displayed after
+     * clicking on the back button */
+    private WizardDialog previousDialog;
     /** Progress bar. */
     private ProgressBar progressBar = null;
 

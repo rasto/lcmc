@@ -36,11 +36,6 @@ final class DrbdTest2 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest2.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest2() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final Cluster cluster, final int blockDevY) {
         slowFactor = 0.2f;
         aborted = false;
@@ -132,5 +127,10 @@ final class DrbdTest2 {
         }
         removeDrbdVolume(true);
         checkDRBDTest(drbdTest, 2);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest2() {
+        /* Cannot be instantiated. */
     }
 }

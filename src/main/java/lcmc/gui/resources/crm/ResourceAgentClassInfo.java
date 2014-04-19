@@ -43,13 +43,13 @@ import java.awt.event.ActionEvent;
  * services.
  */
 public final class ResourceAgentClassInfo extends HbCategoryInfo {
+    /** Back to overview icon. */
+    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
+                                            Tools.getDefault("BackIcon"));
     /** Map from ResourceAgent name to its object. It is possible only within
      * a class. */
     private final Map<String, ResourceAgent> raMap =
                                          new HashMap<String, ResourceAgent>();
-    /** Back to overview icon. */
-    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
-                                            Tools.getDefault("BackIcon"));
     /** Prepares a new {@code ResourceAgentClassInfo} object. */
     public ResourceAgentClassInfo(final String name, final Browser browser) {
         super(name, browser);

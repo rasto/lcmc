@@ -37,11 +37,6 @@ final class DrbdTest1 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest1.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest1() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final Cluster cluster, final int blockDevY) {
         slowFactor = 0.2f;
         aborted = false;
@@ -65,8 +60,7 @@ final class DrbdTest1 {
         checkDRBDTest(drbdTest, 2);
     }
 
-    static void addDrbdResource(final Cluster cluster,
-                                final int blockDevY) {
+    static void addDrbdResource(final Cluster cluster, final int blockDevY) {
         moveTo(334, blockDevY); /* add drbd resource */
         rightClick();
         moveTo(Tools.getString("HostBrowser.Drbd.AddDrbdResource"));
@@ -90,8 +84,7 @@ final class DrbdTest1 {
         rightClick();
     }
 
-    static void chooseDrbdResourceInterface(final String hostName,
-                                            final boolean proxy) {
+    static void chooseDrbdResourceInterface(final String hostName, final boolean proxy) {
         moveTo("on " + hostName, MComboBox.class); /* interface */
         leftClick();
         if (proxy) {
@@ -258,5 +251,10 @@ final class DrbdTest1 {
         leftClick();
         moveTo("Remove"); /* button */
         leftClick();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest1() {
+        /* Cannot be instantiated. */
     }
 }

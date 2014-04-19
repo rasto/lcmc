@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_redhat_6 extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -82,4 +76,10 @@ public final class DistResource_redhat_6 extends ListResourceBundle {
          + "&& " + DistResource.SUDO + "/sbin/chkconfig --level 016 corosync off"},
 
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

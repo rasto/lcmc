@@ -117,6 +117,27 @@ public abstract class ResourceGraph {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(ResourceGraph.class);
+    /** Empty shape for arrows. (to not show an arrow). */
+    private static final Shape EMPTY_SHAPE = new Area();
+    /** Singleton instance of the Line2D edge shape. */
+    private static final Shape INSTANCE =
+                                    new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
+    /** Singleton instance of dotted line edge shape. */
+    private static final Path2D HOLLOW_INSTANCE = new Path2D.Float();
+    /** Edge draw paint. */
+    private static final Paint EDGE_DRAW_PAINT =
+                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
+    /** Edge picked paint. */
+    private static final Paint EDGE_PICKED_PAINT =
+                (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
+    static {
+        final float d = 0.05f;
+        for (float i = 0; i < 1.0f; i += d) {
+            HOLLOW_INSTANCE.moveTo(i, 0.0f);
+            HOLLOW_INSTANCE.lineTo(i + d * 0.7, 0.0f);
+        }
+        HOLLOW_INSTANCE.lineTo(1.0f, 0.0f);
+    }
     /** Cluster browser object. */
     private final ClusterBrowser clusterBrowser;
     /** Pluggable renderer. */
@@ -137,8 +158,6 @@ public abstract class ResourceGraph {
     /** Edge to menus map. */
     private final Map<Edge, List<MyMenuItem>> edgeToMenus =
                                 new LinkedHashMap<Edge, List<MyMenuItem>>();
-    /** Empty shape for arrows. (to not show an arrow). */
-    private static final Shape EMPTY_SHAPE = new Area();
     /** Graph lock. */
     private final Lock mGraphLock = new ReentrantLock();
     /** The graph object. */
@@ -194,29 +213,9 @@ public abstract class ResourceGraph {
     private final Lock mTestEdgeLock = new ReentrantLock();
     private final int animInterval =
                              (int) (1000 / Tools.getApplication().getAnimFPS());
-    /** Singleton instance of the Line2D edge shape. */
-    private static final Shape INSTANCE =
-                                    new Line2D.Float(0.0f, 0.0f, 1.0f, 0.0f);
-    /** Singleton instance of dotted line edge shape. */
-    private static final Path2D HOLLOW_INSTANCE = new Path2D.Float();
-    /** Edge draw paint. */
-    private static final Paint EDGE_DRAW_PAINT =
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
-    /** Edge picked paint. */
-    private static final Paint EDGE_PICKED_PAINT =
-                (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
     /** Cache for text layouts. */
     private final Map<String, TextLayout> textLayoutCache =
                                             new HashMap<String, TextLayout>();
-
-    static {
-        final float d = 0.05f;
-        for (float i = 0; i < 1.0f; i += d) {
-            HOLLOW_INSTANCE.moveTo(i, 0.0f);
-            HOLLOW_INSTANCE.lineTo(i + d * 0.7, 0.0f);
-        }
-        HOLLOW_INSTANCE.lineTo(1.0f, 0.0f);
-    }
     /** How much was it scaled so far. */
     private double scaledSoFar = 1.0;
 
@@ -637,90 +636,6 @@ public abstract class ResourceGraph {
         visualizationViewer.repaint();
     }
 
-    /** This class allows to change direction of the edge. */
-    protected static class Vertex {
-        /** Create vertex. */
-        Vertex() {
-            super();
-        }
-
-        @Override
-        public String toString() {
-            return "V";
-        }
-    }
-
-    /** This class allows to change direction of the edge. */
-    protected class Edge {
-        /** From. */
-        private Vertex mFrom;
-        /** To. */
-        private Vertex mTo;
-        /** Originaly from. */
-        private final Vertex origFrom;
-        /** Originaly to. */
-        private final Vertex origTo;
-        /** Colocation in the same direction as an order. */
-        private boolean wrongColocation = false;
-        /** Creates new {@code Edge} object. */
-        Edge(final Vertex from, final Vertex to) {
-            mFrom = from;
-            mTo = to;
-            origFrom = from;
-            origTo   = to;
-        }
-
-        /** Returns source. */
-        final Vertex getSource() {
-            return mFrom;
-        }
-
-        /** Returns destination. */
-        final Vertex getDest() {
-            return mTo;
-        }
-
-        /** Reverse direction of the edge. */
-        void reverse() {
-            setDirection(mTo, mFrom);
-        }
-
-        /** Sets direction of the edge. */
-        void setDirection(final Vertex from, final Vertex to) {
-            final Edge thisEdge = this;
-            if (mFrom != from || mTo != to) {
-                mGraphLock.lock();
-                try {
-                    getGraph().removeEdge(thisEdge);
-                    mFrom = from;
-                    mTo   = to;
-                    getGraph().addEdge(thisEdge, mFrom, mTo);
-                } finally {
-                    mGraphLock.unlock();
-                }
-            }
-        }
-
-        /** Sets direction to the original state. */
-        void reset() {
-            setDirection(origFrom, origTo);
-        }
-
-        /** Returns edge label. */
-        @Override
-        public final String toString() {
-            return ' ' + getLabelForEdgeStringer(this) + ' ';
-        }
-
-        void setWrongColocation(final boolean wrongColocation) {
-            this.wrongColocation = wrongColocation;
-        }
-
-        boolean isWrongColocation() {
-            return wrongColocation;
-        }
-    }
-
     /** Returns position adjusted to scrollbar. */
     protected Point2D posWithScrollbar(final Point2D oldPos) {
         final double newX = oldPos.getX()
@@ -746,24 +661,6 @@ public abstract class ResourceGraph {
 
     /** Returns label for edge e. */
     protected abstract String getLabelForEdgeStringer(Edge e);
-
-    /** This class provides tool tips for the vertices. */
-    class MyVertexToolTipFunction<V> implements Transformer<V, String> {
-        /** Returns tool tip for vertex v. */
-        @Override
-        public String transform(final V v) {
-            return Tools.html(getVertexToolTip((Vertex) v));
-        }
-    }
-
-    /** This class provides tool tips for the vertices. */
-    class MyEdgeToolTipFunction<E> implements Transformer<E, String> {
-        /** Returns tool tip for edge. */
-        @Override
-        public String transform(final E edge) {
-            return Tools.html(getEdgeToolTip((Edge) edge));
-        }
-    }
 
     /** Returns tool tip for vertex v. */
     abstract String getVertexToolTip(final Vertex v);
@@ -820,42 +717,6 @@ public abstract class ResourceGraph {
         return factory.getEllipse(v);
     }
 
-    /** Controls the shape, size, and aspect ratio for each vertex. */
-    private final class MyVertexShapeSize<V, E>
-                                    extends AbstractVertexShapeTransformer<V> {
-        /** Transformer. */
-        private final Transformer<Vertex, Point2D> vlf;
-        /** Graph. */
-        private final Graph<V, E> graph;
-
-        /** Constructor. */
-        MyVertexShapeSize(final Graph<V, E> graphIn,
-                          final Transformer<Vertex, Point2D> vlfIn) {
-            super();
-            graph = graphIn;
-            vlf = vlfIn;
-            setSizeTransformer(new Transformer<V, Integer>() {
-                                @Override
-                                public Integer transform(final V v) {
-                                    return getVertexWidth((Vertex) v);
-                                }
-                           });
-            setAspectRatioTransformer(new Transformer<V, Float>() {
-                                @Override
-                                public Float transform(final V v) {
-                                    return getVertexAspectRatio((Vertex) v);
-                                }
-                            });
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public Shape transform(final V v) {
-            return getVertexShape((Vertex) v,
-                                  (VertexShapeFactory<Vertex>) factory);
-        }
-    }
-
     /** Handles right click on the vertex. */
     protected abstract void handlePopupVertex(final Vertex vertex,
                                               final List<Vertex> pickedV,
@@ -890,94 +751,6 @@ public abstract class ResourceGraph {
             for (final MyMenuItem menu : menus) {
                 menu.updateAndWait();
             }
-        }
-    }
-
-    /** This class handles popup menus in the graph. */
-    class MyPopupGraphMousePlugin<V, E>
-                                  extends AbstractPopupGraphMousePlugin {
-
-        /** Constructor. */
-        MyPopupGraphMousePlugin() {
-            this(MouseEvent.BUTTON3_MASK);
-        }
-
-        /** Constructor. */
-        MyPopupGraphMousePlugin(final int modifiers) {
-            super(modifiers);
-        }
-
-
-        /**
-         * Is called when mouse was released. Create a multi selection
-         * object. */
-        @Override
-        public void mouseReleased(final MouseEvent e) {
-            if (getPickedVertices().size() > 1) {
-                multiSelection();
-            }
-            if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
-                handlePopup0(e);
-            }
-        }
-
-        /** Is called when mouse was clicked. */
-        @Override
-        public void mouseClicked(final MouseEvent e) {
-
-            super.mouseClicked(e);
-            final PickedState<Edge> psEdge =
-                                    visualizationViewer.getRenderContext().getPickedEdgeState();
-            if (psEdge.getPicked().size() == 1) {
-                final Edge edge = (Edge) psEdge.getPicked().toArray()[0];
-                oneEdgePressed(edge);
-            } else if (getPickedVertices().isEmpty()
-                       && psEdge.getPicked().isEmpty()) {
-                backgroundClicked();
-            }
-        }
-
-        /** Creates and displays popup menus for vertices and edges. */
-        @Override
-        protected void handlePopup(final MouseEvent me) {
-            /* doesn't work on Windows along the mouseReleased handler. */
-        }
-
-        /** Creates and displays popup menus for vertices and edges. */
-        private void handlePopup0(final MouseEvent me) {
-            final Thread thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final Point2D popP = me.getPoint();
-
-                    final int posX = (int) popP.getX();
-                    final int posY = (int) popP.getY();
-
-                    final GraphElementAccessor<Vertex, Edge> pickSupport =
-                                                           visualizationViewer.getPickSupport();
-                    final Vertex v = pickSupport.getVertex(layout, posX, posY);
-                    if (v == null) {
-                        final Edge edge = pickSupport.getEdge(layout,
-                                                              posX,
-                                                              posY);
-                        if (edge == null) {
-                            /* background was clicked */
-                            handlePopupBackground(popP);
-                            backgroundClicked();
-                        } else {
-                            handlePopupEdge(edge, popP);
-                            oneEdgePressed(edge);
-                        }
-                    } else {
-                        final List<Vertex> pickedV = getPickedVertices();
-                        handlePopupVertex(v, pickedV, popP);
-                        if (pickedV.size() < 2) {
-                            oneVertexPressed(v); /* select this vertex */
-                        }
-                    }
-                }
-            });
-            thread.start();
         }
     }
 
@@ -1081,54 +854,6 @@ public abstract class ResourceGraph {
     /** Is called when background was clicked. */
     protected abstract void backgroundClicked();
 
-    /** This class is used to change view, if graph was clicked. */
-    class MyGraphMouseListener<V> implements GraphMouseListener<V> {
-
-        /** Graph was clicked. */
-        @Override
-        public void graphClicked(final V v, final MouseEvent me) {
-            /* do nothing */
-        }
-
-        /** Graph was released. */
-        @Override
-        public void graphReleased(final V v, final MouseEvent me) {
-            for (final Vertex vertex : getPickedVertices()) {
-                // TODO: if vertex is removed a race condition can be here
-                if (vertex == null) {
-                    continue;
-                }
-                final double x = layout.getX(vertex);
-                final double y = layout.getY(vertex);
-                final Point2D p = new Point2D.Double(x, y);
-                vertexReleased(vertex, p);
-            }
-            scale();
-        }
-
-        /** Graph was pressed. */
-        @Override
-        public void graphPressed(final V v, final MouseEvent me) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    final PickedState<Vertex> psVertex =
-                                  visualizationViewer.getRenderContext().getPickedVertexState();
-                    if ((me.getModifiers() & MouseEvent.CTRL_MASK) == 0) {
-                        final List<Vertex> picked = getPickedVertices();
-                        if (picked.size() == 1 || !picked.contains(v)) {
-                            oneVertexPressed((Vertex) v);
-                        }
-                    } else {
-                            /* ctrl-click */
-                        psVertex.pick((Vertex) v, true);
-                    }
-                }
-            });
-            t.start();
-        }
-    }
-
     /** Retuns border paint color for vertex v. */
     protected final Paint getVertexDrawPaint(final Vertex v) {
         return Tools.getDefaultColor("ResourceGraph.DrawPaint");
@@ -1159,65 +884,6 @@ public abstract class ResourceGraph {
         return visualizationViewer.getPickedEdgeState().isPicked(e);
     }
 
-    /**
-     * This class provides methods for different paint colors for different
-     * conditions.
-     */
-    class MyPickableVertexPaintFunction<V>
-                                    extends PickableVertexPaintTransformer<V> {
-        /** Whether it is the draw paint. */
-        private final boolean draw;
-
-        /** Creates new {@code MyPickableVertexPaintFunction} object. */
-        MyPickableVertexPaintFunction(final PickedInfo<V> pi,
-                                      final boolean draw) {
-            super(pi, null, null);
-            this.draw = draw;
-        }
-
-        /** Returns paint color for border of vertex v. */
-        @Override
-        public Paint transform(final V v) {
-            if (draw && isPicked(v)) {
-                return getVertexDrawPaint((Vertex) v);
-            } else {
-                final Paint drawPaintNotPicked =
-                                       getVertexDrawPaintNotPicked((Vertex) v);
-                if (drawPaintNotPicked == null) {
-                    return getFillPaint((Vertex) v);
-                } else {
-                    return drawPaintNotPicked;
-                }
-            }
-        }
-
-        /** Returns whether the vertex is picked. */
-        final boolean isPicked(final V v) {
-            return visualizationViewer.getPickedVertexState().isPicked((Vertex) v);
-        }
-
-        /** Returns fill paint color for of vertex v. */
-        public Paint getFillPaint(final Vertex v)  {
-            Point2D p = layout.transform(v);
-            p = visualizationViewer.getRenderContext().getMultiLayerTransformer().transform(
-                                                              Layer.LAYOUT, p);
-            final float x = (float) p.getX();
-            final float y = (float) p.getY();
-            final Color col = getVertexFillColor(v);
-            final Color secCol = getVertexFillSecondaryColor(v);
-            if (col == null || secCol == null) {
-                return null;
-            }
-            return new GradientPaint(x,
-                                     y - getVertexHeight(v) / 2,
-                                     secCol,
-                                     x,
-                                     y + getVertexHeight(v) / 2,
-                                     col,
-                                     false);
-        }
-    }
-
     /** Retuns border paint color for edge e. */
     protected Paint getEdgeDrawPaint(final Edge e) {
         return EDGE_DRAW_PAINT;
@@ -1226,85 +892,6 @@ public abstract class ResourceGraph {
     /** Retuns fill paint color for edge e. */
     protected Paint getEdgePickedPaint(final Edge e) {
         return EDGE_PICKED_PAINT;
-    }
-
-    /** This class defines paints for the edges. */
-    class MyPickableEdgePaintFunction<E>
-                                extends PickableEdgePaintTransformer<E> {
-
-        /** Creates new {@code MyPickableEdgePaintFunction} object. */
-        MyPickableEdgePaintFunction(final PickedInfo<E> ps,
-                                    final Paint drawPaint,
-                                    final Paint pickedPaint) {
-            super(ps, drawPaint, pickedPaint);
-        }
-
-        /** Returns paint of the edge. */
-        Paint getDrawPaint(final Edge e) {
-            if (isPicked(e)) {
-                return getEdgePickedPaint(e);
-            } else {
-                return getEdgeDrawPaint(e);
-            }
-        }
-
-        /** Returns paint color for border of edge e. */
-        @Override
-        public Paint transform(final E e)  {
-            return getDrawPaint((Edge) e);
-        }
-    }
-
-    /** This class defines paints for the arrows. */
-    class MyPickableArrowEdgePaintFunction<E>
-                                extends PickableEdgePaintTransformer<E> {
-
-        /** Creates new {@code MyPickableArrowEdgePaintFunction} object.*/
-        MyPickableArrowEdgePaintFunction(final PickedInfo<E> ps,
-                                         final Paint drawPaint,
-                                         final Paint pickedPaint) {
-            super(ps, drawPaint, pickedPaint);
-        }
-
-        /** Returns paint of the edge. */
-        public Paint getDrawPaint(final Edge e) {
-            if (isPicked(e)) {
-                return getEdgePickedPaint(e);
-            } else {
-                return getEdgeDrawPaint(e);
-            }
-        }
-
-        /** Returns paint color for border of edge e. */
-        @Override
-        public Paint transform(final E e)  {
-            if (showHollowArrow((Edge) e)) {
-                return Color.WHITE;
-            }
-            return getDrawPaint((Edge) e);
-        }
-    }
-
-    /** This class defines what arrow and if at all should be painted. */
-    class MyEdgeArrowFunction<V, E>
-                              extends DirectionalEdgeArrowTransformer<V, E> {
-        /** Creates new MyEdgeArrowFunction object. */
-        MyEdgeArrowFunction() {
-            super(20, 8, 4);
-        }
-
-        /**
-         * Returns the shape of the arrow, or not if no arrow should be
-         * painted.
-         */
-        @Override
-        public Shape transform(final Context<Graph<V, E>, E> context) {
-            if (showEdgeArrow((Edge) context.element)) {
-                return super.transform(context);
-            } else {
-                return EMPTY_SHAPE;
-            }
-        }
     }
 
     /** Returns whether to show the hollow arrow. */
@@ -1356,243 +943,6 @@ public abstract class ResourceGraph {
                                        final double x,
                                        final double y,
                                        final Shape shape);
-
-    /** This class is for rendering of the vertices. */
-    class MyPluggableRenderer<V, E> extends BasicVertexRenderer<V, E> {
-        /**
-         * Paints the shape for vertex and all icons and texts inside. It
-         * resizes and repositions the vertex if neccessary.
-         */
-        @Override
-        protected final void paintShapeForVertex(final RenderContext<V, E> rc,
-                                                 final V v,
-                                                 final Shape shape) {
-            final Graphics2D g2d = rc.getGraphicsContext().getDelegate();
-            int shapeWidth = getDefaultVertexWidth((Vertex) v);
-            int shapeHeight = getDefaultVertexHeight((Vertex) v);
-
-            /* icons */
-            final List<ImageIcon> icons =
-                                   getIconsForVertex((Vertex) v, getRunMode());
-            /* main text */
-            final String mainText = getMainText((Vertex) v, getRunMode());
-            TextLayout mainTextLayout = null;
-            if (mainText != null && !mainText.isEmpty()) {
-                mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
-                int iconWidth = 64;
-                if (icons == null) {
-                    iconWidth = 4;
-                }
-                final int mainTextWidth =
-                       (int) mainTextLayout.getBounds().getWidth() + iconWidth;
-                if (mainTextWidth > shapeWidth) {
-                    shapeWidth = mainTextWidth;
-                }
-            }
-
-            /* icon text */
-            final String iconText = getIconText((Vertex) v, getRunMode());
-            int iconTextWidth = 0;
-            TextLayout iconTextLayout = null;
-            if (iconText != null && !iconText.isEmpty()) {
-                iconTextLayout = getVertexTextLayout(g2d, iconText, 0.8);
-                iconTextWidth =
-                            (int) iconTextLayout.getBounds().getWidth();
-            }
-
-            /* right corner text */
-            final Subtext rightCornerText = getRightCornerText((Vertex) v,
-                                                               getRunMode());
-            TextLayout rightCornerTextLayout = null;
-            if (rightCornerText != null && !rightCornerText.equals("")) {
-                rightCornerTextLayout = getVertexTextLayout(
-                               g2d,
-                               rightCornerText.getSubtext(),
-                               0.8);
-                final int rightCornerTextWidth =
-                        (int) rightCornerTextLayout.getBounds().getWidth();
-
-                if (iconTextWidth + rightCornerTextWidth + 10 > shapeWidth) {
-                    shapeWidth = iconTextWidth + rightCornerTextWidth + 10;
-                }
-            }
-
-            /* subtext */
-            final Subtext[] subtexts = getSubtexts((Vertex) v, getRunMode());
-            TextLayout[] subtextLayouts = null;
-            if (subtexts != null) {
-                subtextLayouts = new TextLayout[subtexts.length];
-                int i = 0;
-                for (final Subtext subtext : subtexts) {
-                    subtextLayouts[i] =
-                           getVertexTextLayout(g2d,
-                                               subtext.getSubtext(),
-                                               0.8);
-                    final int subtextWidth =
-                                (int) subtextLayouts[i].getBounds().getWidth();
-                    if (subtextWidth + 10 > shapeWidth) {
-                        shapeWidth = subtextWidth + 10;
-                    }
-                    i++;
-                }
-                if (i > 1) {
-                    shapeHeight += (i - 1) << 3;
-                }
-                shapeHeight += 3;
-            }
-            final int oldShapeWidth = getVertexWidth((Vertex) v);
-            final int oldShapeHeight = getVertexHeight((Vertex) v);
-            if (isRunModeTestAnimation()) {
-                if (oldShapeWidth > shapeWidth) {
-                    shapeWidth = oldShapeWidth;
-                }
-                if (oldShapeHeight > shapeHeight) {
-                    shapeHeight = oldShapeHeight;
-                }
-            }
-            final boolean widthChanged =
-                                    Math.abs(oldShapeWidth - shapeWidth) > 5;
-            final boolean heightChanged =
-                                    Math.abs(oldShapeHeight - shapeHeight) > 1;
-            if (widthChanged || heightChanged) {
-                somethingChanged();
-                /* move it, so that left side has the same position, if it is
-                 * resized */
-                final Point2D pos = layout.transform((Vertex) v);
-                if (pos != null) {
-                    double x = pos.getX();
-                    double y = pos.getY();
-                    if (widthChanged) {
-                        setVertexWidth((Vertex) v, shapeWidth);
-                        x -= (oldShapeWidth - getVertexWidth((Vertex) v)) / 2;
-                    }
-                    if (heightChanged) {
-                        setVertexHeight((Vertex) v, shapeHeight);
-                        y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
-                    }
-                    pos.setLocation(x, y);
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                      new Runnable() {
-                        @Override
-                        public void run() {
-                            scale();
-                        }
-                    });
-                }
-            }
-
-            /* shape */
-            super.paintShapeForVertex(rc, v, shape);
-            Point2D loc = layout.transform((Vertex) v);
-            loc = rc.getMultiLayerTransformer().transform(Layer.LAYOUT, loc);
-            final double x = loc.getX() - getVertexWidth((Vertex) v) / 2;
-            final double height = getDefaultVertexHeight((Vertex) v);
-            final double y = loc.getY() - getVertexHeight((Vertex) v) / 2;
-            drawInside((Vertex) v, g2d, x, y, shape);
-
-            /* icon */
-            if (icons != null) {
-                for (final ImageIcon icon : icons) {
-                    icon.setDescription("");
-                    g2d.drawImage(
-                          icon.getImage(),
-                          (int) (x + 4),
-                          (int) (y + height / 2 - icon.getIconHeight() / 2),
-                          null);
-                }
-            }
-
-            /* texts are drawn from left down corner. */
-            if (mainTextLayout != null) {
-                final int textW = (int) mainTextLayout.getBounds().getWidth();
-                final int textH = (int) mainTextLayout.getBounds().getHeight();
-                drawVertexText(g2d,
-                               mainTextLayout,
-                               x + shapeWidth / 2 - textW / 2, /* middle */
-                               y + height / 2 + textH / 2,
-                               new Color(0, 0, 0),
-                               255);
-            }
-            if (iconTextLayout != null) {
-                drawVertexText(g2d,
-                               iconTextLayout,
-                               x + 4,
-                               y + 11,
-                               new Color(0, 0, 0),
-                               255);
-            }
-            if (rightCornerTextLayout != null) {
-                drawVertexText(
-                   g2d,
-                   rightCornerTextLayout,
-                   x + shapeWidth
-                     - rightCornerTextLayout.getBounds().getWidth() - 4,
-                   y + 11,
-                   rightCornerText.getTextColor(),
-                   255);
-            }
-            if (subtextLayouts != null) {
-                int i = 0;
-                for (final TextLayout l : subtextLayouts) {
-                    int alpha = 255;
-                    final Subtext subtext = subtexts[i];
-                    if (" ".equals(subtext.getSubtext().substring(0, 1))) {
-                        alpha = 128;
-                    }
-                    final Color color = subtext.getColor();
-                    if (color != null) {
-                        final Paint p =
-                           new GradientPaint((float) x + shapeWidth / 2,
-                                             (float) y,
-                                             getVertexFillSecondaryColor(
-                                                                   (Vertex) v),
-                                             (float) x + shapeWidth / 2,
-                                             (float) y + shapeHeight,
-                                             color,
-                                             false);
-                        g2d.setPaint(p);
-                        g2d.fillRect((int) x + 4,
-                                     (int) (y + height - 3 + 8 * (i - 1)),
-                                     shapeWidth - 8, 9);
-                    }
-                    final Color textColor = subtext.getTextColor();
-                    drawVertexText(
-                               g2d,
-                               l,
-                               x + 4,
-                               y + height - 4 + 8 * i,
-                               textColor,
-                               alpha);
-                    i++;
-                }
-            }
-
-            final Info info = getInfo((Vertex) v);
-            mAnimationListLock.lock();
-            if (animationList.contains(info)) {
-                /* update animation */
-                final double i = info.getAnimationIndex();
-                mAnimationListLock.unlock();
-                final int barPos =
-                           (int) (i * (shapeWidth) / 100);
-                g2d.setColor(new Color(250, 133, 34,
-                                       50));
-                if (barPos > shapeWidth / 2) {
-                    g2d.fillRect((int) (x + (barPos / 2)),
-                                 (int) y,
-                                 shapeWidth - barPos,
-                                 shapeHeight);
-                } else {
-                    g2d.fillRect((int) (x + shapeWidth / 2 - barPos / 2),
-                                 (int) y,
-                                 barPos,
-                                 shapeHeight);
-                }
-            } else {
-                mAnimationListLock.unlock();
-            }
-        }
-    }
 
     /** Small text that appears above the icon. */
     protected abstract String getIconText(final Vertex v,
@@ -1820,45 +1170,6 @@ public abstract class ResourceGraph {
         }
     }
 
-    /**
-     * An edge shape that renders as a straight line between
-     * the vertex endpoints.
-     */
-    private class MyLine<V, E> extends AbstractEdgeShapeTransformer<V, E> {
-
-        /**
-         * Get the shape for this edge, returning either the
-         * shared instance or, in the case of self-loop edges, the
-         * SimpleLoop shared instance.
-         */
-        @Override
-        public Shape transform(final Context<Graph<V, E>, E> context) {
-            final Graph<V, E> g = context.graph;
-            final E e = context.element;
-            if (!(e instanceof Edge)) {
-                return null;
-            }
-
-            final Pair<V> endpoints = g.getEndpoints(e);
-            if (endpoints != null) {
-                final boolean isLoop = endpoints.getFirst().equals(
-                                                        endpoints.getSecond());
-                if (isLoop) {
-                    LOG.appWarning("transform: an illegal loop: "
-                                + vertexToInfoMap.get(endpoints.getFirst())
-                                + ' ' + e + ' '
-                                + vertexToInfoMap.get(endpoints.getSecond()));
-                    return EMPTY_SHAPE;
-                }
-            }
-            if (showHollowArrow((Edge) e)) {
-                return HOLLOW_INSTANCE;
-            } else {
-                return INSTANCE;
-            }
-        }
-    }
-
     /** Locking graph's vertex and edge lists. */
     protected final void lockGraph() {
         mGraphLock.lock();
@@ -2002,5 +1313,694 @@ public abstract class ResourceGraph {
             }
         }
         return new ArrayList<Vertex>();
+    }
+
+    /** This class allows to change direction of the edge. */
+    protected static class Vertex {
+        /** Create vertex. */
+        Vertex() {
+            super();
+        }
+
+        @Override
+        public String toString() {
+            return "V";
+        }
+    }
+
+    /** This class allows to change direction of the edge. */
+    protected class Edge {
+        /** From. */
+        private Vertex mFrom;
+        /** To. */
+        private Vertex mTo;
+        /** Originaly from. */
+        private final Vertex origFrom;
+        /** Originaly to. */
+        private final Vertex origTo;
+        /** Colocation in the same direction as an order. */
+        private boolean wrongColocation = false;
+        /** Creates new {@code Edge} object. */
+        Edge(final Vertex from, final Vertex to) {
+            mFrom = from;
+            mTo = to;
+            origFrom = from;
+            origTo   = to;
+        }
+
+        /** Returns source. */
+        final Vertex getSource() {
+            return mFrom;
+        }
+
+        /** Returns destination. */
+        final Vertex getDest() {
+            return mTo;
+        }
+
+        /** Reverse direction of the edge. */
+        void reverse() {
+            setDirection(mTo, mFrom);
+        }
+
+        /** Sets direction of the edge. */
+        void setDirection(final Vertex from, final Vertex to) {
+            final Edge thisEdge = this;
+            if (mFrom != from || mTo != to) {
+                mGraphLock.lock();
+                try {
+                    getGraph().removeEdge(thisEdge);
+                    mFrom = from;
+                    mTo   = to;
+                    getGraph().addEdge(thisEdge, mFrom, mTo);
+                } finally {
+                    mGraphLock.unlock();
+                }
+            }
+        }
+
+        /** Sets direction to the original state. */
+        void reset() {
+            setDirection(origFrom, origTo);
+        }
+
+        /** Returns edge label. */
+        @Override
+        public final String toString() {
+            return ' ' + getLabelForEdgeStringer(this) + ' ';
+        }
+
+        void setWrongColocation(final boolean wrongColocation) {
+            this.wrongColocation = wrongColocation;
+        }
+
+        boolean isWrongColocation() {
+            return wrongColocation;
+        }
+    }
+
+    /** This class provides tool tips for the vertices. */
+    class MyVertexToolTipFunction<V> implements Transformer<V, String> {
+
+        /** Returns tool tip for vertex v. */
+        @Override
+        public String transform(final V v) {
+            return Tools.html(getVertexToolTip((Vertex) v));
+        }
+    }
+
+    /** This class provides tool tips for the vertices. */
+    class MyEdgeToolTipFunction<E> implements Transformer<E, String> {
+
+        /** Returns tool tip for edge. */
+        @Override
+        public String transform(final E edge) {
+            return Tools.html(getEdgeToolTip((Edge) edge));
+        }
+    }
+
+    /** Controls the shape, size, and aspect ratio for each vertex. */
+    private final class MyVertexShapeSize<V, E>
+                                    extends AbstractVertexShapeTransformer<V> {
+        /** Transformer. */
+        private final Transformer<Vertex, Point2D> vlf;
+        /** Graph. */
+        private final Graph<V, E> graph;
+
+        /** Constructor. */
+        MyVertexShapeSize(final Graph<V, E> graphIn,
+                          final Transformer<Vertex, Point2D> vlfIn) {
+            super();
+            graph = graphIn;
+            vlf = vlfIn;
+            setSizeTransformer(new Transformer<V, Integer>() {
+                                @Override
+                                public Integer transform(final V v) {
+                                    return getVertexWidth((Vertex) v);
+                                }
+                           });
+            setAspectRatioTransformer(new Transformer<V, Float>() {
+                                @Override
+                                public Float transform(final V v) {
+                                    return getVertexAspectRatio((Vertex) v);
+                                }
+                            });
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public Shape transform(final V v) {
+            return getVertexShape((Vertex) v,
+                                  (VertexShapeFactory<Vertex>) factory);
+        }
+    }
+
+    /** This class handles popup menus in the graph. */
+    class MyPopupGraphMousePlugin<V, E> extends AbstractPopupGraphMousePlugin {
+
+        /** Constructor. */
+        MyPopupGraphMousePlugin() {
+            this(MouseEvent.BUTTON3_MASK);
+        }
+
+        /** Constructor. */
+        MyPopupGraphMousePlugin(final int modifiers) {
+            super(modifiers);
+        }
+
+        /**
+         * Is called when mouse was released. Create a multi selection
+         * object. */
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+            if (getPickedVertices().size() > 1) {
+                multiSelection();
+            }
+            if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
+                handlePopup0(e);
+            }
+        }
+
+        /** Is called when mouse was clicked. */
+        @Override
+        public void mouseClicked(final MouseEvent e) {
+            
+            super.mouseClicked(e);
+            final PickedState<Edge> psEdge =
+                visualizationViewer.getRenderContext().getPickedEdgeState();
+            if (psEdge.getPicked().size() == 1) {
+                final Edge edge = (Edge) psEdge.getPicked().toArray()[0];
+                oneEdgePressed(edge);
+            } else if (getPickedVertices().isEmpty()
+                       && psEdge.getPicked().isEmpty()) {
+                backgroundClicked();
+            }
+        }
+
+        /** Creates and displays popup menus for vertices and edges. */
+        @Override
+        protected void handlePopup(final MouseEvent me) {
+            /* doesn't work on Windows along the mouseReleased handler. */
+        }
+
+        /** Creates and displays popup menus for vertices and edges. */
+        private void handlePopup0(final MouseEvent me) {
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final Point2D popP = me.getPoint();
+                    
+                    final int posX = (int) popP.getX();
+                    final int posY = (int) popP.getY();
+                    
+                    final GraphElementAccessor<Vertex, Edge> pickSupport =
+                        visualizationViewer.getPickSupport();
+                    final Vertex v = pickSupport.getVertex(layout, posX, posY);
+                    if (v == null) {
+                        final Edge edge = pickSupport.getEdge(layout,
+                                                              posX,
+                                                              posY);
+                        if (edge == null) {
+                            /* background was clicked */
+                            handlePopupBackground(popP);
+                            backgroundClicked();
+                        } else {
+                            handlePopupEdge(edge, popP);
+                            oneEdgePressed(edge);
+                        }
+                    } else {
+                        final List<Vertex> pickedV = getPickedVertices();
+                        handlePopupVertex(v, pickedV, popP);
+                        if (pickedV.size() < 2) {
+                            oneVertexPressed(v); /* select this vertex */
+                        }
+                    }
+                }
+            });
+            thread.start();
+        }
+    }
+
+    /** This class is used to change view, if graph was clicked. */
+    class MyGraphMouseListener<V> implements GraphMouseListener<V> {
+
+        /** Graph was clicked. */
+        @Override
+        public void graphClicked(final V v, final MouseEvent me) {
+            /* do nothing */
+        }
+
+        /** Graph was released. */
+        @Override
+        public void graphReleased(final V v, final MouseEvent me) {
+            for (final Vertex vertex : getPickedVertices()) {
+                // TODO: if vertex is removed a race condition can be here
+                if (vertex == null) {
+                    continue;
+                }
+                final double x = layout.getX(vertex);
+                final double y = layout.getY(vertex);
+                final Point2D p = new Point2D.Double(x, y);
+                vertexReleased(vertex, p);
+            }
+            scale();
+        }
+
+        /** Graph was pressed. */
+        @Override
+        public void graphPressed(final V v, final MouseEvent me) {
+            final Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    final PickedState<Vertex> psVertex =
+                        visualizationViewer.getRenderContext().getPickedVertexState();
+                    if ((me.getModifiers() & MouseEvent.CTRL_MASK) == 0) {
+                        final List<Vertex> picked = getPickedVertices();
+                        if (picked.size() == 1 || !picked.contains(v)) {
+                            oneVertexPressed((Vertex) v);
+                        }
+                    } else {
+                        /* ctrl-click */
+                        psVertex.pick((Vertex) v, true);
+                    }
+                }
+            });
+            t.start();
+        }
+    }
+
+    /**
+     * This class provides methods for different paint colors for different
+     * conditions.
+     */
+    class MyPickableVertexPaintFunction<V> extends PickableVertexPaintTransformer<V> {
+
+        /** Whether it is the draw paint. */
+        private final boolean draw;
+
+        /** Creates new {@code MyPickableVertexPaintFunction} object. */
+        MyPickableVertexPaintFunction(
+            final PickedInfo<V> pi, final boolean draw) {
+            super(pi, null, null);
+            this.draw = draw;
+        }
+
+        /** Returns paint color for border of vertex v. */
+        @Override
+        public Paint transform(final V v) {
+            if (draw && isPicked(v)) {
+                return getVertexDrawPaint((Vertex) v);
+            } else {
+                final Paint drawPaintNotPicked =
+                    getVertexDrawPaintNotPicked((Vertex) v);
+                if (drawPaintNotPicked == null) {
+                    return getFillPaint((Vertex) v);
+                } else {
+                    return drawPaintNotPicked;
+                }
+            }
+        }
+
+        /** Returns whether the vertex is picked. */
+        final boolean isPicked(final V v) {
+            return visualizationViewer.getPickedVertexState().isPicked((Vertex) v);
+        }
+
+        /** Returns fill paint color for of vertex v. */
+        public Paint getFillPaint(final Vertex v)  {
+            Point2D p = layout.transform(v);
+            p = visualizationViewer.getRenderContext().getMultiLayerTransformer().transform(
+                Layer.LAYOUT, p);
+            final float x = (float) p.getX();
+            final float y = (float) p.getY();
+            final Color col = getVertexFillColor(v);
+            final Color secCol = getVertexFillSecondaryColor(v);
+            if (col == null || secCol == null) {
+                return null;
+            }
+            return new GradientPaint(x,
+                y - getVertexHeight(v) / 2,
+                secCol,
+                x,
+                y + getVertexHeight(v) / 2,
+                col,
+                false);
+        }
+    }
+
+    /** This class defines paints for the edges. */
+    class MyPickableEdgePaintFunction<E> extends PickableEdgePaintTransformer<E> {
+
+        /** Creates new {@code MyPickableEdgePaintFunction} object. */
+        MyPickableEdgePaintFunction(
+            final PickedInfo<E> ps,
+                                    final Paint drawPaint,
+                                    final Paint pickedPaint) {
+            super(ps, drawPaint, pickedPaint);
+        }
+
+        /** Returns paint of the edge. */
+        Paint getDrawPaint(final Edge e) {
+            if (isPicked(e)) {
+                return getEdgePickedPaint(e);
+            } else {
+                return getEdgeDrawPaint(e);
+            }
+        }
+
+        /** Returns paint color for border of edge e. */
+        @Override
+        public Paint transform(final E e)  {
+            return getDrawPaint((Edge) e);
+        }
+    }
+
+    /** This class defines paints for the arrows. */
+    class MyPickableArrowEdgePaintFunction<E> extends PickableEdgePaintTransformer<E> {
+
+        /** Creates new {@code MyPickableArrowEdgePaintFunction} object.*/
+        MyPickableArrowEdgePaintFunction(
+            final PickedInfo<E> ps,
+                                         final Paint drawPaint,
+                                         final Paint pickedPaint) {
+            super(ps, drawPaint, pickedPaint);
+        }
+
+        /** Returns paint of the edge. */
+        public Paint getDrawPaint(final Edge e) {
+            if (isPicked(e)) {
+                return getEdgePickedPaint(e);
+            } else {
+                return getEdgeDrawPaint(e);
+            }
+        }
+
+        /** Returns paint color for border of edge e. */
+        @Override
+        public Paint transform(final E e)  {
+            if (showHollowArrow((Edge) e)) {
+                return Color.WHITE;
+            }
+            return getDrawPaint((Edge) e);
+        }
+    }
+
+    /** This class defines what arrow and if at all should be painted. */
+    class MyEdgeArrowFunction<V, E> extends DirectionalEdgeArrowTransformer<V, E> {
+
+        /** Creates new MyEdgeArrowFunction object. */
+        MyEdgeArrowFunction() {
+            super(20, 8, 4);
+        }
+
+        /**
+         * Returns the shape of the arrow, or not if no arrow should be
+         * painted.
+         */
+        @Override
+        public Shape transform(final Context<Graph<V, E>, E> context) {
+            if (showEdgeArrow((Edge) context.element)) {
+                return super.transform(context);
+            } else {
+                return EMPTY_SHAPE;
+            }
+        }
+    }
+
+    /** This class is for rendering of the vertices. */
+    class MyPluggableRenderer<V, E> extends BasicVertexRenderer<V, E> {
+
+        /**
+         * Paints the shape for vertex and all icons and texts inside. It
+         * resizes and repositions the vertex if neccessary.
+         */
+        @Override
+        protected final void paintShapeForVertex(final RenderContext<V, E> rc,
+                                                 final V v,
+                                                 final Shape shape) {
+            final Graphics2D g2d = rc.getGraphicsContext().getDelegate();
+            int shapeWidth = getDefaultVertexWidth((Vertex) v);
+            int shapeHeight = getDefaultVertexHeight((Vertex) v);
+            
+            /* icons */
+            final List<ImageIcon> icons =
+                getIconsForVertex((Vertex) v, getRunMode());
+            /* main text */
+            final String mainText = getMainText((Vertex) v, getRunMode());
+            TextLayout mainTextLayout = null;
+            if (mainText != null && !mainText.isEmpty()) {
+                mainTextLayout = getVertexTextLayout(g2d, mainText, 1);
+                int iconWidth = 64;
+                if (icons == null) {
+                    iconWidth = 4;
+                }
+                final int mainTextWidth =
+                    (int) mainTextLayout.getBounds().getWidth() + iconWidth;
+                if (mainTextWidth > shapeWidth) {
+                    shapeWidth = mainTextWidth;
+                }
+            }
+            
+            /* icon text */
+            final String iconText = getIconText((Vertex) v, getRunMode());
+            int iconTextWidth = 0;
+            TextLayout iconTextLayout = null;
+            if (iconText != null && !iconText.isEmpty()) {
+                iconTextLayout = getVertexTextLayout(g2d, iconText, 0.8);
+                iconTextWidth =
+                    (int) iconTextLayout.getBounds().getWidth();
+            }
+            
+            /* right corner text */
+            final Subtext rightCornerText = getRightCornerText((Vertex) v,
+                                                               getRunMode());
+            TextLayout rightCornerTextLayout = null;
+            if (rightCornerText != null && !rightCornerText.equals("")) {
+                rightCornerTextLayout = getVertexTextLayout(
+                    g2d,
+                               rightCornerText.getSubtext(),
+                               0.8);
+                final int rightCornerTextWidth =
+                    (int) rightCornerTextLayout.getBounds().getWidth();
+                
+                if (iconTextWidth + rightCornerTextWidth + 10 > shapeWidth) {
+                    shapeWidth = iconTextWidth + rightCornerTextWidth + 10;
+                }
+            }
+            
+            /* subtext */
+            final Subtext[] subtexts = getSubtexts((Vertex) v, getRunMode());
+            TextLayout[] subtextLayouts = null;
+            if (subtexts != null) {
+                subtextLayouts = new TextLayout[subtexts.length];
+                int i = 0;
+                for (final Subtext subtext : subtexts) {
+                    subtextLayouts[i] =
+                        getVertexTextLayout(g2d,
+                                               subtext.getSubtext(),
+                                               0.8);
+                    final int subtextWidth =
+                        (int) subtextLayouts[i].getBounds().getWidth();
+                    if (subtextWidth + 10 > shapeWidth) {
+                        shapeWidth = subtextWidth + 10;
+                    }
+                    i++;
+                }
+                if (i > 1) {
+                    shapeHeight += (i - 1) << 3;
+                }
+                shapeHeight += 3;
+            }
+            final int oldShapeWidth = getVertexWidth((Vertex) v);
+            final int oldShapeHeight = getVertexHeight((Vertex) v);
+            if (isRunModeTestAnimation()) {
+                if (oldShapeWidth > shapeWidth) {
+                    shapeWidth = oldShapeWidth;
+                }
+                if (oldShapeHeight > shapeHeight) {
+                    shapeHeight = oldShapeHeight;
+                }
+            }
+            final boolean widthChanged =
+                Math.abs(oldShapeWidth - shapeWidth) > 5;
+            final boolean heightChanged =
+                Math.abs(oldShapeHeight - shapeHeight) > 1;
+            if (widthChanged || heightChanged) {
+                somethingChanged();
+                /* move it, so that left side has the same position, if it is
+                * resized */
+                final Point2D pos = layout.transform((Vertex) v);
+                if (pos != null) {
+                    double x = pos.getX();
+                    double y = pos.getY();
+                    if (widthChanged) {
+                        setVertexWidth((Vertex) v, shapeWidth);
+                        x -= (oldShapeWidth - getVertexWidth((Vertex) v)) / 2;
+                    }
+                    if (heightChanged) {
+                        setVertexHeight((Vertex) v, shapeHeight);
+                        y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
+                    }
+                    pos.setLocation(x, y);
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                                      new Runnable() {
+                                          @Override
+                                          public void run() {
+                                              scale();
+                                          }
+                                      });
+                }
+            }
+            
+            /* shape */
+            super.paintShapeForVertex(rc, v, shape);
+            Point2D loc = layout.transform((Vertex) v);
+            loc = rc.getMultiLayerTransformer().transform(Layer.LAYOUT, loc);
+            final double x = loc.getX() - getVertexWidth((Vertex) v) / 2;
+            final double height = getDefaultVertexHeight((Vertex) v);
+            final double y = loc.getY() - getVertexHeight((Vertex) v) / 2;
+            drawInside((Vertex) v, g2d, x, y, shape);
+            
+            /* icon */
+            if (icons != null) {
+                for (final ImageIcon icon : icons) {
+                    icon.setDescription("");
+                    g2d.drawImage(
+                        icon.getImage(),
+                          (int) (x + 4),
+                          (int) (y + height / 2 - icon.getIconHeight() / 2),
+                          null);
+                }
+            }
+            
+            /* texts are drawn from left down corner. */
+            if (mainTextLayout != null) {
+                final int textW = (int) mainTextLayout.getBounds().getWidth();
+                final int textH = (int) mainTextLayout.getBounds().getHeight();
+                drawVertexText(g2d,
+                               mainTextLayout,
+                               x + shapeWidth / 2 - textW / 2, /* middle */
+                               y + height / 2 + textH / 2,
+                               new Color(0, 0, 0),
+                               255);
+            }
+            if (iconTextLayout != null) {
+                drawVertexText(g2d,
+                               iconTextLayout,
+                               x + 4,
+                               y + 11,
+                               new Color(0, 0, 0),
+                               255);
+            }
+            if (rightCornerTextLayout != null) {
+                drawVertexText(
+                    g2d,
+                   rightCornerTextLayout,
+                   x + shapeWidth
+                   - rightCornerTextLayout.getBounds().getWidth() - 4,
+                   y + 11,
+                   rightCornerText.getTextColor(),
+                   255);
+            }
+            if (subtextLayouts != null) {
+                int i = 0;
+                for (final TextLayout l : subtextLayouts) {
+                    int alpha = 255;
+                    final Subtext subtext = subtexts[i];
+                    if (" ".equals(subtext.getSubtext().substring(0, 1))) {
+                        alpha = 128;
+                    }
+                    final Color color = subtext.getColor();
+                    if (color != null) {
+                        final Paint p =
+                            new GradientPaint((float) x + shapeWidth / 2,
+                                (float) y,
+                                getVertexFillSecondaryColor(
+                                    (Vertex) v),
+                                (float) x + shapeWidth / 2,
+                                (float) y + shapeHeight,
+                                color,
+                                false);
+                        g2d.setPaint(p);
+                        g2d.fillRect((int) x + 4,
+                                     (int) (y + height - 3 + 8 * (i - 1)),
+                                     shapeWidth - 8, 9);
+                    }
+                    final Color textColor = subtext.getTextColor();
+                    drawVertexText(
+                        g2d,
+                               l,
+                               x + 4,
+                               y + height - 4 + 8 * i,
+                               textColor,
+                               alpha);
+                    i++;
+                }
+            }
+            
+            final Info info = getInfo((Vertex) v);
+            mAnimationListLock.lock();
+            if (animationList.contains(info)) {
+                /* update animation */
+                final double i = info.getAnimationIndex();
+                mAnimationListLock.unlock();
+                final int barPos =
+                    (int) (i * (shapeWidth) / 100);
+                g2d.setColor(new Color(250, 133, 34,
+                    50));
+                if (barPos > shapeWidth / 2) {
+                    g2d.fillRect((int) (x + (barPos / 2)),
+                                 (int) y,
+                                 shapeWidth - barPos,
+                                 shapeHeight);
+                } else {
+                    g2d.fillRect((int) (x + shapeWidth / 2 - barPos / 2),
+                                 (int) y,
+                                 barPos,
+                                 shapeHeight);
+                }
+            } else {
+                mAnimationListLock.unlock();
+            }
+        }
+    }
+
+    /**
+     * An edge shape that renders as a straight line between
+     * the vertex endpoints.
+     */
+    private class MyLine<V, E> extends AbstractEdgeShapeTransformer<V, E> {
+
+        /**
+         * Get the shape for this edge, returning either the
+         * shared instance or, in the case of self-loop edges, the
+         * SimpleLoop shared instance.
+         */
+        @Override
+        public Shape transform(final Context<Graph<V, E>, E> context) {
+            final Graph<V, E> g = context.graph;
+            final E e = context.element;
+            if (!(e instanceof Edge)) {
+                return null;
+            }
+
+            final Pair<V> endpoints = g.getEndpoints(e);
+            if (endpoints != null) {
+                final boolean isLoop = endpoints.getFirst().equals(
+                                                        endpoints.getSecond());
+                if (isLoop) {
+                    LOG.appWarning("transform: an illegal loop: "
+                                + vertexToInfoMap.get(endpoints.getFirst())
+                                + ' ' + e + ' '
+                                + vertexToInfoMap.get(endpoints.getSecond()));
+                    return EMPTY_SHAPE;
+                }
+            }
+            if (showHollowArrow((Edge) e)) {
+                return HOLLOW_INSTANCE;
+            } else {
+                return INSTANCE;
+            }
+        }
     }
 }

@@ -33,14 +33,12 @@ final class VMTest5 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(VMTest5.class);
 
+    static void start(final Cluster cluster, final String vmTest, final int count) {
+        VMTest1.startVMTest(cluster, vmTest, "lxc", count);
+    }
+
     /** Private constructor, cannot be instantiated. */
     private VMTest5() {
         /* Cannot be instantiated. */
-    }
-
-    static void start(final Cluster cluster,
-                      final String vmTest,
-                      final int count) {
-        VMTest1.startVMTest(cluster, vmTest, "lxc", count);
     }
 }

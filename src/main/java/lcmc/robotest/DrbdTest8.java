@@ -40,11 +40,6 @@ final class DrbdTest8 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest8.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest8() {
-        /* Cannot be instantiated. */
-    }
-
     /** DRBD Test 8 / proxy. */
     static void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
@@ -174,8 +169,8 @@ final class DrbdTest8 {
         leftClick(); /* apply/disables tooltip */
         leftClick();
         checkDRBDTest(drbdTest, 2.1); /* 2.1 */
-
-
+        
+        
         /* common */
         moveTo(500, 342); /* select background */
         leftClick();
@@ -280,5 +275,10 @@ final class DrbdTest8 {
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 4);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest8() {
+        /* Cannot be instantiated. */
     }
 }

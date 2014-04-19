@@ -43,8 +43,6 @@ import java.util.ArrayList;
  * to show it to the user.
  */
 public final class AvailableServiceInfo extends HbCategoryInfo {
-    /** Info about the service. */
-    private final ResourceAgent resourceAgent;
     /** Available services icon. */
     private static final ImageIcon AVAIL_SERVICES_ICON =
         Tools.createImageIcon(
@@ -52,6 +50,8 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(
                                             Tools.getDefault("BackIcon"));
+    /** Info about the service. */
+    private final ResourceAgent resourceAgent;
 
     /** Prepares a new {@code AvailableServiceInfo} object. */
     public AvailableServiceInfo(final ResourceAgent resourceAgent,

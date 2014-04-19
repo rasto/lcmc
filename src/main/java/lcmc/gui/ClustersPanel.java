@@ -69,8 +69,6 @@ public final class ClustersPanel extends JPanel {
                                 LoggerFactory.getLogger(ClustersPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** The tabbed pane where the tabs are painted. */
-    private JTabbedPane tabbedPane;
     /** Icon of the cluster. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
@@ -80,6 +78,10 @@ public final class ClustersPanel extends JPanel {
     /** Name of all clusters tab. */
     private static final String CLUSTERS_LABEL =
                                 Tools.getString("ClustersPanel.ClustersTab");
+    /** Width of the tab border. */
+    private static final int TAB_BORDER_WIDTH = 3;
+    /** The tabbed pane where the tabs are painted. */
+    private JTabbedPane tabbedPane;
     /** New empty cluster tab. */
     private final ClusterTab newClusterTab;
     /** Previously selected tab. */
@@ -87,8 +89,6 @@ public final class ClustersPanel extends JPanel {
 
     private final Map<ClusterTab, JLabel> clusterTabLabels =
                                             new HashMap<ClusterTab, JLabel>();
-    /** Width of the tab border. */
-    private static final int TAB_BORDER_WIDTH = 3;
 
     /** Prepares a new {@code ClustersPanel} object. */
     ClustersPanel() {

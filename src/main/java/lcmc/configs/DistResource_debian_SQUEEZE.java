@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_debian_SQUEEZE
                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -77,4 +71,10 @@ public final class DistResource_debian_SQUEEZE
          + " fi"},
 
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

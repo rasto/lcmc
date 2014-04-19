@@ -64,11 +64,11 @@ public class HostDrbdInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(HostDrbdInfo.class);
+    /** String that is displayed as a tool tip for disabled menu item. */
+    static final String NO_DRBD_STATUS_STRING = "drbd status is not available";
     private final HostDrbdMenu hostDrbdMenu;
     /** Host data. */
     private final Host host;
-    /** String that is displayed as a tool tip for disabled menu item. */
-    static final String NO_DRBD_STATUS_STRING = "drbd status is not available";
     /** Prepares a new {@code HostDrbdInfo} object. */
     public HostDrbdInfo(final Host host, final Browser browser) {
         super(host.getName(), browser);

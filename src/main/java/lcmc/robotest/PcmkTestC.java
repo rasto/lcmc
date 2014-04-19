@@ -35,11 +35,6 @@ final class PcmkTestC {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTestC.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestC() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final int count) {
         slowFactor = 0.5f;
         disableStonith();
@@ -82,11 +77,16 @@ final class PcmkTestC {
             moveTo(Tools.getString("Browser.ApplyResource"));
             leftClick();
             checkTest(testName, 4);
-
-
+            
+            
             removeResource(statefulX, statefulY, CONFIRM_REMOVE);
             removeResource(245, statefulY + 90, CONFIRM_REMOVE);
             resetTerminalAreas();
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestC() {
+        /* Cannot be instantiated. */
     }
 }

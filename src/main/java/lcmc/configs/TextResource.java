@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class TextResource extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"DrbdMC.Title",
@@ -2881,4 +2875,10 @@ public final class TextResource extends ListResourceBundle {
          + "100 (2) cmd ... Time in 1/100 secs (how many times).<br>"
          + "100+ not finished (or interrupted)"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

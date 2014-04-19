@@ -56,6 +56,12 @@ import javax.swing.SpringLayout;
 
 /** Create LV dialog. */
 public final class LVCreate extends LV {
+
+    /** Description create LV. */
+    private static final String LV_CREATE_DESCRIPTION =
+                       "Create a logical volume in an existing volume group.";
+    /** LV create timeout. */
+    private static final int CREATE_TIMEOUT = 5000;
     /** Block device info object. */
     private final Collection<Host> selectedHosts = new LinkedHashSet<Host>();
     /** Create button. */
@@ -73,12 +79,6 @@ public final class LVCreate extends LV {
     /** Selected block device. */
     private final Collection<BlockDevice> selectedBlockDevices =
                                              new LinkedHashSet<BlockDevice>();
-
-    /** Description create LV. */
-    private static final String LV_CREATE_DESCRIPTION =
-                       "Create a logical volume in an existing volume group.";
-    /** LV create timeout. */
-    private static final int CREATE_TIMEOUT = 5000;
     /** Create new LVCreate object. */
     public LVCreate(final Host host,
                     final String volumeGroup,

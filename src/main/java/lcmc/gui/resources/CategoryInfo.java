@@ -35,10 +35,10 @@ import lcmc.data.Application;
  * This class holds info data for a category.
  */
 public class CategoryInfo extends Info {
-    /** Info panel. */
-    private JComponent infoPanel = null;
     /** Main table. */
     public static final String MAIN_TABLE = "main";
+    /** Info panel. */
+    private JComponent infoPanel = null;
     /**
      * Prepares a new {@code CategoryInfo} object.
      */

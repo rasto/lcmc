@@ -57,6 +57,12 @@ public final class ConstraintPHInfo extends ServiceInfo {
                              LoggerFactory.getLogger(ConstraintPHInfo.class);
     /** Name of this object. */
     static final String NAME = "Placeholder";
+    /** Name of the "and" constraint placeholder .*/
+    private static final String CONSTRAINT_PLACEHOLDER_AND =
+                                       Tools.getString("ConstraintPHInfo.And");
+    /** Name of the "or" constraint placeholder .*/
+    private static final String CONSTRAINT_PLACEHOLDER_OR =
+                                       Tools.getString("ConstraintPHInfo.Or");
     /** Resource set connection data for colocation. */
     private CRMXML.RscSetConnectionData rscSetConnectionDataCol = null;
     /** Resource set connection data for order. */
@@ -74,17 +80,6 @@ public final class ConstraintPHInfo extends ServiceInfo {
     /** Resource set info object for this placeholder. More placeholders can
      * have on resource set info object. */
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
-    /** Name of the "and" constraint placeholder .*/
-    private static final String CONSTRAINT_PLACEHOLDER_AND =
-                                       Tools.getString("ConstraintPHInfo.And");
-    /** Name of the "or" constraint placeholder .*/
-    private static final String CONSTRAINT_PLACEHOLDER_OR =
-                                       Tools.getString("ConstraintPHInfo.Or");
-
-    public enum Preference {
-        AND,
-        OR
-    }
     /** Whether the all resources are required to be started. */
     private final Preference preference;
 
@@ -1018,5 +1013,10 @@ public final class ConstraintPHInfo extends ServiceInfo {
     @Override
     void stopResource(final Host dcHost, final Application.RunMode runMode) {
         /* cannot stop placeholder */
+    }
+
+    public enum Preference {
+        AND,
+        OR
     }
 }

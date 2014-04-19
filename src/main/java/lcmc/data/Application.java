@@ -50,23 +50,6 @@ public final class Application {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(Application.class);
-
-    /** access type. */
-    public enum AccessType {
-        RO,
-        OP,
-        ADMIN,
-        GOD,
-        NEVER
-    }
-    /**
-     * Run mode. TEST does shows changes in the GUI, but does not change the
-     * cluster
-     */
-    public enum RunMode {
-        LIVE,
-        TEST
-    }
     /** Read only operating mode. */
     public static final String OP_MODE_RO =
                                         Tools.getString("Application.OpMode.RO");
@@ -88,6 +71,18 @@ public final class Application {
     /** String representation to its access type. */
     public static final Map<String, AccessType> ACCESS_TYPE_MAP =
                                        new LinkedHashMap<String, AccessType>();
+    /** Name of the Heartbeat comm stack. */
+    public static final String HEARTBEAT_NAME = "Heartbeat";
+    /** Name of the Corosync/Openais comm stack. */
+    public static final String COROSYNC_NAME = "Corosync/OpenAIS";
+    /** Name of the clone set pacemaker object. */
+    public static final String PM_CLONE_SET_NAME = "Clone Set";
+    /** Name of the Master/Slave set pacemaker object. */
+    public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
+    /** Name of the group pacemaker object. */
+    public static final String PM_GROUP_NAME = "Group";
+    /** Default frames per second for animations. */
+    public static final float DEFAULT_ANIM_FPS = 20.0f;
     static {
         OP_MODES_MAP.put(AccessType.RO, OP_MODE_RO);
         OP_MODES_MAP.put(AccessType.OP, OP_MODE_OP);
@@ -98,6 +93,20 @@ public final class Application {
         ACCESS_TYPE_MAP.put(OP_MODE_OP, AccessType.OP);
         ACCESS_TYPE_MAP.put(OP_MODE_ADMIN, AccessType.ADMIN);
         ACCESS_TYPE_MAP.put(OP_MODE_GOD, AccessType.GOD);
+    }
+
+    /**
+     * Return whether the run mode is "live" run mode.
+     */
+    public static boolean isLive(final RunMode runMode) {
+        return RunMode.LIVE == runMode;
+    }
+
+    /**
+     * Return whether the run mode is "test" run mode.
+     */
+    public static boolean isTest(final RunMode runMode) {
+        return RunMode.TEST == runMode;
     }
     /** All hosts object. */
     private final Hosts hosts;
@@ -148,18 +157,6 @@ public final class Application {
     /** Auto options, that make automatic actions in the gui. */
     private final MultiKeyMap<String, String> autoOptions =
                                             new MultiKeyMap<String, String>();
-    /** Name of the Heartbeat comm stack. */
-    public static final String HEARTBEAT_NAME = "Heartbeat";
-    /** Name of the Corosync/Openais comm stack. */
-    public static final String COROSYNC_NAME = "Corosync/OpenAIS";
-    /** Name of the clone set pacemaker object. */
-    public static final String PM_CLONE_SET_NAME = "Clone Set";
-    /** Name of the Master/Slave set pacemaker object. */
-    public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
-    /** Name of the group pacemaker object. */
-    public static final String PM_GROUP_NAME = "Group";
-    /** Default frames per second for animations. */
-    public static final float DEFAULT_ANIM_FPS = 20.0f;
     /** Remote port offset when making ssh tunnel for vnc. */
     private int vncPortOffset = 0;
     /** Whether tight vnc viewer should be used. */
@@ -756,17 +753,20 @@ public final class Application {
         this.checkSwing = checkSwing;
     }
 
-    /**
-     * Return whether the run mode is "live" run mode.
-     */
-    public static boolean isLive(final RunMode runMode) {
-        return RunMode.LIVE == runMode;
+    /** access type. */
+    public enum AccessType {
+        RO,
+        OP,
+        ADMIN,
+        GOD,
+        NEVER
     }
-
     /**
-     * Return whether the run mode is "test" run mode.
+     * Run mode. TEST does shows changes in the GUI, but does not change the
+     * cluster
      */
-    public static boolean isTest(final RunMode runMode) {
-        return RunMode.TEST == runMode;
+    public enum RunMode {
+        LIVE,
+        TEST
     }
 }

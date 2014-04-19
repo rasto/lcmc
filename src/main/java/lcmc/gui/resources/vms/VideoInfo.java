@@ -58,24 +58,10 @@ final class VideoInfo extends HardwareInfo {
     /** Short name. */
     private static final Map<String, String> SHORTNAME_MAP =
                                                  new HashMap<String, String>();
-    static {
-        SHORTNAME_MAP.put(VideoData.MODEL_TYPE,
-                          Tools.getString("VideoInfo.ModelType"));
-        SHORTNAME_MAP.put(VideoData.MODEL_VRAM,
-                          Tools.getString("VideoInfo.ModelVRAM"));
-        SHORTNAME_MAP.put(VideoData.MODEL_HEADS,
-                          Tools.getString("VideoInfo.ModelHeads"));
-    }
 
     /** Long name. */
     private static final Map<String, String> LONGNAME_MAP =
                                                  new HashMap<String, String>();
-    static {
-        LONGNAME_MAP.put(VideoData.MODEL_VRAM,
-                         Tools.getString("VideoInfo.ModelVRAM.ToolTip"));
-        LONGNAME_MAP.put(VideoData.MODEL_HEADS,
-                         Tools.getString("VideoInfo.ModelHeads.ToolTip"));
-    }
 
     /** Whether the parameter is required. */
     private static final Collection<String> IS_REQUIRED =
@@ -85,11 +71,44 @@ final class VideoInfo extends HardwareInfo {
     private static final Map<String, Value[]> POSSIBLE_VALUES =
                                                new HashMap<String, Value[]>();
     static {
+        SHORTNAME_MAP.put(VideoData.MODEL_TYPE,
+                          Tools.getString("VideoInfo.ModelType"));
+        SHORTNAME_MAP.put(VideoData.MODEL_VRAM,
+                          Tools.getString("VideoInfo.ModelVRAM"));
+        SHORTNAME_MAP.put(VideoData.MODEL_HEADS,
+                          Tools.getString("VideoInfo.ModelHeads"));
+    }
+    static {
+        LONGNAME_MAP.put(VideoData.MODEL_VRAM,
+                         Tools.getString("VideoInfo.ModelVRAM.ToolTip"));
+        LONGNAME_MAP.put(VideoData.MODEL_HEADS,
+                         Tools.getString("VideoInfo.ModelHeads.ToolTip"));
+    }
+    static {
         POSSIBLE_VALUES.put(VideoData.MODEL_TYPE,
                             new Value[]{new StringValue("cirrus"),
                                         new StringValue("vga"),
                                         new StringValue("vmvga"),
                                         new StringValue("xen")});
+    }
+
+
+    /** Returns "add new" button. */
+    static MyButton getNewBtn(final DomainInfo vdi) {
+        final MyButton newBtn = new MyButton("Add Video Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        vdi.addVideosPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
     }
     /** Table panel. */
     private JComponent tablePanel = null;
@@ -401,30 +420,9 @@ final class VideoInfo extends HardwareInfo {
     }
 
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Video Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addVideosPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
-
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
-                             final Node node,
-                             final String domainName,
-                             final Map<String, String> params) {
+    protected void modifyXML(final VMSXML vmsxml, final Node node, final String domainName, final Map<String, String> params) {
         if (vmsxml != null) {
             vmsxml.modifyVideoXML(node, domainName, params);
         }

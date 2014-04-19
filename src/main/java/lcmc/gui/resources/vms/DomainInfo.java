@@ -94,124 +94,6 @@ public final class DomainInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
                           LoggerFactory.getLogger(DomainInfo.class);
-    /** Cache for the info panel. */
-    private JComponent infoPanel = null;
-    /** UUID. */
-    private String uuid;
-    /** HTML string on which hosts the vm is defined. */
-    private String definedOnString = "";
-    /** HTML string on which hosts the vm is running. */
-    private String runningOnString = "";
-    /** Row color, that is color of host on which is it running or null. */
-    private Color rowColor = Browser.PANEL_BACKGROUND;
-    /** Transition between states lock. */
-    private final ReadWriteLock mTransitionLock = new ReentrantReadWriteLock();
-    /** Transition between states read lock. */
-    private final Lock mTransitionReadLock = mTransitionLock.readLock();
-    /** Transition between states write lock. */
-    private final Lock mTransitionWriteLock = mTransitionLock.writeLock();
-    /** Starting. */
-    private final Set<String> starting = new HashSet<String>();
-    /** Shutting down. */
-    private final Set<String> shuttingdown = new HashSet<String>();
-    /** Suspending. */
-    private final Set<String> suspending = new HashSet<String>();
-    /** Resuming. */
-    private final Set<String> resuming = new HashSet<String>();
-    /** Progress indicator when starting or stopping. */
-    private final StringBuilder progress = new StringBuilder("-");
-    /** Disk to info hash lock. */
-    private final Lock mDiskToInfoLock = new ReentrantLock();
-    /** Map from key to vms disk info object. */
-    private final Map<String, DiskInfo> diskToInfo =
-                                           new HashMap<String, DiskInfo>();
-    /** Map from target string in the table to vms disk info object.
-     */
-    private volatile Map<String, DiskInfo> diskKeyToInfo =
-                                           new HashMap<String, DiskInfo>();
-
-    /** FS to info hash lock. */
-    private final Lock mFilesystemToInfoLock = new ReentrantLock();
-    /** Map from key to vms fs info object. */
-    private final Map<String, FilesystemInfo> filesystemToInfo =
-                                      new HashMap<String, FilesystemInfo>();
-    /** Map from target string in the table to vms fs info object.
-     */
-    private volatile Map<String, FilesystemInfo> filesystemKeyToInfo =
-                                       new HashMap<String, FilesystemInfo>();
-
-    /** Interface to info hash lock. */
-    private final Lock mInterfaceToInfoLock = new ReentrantLock();
-    /** Map from key to vms interface info object. */
-    private final Map<String, InterfaceInfo> interfaceToInfo =
-                                       new HashMap<String, InterfaceInfo>();
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, InterfaceInfo> interfaceKeyToInfo =
-                                       new HashMap<String, InterfaceInfo>();
-    /** Input device to info hash lock. */
-    private final Lock mInputDevToInfoLock = new ReentrantLock();
-    /** Map from key to vms input device info object. */
-    private final Map<String, InputDevInfo> inputDevToInfo =
-                                       new HashMap<String, InputDevInfo>();
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, InputDevInfo> inputDevKeyToInfo =
-                                       new HashMap<String, InputDevInfo>();
-
-    /** Graphics device to info hash lock. */
-    private final Lock mGraphicsToInfoLock = new ReentrantLock();
-    /** Map from key to vms graphics device info object. */
-    private final Map<String, GraphicsInfo> graphicsToInfo =
-                                       new HashMap<String, GraphicsInfo>();
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, GraphicsInfo> graphicsKeyToInfo =
-                                       new HashMap<String, GraphicsInfo>();
-
-    /** Sound device to info hash lock. */
-    private final Lock mSoundToInfoLock = new ReentrantLock();
-    /** Map from key to vms sound device info object. */
-    private final Map<String, SoundInfo> soundToInfo =
-                                       new HashMap<String, SoundInfo>();
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, SoundInfo> soundKeyToInfo =
-                                       new HashMap<String, SoundInfo>();
-
-    /** Serial device to info hash lock. */
-    private final Lock mSerialToInfoLock = new ReentrantLock();
-    /** Map from key to vms serial device info object. */
-    private final Map<String, SerialInfo> serialToInfo =
-                                       new HashMap<String, SerialInfo>();
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, SerialInfo> serialKeyToInfo =
-                                       new HashMap<String, SerialInfo>();
-
-    /** Parallel device to info hash lock. */
-    private final Lock mParallelToInfoLock = new ReentrantLock();
-    /** Map from key to vms parallel device info object. */
-    private final Map<String, ParallelInfo> parallelToInfo =
-                                       new HashMap<String, ParallelInfo>();
-    /** Preferred emulator. It's distro dependent. */
-    private final String preferredEmulator;
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, ParallelInfo> parallelKeyToInfo =
-                                       new HashMap<String, ParallelInfo>();
-
-    /** Video device to info hash lock. */
-    private final Lock mVideoToInfoLock = new ReentrantLock();
-    /** Map from key to vms video device info object. */
-    private final Map<String, VideoInfo> videoToInfo =
-                                       new HashMap<String, VideoInfo>();
-    /** Map to host buttons, to start and view virtual hosts. */
-    private final Map<String, MyButton> hostButtons =
-                                               new HashMap<String, MyButton>();
-    /** Whether it is used by CRM. */
-    private boolean usedByCRM = false;
-    /** Map from target string in the table to vms interface info object. */
-    private volatile Map<String, VideoInfo> videoKeyToInfo =
-                                       new HashMap<String, VideoInfo>();
-    /** Previous type. */
-    private volatile Value prevType = null;
-    /** Autostart possible values - hosts. */
-    private final Value[] autostartPossibleValues;
     /** Timeout of starting, shutting down, etc. actions in seconds. */
     private static final int ACTION_TIMEOUT = 20;
     /** Virsh options. */
@@ -492,9 +374,6 @@ public final class DomainInfo extends EditableInfo {
     private static final int CONTROL_BUTTON_WIDTH = 80;
     /** String that is displayed as a tool tip if a menu item is used by CRM. */
     static final String IS_USED_BY_CRM_STRING = "it is used by cluster manager";
-    /** This is a map from host to the check box. */
-    private final Map<String, Widget> definedOnHostComboBoxHash =
-                                          new HashMap<String, Widget>();
 
     public static final Value BOOT_HD      = new StringValue("hd", "Hard Disk");
     public static final Value BOOT_NETWORK =
@@ -799,6 +678,127 @@ public final class DomainInfo extends EditableInfo {
         REQUIRED_VERSION.put(VMSXML.VM_PARAM_CPUMATCH_FEATURES,
                              "0.7.5");
     }
+    /** Cache for the info panel. */
+    private JComponent infoPanel = null;
+    /** UUID. */
+    private String uuid;
+    /** HTML string on which hosts the vm is defined. */
+    private String definedOnString = "";
+    /** HTML string on which hosts the vm is running. */
+    private String runningOnString = "";
+    /** Row color, that is color of host on which is it running or null. */
+    private Color rowColor = Browser.PANEL_BACKGROUND;
+    /** Transition between states lock. */
+    private final ReadWriteLock mTransitionLock = new ReentrantReadWriteLock();
+    /** Transition between states read lock. */
+    private final Lock mTransitionReadLock = mTransitionLock.readLock();
+    /** Transition between states write lock. */
+    private final Lock mTransitionWriteLock = mTransitionLock.writeLock();
+    /** Starting. */
+    private final Set<String> starting = new HashSet<String>();
+    /** Shutting down. */
+    private final Set<String> shuttingdown = new HashSet<String>();
+    /** Suspending. */
+    private final Set<String> suspending = new HashSet<String>();
+    /** Resuming. */
+    private final Set<String> resuming = new HashSet<String>();
+    /** Progress indicator when starting or stopping. */
+    private final StringBuilder progress = new StringBuilder("-");
+    /** Disk to info hash lock. */
+    private final Lock mDiskToInfoLock = new ReentrantLock();
+    /** Map from key to vms disk info object. */
+    private final Map<String, DiskInfo> diskToInfo =
+                                           new HashMap<String, DiskInfo>();
+    /** Map from target string in the table to vms disk info object.
+     */
+    private volatile Map<String, DiskInfo> diskKeyToInfo =
+                                           new HashMap<String, DiskInfo>();
+
+    /** FS to info hash lock. */
+    private final Lock mFilesystemToInfoLock = new ReentrantLock();
+    /** Map from key to vms fs info object. */
+    private final Map<String, FilesystemInfo> filesystemToInfo =
+                                      new HashMap<String, FilesystemInfo>();
+    /** Map from target string in the table to vms fs info object.
+     */
+    private volatile Map<String, FilesystemInfo> filesystemKeyToInfo =
+                                       new HashMap<String, FilesystemInfo>();
+
+    /** Interface to info hash lock. */
+    private final Lock mInterfaceToInfoLock = new ReentrantLock();
+    /** Map from key to vms interface info object. */
+    private final Map<String, InterfaceInfo> interfaceToInfo =
+                                       new HashMap<String, InterfaceInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, InterfaceInfo> interfaceKeyToInfo =
+                                       new HashMap<String, InterfaceInfo>();
+    /** Input device to info hash lock. */
+    private final Lock mInputDevToInfoLock = new ReentrantLock();
+    /** Map from key to vms input device info object. */
+    private final Map<String, InputDevInfo> inputDevToInfo =
+                                       new HashMap<String, InputDevInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, InputDevInfo> inputDevKeyToInfo =
+                                       new HashMap<String, InputDevInfo>();
+
+    /** Graphics device to info hash lock. */
+    private final Lock mGraphicsToInfoLock = new ReentrantLock();
+    /** Map from key to vms graphics device info object. */
+    private final Map<String, GraphicsInfo> graphicsToInfo =
+                                       new HashMap<String, GraphicsInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, GraphicsInfo> graphicsKeyToInfo =
+                                       new HashMap<String, GraphicsInfo>();
+
+    /** Sound device to info hash lock. */
+    private final Lock mSoundToInfoLock = new ReentrantLock();
+    /** Map from key to vms sound device info object. */
+    private final Map<String, SoundInfo> soundToInfo =
+                                       new HashMap<String, SoundInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, SoundInfo> soundKeyToInfo =
+                                       new HashMap<String, SoundInfo>();
+
+    /** Serial device to info hash lock. */
+    private final Lock mSerialToInfoLock = new ReentrantLock();
+    /** Map from key to vms serial device info object. */
+    private final Map<String, SerialInfo> serialToInfo =
+                                       new HashMap<String, SerialInfo>();
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, SerialInfo> serialKeyToInfo =
+                                       new HashMap<String, SerialInfo>();
+
+    /** Parallel device to info hash lock. */
+    private final Lock mParallelToInfoLock = new ReentrantLock();
+    /** Map from key to vms parallel device info object. */
+    private final Map<String, ParallelInfo> parallelToInfo =
+                                       new HashMap<String, ParallelInfo>();
+    /** Preferred emulator. It's distro dependent. */
+    private final String preferredEmulator;
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, ParallelInfo> parallelKeyToInfo =
+                                       new HashMap<String, ParallelInfo>();
+
+    /** Video device to info hash lock. */
+    private final Lock mVideoToInfoLock = new ReentrantLock();
+    /** Map from key to vms video device info object. */
+    private final Map<String, VideoInfo> videoToInfo =
+                                       new HashMap<String, VideoInfo>();
+    /** Map to host buttons, to start and view virtual hosts. */
+    private final Map<String, MyButton> hostButtons =
+                                               new HashMap<String, MyButton>();
+    /** Whether it is used by CRM. */
+    private boolean usedByCRM = false;
+    /** Map from target string in the table to vms interface info object. */
+    private volatile Map<String, VideoInfo> videoKeyToInfo =
+                                       new HashMap<String, VideoInfo>();
+    /** Previous type. */
+    private volatile Value prevType = null;
+    /** Autostart possible values - hosts. */
+    private final Value[] autostartPossibleValues;
+    /** This is a map from host to the check box. */
+    private final Map<String, Widget> definedOnHostComboBoxHash =
+                                          new HashMap<String, Widget>();
 
     /** Creates the DomainInfo object. */
     public DomainInfo(final String name,

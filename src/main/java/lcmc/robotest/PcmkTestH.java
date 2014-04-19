@@ -36,15 +36,8 @@ final class PcmkTestH {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTestH.class);
 
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestH() {
-        /* Cannot be instantiated. */
-    }
-
     /** Create ipmi resource. */
-    private static void chooseIpmi(final int x,
-                                   final int y,
-                                   final boolean apply) {
+    private static void chooseIpmi(final int x, final int y, final boolean apply) {
         moveTo(x, y);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
@@ -98,5 +91,10 @@ final class PcmkTestH {
             removeResource(ipmiX, ipmiY + 90, CONFIRM_REMOVE);
         }
         System.gc();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestH() {
+        /* Cannot be instantiated. */
     }
 }

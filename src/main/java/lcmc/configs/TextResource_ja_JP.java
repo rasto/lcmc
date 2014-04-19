@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class TextResource_ja_JP extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"DrbdMC.Title",
@@ -2215,4 +2209,10 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"VolumeInfo.Device",
          "Device"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

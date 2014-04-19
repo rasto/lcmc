@@ -51,6 +51,8 @@ import lcmc.gui.widget.Check;
  * drbd device is selected, the drbddisk service will be added too.
  */
 public final class FilesystemInfo extends ServiceInfo {
+    /** Name of the device parameter in the file system. */
+    private static final String FS_RES_PARAM_DEV = "device";
     /** linbit::drbd service object. */
     private LinbitDrbdInfo linbitDrbdInfo = null;
     /** drbddisk service object. */
@@ -61,8 +63,6 @@ public final class FilesystemInfo extends ServiceInfo {
     private Widget fstypeParamWi = null;
     /** Whether old style drbddisk is preferred. */
     private boolean drbddiskIsPreferred = false;
-    /** Name of the device parameter in the file system. */
-    private static final String FS_RES_PARAM_DEV = "device";
 
     /** Creates the FilesystemInfo object. */
     FilesystemInfo(final String name,
