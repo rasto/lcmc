@@ -553,18 +553,10 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 final Map<Host, String> testOutput =
                                             new LinkedHashMap<Host, String>();
                 try {
-                    getDrbdInfo().createDrbdConfig(Application.RunMode.TEST);
-                    for (final Host h : getHosts()) {
-                        DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.TEST);
-                        testOutput.put(h, DRBD.getDRBDtest());
-                    }
+                    getDrbdInfo().createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
-                } catch (final Exceptions.DrbdConfigException dce) {
-                    LOG.appError("getInfoPanel: config failed", dce);
-                } catch (final UnknownHostException e) {
-                    LOG.appError("getInfoPanel: config failed", e);
                 } finally {
                     getBrowser().drbdtestLockRelease();
                     startTestLatch.countDown();
@@ -626,7 +618,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getDrbdInfo().createDrbdConfig(Application.RunMode.LIVE);
+                            getDrbdInfo().createDrbdConfigLive();
                             for (final Host h : getHosts()) {
                                 DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                             }

@@ -1010,23 +1010,11 @@ public class BlockDevInfo extends EditableInfo {
 				final Map<Host, String> testOutput =
 				    new LinkedHashMap<Host, String>();
 				try {
-					getBrowser().getDrbdGraph().getDrbdInfo().createDrbdConfig(
-					    Application.RunMode.TEST);
-					for (final Host h
-					    : getHost().getCluster().getHostsArray()) {
-						DRBD.adjustApply(h,
-						    DRBD.ALL,
-						    null,
-						    Application.RunMode.TEST);
-						testOutput.put(h, DRBD.getDRBDtest());
-					}
+					getBrowser().getDrbdGraph().getDrbdInfo()
+					              .createConfigDryRun(testOutput);
 					final DRBDtestData dtd = new DRBDtestData(testOutput);
 					component.setToolTipText(dtd.getToolTip());
 					thisClass.setDRBDtestData(dtd);
-				} catch (final Exceptions.DrbdConfigException dce) {
-					LOG.appError("getInfoPanelBD: config failed", dce);
-				} catch (final UnknownHostException e) {
-					LOG.appError("getInfoPanelBD: config failed", e);
 				} finally {
 					getBrowser().drbdtestLockRelease();
 					startTestLatch.countDown();
@@ -1079,7 +1067,7 @@ public class BlockDevInfo extends EditableInfo {
 							getBrowser().getClusterBrowser().drbdStatusLock();
 							try {
 								getBrowser().getDrbdGraph().getDrbdInfo()
-								    .createDrbdConfig(Application.RunMode.LIVE);
+								    .createDrbdConfigLive();
 								for (final Host h
 								    : getHost().getCluster().getHostsArray()) {
 									DRBD.adjustApply(h,

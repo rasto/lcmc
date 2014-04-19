@@ -1613,6 +1613,7 @@ public final class SSH {
                              final boolean makeBackup,
                              final String preCommand,
                              final String postCommand) {
+        LOG.debug1("createConfig: " + dir + fileName + "\n" + config);
         scp(config,
             dir + fileName,
             mode,

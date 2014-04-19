@@ -714,7 +714,7 @@ public final class DRBD {
         if (m.matches()) {
             return Integer.parseInt(m.group(1));
         }
-        return 0;
+        return ret.getExitCode();
     }
 
     /** Executes the drbdadm proxy-up on the specified host and resource. */

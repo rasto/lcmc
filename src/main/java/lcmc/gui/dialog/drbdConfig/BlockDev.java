@@ -127,7 +127,7 @@ final class BlockDev extends DrbdConfig {
 
                 /* create config */
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
-                                                    .createDrbdConfig(Application.RunMode.LIVE);
+                                                    .createDrbdConfigLive();
                 final String gi1 = getGI(blockDevInfo);
                 final String gi2 = getGI(oBdi);
                 if (gi1 == null || gi2 == null) {
