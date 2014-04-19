@@ -24,12 +24,11 @@
 package lcmc;
 
 import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * EditClusterDialog.
@@ -43,14 +42,14 @@ public final class EditClusterDialog {
     /** Logger. */
     private static final Logger LOG =
                              LoggerFactory.getLogger(EditClusterDialog.class);
-    /** Cluster object. */
-    private final Cluster cluster;
     /** Cancel button. */
     private static final String CANCEL_BTN =
                                        Tools.getString("Dialog.Dialog.Cancel");
     /** Finish button. */
     private static final String FINISH_BTN =
                                        Tools.getString("Dialog.Dialog.Finish");
+    /** Cluster object. */
+    private final Cluster cluster;
 
     /** Prepares new {@code EditClusterDialog} object. */
     public EditClusterDialog(final Cluster cluster) {

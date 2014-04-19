@@ -83,7 +83,7 @@ final class HbOrderInfo extends EditableInfo
 
     /** Returns browser object of this info. */
     @Override
-	public ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -491,7 +491,7 @@ final class HbOrderInfo extends EditableInfo
      * connection with this constraint.
      */
     @Override
-	public Check checkResourceFields(final String param, final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 

@@ -55,7 +55,7 @@ public class NetInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-	public final HostBrowser getBrowser() {
+    public final HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

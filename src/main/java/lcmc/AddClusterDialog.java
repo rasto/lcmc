@@ -22,14 +22,13 @@
 
 package lcmc;
 
-import lcmc.data.Clusters;
 import lcmc.data.Cluster;
+import lcmc.data.Clusters;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
-import lcmc.utilities.Tools;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * AddClusterDialog.

@@ -88,7 +88,7 @@ public class MultiSelectionInfo extends EditableInfo {
         return multiSelectionMenu.getPulldownMenu();
     }
     @Override
-	public ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

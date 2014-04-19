@@ -26,11 +26,11 @@
  */
 package lcmc;
 
-import lcmc.utilities.Tools;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 
 /**

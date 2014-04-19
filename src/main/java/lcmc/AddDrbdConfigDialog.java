@@ -22,21 +22,19 @@
 
 package lcmc;
 
-import lcmc.utilities.Tools;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.dialog.drbdConfig.Start;
 import lcmc.gui.dialog.drbdConfig.Resource;
+import lcmc.gui.dialog.drbdConfig.Start;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * AddDrbdConfigDialog.

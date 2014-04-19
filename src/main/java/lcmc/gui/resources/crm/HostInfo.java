@@ -142,7 +142,7 @@ public final class HostInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-	public HostBrowser getBrowser() {
+    public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

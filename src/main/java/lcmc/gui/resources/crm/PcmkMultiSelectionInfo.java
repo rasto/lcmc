@@ -1254,7 +1254,7 @@ public final class PcmkMultiSelectionInfo extends EditableInfo {
     }
 
     @Override
-	public ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

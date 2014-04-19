@@ -291,7 +291,7 @@ public final class CRMGraph extends ResourceGraph {
             try {
                 lockGraph();
                 final Collection<Vertex> predecessors =
-		                                 getGraph().getPredecessors(v);
+                                                getGraph().getPredecessors(v);
                 if (predecessors != null) {
                     for (final Vertex pV : predecessors) {
                         Edge edge = getGraph().findEdge(pV, v);
@@ -307,7 +307,7 @@ public final class CRMGraph extends ResourceGraph {
                     }
                 }
                 final Collection<Vertex> successors =
-		                                 getGraph().getPredecessors(v);
+                                               getGraph().getPredecessors(v);
                 if (successors != null) {
                     for (final Vertex sV : successors) {
                         Edge edge = getGraph().findEdge(v, sV);

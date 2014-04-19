@@ -61,7 +61,7 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-	public ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -138,7 +138,7 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Returns saved value for specified parameter. */
     @Override
-	public Value getParamSaved(final String param) {
+    public Value getParamSaved(final String param) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         Value value = super.getParamSaved(param);
         if (value == null) {
@@ -272,7 +272,7 @@ public final class RscDefaultsInfo extends EditableInfo {
 
     /** Check the fields. */
     @Override
-	public Check checkResourceFields(final String param, final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 

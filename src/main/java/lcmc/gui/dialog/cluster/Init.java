@@ -578,9 +578,9 @@ public class Init extends DialogCluster {
                 }
             });
 
-	    final List<String> incorrect = new ArrayList<String>();
-            if (oneFailed) {
-		incorrect.add("one component failed");
+        final List<String> incorrect = new ArrayList<String>();
+        if (oneFailed) {
+            incorrect.add("one component failed");
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -588,9 +588,9 @@ public class Init extends DialogCluster {
                     }
                 });
             }
-	    final List<String> changed = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
             enableComponents();
-	    nextButtonSetEnabled(new Check(incorrect, changed));
+            nextButtonSetEnabled(new Check(incorrect, changed));
             if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();

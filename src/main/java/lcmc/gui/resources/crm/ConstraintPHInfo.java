@@ -309,7 +309,7 @@ public final class ConstraintPHInfo extends ServiceInfo {
 
     /** Applies changes to the placeholder. */
     @Override
-	public void apply(final Host dcHost, final Application.RunMode runMode) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         /* apply is in resource set info object. */
     }
 

@@ -444,7 +444,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
      * TODO: should select something.
      */
     @Override
-	public boolean selectAutomaticallyInTreeMenu() {
+    public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 

@@ -46,7 +46,7 @@ public final class NetworkInfo extends Info {
 
     /** Returns network info. */
     @Override
-	public String getInfo() {
+    public String getInfo() {
         return "Network: " + getNetwork().getName()
                            + "\n IPs: " + getNetwork().getIps()
                            + "\nCIDR: " + getNetwork().getCidr()

@@ -110,7 +110,7 @@ public abstract class HardwareInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-	public final ClusterBrowser getBrowser() {
+    public final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

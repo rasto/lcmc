@@ -170,7 +170,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     public static final Pattern DRBDP_ADDRESS =
        Pattern.compile('^' + ProxyNetInfo.PROXY_PREFIX
                        + "(\\d+\\.\\d+\\.\\d+\\.\\d+)(\\s+\\S+\\s+(\\S+))$");
-    
+
     public static final String FAMILY_SDP = "sdp";
     public static final String FAMILY_SSOCKS = "ssocks";
     /**
@@ -2027,7 +2027,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     /** Stores values in the combo boxes in the component c. */
     @Override
-	public void storeComboBoxValues(final String[] params) {
+    public void storeComboBoxValues(final String[] params) {
         super.storeComboBoxValues(params);
         storeHostAddresses();
         storeProxyInfo();

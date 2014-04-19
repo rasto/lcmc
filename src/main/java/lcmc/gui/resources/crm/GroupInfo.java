@@ -227,7 +227,7 @@ public final class GroupInfo extends ServiceInfo {
 
     /** Applies the changes to the group parameters. */
     @Override
-	public void apply(final Host dcHost, final Application.RunMode runMode) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override
@@ -469,7 +469,7 @@ public final class GroupInfo extends ServiceInfo {
      * nodes or not at all.
      */
     @Override
-	protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
+    protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
         final List<String> resources = cs.getGroupResources(
                                                       getHeartbeatId(runMode),

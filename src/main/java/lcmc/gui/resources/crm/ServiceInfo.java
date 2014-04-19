@@ -317,7 +317,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-	public ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -2163,7 +2163,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Returns saved value for specified parameter. */
     @Override
-	public Value getParamSaved(final String param) {
+    public Value getParamSaved(final String param) {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         if (isMetaAttr(param)) {
             final String crmId = getService().getHeartbeatId();
@@ -2877,7 +2877,7 @@ public class ServiceInfo extends EditableInfo {
 
     /** Clears the info panel cache, forcing it to reload. */
     @Override
-	public boolean selectAutomaticallyInTreeMenu() {
+    public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 

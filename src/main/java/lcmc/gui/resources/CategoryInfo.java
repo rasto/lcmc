@@ -48,7 +48,7 @@ public class CategoryInfo extends Info {
 
     /** Info panel for the category. */
     @Override
-	public String getInfo() {
+    public String getInfo() {
         return null;
     }
 

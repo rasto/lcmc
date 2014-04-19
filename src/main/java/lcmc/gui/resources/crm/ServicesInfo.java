@@ -912,7 +912,7 @@ public final class ServicesInfo extends EditableInfo {
 
     /** Clears the info panel cache, forcing it to reload. */
     @Override
-	public boolean selectAutomaticallyInTreeMenu() {
+    public boolean selectAutomaticallyInTreeMenu() {
         return infoPanel == null;
     }
 
@@ -927,7 +927,7 @@ public final class ServicesInfo extends EditableInfo {
      * case the getInfoPanel() function will show.
      */
     @Override
-	public String getInfo() {
+    public String getInfo() {
         if (getBrowser().clStatusFailed()) {
             return Tools.getString("ClusterBrowser.ClStatusFailed");
         }

@@ -66,7 +66,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
 
     /** Returns info for this block device. */
     @Override
-	public String getInfo() {
+    public String getInfo() {
         return "Device    : " + getCommonBlockDevice().getName() + '\n';
     }
 

@@ -135,7 +135,7 @@ public final class FilesystemInfo extends ServiceInfo {
 
     /** Applies changes to the Filesystem service parameters. */
     @Override
-	public void apply(final Host dcHost, final Application.RunMode runMode) {
+    public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             Tools.invokeAndWait(new Runnable() {
                 @Override

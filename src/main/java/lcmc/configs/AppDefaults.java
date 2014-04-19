@@ -46,13 +46,6 @@ public final class AppDefaults extends ListResourceBundle {
 
     public static final Color LIGHT_ORANGE = new Color(253, 180, 109);
 
-
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /*
@@ -431,4 +424,11 @@ public final class AppDefaults extends ListResourceBundle {
         {"MaxHops",                           20},
 
     };
+
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

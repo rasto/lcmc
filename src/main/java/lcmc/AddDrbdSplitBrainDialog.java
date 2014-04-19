@@ -23,12 +23,12 @@
 
 package lcmc;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.dialog.drbd.SplitBrain;
+import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * AddDrbdSplitBrainDialog.

@@ -22,9 +22,9 @@
 
 package lcmc.configs;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.ArrayList;
 import java.util.ListResourceBundle;
 
 /**
@@ -33,11 +33,6 @@ import java.util.ListResourceBundle;
 public final class DistResource extends ListResourceBundle {
     /** Sudo placeholder. */
     public static final String SUDO = "@DMCSUDO@";
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
 
     /** Contents. */
     private static final Object[][] contents = {
@@ -648,4 +643,9 @@ public final class DistResource extends ListResourceBundle {
               "xmfile")))},
 
     };
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }
