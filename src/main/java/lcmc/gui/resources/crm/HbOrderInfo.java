@@ -301,13 +301,13 @@ final class HbOrderInfo extends EditableInfo
     }
 
     /** Returns attributes of this colocation. */
-    //TODO: what uses it?
     protected Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            if (!value.equals(getParamDefault(param))) {
+            if (value != null
+                && !Tools.areEqual(value, getParamDefault(param))) {
                 attrs.put(param, value.getValueForConfig());
             }
         }
@@ -322,10 +322,10 @@ final class HbOrderInfo extends EditableInfo
         boolean changed = false;
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            if (!value.equals(getParamSaved(param))) {
+            if (!Tools.areEqual(value, getParamSaved(param))) {
                 changed = true;
             }
-            if (!value.equals(getParamDefault(param))) {
+            if (value != null && !value.equals(getParamDefault(param))) {
                 attrs.put(param, value.getValueForConfig());
             }
         }

@@ -295,17 +295,14 @@ final class HbColocationInfo extends EditableInfo
     }
 
     /** Returns attributes of this colocation. */
-    //TODO: what is using it?
     protected Map<String, String> getAttributes() {
         final String[] params = getParametersFromXML();
         final Map<String, String> attrs = new LinkedHashMap<String, String>();
-        boolean changed = true;
         for (final String param : params) {
             final Value value = getComboBoxValue(param);
-            if (!value.equals(getParamSaved(param))) {
-                changed = true;
+            if (value != null) {
+                attrs.put(param, value.getValueForConfig());
             }
-            attrs.put(param, value.getValueForConfig());
         }
         return attrs;
     }
@@ -321,7 +318,9 @@ final class HbColocationInfo extends EditableInfo
             if (!Tools.areEqual(value, getParamSaved(param))) {
                 changed = true;
             }
-            attrs.put(param, value.getValueForConfig());
+            if (value != null) {
+                attrs.put(param, value.getValueForConfig());
+            }
         }
         if (changed) {
             final String colId = getService().getHeartbeatId();
