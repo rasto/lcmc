@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
-import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
@@ -37,19 +36,16 @@ import lcmc.data.StringValue;
 import lcmc.data.Subtext;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
 /**
  * Object that holds an order constraint information.
  */
-public final class ConstraintPHInfo extends ServiceInfo {
+public class ConstraintPHInfo extends ServiceInfo {
     /** Logger. */
     private static final Logger LOG =
                              LoggerFactory.getLogger(ConstraintPHInfo.class);
@@ -360,49 +356,8 @@ public final class ConstraintPHInfo extends ServiceInfo {
     /** Return list of popup items. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final Application.RunMode runMode = Application.RunMode.LIVE;
-        addDependencyMenuItems(items, true, runMode);
-        /* remove the placeholder and all constraints associated with it. */
-        final MyMenuItem removeMenuItem = new MyMenuItem(
-                    Tools.getString("ConstraintPHInfo.Remove"),
-                    ClusterBrowser.REMOVE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(Application.AccessType.ADMIN, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                } else if (getService().isRemoved()) {
-                    return IS_BEING_REMOVED_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                hidePopup();
-                removeMyself(Application.RunMode.LIVE);
-                getBrowser().getCRMGraph().repaint();
-            }
-        };
-        final ButtonCallback removeItemCallback =
-                                    getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public boolean isEnabled() {
-                return super.isEnabled() && !getService().isNew();
-            }
-            @Override
-            public void action(final Host dcHost) {
-                removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
-            }
-        };
-        addMouseOverListener(removeMenuItem, removeItemCallback);
-        items.add(removeMenuItem);
-        return items;
+        final ConstraintPHMenu constraintPHMenu = new ConstraintPHMenu(this);
+        return constraintPHMenu.getPulldownMenu();
     }
 
     /** Removes the placeholder without confirmation dialog. */

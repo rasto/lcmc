@@ -32,10 +32,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
@@ -47,10 +45,7 @@ import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Check;
-import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
@@ -58,7 +53,7 @@ import lcmc.utilities.UpdatableItem;
 /**
  * This class holds clone service info object.
  */
-public final class CloneInfo extends ServiceInfo {
+public class CloneInfo extends ServiceInfo {
     /** Service that belongs to this clone. */
     private ServiceInfo containedService = null;
     /** Creates new CloneInfo object. */
@@ -546,105 +541,6 @@ public final class CloneInfo extends ServiceInfo {
         }
     }
 
-    /** Adds migrate and unmigrate menu items. */
-    @Override
-    protected void addMigrateMenuItems(final List<UpdatableItem> items) {
-        super.addMigrateMenuItems(items);
-        if (!getService().isMaster()) {
-            return;
-        }
-        final Application.RunMode runMode = Application.RunMode.LIVE;
-        for (final Host host : getBrowser().getClusterHosts()) {
-            final String hostName = host.getName();
-            final MyMenuItem migrateFromMenuItem =
-               new MyMenuItem(Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + ' ' + hostName + " (stop)",
-                              MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-
-                              Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + ' ' + hostName + " (stop) (offline)",
-                              MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(Application.AccessType.OP, false),
-                              new AccessMode(Application.AccessType.OP, false)) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public boolean predicate() {
-                        return host.isClStatus();
-                    }
-
-                    @Override
-                    public boolean visiblePredicate() {
-                        return !host.isClStatus()
-                               || enablePredicate() == null;
-                    }
-
-                    @Override
-                    public String enablePredicate() {
-                        final List<String> runningOnNodes =
-                                               getRunningOnNodes(runMode);
-                        if (runningOnNodes == null
-                            || runningOnNodes.size() < 1) {
-                            return "must run";
-                        }
-                        boolean runningOnNode = false;
-                        for (final String ron : runningOnNodes) {
-                            if (hostName.toLowerCase(Locale.US).equals(
-                                               ron.toLowerCase(Locale.US))) {
-                                runningOnNode = true;
-                                break;
-                            }
-                        }
-                        if (!getBrowser().clStatusFailed()
-                               && getService().isAvailable()
-                               && runningOnNode
-                               && host.isClStatus()) {
-                            return null;
-                        } else {
-                            return ""; /* is not visible anyway */
-                        }
-                    }
-
-                    @Override
-                    public void action() {
-                        hidePopup();
-                        if (getService().isMaster()) {
-                            /* without role=master */
-                            superMigrateFromResource(getBrowser().getDCHost(),
-                                                      hostName,
-                                                      runMode);
-                        } else {
-                            migrateFromResource(getBrowser().getDCHost(),
-                                                hostName,
-                                                runMode);
-                        }
-                    }
-                };
-            final ButtonCallback migrateItemCallback =
-               getBrowser().new ClMenuItemCallback(null) {
-                @Override
-                public void action(final Host dcHost) {
-                    if (getService().isMaster()) {
-                        /* without role=master */
-                        superMigrateFromResource(dcHost,
-                                                 hostName,
-                                                 Application.RunMode.TEST);
-                    } else {
-                        migrateFromResource(dcHost,
-                                            hostName,
-                                            Application.RunMode.TEST);
-                    }
-                }
-            };
-            addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
-            items.add(migrateFromMenuItem);
-        }
-    }
-
     /** Stops resource in crm. */
     @Override
     void stopResource(final Host dcHost, final Application.RunMode runMode) {
@@ -662,11 +558,12 @@ public final class CloneInfo extends ServiceInfo {
     }
 
     /** Workaround to call method from super. */
-    private void superMigrateFromResource(final Host dcHost,
+    public void superMigrateFromResource(final Host dcHost,
                                           final String fromHost,
                                           final Application.RunMode runMode) {
         super.migrateFromResource(dcHost, fromHost, runMode);
     }
+    
     /** Migrates resource in heartbeat from current location. */
     @Override
     void migrateFromResource(final Host dcHost,
@@ -713,44 +610,11 @@ public final class CloneInfo extends ServiceInfo {
         }
     }
 
-    /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
-    @Override
-    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
-        /* no migrate / unmigrate menu advanced items for clones. */
-    }
-
     /** Returns items for the clone popup. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = super.createPopup();
-        final ServiceInfo cs = containedService;
-        if (cs == null) {
-            return items;
-        }
-        final UpdatableItem csMenu = new MyMenu(
-                                     cs.toString(),
-                                     new AccessMode(Application.AccessType.RO,
-                                                    false),
-                                     new AccessMode(Application.AccessType.RO,
-                                                    false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void updateAndWait() {
-                Tools.isSwingThread();
-                removeAll();
-                final ServiceInfo cs0 = containedService;
-                if (cs0 != null) {
-                    for (final UpdatableItem u : cs0.createPopup()) {
-                        add((JMenuItem) u);
-                        u.updateAndWait();
-                    }
-                }
-                super.updateAndWait();
-            }
-        };
-        items.add(csMenu);
-        return items;
+        final CloneMenu cloneMenu = new CloneMenu(this);
+        return cloneMenu.getPulldownMenu();
     }
 
     /** Returns whether info panel is already created. */

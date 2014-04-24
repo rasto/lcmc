@@ -424,7 +424,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns resource object. */
-    public final Resource getResource() {
+    public Resource getResource() {
         return resource;
     }
 

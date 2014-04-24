@@ -277,12 +277,12 @@ public class Service extends Resource {
     }
 
     /** Sets this service if it is master. */
-    public final void setMaster(final boolean master) {
+    public void setMaster(final boolean master) {
         this.master = master;
     }
 
     /** Returns whether this clone is master, if it is clone. */
-    public final boolean isMaster() {
+    public boolean isMaster() {
         return master;
     }
 

@@ -36,11 +36,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JMenuItem;
 import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.CRMXML;
 import lcmc.data.ClusterStatus;
@@ -49,18 +45,12 @@ import lcmc.data.ResourceAgent;
 import lcmc.data.Subtext;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
-import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.MyList;
-import lcmc.utilities.MyListModel;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
@@ -68,7 +58,7 @@ import lcmc.utilities.UpdatableItem;
  * GroupInfo class holds data for heartbeat group, that is in some ways
  * like normal service, but it can contain other services.
  */
-public final class GroupInfo extends ServiceInfo {
+public class GroupInfo extends ServiceInfo {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(GroupInfo.class);
@@ -568,125 +558,8 @@ public final class GroupInfo extends ServiceInfo {
     /** Returns items for the group popup. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final GroupInfo thisGroupInfo = this;
-        /* add group service */
-        final UpdatableItem addGroupServiceMenuItem = new MyMenu(
-                        Tools.getString("ClusterBrowser.Hb.AddGroupService"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                } else {
-                    return null;
-                }
-            }
-
-            @Override
-            public void updateAndWait() {
-                Tools.isSwingThread();
-                removeAll();
-                final Collection<JDialog> popups = new ArrayList<JDialog>();
-                for (final String cl : ClusterBrowser.HB_CLASSES) {
-                    final MyMenu classItem =
-                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
-                                   new AccessMode(Application.AccessType.ADMIN,
-                                                  false),
-                                   new AccessMode(Application.AccessType.OP,
-                                                  false));
-                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
-                    for (final ResourceAgent ra : getAddGroupServiceList(cl)) {
-                        final MyMenuItem mmi =
-                            new MyMenuItem(
-                                   ra.getMenuName(),
-                                   null,
-                                   null,
-                                   new AccessMode(Application.AccessType.ADMIN,
-                                                  false),
-                                   new AccessMode(Application.AccessType.OP,
-                                                  false)) {
-                            private static final long serialVersionUID = 1L;
-                            @Override
-                            public void action() {
-                                final CloneInfo ci = getCloneInfo();
-                                if (ci != null) {
-                                    ci.hidePopup();
-                                }
-                                hidePopup();
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for (final JDialog otherP : popups) {
-                                            otherP.dispose();
-                                        }
-                                    }
-                                });
-                                if (ra.isLinbitDrbd()
-                                    && !getBrowser()
-                                                .linbitDrbdConfirmDialog()) {
-                                    return;
-                                }
-                                addGroupServicePanel(ra, true);
-                                repaint();
-                            }
-                        };
-                        dlm.addElement(mmi);
-                    }
-                    final boolean ret = Tools.getScrollingMenu(
-                                ClusterBrowser.HB_CLASS_MENU.get(cl),
-                                null, /* options */
-                                classItem,
-                                dlm,
-                                new MyList<MyMenuItem>(dlm, getBackground()),
-                                thisGroupInfo,
-                                popups,
-                                null);
-                    if (!ret) {
-                        classItem.setEnabled(false);
-                    }
-                    add(classItem);
-                }
-                super.updateAndWait();
-            }
-        };
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        items.add(addGroupServiceMenuItem);
-        for (final UpdatableItem item : super.createPopup()) {
-            items.add(item);
-        }
-
-        /* group services */
-        if (!Tools.getApplication().isSlow()) {
-            for (final ServiceInfo child : getGroupServices()) {
-                final UpdatableItem groupServicesMenu = new MyMenu(
-                        child.toString(),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false)) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public void updateAndWait() {
-                        Tools.isSwingThread();
-                        removeAll();
-                        final Collection<UpdatableItem> serviceMenus =
-                                        new ArrayList<UpdatableItem>();
-                        for (final UpdatableItem u : child.createPopup()) {
-                            serviceMenus.add(u);
-                            u.updateAndWait();
-                        }
-                        for (final UpdatableItem u : serviceMenus) {
-                            add((JMenuItem) u);
-                        }
-                        super.updateAndWait();
-                    }
-                };
-                items.add(groupServicesMenu);
-            }
-        }
-        return items;
+        final GroupMenu groupMenu = new GroupMenu(this);
+        return groupMenu.getPulldownMenu();
     }
 
     /** Removes this group from the cib. */
@@ -1094,30 +967,6 @@ public final class GroupInfo extends ServiceInfo {
         }
     }
 
-    /** Adds existing service menu item for every member of a group. */
-    @Override
-    protected void addExistingGroupServiceMenuItems(
-                        final ServiceInfo asi,
-                        final MyListModel<MyMenuItem> dlm,
-                        final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final MyList<MyMenuItem> list,
-                        final JCheckBox colocationWi,
-                        final JCheckBox orderWi,
-                        final List<JDialog> popups,
-                        final Application.RunMode runMode) {
-        for (final ServiceInfo child : getGroupServices()) {
-            asi.addExistingServiceMenuItem("         " + child,
-                                           child,
-                                           dlm,
-                                           callbackHash,
-                                           list,
-                                           colocationWi,
-                                           orderWi,
-                                           popups,
-                                           runMode);
-        }
-    }
-
     /** Returns the icon for the category. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
@@ -1143,7 +992,7 @@ public final class GroupInfo extends ServiceInfo {
     }
 
     /** Return copy of the group services. */
-    private List<ServiceInfo> getGroupServices() {
+    public List<ServiceInfo> getGroupServices() {
         mGroupServiceReadLock.lock();
         try {
             return Collections.unmodifiableList(
