@@ -21,19 +21,22 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.when;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -42,7 +45,7 @@ public class ProxyHostMenuTest {
         Tools.init();
     }
 
-    private ProxyHostMenu proxyHostMenu;
+    private ProxyHostMenu sut;
 
     @Mock
     private ProxyHostInfo proxyHostInfoStub;
@@ -58,14 +61,14 @@ public class ProxyHostMenuTest {
         when(proxyHostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
-        proxyHostMenu = new ProxyHostMenu(proxyHostInfoStub);
+        sut = new ProxyHostMenu(proxyHostInfoStub);
     }
 
     @Test
     @Category(GuiTest.class)
-    public void menuShouldHaveAtLeastTwoItems() {
-        final List<UpdatableItem> items = proxyHostMenu.getPulldownMenu();
+    public void menuShouldHaveItems() {
+        final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertTrue(items.size() > 1);
+        assertEquals(7, items.size());
     }
 }

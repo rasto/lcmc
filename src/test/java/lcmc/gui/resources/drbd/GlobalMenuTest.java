@@ -20,11 +20,14 @@
 
 package lcmc.gui.resources.drbd;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.List;
+
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -47,9 +50,9 @@ public class GlobalMenuTest {
 
     @Test
     @Category(GuiTest.class)
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertTrue(items.size() > 1);
+        assertEquals(4, items.size());
     }
 }

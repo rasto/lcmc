@@ -56,7 +56,7 @@ public class ConstraintPHMenuTest {
     }
 
     @Test
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
         assertEquals(4, items.size());

@@ -1,19 +1,24 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.when;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -22,7 +27,7 @@ public class HostDrbdMenuTest {
         Tools.init();
     }
 
-    private HostDrbdMenu hostDrbdMenu;
+    private HostDrbdMenu sut;
 
     @Mock
     private Host hostStub;
@@ -44,15 +49,15 @@ public class HostDrbdMenuTest {
     public void setUp() {
         when(hostDrbdInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
-        hostDrbdMenu = new HostDrbdMenu(hostStub, hostDrbdInfoStub);
+        sut = new HostDrbdMenu(hostStub, hostDrbdInfoStub);
     }
 
     @Test
     @Category(GuiTest.class)
-    public void menuShouldHaveAtLeastTwoItems() {
-        final List<UpdatableItem> items = hostDrbdMenu.getPulldownMenu();
+    public void menuShouldHaveItems() {
+        final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertTrue(items.size() > 1);
+        assertEquals(20, items.size());
     }
 
     @Test
@@ -64,8 +69,7 @@ public class HostDrbdMenuTest {
         final HostDrbdMenu hostDrbdMenuNoCluster =
                                     new HostDrbdMenu(hostNoClusterStub,
                                                      hostDrbdInfoNoClusterStub);
-        final List<UpdatableItem> itemsWithCluster =
-                                                 hostDrbdMenu.getPulldownMenu();
+        final List<UpdatableItem> itemsWithCluster = sut.getPulldownMenu();
 
         final List<UpdatableItem> itemsNoCluster =
                                         hostDrbdMenuNoCluster.getPulldownMenu();

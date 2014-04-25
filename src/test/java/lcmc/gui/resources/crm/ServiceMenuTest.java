@@ -65,7 +65,7 @@ public class ServiceMenuTest {
     }
 
     @Test
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
         assertEquals(15, items.size());

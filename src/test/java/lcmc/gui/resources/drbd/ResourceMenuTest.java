@@ -23,14 +23,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.when;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -58,9 +61,9 @@ public class ResourceMenuTest {
     }
 
     @Test
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertTrue(items.size() > 1);
+        assertEquals(2, items.size());
     }
 }

@@ -71,10 +71,9 @@ public class CloneMenuTest {
     }
 
     @Test
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
         assertEquals(17, items.size());
     }
-
 }

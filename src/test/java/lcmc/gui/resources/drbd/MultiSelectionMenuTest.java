@@ -22,6 +22,7 @@ package lcmc.gui.resources.drbd;
 
 import java.util.Arrays;
 import java.util.List;
+
 import lcmc.data.Host;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
@@ -29,14 +30,16 @@ import lcmc.gui.resources.Info;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -75,9 +78,9 @@ public class MultiSelectionMenuTest {
 
     @Test
     @Category(GuiTest.class)
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertTrue(items.size() > 1);
+        assertEquals(26, items.size());
     }
 }

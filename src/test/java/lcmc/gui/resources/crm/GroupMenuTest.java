@@ -65,7 +65,7 @@ public class GroupMenuTest {
     }
 
     @Test
-    public void menuShouldHaveAtLeastTwoItems() {
+    public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
         assertEquals(16, items.size());
