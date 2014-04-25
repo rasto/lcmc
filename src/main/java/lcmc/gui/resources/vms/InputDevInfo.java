@@ -75,7 +75,8 @@ final class InputDevInfo extends HardwareInfo {
     static {
         POSSIBLE_VALUES.put(InputDevData.TYPE,
                             new Value[]{new StringValue("tablet"),
-                                        new StringValue("mouse")});
+                                        new StringValue("mouse"),
+                                        new StringValue("keyboard")});
         POSSIBLE_VALUES.put(InputDevData.BUS,
                             new Value[]{new StringValue("usb")}); /* no ps2 */
     }
