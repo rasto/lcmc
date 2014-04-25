@@ -151,18 +151,17 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Reloads combo box with items and selects supplied value. */
         @Override
     public void reloadComboBox(final Value selectedValue, final Value[] items) {
-        final String stackTrace = Tools.getStackTrace();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MComboBox<Value> cb = getInternalComponent();
                 final Object selectedObject = cb.getSelectedItem();
-                if (selectedObject != null
-                    && !(selectedObject instanceof Value)) {
-                    LOG.appError("reloadComboBox: selected item not a value: " + selectedObject
-                                 + ", stacktrance: " + stackTrace);
+                final Value selectedItem;
+                if (selectedObject instanceof String) {
+                    selectedItem = new StringValue((String) selectedObject);
+                } else {
+                    selectedItem = (Value) selectedObject;
                 }
-                final Value selectedItem = (Value) selectedObject;
                 boolean selectedChanged = false;
                 if (selectedValue == null
                     && selectedItem != null
