@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_redhatenterpriseas_4_0
                                     extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* distribution name that is used in the download url */
@@ -97,4 +91,10 @@ public final class DistResource_redhatenterpriseas_4_0
          + "rpm -Uvh /tmp/drbd-mc-hbinst/*.rpm && "
          + "rm -rf /tmp/drbd-mc-hbinst/"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

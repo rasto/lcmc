@@ -22,10 +22,6 @@
 
 package lcmc.data;
 
-import lcmc.gui.widget.Widget;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.ServiceInfo;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,11 +30,12 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.widget.Widget;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class describes a resource agent with its name and class.
@@ -53,6 +50,30 @@ public final class ResourceAgent {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(ResourceAgent.class);
+    /** Name of service resource (upstart, systemd). */
+    public static final String SERVICE_CLASS = "service";
+    /** Name of upstart class. */
+    public static final String UPSTART_CLASS = "upstart";
+    /** Name of systemd class. */
+    public static final String SYSTEMD_CLASS = "systemd";
+    /** Name of lsb style resource (/etc/init.d/*). */
+    public static final String LSB_CLASS = "lsb";
+    /** System services classes: upstart, systemd, lsb... */
+    public static final Collection<String> SERVICE_CLASSES = new ArrayList<String>();
+    /** Name of heartbeat style resource (heartbeat 1). */
+    public static final String HEARTBEAT_CLASS = "heartbeat";
+    /** Name of ocf style resource (heartbeat 2). */
+    public static final String OCF_CLASS = "ocf";
+    /** Name of stonith device class. */
+    public static final String STONITH_CLASS = "stonith";
+    /** Name of the heartbeat provider. */
+    public static final String HEARTBEAT_PROVIDER = "heartbeat";
+    static {
+        SERVICE_CLASSES.add(SERVICE_CLASS); /* contains upstart and systemd */
+        SERVICE_CLASSES.add(UPSTART_CLASS);
+        SERVICE_CLASSES.add(SYSTEMD_CLASS);
+        SERVICE_CLASSES.add(LSB_CLASS); /* will disappear soon */
+    }
     /** Name of the service. */
     private final String name;
     /** Name of the provider like "linbit". */
@@ -120,30 +141,6 @@ public final class ResourceAgent {
     private boolean ignoreDefaults = false;
     /** Whether meta-data has been loaded. */
     private boolean metaDataLoaded = false;
-    /** Name of service resource (upstart, systemd). */
-    public static final String SERVICE_CLASS = "service";
-    /** Name of upstart class. */
-    public static final String UPSTART_CLASS = "upstart";
-    /** Name of systemd class. */
-    public static final String SYSTEMD_CLASS = "systemd";
-    /** Name of lsb style resource (/etc/init.d/*). */
-    public static final String LSB_CLASS = "lsb";
-    /** System services classes: upstart, systemd, lsb... */
-    public static final Collection<String> SERVICE_CLASSES = new ArrayList<String>();
-    static {
-        SERVICE_CLASSES.add(SERVICE_CLASS); /* contains upstart and systemd */
-        SERVICE_CLASSES.add(UPSTART_CLASS);
-        SERVICE_CLASSES.add(SYSTEMD_CLASS);
-        SERVICE_CLASSES.add(LSB_CLASS); /* will disappear soon */
-    }
-    /** Name of heartbeat style resource (heartbeat 1). */
-    public static final String HEARTBEAT_CLASS = "heartbeat";
-    /** Name of ocf style resource (heartbeat 2). */
-    public static final String OCF_CLASS = "ocf";
-    /** Name of stonith device class. */
-    public static final String STONITH_CLASS = "stonith";
-    /** Name of the heartbeat provider. */
-    public static final String HEARTBEAT_PROVIDER = "heartbeat";
     /**
      * Prepares a new {@code ResourceAgent} object.
      */

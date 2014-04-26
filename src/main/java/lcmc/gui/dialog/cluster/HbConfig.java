@@ -23,55 +23,57 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.*;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Heartbeat;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
-import lcmc.data.resources.NetInterface;
-import lcmc.data.resources.UcastLink;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.Exceptions;
-
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ComponentEvent;
-import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.util.concurrent.CountDownLatch;
-
-import javax.swing.JPanel;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.SpringLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
-import javax.swing.JComponent;
-import java.awt.Component;
+import javax.swing.SpringLayout;
+import lcmc.Exceptions;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.CastAddress;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.data.resources.NetInterface;
+import lcmc.data.resources.UcastLink;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
-
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
@@ -134,6 +136,36 @@ final class HbConfig extends DialogCluster {
     /** Option sizes. */
     private static final Map<String, Integer> OPTION_SIZES =
                                                 new HashMap<String, Integer>();
+    /** Multicast type string. */
+    private static final Value MCAST_TYPE = new StringValue("mcast");
+    /** Broadcast type string. */
+    private static final Value BCAST_TYPE = new StringValue("bcast");
+    /** Unicast type string. */
+    private static final Value UCAST_TYPE = new StringValue("ucast");
+    /** Serial type. */
+    private static final Value SERIAL_TYPE = new StringValue("serial");
+    /** Width of the address combobox. */
+    private static final int ADDR_COMBOBOX_WIDTH = 160;
+    /** Width of the link combobox. */
+    private static final int LINK_COMBOBOX_WIDTH = 130;
+    /** Width of the type combobox. */
+    private static final int TYPE_COMBOBOX_WIDTH = 80;
+    /** Width of the interface combobox. */
+    private static final int INTF_COMBOBOX_WIDTH = 80;
+    /** Width of the remove button. */
+    private static final int REMOVE_BUTTON_WIDTH  = 100;
+    /** Height of the remove button. */
+    private static final int REMOVE_BUTTON_HEIGHT = 14;
+    /** Checkbox text (Edit the config). */
+    private static final String EDIT_CONFIG_STRING = Tools.getString(
+                               "Dialog.Cluster.HbConfig.Checkbox.EditConfig");
+    /** Checkbox text (See existing). */
+    private static final String SEE_EXISTING_STRING = Tools.getString(
+                               "Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
+    /** /etc/ha.d/ha.cf read error string. */
+    private static final String HA_CF_ERROR_STRING = "error: read error";
+    /** Newline. */
+    private static final String NEWLINE = "\\r?\\n";
     static {
         //OPTION_TYPES.put(CRM, Widget.Type.COMBOBOX);
         OPTION_REGEXPS.put(KEEPALIVE, "\\d*");
@@ -214,36 +246,6 @@ final class HbConfig extends DialogCluster {
     private final JPanel configPanel = new JPanel();
     /** Whether the config was changed by the user. */
     private boolean configChanged = false;
-    /** Multicast type string. */
-    private static final Value MCAST_TYPE = new StringValue("mcast");
-    /** Broadcast type string. */
-    private static final Value BCAST_TYPE = new StringValue("bcast");
-    /** Unicast type string. */
-    private static final Value UCAST_TYPE = new StringValue("ucast");
-    /** Serial type. */
-    private static final Value SERIAL_TYPE = new StringValue("serial");
-    /** Width of the address combobox. */
-    private static final int ADDR_COMBOBOX_WIDTH = 160;
-    /** Width of the link combobox. */
-    private static final int LINK_COMBOBOX_WIDTH = 130;
-    /** Width of the type combobox. */
-    private static final int TYPE_COMBOBOX_WIDTH = 80;
-    /** Width of the interface combobox. */
-    private static final int INTF_COMBOBOX_WIDTH = 80;
-    /** Width of the remove button. */
-    private static final int REMOVE_BUTTON_WIDTH  = 100;
-    /** Height of the remove button. */
-    private static final int REMOVE_BUTTON_HEIGHT = 14;
-    /** Checkbox text (Edit the config). */
-    private static final String EDIT_CONFIG_STRING = Tools.getString(
-                               "Dialog.Cluster.HbConfig.Checkbox.EditConfig");
-    /** Checkbox text (See existing). */
-    private static final String SEE_EXISTING_STRING = Tools.getString(
-                               "Dialog.Cluster.HbConfig.Checkbox.SeeExisting");
-    /** /etc/ha.d/ha.cf read error string. */
-    private static final String HA_CF_ERROR_STRING = "error: read error";
-    /** Newline. */
-    private static final String NEWLINE = "\\r?\\n";
     /** Config scroll pane. */
     private volatile JScrollPane configScrollPane = null;
     /** Whether the config pane was already moved to the position. */

@@ -22,19 +22,18 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.data.Host;
-import lcmc.AddClusterDialog;
-import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Dimension;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import lcmc.AddClusterDialog;
+import lcmc.data.Host;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * Host finish dialog with buttons to configure next host or configure the
@@ -45,10 +44,6 @@ import java.awt.Dimension;
  *
  */
 final class Finish extends DialogHost {
-    /** Add another host button. */
-    private MyButton addAnotherHostButton;
-    /** Configure cluster button. */
-    private MyButton confClusterButton;
     /** Host icon for add another host button. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(
                             Tools.getDefault("Dialog.Host.Finish.HostIcon"));
@@ -57,6 +52,10 @@ final class Finish extends DialogHost {
                             Tools.getDefault("Dialog.Host.Finish.ClusterIcon"));
     /** Dimensions of the buttons. */
     private static final Dimension BUTTON_DIMENSION = new Dimension(300, 100);
+    /** Add another host button. */
+    private MyButton addAnotherHostButton;
+    /** Configure cluster button. */
+    private MyButton confClusterButton;
     /** Save checkbox. */
     private final JCheckBox saveCB = new JCheckBox(
                                     Tools.getString("Dialog.Host.Finish.Save"),

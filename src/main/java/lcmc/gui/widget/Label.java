@@ -20,18 +20,16 @@
 
 package lcmc.gui.widget;
 
+import java.awt.Color;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.text.Document;
+import lcmc.data.AccessMode;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-import lcmc.data.AccessMode;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.WidgetListener;
 import lcmc.utilities.Tools;
-
-import javax.swing.JComponent;
-import javax.swing.text.Document;
-import javax.swing.JLabel;
-
-import java.awt.Color;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a field where user can enter new value. The

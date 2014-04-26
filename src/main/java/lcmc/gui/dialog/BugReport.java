@@ -34,21 +34,20 @@ import java.util.Set;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Http;
-import lcmc.gui.ClusterBrowser;
-import lcmc.data.ClusterStatus;
-import lcmc.data.DrbdXML;
-import lcmc.data.VMSXML;
-import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import lcmc.data.Cluster;
+import lcmc.data.ClusterStatus;
+import lcmc.data.DrbdXML;
 import lcmc.data.Host;
-
+import lcmc.data.VMSXML;
+import lcmc.gui.ClusterBrowser;
+import lcmc.utilities.Http;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a bug report dialog.
@@ -60,6 +59,14 @@ public final class BugReport extends ConfigDialog {
     /** Logger. */
     private static final Logger LOG =
                                     LoggerFactory.getLogger(BugReport.class);
+
+    private static final String CONFIG_CIB = "pcmk configs";
+    private static final String CONFIG_DRBD = "DRBD configs";
+    private static final String CONFIG_LIBVIRT = "libvirt configs";
+    private static final String GENERATED_DELIM = "=== configs ===";
+    private static final String LOG_BUFFER_DELIM = "=== logs ===";
+    public static final Cluster UNKNOWN_CLUSTER = null;
+    public static final String NO_ERROR_TEXT = null;
 
     /** Cluster. Can be null, if unknown. */
     private final Cluster cluster;
@@ -74,14 +81,6 @@ public final class BugReport extends ConfigDialog {
                                             new HashMap<Cluster, JCheckBox>();
     /** The whole log buffer. */
     private final String logs;
-
-    private static final String CONFIG_CIB = "pcmk configs";
-    private static final String CONFIG_DRBD = "DRBD configs";
-    private static final String CONFIG_LIBVIRT = "libvirt configs";
-    private static final String GENERATED_DELIM = "=== configs ===";
-    private static final String LOG_BUFFER_DELIM = "=== logs ===";
-    public static final Cluster UNKNOWN_CLUSTER = null;
-    public static final String NO_ERROR_TEXT = null;
 
     /** Prepares a new {@code BugReport} object. */
     public BugReport(final Cluster cluster, final String errorText) {

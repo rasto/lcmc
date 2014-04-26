@@ -29,12 +29,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_redhat_5 extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -132,4 +126,10 @@ public final class DistResource_redhat_5 extends ListResourceBundle {
          + "yum -y -x resource-agents-3.* -x openais-1* -x openais-0.9*"
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

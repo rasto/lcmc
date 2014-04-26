@@ -21,79 +21,80 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
-import lcmc.data.PtestData;
-import lcmc.data.DRBDtestData;
-
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.data.ClusterStatus;
-import lcmc.data.CRMXML;
-import lcmc.data.DrbdXML;
-import lcmc.data.VMSXML;
-import lcmc.data.Application;
-import lcmc.utilities.NewOutputCallback;
-
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Heartbeat;
-import lcmc.utilities.CRM;
-import lcmc.data.resources.Service;
-import lcmc.data.resources.Network;
-
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.HbCategoryInfo;
-import lcmc.gui.resources.HbConnectionInfo;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.CategoryInfo;
-import lcmc.gui.resources.ServicesInfo;
-import lcmc.gui.resources.ServiceInfo;
-import lcmc.gui.resources.GroupInfo;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.NetworkInfo;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.AvailableServiceInfo;
-import lcmc.gui.resources.CommonBlockDevInfo;
-import lcmc.gui.resources.CRMInfo;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSInfo;
-import lcmc.gui.resources.VMSHardwareInfo;
-import lcmc.gui.resources.AvailableServicesInfo;
-import lcmc.gui.resources.ResourceAgentClassInfo;
-import lcmc.gui.resources.ClusterHostsInfo;
-import lcmc.gui.resources.RscDefaultsInfo;
-
-import lcmc.data.ResourceAgent;
-import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.ButtonCallback;
-
-import javax.swing.JComponent;
-import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-
 import java.awt.Color;
 import java.awt.geom.Point2D;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
-
-import org.apache.commons.collections15.map.MultiKeyMap;
-import org.apache.commons.collections15.map.LinkedMap;
-import org.apache.commons.collections15.keyvalue.MultiKey;
-
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import lcmc.data.Application;
+import lcmc.data.CRMXML;
+import lcmc.data.Cluster;
+import lcmc.data.ClusterStatus;
+import lcmc.data.DRBDtestData;
+import lcmc.data.DrbdXML;
+import lcmc.data.Host;
+import lcmc.data.PtestData;
+import lcmc.data.ResourceAgent;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
 import lcmc.data.Value;
+import lcmc.data.resources.Network;
+import lcmc.data.resources.Service;
+import lcmc.gui.resources.CategoryInfo;
+import lcmc.gui.resources.ClusterHostsInfo;
+import lcmc.gui.resources.CommonBlockDevInfo;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.NetworkInfo;
+import lcmc.gui.resources.crm.AvailableServiceInfo;
+import lcmc.gui.resources.crm.AvailableServicesInfo;
+import lcmc.gui.resources.crm.CRMInfo;
+import lcmc.gui.resources.crm.GroupInfo;
+import lcmc.gui.resources.crm.HbCategoryInfo;
+import lcmc.gui.resources.crm.HbConnectionInfo;
+import lcmc.gui.resources.crm.ResourceAgentClassInfo;
+import lcmc.gui.resources.crm.RscDefaultsInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.resources.crm.ServicesInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.gui.resources.vms.HardwareInfo;
+import lcmc.gui.resources.vms.VMListInfo;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.CRM;
+import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.NewOutputCallback;
+import lcmc.utilities.Tools;
+import org.apache.commons.collections15.keyvalue.MultiKey;
+import org.apache.commons.collections15.map.LinkedMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
 
 
 /**
@@ -105,10 +106,151 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class ClusterBrowser extends Browser {
+public class ClusterBrowser extends Browser {
     /** Logger. */
     private static final Logger LOG =
                                LoggerFactory.getLogger(ClusterBrowser.class);
+    /** Remove icon. */
+    public static final ImageIcon REMOVE_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("ClusterBrowser.RemoveIcon"));
+    /** Remove icon small. */
+    public static final ImageIcon REMOVE_ICON_SMALL =
+        Tools.createImageIcon(
+                Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
+
+    /** Hash that holds all hb classes with descriptions that appear in the
+     * pull down menus. */
+    public static final Map<String, String> HB_CLASS_MENU =
+                                                new HashMap<String, String>();
+    /** Width of the label in the info panel. */
+    public static final int SERVICE_LABEL_WIDTH =
+                    Tools.getDefaultSize("ClusterBrowser.ServiceLabelWidth");
+    /** Width of the field in the info panel. */
+    public static final int SERVICE_FIELD_WIDTH =
+                    Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
+    /** Color for stopped services. */
+    public static final Color FILL_PAINT_STOPPED =
+                      Tools.getDefaultColor("CRMGraph.FillPaintStopped");
+    /** Identation. */
+    public static final String IDENT_4 = "    ";
+    /** Name of the boolean type in drbd. */
+    public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
+    /** String array with all hb classes. */
+    public static final Collection<String> HB_CLASSES = new ArrayList<String>();
+
+    /** Hb start operation. */
+    private static final String HB_OP_START = "start";
+    /** Hb stop operation. */
+    private static final String HB_OP_STOP = "stop";
+    /** Hb status operation. */
+    private static final String HB_OP_STATUS = "status";
+    /** Hb monitor operation. */
+    private static final String HB_OP_MONITOR = "monitor";
+    /** Hb meta-data operation. */
+    private static final String HB_OP_META_DATA = "meta-data";
+    /** Hb validate-all operation. */
+    private static final String HB_OP_VALIDATE_ALL = "validate-all";
+    /** Promote operation. */
+    public static final String HB_OP_PROMOTE = "promote";
+    /** Demote operation. */
+    public static final String HB_OP_DEMOTE = "demote";
+
+    /** Hb desc parameter. */
+    private static final String HB_PAR_DESC = "description";
+    /** Hb interval parameter. */
+    private static final String HB_PAR_INTERVAL = "interval";
+    /** Hb timeout parameter. */
+    private static final String HB_PAR_TIMEOUT = "timeout";
+    /** Hb start-delay parameter. */
+    private static final String HB_PAR_START_DELAY = "start-delay";
+    /** Hb disabled parameter. */
+    private static final String HB_PAR_DISABLED = "disabled";
+    /** Hb role parameter. */
+    private static final String HB_PAR_ROLE = "role";
+    /** Hb prereq parameter. */
+    private static final String HB_PAR_PREREQ = "prereq";
+    /** Hb on-fail parameter. */
+    private static final String HB_PAR_ON_FAIL = "on-fail";
+    /** String array with all hb operations. */
+    public static final String[] HB_OPERATIONS = {HB_OP_START,
+                                                  HB_OP_PROMOTE,
+                                                  HB_OP_DEMOTE,
+                                                  HB_OP_STOP,
+                                                  HB_OP_STATUS,
+                                                  HB_OP_MONITOR,
+                                                  HB_OP_META_DATA,
+                                                  HB_OP_VALIDATE_ALL};
+    /** Operations that should not have default values. */
+    public static final Collection<String> HB_OP_IGNORE_DEFAULT =
+                                                      new ArrayList<String>();
+    /** All parameters for the hb operations, so that it is possible to create
+     * arguments for up_rsc_full_ops. */
+    public static final String[] HB_OPERATION_PARAM_LIST = {
+                                                        HB_PAR_DESC,
+                                                        HB_PAR_INTERVAL,
+                                                        HB_PAR_TIMEOUT,
+                                                        CRMXML.PAR_CHECK_LEVEL,
+                                                        HB_PAR_START_DELAY,
+                                                        HB_PAR_DISABLED,
+                                                        HB_PAR_ROLE,
+                                                        HB_PAR_PREREQ,
+                                                        HB_PAR_ON_FAIL};
+    /** Starting ptest tooltip. */
+    public static final String STARTING_PTEST_TOOLTIP =
+                                Tools.getString("ClusterBrowser.StartingPtest");
+    /** Cluster status error string. */
+    private static final String CLUSTER_STATUS_ERROR =
+                                  "---start---\r\nerror\r\n\r\n---done---\r\n";
+    /** Small cluster icon. */
+    static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
+                          Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
+    /** String that appears as a tooltip in menu items if status was disabled.*/
+    public static final String UNKNOWN_CLUSTER_STATUS_STRING =
+                                                     "unknown cluster status";
+    /** Default operation parameters. */
+    private static final Collection<String> DEFAULT_OP_PARAMS =
+                                       new ArrayList<String>(
+                                               Arrays.asList(HB_PAR_TIMEOUT,
+                                                             HB_PAR_INTERVAL));
+    private static final String RESET_STRING = "---reset---\r\n";
+    private static final int RESET_STRING_LEN = RESET_STRING.length();
+    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4. */
+    private static final Pattern BY_RES_PATTERN =
+                    Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
+    static {
+        HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
+        HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
+                          "Heartbeat 1 RAs (deprecated)");
+        HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
+        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS,
+                          "Upstart/Systemd Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.SYSTEMD_CLASS, "Systemd Scripts");
+        HB_CLASS_MENU.put(ResourceAgent.UPSTART_CLASS, "Upstart Scripts");
+    }
+    static {
+        HB_CLASSES.add(ResourceAgent.OCF_CLASS);
+        HB_CLASSES.add(ResourceAgent.HEARTBEAT_CLASS);
+        for (final String c : ResourceAgent.SERVICE_CLASSES) {
+            HB_CLASSES.add(c);
+        }
+        HB_CLASSES.add(ResourceAgent.STONITH_CLASS);
+    }
+    static {
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_META_DATA);
+        HB_OP_IGNORE_DEFAULT.add(HB_OP_VALIDATE_ALL);
+    }
+
+    /** Return name of the classes in the menu. */
+    public static String getClassMenu(final String cl) {
+        final String name = HB_CLASS_MENU.get(cl);
+        if (name == null) {
+            return Tools.ucfirst(cl) + " scripts";
+        }
+        return name;
+    }
     /**
      * Cluster object that holds data of the cluster. (One Browser belongs to
      * one cluster).
@@ -144,13 +286,13 @@ public final class ClusterBrowser extends Browser {
     /** DRBD resource hash lock. */
     private final Lock mDrbdResHashLock = new ReentrantLock();
     /** DRBD resource name string to drbd resource info hash. */
-    private final Map<String, DrbdResourceInfo> drbdResHash =
-                                new HashMap<String, DrbdResourceInfo>();
+    private final Map<String, ResourceInfo> drbdResHash =
+                                new HashMap<String, ResourceInfo>();
     /** DRBD device hash lock. */
     private final Lock mDrbdDevHashLock = new ReentrantLock();
     /** DRBD resource device string to drbd resource info hash. */
-    private final Map<String, DrbdVolumeInfo> drbdDevHash =
-                                new HashMap<String, DrbdVolumeInfo>();
+    private final Map<String, VolumeInfo> drbdDevHash =
+                                new HashMap<String, VolumeInfo>();
     /** Heartbeat id to service lock. */
     private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
@@ -209,104 +351,6 @@ public final class ClusterBrowser extends Browser {
     private RscDefaultsInfo rscDefaultsInfo = null;
     /** Global hb status lock. */
     private final Lock mClStatusLock = new ReentrantLock();
-    /** Remove icon. */
-    public static final ImageIcon REMOVE_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.RemoveIcon"));
-    /** Remove icon small. */
-    public static final ImageIcon REMOVE_ICON_SMALL =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
-
-    /** Hash that holds all hb classes with descriptions that appear in the
-     * pull down menus. */
-    public static final Map<String, String> HB_CLASS_MENU =
-                                                new HashMap<String, String>();
-    static {
-        HB_CLASS_MENU.put(ResourceAgent.OCF_CLASS, "OCF Resource Agents");
-        HB_CLASS_MENU.put(ResourceAgent.HEARTBEAT_CLASS,
-                          "Heartbeat 1 RAs (deprecated)");
-        HB_CLASS_MENU.put(ResourceAgent.LSB_CLASS, "LSB Init Scripts");
-        HB_CLASS_MENU.put(ResourceAgent.STONITH_CLASS, "Stonith Devices");
-        HB_CLASS_MENU.put(ResourceAgent.SERVICE_CLASS,
-                          "Upstart/Systemd Scripts");
-        HB_CLASS_MENU.put(ResourceAgent.SYSTEMD_CLASS, "Systemd Scripts");
-        HB_CLASS_MENU.put(ResourceAgent.UPSTART_CLASS, "Upstart Scripts");
-    }
-    /** Width of the label in the info panel. */
-    public static final int SERVICE_LABEL_WIDTH =
-                    Tools.getDefaultSize("ClusterBrowser.ServiceLabelWidth");
-    /** Width of the field in the info panel. */
-    public static final int SERVICE_FIELD_WIDTH =
-                    Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
-    /** Color for stopped services. */
-    public static final Color FILL_PAINT_STOPPED =
-                      Tools.getDefaultColor("CRMGraph.FillPaintStopped");
-    /** Identation. */
-    public static final String IDENT_4 = "    ";
-    /** Name of the boolean type in drbd. */
-    public static final String DRBD_RES_BOOL_TYPE_NAME = "boolean";
-    /** String array with all hb classes. */
-    public static final Collection<String> HB_CLASSES = new ArrayList<String>();
-    static {
-        HB_CLASSES.add(ResourceAgent.OCF_CLASS);
-        HB_CLASSES.add(ResourceAgent.HEARTBEAT_CLASS);
-        for (final String c : ResourceAgent.SERVICE_CLASSES) {
-            HB_CLASSES.add(c);
-        }
-        HB_CLASSES.add(ResourceAgent.STONITH_CLASS);
-    }
-
-    /** Hb start operation. */
-    private static final String HB_OP_START = "start";
-    /** Hb stop operation. */
-    private static final String HB_OP_STOP = "stop";
-    /** Hb status operation. */
-    private static final String HB_OP_STATUS = "status";
-    /** Hb monitor operation. */
-    private static final String HB_OP_MONITOR = "monitor";
-    /** Hb meta-data operation. */
-    private static final String HB_OP_META_DATA = "meta-data";
-    /** Hb validate-all operation. */
-    private static final String HB_OP_VALIDATE_ALL = "validate-all";
-    /** Promote operation. */
-    public static final String HB_OP_PROMOTE = "promote";
-    /** Demote operation. */
-    public static final String HB_OP_DEMOTE = "demote";
-
-    /** Hb desc parameter. */
-    private static final String HB_PAR_DESC = "description";
-    /** Hb interval parameter. */
-    private static final String HB_PAR_INTERVAL = "interval";
-    /** Hb timeout parameter. */
-    private static final String HB_PAR_TIMEOUT = "timeout";
-    /** Hb start-delay parameter. */
-    private static final String HB_PAR_START_DELAY = "start-delay";
-    /** Hb disabled parameter. */
-    private static final String HB_PAR_DISABLED = "disabled";
-    /** Hb role parameter. */
-    private static final String HB_PAR_ROLE = "role";
-    /** Hb prereq parameter. */
-    private static final String HB_PAR_PREREQ = "prereq";
-    /** Hb on-fail parameter. */
-    private static final String HB_PAR_ON_FAIL = "on-fail";
-    /** String array with all hb operations. */
-    public static final String[] HB_OPERATIONS = {HB_OP_START,
-                                                  HB_OP_PROMOTE,
-                                                  HB_OP_DEMOTE,
-                                                  HB_OP_STOP,
-                                                  HB_OP_STATUS,
-                                                  HB_OP_MONITOR,
-                                                  HB_OP_META_DATA,
-                                                  HB_OP_VALIDATE_ALL};
-    /** Operations that should not have default values. */
-    public static final Collection<String> HB_OP_IGNORE_DEFAULT =
-                                                      new ArrayList<String>();
-    static {
-        HB_OP_IGNORE_DEFAULT.add(HB_OP_STATUS);
-        HB_OP_IGNORE_DEFAULT.add(HB_OP_META_DATA);
-        HB_OP_IGNORE_DEFAULT.add(HB_OP_VALIDATE_ALL);
-    }
     /** Parameters for the hb operations. */
     private final Map<String, List<String>> crmOperationParams =
                                      new LinkedHashMap<String, List<String>>();
@@ -317,40 +361,6 @@ public final class ClusterBrowser extends Browser {
     /** Map with drbd parameters for every host. */
     private final Map<Host, String> drbdParameters =
                                                   new HashMap<Host, String>();
-    /** All parameters for the hb operations, so that it is possible to create
-     * arguments for up_rsc_full_ops. */
-    public static final String[] HB_OPERATION_PARAM_LIST = {
-                                                        HB_PAR_DESC,
-                                                        HB_PAR_INTERVAL,
-                                                        HB_PAR_TIMEOUT,
-                                                        CRMXML.PAR_CHECK_LEVEL,
-                                                        HB_PAR_START_DELAY,
-                                                        HB_PAR_DISABLED,
-                                                        HB_PAR_ROLE,
-                                                        HB_PAR_PREREQ,
-                                                        HB_PAR_ON_FAIL};
-    /** Starting ptest tooltip. */
-    public static final String STARTING_PTEST_TOOLTIP =
-                                Tools.getString("ClusterBrowser.StartingPtest");
-    /** Cluster status error string. */
-    private static final String CLUSTER_STATUS_ERROR =
-                                  "---start---\r\nerror\r\n\r\n---done---\r\n";
-    /** Small cluster icon. */
-    static final ImageIcon CLUSTER_ICON_SMALL = Tools.createImageIcon(
-                          Tools.getDefault("ClusterBrowser.ClusterIconSmall"));
-    /** String that appears as a tooltip in menu items if status was disabled.*/
-    public static final String UNKNOWN_CLUSTER_STATUS_STRING =
-                                                     "unknown cluster status";
-    /** Default operation parameters. */
-    private static final Collection<String> DEFAULT_OP_PARAMS =
-                                       new ArrayList<String>(
-                                               Arrays.asList(HB_PAR_TIMEOUT,
-                                                             HB_PAR_INTERVAL));
-    private static final String RESET_STRING = "---reset---\r\n";
-    private static final int RESET_STRING_LEN = RESET_STRING.length();
-    /** Match ...by-res/r0 or by-res/r0/0 from DRBD 8.4. */
-    private static final Pattern BY_RES_PATTERN =
-                    Pattern.compile("^/dev/drbd/by-res/([^/]+)(?:/(\\d+))?$");
     /** Prepares a new {@code CusterBrowser} object. */
     public ClusterBrowser(final Cluster cluster) {
         super();
@@ -544,7 +554,7 @@ public final class ClusterBrowser extends Browser {
         /* VMs */
         if (vmsNode == null) {
             vmsNode = new DefaultMutableTreeNode(
-                     new VMSInfo(Tools.getString("ClusterBrowser.VMs"), this));
+                     new VMListInfo(Tools.getString("ClusterBrowser.VMs"), this));
             setNode(vmsNode);
             topAdd(vmsNode);
             reload(getTreeTop(), true);
@@ -571,7 +581,7 @@ public final class ClusterBrowser extends Browser {
 
         /* drbd */
         drbdNode = new DefaultMutableTreeNode(
-            new DrbdInfo(Tools.getString("ClusterBrowser.Drbd"),
+            new GlobalInfo(Tools.getString("ClusterBrowser.Drbd"),
                          this));
         setNode(drbdNode);
         topAdd(drbdNode);
@@ -1476,8 +1486,8 @@ public final class ClusterBrowser extends Browser {
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove =
                                     new ArrayList<DefaultMutableTreeNode>();
-        final Collection<VMSVirtualDomainInfo> currentVMSVDIs =
-                                        new ArrayList<VMSVirtualDomainInfo>();
+        final Collection<DomainInfo> currentVMSVDIs =
+                                        new ArrayList<DomainInfo>();
 
         mVMSUpdateLock.lock();
         boolean nodeChanged = false;
@@ -1486,8 +1496,8 @@ public final class ClusterBrowser extends Browser {
             final Enumeration<DefaultMutableTreeNode> ee = vmsNode.children();
             while (ee.hasMoreElements()) {
                 final DefaultMutableTreeNode node = ee.nextElement();
-                final VMSVirtualDomainInfo vmsvdi =
-                                  (VMSVirtualDomainInfo) node.getUserObject();
+                final DomainInfo vmsvdi =
+                                  (DomainInfo) node.getUserObject();
                 if (domainNames.contains(vmsvdi.toString())) {
                     /* keeping */
                     currentVMSVDIs.add(vmsvdi);
@@ -1524,8 +1534,8 @@ public final class ClusterBrowser extends Browser {
             int i = 0;
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode node = e.nextElement();
-                final VMSVirtualDomainInfo vmsvdi =
-                                  (VMSVirtualDomainInfo) node.getUserObject();
+                final DomainInfo vmsvdi =
+                                  (DomainInfo) node.getUserObject();
                 final String name = vmsvdi.getName();
                 if (domainName != null
                     && name != null
@@ -1535,8 +1545,8 @@ public final class ClusterBrowser extends Browser {
                 i++;
             }
             /* add new vms nodes */
-            final VMSVirtualDomainInfo vmsvdi =
-                                   new VMSVirtualDomainInfo(domainName, this);
+            final DomainInfo vmsvdi =
+                                   new DomainInfo(domainName, this);
             currentVMSVDIs.add(vmsvdi);
             final DefaultMutableTreeNode resource =
                                             new DefaultMutableTreeNode(vmsvdi);
@@ -1556,30 +1566,30 @@ public final class ClusterBrowser extends Browser {
             reload(vmsNode, false);
         }
         for (final ServiceInfo si : getExistingServiceList(null)) {
-            final VMSVirtualDomainInfo vmsvdi = si.connectWithVMS();
+            final DomainInfo vmsvdi = si.connectWithVMS();
             if (vmsvdi != null) {
                 /* keep the not connected ones.*/
                 currentVMSVDIs.remove(vmsvdi);
             }
         }
-        for (final VMSVirtualDomainInfo vmsvdi : currentVMSVDIs) {
+        for (final DomainInfo vmsvdi : currentVMSVDIs) {
             vmsvdi.setUsedByCRM(false);
         }
-        final VMSInfo vmsi = (VMSInfo) vmsNode.getUserObject();
+        final VMListInfo vmsi = (VMListInfo) vmsNode.getUserObject();
         if (vmsi != null) {
-            vmsi.updateTable(VMSInfo.MAIN_TABLE);
+            vmsi.updateTable(VMListInfo.MAIN_TABLE);
         }
     }
 
     /** Returns vmsinfo object. */
-    public VMSInfo getVMSInfo() {
-        return (VMSInfo) vmsNode.getUserObject();
+    public VMListInfo getVMSInfo() {
+        return (VMListInfo) vmsNode.getUserObject();
     }
 
     /** Updates drbd resources. */
     public void updateDrbdResources() {
         Tools.isSwingThread();
-        final DrbdInfo drbdInfo = drbdGraph.getDrbdInfo();
+        final GlobalInfo globalInfo = drbdGraph.getDrbdInfo();
         drbdStatusLock();
         final DrbdXML dxml = drbdXML;
         if (dxml == null) {
@@ -1627,21 +1637,21 @@ public final class ClusterBrowser extends Browser {
             }
             if (bd1 != null && bd2 != null) {
                 /* add DRBD resource */
-                DrbdResourceInfo dri = getDrbdResHash().get(resName);
+                ResourceInfo dri = getDrbdResHash().get(resName);
                 putDrbdResHash();
                 final List<BlockDevInfo> bdis =
                                 new ArrayList<BlockDevInfo>(Arrays.asList(bd1,
                                                                           bd2));
                 if (dri == null) {
-                    dri = drbdInfo.addDrbdResource(
+                    dri = globalInfo.addDrbdResource(
                                resName,
-                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis),
+                               VolumeInfo.getHostsFromBlockDevices(bdis),
                                runMode);
                     atLeastOneAdded = true;
                 }
-                DrbdVolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
+                VolumeInfo dvi = dri.getDrbdVolumeInfo(volumeNr);
                 if (dvi == null) {
-                    dvi = drbdInfo.addDrbdVolume(
+                    dvi = globalInfo.addDrbdVolume(
                                            dri,
                                            volumeNr,
                                            drbdDev,
@@ -1651,7 +1661,7 @@ public final class ClusterBrowser extends Browser {
                 }
                 dri.setParameters();
                 dvi.setParameters();
-                final DrbdResourceInfo dri0 = dri;
+                final ResourceInfo dri0 = dri;
                 dri0.getInfoPanel();
             }
         }
@@ -1659,9 +1669,9 @@ public final class ClusterBrowser extends Browser {
         //killRemovedVolumes(dxml.getResourceDeviceMap());
         drbdStatusUnlock();
         if (atLeastOneAdded) {
-            drbdInfo.getInfoPanel();
-            drbdInfo.setAllApplyButtons();
-            drbdInfo.reloadDRBDResourceComboBoxes();
+            globalInfo.getInfoPanel();
+            globalInfo.setAllApplyButtons();
+            globalInfo.reloadDRBDResourceComboBoxes();
             drbdGraph.scale();
         }
     }
@@ -1673,7 +1683,7 @@ public final class ClusterBrowser extends Browser {
 
     private void killRemovedVolumes(
                                 final MultiKeyMap<String, String> deviceMap) {
-        for (final DrbdVolumeInfo dvi
+        for (final VolumeInfo dvi
                          : getDrbdGraph().getDrbdVolumeToEdgeMap().keySet()) {
             if (!deviceMap.containsKey(dvi.getDrbdResourceInfo().getName(),
                                        dvi.getName())) {
@@ -2185,6 +2195,382 @@ public final class ClusterBrowser extends Browser {
         }
     }
 
+    /**
+     * Returns common file systems on all nodes as StringValue array.
+     * The defaultValue is stored as the first item in the array.
+     */
+    public Value[] getCommonFileSystems(final Value defaultValue) {
+        final Value[] cfs =  new Value[commonFileSystems.length + 2];
+        cfs[0] = defaultValue;
+        int i = 1;
+        for (final String cf : commonFileSystems) {
+            cfs[i] = new StringValue(cf);
+            i++;
+        }
+        cfs[i] = new StringValue("none");
+            i++;
+        return cfs;
+    }
+    /**
+     * Returns nw hb connection info object. This is called from heartbeat
+     * graph.
+     */
+    HbConnectionInfo getNewHbConnectionInfo() {
+        final HbConnectionInfo hbci = new HbConnectionInfo(this);
+        //hbci.getInfoPanel();
+        return hbci;
+    }
+
+    /** Returns cluster status object. */
+    public ClusterStatus getClusterStatus() {
+        return clusterStatus;
+    }
+
+    /** Returns drbd test data. */
+    public DRBDtestData getDRBDtestData() {
+        drbdtestdataLockAcquire();
+        final DRBDtestData dtd = drbdtestData;
+        drbdtestdataLockRelease();
+        return dtd;
+    }
+
+    /** Sets drbd test data. */
+    public void setDRBDtestData(final DRBDtestData drbdtestData) {
+        drbdtestdataLockAcquire();
+        this.drbdtestData = drbdtestData;
+        drbdtestdataLockRelease();
+    }
+
+    /** Acquire ptest lock. */
+    public void ptestLockAcquire() {
+        mPtestLock.lock();
+    }
+
+    /** Release ptest lock. */
+    public void ptestLockRelease() {
+        mPtestLock.unlock();
+    }
+
+    /** Acquire drbd test data lock. */
+    protected void drbdtestdataLockAcquire() {
+        mDRBDtestdataLock.lock();
+    }
+
+    /** Release drbd test data lock. */
+    protected void drbdtestdataLockRelease() {
+        mDRBDtestdataLock.unlock();
+    }
+
+    /** Returns xml from cluster manager. */
+    public CRMXML getCRMXML() {
+        return crmXML;
+    }
+
+    /** Returns xml from drbd. */
+    public DrbdXML getDrbdXML() {
+        return drbdXML;
+    }
+
+    /** Sets xml from drbd. */
+    public void setDrbdXML(final DrbdXML drbdXML) {
+        this.drbdXML = drbdXML;
+    }
+
+    /** Returns drbd node from the menu. */
+    public DefaultMutableTreeNode getDrbdNode() {
+        return drbdNode;
+    }
+
+    /** Returns common blockdevices node from the menu. */
+    public TreeNode getCommonBlockDevicesNode() {
+        return commonBlockDevicesNode;
+    }
+
+    /** Returns cluster hosts node from the menu. */
+    public TreeNode getClusterHostsNode() {
+        return clusterHostsNode;
+    }
+
+    /** Returns services node from the menu. */
+    public DefaultMutableTreeNode getServicesNode() {
+        return servicesNode;
+    }
+
+    /** Returns services node from the menu. */
+    public TreeNode getNetworksNode() {
+        return networksNode;
+    }
+
+    /**
+     * Returns a hash from drbd device to drbd volume info. putDrbdDevHash
+     * must follow after you're done. */
+    public Map<String, VolumeInfo> getDrbdDevHash() {
+        mDrbdDevHashLock.lock();
+        return drbdDevHash;
+    }
+
+    /** Unlock drbd dev hash. */
+    public void putDrbdDevHash() {
+        mDrbdDevHashLock.unlock();
+    }
+
+    /**
+     * Return volume info object from the drbd block device name.
+     * /dev/drbd/by-res/r0
+     * /dev/drbd/by-res/r0/0
+     * /dev/drbd0
+     */
+    public VolumeInfo getDrbdVolumeFromDev(final CharSequence dev) {
+        if (dev == null) {
+            return null;
+        }
+        final Matcher m = BY_RES_PATTERN.matcher(dev);
+        if (m.matches()) {
+            final String res = m.group(1);
+            final String vol;
+            if (m.groupCount() > 2) {
+                vol = m.group(2);
+            } else {
+                vol = "0";
+            }
+            final ResourceInfo dri = getDrbdResHash().get(res);
+            putDrbdResHash();
+            if (dri != null) {
+                return dri.getDrbdVolumeInfo(vol);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a hash from resource name to drbd resource info hash.
+     * Get locks the hash and put unlocks it
+     */
+    public Map<String, ResourceInfo> getDrbdResHash() {
+        mDrbdResHashLock.lock();
+        return drbdResHash;
+    }
+
+    /** Done using drbdResHash. */
+    public void putDrbdResHash() {
+        mDrbdResHashLock.unlock();
+    }
+
+    /** Returns (shallow) copy of all drbdresource info objects. */
+    public Iterable<ResourceInfo> getDrbdResHashValues() {
+        final Iterable<ResourceInfo> values =
+                   new ArrayList<ResourceInfo>(getDrbdResHash().values());
+        putDrbdResHash();
+        return values;
+    }
+
+    /** Reloads all combo boxes that need to be reloaded. */
+    public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
+        lockNameToServiceInfo();
+        for (final String name : nameToServiceInfoHash.keySet()) {
+            final Map<String, ServiceInfo> idToInfoHash =
+                                             nameToServiceInfoHash.get(name);
+            for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
+                final ServiceInfo si = serviceEntry.getValue();
+                if (si != exceptThisOne) {
+                    si.reloadComboBoxes();
+                }
+            }
+        }
+        unlockNameToServiceInfo();
+    }
+
+    /** Returns object that holds data of all VMs. */
+    public VMSXML getVMSXML(final Host host) {
+        mVMSReadLock.lock();
+        try {
+            return vmsXML.get(host);
+        } finally {
+            mVMSReadLock.unlock();
+        }
+    }
+
+    /**
+     * Finds DomainInfo object that contains the VM specified by
+     * name.
+     */
+    public DomainInfo findVMSVirtualDomainInfo(final String name) {
+        if (vmsNode != null && name != null) {
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode node = e.nextElement();
+                final DomainInfo vmsvdi =
+                                  (DomainInfo) node.getUserObject();
+                if (name.equals(vmsvdi.getName())) {
+                    return vmsvdi;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Returns map to ResourceAgentClassInfo. */
+    public ResourceAgentClassInfo getClassInfoMap(final String cl) {
+        return classInfoMap.get(cl);
+    }
+
+    /** Returns map to AvailableServiceInfo. */
+    public AvailableServiceInfo getAvailableServiceInfoMap(
+                                                    final ResourceAgent ra) {
+        return availableServiceMap.get(ra);
+    }
+
+    /** Returns available services info object. */
+    public AvailableServicesInfo getAvailableServicesInfo() {
+        return (AvailableServicesInfo) availableServicesNode.getUserObject();
+    }
+
+    /** Returns the services info object. */
+    public ServicesInfo getServicesInfo() {
+        return servicesInfo;
+    }
+
+    /** Returns rsc defaults info object. */
+    public RscDefaultsInfo getRscDefaultsInfo() {
+        return rscDefaultsInfo;
+    }
+
+    /** Checks all fields in the application. */
+    public void checkAccessOfEverything() {
+        servicesInfo.checkResourceFields(null,
+                                         servicesInfo.getParametersFromXML());
+        servicesInfo.updateAdvancedPanels();
+        rscDefaultsInfo.updateAdvancedPanels();
+        Tools.getGUIData().updateGlobalItems();
+        for (final ServiceInfo si : getExistingServiceList(null)) {
+            si.checkResourceFields(null, si.getParametersFromXML());
+            si.updateAdvancedPanels();
+        }
+
+        drbdGraph.getDrbdInfo().checkResourceFields(
+                                null,
+                                drbdGraph.getDrbdInfo().getParametersFromXML());
+        drbdGraph.getDrbdInfo().updateAdvancedPanels();
+        for (final ResourceInfo dri : getDrbdResHashValues()) {
+            dri.checkResourceFields(null, dri.getParametersFromXML());
+            dri.updateAdvancedPanels();
+            dri.updateAllVolumes();
+        }
+
+        if (vmsNode != null) {
+            @SuppressWarnings("unchecked")
+            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
+            while (e.hasMoreElements()) {
+                final DefaultMutableTreeNode node = e.nextElement();
+                final DomainInfo vmsvdi =
+                                  (DomainInfo) node.getUserObject();
+                vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
+                vmsvdi.updateAdvancedPanels();
+                @SuppressWarnings("unchecked")
+                final Enumeration<DefaultMutableTreeNode> ce = node.children();
+                while (ce.hasMoreElements()) {
+                    final DefaultMutableTreeNode cnode = ce.nextElement();
+                    final HardwareInfo vmshi =
+                                  (HardwareInfo) cnode.getUserObject();
+                    vmshi.checkResourceFields(null,
+                                              vmshi.getParametersFromXML());
+                    vmshi.updateAdvancedPanels();
+                }
+            }
+        }
+
+        for (final HbConnectionInfo hbci : crmGraph.getAllHbConnections()) {
+            hbci.checkResourceFields(null, hbci.getParametersFromXML());
+            hbci.updateAdvancedPanels();
+        }
+
+        for (final Host clusterHost : getClusterHosts()) {
+            final HostBrowser hostBrowser = clusterHost.getBrowser();
+            hostBrowser.getHostInfo().updateAdvancedPanels();
+        }
+    }
+
+
+    /** Returns when at least one resource in the list of resources can be
+        promoted. */
+    public boolean isOneMaster(final Iterable<String> rscs) {
+        for (final String id : rscs) {
+            mHeartbeatIdToServiceLock();
+            final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
+            mHeartbeatIdToServiceUnlock();
+            if (si == null) {
+                continue;
+            }
+            if (si.getService().isMaster()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Updates host hardware info on all cluster hosts immediately. */
+    public void updateHWInfo(final boolean updateLVM) {
+        for (final Host h : getClusterHosts()) {
+            updateHWInfo(h, updateLVM);
+        }
+    }
+
+    /** Updates host hardware info immediately. */
+    public void updateHWInfo(final Host host, final boolean updateLVM) {
+        host.setIsLoading();
+        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
+                       new ResourceGraph[]{drbdGraph, crmGraph},
+                       updateLVM);
+        Tools.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
+            }
+        });
+        updateCommonBlockDevices();
+        drbdGraph.repaint();
+    }
+
+    /** Updates proxy host hardware info immediately. */
+    public void updateProxyHWInfo(final Host host) {
+        host.setIsLoading();
+        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
+                       new ResourceGraph[]{drbdGraph, crmGraph},
+                       !Host.UPDATE_LVM);
+        updateCommonBlockDevices();
+        drbdGraph.repaint();
+    }
+
+    /** Returns DRBD parameter hash. */
+    public Map<Host, String> getDrbdParameters() {
+        return drbdParameters;
+    }
+
+    /** clStatusLock global lock. */
+    public void clStatusLock() {
+        mClStatusLock.lock();
+    }
+
+    /** clStatusLock global unlock. */
+    public void clStatusUnlock() {
+        mClStatusLock.unlock();
+    }
+
+    /** Return null if DRBD info is availble, or the reason why not. */
+    public String isDrbdAvailable(final Host host) {
+        if (drbdParameters.get(host) == null) {
+            return "no suitable man pages";
+        }
+        if (!DRBD.compatibleVersions(host.getDrbdVersion(),
+                                     host.getDrbdModuleVersion())) {
+            return "DRBD util and module versions are not compatible: "
+                   + host.getDrbdVersion() + " / "
+                   + host.getDrbdModuleVersion();
+        }
+        return null;
+    }
+
     /** Callback to service menu items, that show ptest results in tooltips. */
     public abstract class ClMenuItemCallback implements ButtonCallback {
         /** Host if over a menu item that belongs to a host. */
@@ -2335,390 +2721,5 @@ public final class ClusterBrowser extends Browser {
 
         /** Action that is caried out on the host. */
         protected abstract void action(final Host dcHost);
-    }
-
-    /**
-     * Returns common file systems on all nodes as StringValue array.
-     * The defaultValue is stored as the first item in the array.
-     */
-    public Value[] getCommonFileSystems(final Value defaultValue) {
-        final Value[] cfs =  new Value[commonFileSystems.length + 2];
-        cfs[0] = defaultValue;
-        int i = 1;
-        for (final String cf : commonFileSystems) {
-            cfs[i] = new StringValue(cf);
-            i++;
-        }
-        cfs[i] = new StringValue("none");
-            i++;
-        return cfs;
-    }
-    /**
-     * Returns nw hb connection info object. This is called from heartbeat
-     * graph.
-     */
-    HbConnectionInfo getNewHbConnectionInfo() {
-        final HbConnectionInfo hbci = new HbConnectionInfo(this);
-        //hbci.getInfoPanel();
-        return hbci;
-    }
-
-    /** Returns cluster status object. */
-    public ClusterStatus getClusterStatus() {
-        return clusterStatus;
-    }
-
-    /** Returns drbd test data. */
-    public DRBDtestData getDRBDtestData() {
-        drbdtestdataLockAcquire();
-        final DRBDtestData dtd = drbdtestData;
-        drbdtestdataLockRelease();
-        return dtd;
-    }
-
-    /** Sets drbd test data. */
-    public void setDRBDtestData(final DRBDtestData drbdtestData) {
-        drbdtestdataLockAcquire();
-        this.drbdtestData = drbdtestData;
-        drbdtestdataLockRelease();
-    }
-
-    /** Acquire ptest lock. */
-    public void ptestLockAcquire() {
-        mPtestLock.lock();
-    }
-
-    /** Release ptest lock. */
-    public void ptestLockRelease() {
-        mPtestLock.unlock();
-    }
-
-    /** Acquire drbd test data lock. */
-    protected void drbdtestdataLockAcquire() {
-        mDRBDtestdataLock.lock();
-    }
-
-    /** Release drbd test data lock. */
-    protected void drbdtestdataLockRelease() {
-        mDRBDtestdataLock.unlock();
-    }
-
-    /** Returns xml from cluster manager. */
-    public CRMXML getCRMXML() {
-        return crmXML;
-    }
-
-    /** Returns xml from drbd. */
-    public DrbdXML getDrbdXML() {
-        return drbdXML;
-    }
-
-    /** Sets xml from drbd. */
-    public void setDrbdXML(final DrbdXML drbdXML) {
-        this.drbdXML = drbdXML;
-    }
-
-    /** Returns drbd node from the menu. */
-    public DefaultMutableTreeNode getDrbdNode() {
-        return drbdNode;
-    }
-
-    /** Returns common blockdevices node from the menu. */
-    public TreeNode getCommonBlockDevicesNode() {
-        return commonBlockDevicesNode;
-    }
-
-    /** Returns cluster hosts node from the menu. */
-    public TreeNode getClusterHostsNode() {
-        return clusterHostsNode;
-    }
-
-    /** Returns services node from the menu. */
-    public DefaultMutableTreeNode getServicesNode() {
-        return servicesNode;
-    }
-
-    /** Returns services node from the menu. */
-    public TreeNode getNetworksNode() {
-        return networksNode;
-    }
-
-    /**
-     * Returns a hash from drbd device to drbd volume info. putDrbdDevHash
-     * must follow after you're done. */
-    public Map<String, DrbdVolumeInfo> getDrbdDevHash() {
-        mDrbdDevHashLock.lock();
-        return drbdDevHash;
-    }
-
-    /** Unlock drbd dev hash. */
-    public void putDrbdDevHash() {
-        mDrbdDevHashLock.unlock();
-    }
-
-    /**
-     * Return volume info object from the drbd block device name.
-     * /dev/drbd/by-res/r0
-     * /dev/drbd/by-res/r0/0
-     * /dev/drbd0
-     */
-    public DrbdVolumeInfo getDrbdVolumeFromDev(final CharSequence dev) {
-        if (dev == null) {
-            return null;
-        }
-        final Matcher m = BY_RES_PATTERN.matcher(dev);
-        if (m.matches()) {
-            final String res = m.group(1);
-            final String vol;
-            if (m.groupCount() > 2) {
-                vol = m.group(2);
-            } else {
-                vol = "0";
-            }
-            final DrbdResourceInfo dri = getDrbdResHash().get(res);
-            putDrbdResHash();
-            if (dri != null) {
-                return dri.getDrbdVolumeInfo(vol);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns a hash from resource name to drbd resource info hash.
-     * Get locks the hash and put unlocks it
-     */
-    public Map<String, DrbdResourceInfo> getDrbdResHash() {
-        mDrbdResHashLock.lock();
-        return drbdResHash;
-    }
-
-    /** Done using drbdResHash. */
-    public void putDrbdResHash() {
-        mDrbdResHashLock.unlock();
-    }
-
-    /** Returns (shallow) copy of all drbdresource info objects. */
-    public Iterable<DrbdResourceInfo> getDrbdResHashValues() {
-        final Iterable<DrbdResourceInfo> values =
-                   new ArrayList<DrbdResourceInfo>(getDrbdResHash().values());
-        putDrbdResHash();
-        return values;
-    }
-
-    /** Reloads all combo boxes that need to be reloaded. */
-    public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
-        lockNameToServiceInfo();
-        for (final String name : nameToServiceInfoHash.keySet()) {
-            final Map<String, ServiceInfo> idToInfoHash =
-                                             nameToServiceInfoHash.get(name);
-            for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
-                final ServiceInfo si = serviceEntry.getValue();
-                if (si != exceptThisOne) {
-                    si.reloadComboBoxes();
-                }
-            }
-        }
-        unlockNameToServiceInfo();
-    }
-
-    /** Returns object that holds data of all VMs. */
-    public VMSXML getVMSXML(final Host host) {
-        mVMSReadLock.lock();
-        try {
-            return vmsXML.get(host);
-        } finally {
-            mVMSReadLock.unlock();
-        }
-    }
-
-    /**
-     * Finds VMSVirtualDomainInfo object that contains the VM specified by
-     * name.
-     */
-    public VMSVirtualDomainInfo findVMSVirtualDomainInfo(final String name) {
-        if (vmsNode != null && name != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node = e.nextElement();
-                final VMSVirtualDomainInfo vmsvdi =
-                                  (VMSVirtualDomainInfo) node.getUserObject();
-                if (name.equals(vmsvdi.getName())) {
-                    return vmsvdi;
-                }
-            }
-        }
-        return null;
-    }
-
-    /** Returns map to ResourceAgentClassInfo. */
-    public ResourceAgentClassInfo getClassInfoMap(final String cl) {
-        return classInfoMap.get(cl);
-    }
-
-    /** Returns map to AvailableServiceInfo. */
-    public AvailableServiceInfo getAvailableServiceInfoMap(
-                                                    final ResourceAgent ra) {
-        return availableServiceMap.get(ra);
-    }
-
-    /** Returns available services info object. */
-    public AvailableServicesInfo getAvailableServicesInfo() {
-        return (AvailableServicesInfo) availableServicesNode.getUserObject();
-    }
-
-    /** Returns the services info object. */
-    public ServicesInfo getServicesInfo() {
-        return servicesInfo;
-    }
-
-    /** Returns rsc defaults info object. */
-    public RscDefaultsInfo getRscDefaultsInfo() {
-        return rscDefaultsInfo;
-    }
-
-    /** Checks all fields in the application. */
-    public void checkAccessOfEverything() {
-        servicesInfo.checkResourceFields(null,
-                                         servicesInfo.getParametersFromXML());
-        servicesInfo.updateAdvancedPanels();
-        rscDefaultsInfo.updateAdvancedPanels();
-        Tools.getGUIData().updateGlobalItems();
-        for (final ServiceInfo si : getExistingServiceList(null)) {
-            si.checkResourceFields(null, si.getParametersFromXML());
-            si.updateAdvancedPanels();
-        }
-
-        drbdGraph.getDrbdInfo().checkResourceFields(
-                                null,
-                                drbdGraph.getDrbdInfo().getParametersFromXML());
-        drbdGraph.getDrbdInfo().updateAdvancedPanels();
-        for (final DrbdResourceInfo dri : getDrbdResHashValues()) {
-            dri.checkResourceFields(null, dri.getParametersFromXML());
-            dri.updateAdvancedPanels();
-            dri.updateAllVolumes();
-        }
-
-        if (vmsNode != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node = e.nextElement();
-                final VMSVirtualDomainInfo vmsvdi =
-                                  (VMSVirtualDomainInfo) node.getUserObject();
-                vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
-                vmsvdi.updateAdvancedPanels();
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> ce = node.children();
-                while (ce.hasMoreElements()) {
-                    final DefaultMutableTreeNode cnode = ce.nextElement();
-                    final VMSHardwareInfo vmshi =
-                                  (VMSHardwareInfo) cnode.getUserObject();
-                    vmshi.checkResourceFields(null,
-                                              vmshi.getParametersFromXML());
-                    vmshi.updateAdvancedPanels();
-                }
-            }
-        }
-
-        for (final HbConnectionInfo hbci : crmGraph.getAllHbConnections()) {
-            hbci.checkResourceFields(null, hbci.getParametersFromXML());
-            hbci.updateAdvancedPanels();
-        }
-
-        for (final Host clusterHost : getClusterHosts()) {
-            final HostBrowser hostBrowser = clusterHost.getBrowser();
-            hostBrowser.getHostInfo().updateAdvancedPanels();
-        }
-    }
-
-
-    /** Returns when at least one resource in the list of resources can be
-        promoted. */
-    public boolean isOneMaster(final Iterable<String> rscs) {
-        for (final String id : rscs) {
-            mHeartbeatIdToServiceLock();
-            final ServiceInfo si = heartbeatIdToServiceInfo.get(id);
-            mHeartbeatIdToServiceUnlock();
-            if (si == null) {
-                continue;
-            }
-            if (si.getService().isMaster()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Updates host hardware info on all cluster hosts immediately. */
-    public void updateHWInfo(final boolean updateLVM) {
-        for (final Host h : getClusterHosts()) {
-            updateHWInfo(h, updateLVM);
-        }
-    }
-
-    /** Updates host hardware info immediately. */
-    public void updateHWInfo(final Host host, final boolean updateLVM) {
-        host.setIsLoading();
-        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, crmGraph},
-                       updateLVM);
-        Tools.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
-            }
-        });
-        updateCommonBlockDevices();
-        drbdGraph.repaint();
-    }
-
-    /** Updates proxy host hardware info immediately. */
-    public void updateProxyHWInfo(final Host host) {
-        host.setIsLoading();
-        host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, crmGraph},
-                       !Host.UPDATE_LVM);
-        updateCommonBlockDevices();
-        drbdGraph.repaint();
-    }
-
-    /** Returns DRBD parameter hash. */
-    public Map<Host, String> getDrbdParameters() {
-        return drbdParameters;
-    }
-
-    /** clStatusLock global lock. */
-    public void clStatusLock() {
-        mClStatusLock.lock();
-    }
-
-    /** clStatusLock global unlock. */
-    public void clStatusUnlock() {
-        mClStatusLock.unlock();
-    }
-
-    /** Return name of the classes in the menu. */
-    public static String getClassMenu(final String cl) {
-        final String name = HB_CLASS_MENU.get(cl);
-        if (name == null) {
-            return Tools.ucfirst(cl) + " scripts";
-        }
-        return name;
-    }
-
-    /** Return null if DRBD info is availble, or the reason why not. */
-    public String isDrbdAvailable(final Host host) {
-        if (drbdParameters.get(host) == null) {
-            return "no suitable man pages";
-        }
-        if (!DRBD.compatibleVersions(host.getDrbdVersion(),
-                                     host.getDrbdModuleVersion())) {
-            return "DRBD util and module versions are not compatible: "
-                   + host.getDrbdVersion() + " / "
-                   + host.getDrbdModuleVersion();
-        }
-        return null;
     }
 }

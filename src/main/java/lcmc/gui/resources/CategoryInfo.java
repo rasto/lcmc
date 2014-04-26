@@ -21,24 +21,23 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.BoxLayout;
 import lcmc.data.Application;
+import lcmc.gui.Browser;
 
 
 /**
  * This class holds info data for a category.
  */
 public class CategoryInfo extends Info {
-    /** Info panel. */
-    private JComponent infoPanel = null;
     /** Main table. */
     public static final String MAIN_TABLE = "main";
+    /** Info panel. */
+    private JComponent infoPanel = null;
     /**
      * Prepares a new {@code CategoryInfo} object.
      */
@@ -48,7 +47,7 @@ public class CategoryInfo extends Info {
 
     /** Info panel for the category. */
     @Override
-    String getInfo() {
+    public String getInfo() {
         return null;
     }
 

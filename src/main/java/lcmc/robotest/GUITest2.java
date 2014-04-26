@@ -21,10 +21,14 @@
 package lcmc.robotest;
 
 import java.awt.Color;
-import static lcmc.robotest.RoboTest.*;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.isColor;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -32,14 +36,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class GUITest2 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(GUITest2.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private GUITest2() {
-        /* Cannot be instantiated. */
-    }
-
     /** Cluster wizard locked until focus is lost. */
     static void start(final int count) {
         slowFactor = 0.2f;
@@ -62,5 +58,10 @@ final class GUITest2 {
             leftClick();
             sleep(1000);
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private GUITest2() {
+        /* Cannot be instantiated. */
     }
 }

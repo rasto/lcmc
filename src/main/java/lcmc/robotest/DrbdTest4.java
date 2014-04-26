@@ -24,11 +24,23 @@ import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.*;
-import static lcmc.robotest.DrbdTest1.*;
+import static lcmc.robotest.DrbdTest1.addBlockDevice;
+import static lcmc.robotest.DrbdTest1.addDrbdResource;
+import static lcmc.robotest.DrbdTest1.addDrbdVolume;
+import static lcmc.robotest.DrbdTest1.addFileSystem;
+import static lcmc.robotest.DrbdTest1.addMetaData;
+import static lcmc.robotest.DrbdTest1.chooseDrbdResource;
+import static lcmc.robotest.DrbdTest1.drbdNext;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkDRBDTest;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -36,14 +48,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class DrbdTest4 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(DrbdTest4.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest4() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
         slowFactor = 0.2f;
@@ -117,8 +121,8 @@ final class DrbdTest4 {
         leftClick(); /* apply/disables tooltip */
         leftClick();
         checkDRBDTest(drbdTest, 2.1); /* 2.1 */
-
-
+        
+        
         /* common */
         moveTo(500, 342); /* select background */
         leftClick();
@@ -189,5 +193,10 @@ final class DrbdTest4 {
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 4);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest4() {
+        /* Cannot be instantiated. */
     }
 }

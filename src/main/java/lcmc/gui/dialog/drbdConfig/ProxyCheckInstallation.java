@@ -20,24 +20,23 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.DrbdVolumeInfo;
-
-import javax.swing.JPanel;
-import javax.swing.JLabel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import lcmc.data.Host;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.dialog.host.DialogHost;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * @author Rasto Levrinc
@@ -45,18 +44,6 @@ import java.awt.event.ActionEvent;
  *
  */
 final class ProxyCheckInstallation extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
-
-    /** Checking proxy label. */
-    private final JLabel proxyLabel = new JLabel(
-          ": " + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
-
-    /** Install/Upgrade proxy button. */
-    private final MyButton proxyButton = new MyButton(
-            Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
-    /** Proxy installation method. */
-    private Widget proxyInstMethodWi;
 
     /** Checking icon. */
     private static final ImageIcon CHECKING_ICON =
@@ -73,24 +60,36 @@ final class ProxyCheckInstallation extends DialogHost {
 
     private static final String PROXY_PREFIX = "ProxyInst";
     private static final String PROXY_AUTO_OPTION = "proxyinst";
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
+
+    /** Checking proxy label. */
+    private final JLabel proxyLabel = new JLabel(
+          ": " + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
+
+    /** Install/Upgrade proxy button. */
+    private final MyButton proxyButton = new MyButton(
+            Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
+    /** Proxy installation method. */
+    private Widget proxyInstMethodWi;
 
     /** Proxy icon: checking ... */
     private final JLabel proxyIcon = new JLabel(CHECKING_ICON);
     /** The proxy host. */
     private final Host host;
     /** Drbd volume info. */
-    private final DrbdVolumeInfo drbdVolumeInfo;
+    private final VolumeInfo volumeInfo;
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
     /** Prepares a new {@code ProxyCheckInstallation} object. */
     ProxyCheckInstallation(final WizardDialog previousDialog,
                            final Host host,
-                           final DrbdVolumeInfo drbdVolumeInfo,
+                           final VolumeInfo volumeInfo,
                            final WizardDialog origDialog) {
         super(previousDialog, host);
         this.host = host;
-        this.drbdVolumeInfo = drbdVolumeInfo;
+        this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
 
@@ -121,7 +120,7 @@ final class ProxyCheckInstallation extends DialogHost {
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = new ProxyInst(thisClass,
                                                      getHost(),
-                                                     drbdVolumeInfo,
+                                                     volumeInfo,
                                                      origDialog);
                     final InstallMethods im =
                                  (InstallMethods) proxyInstMethodWi.getValue();
@@ -226,8 +225,8 @@ final class ProxyCheckInstallation extends DialogHost {
                 setPressedButton(nextButton());
             }
             getHost().getCluster().addProxyHost(getHost());
-            if (drbdVolumeInfo != null) {
-                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+            if (volumeInfo != null) {
+                volumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
             }
         }
     }

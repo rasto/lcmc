@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_suse_SLES10
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -74,4 +68,10 @@ public final class DistResource_suse_SLES10
          + "make && make install DESTDIR=/ && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

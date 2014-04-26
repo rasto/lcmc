@@ -43,15 +43,10 @@ public final class Openais {
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0400";
 
-    /** No instantiation. */
-    private Openais() { }
-
     /** Executes specified command on the host. */
-    private static void execCommand(final Host host,
-                                    final String command,
-                                    final boolean outputVisible) {
+    private static void execCommand(final Host host, final String command, final boolean outputVisible) {
         Tools.execCommandProgressIndicator(
-                                host,
+            host,
                                 command,
                                 null,
                                 outputVisible,
@@ -62,9 +57,9 @@ public final class Openais {
     /** Stops the heartbeat and starts the openais on the specified host. */
     public static void switchToOpenais(final Host host) {
         final String command = host.getDistCommand(
-                                                "Heartbeat.deleteFromRc"
-                                                + ";;;Openais.addToRc"
-                                                + ";;;Openais.startOpenais",
+            "Heartbeat.deleteFromRc"
+                + ";;;Openais.addToRc"
+                + ";;;Openais.startOpenais",
                                                 (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -95,7 +90,7 @@ public final class Openais {
      */
     public static void stopOpenaisWithPcmk(final Host host) {
         final String command = host.getDistCommand(
-                                              "Openais.stopOpenaisWithPcmk",
+            "Openais.stopOpenaisWithPcmk",
                                               (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -103,7 +98,7 @@ public final class Openais {
     /** Starts openais on host and adds it to the rc. */
     public static void startOpenaisRc(final Host host) {
         final String command = host.getDistCommand("Openais.startOpenais"
-                                                   + ";;;Openais.addToRc",
+            + ";;;Openais.addToRc",
                                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -126,8 +121,7 @@ public final class Openais {
     }
 
     /** Creates OpenAIS config on specified hosts. */
-    public static void createAISConfig(final Host[] hosts,
-                                       final StringBuilder config) {
+    public static void createAISConfig(final Host[] hosts, final StringBuilder config) {
         /* write heartbeat config on all hosts */
         Tools.createConfigOnAllHosts(hosts,
                                      config.toString(),
@@ -136,7 +130,7 @@ public final class Openais {
                                      AIS_CONF_PERMS,
                                      true);
         final StringBuilder authkeys =
-                                  new StringBuilder(Tools.getRandomSecret(128));
+            new StringBuilder(Tools.getRandomSecret(128));
         Tools.createConfigOnAllHosts(hosts,
                                      authkeys.toString(),
                                      AUTHKEYS_CONF_NAME,
@@ -152,4 +146,7 @@ public final class Openais {
             reloadOpenais(host);
         }
     }
+
+    /** No instantiation. */
+    private Openais() { }
 }

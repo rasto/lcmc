@@ -20,22 +20,22 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.data.Host;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.gui.widget.TextfieldWithUnit;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.Unit;
-import java.util.Map;
-import java.util.HashMap;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.widget.TextfieldWithUnit;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
 
 /**
  * An implementation of an dialog with log files.
@@ -44,11 +44,21 @@ import lcmc.data.Value;
  * @version $Id$
  */
 public final class CmdLog extends HostLogs {
+    private static final Value DEFAULT_TIME = new StringValue("5m");
+
+    /** Time units. */
+    protected static Unit[] getUnits() {
+        return new Unit[]{
+                   new Unit("s", "s", "second", "seconds"),
+                   new Unit("m", "m", "minute", "minutes"),
+                   new Unit("h", "h", "hour",   "hours"),
+                   new Unit("d", "d", "day",    "days")
+       };
+    }
     /** Command to retrieve the logs. */
     private String command = "CmdLog.Processed";
     /** Time in minutes of the logs. */
     private TextfieldWithUnit timeTF;
-    private static final Value DEFAULT_TIME = new StringValue("5m");
 
     /** Prepares a new {@code CmdLog} object. */
     public CmdLog(final Host host) {
@@ -107,16 +117,6 @@ public final class CmdLog extends HostLogs {
                                         Tools.getString("CmdLog.Last.Label")),
                                 timeTF,
                                 getRefreshBtn()};
-    }
-
-    /** Time units. */
-    protected static Unit[] getUnits() {
-        return new Unit[]{
-                   new Unit("s", "s", "second", "seconds"),
-                   new Unit("m", "m", "minute", "minutes"),
-                   new Unit("h", "h", "hour",   "hours"),
-                   new Unit("d", "d", "day",    "days")
-       };
     }
 
     /** Options for the log command. */

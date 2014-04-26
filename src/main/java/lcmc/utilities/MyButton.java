@@ -22,9 +22,6 @@
 
 package lcmc.utilities;
 
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JToolTip;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -37,11 +34,12 @@ import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.Shape;
-import java.awt.geom.Point2D;
-
-import java.awt.geom.Rectangle2D;
 import java.awt.event.ActionEvent;
-
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JToolTip;
 import lcmc.gui.widget.Check;
 
 /**
@@ -55,6 +53,9 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Default background color. */
     private static final Color DEFAULT_COLOR =
                            Tools.getDefaultColor("DefaultButton.Background");
+    /** Screen device. */
+    private static final GraphicsDevice SCREEN_DEVICE =
+     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Second color in the gradient. */
     private Color color2 = DEFAULT_COLOR;
     /** Robot to move a mouse a little if a tooltip has changed. */
@@ -65,9 +66,6 @@ public class MyButton extends JButton implements ComponentWithTest {
     private String simulationToolTip = "";
     /** Tooltip about changed/incorrect fields. */
     private String checkToolTip = "";
-    /** Screen device. */
-    private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 
@@ -183,7 +181,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /** Sets tooltip and wiggles the mouse to refresh it. */
-    private final void updateToolTip() {
+    private void updateToolTip() {
         final String toolTipText = "<html>" + simulationToolTip + "<br>"
                             + checkToolTip + "</html>";
         if (toolTip != null && robot != null && toolTip.isShowing()) {
@@ -269,7 +267,7 @@ public class MyButton extends JButton implements ComponentWithTest {
         final Shape rf2 = new Rectangle2D.Float(0.0f, 0.0f, getWidth(),
                 getHeight());
         final Shape rf1 = new Rectangle2D.Float(3.0f, getHeight() * 0.5f,
-                (float) getWidth() - 6, (float) (getHeight() * 0.5 - 3));
+                getWidth() - 6, (float) (getHeight() * 0.5 - 3));
         g2.setPaint(gp2);
         g2.fill(rf2);
         g2.setPaint(gp1);

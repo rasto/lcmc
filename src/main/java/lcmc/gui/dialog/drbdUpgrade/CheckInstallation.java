@@ -22,22 +22,21 @@
 
 package lcmc.gui.dialog.drbdUpgrade;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.SpringLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where drbd installation is checked.
@@ -47,8 +46,6 @@ import java.awt.event.ActionEvent;
  *
  */
 final class CheckInstallation extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
     /** Drbd label. */
     private static final JLabel DRBD_LABEL = new JLabel(": " + Tools.getString(
                                 "Dialog.Host.CheckInstallation.CheckingDrbd"));
@@ -74,6 +71,8 @@ final class CheckInstallation extends DialogHost {
               Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
     /** Drbd icon wrapped in a JLabel. */
     private static final JLabel DRBD_ICON = new JLabel(CHECKING_ICON);
+    /** Next dialog object. */
+    private WizardDialog nextDialogObject = null;
     /** Whether drbd was installed without failure. */
     private boolean drbdOk = false;
 

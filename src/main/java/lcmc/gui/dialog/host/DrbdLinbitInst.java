@@ -23,18 +23,17 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.DrbdInfo;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.SpringLayout;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where drbd will be installed.
@@ -174,12 +173,12 @@ public class DrbdLinbitInst extends DialogHost {
                                    getHost().getBrowser().getClusterBrowser();
         if (clusterBrowser != null) {
             clusterBrowser.getDrbdParameters().clear();
-            final DrbdInfo drbdInfo =
+            final GlobalInfo globalInfo =
                                   clusterBrowser.getDrbdGraph().getDrbdInfo();
-            drbdInfo.clearPanelLists();
-            drbdInfo.updateDrbdInfo();
-            drbdInfo.resetInfoPanel();
-            drbdInfo.getInfoPanel();
+            globalInfo.clearPanelLists();
+            globalInfo.updateDrbdInfo();
+            globalInfo.resetInfoPanel();
+            globalInfo.getInfoPanel();
         }
         nextDialogObject = new CheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog()

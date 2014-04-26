@@ -24,13 +24,11 @@
 package lcmc;
 
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
-
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.NewHost;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * AddHostDialog.

@@ -21,14 +21,15 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.data.Host;
-import lcmc.utilities.MyButton;
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+import lcmc.data.Host;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.HostBrowser;
+import lcmc.gui.resources.crm.HostInfo;
+import lcmc.utilities.MyButton;
 
 /**
  * This class holds the information hosts in this cluster.
@@ -41,7 +42,7 @@ public final class ClusterHostsInfo extends CategoryInfo {
 
     /** Returns browser object of this info. */
     @Override
-    protected ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 

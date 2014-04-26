@@ -25,10 +25,9 @@ package lcmc.data.resources;
 
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-import lcmc.utilities.Tools;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds data of one cluster network.

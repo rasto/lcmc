@@ -23,21 +23,19 @@
 
 package lcmc.gui.dialog.vm;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSInterfaceInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.widget.Widget;
-import lcmc.data.VMSXML.InterfaceData;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML.InterfaceData;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.gui.resources.vms.InterfaceInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -46,8 +44,6 @@ import lcmc.data.StringValue;
  * @version $Id$
  */
 final class Network extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {InterfaceData.TYPE,
                                             InterfaceData.MAC_ADDRESS,
@@ -55,14 +51,16 @@ final class Network extends VMConfig {
                                             InterfaceData.SOURCE_BRIDGE,
                                             InterfaceData.SCRIPT_PATH,
                                             InterfaceData.MODEL_TYPE};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS interface info object. */
-    private VMSInterfaceInfo vmsii = null;
+    private InterfaceInfo vmsii = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Network} object. */
     Network(final WizardDialog previousDialog,
-            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+            final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -145,7 +143,7 @@ final class Network extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsii.savePreferredValues();
         vmsii.getResource().setValue(InterfaceData.TYPE,
-                                     VMSInterfaceInfo.TYPE_NETWORK);
+                                     InterfaceInfo.TYPE_NETWORK);
         vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
         vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, new StringValue());
         vmsii.addWizardParams(

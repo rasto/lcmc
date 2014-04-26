@@ -87,9 +87,6 @@ public final class LoggerFactory {
         return appError;
     }
 
-    private LoggerFactory() {
-    }
-
     public static Logger getLogger(final Class<?> clazz) {
         Logger logger;
         final String name = clazz.getName();
@@ -112,5 +109,8 @@ public final class LoggerFactory {
             }
         }
         return lb.toString();
+    }
+
+    private LoggerFactory() {
     }
 }

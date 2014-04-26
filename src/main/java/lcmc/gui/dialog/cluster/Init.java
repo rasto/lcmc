@@ -23,40 +23,43 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.Heartbeat;
-import lcmc.utilities.Openais;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.SSH;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.ExecCallback;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.ArrayList;
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JLabel;
-import javax.swing.JComponent;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.Color;
-import javax.swing.border.TitledBorder;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.BorderFactory;
-import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import javax.swing.border.TitledBorder;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
-
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Corosync;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Openais;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
@@ -67,6 +70,19 @@ import lcmc.utilities.LoggerFactory;
 public class Init extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Init.class);
+    /** Interval between checks. */
+    private static final int CHECK_INTERVAL = 1000;
+    /** Switch to Heartbeat button text. */
+    private static final String HB_BUTTON_SWITCH =
+                        Tools.getString("Dialog.Cluster.Init.HbButtonSwitch");
+    /** Switch to Corosync/OpenAIS button text. */
+    private static final String CS_AIS_BUTTON_SWITCH =
+                       Tools.getString("Dialog.Cluster.Init.CsAisButtonSwitch");
+    /** Corosync init script. */
+    private static final String COROSYNC_INIT_SCRIPT =
+                                                 "use /etc/init.d/corosync";
+    /** Openais init script. */
+    private static final String OPENAIS_INIT_SCRIPT = "/etc/init.d/openais";
     /** List with texts if drbd is loaded per host. */
     private List<JLabel> drbdLoadedInfos;
     /** List of load drbd buttons. */
@@ -111,19 +127,6 @@ public class Init extends DialogCluster {
      * override this one and use different finish/next button.
      */
     private String button = null;
-    /** Interval between checks. */
-    private static final int CHECK_INTERVAL = 1000;
-    /** Switch to Heartbeat button text. */
-    private static final String HB_BUTTON_SWITCH =
-                        Tools.getString("Dialog.Cluster.Init.HbButtonSwitch");
-    /** Switch to Corosync/OpenAIS button text. */
-    private static final String CS_AIS_BUTTON_SWITCH =
-                       Tools.getString("Dialog.Cluster.Init.CsAisButtonSwitch");
-    /** Corosync init script. */
-    private static final String COROSYNC_INIT_SCRIPT =
-                                                 "use /etc/init.d/corosync";
-    /** Openais init script. */
-    private static final String OPENAIS_INIT_SCRIPT = "/etc/init.d/openais";
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
     private final Widget useOpenaisButton = WidgetFactory.createInstance(
@@ -578,9 +581,9 @@ public class Init extends DialogCluster {
                 }
             });
 
-	    final List<String> incorrect = new ArrayList<String>();
-            if (oneFailed) {
-		incorrect.add("one component failed");
+        final List<String> incorrect = new ArrayList<String>();
+        if (oneFailed) {
+            incorrect.add("one component failed");
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -588,9 +591,9 @@ public class Init extends DialogCluster {
                     }
                 });
             }
-	    final List<String> changed = new ArrayList<String>();
+        final List<String> changed = new ArrayList<String>();
             enableComponents();
-	    nextButtonSetEnabled(new Check(incorrect, changed));
+            nextButtonSetEnabled(new Check(incorrect, changed));
             if (!Tools.getApplication().getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();

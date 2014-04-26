@@ -24,19 +24,17 @@ package lcmc.gui.dialog.host;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.CancelCallback;
-import lcmc.utilities.ConnectionCallback;
 import lcmc.gui.SSHGui;
 import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-
+import lcmc.utilities.CancelCallback;
+import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where ssh connection will be established.

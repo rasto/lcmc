@@ -14,10 +14,24 @@
         <project.reporting.outputEncoding>
         UTF-8
         </project.reporting.outputEncoding>
-        <jmockit.version>0.999.15</jmockit.version>
         <lib.src>${project.basedir}/src/lib</lib.src>
+        <junit.category.exclude>
+            lcmc.testutils.annotation.type.IntegrationTest
+        </junit.category.exclude>
     </properties>
-
+    <profiles>
+        <profile>
+            <id>FastTests</id>
+            <properties>
+                <junit.category.exclude>
+                    lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest
+                </junit.category.exclude>
+            </properties>
+        </profile>
+        <profile>
+            <id>GuiTests</id>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>net.sourceforge.collections</groupId>
@@ -47,13 +61,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope> 
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.jmockit</groupId>
-            <artifactId>jmockit-coverage</artifactId>
-            <version>${jmockit.version}</version>
+            <version>4.11</version>
             <scope>test</scope> 
         </dependency>
         <dependency>
@@ -86,6 +94,13 @@
             <artifactId>vecmath</artifactId>
             <version>1.5.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>
@@ -177,45 +192,50 @@
 
             <!-- surefire -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.17</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
-                    <systemPropertyVariables>
-                        <test.cluster>true</test.cluster>
-                        <test.connect>false</test.connect>
-                        <test.count>2</test.count>
-                        <test.password>rastislav</test.password>
-                        <test.quick>false</test.quick>
-                        <test.interactive>false</test.interactive>
-                    </systemPropertyVariables>
-                    <outputDirectory>${basedir}/target/checks/surefire-reports</outputDirectory>
                     <includes>
-                        <include>**/*Test1.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/TestSuite*.java</exclude>
-                    </excludes>
+                        <include>**/*.class</include>
+                        </includes>
+                        <excludedGroups>${junit.category.exclude}</excludedGroups>
                 </configuration>
             </plugin>
+            <!-- failsafe -->
             <plugin>
-                <artifactId>maven-surefire-report-plugin</artifactId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.17</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.17</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
-                    <outputDirectory>${basedir}/target/checks/surefire-reports</outputDirectory>
-                    <includes>
-                        <include>**/*Test1.java</include>
-                    </includes>
-                    <excludes>
-                        <exclude>**/TestSuite*.java</exclude>
-                    </excludes>
+                    <groups>lcmc.testutils.annotation.type.IntegrationTest</groups>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
-                            <goal>report</goal>
+                            <goal>integration-test</goal>
                         </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/*.class</include>
+                            </includes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
             <!-- jdepend -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -300,41 +320,24 @@
                 </executions>
               </plugin>
               <plugin>
-                  <artifactId>maven-surefire-plugin</artifactId><version>2.6</version>
-                  <configuration>
-                      <argLine>
-                         -Djmockit-coverage-outputDir=target/my-coverage-report
-                      </argLine>
-                  </configuration>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>build-helper-maven-plugin</artifactId>
+                  <version>1.8</version>
+                  <executions>
+                      <execution>
+                          <id>add-source</id>
+                          <phase>generate-sources</phase>
+                          <goals>
+                              <goal>add-source</goal>
+                          </goals>
+                          <configuration>
+                              <sources>
+                                  <source>${lib.src}</source>
+                              </sources>
+                          </configuration>
+                      </execution>
+                  </executions>
               </plugin>
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <!--
-                <configuration>
-                  <argLine>-javaagent:${settings.localRepository}/com/googlecode/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar=coverage=:html:./target/coverage-report</argLine>
-                </configuration>
-                -->
-              </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          <execution>
-            <id>add-source</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>add-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>${lib.src}</source>
-              </sources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
           </plugins>
       </build>
 </project>

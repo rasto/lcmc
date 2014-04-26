@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_suse_OPENSUSE13_1
                                     extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
 
@@ -68,4 +62,10 @@ public final class DistResource_suse_OPENSUSE13_1
          DistResource.SUDO + "systemctl enable corosync.service"},
 
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

@@ -22,13 +22,11 @@
 
 
 package lcmc.gui;
-import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
-import lcmc.utilities.AllHostsUpdatable;
-
-import javax.swing.Box;
-
 import java.awt.BorderLayout;
+import javax.swing.Box;
+import lcmc.data.Cluster;
+import lcmc.utilities.AllHostsUpdatable;
+import lcmc.utilities.Tools;
 
 
 

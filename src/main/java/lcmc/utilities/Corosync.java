@@ -43,15 +43,10 @@ public final class Corosync {
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0400";
 
-    /** No instantiation. */
-    private Corosync() { }
-
     /** Executes specified command on the host. */
-    private static void execCommand(final Host host,
-                                    final String command,
-                                    final boolean outputVisible) {
+    private static void execCommand(final Host host, final String command, final boolean outputVisible) {
         Tools.execCommandProgressIndicator(
-                                host,
+            host,
                                 command,
                                 null,
                                 outputVisible,
@@ -62,9 +57,9 @@ public final class Corosync {
     /** Stops the heartbeat and starts the corosync on the specified host. */
     public static void switchToCorosync(final Host host) {
         final String command = host.getDistCommand(
-                                            "Heartbeat.deleteFromRc"
-                                            + ";;;Corosync.addToRc"
-                                            + ";;;Corosync.startCorosync",
+            "Heartbeat.deleteFromRc"
+                + ";;;Corosync.addToRc"
+                + ";;;Corosync.startCorosync",
                                             (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -85,11 +80,10 @@ public final class Corosync {
      */
     public static void startCorosyncWithPcmk(final Host host) {
         final String command = host.getDistCommand(
-                                              "Corosync.startCorosyncWithPcmk",
+            "Corosync.startCorosyncWithPcmk",
                                               (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
-
 
     /**
      * Starts pacemaker on host.
@@ -100,6 +94,7 @@ public final class Corosync {
                                                    (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
+
 
     /**
      * Stops corosync on host.
@@ -117,7 +112,7 @@ public final class Corosync {
      */
     public static void stopCorosyncWithPcmk(final Host host) {
         final String command = host.getDistCommand(
-                                              "Corosync.stopCorosyncWithPcmk",
+            "Corosync.stopCorosyncWithPcmk",
                                               (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -125,8 +120,8 @@ public final class Corosync {
     /** Starts Corosync on host and adds it to the rc. */
     public static void startCorosyncRc(final Host host) {
         final String command = host.getDistCommand(
-                                            "Corosync.startCorosync"
-                                            + ";;;Corosync.addToRc",
+            "Corosync.startCorosync"
+                + ";;;Corosync.addToRc",
                                             (ConvertCmdCallback) null);
         execCommand(host, command, true);
     }
@@ -149,8 +144,7 @@ public final class Corosync {
     }
 
     /** Creates Corosync config on specified hosts. */
-    public static void createCorosyncConfig(final Host[] hosts,
-                                            final StringBuilder config) {
+    public static void createCorosyncConfig(final Host[] hosts, final StringBuilder config) {
         /* write heartbeat config on all hosts */
         Tools.createConfigOnAllHosts(hosts,
                                      config.toString(),
@@ -159,7 +153,7 @@ public final class Corosync {
                                      COROSYNC_CONF_PERMS,
                                      true);
         final StringBuilder authkeys =
-                                  new StringBuilder(Tools.getRandomSecret(128));
+            new StringBuilder(Tools.getRandomSecret(128));
         Tools.createConfigOnAllHosts(hosts,
                                      authkeys.toString(),
                                      AUTHKEYS_CONF_NAME,
@@ -175,4 +169,7 @@ public final class Corosync {
             reloadCorosync(host);
         }
     }
+
+    /** No instantiation. */
+    private Corosync() { }
 }

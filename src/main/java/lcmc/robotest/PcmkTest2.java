@@ -20,10 +20,30 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.addColocation;
+import static lcmc.robotest.RoboTest.addConstraint;
+import static lcmc.robotest.RoboTest.addConstraintColocationOnly;
+import static lcmc.robotest.RoboTest.addConstraintOrderOnly;
+import static lcmc.robotest.RoboTest.addOrder;
+import static lcmc.robotest.RoboTest.checkTest;
+import static lcmc.robotest.RoboTest.chooseDummy;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.disableStonith;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.maybe;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.removeColocation;
+import static lcmc.robotest.RoboTest.removeConstraint;
+import static lcmc.robotest.RoboTest.removeEverything;
+import static lcmc.robotest.RoboTest.removeOrder;
+import static lcmc.robotest.RoboTest.removeResource;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.slowFactor;
+import static lcmc.robotest.RoboTest.stopEverything;
+import static lcmc.robotest.RoboTest.stopResource;
 import lcmc.utilities.Tools;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -31,14 +51,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class PcmkTest2 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTest2.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest2() {
-        /* Cannot be instantiated. */
-    }
-
     static void start() {
         slowFactor = 0.6f;
         aborted = false;
@@ -97,7 +109,7 @@ final class PcmkTest2 {
         checkTest("test2", 9);
 
         final int dum3PopX = dummy3X + 165;
-        final int dum3PopY = dummy3Y - 10;
+        final int dum3PopY = dummy3Y;
         for (int i = 0; i < 2; i++) {
             removeColocation(dum3PopX, dum3PopY);
 
@@ -136,7 +148,7 @@ final class PcmkTest2 {
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
-        final int dum4PopY = dummy4Y - 10;
+        final int dum4PopY = dummy4Y;
         removeConstraint(dum4PopX, dum4PopY);
         checkTest("test2", 11.6);
         moveTo(dummy4X + 20, dummy4Y + 5);
@@ -186,5 +198,10 @@ final class PcmkTest2 {
             confirmRemove();
         }
         checkTest("test2", 16);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest2() {
+        /* Cannot be instantiated. */
     }
 }

@@ -22,21 +22,20 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
+import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.utilities.ConvertCmdCallback;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where drbd is installed.
@@ -66,12 +65,12 @@ final class DrbdCommandInst extends DialogHost {
                                    getHost().getBrowser().getClusterBrowser();
         if (clusterBrowser != null) {
             clusterBrowser.getDrbdParameters().clear();
-            final DrbdInfo drbdInfo =
+            final GlobalInfo globalInfo =
                                   clusterBrowser.getDrbdGraph().getDrbdInfo();
-            drbdInfo.clearPanelLists();
-            drbdInfo.updateDrbdInfo();
-            drbdInfo.resetInfoPanel();
-            drbdInfo.getInfoPanel();
+            globalInfo.clearPanelLists();
+            globalInfo.updateDrbdInfo();
+            globalInfo.resetInfoPanel();
+            globalInfo.getInfoPanel();
         }
         nextDialogObject = new CheckInstallation(
                    getPreviousDialog().getPreviousDialog().getPreviousDialog(),

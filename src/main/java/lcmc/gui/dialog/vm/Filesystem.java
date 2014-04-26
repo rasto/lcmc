@@ -22,19 +22,17 @@
 
 package lcmc.gui.dialog.vm;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSFilesystemInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.data.VMSXML.FilesystemData;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.data.VMSXML.FilesystemData;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.gui.resources.vms.FilesystemInfo;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -43,21 +41,21 @@ import java.awt.Dimension;
  * @version $Id$
  */
 final class Filesystem extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {FilesystemData.TYPE,
                                             FilesystemData.SOURCE_DIR,
                                             FilesystemData.SOURCE_NAME,
                                             FilesystemData.TARGET_DIR};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS filesystem info object. */
-    private VMSFilesystemInfo vmsfi = null;
+    private FilesystemInfo vmsfi = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Filesystem} object. */
     Filesystem(final WizardDialog previousDialog,
-               final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+               final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -135,7 +133,7 @@ final class Filesystem extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsfi.savePreferredValues();
         vmsfi.getResource().setValue(FilesystemData.TYPE,
-                                     VMSFilesystemInfo.MOUNT_TYPE);
+                                     FilesystemInfo.MOUNT_TYPE);
         vmsfi.addWizardParams(
                       optionsPanel,
                       PARAMS,

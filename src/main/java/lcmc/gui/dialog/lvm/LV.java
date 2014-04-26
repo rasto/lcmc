@@ -23,25 +23,25 @@
 
 package lcmc.gui.dialog.lvm;
 
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.utilities.Unit;
 import javax.swing.JComponent;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.utilities.Unit;
 
 /** LVM dialogs. */
 class LV extends WizardDialog {
-    /** Prepares a new {@code LV} object. */
-    protected LV(final WizardDialog previousDialog) {
-        super(previousDialog);
-    }
     /** Return unit objects. */
     protected static Unit[] getUnits() {
         return new Unit[]{
-                   new Unit("K", "K", "KiByte", "KiBytes"),
+            new Unit("K", "K", "KiByte", "KiBytes"),
                    new Unit("M", "M", "MiByte", "MiBytes"),
                    new Unit("G",  "G",  "GiByte",      "GiBytes"),
                    new Unit("T",  "T",  "TiByte",      "TiBytes")
-       };
+        };
+    }
+    /** Prepares a new {@code LV} object. */
+    protected LV(final WizardDialog previousDialog) {
+        super(previousDialog);
     }
 
     /** Returns the next dialog. */

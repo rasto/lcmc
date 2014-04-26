@@ -22,8 +22,8 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
 import lcmc.data.Host;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of an dialog, with log files.

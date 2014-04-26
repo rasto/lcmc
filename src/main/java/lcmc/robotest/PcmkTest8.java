@@ -20,9 +20,18 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkTest;
+import static lcmc.robotest.RoboTest.chooseDummy;
+import static lcmc.robotest.RoboTest.disableStonith;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftPress;
+import static lcmc.robotest.RoboTest.leftRelease;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.removeEverything;
+import static lcmc.robotest.RoboTest.resetTerminalAreas;
+import static lcmc.robotest.RoboTest.slowFactor;
+import static lcmc.robotest.RoboTest.stopEverything;
 
 /**
  * This class is used to test the GUI.
@@ -30,14 +39,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class PcmkTest8 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTest8.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest8() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final int count) {
         slowFactor = 0.2f;
         aborted = false;
@@ -62,5 +63,10 @@ final class PcmkTest8 {
         removeEverything();
         checkTest("test8", 4);
         resetTerminalAreas();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest8() {
+        /* Cannot be instantiated. */
     }
 }

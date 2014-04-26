@@ -20,11 +20,21 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
 import java.awt.event.KeyEvent;
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkTest;
+import static lcmc.robotest.RoboTest.chooseDummy;
+import static lcmc.robotest.RoboTest.disableStonith;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.removeResource;
+import static lcmc.robotest.RoboTest.robot;
+import static lcmc.robotest.RoboTest.slowFactor;
+import static lcmc.robotest.RoboTest.stopResource;
 import lcmc.utilities.Tools;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -32,14 +42,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class PcmkTest7 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTest7.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest7() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final int count) {
         slowFactor = 0.5f;
         aborted = false;
@@ -73,5 +75,10 @@ final class PcmkTest7 {
             removeResource(dummy1X, dummy1Y + 90, CONFIRM_REMOVE);
         }
         System.gc();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest7() {
+        /* Cannot be instantiated. */
     }
 }

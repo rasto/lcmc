@@ -22,6 +22,7 @@
 package lcmc.gui.resources;
 
 import lcmc.data.Value;
+import lcmc.gui.resources.crm.ServiceInfo;
 
 /**
  * This interface provides getDevice function for DRBD block devices or block

@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_ubuntu_KARMIC
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-KARMIC"},
@@ -61,4 +55,10 @@ public final class DistResource_ubuntu_KARMIC
          + " && if [ -e /etc/corosync/corosync.conf ];then"
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

@@ -23,33 +23,30 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Host;
-import lcmc.data.Hosts;
-import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
-import lcmc.gui.dialog.WizardDialog;
-
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-
-import javax.swing.JPanel;
-import javax.swing.JCheckBox;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
-import javax.swing.Scrollable;
-
-import java.awt.FlowLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.LayoutManager;
+import java.awt.Rectangle;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.Hosts;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
@@ -60,9 +57,6 @@ import java.util.Map;
  *
  */
 final class ClusterHosts extends DialogCluster {
-    /** Map from checkboxes to the host, which they choose. */
-    private final Map<JCheckBox, Host> checkBoxToHost =
-                                    new LinkedHashMap<JCheckBox, Host>();
     /** Host checked icon. */
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
@@ -71,6 +65,9 @@ final class ClusterHosts extends DialogCluster {
             Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
     ///** Whether the scrolling pane was already moved. */
     //private volatile boolean alreadyMoved = false;
+    /** Map from checkboxes to the host, which they choose. */
+    private final Map<JCheckBox, Host> checkBoxToHost =
+                                    new LinkedHashMap<JCheckBox, Host>();
 
     /** Prepares a new {@code ClusterHosts} object. */
     ClusterHosts(final WizardDialog previousDialog,

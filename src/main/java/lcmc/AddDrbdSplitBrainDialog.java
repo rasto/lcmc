@@ -23,13 +23,12 @@
 
 package lcmc;
 
-import lcmc.utilities.Tools;
-
-import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.dialog.drbd.SplitBrain;
-import lcmc.gui.resources.DrbdVolumeInfo;
+import lcmc.gui.dialog.drbdConfig.DrbdConfig;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * AddDrbdSplitBrainDialog.
@@ -46,10 +45,10 @@ public final class AddDrbdSplitBrainDialog {
     /** Whether the wizard was canceled. */
     private boolean canceled = false;
     /** Drbd resource info object. */
-    private final DrbdVolumeInfo dvi;
+    private final VolumeInfo dvi;
 
     /** Prepares a new {@code AddDrbdSplitBrainDialog} object. */
-    public AddDrbdSplitBrainDialog(final DrbdVolumeInfo dvi) {
+    public AddDrbdSplitBrainDialog(final VolumeInfo dvi) {
         this.dvi = dvi;
     }
 

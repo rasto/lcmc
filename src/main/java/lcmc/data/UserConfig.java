@@ -23,25 +23,17 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.TerminalPanel;
-import lcmc.gui.ClusterTab;
-
 import java.io.IOException;
 import java.io.OutputStream;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -51,11 +43,15 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import lcmc.gui.ClusterTab;
+import lcmc.gui.TerminalPanel;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class parses xml from user configs and creates data objects,
@@ -169,9 +165,7 @@ public final class UserConfig extends XML {
         try {
             t.transform(doms, sr);
         } catch (final TransformerException te) {
-            final IOException ioe = new IOException();
-            ioe.initCause(te);
-            throw ioe;
+            throw new IOException("saveXML: transform failed", te);
         }
         return "";
     }

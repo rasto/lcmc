@@ -20,9 +20,15 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import static lcmc.robotest.RoboTest.CLONE_RADIO_Y;
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.chooseDummy;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.removeResource;
+import static lcmc.robotest.RoboTest.slowFactor;
 
 /**
  * This class is used to test the GUI.
@@ -30,14 +36,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class PcmkTestD {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(PcmkTestD.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestD() {
-        /* Cannot be instantiated. */
-    }
-
     /** Pacemaker Leak tests. */
     static void start(final int count) {
         slowFactor = 0.2f;
@@ -82,5 +80,10 @@ final class PcmkTestD {
             }
         }
         removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTestD() {
+        /* Cannot be instantiated. */
     }
 }

@@ -24,17 +24,16 @@ package lcmc.gui.dialog.host;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.Host;
-import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
 import lcmc.utilities.SSH.ExecCommandThread;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.SpringLayout;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where hardware information is collected.

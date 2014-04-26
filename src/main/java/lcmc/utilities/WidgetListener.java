@@ -20,8 +20,8 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Value;
 import lcmc.data.StringValue;
+import lcmc.data.Value;
 
 public abstract class WidgetListener {
     /** Whether it is enabled or not. */

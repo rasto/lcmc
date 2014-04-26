@@ -23,10 +23,10 @@
 
 package lcmc.gui;
 
+import java.awt.BorderLayout;
+import javax.swing.JPanel;
 import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
-import javax.swing.JPanel;
-import java.awt.BorderLayout;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,

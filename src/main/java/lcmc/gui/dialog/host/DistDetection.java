@@ -22,14 +22,13 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.Host;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
 
 /**
  * An implementation of a dialog that shows which distribution was detected.

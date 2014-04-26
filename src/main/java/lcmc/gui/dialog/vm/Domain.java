@@ -23,19 +23,17 @@
 
 package lcmc.gui.dialog.vm;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.widget.Widget;
-import lcmc.data.VMSXML;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.data.VMSXML;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -45,9 +43,6 @@ import java.awt.Dimension;
  *
  */
 public final class Domain extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
-    private Widget domainNameWi;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VMSXML.VM_PARAM_DOMAIN_TYPE,
                                             VMSXML.VM_PARAM_NAME,
@@ -62,12 +57,15 @@ public final class Domain extends VMConfig {
                                             VMSXML.VM_PARAM_INIT,
                                             VMSXML.VM_PARAM_TYPE_ARCH,
                                             VMSXML.VM_PARAM_TYPE_MACHINE};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
+    private Widget domainNameWi;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Domain} object. */
     public Domain(final WizardDialog previousDialog,
-                  final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+                  final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -115,7 +113,7 @@ public final class Domain extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        final DomainInfo vdi = getVMSVirtualDomainInfo();
         final boolean cor = vdi.checkResourceFields(null, PARAMS).isCorrect();
         if (cor || nextDialogObject != null) {
             enableComponents();
@@ -140,7 +138,7 @@ public final class Domain extends VMConfig {
     /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
-        final VMSVirtualDomainInfo vdi = getVMSVirtualDomainInfo();
+        final DomainInfo vdi = getVMSVirtualDomainInfo();
         vdi.waitForInfoPanel();
         if (inputPane != null) {
             return inputPane;
@@ -153,7 +151,7 @@ public final class Domain extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT,
-                                   VMSVirtualDomainInfo.BOOT_CDROM);
+                                   DomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();
         vdi.addWizardParams(
                       optionsPanel,

@@ -20,13 +20,50 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.*;
-import lcmc.Exceptions;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import lcmc.Exceptions;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
+import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
+import static lcmc.robotest.RoboTest.addColocation;
+import static lcmc.robotest.RoboTest.addConstraint;
+import static lcmc.robotest.RoboTest.addConstraintColocationOnly;
+import static lcmc.robotest.RoboTest.addConstraintOrderOnly;
+import static lcmc.robotest.RoboTest.addOrder;
+import static lcmc.robotest.RoboTest.checkTest;
+import static lcmc.robotest.RoboTest.disableStonith;
+import static lcmc.robotest.RoboTest.enableStonith;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.leftPress;
+import static lcmc.robotest.RoboTest.leftRelease;
+import static lcmc.robotest.RoboTest.manageResource;
+import static lcmc.robotest.RoboTest.migrateResource;
+import static lcmc.robotest.RoboTest.moveScrollBar;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.moveToMenu;
+import static lcmc.robotest.RoboTest.moveToSlowly;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.removeColocation;
+import static lcmc.robotest.RoboTest.removeConstraint;
+import static lcmc.robotest.RoboTest.removeEverything;
+import static lcmc.robotest.RoboTest.removeGroup;
+import static lcmc.robotest.RoboTest.removeOrder;
+import static lcmc.robotest.RoboTest.removeResource;
+import static lcmc.robotest.RoboTest.resetStartStopResource;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.robot;
+import static lcmc.robotest.RoboTest.setLocation;
+import static lcmc.robotest.RoboTest.setTimeouts;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.slowFactor;
+import static lcmc.robotest.RoboTest.startResource;
+import static lcmc.robotest.RoboTest.stopGroup;
+import static lcmc.robotest.RoboTest.stopResource;
+import static lcmc.robotest.RoboTest.typeDummy;
+import static lcmc.robotest.RoboTest.unmanageResource;
+import static lcmc.robotest.RoboTest.unmigrateResource;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -39,11 +76,6 @@ import lcmc.utilities.Tools;
 final class PcmkTest1 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest1.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest1() {
-        /* Cannot be instantiated. */
-    }
 
     static void start(final Cluster cluster) {
         RoboTest.slowFactor = 0.4f;
@@ -621,7 +653,7 @@ final class PcmkTest1 {
         moveTo(ipX, ipY);
         rightClick();
         moveTo(
-             Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
+            Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
         leftClick();
         checkTest(testName, 28.4);
         moveTo(700, 520); /* reset selection */
@@ -644,5 +676,10 @@ final class PcmkTest1 {
             removeEverything();
         }
         checkTest(testName, 1);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private PcmkTest1() {
+        /* Cannot be instantiated. */
     }
 }

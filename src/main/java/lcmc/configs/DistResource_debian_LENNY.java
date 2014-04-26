@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_debian_LENNY
                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -98,4 +92,10 @@ public final class DistResource_debian_LENNY
          + " && apt-get -y -q  --allow-unauthenticated -t lenny-backports install"
          + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

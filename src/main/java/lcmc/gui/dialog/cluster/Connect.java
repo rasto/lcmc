@@ -23,18 +23,16 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Host;
-import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.dialog.WizardDialog;
-
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JComponent;
-
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where connection to every host will be checked

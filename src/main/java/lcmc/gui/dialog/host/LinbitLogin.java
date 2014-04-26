@@ -21,19 +21,21 @@
  */
 package lcmc.gui.dialog.host;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
+import java.awt.BorderLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
 import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JPanel;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
-import java.awt.BorderLayout;
+import lcmc.utilities.Tools;
 
 /**.
  * An implementation of a dialog where user can enter the name and password
@@ -44,14 +46,14 @@ import java.awt.BorderLayout;
  *
  */
 public class LinbitLogin extends DialogHost {
+    /** Width of the check boxes. */
+    private static final int CHECKBOX_WIDTH = 120;
     /** Field with user name. */
     private Widget downloadUserField;
     /** Field with password. */
     private Widget downloadPasswordField;
     /** Checkbox to save the info. */
     private JCheckBox saveCheckBox;
-    /** Width of the check boxes. */
-    private static final int CHECKBOX_WIDTH = 120;
 
     /** Prepares a new {@code LinbitLogin} object. */
     public LinbitLogin(final WizardDialog previousDialog,

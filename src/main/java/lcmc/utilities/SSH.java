@@ -22,29 +22,25 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
-import lcmc.gui.SSHGui;
-import lcmc.gui.ProgressBar;
-import lcmc.configs.DistResource;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import ch.ethz.ssh2.Connection;
-import ch.ethz.ssh2.ServerHostKeyVerifier;
-import ch.ethz.ssh2.InteractiveCallback;
-import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.ChannelCondition;
+import ch.ethz.ssh2.Connection;
+import ch.ethz.ssh2.InteractiveCallback;
 import ch.ethz.ssh2.KnownHosts;
 import ch.ethz.ssh2.LocalPortForwarder;
 import ch.ethz.ssh2.SCPClient;
+import ch.ethz.ssh2.ServerHostKeyVerifier;
+import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.channel.ChannelManager;
-
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.InterruptedException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import lcmc.configs.DistResource;
+import lcmc.data.Host;
+import lcmc.gui.ProgressBar;
+import lcmc.gui.SSHGui;
 
 /**
  * Verifying server hostkeys with an existing known_hosts file
@@ -56,6 +52,21 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class SSH {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
+    /** Exit code if command failed. */
+    private static final int ERROR_EXIT_CODE = 255;
+    /** Size of the buffer for output of commads. */
+    private static final int EXEC_OUTPUT_BUFFER_SIZE = 8192;
+    /** Default timeout for SSH commands. */
+    public static final int DEFAULT_COMMAND_TIMEOUT =
+                                    Tools.getDefaultInt("SSH.Command.Timeout");
+    /** Default timeout for SSH commands. */
+    public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
+                               Tools.getDefaultInt("SSH.Command.Timeout.Long");
+    /** No timeout for SSH commands. */
+    public static final int NO_COMMAND_TIMEOUT = 0;
+    /** Sudo prompt. */
+    public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
+    public static final String SUDO_FAIL = "Sorry, try again";
     /** SSHGui object for enter password dialogs etc. */
     private SSHGui sshGui;
     /** Callback when connection is failed or properly closed. */
@@ -72,10 +83,6 @@ public final class SSH {
     private boolean connectionFailed;
     /** Whether we are disconnected manually and should not reconnect. */
     private volatile boolean disconnectForGood = true;
-    /** Exit code if command failed. */
-    private static final int ERROR_EXIT_CODE = 255;
-    /** Size of the buffer for output of commads. */
-    private static final int EXEC_OUTPUT_BUFFER_SIZE = 8192;
     /** Last successful password. */
     private String lastPassword = null;
     /** Last successful rsa key. */
@@ -88,17 +95,6 @@ public final class SSH {
     private final Lock mConnectionThreadLock = new ReentrantLock();
     /** Local port forwarder. */
     private LocalPortForwarder localPortForwarder = null;
-    /** Default timeout for SSH commands. */
-    public static final int DEFAULT_COMMAND_TIMEOUT =
-                                    Tools.getDefaultInt("SSH.Command.Timeout");
-    /** Default timeout for SSH commands. */
-    public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
-                               Tools.getDefaultInt("SSH.Command.Timeout.Long");
-    /** No timeout for SSH commands. */
-    public static final int NO_COMMAND_TIMEOUT = 0;
-    /** Sudo prompt. */
-    public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
-    public static final String SUDO_FAIL = "Sorry, try again";
 
     /** Reconnect. */
     boolean reconnect() {
@@ -328,6 +324,488 @@ public final class SSH {
     /** Returns true if connection is established. */
     public boolean isConnectionFailed() {
         return connectionFailed;
+    }
+
+    /**
+     * Executes command and returns an exit code.
+     * 100 is timeout
+     * 101 no host
+     * 102 no io error
+     */
+    public SSHOutput execCommandAndWait(final String command,
+                                        final boolean outputVisible,
+                                        final boolean commandVisible,
+                                        final int sshCommandTimeout) {
+        if (host == null) {
+            return new SSHOutput("", 101);
+        }
+        final ExecCommandThread execCommandThread;
+        final String[] answer = new String[]{""};
+        final Integer[] exitCode = new Integer[]{100};
+        try {
+            execCommandThread = new ExecCommandThread(
+                            command,
+                            new ExecCallback() {
+                                @Override
+                                public void done(final String ans) {
+                                    answer[0] = ans;
+                                    exitCode[0] = 0;
+                                }
+                                @Override
+                                public void doneError(final String ans,
+                                                      final int ec) {
+                                    answer[0] = ans;
+                                    exitCode[0] = ec;
+                                }
+                            },
+                            null,
+                            outputVisible,
+                            commandVisible,
+                            sshCommandTimeout);
+        } catch (final IOException e) {
+            LOG.appError("execCommandThread: Can not execute command: "
+                         + command, "", e);
+            return new SSHOutput("", 102);
+        }
+        execCommandThread.start();
+        try {
+            execCommandThread.join();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return new SSHOutput(answer[0], exitCode[0]);
+    }
+
+    /**
+     * Executes command. Command is executed in a new thread, after command
+     * is finished execCallback.done function will be called. In case of error,
+     * execCallback.doneError is called.
+     *
+     * @param command
+     *          command that is to be executed.
+     * @param execCallback
+     *          callback that implements ExecCallback interface.
+     * @param outputVisible
+     *          whether the output of the command should be visible
+     *
+     * @return command thread
+     */
+    public ExecCommandThread execCommand(final String command,
+                                         final ExecCallback execCallback,
+                                         final boolean outputVisible,
+                                         final boolean commandVisible,
+                                         final int sshCommandTimeout) {
+        if (host == null) {
+            return null;
+        }
+        final String realCommand = host.replaceVars(command);
+        LOG.debug2("execCommand: real command: " + realCommand);
+        final ExecCommandThread execCommandThread;
+        try {
+            execCommandThread = new ExecCommandThread(realCommand,
+                                                      execCallback,
+                                                      null,
+                                                      outputVisible,
+                                                      commandVisible,
+                                                      sshCommandTimeout);
+        } catch (final IOException e) {
+            LOG.appError("execCommand: Can not execute command: "
+                         + realCommand, "", e);
+            return null;
+        }
+        execCommandThread.setPriority(Thread.MIN_PRIORITY);
+        execCommandThread.start();
+        return execCommandThread;
+    }
+
+    /**
+     * Executes command. Command is executed in a new thread, after command
+     * is finished execCallback.done function will be called. In case of error,
+     * execCallback.doneError is called. During any new output a output
+     * callback will be called.
+     *
+     * @param command
+     *          command that is to be executed.
+     * @param execCallback
+     *          callback that implements ExecCallback interface.
+     * @param newOutputCallback
+     *          callback that is called after a new output is available
+     * @param outputVisible
+     *          whether the output of the command should be visible
+     * @param commandVisible
+     *          whether the command should be visible
+     *
+     * @return thread
+     */
+    public ExecCommandThread execCommand(
+                               final String command,
+                               final ExecCallback execCallback,
+                               final NewOutputCallback newOutputCallback,
+                               final boolean outputVisible,
+                               final boolean commandVisible,
+                               final int sshCommandTimeout) {
+        final String realCommand = host.replaceVars(command);
+        final ExecCommandThread execCommandThread;
+        try {
+            execCommandThread = new ExecCommandThread(realCommand,
+                                                      execCallback,
+                                                      newOutputCallback,
+                                                      outputVisible,
+                                                      commandVisible,
+                                                      sshCommandTimeout);
+        } catch (final IOException e) {
+            LOG.appError("execCommand: can not execute command: "
+                         + realCommand, "", e);
+            return null;
+        }
+        execCommandThread.setPriority(Thread.MIN_PRIORITY);
+        execCommandThread.start();
+        return execCommandThread;
+    }
+
+    /**
+     * Executes command and manages a progress bar. Command is executed in a
+     * new thread, after command is finished execCallback.done function will
+     * be called. In case of error, execCallback.doneError is called.
+     *
+     * @param command
+     *          command that is to be executed.
+     * @param progressBar
+     *
+     * @param execCallback
+     *          callback that implements ExecCallback interface.
+     * @param outputVisible
+     *          whether the output of the command should be visible
+     * @param commandVisible
+     *          whether the command should be visible
+     *
+     * @return command thread
+     */
+    public ExecCommandThread execCommand(final String command,
+                                         final ProgressBar progressBar,
+                                         final ExecCallback execCallback,
+                                         final boolean outputVisible,
+                                         final boolean commandVisible,
+                                         final int sshCommandTimeout) {
+        LOG.debug2("execCommand: with progress bar");
+        this.progressBar = progressBar;
+        if (progressBar != null) {
+            progressBar.start(0);
+            progressBar.hold();
+        }
+        return execCommand(command,
+                           execCallback,
+                           outputVisible,
+                           commandVisible,
+                           sshCommandTimeout);
+    }
+
+    private String getKeyFromUser(final String lastError) {
+        return sshGui.enterSomethingDialog(
+                                Tools.getString("SSH.RSA.DSA.Authentication"),
+                                new String[] {lastError,
+                                              "<html>"
+                                              + Tools.getString(
+                                               "SSH.Enter.passphrase")
+                                              + "</html>",
+
+                                              },
+                                "<html>"
+                                + Tools.getString("SSH.Enter.passphrase2")
+                                + "</html>",
+                                Tools.getDefault("SSH.PublicKey"),
+                                true);
+    }
+
+    /**
+     * Enter sudo password.
+     * Return whether the dialog was cancelled.
+     */
+    private boolean enterSudoPassword() {
+        if (host.isUseSudo() != null && host.isUseSudo()) {
+            final String lastError = "";
+            final String lastSudoPwd = host.getSudoPassword();
+            final String sudoPwd = sshGui.enterSomethingDialog(
+                     Tools.getString("SSH.SudoAuthentication"),
+                    new String[] {lastError,
+                                  "<html>"
+                                  + host.getName()
+                                  + Tools.getString(
+                                      "SSH.Enter.sudoPassword")
+                                  + "</html>"},
+                    null,
+                    null,
+                    true);
+            if (sudoPwd == null) {
+                /* cancelled */
+                return true;
+            } else {
+                host.setSudoPassword(sudoPwd);
+            }
+        }
+        return false;
+    }
+
+    /** Installs gui-helper on the remote host. */
+    public void installGuiHelper() {
+        if (!Tools.getApplication().getKeepHelper()) {
+            final String fileName = "/help-progs/lcmc-gui-helper";
+            final String file = Tools.getFile(fileName);
+            if (file != null) {
+                scp(file, "@GUI-HELPER-PROG@", "0700", false, null, null, null);
+            }
+        }
+    }
+
+    /** Installs test suite on the remote host. */
+    public void installTestFiles() {
+        final Connection conn = connection;
+        if (conn == null) {
+            return;
+        }
+        final SCPClient scpClient = new SCPClient(conn);
+        final String fileName = "lcmc-test.tar";
+        final String file = Tools.getFile('/' + fileName);
+        try {
+            scpClient.put(file.getBytes(), fileName, "/tmp");
+        } catch (final IOException e) {
+            LOG.appError("installTestFiles: could not copy: "
+                         + fileName, "", e);
+            return;
+        }
+        final SSHOutput ret = execCommandAndWait(
+                                       "tar xf /tmp/lcmc-test.tar -C /tmp/",
+                                       false,
+                                       false,
+                                       60000);
+    }
+
+    /**
+     * Creates config on the host with specified name in the specified
+     * directory.
+     *
+     * @param config
+     *          config content as a string
+     * @param fileName
+     *          file name of the config
+     * @param dir
+     *          directory where the config should be stored
+     * @param mode
+     *          mode, e.g. "0700"
+     * @param makeBackup
+                whether to make backup or not
+     */
+    public void createConfig(final String config,
+                             final String fileName,
+                             final String dir,
+                             final String mode,
+                             final boolean makeBackup,
+                             final String preCommand,
+                             final String postCommand) {
+        LOG.debug1("createConfig: " + dir + fileName + "\n" + config);
+        scp(config,
+            dir + fileName,
+            mode,
+            makeBackup,
+            null, /* install command */
+            preCommand,
+            postCommand);
+    }
+
+    /**
+     * Copies file to the /tmp/ dir on the remote host.
+     *
+     * @param fileContent
+     *          content of the file as string
+     * @param remoteFilename
+     *          new file name on the other host
+     */
+    public void scp(final String fileContent,
+                    final String remoteFilename,
+                    final String mode,
+                    final boolean makeBackup,
+                    String installCommand,
+                    final String preCommand,
+                    final String postCommand) {
+        final StringBuilder commands = new StringBuilder(40);
+        if (preCommand != null) {
+            commands.append(preCommand);
+            commands.append(';');
+        }
+        if (makeBackup) {
+            commands.append("cp ");
+            commands.append(remoteFilename);
+            commands.append("{,.bak} 2>/dev/null;");
+        }
+        final int index = remoteFilename.lastIndexOf('/');
+        if (index > 0) {
+            final String dir = remoteFilename.substring(0, index + 1);
+            commands.append("mkdir -p ");
+            commands.append(dir);
+            commands.append(';');
+        }
+        if  (!isConnected()) {
+            return;
+        }
+        String modeString = "";
+        if (mode != null) {
+            modeString = " && chmod " + mode + ' ' + remoteFilename + ".new";
+        }
+        String postCommandString = "";
+        if (postCommand != null) {
+            postCommandString = " && " + postCommand;
+        }
+        final StringBuilder backupString = new StringBuilder(50);
+        if (makeBackup) {
+            backupString.append(" && if ! diff ");
+            backupString.append(remoteFilename);
+            backupString.append("{,.bak}>/dev/null 2>&1; then ");
+            backupString.append("mv ");
+            backupString.append(remoteFilename);
+            backupString.append("{.bak,.`date +'%s'`} 2>/dev/null;true;");
+            backupString.append(" else ");
+            backupString.append("rm -f ");
+            backupString.append(remoteFilename);
+            backupString.append(".bak;");
+            backupString.append(" fi ");
+        }
+        final String stacktrace = Tools.getStackTrace();
+        if (installCommand == null) {
+            installCommand = "mv " + remoteFilename + ".new " + remoteFilename;
+        }
+        final String commandTail = "\">" + remoteFilename + ".new"
+                                   + modeString
+
+                                   + "&& "
+                                   + installCommand
+
+                                   + postCommandString
+                                   + backupString.toString();
+        LOG.debug1("scp: " + commands.toString() + "echo \"..." + commandTail);
+        final Thread t = execCommand(
+                            DistResource.SUDO + "bash -c \""
+                            + Tools.escapeQuotes(
+                                commands.toString()
+                                + "echo \""
+                                + Tools.escapeQuotes(fileContent, 1)
+                                + commandTail, 1)
+                            + '"',
+                            new ExecCallback() {
+                                @Override
+                                public void done(final String ans) {
+                                    /* ok */
+                                }
+                                @Override
+                                public void doneError(
+                                                         final String ans,
+                                                         final int exitCode) {
+                                    if (ans == null) {
+                                        return;
+                                    }
+                                    for (final String line
+                                                   : ans.split("\n")) {
+                                        if (line.indexOf(
+                                                    "error:") != 0) {
+                                            continue;
+                                        }
+                                        final Thread t = new Thread(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Tools.progressIndicatorFailed(
+                                                                host.getName(),
+                                                                line,
+                                                                3000);
+                                            }
+                                        });
+                                        t.start();
+                                    }
+                                }
+                            },
+                            false,
+                            false,
+                            10000); /* smaller timeout */
+        try {
+            t.join();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    /** Starts port forwarding for vnc. */
+    void startVncPortForwarding(final String remoteHost,
+                                final int remotePort)
+        throws IOException {
+        final int localPort =
+                        remotePort + Tools.getApplication().getVncPortOffset();
+        try {
+            localPortForwarder =
+                connection.createLocalPortForwarder(localPort,
+                                                    "127.0.0.1",
+                                                    remotePort);
+        } catch (final IOException e) {
+            throw e;
+        }
+    }
+
+    /** Stops port forwarding for vnc. */
+    void stopVncPortForwarding(final int remotePort)
+        throws IOException {
+        final int localPort =
+                        remotePort + Tools.getApplication().getVncPortOffset();
+        try {
+            localPortForwarder.close();
+        } catch (final IOException e) {
+            throw e;
+        }
+    }
+
+    /** Returns whether connection was canceled. */
+    public boolean isConnectionCanceled() {
+        return disconnectForGood;
+    }
+
+    /** Connection class that can cancel it's connection during openSession. */
+    private static class MyConnection extends Connection {
+        /** Creates new MyConnection object. */
+        MyConnection(final String hostname, final int port) {
+            super(hostname, port);
+        }
+
+        /** Cancel from application. */
+        void dmcCancel() {
+            /* public getChannelManager() { return cm }
+               has to be added to the Connection.java till
+               it's sorted out. */
+            final ChannelManager cm = getChannelManager();
+            if (cm != null) {
+                cm.closeAllChannels();
+            }
+        }
+    }
+
+    /** Class that holds output of ssh command. */
+    public static final class SSHOutput {
+        /** Output string. */
+        private final String output;
+        /** Exit code. */
+        private final int exitCode;
+        /** Creates new SSHOutput object. */
+        SSHOutput(final String output, final int exitCode) {
+            this.output = output;
+            this.exitCode = exitCode;
+        }
+
+        /** Returns output string. */
+        public String getOutput() {
+            return output;
+        }
+
+        /** Returns exit code. */
+        public int getExitCode() {
+            return exitCode;
+        }
+
     }
 
     /** This class is a thread that executes commands. */
@@ -726,180 +1204,6 @@ public final class SSH {
     }
 
     /**
-     * Executes command and returns an exit code.
-     * 100 is timeout
-     * 101 no host
-     * 102 no io error
-     */
-    public SSHOutput execCommandAndWait(final String command,
-                                        final boolean outputVisible,
-                                        final boolean commandVisible,
-                                        final int sshCommandTimeout) {
-        if (host == null) {
-            return new SSHOutput("", 101);
-        }
-        final ExecCommandThread execCommandThread;
-        final String[] answer = new String[]{""};
-        final Integer[] exitCode = new Integer[]{100};
-        try {
-            execCommandThread = new ExecCommandThread(
-                            command,
-                            new ExecCallback() {
-                                @Override
-                                public void done(final String ans) {
-                                    answer[0] = ans;
-                                    exitCode[0] = 0;
-                                }
-                                @Override
-                                public void doneError(final String ans,
-                                                      final int ec) {
-                                    answer[0] = ans;
-                                    exitCode[0] = ec;
-                                }
-                            },
-                            null,
-                            outputVisible,
-                            commandVisible,
-                            sshCommandTimeout);
-        } catch (final IOException e) {
-            LOG.appError("execCommandThread: Can not execute command: "
-                         + command, "", e);
-            return new SSHOutput("", 102);
-        }
-        execCommandThread.start();
-        try {
-            execCommandThread.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return new SSHOutput(answer[0], exitCode[0]);
-    }
-
-    /**
-     * Executes command. Command is executed in a new thread, after command
-     * is finished execCallback.done function will be called. In case of error,
-     * execCallback.doneError is called.
-     *
-     * @param command
-     *          command that is to be executed.
-     * @param execCallback
-     *          callback that implements ExecCallback interface.
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     *
-     * @return command thread
-     */
-    public ExecCommandThread execCommand(final String command,
-                                         final ExecCallback execCallback,
-                                         final boolean outputVisible,
-                                         final boolean commandVisible,
-                                         final int sshCommandTimeout) {
-        if (host == null) {
-            return null;
-        }
-        final String realCommand = host.replaceVars(command);
-        LOG.debug2("execCommand: real command: " + realCommand);
-        final ExecCommandThread execCommandThread;
-        try {
-            execCommandThread = new ExecCommandThread(realCommand,
-                                                      execCallback,
-                                                      null,
-                                                      outputVisible,
-                                                      commandVisible,
-                                                      sshCommandTimeout);
-        } catch (final IOException e) {
-            LOG.appError("execCommand: Can not execute command: "
-                         + realCommand, "", e);
-            return null;
-        }
-        execCommandThread.setPriority(Thread.MIN_PRIORITY);
-        execCommandThread.start();
-        return execCommandThread;
-    }
-
-    /**
-     * Executes command. Command is executed in a new thread, after command
-     * is finished execCallback.done function will be called. In case of error,
-     * execCallback.doneError is called. During any new output a output
-     * callback will be called.
-     *
-     * @param command
-     *          command that is to be executed.
-     * @param execCallback
-     *          callback that implements ExecCallback interface.
-     * @param newOutputCallback
-     *          callback that is called after a new output is available
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     * @param commandVisible
-     *          whether the command should be visible
-     *
-     * @return thread
-     */
-    public ExecCommandThread execCommand(
-                               final String command,
-                               final ExecCallback execCallback,
-                               final NewOutputCallback newOutputCallback,
-                               final boolean outputVisible,
-                               final boolean commandVisible,
-                               final int sshCommandTimeout) {
-        final String realCommand = host.replaceVars(command);
-        final ExecCommandThread execCommandThread;
-        try {
-            execCommandThread = new ExecCommandThread(realCommand,
-                                                      execCallback,
-                                                      newOutputCallback,
-                                                      outputVisible,
-                                                      commandVisible,
-                                                      sshCommandTimeout);
-        } catch (final IOException e) {
-            LOG.appError("execCommand: can not execute command: "
-                         + realCommand, "", e);
-            return null;
-        }
-        execCommandThread.setPriority(Thread.MIN_PRIORITY);
-        execCommandThread.start();
-        return execCommandThread;
-    }
-
-    /**
-     * Executes command and manages a progress bar. Command is executed in a
-     * new thread, after command is finished execCallback.done function will
-     * be called. In case of error, execCallback.doneError is called.
-     *
-     * @param command
-     *          command that is to be executed.
-     * @param progressBar
-     *
-     * @param execCallback
-     *          callback that implements ExecCallback interface.
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     * @param commandVisible
-     *          whether the command should be visible
-     *
-     * @return command thread
-     */
-    public ExecCommandThread execCommand(final String command,
-                                         final ProgressBar progressBar,
-                                         final ExecCallback execCallback,
-                                         final boolean outputVisible,
-                                         final boolean commandVisible,
-                                         final int sshCommandTimeout) {
-        LOG.debug2("execCommand: with progress bar");
-        this.progressBar = progressBar;
-        if (progressBar != null) {
-            progressBar.start(0);
-            progressBar.hold();
-        }
-        return execCommand(command,
-                           execCallback,
-                           outputVisible,
-                           commandVisible,
-                           sshCommandTimeout);
-    }
-
-    /**
      * This ServerHostKeyVerifier asks the user on how to proceed if a key
      * cannot befound in the in-memory database.
      */
@@ -1083,42 +1387,6 @@ public final class SSH {
         int getPromptCount() {
             return promptCount;
         }
-    }
-
-    /** Connection class that can cancel it's connection during openSession. */
-    private static class MyConnection extends Connection {
-        /** Creates new MyConnection object. */
-        MyConnection(final String hostname, final int port) {
-            super(hostname, port);
-        }
-
-        /** Cancel from application. */
-        void dmcCancel() {
-            /* public getChannelManager() { return cm }
-               has to be added to the Connection.java till
-               it's sorted out. */
-            final ChannelManager cm = getChannelManager();
-            if (cm != null) {
-                cm.closeAllChannels();
-            }
-        }
-    }
-
-    private String getKeyFromUser(final String lastError) {
-        return sshGui.enterSomethingDialog(
-                                Tools.getString("SSH.RSA.DSA.Authentication"),
-                                new String[] {lastError,
-                                              "<html>"
-                                              + Tools.getString(
-                                               "SSH.Enter.passphrase")
-                                              + "</html>",
-
-                                              },
-                                "<html>"
-                                + Tools.getString("SSH.Enter.passphrase2")
-                                + "</html>",
-                                Tools.getDefault("SSH.PublicKey"),
-                                true);
     }
 
     /**
@@ -1526,276 +1794,5 @@ public final class SSH {
                 host.setConnected();
             }
         }
-    }
-
-    /**
-     * Enter sudo password.
-     * Return whether the dialog was cancelled.
-     */
-    private boolean enterSudoPassword() {
-        if (host.isUseSudo() != null && host.isUseSudo()) {
-            final String lastError = "";
-            final String lastSudoPwd = host.getSudoPassword();
-            final String sudoPwd = sshGui.enterSomethingDialog(
-                     Tools.getString("SSH.SudoAuthentication"),
-                    new String[] {lastError,
-                                  "<html>"
-                                  + host.getName()
-                                  + Tools.getString(
-                                      "SSH.Enter.sudoPassword")
-                                  + "</html>"},
-                    null,
-                    null,
-                    true);
-            if (sudoPwd == null) {
-                /* cancelled */
-                return true;
-            } else {
-                host.setSudoPassword(sudoPwd);
-            }
-        }
-        return false;
-    }
-
-    /** Installs gui-helper on the remote host. */
-    public void installGuiHelper() {
-        if (!Tools.getApplication().getKeepHelper()) {
-            final String fileName = "/help-progs/lcmc-gui-helper";
-            final String file = Tools.getFile(fileName);
-            if (file != null) {
-                scp(file, "@GUI-HELPER-PROG@", "0700", false, null, null, null);
-            }
-        }
-    }
-
-    /** Installs test suite on the remote host. */
-    public void installTestFiles() {
-        final Connection conn = connection;
-        if (conn == null) {
-            return;
-        }
-        final SCPClient scpClient = new SCPClient(conn);
-        final String fileName = "lcmc-test.tar";
-        final String file = Tools.getFile('/' + fileName);
-        try {
-            scpClient.put(file.getBytes(), fileName, "/tmp");
-        } catch (final IOException e) {
-            LOG.appError("installTestFiles: could not copy: "
-                         + fileName, "", e);
-            return;
-        }
-        final SSHOutput ret = execCommandAndWait(
-                                       "tar xf /tmp/lcmc-test.tar -C /tmp/",
-                                       false,
-                                       false,
-                                       60000);
-    }
-
-    /**
-     * Creates config on the host with specified name in the specified
-     * directory.
-     *
-     * @param config
-     *          config content as a string
-     * @param fileName
-     *          file name of the config
-     * @param dir
-     *          directory where the config should be stored
-     * @param mode
-     *          mode, e.g. "0700"
-     * @param makeBackup
-                whether to make backup or not
-     */
-    public void createConfig(final String config,
-                             final String fileName,
-                             final String dir,
-                             final String mode,
-                             final boolean makeBackup,
-                             final String preCommand,
-                             final String postCommand) {
-        scp(config,
-            dir + fileName,
-            mode,
-            makeBackup,
-            null, /* install command */
-            preCommand,
-            postCommand);
-    }
-
-    /**
-     * Copies file to the /tmp/ dir on the remote host.
-     *
-     * @param fileContent
-     *          content of the file as string
-     * @param remoteFilename
-     *          new file name on the other host
-     */
-    public void scp(final String fileContent,
-                    final String remoteFilename,
-                    final String mode,
-                    final boolean makeBackup,
-                    String installCommand,
-                    final String preCommand,
-                    final String postCommand) {
-        final StringBuilder commands = new StringBuilder(40);
-        if (preCommand != null) {
-            commands.append(preCommand);
-            commands.append(';');
-        }
-        if (makeBackup) {
-            commands.append("cp ");
-            commands.append(remoteFilename);
-            commands.append("{,.bak} 2>/dev/null;");
-        }
-        final int index = remoteFilename.lastIndexOf('/');
-        if (index > 0) {
-            final String dir = remoteFilename.substring(0, index + 1);
-            commands.append("mkdir -p ");
-            commands.append(dir);
-            commands.append(';');
-        }
-        if  (!isConnected()) {
-            return;
-        }
-        String modeString = "";
-        if (mode != null) {
-            modeString = " && chmod " + mode + ' ' + remoteFilename + ".new";
-        }
-        String postCommandString = "";
-        if (postCommand != null) {
-            postCommandString = " && " + postCommand;
-        }
-        final StringBuilder backupString = new StringBuilder(50);
-        if (makeBackup) {
-            backupString.append(" && if ! diff ");
-            backupString.append(remoteFilename);
-            backupString.append("{,.bak}>/dev/null 2>&1; then ");
-            backupString.append("mv ");
-            backupString.append(remoteFilename);
-            backupString.append("{.bak,.`date +'%s'`} 2>/dev/null;true;");
-            backupString.append(" else ");
-            backupString.append("rm -f ");
-            backupString.append(remoteFilename);
-            backupString.append(".bak;");
-            backupString.append(" fi ");
-        }
-        final String stacktrace = Tools.getStackTrace();
-        if (installCommand == null) {
-            installCommand = "mv " + remoteFilename + ".new " + remoteFilename;
-        }
-        final String commandTail = "\">" + remoteFilename + ".new"
-                                   + modeString
-
-                                   + "&& "
-                                   + installCommand
-
-                                   + postCommandString
-                                   + backupString.toString();
-        LOG.debug1("scp: " + commands.toString() + "echo \"..." + commandTail);
-        final Thread t = execCommand(
-                            DistResource.SUDO + "bash -c \""
-                            + Tools.escapeQuotes(
-                                commands.toString()
-                                + "echo \""
-                                + Tools.escapeQuotes(fileContent, 1)
-                                + commandTail, 1)
-                            + '"',
-                            new ExecCallback() {
-                                @Override
-                                public void done(final String ans) {
-                                    /* ok */
-                                }
-                                @Override
-                                public void doneError(
-                                                         final String ans,
-                                                         final int exitCode) {
-                                    if (ans == null) {
-                                        return;
-                                    }
-                                    for (final String line
-                                                   : ans.split("\n")) {
-                                        if (line.indexOf(
-                                                    "error:") != 0) {
-                                            continue;
-                                        }
-                                        final Thread t = new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Tools.progressIndicatorFailed(
-                                                                host.getName(),
-                                                                line,
-                                                                3000);
-                                            }
-                                        });
-                                        t.start();
-                                    }
-                                }
-                            },
-                            false,
-                            false,
-                            10000); /* smaller timeout */
-        try {
-            t.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /** Starts port forwarding for vnc. */
-    void startVncPortForwarding(final String remoteHost,
-                                final int remotePort)
-        throws IOException {
-        final int localPort =
-                        remotePort + Tools.getApplication().getVncPortOffset();
-        try {
-            localPortForwarder =
-                connection.createLocalPortForwarder(localPort,
-                                                    "127.0.0.1",
-                                                    remotePort);
-        } catch (final IOException e) {
-            throw e;
-        }
-    }
-
-    /** Stops port forwarding for vnc. */
-    void stopVncPortForwarding(final int remotePort)
-        throws IOException {
-        final int localPort =
-                        remotePort + Tools.getApplication().getVncPortOffset();
-        try {
-            localPortForwarder.close();
-        } catch (final IOException e) {
-            throw e;
-        }
-    }
-
-    /** Class that holds output of ssh command. */
-    public static final class SSHOutput {
-        /** Output string. */
-        private final String output;
-        /** Exit code. */
-        private final int exitCode;
-        /** Creates new SSHOutput object. */
-        SSHOutput(final String output, final int exitCode) {
-            this.output = output;
-            this.exitCode = exitCode;
-        }
-
-        /** Returns output string. */
-        public String getOutput() {
-            return output;
-        }
-
-        /** Returns exit code. */
-        public int getExitCode() {
-            return exitCode;
-        }
-
-    }
-
-    /** Returns whether connection was canceled. */
-    public boolean isConnectionCanceled() {
-        return disconnectForGood;
     }
 }

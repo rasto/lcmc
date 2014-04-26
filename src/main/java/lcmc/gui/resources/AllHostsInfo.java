@@ -21,32 +21,18 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.AddHostDialog;
-import lcmc.gui.Browser;
-import lcmc.gui.TerminalPanel;
-import lcmc.data.Cluster;
-import lcmc.data.Clusters;
-import lcmc.data.Host;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.MyButton;
-
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.border.LineBorder;
-import javax.swing.JScrollPane;
-import javax.swing.ImageIcon;
-import javax.swing.JTextField;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,22 +40,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Dimension;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.FlowLayout;
-import java.awt.Insets;
-
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import lcmc.AddHostDialog;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Clusters;
+import lcmc.data.Host;
+import lcmc.gui.Browser;
+import lcmc.gui.TerminalPanel;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
@@ -79,6 +76,19 @@ public final class AllHostsInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(AllHostsInfo.class);
+    /** Cluster icon. */
+    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
+                                   Tools.getDefault("ClusterTab.ClusterIcon"));
+    /** Title over quick connect box. */
+    private static final String QUICK_CLUSTER_TITLE =
+                                  Tools.getString("AllHostsInfo.QuickCluster");
+    /** Place holder for cluster name in the textfield. */
+    private static final String CLUSTER_NAME_PH = "cluster name...";
+    /** Default cluster name. */
+    private static final String DEFAULT_CLUSTER_NAME = "default";
+    /** Host icon. */
+    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
+                                Tools.getDefault("EmptyBrowser.HostIcon"));
     /** infoPanel cache. */
     private JPanel infoPanel = null;
     /** Checkboxes in the cluster boxes. */
@@ -94,16 +104,6 @@ public final class AllHostsInfo extends Info {
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     /** Constraints. */
     private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    /** Cluster icon. */
-    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
-                                   Tools.getDefault("ClusterTab.ClusterIcon"));
-    /** Title over quick connect box. */
-    private static final String QUICK_CLUSTER_TITLE =
-                                  Tools.getString("AllHostsInfo.QuickCluster");
-    /** Place holder for cluster name in the textfield. */
-    private static final String CLUSTER_NAME_PH = "cluster name...";
-    /** Default cluster name. */
-    private static final String DEFAULT_CLUSTER_NAME = "default";
     /** Start marked clusters button. */
     private final MyButton loadMarkedClustersBtn = new MyButton(
               Tools.getString("EmptyBrowser.LoadMarkedClusters"),
@@ -121,9 +121,6 @@ public final class AllHostsInfo extends Info {
                   CLUSTER_ICON,
                   Tools.getString(
                              "EmptyBrowser.RemoveMarkedClusters.ToolTip"));
-    /** Host icon. */
-    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                                Tools.getDefault("EmptyBrowser.HostIcon"));
     /** Creates a new AllHostsInfo instance. */
     public AllHostsInfo(final Browser browser) {
         super(Tools.getString("ClusterBrowser.AllHosts"), browser);

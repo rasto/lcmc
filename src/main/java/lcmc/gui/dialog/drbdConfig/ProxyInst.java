@@ -20,21 +20,20 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.Tools;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.utilities.ExecCallback;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.ConvertCmdCallback;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.SSH;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
-import lcmc.data.Application;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
@@ -47,17 +46,17 @@ final class ProxyInst extends DialogHost {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
     /** Drbd volume info. */
-    private final DrbdVolumeInfo drbdVolumeInfo;
+    private final VolumeInfo volumeInfo;
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
     /** Prepares a new {@code ProxyInst} object. */
     ProxyInst(final WizardDialog previousDialog,
               final Host host,
-              final DrbdVolumeInfo drbdVolumeInfo,
+              final VolumeInfo volumeInfo,
               final WizardDialog origDialog) {
         super(previousDialog, host);
-        this.drbdVolumeInfo = drbdVolumeInfo;
+        this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
 
@@ -69,7 +68,7 @@ final class ProxyInst extends DialogHost {
         nextDialogObject = new ProxyCheckInstallation(
                                         getPreviousDialog().getPreviousDialog(),
                                         getHost(),
-                                        drbdVolumeInfo,
+                                        volumeInfo,
                                         origDialog);
         DRBD.startProxy(getHost(), Application.RunMode.LIVE);
         progressBarDone();
@@ -145,7 +144,7 @@ final class ProxyInst extends DialogHost {
         if (nextDialogObject == null) {
             return new ProxyCheckInstallation(this,
                                               getHost(),
-                                              drbdVolumeInfo,
+                                              volumeInfo,
                                               origDialog);
         } else {
             return nextDialogObject;
@@ -162,9 +161,9 @@ final class ProxyInst extends DialogHost {
                 setPressedButton(nextButton());
             }
             getHost().getCluster().addProxyHost(getHost());
-            if (drbdVolumeInfo != null) {
-                drbdVolumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
-                drbdVolumeInfo.getDrbdInfo().addProxyHostNode(getHost());
+            if (volumeInfo != null) {
+                volumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
+                volumeInfo.getDrbdInfo().addProxyHostNode(getHost());
             }
         }
     }

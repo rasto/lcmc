@@ -23,36 +23,31 @@
 
 package lcmc.gui;
 
-import lcmc.data.Cluster;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-
-import javax.swing.BorderFactory;
-import javax.swing.JTabbedPane;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.UIManager;
-import javax.swing.plaf.basic.BasicTabbedPaneUI;
-
-
-import java.awt.GridLayout;
-import java.awt.Component;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-
-import java.util.Map;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
-
+import java.util.Map;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.basic.BasicTabbedPaneUI;
+import lcmc.data.Cluster;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
@@ -69,8 +64,6 @@ public final class ClustersPanel extends JPanel {
                                 LoggerFactory.getLogger(ClustersPanel.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** The tabbed pane where the tabs are painted. */
-    private JTabbedPane tabbedPane;
     /** Icon of the cluster. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
                                 Tools.getDefault("ClustersPanel.ClusterIcon"));
@@ -80,6 +73,10 @@ public final class ClustersPanel extends JPanel {
     /** Name of all clusters tab. */
     private static final String CLUSTERS_LABEL =
                                 Tools.getString("ClustersPanel.ClustersTab");
+    /** Width of the tab border. */
+    private static final int TAB_BORDER_WIDTH = 3;
+    /** The tabbed pane where the tabs are painted. */
+    private JTabbedPane tabbedPane;
     /** New empty cluster tab. */
     private final ClusterTab newClusterTab;
     /** Previously selected tab. */
@@ -87,8 +84,6 @@ public final class ClustersPanel extends JPanel {
 
     private final Map<ClusterTab, JLabel> clusterTabLabels =
                                             new HashMap<ClusterTab, JLabel>();
-    /** Width of the tab border. */
-    private static final int TAB_BORDER_WIDTH = 3;
 
     /** Prepares a new {@code ClustersPanel} object. */
     ClustersPanel() {

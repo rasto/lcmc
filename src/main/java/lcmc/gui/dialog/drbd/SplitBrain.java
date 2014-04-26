@@ -23,31 +23,27 @@
 
 package lcmc.gui.dialog.drbd;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
-import lcmc.data.Host;
-import lcmc.data.Application;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Set;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.DrbdConfig;
-import lcmc.utilities.MyButton;
-
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
-import java.util.Set;
-
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -61,17 +57,17 @@ public final class SplitBrain extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(SplitBrain.class);
+    /** Width of the combo box. */
+    private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
     private Widget hostWi;
     /** Resolve split brain button. */
     private final MyButton resolveButton = new MyButton(
                     Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
-    /** Width of the combo box. */
-    private static final int COMBOBOX_WIDTH = 160;
 
     /** Prepares a new {@code SplitBrain} object. */
     public SplitBrain(final WizardDialog previousDialog,
-               final DrbdVolumeInfo dvi) {
+               final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 

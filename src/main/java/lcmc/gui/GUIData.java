@@ -23,27 +23,8 @@
 
 package lcmc.gui;
 
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.ServicesInfo;
-import lcmc.data.Cluster;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.utilities.Tools;
-import lcmc.utilities.AllHostsUpdatable;
-
-import javax.swing.JApplet;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JSplitPane;
-import javax.swing.RootPaneContainer;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
-import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import java.awt.Component;
 import java.awt.Container;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,9 +33,25 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import javax.swing.JApplet;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JSplitPane;
+import javax.swing.RootPaneContainer;
+import javax.swing.plaf.basic.BasicSplitPaneDivider;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.crm.ServicesInfo;
+import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * GUIData

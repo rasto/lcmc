@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_suse_SLES9
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -46,4 +40,10 @@ public final class DistResource_suse_SLES9
         {"distributiondir", "sles9"},
         {"Support", "suse-SLES9"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

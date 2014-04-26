@@ -21,11 +21,21 @@
 package lcmc.robotest;
 
 import lcmc.data.Cluster;
-import static lcmc.robotest.RoboTest.*;
-import static lcmc.robotest.DrbdTest1.*;
+import static lcmc.robotest.DrbdTest1.addBlockDevice;
+import static lcmc.robotest.DrbdTest1.addDrbdResource;
+import static lcmc.robotest.DrbdTest1.addDrbdVolume;
+import static lcmc.robotest.DrbdTest1.addFileSystem;
+import static lcmc.robotest.DrbdTest1.addMetaData;
+import static lcmc.robotest.DrbdTest1.chooseDrbdResource;
+import static lcmc.robotest.DrbdTest1.removeDrbdVolume;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkDRBDTest;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 
 /**
  * This class is used to test the GUI.
@@ -33,14 +43,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class DrbdTest2 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(DrbdTest2.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest2() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final Cluster cluster, final int blockDevY) {
         slowFactor = 0.2f;
         aborted = false;
@@ -132,5 +134,10 @@ final class DrbdTest2 {
         }
         removeDrbdVolume(true);
         checkDRBDTest(drbdTest, 2);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest2() {
+        /* Cannot be instantiated. */
     }
 }

@@ -44,10 +44,6 @@ public final class Http {
     private static final Logger LOG = LoggerFactory.getLogger(Http.class);
     static final String URL_STRING = "http://lcmc.sourceforge.net/cgi-bin/exc";
     static final String ENCODING = "UTF-8";
-    /** Private constructor, cannot be instantiated. */
-    private Http() {
-        /* Cannot be instantiated. */
-    }
 
     public static void post(final String from, final String exception) {
         final URL url;
@@ -95,8 +91,8 @@ public final class Http {
         final Map<String, String> params = new HashMap<String, String>();
         params.put("f", from);
         params.put("e", exception);
-
-
+        
+        
         try {
             output.writeBytes(getPostParams(params));
             output.flush();
@@ -109,7 +105,7 @@ public final class Http {
         /* Response */
         try {
             final BufferedReader input = new BufferedReader(
-                                  new InputStreamReader(conn.getInputStream()));
+                new InputStreamReader(conn.getInputStream()));
             String str;
             while (null != ((str = input.readLine()))) {
                 LOG.info("post: " + str);
@@ -120,15 +116,19 @@ public final class Http {
         }
     }
 
-    private static String getPostParams(final Map<String, String> params)
-        throws UnsupportedEncodingException {
+    private static String getPostParams(final Map<String, String> params) throws UnsupportedEncodingException {
         String postParams = "";
         String delim = "";
         for (final Map.Entry<String, String> entry : params.entrySet()) {
             postParams += delim + entry.getKey() + '='
-                        + URLEncoder.encode(entry.getValue(), ENCODING);
+                          + URLEncoder.encode(entry.getValue(), ENCODING);
             delim = "&";
         }
         return postParams;
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private Http() {
+        /* Cannot be instantiated. */
     }
 }

@@ -32,12 +32,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_ubuntu_DAPPER
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-DAPPER"},
@@ -68,4 +62,10 @@ public final class DistResource_ubuntu_DAPPER
          + "make && make install DESTDIR=/ && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

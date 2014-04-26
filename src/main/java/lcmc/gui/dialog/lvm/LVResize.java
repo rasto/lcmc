@@ -22,37 +22,40 @@
 
 package lcmc.gui.dialog.lvm;
 
-import lcmc.data.*;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.LVM;
-import lcmc.utilities.WidgetListener;
-import lcmc.data.resources.BlockDevice;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.TextfieldWithUnit;
-import lcmc.gui.Browser;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.Set;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Map;
+import java.util.Set;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import javax.swing.JLabel;
-import javax.swing.JCheckBox;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
+import lcmc.data.Value;
+import lcmc.data.resources.BlockDevice;
+import lcmc.gui.Browser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.TextfieldWithUnit;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.LVM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * This class implements LVM resize dialog.
@@ -129,7 +132,7 @@ public final class LVResize extends LV {
     /** Check if it is DRBD device and if it could be resized. */
     private boolean checkDRBD() {
         if (blockDevInfo.getBlockDevice().isDrbd()) {
-            final DrbdVolumeInfo dvi = blockDevInfo.getDrbdVolumeInfo();
+            final VolumeInfo dvi = blockDevInfo.getDrbdVolumeInfo();
             final BlockDevInfo oBDI = blockDevInfo.getOtherBlockDevInfo();
             if (!dvi.isConnected(Application.RunMode.LIVE)) {
                 printErrorAndRetry(

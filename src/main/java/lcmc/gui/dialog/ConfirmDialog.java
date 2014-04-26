@@ -23,10 +23,10 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import lcmc.utilities.Tools;
 
 /**
  * @author rasto

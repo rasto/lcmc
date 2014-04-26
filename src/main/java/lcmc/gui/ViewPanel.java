@@ -23,31 +23,26 @@
 
 package lcmc.gui;
 
-import lcmc.gui.resources.Info;
-import lcmc.utilities.Tools;
-
-import java.awt.Dimension;
-
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-
-import javax.swing.JTree;
-import javax.swing.tree.TreeSelectionModel;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeModelEvent;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
-
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTree;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+import lcmc.gui.resources.Info;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
@@ -60,8 +55,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ViewPanel extends JPanel {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** This view split pane. */
-    private JSplitPane viewSP = null;
     /** Minimum size of the menu tree. */
     private static final Dimension MENU_TREE_MIN_SIZE = new Dimension(200, 200);
     /** Minimum size of the info panel. */
@@ -71,6 +64,8 @@ public class ViewPanel extends JPanel {
     private static final Dimension MENU_TREE_SIZE = new Dimension(400, 200);
     /** Location of the divider in the split pane. */
     private static final int DIVIDER_LOCATION   = 200;
+    /** This view split pane. */
+    private JSplitPane viewSP = null;
     /** Disabled during load. It disables the menu expanding.*/
     private volatile boolean disabledDuringLoad = true;
     /** Update VMS lock. */

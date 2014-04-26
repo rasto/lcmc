@@ -20,35 +20,32 @@
 
 package lcmc.gui.widget;
 
-import lcmc.data.StringValue;
-import lcmc.data.Value;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
-import lcmc.utilities.PatternDocument;
-import lcmc.data.AccessMode;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.WidgetListener;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JTextField;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Document;
-import javax.swing.text.AbstractDocument;
-import javax.swing.SpringLayout;
-import javax.swing.event.DocumentListener;
-
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ItemListener;
-import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-
+import java.awt.event.FocusListener;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import lcmc.data.AccessMode;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.PatternDocument;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -62,6 +59,25 @@ import java.util.ArrayList;
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+
+    private static Unit addItems(final Collection<Unit> comboList,
+                                     final Unit selectedValue,
+                                     final Unit[] items) {
+        Unit selectedUnit = null;
+        if (items != null) {
+            for (final Unit item : items) {
+                if (item.equals(selectedValue)) {
+                    selectedUnit = item;
+                }
+                comboList.add(item);
+            }
+            if (selectedUnit == null && selectedValue != null) {
+                comboList.add(selectedValue);
+                selectedUnit = selectedValue;
+            }
+        }
+        return selectedUnit;
+    }
     /** Text field in widget with units. */
     private final JTextField textFieldPart;
     /** Combo box with units. */
@@ -349,24 +365,5 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         for (final ItemListener il : unitComboBox.getItemListeners()) {
             unitComboBox.removeItemListener(il);
         }
-    }
-
-    private static Unit addItems(final Collection<Unit> comboList,
-                                     final Unit selectedValue,
-                                     final Unit[] items) {
-        Unit selectedUnit = null;
-        if (items != null) {
-            for (final Unit item : items) {
-                if (item.equals(selectedValue)) {
-                    selectedUnit = item;
-                }
-                comboList.add(item);
-            }
-            if (selectedUnit == null && selectedValue != null) {
-                comboList.add(selectedValue);
-                selectedUnit = selectedValue;
-            }
-        }
-        return selectedUnit;
     }
 }

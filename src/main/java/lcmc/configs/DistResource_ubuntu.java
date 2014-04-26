@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_ubuntu extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",                       "ubuntu"},
@@ -215,4 +209,10 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          "dpkg-query -W -f '${status}:${version}' drbd-proxy"
          + "|grep '^install ok installed:'|cut -d ':' -f 2"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

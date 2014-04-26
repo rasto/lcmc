@@ -31,9 +31,6 @@ public final class Exceptions {
     private Exceptions() {
     }
 
-    /**
-     * This class defines drbd config error exception.
-     */
     public static class DrbdConfigException extends Exception {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;
@@ -44,9 +41,6 @@ public final class Exceptions {
         }
     }
 
-    /**
-     * This class defines wrong version exception, when comparing versions.
-     */
     public static class IllegalVersionException extends Exception {
         /** Serial version UID. */
         private static final long serialVersionUID = 1L;

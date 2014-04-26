@@ -21,12 +21,15 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.data.resources.BlockDevice;
-import lcmc.data.resources.CommonBlockDevice;
-import lcmc.utilities.Tools;
 import javax.swing.ImageIcon;
 import lcmc.data.Application;
+import lcmc.data.resources.BlockDevice;
+import lcmc.data.resources.CommonBlockDevice;
+import lcmc.gui.Browser;
+import lcmc.gui.resources.crm.HbCategoryInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info data for a block device that is common
@@ -61,7 +64,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
 
     /** Returns info for this block device. */
     @Override
-    String getInfo() {
+    public String getInfo() {
         return "Device    : " + getCommonBlockDevice().getName() + '\n';
     }
 

@@ -22,29 +22,27 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.dialog.WizardDialog;
-
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.SpringLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where
@@ -58,6 +56,32 @@ final class CheckInstallation extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                             LoggerFactory.getLogger(CheckInstallation.class);
+
+    /** Checking icon. */
+    private static final ImageIcon CHECKING_ICON =
+        Tools.createImageIcon(
+                Tools.getDefault("Dialog.Host.CheckInstallation.CheckingIcon"));
+    /** Not installed icon. */
+    private static final ImageIcon NOT_INSTALLED_ICON =
+        Tools.createImageIcon(
+            Tools.getDefault("Dialog.Host.CheckInstallation.NotInstalledIcon"));
+    /** Already installed icon. */
+    private static final ImageIcon INSTALLED_ICON =
+        Tools.createImageIcon(
+              Tools.getDefault("Dialog.Host.CheckInstallation.InstalledIcon"));
+    /** Upgrade available icon. */
+    private static final ImageIcon UPGR_AVAIL_ICON =
+        Tools.createImageIcon(
+              Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
+
+    private static final String PM_PREFIX = "PmInst";
+    private static final String HBPM_PREFIX = "HbPmInst";
+    private static final String DRBD_PREFIX = "DrbdInst";
+
+    /** Auto options for testing. */
+    private static final String PM_AUTO_OPTION = "pminst";
+    private static final String HBPM_AUTO_OPTION = "hbinst";
+    private static final String DRBD_AUTO_OPTION = "drbdinst";
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
@@ -86,32 +110,6 @@ final class CheckInstallation extends DialogHost {
     private Widget hbPmInstMethodWi;
     /** DRBD installation method. */
     private Widget drbdInstMethodWi;
-
-    /** Checking icon. */
-    private static final ImageIcon CHECKING_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("Dialog.Host.CheckInstallation.CheckingIcon"));
-    /** Not installed icon. */
-    private static final ImageIcon NOT_INSTALLED_ICON =
-        Tools.createImageIcon(
-            Tools.getDefault("Dialog.Host.CheckInstallation.NotInstalledIcon"));
-    /** Already installed icon. */
-    private static final ImageIcon INSTALLED_ICON =
-        Tools.createImageIcon(
-              Tools.getDefault("Dialog.Host.CheckInstallation.InstalledIcon"));
-    /** Upgrade available icon. */
-    private static final ImageIcon UPGR_AVAIL_ICON =
-        Tools.createImageIcon(
-              Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
-
-    private static final String PM_PREFIX = "PmInst";
-    private static final String HBPM_PREFIX = "HbPmInst";
-    private static final String DRBD_PREFIX = "DrbdInst";
-
-    /** Auto options for testing. */
-    private static final String PM_AUTO_OPTION = "pminst";
-    private static final String HBPM_AUTO_OPTION = "hbinst";
-    private static final String DRBD_AUTO_OPTION = "drbdinst";
 
     /** Drbd icon: checking ... */
     private final JLabel drbdIcon = new JLabel(CHECKING_ICON);

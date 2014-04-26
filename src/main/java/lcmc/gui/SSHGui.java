@@ -23,34 +23,30 @@
 
 package lcmc.gui;
 
-import lcmc.data.Host;
-import lcmc.utilities.Tools;
-
-import javax.swing.JDialog;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
-import javax.swing.JPanel;
-import javax.swing.JApplet;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
-import javax.swing.border.LineBorder;
-
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Frame;
-import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.Font;
-
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.swing.BoxLayout;
+import javax.swing.JApplet;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.border.LineBorder;
+import lcmc.data.Host;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of dialogs that are needed for establishing of a ssh
@@ -63,14 +59,14 @@ import lcmc.utilities.LoggerFactory;
 public final class SSHGui {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSHGui.class);
+    /** Default length of fields. */
+    private static final int DEFAULT_FIELD_LENGTH = 20;
     /** Root pane on which the dialogs are comming to. */
     private final Container rootPane;
     /** Host data object. */
     private final Host host;
     /** Progress bar. */
     private final ProgressBar progressBar;
-    /** Default length of fields. */
-    private static final int DEFAULT_FIELD_LENGTH = 20;
 
     /** Prepares a new {@code SSHGui} object. */
     public SSHGui(final Container rootPane,

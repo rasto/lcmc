@@ -23,42 +23,45 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.VIRSH;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import org.apache.commons.collections15.map.MultiKeyMap;
-
-import javax.xml.transform.Source;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPath;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.TransformerFactory;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
-
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import lcmc.utilities.VIRSH;
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -73,74 +76,9 @@ import lcmc.utilities.Unit;
 public final class VMSXML extends XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(VMSXML.class);
-    /** List of domain names. */
-    private final Collection<String> domainNames = new ArrayList<String>();
-    /** Map from configs to names. */
-    private final Map<Value, String> configsMap =
-                                            new HashMap<Value, String>();
-    /** Map from names to configs. */
-    private final Map<String, String> namesConfigsMap =
-                                            new HashMap<String, String>();
-    /** Map from network configs to names. */
-    private final Map<String, String> netConfigsMap =
-                                            new HashMap<String, String>();
-    /** Map from network names to configs. */
-    private final Map<String, String> netNamesConfigsMap =
-                                            new HashMap<String, String>();
-    /** Map from parameters to values. */
-    private final MultiKeyMap<String, String> parameterValues =
-                                             new MultiKeyMap<String, String>();
-    /** Hash of domains and their remote ports. */
-    private final Map<String, Integer> remotePorts =
-                                                new HashMap<String, Integer>();
-    /** Hash of domains that use autoport. */
-    private final Map<String, Boolean> autoports =
-                                                new HashMap<String, Boolean>();
-    /** Whether the domain is running. */
-    private final Map<String, Boolean> runningMap =
-                                                new HashMap<String, Boolean>();
-    /** Whether the domain is suspended. */
-    private final Map<String, Boolean> suspendedMap =
-                                                new HashMap<String, Boolean>();
-    /** Map from domain name and target device to the disk data. */
-    private final Map<String, Map<String, DiskData>> disksMap =
-                           new LinkedHashMap<String, Map<String, DiskData>>();
-    /** Map from domain name and target device to the fs data. */
-    private final Map<String, Map<String, FilesystemData>> filesystemsMap =
-                       new LinkedHashMap<String, Map<String, FilesystemData>>();
-    /** Map from domain name and mac address to the interface data. */
-    private final Map<String, Map<String, InterfaceData>> interfacesMap =
-                       new LinkedHashMap<String, Map<String, InterfaceData>>();
-    /** Map from domain name and index to the input device data. */
-    private final Map<String, Map<String, InputDevData>> inputDevsMap =
-                       new LinkedHashMap<String, Map<String, InputDevData>>();
-    /** Map from domain name and type to the graphics device data. */
-    private final Map<String, Map<String, GraphicsData>> graphicsDevsMap =
-                       new LinkedHashMap<String, Map<String, GraphicsData>>();
-    /** Map from domain name and model to the sound device data. */
-    private final Map<String, Map<String, SoundData>> soundsMap =
-                       new LinkedHashMap<String, Map<String, SoundData>>();
-    /** Map from domain name and type to the serial device data. */
-    private final Map<String, Map<String, SerialData>> serialsMap =
-                       new LinkedHashMap<String, Map<String, SerialData>>();
-    /** Map from domain name and type to the parallel device data. */
-    private final Map<String, Map<String, ParallelData>> parallelsMap =
-                       new LinkedHashMap<String, Map<String, ParallelData>>();
-    /** Map from domain name and model type to the video device data. */
-    private final Map<String, Map<String, VideoData>> videosMap =
-                       new LinkedHashMap<String, Map<String, VideoData>>();
-    /** Map from domain name and network name to the network data. */
-    private final Map<Value, NetworkData> networkMap =
-                                    new LinkedHashMap<Value, NetworkData>();
-    /** Directories where are source files. */
-    private final Collection<String> sourceFileDirs = new TreeSet<String>();
-    /** All used mac addresses. */
-    private final Collection<String> macAddresses = new HashSet<String>();
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
-    /** Host on which the vm is defined. */
-    private final Host host;
     /** VM field: name. */
     public static final String VM_PARAM_NAME = "name";
     /** VM field: uuid. */
@@ -407,6 +345,206 @@ public final class VMSXML extends XML {
         VIDEO_TAG_MAP.put(VideoData.MODEL_HEADS, "model");
         VIDEO_ATTRIBUTE_MAP.put(VideoData.MODEL_HEADS, "heads");
     }
+
+    /** Returns string representation of the port; it can be autoport. */
+    static String portString(final String port) {
+        if ("-1".equals(port)) {
+            return "auto";
+        }
+        return port;
+    }
+
+    /** Returns string representation graphic display SDL/VNC. */
+    public static String graphicsDisplayName(final String type,
+                                             final String port,
+                                             final String display) {
+        if ("vnc".equals(type)) {
+            return type + " : " + portString(port);
+        } else if ("sdl".equals(type)) {
+            return type + " (" + display + ')';
+        }
+        return "unknown";
+    }
+
+    public static Unit getUnitKiBytes() {
+        return new Unit("K", "K", "KiByte", "KiBytes");
+    }
+
+    public static Unit getUnitMiBytes() {
+        return new Unit("M", "M", "MiByte", "MiBytes");
+    }
+
+    public static Unit getUnitGiBytes() {
+        return new Unit("G", "G", "GiByte", "GiBytes");
+    }
+
+    public static Unit getUnitTiBytes() {
+        return new Unit("T", "T", "TiByte", "TiBytes");
+    }
+
+    public static Unit getUnitPiBytes() {
+        return new Unit("P", "P", "PiByte", "PiBytes");
+    }
+
+    public static Unit[] getUnits() {
+        return new Unit[]{getUnitKiBytes(),
+                          getUnitMiBytes(),
+                          getUnitGiBytes(),
+                          getUnitTiBytes(),
+                          getUnitPiBytes()
+        };
+    }
+
+    /** Converts value in kilobytes. */
+    //TODO: move somewhere else
+    public static Value convertKilobytes(final String kb) {
+        if (!Tools.isNumber(kb)) {
+            return new StringValue(kb, getUnitKiBytes());
+        }
+        final double k = Long.parseLong(kb);
+        if (k == 0) {
+            return new StringValue("0", getUnitKiBytes());
+        }
+        if (k / 1024 != (long) (k / 1024)) {
+            return new StringValue(kb, getUnitKiBytes());
+        }
+        final double m = k / 1024;
+        if (m / 1024 != (long) (m / 1024)) {
+            return new StringValue(Long.toString((long) m), getUnitMiBytes());
+        }
+        final double g = m / 1024;
+        if (g / 1024 != (long) (g / 1024)) {
+            return new StringValue(Long.toString((long) g), getUnitGiBytes());
+        }
+        final double t = g / 1024;
+        if (t / 1024 != (long) (t / 1024)) {
+            return new StringValue(Long.toString((long) t), getUnitTiBytes());
+        }
+        final double p = t / 1024;
+        return new StringValue(Long.toString((long) p), getUnitPiBytes());
+    }
+    ///** Converts value in kilobytes. */
+    //public static String convertKilobytes(final String kb) {
+    //    if (!isNumber(kb)) {
+    //        return kb;
+    //    }
+    //    final double k = Long.parseLong(kb);
+    //    if (k == 0) {
+    //        return "0K";
+    //    }
+    //    if (k / 1024 != (long) (k / 1024)) {
+    //        return kb + "K";
+    //    }
+    //    final double m = k / 1024;
+    //    if (m / 1024 != (long) (m / 1024)) {
+    //        return Long.toString((long) m) + "M";
+    //    }
+    //    final double g = m / 1024;
+    //    if (g / 1024 != (long) (g / 1024)) {
+    //        return Long.toString((long) g) + "G";
+    //    }
+    //    final double t = g / 1024;
+    //    if (t / 1024 != (long) (t / 1024)) {
+    //        return Long.toString((long) t) + "T";
+    //    }
+    //    return Long.toString((long) (t / 1024)) + "P";
+    //}
+
+    /** Converts value with unit to kilobites. */
+    //TODO: move somewhere else
+    public static long convertToKilobytes(final Value value) {
+        if (value == null) {
+            return -1;
+        }
+        final String numS = value.getValueForConfig();
+        if (Tools.isNumber(numS)) {
+            long num = Long.parseLong(numS);
+            final Unit unitObject = value.getUnit();
+            if (unitObject == null) {
+                return -1;
+            }
+            final String unit = unitObject.getShortName();
+            if ("P".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024 * 1024;
+            } else if ("T".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024 * 1024;
+            } else if ("G".equalsIgnoreCase(unit)) {
+                num = num * 1024 * 1024;
+            } else if ("M".equalsIgnoreCase(unit)) {
+                num *= 1024;
+            } else if ("K".equalsIgnoreCase(unit)) {
+            } else {
+                return -1;
+            }
+            return num;
+        }
+        return -1;
+    }
+    /** List of domain names. */
+    private final Collection<String> domainNames = new ArrayList<String>();
+    /** Map from configs to names. */
+    private final Map<Value, String> configsMap =
+                                            new HashMap<Value, String>();
+    /** Map from names to configs. */
+    private final Map<String, String> namesConfigsMap =
+                                            new HashMap<String, String>();
+    /** Map from network configs to names. */
+    private final Map<String, String> netConfigsMap =
+                                            new HashMap<String, String>();
+    /** Map from network names to configs. */
+    private final Map<String, String> netNamesConfigsMap =
+                                            new HashMap<String, String>();
+    /** Map from parameters to values. */
+    private final MultiKeyMap<String, String> parameterValues =
+                                             new MultiKeyMap<String, String>();
+    /** Hash of domains and their remote ports. */
+    private final Map<String, Integer> remotePorts =
+                                                new HashMap<String, Integer>();
+    /** Hash of domains that use autoport. */
+    private final Map<String, Boolean> autoports =
+                                                new HashMap<String, Boolean>();
+    /** Whether the domain is running. */
+    private final Map<String, Boolean> runningMap =
+                                                new HashMap<String, Boolean>();
+    /** Whether the domain is suspended. */
+    private final Map<String, Boolean> suspendedMap =
+                                                new HashMap<String, Boolean>();
+    /** Map from domain name and target device to the disk data. */
+    private final Map<String, Map<String, DiskData>> disksMap =
+                           new LinkedHashMap<String, Map<String, DiskData>>();
+    /** Map from domain name and target device to the fs data. */
+    private final Map<String, Map<String, FilesystemData>> filesystemsMap =
+                       new LinkedHashMap<String, Map<String, FilesystemData>>();
+    /** Map from domain name and mac address to the interface data. */
+    private final Map<String, Map<String, InterfaceData>> interfacesMap =
+                       new LinkedHashMap<String, Map<String, InterfaceData>>();
+    /** Map from domain name and index to the input device data. */
+    private final Map<String, Map<String, InputDevData>> inputDevsMap =
+                       new LinkedHashMap<String, Map<String, InputDevData>>();
+    /** Map from domain name and type to the graphics device data. */
+    private final Map<String, Map<String, GraphicsData>> graphicsDevsMap =
+                       new LinkedHashMap<String, Map<String, GraphicsData>>();
+    /** Map from domain name and model to the sound device data. */
+    private final Map<String, Map<String, SoundData>> soundsMap =
+                       new LinkedHashMap<String, Map<String, SoundData>>();
+    /** Map from domain name and type to the serial device data. */
+    private final Map<String, Map<String, SerialData>> serialsMap =
+                       new LinkedHashMap<String, Map<String, SerialData>>();
+    /** Map from domain name and type to the parallel device data. */
+    private final Map<String, Map<String, ParallelData>> parallelsMap =
+                       new LinkedHashMap<String, Map<String, ParallelData>>();
+    /** Map from domain name and model type to the video device data. */
+    private final Map<String, Map<String, VideoData>> videosMap =
+                       new LinkedHashMap<String, Map<String, VideoData>>();
+    /** Map from domain name and network name to the network data. */
+    private final Map<Value, NetworkData> networkMap =
+                                    new LinkedHashMap<Value, NetworkData>();
+    /** Directories where are source files. */
+    private final Collection<String> sourceFileDirs = new TreeSet<String>();
+    /** All used mac addresses. */
+    private final Collection<String> macAddresses = new HashSet<String>();
+    /** Host on which the vm is defined. */
+    private final Host host;
 
     /** XML document lock. */
     private final ReadWriteLock mXMLDocumentLock = new ReentrantReadWriteLock();
@@ -2230,99 +2368,6 @@ public final class VMSXML extends XML {
         return videosMap.get(name);
     }
 
-    /** Class that holds data about networks. */
-    static final class NetworkData extends HardwareData {
-        /** Name of the network. */
-        private final String name;
-        /** UUID of the network. */
-        private final String uuid;
-        /** Autostart. */
-        private final boolean autostart;
-        /** Forward mode. */
-        private final String forwardMode;
-        /** Bridge name. */
-        private final String bridgeName;
-        /** Bridge STP. */
-        private final String bridgeSTP;
-        /** Bridge delay. */
-        private final String bridgeDelay;
-        /** Bridge forward delay. */
-        private final String bridgeForwardDelay;
-
-        /** Autostart. */
-        static final String AUTOSTART = "autostart";
-        /** Forward mode. */
-        static final String FORWARD_MODE = "forward_mode";
-        /** Bridge name. */
-        static final String BRIDGE_NAME = "bridge_name";
-        /** Bridge STP. */
-        static final String BRIDGE_STP = "bridge_stp";
-        /** Bridge delay. */
-        static final String BRIDGE_DELAY = "bridge_delay";
-        /** Bridge forward delay. */
-        static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
-
-        /** Creates new NetworkData object. */
-        NetworkData(final String name,
-                    final String uuid,
-                    final boolean autostart,
-                    final String forwardMode,
-                    final String bridgeName,
-                    final String bridgeSTP,
-                    final String bridgeDelay,
-                    final String bridgeForwardDelay) {
-            super();
-            this.name = name;
-            this.uuid = uuid;
-            this.autostart = autostart;
-            if (autostart) {
-                setValue(AUTOSTART, new StringValue("true"));
-            } else {
-                setValue(AUTOSTART, new StringValue("false"));
-            }
-            this.forwardMode = forwardMode;
-            setValue(FORWARD_MODE, new StringValue(forwardMode));
-            this.bridgeName = bridgeName;
-            setValue(BRIDGE_NAME, new StringValue(bridgeName));
-            this.bridgeSTP = bridgeSTP;
-            setValue(BRIDGE_STP, new StringValue(bridgeSTP));
-            this.bridgeDelay = bridgeDelay;
-            setValue(BRIDGE_DELAY, new StringValue(bridgeDelay));
-            this.bridgeForwardDelay = bridgeForwardDelay;
-            setValue(BRIDGE_FORWARD_DELAY, new StringValue(bridgeForwardDelay));
-        }
-
-        /** Whether it is autostart. */
-        boolean isAutostart() {
-            return autostart;
-        }
-
-        /** Returns forward mode. */
-        String getForwardMode() {
-            return forwardMode;
-        }
-
-        /** Returns bridge name. */
-        String getBridgeName() {
-            return bridgeName;
-        }
-
-        /** Returns bridge STP. */
-        String getBridgeSTP() {
-            return bridgeSTP;
-        }
-
-        /** Returns bridge delay. */
-        String getBridgeDelay() {
-            return bridgeDelay;
-        }
-
-        /** Returns bridge forward delay. */
-        String getBridgeForwardDelay() {
-            return bridgeForwardDelay;
-        }
-    }
-
     /** Returns function that gets the node that belongs to the paremeters. */
     protected VirtualHardwareComparator getDiskDataComparator() {
         return new VirtualHardwareComparator() {
@@ -2524,6 +2569,99 @@ public final class VMSXML extends XML {
         };
     }
 
+    /** Returns source file directories. */
+    public Iterable<String> getSourceFileDirs() {
+        return sourceFileDirs;
+    }
+
+    /** Return set of mac addresses. */
+    public Collection<String> getMacAddresses() {
+        return macAddresses;
+    }
+
+    public String getConfig() {
+        return oldConfig;
+    }
+
+    /** Class that holds data about networks. */
+    static final class NetworkData extends HardwareData {
+        /** Name of the network. */
+        private final String name;
+        /** UUID of the network. */
+        private final String uuid;
+        /** Autostart. */
+        private final boolean autostart;
+        /** Forward mode. */
+        private final String forwardMode;
+        /** Bridge name. */
+        private final String bridgeName;
+        /** Bridge STP. */
+        private final String bridgeSTP;
+        /** Bridge delay. */
+        private final String bridgeDelay;
+        /** Bridge forward delay. */
+        private final String bridgeForwardDelay;
+        /** Autostart. */
+        static final String AUTOSTART = "autostart";
+        /** Forward mode. */
+        static final String FORWARD_MODE = "forward_mode";
+        /** Bridge name. */
+        static final String BRIDGE_NAME = "bridge_name";
+        /** Bridge STP. */
+        static final String BRIDGE_STP = "bridge_stp";
+        /** Bridge delay. */
+        static final String BRIDGE_DELAY = "bridge_delay";
+        /** Bridge forward delay. */
+        static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
+
+        /** Creates new NetworkData object. */
+        NetworkData(final String name, final String uuid, final boolean autostart, final String forwardMode, final String bridgeName, final String bridgeSTP, final String bridgeDelay, final String bridgeForwardDelay) {
+            super();
+            this.name = name;
+            this.uuid = uuid;
+            this.autostart = autostart;
+            if (autostart) {
+                setValue(AUTOSTART, new StringValue("true"));
+            } else {
+                setValue(AUTOSTART, new StringValue("false"));
+            }
+            this.forwardMode = forwardMode;
+            setValue(FORWARD_MODE, new StringValue(forwardMode));
+            this.bridgeName = bridgeName;
+            setValue(BRIDGE_NAME, new StringValue(bridgeName));
+            this.bridgeSTP = bridgeSTP;
+            setValue(BRIDGE_STP, new StringValue(bridgeSTP));
+            this.bridgeDelay = bridgeDelay;
+            setValue(BRIDGE_DELAY, new StringValue(bridgeDelay));
+            this.bridgeForwardDelay = bridgeForwardDelay;
+            setValue(BRIDGE_FORWARD_DELAY, new StringValue(bridgeForwardDelay));
+        }
+        /** Whether it is autostart. */
+        boolean isAutostart() {
+            return autostart;
+        }
+        /** Returns forward mode. */
+        String getForwardMode() {
+            return forwardMode;
+        }
+        /** Returns bridge name. */
+        String getBridgeName() {
+            return bridgeName;
+        }
+        /** Returns bridge STP. */
+        String getBridgeSTP() {
+            return bridgeSTP;
+        }
+        /** Returns bridge delay. */
+        String getBridgeDelay() {
+            return bridgeDelay;
+        }
+        /** Returns bridge forward delay. */
+        String getBridgeForwardDelay() {
+            return bridgeForwardDelay;
+        }
+    }
+
     /** Class that holds data about virtual disks. */
     public static final class DiskData extends HardwareData {
         /** Type: file, block... */
@@ -2566,12 +2704,10 @@ public final class VMSXML extends XML {
         public static final String TARGET_DEVICE = "target_device";
         /** Saved target device string. */
         public static final String SAVED_TARGET_DEVICE = "saved_target_device";
-
         /** Source file. */
         public static final String SOURCE_FILE = "source_file";
         /** Source dev. */
         public static final String SOURCE_DEVICE = "source_dev";
-
         /** Source protocol. */
         public static final String SOURCE_PROTOCOL = "source_protocol";
         /** Source name. */
@@ -2580,14 +2716,12 @@ public final class VMSXML extends XML {
         public static final String SOURCE_HOST_NAME = "source_host_name";
         /** Source host port. */
         public static final String SOURCE_HOST_PORT = "source_host_port";
-
         /** Auth user name. */
         public static final String AUTH_USERNAME = "auth_username";
         /** Auth secret type. */
         public static final String AUTH_SECRET_TYPE = "auth_secret_type";
         /** Auth secret uuid. */
         public static final String AUTH_SECRET_UUID = "auth_secret_uuid";
-
         /** Target bus and type. */
         public static final String TARGET_BUS_TYPE = "target_bus_type";
         /** Target bus. */
@@ -2606,23 +2740,7 @@ public final class VMSXML extends XML {
         public static final String SHAREABLE = "shareable";
 
         /** Creates new DiskData object. */
-        public DiskData(final String type,
-                        final String targetDev,
-                        final String sourceFile,
-                        final String sourceDev,
-                        final String sourceProtocol,
-                        final String sourceName,
-                        final String sourceHostName,
-                        final String sourceHostPort,
-                        final String authUsername,
-                        final String authSecretType,
-                        final String authSecretUuid,
-                        final String targetBusType,
-                        final String driverName,
-                        final String driverType,
-                        final String driverCache,
-                        final boolean readonly,
-                        final boolean shareable) {
+        public DiskData(final String type, final String targetDev, final String sourceFile, final String sourceDev, final String sourceProtocol, final String sourceName, final String sourceHostName, final String sourceHostPort, final String authUsername, final String authSecretType, final String authSecretUuid, final String targetBusType, final String driverName, final String driverType, final String driverCache, final boolean readonly, final boolean shareable) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -2669,22 +2787,18 @@ public final class VMSXML extends XML {
                 setValue(SHAREABLE, new StringValue("False"));
             }
         }
-
         /** Returns type. */
         public String getType() {
             return type;
         }
-
         /** Returns target device. */
         public String getTargetDev() {
             return targetDev;
         }
-
         /** Returns source file. */
         public String getSourceFile() {
             return sourceFile;
         }
-
         /** Returns source device. */
         public String getSourceDev() {
             return sourceDev;
@@ -2776,12 +2890,8 @@ public final class VMSXML extends XML {
         public static final String TARGET_DIR = "target_dir";
         /** Saved target dir string. */
         public static final String SAVED_TARGET_DIR = "saved_target_dir";
-
         /** Creates new FilesysmteData object. */
-        public FilesystemData(final String type,
-                              final String sourceDir,
-                              final String sourceName,
-                              final String targetDir) {
+        public FilesystemData(final String type, final String sourceDir, final String sourceName, final String targetDir) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -2792,7 +2902,6 @@ public final class VMSXML extends XML {
             this.targetDir = targetDir;
             setValue(TARGET_DIR, new StringValue(targetDir));
         }
-
         /** Returns type. */
         public String getType() {
             return type;
@@ -2815,10 +2924,10 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual hardware. */
-    private abstract static class HardwareData {
+    private static abstract class HardwareData {
         /** Name value pairs. */
         private final Map<String, Value> valueMap =
-                                                new HashMap<String, Value>();
+            new HashMap<String, Value>();
         /** Sets value of this parameter. */
         final void setValue(final String param, final Value value) {
             valueMap.put(param, value);
@@ -2827,6 +2936,7 @@ public final class VMSXML extends XML {
         public final Value getValue(final String param) {
             return valueMap.get(param);
         }
+
     }
 
     /** Class that holds data about virtual interfaces. */
@@ -2839,7 +2949,6 @@ public final class VMSXML extends XML {
         private final String sourceBridge;
         /** Target dev: vnet0... */
         private final String targetDev;
-
         /** Type. */
         public static final String TYPE = "type";
         /** Mac address. */
@@ -2858,13 +2967,7 @@ public final class VMSXML extends XML {
         public static final String MODEL_TYPE = "model_type";
 
         /** Creates new InterfaceData object. */
-        public InterfaceData(final String type,
-                             final String macAddress,
-                             final String sourceNetwork,
-                             final String sourceBridge,
-                             final String targetDev,
-                             final String modelType,
-                             final String scriptPath) {
+        public InterfaceData(final String type, final String macAddress, final String sourceNetwork, final String sourceBridge, final String targetDev, final String modelType, final String scriptPath) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -2878,12 +2981,10 @@ public final class VMSXML extends XML {
             setValue(MODEL_TYPE, new StringValue(modelType));
             setValue(SCRIPT_PATH, new StringValue(scriptPath));
         }
-
         /** Returns type. */
         public String getType() {
             return type;
         }
-
         /** Returns source network. */
         public String getSourceNetwork() {
             return sourceNetwork;
@@ -2917,15 +3018,13 @@ public final class VMSXML extends XML {
         public static final String SAVED_BUS = "saved_bus";
 
         /** Creates new InputDevData object. */
-        public InputDevData(final String type,
-                            final String bus) {
+        public InputDevData(final String type, final String bus) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
             this.bus = bus;
             setValue(BUS, new StringValue(bus));
         }
-
         /** Returns type. */
         public String getType() {
             return type;
@@ -2935,7 +3034,6 @@ public final class VMSXML extends XML {
         public String getBus() {
             return bus;
         }
-
     }
 
     /** Class that holds data about virtual displays. */
@@ -2962,13 +3060,7 @@ public final class VMSXML extends XML {
         public static final String XAUTH = "xauth";
 
         /** Creates new GraphicsData object. */
-        public GraphicsData(final String type,
-                            final String port,
-                            final String listen,
-                            final String passwd,
-                            final String keymap,
-                            final String display,
-                            final String xauth) {
+        public GraphicsData(final String type, final String port, final String listen, final String passwd, final String keymap, final String display, final String xauth) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -2979,7 +3071,6 @@ public final class VMSXML extends XML {
             setValue(DISPLAY, new StringValue(display));
             setValue(XAUTH, new StringValue(xauth));
         }
-
         /** Returns type. */
         public String getType() {
             return type;
@@ -2994,14 +3085,12 @@ public final class VMSXML extends XML {
         public static final String MODEL = "model";
         /** Saved model. */
         public static final String SAVED_MODEL = "saved_model";
-
         /** Creates new SoundData object. */
         public SoundData(final String model) {
             super();
             this.model = model;
             setValue(MODEL, new StringValue(model));
         }
-
         /** Returns model. */
         public String getModel() {
             return model;
@@ -3009,7 +3098,7 @@ public final class VMSXML extends XML {
     }
 
     /** Class that holds data about virtual parallel or serial devices. */
-    public abstract static class ParallelSerialData extends HardwareData {
+    public static abstract class ParallelSerialData extends HardwareData {
         /** Type. */
         private final String type;
         /** Type: dev, file, null, pipe, pty, stdio, tcp, udp, unix, vc. */
@@ -3019,7 +3108,7 @@ public final class VMSXML extends XML {
         /** Source path. */
         public static final String SOURCE_PATH = "source_path";
         /** Source mode: bind, connect. This is for tcp, because it is
-            either-or */
+         * either-or */
         public static final String SOURCE_MODE = "source_mode";
         /** Source mode: bind, connect. */
         public static final String BIND_SOURCE_MODE = "bind_source_mode";
@@ -3033,22 +3122,13 @@ public final class VMSXML extends XML {
         public static final String CONNECT_SOURCE_HOST = "connect_source_host";
         /** Connect source service. */
         public static final String CONNECT_SOURCE_SERVICE =
-                                                    "connect_source_service";
+            "connect_source_service";
         /** Protocol type. */
         public static final String PROTOCOL_TYPE = "protocol_type";
         /** Target port. */
         public static final String TARGET_PORT = "target_port";
         /** Creates new ParallelSerialData object. */
-        public ParallelSerialData(final String type,
-                                  final String sourcePath,
-                                  final String bindSourceMode,
-                                  final String bindSourceHost,
-                                  final String bindSourceService,
-                                  final String connectSourceMode,
-                                  final String connectSourceHost,
-                                  final String connectSourceService,
-                                  final String protocolType,
-                                  final String targetPort) {
+        public ParallelSerialData(final String type, final String sourcePath, final String bindSourceMode, final String bindSourceHost, final String bindSourceService, final String connectSourceMode, final String connectSourceHost, final String connectSourceService, final String protocolType, final String targetPort) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -3072,18 +3152,9 @@ public final class VMSXML extends XML {
     /** Class that holds data about virtual serial devices. */
     public static final class SerialData extends ParallelSerialData {
         /** Creates new SerialData object. */
-        public SerialData(final String type,
-                          final String sourcePath,
-                          final String bindSourceMode,
-                          final String bindSourceHost,
-                          final String bindSourceService,
-                          final String connectSourceMode,
-                          final String connectSourceHost,
-                          final String connectSourceService,
-                          final String protocolType,
-                          final String targetPort) {
-
-        super(type,
+        public SerialData(final String type, final String sourcePath, final String bindSourceMode, final String bindSourceHost, final String bindSourceService, final String connectSourceMode, final String connectSourceHost, final String connectSourceService, final String protocolType, final String targetPort) {
+            
+            super(type,
               sourcePath,
               bindSourceMode,
               bindSourceHost,
@@ -3098,19 +3169,11 @@ public final class VMSXML extends XML {
 
     /** Class that holds data about virtual parallel devices. */
     public static final class ParallelData extends ParallelSerialData {
-        /** Creates new ParallelData object. */
-        public ParallelData(final String type,
-                            final String sourcePath,
-                            final String bindSourceMode,
-                            final String bindSourceHost,
-                            final String bindSourceService,
-                            final String connectSourceMode,
-                            final String connectSourceHost,
-                            final String connectSourceService,
-                            final String protocolType,
-                            final String targetPort) {
 
-        super(type,
+        /** Creates new ParallelData object. */
+        public ParallelData(final String type, final String sourcePath, final String bindSourceMode, final String bindSourceHost, final String bindSourceService, final String connectSourceMode, final String connectSourceHost, final String connectSourceService, final String protocolType, final String targetPort) {
+            
+            super(type,
               sourcePath,
               bindSourceMode,
               bindSourceHost,
@@ -3158,154 +3221,5 @@ public final class VMSXML extends XML {
         /** Returns an element. */
         Element getElement(final NodeList nodes,
                            final Map<String, String> parameters);
-    }
-
-    /** Returns string representation of the port; it can be autoport. */
-    static String portString(final String port) {
-        if ("-1".equals(port)) {
-            return "auto";
-        }
-        return port;
-    }
-
-    /** Returns string representation graphic display SDL/VNC. */
-    public static String graphicsDisplayName(final String type,
-                                             final String port,
-                                             final String display) {
-        if ("vnc".equals(type)) {
-            return type + " : " + portString(port);
-        } else if ("sdl".equals(type)) {
-            return type + " (" + display + ')';
-        }
-        return "unknown";
-    }
-
-    /** Returns source file directories. */
-    public Iterable<String> getSourceFileDirs() {
-        return sourceFileDirs;
-    }
-
-    /** Return set of mac addresses. */
-    public Collection<String> getMacAddresses() {
-        return macAddresses;
-    }
-
-    public String getConfig() {
-        return oldConfig;
-    }
-
-    public static Unit getUnitKiBytes() {
-        return new Unit("K", "K", "KiByte", "KiBytes");
-    }
-
-    public static Unit getUnitMiBytes() {
-        return new Unit("M", "M", "MiByte", "MiBytes");
-    }
-
-    public static Unit getUnitGiBytes() {
-        return new Unit("G", "G", "GiByte", "GiBytes");
-    }
-
-    public static Unit getUnitTiBytes() {
-        return new Unit("T", "T", "TiByte", "TiBytes");
-    }
-
-    public static Unit getUnitPiBytes() {
-        return new Unit("P", "P", "PiByte", "PiBytes");
-    }
-
-    public static Unit[] getUnits() {
-        return new Unit[]{getUnitKiBytes(),
-                          getUnitMiBytes(),
-                          getUnitGiBytes(),
-                          getUnitTiBytes(),
-                          getUnitPiBytes()
-        };
-    }
-
-    /** Converts value in kilobytes. */
-    //TODO: move somewhere else
-    public static Value convertKilobytes(final String kb) {
-        if (!Tools.isNumber(kb)) {
-            return new StringValue(kb, getUnitKiBytes());
-        }
-        final double k = Long.parseLong(kb);
-        if (k == 0) {
-            return new StringValue("0", getUnitKiBytes());
-        }
-        if (k / 1024 != (long) (k / 1024)) {
-            return new StringValue(kb, getUnitKiBytes());
-        }
-        final double m = k / 1024;
-        if (m / 1024 != (long) (m / 1024)) {
-            return new StringValue(Long.toString((long) m), getUnitMiBytes());
-        }
-        final double g = m / 1024;
-        if (g / 1024 != (long) (g / 1024)) {
-            return new StringValue(Long.toString((long) g), getUnitGiBytes());
-        }
-        final double t = g / 1024;
-        if (t / 1024 != (long) (t / 1024)) {
-            return new StringValue(Long.toString((long) t), getUnitTiBytes());
-        }
-        final double p = t / 1024;
-        return new StringValue(Long.toString((long) p), getUnitPiBytes());
-    }
-    ///** Converts value in kilobytes. */
-    //public static String convertKilobytes(final String kb) {
-    //    if (!isNumber(kb)) {
-    //        return kb;
-    //    }
-    //    final double k = Long.parseLong(kb);
-    //    if (k == 0) {
-    //        return "0K";
-    //    }
-    //    if (k / 1024 != (long) (k / 1024)) {
-    //        return kb + "K";
-    //    }
-    //    final double m = k / 1024;
-    //    if (m / 1024 != (long) (m / 1024)) {
-    //        return Long.toString((long) m) + "M";
-    //    }
-    //    final double g = m / 1024;
-    //    if (g / 1024 != (long) (g / 1024)) {
-    //        return Long.toString((long) g) + "G";
-    //    }
-    //    final double t = g / 1024;
-    //    if (t / 1024 != (long) (t / 1024)) {
-    //        return Long.toString((long) t) + "T";
-    //    }
-    //    return Long.toString((long) (t / 1024)) + "P";
-    //}
-
-    /** Converts value with unit to kilobites. */
-    //TODO: move somewhere else
-    public static long convertToKilobytes(final Value value) {
-        if (value == null) {
-            return -1;
-        }
-        final String numS = value.getValueForConfig();
-        if (Tools.isNumber(numS)) {
-            long num = Long.parseLong(numS);
-            final Unit unitObject = value.getUnit();
-            if (unitObject == null) {
-                return -1;
-            }
-            final String unit = unitObject.getShortName();
-            if ("P".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024 * 1024;
-            } else if ("T".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024 * 1024;
-            } else if ("G".equalsIgnoreCase(unit)) {
-                num = num * 1024 * 1024;
-            } else if ("M".equalsIgnoreCase(unit)) {
-                num *= 1024;
-            } else if ("K".equalsIgnoreCase(unit)) {
-            } else {
-                return -1;
-            }
-            return num;
-        }
-        return -1;
     }
 }

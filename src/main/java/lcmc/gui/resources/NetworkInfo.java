@@ -21,12 +21,11 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.data.resources.Network;
-import lcmc.utilities.Tools;
-
 import javax.swing.ImageIcon;
 import lcmc.data.Application;
+import lcmc.data.resources.Network;
+import lcmc.gui.Browser;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info data for a network.
@@ -46,7 +45,7 @@ public final class NetworkInfo extends Info {
 
     /** Returns network info. */
     @Override
-    String getInfo() {
+    public String getInfo() {
         return "Network: " + getNetwork().getName()
                            + "\n IPs: " + getNetwork().getIps()
                            + "\nCIDR: " + getNetwork().getCidr()

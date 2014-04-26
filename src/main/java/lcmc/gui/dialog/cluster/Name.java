@@ -22,22 +22,20 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Cluster;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.utilities.Tools;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-
 import java.awt.BorderLayout;
-
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import javax.swing.JLabel;
-import javax.swing.JComponent;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
 import lcmc.data.StringValue;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
@@ -47,10 +45,10 @@ import lcmc.data.StringValue;
  *
  */
 public final class Name extends DialogCluster {
-    /** Name field. */
-    private Widget nameField;
     /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
+    /** Name field. */
+    private Widget nameField;
 
     /** Prepares a new {@code Name} object. */
     public Name(final WizardDialog previousDialog, final Cluster cluster) {

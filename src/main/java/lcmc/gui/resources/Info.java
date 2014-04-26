@@ -22,54 +22,17 @@
 
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.gui.widget.Widget;
-import lcmc.data.resources.Resource;
-import lcmc.data.AccessMode;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.Unit;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.MyCellRenderer;
-import lcmc.utilities.MyButtonCellRenderer;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.MyMenu;
-
-import javax.swing.SwingUtilities;
-import javax.swing.ImageIcon;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.JComponent;
-import javax.swing.text.JTextComponent;
-import javax.swing.JPopupMenu;
-import javax.swing.JMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JMenuItem;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableRowSorter;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.SwingConstants;
-import javax.swing.JTable;
-import javax.swing.BoxLayout;
-import javax.swing.border.TitledBorder;
-import javax.swing.JToggleButton;
-import javax.swing.AbstractButton;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.tree.MutableTreeNode;
-
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.Font;
-import java.awt.Component;
-import java.awt.geom.Point2D;
-import java.awt.Dimension;
 import java.awt.event.MouseListener;
-import java.awt.Point;
-import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,14 +40,48 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.AbstractButton;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.JTextComponent;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Value;
+import lcmc.data.resources.Resource;
+import lcmc.gui.Browser;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.ComponentWithTest;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.MyButtonCellRenderer;
+import lcmc.utilities.MyCellRenderer;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
@@ -94,6 +91,11 @@ import lcmc.utilities.LoggerFactory;
 public class Info implements Comparable<Info>, Value {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
+    /** Amount of frames per second. */
+    private static final float FPS = Tools.getApplication().getAnimFPS();
+    /** Log file icon. */
+    public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
+                                  Tools.getDefault("Info.LogIcon"));
     /** Menu node of this object. */
     private DefaultMutableTreeNode node = null;
     /** Name of the object. */
@@ -101,8 +103,6 @@ public class Info implements Comparable<Info>, Value {
     /** Resource object as found in data/resources associated with this
      * object. */
     private Resource resource;
-    /** Amount of frames per second. */
-    private static final float FPS = Tools.getApplication().getAnimFPS();
     /** TODL: Checking for leak. */
     private int maxMenuList = 0;
 
@@ -135,9 +135,6 @@ public class Info implements Comparable<Info>, Value {
     /** Table models. */
     private final Map<String, DefaultTableModel> tableModels =
                                     new HashMap<String, DefaultTableModel>();
-    /** Log file icon. */
-    public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(
-                                  Tools.getDefault("Info.LogIcon"));
     /** Hash from component to the edit access mode. */
     private final Map<JTextComponent, AccessMode> componentToEditAccessMode =
                                      new HashMap<JTextComponent, AccessMode>();
@@ -151,7 +148,7 @@ public class Info implements Comparable<Info>, Value {
      * @param name
      *      name that will be shown to the user
      */
-    Info(final String name, final Browser browser) {
+    public Info(final String name, final Browser browser) {
         this.name = name;
         this.browser = browser;
     }
@@ -172,12 +169,12 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns browser object of this info. */
-    protected Browser getBrowser() {
+    public Browser getBrowser() {
         return browser;
     }
 
     /** Returns the tool tip for this object. */
-    String getToolTipText(final Application.RunMode runMode) {
+    public String getToolTipText(final Application.RunMode runMode) {
         return "no tooltip";
     }
 
@@ -207,7 +204,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Removes the parameter from the widget hash. */
-    protected final Widget widgetRemove(final String param,
+    public final Widget widgetRemove(final String param,
                                                final String prefix) {
         if (prefix == null) {
             if (widgetHash.containsKey(param)) {
@@ -225,7 +222,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Clears the whole widget hash. */
-    protected final void widgetClear() {
+    public final void widgetClear() {
         for (final Map.Entry<String, Widget> widgetEntry : widgetHash.entrySet()) {
             widgetEntry.getValue().cleanup();
         }
@@ -350,7 +347,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** TODO: clears info panel cache most of the time. */
-    boolean selectAutomaticallyInTreeMenu() {
+    public boolean selectAutomaticallyInTreeMenu() {
         return false;
     }
 
@@ -363,7 +360,7 @@ public class Info implements Comparable<Info>, Value {
      * Returns info as string. This can be used by simple view, when
      * getInfoPanel() is not overwritten.
      */
-    String getInfo() {
+    public String getInfo() {
         return name;
     }
 
@@ -379,7 +376,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Gets node of this resource or service. */
-    final DefaultMutableTreeNode getNode() {
+    public final DefaultMutableTreeNode getNode() {
         return node;
     }
 
@@ -427,7 +424,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns resource object. */
-    public final Resource getResource() {
+    public Resource getResource() {
         return resource;
     }
 
@@ -574,7 +571,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns the Action button. */
-    final JToggleButton getActionsButton() {
+    protected final JToggleButton getActionsButton() {
         final JToggleButton b =
                       new JToggleButton(Tools.getString("Browser.ActionsMenu"),
                                         Browser.MENU_ICON);
@@ -703,7 +700,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Adds mouse over listener. */
-    protected final void addMouseOverListener(final ComponentWithTest c,
+    public final void addMouseOverListener(final ComponentWithTest c,
                                               final ButtonCallback bc) {
         if (bc == null) {
             return;
@@ -1120,7 +1117,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Remove node in tree menu. Call it from swing thread. */
-    final void removeNodeAndWait() {
+    protected final void removeNodeAndWait() {
         Tools.isSwingThread();
         final DefaultMutableTreeNode n = node;
         node = null;
@@ -1134,7 +1131,7 @@ public class Info implements Comparable<Info>, Value {
         }
     }
 
-    final void removeNode() {
+    protected final void removeNode() {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {

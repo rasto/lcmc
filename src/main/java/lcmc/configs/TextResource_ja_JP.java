@@ -30,12 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class TextResource_ja_JP extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"DrbdMC.Title",
@@ -1922,167 +1916,167 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"VMSXML.GetConfig",
          "libvirt構成を解析しています..."},
 
-        {"VMSInfo.AddNewDomain",
+        {"VMListInfo.AddNewDomain",
          "新しい仮想マシンの追加"},
 
-        {"VMSVirtualDomainInfo.Section.VirtualSystem",
+        {"DomainInfo.Section.VirtualSystem",
          "仮想システム"},
 
-        {"VMSVirtualDomainInfo.Section.Options",
+        {"DomainInfo.Section.Options",
          "拡張オプション"},
 
-        {"VMSVirtualDomainInfo.Section.Features",
+        {"DomainInfo.Section.Features",
          "機能"},
 
-        {"VMSVirtualDomainInfo.Section.CPUMatch",
+        {"DomainInfo.Section.CPUMatch",
          "CPU Match"},
 
-        {"VMSVirtualDomainInfo.Short.Name",
+        {"DomainInfo.Short.Name",
          "ドメイン名"},
 
-        {"VMSVirtualDomainInfo.Short.Type",
+        {"DomainInfo.Short.Type",
          "タイプ"},
 
-        {"VMSVirtualDomainInfo.Short.Vcpu",
+        {"DomainInfo.Short.Vcpu",
          "CPU数"},
 
-        {"VMSVirtualDomainInfo.Short.CurrentMemory",
+        {"DomainInfo.Short.CurrentMemory",
          "現在のメモリー使用量"},
 
-        {"VMSVirtualDomainInfo.Short.Memory",
+        {"DomainInfo.Short.Memory",
          "最大メモリー使用量"},
 
-        {"VMSVirtualDomainInfo.Short.Os.Boot",
+        {"DomainInfo.Short.Os.Boot",
          "ブート デバイス"},
 
-        {"VMSVirtualDomainInfo.Short.Os.Loader",
+        {"DomainInfo.Short.Os.Loader",
          "ローダー"},
 
-        {"VMSVirtualDomainInfo.Short.Autostart",
+        {"DomainInfo.Short.Autostart",
          "自動起動"},
 
-        {"VMSVirtualDomainInfo.Short.Arch",
+        {"DomainInfo.Short.Arch",
          "CPUアーキテクチャー"},
 
-        {"VMSVirtualDomainInfo.Short.Acpi",
+        {"DomainInfo.Short.Acpi",
          "ACPI"},
 
-        {"VMSVirtualDomainInfo.Short.Apic",
+        {"DomainInfo.Short.Apic",
          "APIC"},
 
-        {"VMSVirtualDomainInfo.Short.Pae",
+        {"DomainInfo.Short.Pae",
          "PAE"},
 
-        {"VMSVirtualDomainInfo.Short.Hap",
+        {"DomainInfo.Short.Hap",
          "HAP"},
 
-        {"VMSVirtualDomainInfo.Short.CPU.Match",
+        {"DomainInfo.Short.CPU.Match",
          "Match"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Model",
+        {"DomainInfo.Short.CPUMatch.Model",
          "Model"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Vendor",
+        {"DomainInfo.Short.CPUMatch.Vendor",
          "Vendor"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologySockets",
+        {"DomainInfo.Short.CPUMatch.TopologySockets",
          "Topology Sockets"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyCores",
+        {"DomainInfo.Short.CPUMatch.TopologyCores",
          "Topology Cores"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.TopologyThreads",
+        {"DomainInfo.Short.CPUMatch.TopologyThreads",
          "Topology Threads"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Policy",
+        {"DomainInfo.Short.CPUMatch.Policy",
          "Policy"},
 
-        {"VMSVirtualDomainInfo.Short.CPUMatch.Features",
+        {"DomainInfo.Short.CPUMatch.Features",
          "Features"},
 
-        {"VMSVirtualDomainInfo.Short.OnPoweroff",
+        {"DomainInfo.Short.OnPoweroff",
          "On Poweroff"},
 
-        {"VMSVirtualDomainInfo.Short.OnReboot",
+        {"DomainInfo.Short.OnReboot",
          "リブート時"},
 
-        {"VMSVirtualDomainInfo.Short.OnCrash",
+        {"DomainInfo.Short.OnCrash",
          "クラッシュ時"},
 
-        {"VMSVirtualDomainInfo.Short.Emulator",
+        {"DomainInfo.Short.Emulator",
          "エミュレーター"},
 
-        {"VMSVirtualDomainInfo.StartVNCViewerOn",
+        {"DomainInfo.StartVNCViewerOn",
          "Console (@VIEWER@ VNC) on "},
 
-        {"VMSVirtualDomainInfo.StartOn",
+        {"DomainInfo.StartOn",
          "Start on "},
 
-        {"VMSVirtualDomainInfo.ShutdownOn",
+        {"DomainInfo.ShutdownOn",
          "Gracefully shutdown on "},
 
-        {"VMSVirtualDomainInfo.DestroyOn",
+        {"DomainInfo.DestroyOn",
          "Kill on "},
 
-        {"VMSVirtualDomainInfo.RebootOn",
+        {"DomainInfo.RebootOn",
          "Reboot on "},
 
-        {"VMSVirtualDomainInfo.SuspendOn",
+        {"DomainInfo.SuspendOn",
          "Suspend on "},
 
-        {"VMSVirtualDomainInfo.ResumeOn",
+        {"DomainInfo.ResumeOn",
          "Resume on "},
 
-        {"VMSVirtualDomainInfo.AddNewDisk",
+        {"DomainInfo.AddNewDisk",
          "新しいディスク"},
 
-        {"VMSVirtualDomainInfo.AddNewInterface",
+        {"DomainInfo.AddNewInterface",
          "新しいネットワーク インターフェース"},
 
-        {"VMSVirtualDomainInfo.AddNewInputDev",
+        {"DomainInfo.AddNewInputDev",
          "新しい入力デバイス（マウス/タブレット）"},
 
-        {"VMSVirtualDomainInfo.AddNewGraphics",
+        {"DomainInfo.AddNewGraphics",
          "新しいグラフィック デバイス（VNC, SDL）"},
 
-        {"VMSVirtualDomainInfo.AddNewSound",
+        {"DomainInfo.AddNewSound",
          "新しいサウンド デバイス"},
 
-        {"VMSVirtualDomainInfo.AddNewSerial",
+        {"DomainInfo.AddNewSerial",
          "新しいシリアル デバイス"},
 
-        {"VMSVirtualDomainInfo.AddNewParallel",
+        {"DomainInfo.AddNewParallel",
          "新しいパラレル デバイス"},
 
-        {"VMSVirtualDomainInfo.AddNewVideo",
+        {"DomainInfo.AddNewVideo",
          "新しいビデオ デバイス"},
 
-        {"VMSVirtualDomainInfo.AddNewHardware",
+        {"DomainInfo.AddNewHardware",
          "新しいハードウェア"},
 
-        {"VMSVirtualDomainInfo.MoreOptions",
+        {"DomainInfo.MoreOptions",
          "レジューム/サスペンド"},
 
-        {"VMSVirtualDomainInfo.RemoveDomain",
+        {"DomainInfo.RemoveDomain",
          "ドメインの削除"},
 
-        {"VMSVirtualDomainInfo.CancelDomain",
+        {"DomainInfo.CancelDomain",
          "新しいドメインのキャンセル"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.Title",
+        {"DomainInfo.confirmRemove.Title",
          "仮想ドメインの削除"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.Description",
+        {"DomainInfo.confirmRemove.Description",
          "仮想ドメイン\"@DOMAIN@\"を削除します。"
          + "本当によいですか？"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.Yes",
+        {"DomainInfo.confirmRemove.Yes",
          "削除"},
 
-        {"VMSVirtualDomainInfo.confirmRemove.No",
+        {"DomainInfo.confirmRemove.No",
          "キャンセル"},
 
-        {"VMSVirtualDomainInfo.AvailableInVersion",
+        {"DomainInfo.AvailableInVersion",
          "libvirt バージョン@VERSION@で利用可能"},
 
         {"ConstraintPHInfo.ToolTip",
@@ -2119,47 +2113,47 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"EditableInfo.MoreOptions",
          "拡張モードではより多くのオプションが利用できます..."},
 
-        {"VMSDiskInfo.FileChooserTitle",
+        {"DiskInfo.FileChooserTitle",
          "イメージを選択します。"},
 
-        {"VMSDiskInfo.Approve",
+        {"DiskInfo.Approve",
          "選択"},
 
-        {"VMSDiskInfo.Approve.ToolTip",
+        {"DiskInfo.Approve.ToolTip",
          "このイメージを選択します。"},
 
-        {"VMSVideoInfo.ModelType",
+        {"VideoInfo.ModelType",
          "タイプ"},
 
-        {"VMSVideoInfo.ModelVRAM",
+        {"VideoInfo.ModelVRAM",
          "ビデオ メモリー (Kb)"},
 
-        {"VMSVideoInfo.ModelHeads",
+        {"VideoInfo.ModelHeads",
          "画面の数"},
 
-        {"VMSVideoInfo.ModelVRAM.ToolTip",
+        {"VideoInfo.ModelVRAM.ToolTip",
          "ビデオ メモリー(VRAM) (Kb)"},
 
-        {"VMSVideoInfo.ModelHeads.ToolTip",
+        {"VideoInfo.ModelHeads.ToolTip",
          "画面の数 (Heads)"},
 
-        {"VMSHardwareInfo.Menu.Remove",
+        {"HardwareInfo.Menu.Remove",
          "削除"},
 
-        {"VMSHardwareInfo.Menu.Cancel",
+        {"HardwareInfo.Menu.Cancel",
          "キャンセル"},
 
-        {"VMSHardwareInfo.confirmRemove.Title",
+        {"HardwareInfo.confirmRemove.Title",
          "仮想ハードウェアの削除"},
 
-        {"VMSHardwareInfo.confirmRemove.Description",
+        {"HardwareInfo.confirmRemove.Description",
          "仮想\"@HW@\"を削除します。"
          + "本当によいですか？"},
 
-        {"VMSHardwareInfo.confirmRemove.Yes",
+        {"HardwareInfo.confirmRemove.Yes",
          "削除"},
 
-        {"VMSHardwareInfo.confirmRemove.No",
+        {"HardwareInfo.confirmRemove.No",
          "キャンセル"},
 
         {"ServiceInfo.PingdToolTip",
@@ -2191,28 +2185,34 @@ public final class TextResource_ja_JP extends ListResourceBundle {
         {"ServiceInfo.AlreadyStopped",
          "既に停止している"},
 
-        {"DrbdInfo.CommonSection",
+        {"GlobalInfo.CommonSection",
          "common "},
 
-        {"DrbdResourceInfo.HostAddresses",
+        {"ResourceInfo.HostAddresses",
          "Net Interface"},
 
-        {"DrbdResourceInfo.AddressOnHost",
+        {"ResourceInfo.AddressOnHost",
          "on "},
 
-        {"DrbdResourceInfo.NetInterfacePort",
+        {"ResourceInfo.NetInterfacePort",
          "Port"},
 
         {"BlockDevice.MetaDiskSection",
          "DRBDメタディスク"},
 
-        {"DrbdVolumeInfo.VolumeSection",
+        {"VolumeInfo.VolumeSection",
          "DRBD Volume"},
 
-        {"DrbdVolumeInfo.Number",
+        {"VolumeInfo.Number",
          "Number"},
 
-        {"DrbdVolumeInfo.Device",
+        {"VolumeInfo.Device",
          "Device"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

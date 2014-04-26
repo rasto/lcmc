@@ -23,34 +23,31 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyButton;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.configs.AppDefaults;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.data.Host;
-import lcmc.data.DrbdXML;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-
-import java.util.Map;
-import java.util.HashMap;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.configs.AppDefaults;
+import lcmc.data.DrbdXML;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Widget;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -112,7 +109,7 @@ public final class Resource extends DrbdConfig {
 
     /** Prepares a new {@code Resource} object. */
     public Resource(final WizardDialog previousDialog,
-                    final DrbdVolumeInfo dvi) {
+                    final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 
@@ -124,7 +121,7 @@ public final class Resource extends DrbdConfig {
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override
     public WizardDialog nextDialog() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         if (proxyHostNextDialog) {
             proxyHostNextDialog = false;
             final Host proxyHost = new Host();
@@ -134,21 +131,21 @@ public final class Resource extends DrbdConfig {
                                     getDrbdVolumeInfo(),
                                     this);
         }
-        final DrbdInfo drbdInfo = dri.getDrbdInfo();
-        final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
-        if (drbdInfo.getDrbdResources().size() <= 1) {
+        final GlobalInfo globalInfo = dri.getDrbdInfo();
+        final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
+        if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 if (!protocolInNetSection
                     && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
-                final Widget wi = drbdInfo.getWidget(commonP, null);
+                final Widget wi = globalInfo.getWidget(commonP, null);
                 if (wi == null) {
                     LOG.appError("widget for param: " + commonP + " was not created");
                     return null;
                 }
                 final Value value = dri.getComboBoxValue(commonP);
-                drbdInfo.getResource().setValue(commonP, value);
+                globalInfo.getResource().setValue(commonP, value);
                 wi.setValue(value);
             }
         }
@@ -175,7 +172,7 @@ public final class Resource extends DrbdConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         dri.waitForInfoPanel();
     }
 
@@ -189,7 +186,7 @@ public final class Resource extends DrbdConfig {
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         final boolean cor = dri.checkResourceFields(null, PARAMS).isCorrect();
         if (cor) {
             enableComponents();
@@ -211,8 +208,8 @@ public final class Resource extends DrbdConfig {
     /** Returns input pane where user can configure a drbd resource. */
     @Override
     protected JComponent getInputPane() {
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final DrbdInfo drbdInfo = dri.getDrbdInfo();
+        final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        final GlobalInfo globalInfo = dri.getDrbdInfo();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.LINE_AXIS));
 
@@ -230,24 +227,24 @@ public final class Resource extends DrbdConfig {
                                  new StringValue("100",
                                                  DrbdXML.getUnitMiBytes("")));
         commonPreferredValue.put(PROXY_PLUGIN_ZLIB, new StringValue("level 9"));
-        final boolean protocolInNetSection = drbdInfo.atLeastVersion("8.4");
-        if (drbdInfo.getDrbdResources().size() <= 1) {
+        final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
+        if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 if (!protocolInNetSection
                     && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
-                final Widget wi = drbdInfo.getWidget(commonP, null);
+                final Widget wi = globalInfo.getWidget(commonP, null);
                 if (wi == null) {
                     LOG.appError("widget for param: " + commonP + " was not created");
                     return new JPanel();
                 }
                 /* for the first resource set common options. */
                 final Value commonValue =
-                                      drbdInfo.getResource().getValue(commonP);
+                                      globalInfo.getResource().getValue(commonP);
                 if (commonPreferredValue.containsKey(commonP)) {
                     final Value defaultValue =
-                               drbdInfo.getParamDefault(commonP);
+                               globalInfo.getParamDefault(commonP);
                     if (Tools.areEqual(defaultValue, commonValue)) {
                         wi.setValue(commonPreferredValue.get(commonP));
                         dri.getResource().setValue(
@@ -262,7 +259,7 @@ public final class Resource extends DrbdConfig {
             /* resource options, if not defined in common section. */
             for (final String commonP : COMMON_PARAMS) {
                 final Value commonValue =
-                                      drbdInfo.getResource().getValue(commonP);
+                                      globalInfo.getResource().getValue(commonP);
                 if (commonValue == null || commonValue.isNothingSelected()
                     && commonPreferredValue.containsKey(commonP)) {
                     dri.getResource().setValue(
@@ -332,7 +329,7 @@ public final class Resource extends DrbdConfig {
         });
         panel.add(btn);
 
-        final DrbdResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
+        final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         for (final Host h : dri.getCluster().getProxyHosts()) {
             panel.add(new JLabel(h.getName()));
         }

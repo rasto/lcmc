@@ -25,8 +25,29 @@ import lcmc.Exceptions;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.*;
-import static lcmc.robotest.DrbdTest1.*;
+import static lcmc.robotest.DrbdTest1.addBlockDevice;
+import static lcmc.robotest.DrbdTest1.addDrbdResource;
+import static lcmc.robotest.DrbdTest1.addDrbdVolume;
+import static lcmc.robotest.DrbdTest1.addFileSystem;
+import static lcmc.robotest.DrbdTest1.addMetaData;
+import static lcmc.robotest.DrbdTest1.chooseDrbdResourceInterface;
+import static lcmc.robotest.DrbdTest1.drbdNext;
+import static lcmc.robotest.DrbdTest1.newDrbdResource;
+import static lcmc.robotest.RoboTest.PROXY;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkDRBDTest;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.dialogColorTest;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.leftPress;
+import static lcmc.robotest.RoboTest.leftRelease;
+import static lcmc.robotest.RoboTest.moveScrollBar;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.moveToSlowly;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.robot;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -39,11 +60,6 @@ import lcmc.utilities.Tools;
 final class DrbdTest8 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest8.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest8() {
-        /* Cannot be instantiated. */
-    }
 
     /** DRBD Test 8 / proxy. */
     static void start(final Cluster cluster, final int blockDevY) {
@@ -68,7 +84,7 @@ final class DrbdTest8 {
             moveTo(700, 450);
             leftClick();
 
-            moveTo(Tools.getString("DrbdResourceInfo.ProxyOutsideIp"),
+            moveTo(Tools.getString("ResourceInfo.ProxyOutsideIp"),
                    MComboBox.class); /* outside */
             leftClick();
             press(KeyEvent.VK_E);
@@ -109,13 +125,13 @@ final class DrbdTest8 {
         rightClick();
         moveToSlowly(400, blockDevY + 160);
 
-        moveTo(Tools.getString("DrbdMultiSelectionInfo.Detach"));
+        moveTo(Tools.getString("MultiSelectionInfo.Detach"));
         leftClick();
         checkDRBDTest(drbdTest, 2.01);
 
         moveTo(400, blockDevY);
         rightClick();
-        moveTo(Tools.getString("DrbdMultiSelectionInfo.Attach"));
+        moveTo(Tools.getString("MultiSelectionInfo.Attach"));
         leftClick();
         checkDRBDTest(drbdTest, 2.02);
 
@@ -174,8 +190,8 @@ final class DrbdTest8 {
         leftClick(); /* apply/disables tooltip */
         leftClick();
         checkDRBDTest(drbdTest, 2.1); /* 2.1 */
-
-
+        
+        
         /* common */
         moveTo(500, 342); /* select background */
         leftClick();
@@ -280,5 +296,10 @@ final class DrbdTest8 {
         leftClick();
         confirmRemove();
         checkDRBDTest(drbdTest, 4);
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest8() {
+        /* Cannot be instantiated. */
     }
 }

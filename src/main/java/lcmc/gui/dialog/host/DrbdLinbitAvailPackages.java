@@ -22,31 +22,32 @@
 
 package lcmc.gui.dialog.host;
 
-import lcmc.data.*;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.WidgetListener;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.utilities.SSH.ExecCommandThread;
-
-import javax.swing.JPanel;
-import javax.swing.SpringLayout;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.util.List;
 import java.util.Arrays;
-import javax.swing.BoxLayout;
+import java.util.List;
 import javax.swing.Box;
-
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where user can choose a distribution of the
@@ -60,6 +61,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                       LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
+    /** No match string. */
+    private static final String NO_MATCH_STRING = "No Match";
+    /** Newline. */
+    private static final String NEWLINE = "\\r?\\n";
+    /** Height of the choice boxes. */
+    private static final int CHOICE_BOX_HEIGHT = 30;
     /** Combo box with distributions. */
     private Widget drbdDistCombo = null;
     /** Combo box with available kernel versions for this distribution. */
@@ -73,12 +80,6 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private List<String> drbdKernelDirItems = null;
     /** List of items in the arch combo. */
     private List<String> drbdArchItems = null;
-    /** No match string. */
-    private static final String NO_MATCH_STRING = "No Match";
-    /** Newline. */
-    private static final String NEWLINE = "\\r?\\n";
-    /** Height of the choice boxes. */
-    private static final int CHOICE_BOX_HEIGHT = 30;
 
     /** Prepares a new {@code DrbdLinbitAvailPackages} object. */
     public DrbdLinbitAvailPackages(final WizardDialog previousDialog,

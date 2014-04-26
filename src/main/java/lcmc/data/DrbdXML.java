@@ -23,19 +23,7 @@
 
 package lcmc.data;
 
-import lcmc.gui.DrbdGraph;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.ProxyNetInfo;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.SSH;
-import lcmc.Exceptions;
-import lcmc.utilities.Unit;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,16 +33,24 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
-
-import java.math.BigInteger;
-import org.apache.commons.collections15.map.MultiKeyMap;
-import org.apache.commons.collections15.map.LinkedMap;
-import org.apache.commons.collections15.keyvalue.MultiKey;
-
+import java.util.regex.Pattern;
+import lcmc.Exceptions;
+import lcmc.gui.DrbdGraph;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.ProxyNetInfo;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import org.apache.commons.collections15.keyvalue.MultiKey;
+import org.apache.commons.collections15.map.LinkedMap;
+import org.apache.commons.collections15.map.MultiKeyMap;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -66,10 +62,168 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class DrbdXML extends XML {
+public class DrbdXML extends XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXML.class);
     public static final String[] EMPTY_STRING = new String[0];
+
+    private static final Pattern UNIT_PATTERN =
+                                     Pattern.compile("(\\d*)([kmgtsKMGTS]?)");
+    /** Global section. */
+    public static final String GLOBAL_SECTION = "global";
+    /** DRBD protocol A. */
+    public static final Value PROTOCOL_A =
+                                    new StringValue("A", "A / Asynchronous");
+
+    public static final Value PROTOCOL_B =
+                                new StringValue("B", "B / Semi-Synchronous");
+    /** DRBD protocol C, that is a default. */
+    public static final Value PROTOCOL_C =
+                                     new StringValue("C", "C / Synchronous");
+    /** Protocol parameter. */
+    public static final String PROTOCOL_PARAM = "protocol";
+    /** Ping timeout parameter. */
+    public static final String PING_TIMEOUT_PARAM = "ping-timeout";
+    /** DRBD communication protocols. */
+    static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
+    /** Some non advanced parameters. */
+    static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
+
+    /** Drbd config "errors" that are to be ignored. */
+    static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
+    /** Access types of some parameters. */
+    static final Map<String, Application.AccessType> PARAM_ACCESS_TYPE =
+                                new HashMap<String, Application.AccessType>();
+
+    /** Preferred values. */
+    private static final Map<String, Value> PREFERRED_MAP =
+                                                 new HashMap<String, Value>();
+
+    /** Yes / true drbd config value. */
+    public static final Value CONFIG_YES = new StringValue("yes");
+    /** No / false drbd config value. */
+    public static final Value CONFIG_NO = new StringValue("no");
+    /** Hardcoded defaults, for options that have it but we don't get
+        it from the drbdsetup. */
+    static final Map<String, Value> HARDCODED_DEFAULTS =
+                                                new HashMap<String, Value>();
+    static {
+        NOT_ADVANCED_PARAMS.add("rate");
+        NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
+        NOT_ADVANCED_PARAMS.add(PING_TIMEOUT_PARAM);
+        NOT_ADVANCED_PARAMS.add("fence-peer");
+        NOT_ADVANCED_PARAMS.add("wfc-timeout");
+        NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
+        NOT_ADVANCED_PARAMS.add("become-primary-on");
+        NOT_ADVANCED_PARAMS.add("timeout");
+        NOT_ADVANCED_PARAMS.add("allow-two-primaries");
+        NOT_ADVANCED_PARAMS.add("fencing");
+        NOT_ADVANCED_PARAMS.add("after"); /* before 8.4 */
+        NOT_ADVANCED_PARAMS.add("resync-after");
+        NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
+        NOT_ADVANCED_PARAMS.add("memlimit"); /* proxy */
+        NOT_ADVANCED_PARAMS.add("plugin-zlib"); /* proxy */
+        NOT_ADVANCED_PARAMS.add("plugin-lzma"); /* proxy */
+    }
+    static {
+        IGNORE_CONFIG_ERRORS.add("no resources defined!");
+        IGNORE_CONFIG_ERRORS.add(
+            "Can not open '/etc/drbd.conf': No such file or directory");
+    }
+    static {
+        PARAM_ACCESS_TYPE.put("rate", Application.AccessType.OP);
+    }
+    static {
+        PREFERRED_MAP.put(PROTOCOL_PARAM, PROTOCOL_C);
+    }
+    static {
+        HARDCODED_DEFAULTS.put("usage-count", new StringValue());
+        HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
+        
+        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, PROTOCOL_C);
+        HARDCODED_DEFAULTS.put("after-sb-0pri", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("after-sb-1pri", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("after-sb-2pri", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("rr-conflict", new StringValue("disconnect"));
+        HARDCODED_DEFAULTS.put("on-io-error", new StringValue("pass_on"));
+        HARDCODED_DEFAULTS.put("fencing", new StringValue("dont-care"));
+        HARDCODED_DEFAULTS.put("on-no-data-accessible", new StringValue("io-error"));
+        HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
+    }
+
+    public static Unit getUnitBytes(final String unitPart) {
+        return new Unit("", "", "Byte" + unitPart, "Bytes" + unitPart);
+    }
+
+    public static Unit getUnitKiBytes(final String unitPart) {
+        return new Unit("K", "k", "KiByte" + unitPart, "KiBytes" + unitPart);
+    }
+
+    public static Unit getUnitMiBytes(final String unitPart) {
+        return new Unit("M", "m", "MiByte" + unitPart, "MiBytes" + unitPart);
+    }
+
+    public static Unit getUnitGiBytes(final String unitPart) {
+        return new Unit("G", "g", "GiByte" + unitPart, "GiBytes" + unitPart);
+    }
+
+    public static Unit getUnitTiBytes(final String unitPart) {
+        return new Unit("T", "t", "TiByte" + unitPart, "TiBytes" + unitPart);
+    }
+
+    public static Unit getUnitSectors(final String unitPart) {
+        return new Unit("s", "s", "Sector" + unitPart, "Sectors" + unitPart); }
+
+    /** Returns units. */
+
+    public static Unit[] getByteUnits(final String unitPart) {
+        return new Unit[]{getUnitBytes(unitPart),
+                          getUnitKiBytes(unitPart),
+                          getUnitMiBytes(unitPart),
+                          getUnitGiBytes(unitPart),
+                          getUnitSectors(unitPart)};
+    }
+
+    public static Unit getUnitDefault(final String unitPart) {
+        return new Unit("", "", "", "");
+    }
+
+    public static Unit getUnitKi(final String unitPart) {
+        return new Unit("k", "K", "k", "k");
+    }
+                    
+    public static Unit getUnitMi(final String unitPart) {
+        return new Unit("m", "M", "m", "m");
+    }
+
+    public static Unit getUnitGi(final String unitPart) {
+        return new Unit("g", "G", "g", "g");
+    }
+
+    public static Unit getUnitTi(final String unitPart) {
+        return new Unit("t", "T", "t", "t");
+    }
+
+    public static Unit[] getUnits(final String unitPart) {
+        return new Unit[]{getUnitDefault(unitPart),
+                          getUnitKi(unitPart),
+                          getUnitMi(unitPart),
+                          getUnitGi(unitPart)};
+    }
+
+    /** Return part after '/' from the unit long description. */
+    public static String getUnitPart(final String unitLong) {
+        if (unitLong == null) {
+            return "";
+        }
+
+        final int index = unitLong.indexOf('/');
+        String unitPart = "";
+        if (index > -1) {
+            unitPart = unitLong.substring(index);
+        }
+        return unitPart;
+    }
     // TODO: should that not be per host?
     /** Map from parameter name to the default value. */
     private final Map<String, Value> paramDefaultMap =
@@ -165,90 +319,6 @@ public final class DrbdXML extends XML {
     private boolean unknownSections = false;
     /** Old config. */
     private String oldConfig = null;
-
-    private static final Pattern UNIT_PATTERN =
-                                     Pattern.compile("(\\d*)([kmgtsKMGTS]?)");
-    /** Global section. */
-    public static final String GLOBAL_SECTION = "global";
-    /** DRBD protocol A. */
-    public static final Value PROTOCOL_A =
-                                    new StringValue("A", "A / Asynchronous");
-
-    public static final Value PROTOCOL_B =
-                                new StringValue("B", "B / Semi-Synchronous");
-    /** DRBD protocol C, that is a default. */
-    public static final Value PROTOCOL_C =
-                                     new StringValue("C", "C / Synchronous");
-    /** Protocol parameter. */
-    public static final String PROTOCOL_PARAM = "protocol";
-    /** Ping timeout parameter. */
-    public static final String PING_TIMEOUT_PARAM = "ping-timeout";
-    /** DRBD communication protocols. */
-    static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
-    /** Some non advanced parameters. */
-    static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
-    static {
-        NOT_ADVANCED_PARAMS.add("rate");
-        NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
-        NOT_ADVANCED_PARAMS.add(PING_TIMEOUT_PARAM);
-        NOT_ADVANCED_PARAMS.add("fence-peer");
-        NOT_ADVANCED_PARAMS.add("wfc-timeout");
-        NOT_ADVANCED_PARAMS.add("degr-wfc-timeout");
-        NOT_ADVANCED_PARAMS.add("become-primary-on");
-        NOT_ADVANCED_PARAMS.add("timeout");
-        NOT_ADVANCED_PARAMS.add("allow-two-primaries");
-        NOT_ADVANCED_PARAMS.add("fencing");
-        NOT_ADVANCED_PARAMS.add("after"); /* before 8.4 */
-        NOT_ADVANCED_PARAMS.add("resync-after");
-        NOT_ADVANCED_PARAMS.add("usage-count"); /* global */
-        NOT_ADVANCED_PARAMS.add("memlimit"); /* proxy */
-        NOT_ADVANCED_PARAMS.add("plugin-zlib"); /* proxy */
-        NOT_ADVANCED_PARAMS.add("plugin-lzma"); /* proxy */
-    }
-
-    /** Drbd config "errors" that are to be ignored. */
-    static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
-    static {
-        IGNORE_CONFIG_ERRORS.add("no resources defined!");
-        IGNORE_CONFIG_ERRORS.add(
-                  "Can not open '/etc/drbd.conf': No such file or directory");
-    }
-    /** Access types of some parameters. */
-    static final Map<String, Application.AccessType> PARAM_ACCESS_TYPE =
-                                new HashMap<String, Application.AccessType>();
-    static {
-        PARAM_ACCESS_TYPE.put("rate", Application.AccessType.OP);
-    }
-
-    /** Preferred values. */
-    private static final Map<String, Value> PREFERRED_MAP =
-                                                 new HashMap<String, Value>();
-    static {
-        PREFERRED_MAP.put(PROTOCOL_PARAM, PROTOCOL_C);
-    }
-
-    /** Yes / true drbd config value. */
-    public static final Value CONFIG_YES = new StringValue("yes");
-    /** No / false drbd config value. */
-    public static final Value CONFIG_NO = new StringValue("no");
-    /** Hardcoded defaults, for options that have it but we don't get
-        it from the drbdsetup. */
-    static final Map<String, Value> HARDCODED_DEFAULTS =
-                                                new HashMap<String, Value>();
-    static {
-        HARDCODED_DEFAULTS.put("usage-count", new StringValue());
-        HARDCODED_DEFAULTS.put("disable-ip-verification", CONFIG_NO);
-
-        HARDCODED_DEFAULTS.put(PROTOCOL_PARAM, PROTOCOL_C);
-        HARDCODED_DEFAULTS.put("after-sb-0pri", new StringValue("disconnect"));
-        HARDCODED_DEFAULTS.put("after-sb-1pri", new StringValue("disconnect"));
-        HARDCODED_DEFAULTS.put("after-sb-2pri", new StringValue("disconnect"));
-        HARDCODED_DEFAULTS.put("rr-conflict", new StringValue("disconnect"));
-        HARDCODED_DEFAULTS.put("on-io-error", new StringValue("pass_on"));
-        HARDCODED_DEFAULTS.put("fencing", new StringValue("dont-care"));
-        HARDCODED_DEFAULTS.put("on-no-data-accessible", new StringValue("io-error"));
-        HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
-    }
 
     /** Prepares a new {@code DrbdXML} object. */
     public DrbdXML(final Host[] hosts, final Map<Host, String> drbdParameters) {
@@ -1452,46 +1522,6 @@ public final class DrbdXML extends XML {
         return unknownSections && !Tools.getApplication().isAdvancedMode();
     }
 
-    public class HostProxy {
-        private final String proxyHostName;
-        private final Value insideIp;
-        private final Value insidePort;
-        private final Value outsideIp;
-        private final Value outsidePort;
-
-        public HostProxy(final String proxyHostName,
-                         final Value insideIp,
-                         final Value insidePort,
-                         final Value outsideIp,
-                         final Value outsidePort) {
-            this.proxyHostName = proxyHostName;
-            this.insideIp = insideIp;
-            this.insidePort = insidePort;
-            this.outsideIp = outsideIp;
-            this.outsidePort = outsidePort;
-        }
-
-        public String getProxyHostName() {
-            return proxyHostName;
-        }
-
-        public Value getInsideIp() {
-            return insideIp;
-        }
-
-        public Value getInsidePort() {
-            return insidePort;
-        }
-
-        public Value getOutsideIp() {
-            return outsideIp;
-        }
-
-        public Value getOutsidePort() {
-            return outsidePort;
-        }
-    }
-
     public String getOldConfig() {
         return oldConfig;
     }
@@ -1561,77 +1591,43 @@ public final class DrbdXML extends XML {
         return null;
     }
 
-    public static Unit getUnitBytes(final String unitPart) {
-        return new Unit("", "", "Byte" + unitPart, "Bytes" + unitPart);
-    }
+    public class HostProxy {
+        private final String proxyHostName;
+        private final Value insideIp;
+        private final Value insidePort;
+        private final Value outsideIp;
+        private final Value outsidePort;
 
-    public static Unit getUnitKiBytes(final String unitPart) {
-        return new Unit("K", "k", "KiByte" + unitPart, "KiBytes" + unitPart);
-    }
-
-    public static Unit getUnitMiBytes(final String unitPart) {
-        return new Unit("M", "m", "MiByte" + unitPart, "MiBytes" + unitPart);
-    }
-
-    public static Unit getUnitGiBytes(final String unitPart) {
-        return new Unit("G", "g", "GiByte" + unitPart, "GiBytes" + unitPart);
-    }
-
-    public static Unit getUnitTiBytes(final String unitPart) {
-        return new Unit("T", "t", "TiByte" + unitPart, "TiBytes" + unitPart);
-    }
-
-    public static Unit getUnitSectors(final String unitPart) {
-        return new Unit("s", "s", "Sector" + unitPart, "Sectors" + unitPart); }
-
-    /** Returns units. */
-
-    public static Unit[] getByteUnits(final String unitPart) {
-        return new Unit[]{getUnitBytes(unitPart),
-                          getUnitKiBytes(unitPart),
-                          getUnitMiBytes(unitPart),
-                          getUnitGiBytes(unitPart),
-                          getUnitSectors(unitPart)};
-    }
-
-    public static Unit getUnitDefault(final String unitPart) {
-        return new Unit("", "", "", "");
-    }
-
-    public static Unit getUnitKi(final String unitPart) {
-        return new Unit("k", "K", "k", "k");
-    }
-                    
-    public static Unit getUnitMi(final String unitPart) {
-        return new Unit("m", "M", "m", "m");
-    }
-
-    public static Unit getUnitGi(final String unitPart) {
-        return new Unit("g", "G", "g", "g");
-    }
-
-    public static Unit getUnitTi(final String unitPart) {
-        return new Unit("t", "T", "t", "t");
-    }
-
-    public static Unit[] getUnits(final String unitPart) {
-        return new Unit[]{getUnitDefault(unitPart),
-                          getUnitKi(unitPart),
-                          getUnitMi(unitPart),
-                          getUnitGi(unitPart)};
-    }
-
-    /** Return part after '/' from the unit long description. */
-    public static String getUnitPart(final String unitLong) {
-        if (unitLong == null) {
-            return "";
+        public HostProxy(final String proxyHostName,
+                         final Value insideIp,
+                         final Value insidePort,
+                         final Value outsideIp,
+                         final Value outsidePort) {
+            this.proxyHostName = proxyHostName;
+            this.insideIp = insideIp;
+            this.insidePort = insidePort;
+            this.outsideIp = outsideIp;
+            this.outsidePort = outsidePort;
         }
 
-        final int index = unitLong.indexOf('/');
-        String unitPart = "";
-        if (index > -1) {
-            unitPart = unitLong.substring(index);
+        public String getProxyHostName() {
+            return proxyHostName;
         }
-        return unitPart;
+
+        public Value getInsideIp() {
+            return insideIp;
+        }
+
+        public Value getInsidePort() {
+            return insidePort;
+        }
+
+        public Value getOutsideIp() {
+            return outsideIp;
+        }
+
+        public Value getOutsidePort() {
+            return outsidePort;
+        }
     }
 }

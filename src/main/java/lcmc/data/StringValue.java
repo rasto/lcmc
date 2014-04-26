@@ -23,14 +23,35 @@ package lcmc.data;
 import lcmc.utilities.Unit;
 
 public class StringValue implements Value, Comparable<Value> {
+
+    private static final String NOTHING_VALUE = null;
+
+    public static Value[] getValues(final String[] strings) {
+        if (strings == null) {
+            return null;
+        }
+        final Value[] values = new Value[strings.length];
+        int i = 0;
+        for (final String s : strings) {
+            values[i] = new StringValue(s);
+            i++;
+        }
+        return values;
+    }
+
+    public static String getValueForConfig(final Value v) {
+        if (v == null) {
+            return NOTHING_VALUE;
+        } else {
+            return v.getValueForConfig();
+        }
+    }
     /** Internal string, used in configs. */
     private final String valueForConfig;
     /** Value visible in the GUI. */
     private final String valueForGui;
     
     private final Unit unit;
-
-    private static final String NOTHING_VALUE = null;
     
     /** Constructor for "nothing selected" */
     public StringValue() {
@@ -146,27 +167,6 @@ public class StringValue implements Value, Comparable<Value> {
             return false;
         }
         return true;
-    }
-
-    public static Value[] getValues(final String[] strings) {
-        if (strings == null) {
-            return null;
-        }
-        final Value[] values = new Value[strings.length];
-        int i = 0;
-        for (final String s : strings) {
-            values[i] = new StringValue(s);
-            i++;
-        }
-        return values;
-    }
-
-    public static String getValueForConfig(final Value v) {
-        if (v == null) {
-            return NOTHING_VALUE;
-        } else {
-            return v.getValueForConfig();
-        }
     }
 
     @Override

@@ -22,11 +22,10 @@
 
 package lcmc.gui;
 
+import java.awt.Component;
+import java.awt.Container;
 import javax.swing.Spring;
 import javax.swing.SpringLayout;
-
-import java.awt.Container;
-import java.awt.Component;
 
 /**
  * A 1.4 file that provides utility methods for

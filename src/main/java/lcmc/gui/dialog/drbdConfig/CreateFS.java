@@ -23,32 +23,29 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.Exceptions;
-import lcmc.utilities.Tools;
-import lcmc.data.Host;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.WidgetListener;
-
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.ActionListener;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.Exceptions;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -61,17 +58,6 @@ import lcmc.utilities.LoggerFactory;
 final class CreateFS extends DrbdConfig {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
-    /** Pull down menu with hosts (or no host). */
-    private Widget hostW;
-    /** Pull down menu with file systems. */
-    private Widget filesystemW;
-    /** Whether to skip the initial full sync. */
-    private Widget skipSyncW;
-    /** Whether to skip the initial full sync label. */
-    private JLabel skipSyncLabel;
-    /** Make file system button. */
-    private final MyButton makeFsButton = new MyButton(
-                Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
     /** No host string. (none) */
     private static final Value NO_HOST_STRING =
                     new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
@@ -84,11 +70,22 @@ final class CreateFS extends DrbdConfig {
     private static final Value SKIP_SYNC_FALSE = new StringValue("false");
     /** Skip sync true. */
     private static final Value SKIP_SYNC_TRUE = new StringValue("true");
+    /** Pull down menu with hosts (or no host). */
+    private Widget hostW;
+    /** Pull down menu with file systems. */
+    private Widget filesystemW;
+    /** Whether to skip the initial full sync. */
+    private Widget skipSyncW;
+    /** Whether to skip the initial full sync label. */
+    private JLabel skipSyncLabel;
+    /** Make file system button. */
+    private final MyButton makeFsButton = new MyButton(
+                Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
 
     /** Prepares a new {@code CreateFS} object. */
     CreateFS(final WizardDialog previousDialog,
-             final DrbdVolumeInfo drbdVolumeInfo) {
-        super(previousDialog, drbdVolumeInfo);
+             final VolumeInfo volumeInfo) {
+        super(previousDialog, volumeInfo);
     }
 
     /**

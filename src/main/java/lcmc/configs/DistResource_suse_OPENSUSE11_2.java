@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_suse_OPENSUSE11_2
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -116,4 +110,10 @@ public final class DistResource_suse_OPENSUSE11_2
         {"HbPmInst.install.2",
          "zypper -n install heartbeat pacemaker"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_ubuntu_INTREPID
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-INTREPID"},
@@ -58,4 +52,10 @@ public final class DistResource_ubuntu_INTREPID
         {"DrbdInst.install.text.3",
          "apt-get install: 8.2.x"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

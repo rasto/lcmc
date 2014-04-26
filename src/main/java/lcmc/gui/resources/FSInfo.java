@@ -21,24 +21,23 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
-
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import lcmc.data.Application;
+import lcmc.gui.Browser;
+import lcmc.gui.HostBrowser;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info data for a filesystem.
  */
 public final class FSInfo extends Info {
-    /** cached output from the modinfo command for the info panel. */
-    private String modinfo = null;
     /** File system icon. */
     private static final ImageIcon FS_ICON = Tools.createImageIcon(
                                Tools.getDefault("HostBrowser.FileSystemIcon"));
+    /** cached output from the modinfo command for the info panel. */
+    private String modinfo = null;
     /** Prepares a new {@code FSInfo} object. */
     public FSInfo(final String name, final Browser browser) {
         super(name, browser);
@@ -46,7 +45,7 @@ public final class FSInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected HostBrowser getBrowser() {
+    public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
@@ -64,7 +63,7 @@ public final class FSInfo extends Info {
 
     /** Returns info, before it is updated. */
     @Override
-    String getInfo() {
+    public String getInfo() {
         return "<html><pre>" + getName() + "</html></pre>";
     }
 

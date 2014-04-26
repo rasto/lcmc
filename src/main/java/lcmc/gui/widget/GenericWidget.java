@@ -20,54 +20,47 @@
 
 package lcmc.gui.widget;
 
-import lcmc.data.Value;
-import lcmc.utilities.Tools;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.gui.SpringUtilities;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.WidgetListener;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JRootPane;
-import javax.swing.SwingUtilities;
-import javax.swing.JButton;
-import javax.swing.text.Document;
-import javax.swing.JLabel;
-import javax.swing.Box;
-import javax.swing.SpringLayout;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.BadLocationException;
-
 import java.awt.BorderLayout;
-
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
-import java.awt.Container;
-
-import java.awt.Component;
-
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
-import java.util.ArrayList;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JTextField;
+import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a field where user can enter new value. The
@@ -596,91 +589,6 @@ implements Widget {
                                           final Color compColor) {
     }
 
-    /** Workaround for jcombobox so that it works with default button. */
-    static class ActivateDefaultButtonListener<E> extends KeyAdapter
-                                               implements ActionListener {
-        /** Combobox, that should work with default button. */
-        private final JComboBox<E> box;
-
-        /** Creates new ActivateDefaultButtonListener. */
-        ActivateDefaultButtonListener(final JComboBox<E> box) {
-            super();
-            this.box = box;
-        }
-
-        /** Is called when a key was pressed. */
-        @Override
-        public void keyPressed(final KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                /* Simulte click on default button. */
-                doClick(e);
-            }
-        }
-
-        /** Is called when an action was performed. */
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            doClick(e);
-        }
-
-        /** Do click. */
-        private void doClick(final EventObject e) {
-            final Component c = (Component) e.getSource();
-
-            final JRootPane rootPane = SwingUtilities.getRootPane(c);
-
-            if (rootPane != null) {
-                final JButton defaultButton = rootPane.getDefaultButton();
-
-                if (defaultButton != null && !box.isPopupVisible()) {
-                    final Object selection = box.getEditor().getItem();
-                    box.setSelectedItem(selection);
-                    defaultButton.doClick();
-                }
-            }
-        }
-    }
-
-    /**
-     * TextField that selects all when focused.
-     */
-    public static final class MTextField extends JTextField {
-        /** Serial Version UID. */
-        private static final long serialVersionUID = 1L;
-        /** To select all only once. */
-        private volatile boolean selected = false;
-
-        /** Creates a new MTextField object. */
-        public MTextField(final String text) {
-            super(text);
-        }
-
-        /** Creates a new MTextField object. */
-        public MTextField(final String text,
-                          final int columns) {
-            super(text, columns);
-        }
-
-        /** Creates a new MTextField object. */
-        MTextField(final Document doc,
-                   final String text,
-                   final int columns) {
-            super(doc, text, columns);
-        }
-
-        /** Focus event. */
-        @Override
-        protected void processFocusEvent(final FocusEvent e) {
-            super.processFocusEvent(e);
-            if (!selected) {
-                selected = true;
-                if (e.getID() == FocusEvent.FOCUS_GAINED) {
-                    selectAll();
-                }
-            }
-        }
-    }
-
     /** Sets flag that determines whether the combo box is always editable. */
     @Override
     public final void setAlwaysEditable(final boolean alwaysEditable) {
@@ -886,5 +794,90 @@ implements Widget {
 
     @Override
     public void setText(final String text) {
+    }
+
+    /** Workaround for jcombobox so that it works with default button. */
+    static class ActivateDefaultButtonListener<E> extends KeyAdapter
+                                               implements ActionListener {
+        /** Combobox, that should work with default button. */
+        private final JComboBox<E> box;
+
+        /** Creates new ActivateDefaultButtonListener. */
+        ActivateDefaultButtonListener(final JComboBox<E> box) {
+            super();
+            this.box = box;
+        }
+
+        /** Is called when a key was pressed. */
+        @Override
+        public void keyPressed(final KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                /* Simulte click on default button. */
+                doClick(e);
+            }
+        }
+
+        /** Is called when an action was performed. */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            doClick(e);
+        }
+
+        /** Do click. */
+        private void doClick(final EventObject e) {
+            final Component c = (Component) e.getSource();
+
+            final JRootPane rootPane = SwingUtilities.getRootPane(c);
+
+            if (rootPane != null) {
+                final JButton defaultButton = rootPane.getDefaultButton();
+
+                if (defaultButton != null && !box.isPopupVisible()) {
+                    final Object selection = box.getEditor().getItem();
+                    box.setSelectedItem(selection);
+                    defaultButton.doClick();
+                }
+            }
+        }
+    }
+
+    /**
+     * TextField that selects all when focused.
+     */
+    public static final class MTextField extends JTextField {
+        /** Serial Version UID. */
+        private static final long serialVersionUID = 1L;
+        /** To select all only once. */
+        private volatile boolean selected = false;
+
+        /** Creates a new MTextField object. */
+        public MTextField(final String text) {
+            super(text);
+        }
+
+        /** Creates a new MTextField object. */
+        public MTextField(final String text,
+                          final int columns) {
+            super(text, columns);
+        }
+
+        /** Creates a new MTextField object. */
+        MTextField(final Document doc,
+                   final String text,
+                   final int columns) {
+            super(doc, text, columns);
+        }
+
+        /** Focus event. */
+        @Override
+        protected void processFocusEvent(final FocusEvent e) {
+            super.processFocusEvent(e);
+            if (!selected) {
+                selected = true;
+                if (e.getID() == FocusEvent.FOCUS_GAINED) {
+                    selectAll();
+                }
+            }
+        }
     }
 }

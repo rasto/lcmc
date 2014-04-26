@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_redhatenterpriseserver_6
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* distribution name that is used in the download url */
@@ -121,4 +115,10 @@ public final class DistResource_redhatenterpriseserver_6
          + "make && make install DESTDIR=/ && "
          + "/bin/rm -rf /tmp/drbdinst"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

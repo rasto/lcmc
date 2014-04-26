@@ -22,15 +22,15 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
+import java.awt.Component;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
-import java.awt.Component;
-import java.awt.geom.Point2D;
-import java.util.Collection;
-import java.util.ArrayList;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
 
 /**
  * This is a menu object that holds MyMenuItems.

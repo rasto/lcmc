@@ -22,27 +22,23 @@
 
 package lcmc.gui;
 
-import lcmc.AddClusterDialog;
-import lcmc.AddHostDialog;
-import lcmc.utilities.Tools;
-import lcmc.utilities.AllHostsUpdatable;
-import lcmc.utilities.MyButton;
-import lcmc.data.Host;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.BoxLayout;
-
-import java.awt.FlowLayout;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.CardLayout;
-
-import java.awt.event.ActionListener;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.BorderLayout;
-
+import java.awt.event.ActionListener;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import lcmc.AddClusterDialog;
+import lcmc.AddHostDialog;
+import lcmc.data.Host;
+import lcmc.utilities.AllHostsUpdatable;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
@@ -53,8 +49,6 @@ import javax.swing.ImageIcon;
 final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
-    /** Browser. */
-    private final transient EmptyBrowser browser;
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND =
                         Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -69,6 +63,8 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                                                     new Dimension(300, 100);
     /** Logo panel for card layout. */
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
+    /** Browser. */
+    private final transient EmptyBrowser browser;
     /**
      * Prepares a new {@code ClusterViewPanel} object.
      */

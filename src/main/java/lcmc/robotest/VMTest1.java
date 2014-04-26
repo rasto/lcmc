@@ -23,14 +23,20 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import javax.swing.JCheckBox;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkVMTest;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.dialogColorTest;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.moveToMenu;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
 
 /**
@@ -39,25 +45,12 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class VMTest1 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(VMTest1.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private VMTest1() {
-        /* Cannot be instantiated. */
-    }
-
-    static void start(final Cluster cluster,
-                      final String vmTest,
-                      final int count) {
+    static void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "kvm", count);
     }
 
     /** VM Test 1. */
-    static void startVMTest(final Cluster cluster,
-                            final String vmTest,
-                            final String type,
-                            final int count) {
+    static void startVMTest(final Cluster cluster, final String vmTest, final String type, final int count) {
         slowFactor = 0.1f;
         aborted = false;
         String name = "dmc";
@@ -363,5 +356,10 @@ final class VMTest1 {
             leftClick();
             Tools.sleep(500);
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private VMTest1() {
+        /* Cannot be instantiated. */
     }
 }

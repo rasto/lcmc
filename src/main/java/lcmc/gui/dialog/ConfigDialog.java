@@ -22,10 +22,6 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.MyButton;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
@@ -33,7 +29,22 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.Point;
-
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -48,25 +59,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import javax.swing.event.DocumentListener;
+import lcmc.gui.widget.Widget;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 
 /**
@@ -78,6 +75,8 @@ import java.beans.PropertyChangeListener;
  * @version $Id$
  */
 public abstract class ConfigDialog {
+    /** Size of the imput pane. */
+    private static final int INPUT_PANE_HEIGHT = 200;
     /** The whole option pane. */
     private volatile JOptionPane optionPane;
     /** dialog panel. */
@@ -94,8 +93,6 @@ public abstract class ConfigDialog {
     /** Components that were disabled and can be enabled later. */
     private final Collection<Component> disabledComponents =
                                                 new ArrayList<Component>();
-    /** Size of the imput pane. */
-    private static final int INPUT_PANE_HEIGHT = 200;
     /** Gate to synchronize the non-modal dialog and the answer.*/
     private CountDownLatch dialogGate;
     /** Skip button, can be null, if there is no skip button. */
@@ -671,31 +668,6 @@ public abstract class ConfigDialog {
         /* Does nothing by default. */
     }
 
-    /**
-     * Action listener for custom buttons.
-     */
-    class OptionPaneActionListener implements ActionListener {
-        /**
-         * Action performered on custom button.
-         */
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            optionPane.setValue(
-                                      ((AbstractButton) e.getSource()).getText());
-                        }
-                    });
-                }
-            });
-            t.start();
-        }
-    }
-
     /** Returns panel with checkbox. */
     protected final JPanel getComponentPanel(final String text,
                                              final Component component) {
@@ -717,5 +689,31 @@ public abstract class ConfigDialog {
     /** Add the compoment to the options. */
     protected final void addToOptions(final JComponent c) {
         additionalOptions.add(c);
+    }
+
+    /**
+     * Action listener for custom buttons.
+     */
+    class OptionPaneActionListener implements ActionListener {
+
+        /**
+         * Action performered on custom button.
+         */
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            final Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Tools.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            optionPane.setValue(
+                                ((AbstractButton) e.getSource()).getText());
+                        }
+                    });
+                }
+            });
+            t.start();
+        }
     }
 }

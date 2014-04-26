@@ -22,18 +22,17 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
-import lcmc.configs.DistResource;
-import lcmc.Exceptions.IllegalVersionException;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.Lock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.Exceptions.IllegalVersionException;
+import lcmc.configs.DistResource;
 import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.utilities.SSH.SSHOutput;
 
 /**
@@ -71,11 +70,6 @@ public final class DRBD {
     private static final Pattern DRBD_VERSION_MAJ =
                                       Pattern.compile("^(\\d+\\.\\d+)\\..*");
 
-    /** Private constructor, cannot be instantiated. */
-    private DRBD() {
-        /* Cannot be instantiated. */
-    }
-
     /**
      * Executes the specified drbd command on the specified host and calls the
      * supplied callback function.
@@ -84,11 +78,7 @@ public final class DRBD {
      *          The flag whether the output should appear in
      *          the terminal panel.
      */
-    private static SSHOutput execCommand(final Host host,
-                                             final String command,
-                                             final ExecCallback execCallback,
-                                             final boolean outputVisible,
-                                             final Application.RunMode runMode) {
+    private static SSHOutput execCommand(final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final Application.RunMode runMode) {
         if (Application.isTest(runMode)) {
             if (!command.contains("@DRYRUN@")) {
                 /* it would be very bad */
@@ -101,7 +91,7 @@ public final class DRBD {
                                      "-c /var/lib/drbd/drbd.conf-lcmc-test");
             }
             final SSHOutput output = Tools.execCommand(
-                                                host,
+                host,
                                                 cmd,
                                                 null,
                                                 false,
@@ -126,7 +116,7 @@ public final class DRBD {
             }
             cmd = cmd.replaceAll("@DRYRUNCONF@", "");
             return Tools.execCommandProgressIndicator(
-                                     host,
+                host,
                                      cmd,
                                      execCallback,
                                      outputVisible,
@@ -152,18 +142,12 @@ public final class DRBD {
     }
 
     /** Executes the drbdadm attach on the specified host and resource. */
-    public static boolean attach(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final Application.RunMode runMode) {
+    public static boolean attach(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return attach(host, resource, volume, null, runMode);
     }
 
     /** Returns hash that replaces placeholder in commands. */
-    private static Map<String, String> getResVolReplaceHash(
-                                                      final Host host,
-                                                      final String resource,
-                                                      final String volume) {
+    private static Map<String, String> getResVolReplaceHash(final Host host, final String resource, final String volume) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         if (volume != null && host.hasVolumes()) {
             replaceHash.put(RESOURCE_VOLUME_PH, resource + '/' + volume);
@@ -177,26 +161,20 @@ public final class DRBD {
      * Executes the drbdadm attach on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean attach(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final ExecCallback execCallback,
-                                 final Application.RunMode runMode) {
+    public static boolean attach(
+        final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.attach",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm detach on the specified host and resource. */
-    public static boolean detach(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final Application.RunMode runMode) {
+    public static boolean detach(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return detach(host, resource, volume, null, runMode);
     }
 
@@ -204,26 +182,19 @@ public final class DRBD {
      * Executes the drbdadm detach on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean detach(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final ExecCallback execCallback,
-                                 final Application.RunMode runMode) {
+    public static boolean detach(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.detach",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm connect on the specified host and resource. */
-    public static boolean connect(final Host host,
-                                  final String resource,
-                                  final String volume,
-                                  final Application.RunMode runMode) {
+    public static boolean connect(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return connect(host, resource, volume, null, runMode);
     }
 
@@ -231,26 +202,19 @@ public final class DRBD {
      * Executes the drbdadm connect on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean connect(final Host host,
-                                  final String resource,
-                                  final String volume,
-                                  final ExecCallback execCallback,
-                                  final Application.RunMode runMode) {
+    public static boolean connect(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.connect",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm disconnect on the specified host and resource. */
-    public static boolean disconnect(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final Application.RunMode runMode) {
+    public static boolean disconnect(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return disconnect(host, resource, volume, null, runMode);
     }
 
@@ -258,26 +222,19 @@ public final class DRBD {
      * Executes the drbdadm disconnect on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean disconnect(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final ExecCallback execCallback,
-                                     final Application.RunMode runMode) {
+    public static boolean disconnect(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.disconnect",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm pause-sync on the specified host and resource. */
-    public static boolean pauseSync(final Host host,
-                                    final String resource,
-                                    final String volume,
-                                    final Application.RunMode runMode) {
+    public static boolean pauseSync(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return pauseSync(host, resource, volume, null, runMode);
     }
 
@@ -285,26 +242,19 @@ public final class DRBD {
      * Executes the drbdadm pause-sync on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean pauseSync(final Host host,
-                                    final String resource,
-                                    final String volume,
-                                    final ExecCallback execCallback,
-                                    final Application.RunMode runMode) {
+    public static boolean pauseSync(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.pauseSync",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm resume-sync on the specified host and resource. */
-    public static boolean resumeSync(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final Application.RunMode runMode) {
+    public static boolean resumeSync(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return resumeSync(host, resource, volume, null, runMode);
     }
 
@@ -312,26 +262,19 @@ public final class DRBD {
      * Executes the drbdadm resume-sync on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean resumeSync(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final ExecCallback execCallback,
-                                     final Application.RunMode runMode) {
+    public static boolean resumeSync(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.resumeSync",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm primary on the specified host and resource. */
-    public static boolean setPrimary(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final Application.RunMode runMode) {
+    public static boolean setPrimary(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return setPrimary(host, resource, volume, null, runMode);
     }
 
@@ -339,26 +282,19 @@ public final class DRBD {
      * Executes the drbdadm primary on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean setPrimary(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final ExecCallback execCallback,
-                                     final Application.RunMode runMode) {
+    public static boolean setPrimary(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.setPrimary",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm secondary on the specified host and resource. */
-    public static boolean setSecondary(final Host host,
-                                       final String resource,
-                                       final String volume,
-                                       final Application.RunMode runMode) {
+    public static boolean setSecondary(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return setSecondary(host, resource, volume, null, runMode);
     }
 
@@ -366,18 +302,14 @@ public final class DRBD {
      * Executes the drbdadm secondary on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean setSecondary(final Host host,
-                                       final String resource,
-                                       final String volume,
-                                       final ExecCallback execCallback,
-                                       final Application.RunMode runMode) {
+    public static boolean setSecondary(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.setSecondary",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -385,10 +317,7 @@ public final class DRBD {
      * Loads the drbd, executes the drbdadm create-md and up on the specified
      * host and resource.
      */
-    public static boolean initDrbd(final Host host,
-                                   final String resource,
-                                   final String volume,
-                                   final Application.RunMode runMode) {
+    public static boolean initDrbd(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return initDrbd(host, resource, volume, null, runMode);
     }
 
@@ -396,18 +325,14 @@ public final class DRBD {
      * Loads the drbd, executes the drbdadm create-md and up on the specified
      * host and resource and calls the callback function.
      */
-    public static boolean initDrbd(final Host host,
-                                   final String resource,
-                                   final String volume,
-                                   final ExecCallback execCallback,
-                                   final Application.RunMode runMode) {
+    public static boolean initDrbd(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.initDrbd",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -415,12 +340,7 @@ public final class DRBD {
      * Creates a drbd meta-data on the specified host, resource and block
      * device and calls the callback function.
      */
-    public static boolean createMD(final Host host,
-                                   final String resource,
-                                   final String volume,
-                                   final String device,
-                                   final ExecCallback execCallback,
-                                   final Application.RunMode runMode) {
+    public static boolean createMD(final Host host, final String resource, final String volume, final String device, final ExecCallback execCallback, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = getResVolReplaceHash(host,
                                                                      resource,
                                                                      volume);
@@ -428,7 +348,7 @@ public final class DRBD {
         final String command = host.getDistCommand("DRBD.createMD",
                                                    replaceHash);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -437,12 +357,7 @@ public final class DRBD {
      * device and calls the callback function.
      * Before that, it DESTROYS the old file system.
      */
-    public static boolean createMDDestroyData(final Host host,
-                                              final String resource,
-                                              final String volume,
-                                              final String device,
-                                              final ExecCallback execCallback,
-                                              final Application.RunMode runMode) {
+    public static boolean createMDDestroyData(final Host host, final String resource, final String volume, final String device, final ExecCallback execCallback, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = getResVolReplaceHash(host,
                                                                      resource,
                                                                      volume);
@@ -450,15 +365,12 @@ public final class DRBD {
         final String command = host.getDistCommand("DRBD.createMDDestroyData",
                                                    replaceHash);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Makes specified filesystem on the specified host and block device. */
-    public static boolean makeFilesystem(final Host host,
-                                         final String blockDevice,
-                                         final String filesystem,
-                                         final Application.RunMode runMode) {
+    public static boolean makeFilesystem(final Host host, final String blockDevice, final String filesystem, final Application.RunMode runMode) {
         return makeFilesystem(host, blockDevice, filesystem, null, runMode);
     }
 
@@ -466,11 +378,7 @@ public final class DRBD {
      * Makes specified filesystem on the specified host and block device and
      * calls the callback function.
      */
-    public static boolean makeFilesystem(final Host host,
-                                         final String blockDevice,
-                                         final String filesystem,
-                                         final ExecCallback execCallback,
-                                         final Application.RunMode runMode) {
+    public static boolean makeFilesystem(final Host host, final String blockDevice, final String filesystem, final ExecCallback execCallback, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DRBDDEV_PH, blockDevice);
         if ("jfs".equals(filesystem)
@@ -482,24 +390,17 @@ public final class DRBD {
         final String command = host.getDistCommand("DRBD.makeFilesystem",
                                                    replaceHash);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm -- --clear-bitmap new-current-uuid. */
-    public static boolean skipInitialFullSync(final Host host,
-                                              final String resource,
-                                              final String volume,
-                                              final Application.RunMode runMode) {
+    public static boolean skipInitialFullSync(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return skipInitialFullSync(host, resource, volume, null, runMode);
     }
 
     /** Executes the drbdadm -- --clear-bitmap new-current-uuid. */
-    public static boolean skipInitialFullSync(final Host host,
-                                              final String resource,
-                                              final String volume,
-                                              final ExecCallback execCallback,
-                                              final Application.RunMode runMode) {
+    public static boolean skipInitialFullSync(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         try {
             final String command;
             final String drbdV = host.getDrbdVersion();
@@ -515,7 +416,7 @@ public final class DRBD {
                                                                    volume));
             }
             final SSHOutput ret =
-                      execCommand(host, command, execCallback, true, runMode);
+                execCommand(host, command, execCallback, true, runMode);
             return ret.getExitCode() == 0;
         } catch (final IllegalVersionException e) {
             LOG.appWarning("skipInitialFullSync: " + e.getMessage(), e);
@@ -523,27 +424,20 @@ public final class DRBD {
         }
     }
 
-
     /**
      * Executes the drbdadm -- --overwrite-data-of-peer connect on the specified
      * host.
      */
-    public static boolean forcePrimary(final Host host,
-                                       final String resource,
-                                       final String volume,
-                                       final Application.RunMode runMode) {
+    public static boolean forcePrimary(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return forcePrimary(host, resource, volume, null, runMode);
     }
+
 
     /**
      * Executes the drbdadm -- --overwrite-data-of-peer connect on the specified
      * host and resource and calls the callback function.
      */
-    public static boolean forcePrimary(final Host host,
-                                       final String resource,
-                                       final String volume,
-                                       final ExecCallback execCallback,
-                                       final Application.RunMode runMode) {
+    public static boolean forcePrimary(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         try {
             final String command;
             final String drbdV = host.getDrbdVersion();
@@ -564,7 +458,7 @@ public final class DRBD {
                                                                    volume));
             }
             final SSHOutput ret =
-                      execCommand(host, command, execCallback, true, runMode);
+                execCommand(host, command, execCallback, true, runMode);
             return ret.getExitCode() == 0;
         } catch (final IllegalVersionException e) {
             LOG.appWarning("forcePrimary: " + e.getMessage(), e);
@@ -573,10 +467,7 @@ public final class DRBD {
     }
 
     /** Executes the drbdadm invalidate on the specified host and resource. */
-    public static boolean invalidate(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final Application.RunMode runMode) {
+    public static boolean invalidate(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return invalidate(host, resource, volume, null, runMode);
     }
 
@@ -584,18 +475,14 @@ public final class DRBD {
      * Executes the drbdadm invalidate on the specified host and resource
      * and calls the callback function.
      */
-    public static boolean invalidate(final Host host,
-                                     final String resource,
-                                     final String volume,
-                                     final ExecCallback execCallback,
-                                     final Application.RunMode runMode) {
+    public static boolean invalidate(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.invalidate",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -603,10 +490,7 @@ public final class DRBD {
      * Executes the drbdadm -- --discard-my-data connect on the specified
      * host and resource.
      */
-    public static boolean discardData(final Host host,
-                                      final String resource,
-                                      final String volume,
-                                      final Application.RunMode runMode) {
+    public static boolean discardData(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return discardData(host, resource, volume, null, runMode);
     }
 
@@ -614,77 +498,57 @@ public final class DRBD {
      * Executes the drbdadm -- --discard-my-data connect on the specified
      * host and resource and calls the callback function.
      */
-    public static boolean discardData(final Host host,
-                                      final String resource,
-                                      final String volume,
-                                      final ExecCallback execCallback,
-                                      final Application.RunMode runMode) {
+    public static boolean discardData(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.discardData",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm resize on the specified host and resource. */
-    public static boolean resize(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final Application.RunMode runMode) {
+    public static boolean resize(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return resize(host, resource, volume, null, runMode);
     }
-
 
     /**
      * Executes the drbdadm resize on the specified host and resource and
      * calls the callback function.
      */
-    public static boolean resize(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final ExecCallback execCallback,
-                                 final Application.RunMode runMode) {
+    public static boolean resize(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.resize",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
+
     /** Executes the drbdadm verify on the specified host and resource. */
-    public static boolean verify(final Host host,
-                                 final String resource,
-                                 final String volume,
-                                 final Application.RunMode runMode) {
+    public static boolean verify(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.verify",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                        execCommand(host, command, null, true, runMode);
+            execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm adjust on the specified host and resource. */
-    public static int adjust(final Host host,
-                             final String resource,
-                             final String volume,
-                             final Application.RunMode runMode) {
+    public static int adjust(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return adjustApply(host, resource, null, null, runMode);
     }
 
     /** Executes the drbdadm adjust on the specified host and resource. */
-    public static int adjustApply(final Host host,
-                             final String resource,
-                             final String volume,
-                             final Application.RunMode runMode) {
+    public static int adjustApply(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return adjustApply(host, resource, null, null, runMode);
     }
 
@@ -692,36 +556,29 @@ public final class DRBD {
      * Executes the drbdadm adjust on the specified host and resource and
      * calls the callback function.
      */
-    public static int adjustApply(final Host host,
-                             final String resource,
-                             final String volume,
-                             final ExecCallback execCallback,
-                             final Application.RunMode runMode) {
+    public static int adjustApply(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.adjust.apply",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret = execCommand(host,
-                                              command,
-                                              execCallback,
-                                              false,
-                                              runMode);
-
+                                          command,
+                                          execCallback,
+                                          false,
+                                          runMode);
+        
         final Pattern p = Pattern.compile(".*Failure: \\((\\d+)\\).*",
                                           Pattern.DOTALL);
         final Matcher m = p.matcher(ret.getOutput());
         if (m.matches()) {
             return Integer.parseInt(m.group(1));
         }
-        return 0;
+        return ret.getExitCode();
     }
 
     /** Executes the drbdadm proxy-up on the specified host and resource. */
-    public static int proxyUp(final Host host,
-                              final String resource,
-                              final String volume,
-                              final Application.RunMode runMode) {
+    public static int proxyUp(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return proxyUp(host, resource, null, null, runMode);
     }
 
@@ -729,29 +586,22 @@ public final class DRBD {
      * Executes the drbdadm proxy-up on the specified host and resource and
      * calls the callback function.
      */
-    public static int proxyUp(final Host host,
-                              final String resource,
-                              final String volume,
-                              final ExecCallback execCallback,
-                              final Application.RunMode runMode) {
+    public static int proxyUp(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = getDistCommand("DRBD.proxyUp",
                                               host,
                                               resource,
                                               volume);
         final SSHOutput ret = execCommand(host,
-                                              command,
-                                              execCallback,
-                                              false,
-                                              runMode);
-
+                                          command,
+                                          execCallback,
+                                          false,
+                                          runMode);
+        
         return ret.getExitCode();
     }
 
     /** Executes the drbdadm proxy-down on the specified host and resource. */
-    public static int proxyDown(final Host host,
-                                final String resource,
-                                final String volume,
-                                final Application.RunMode runMode) {
+    public static int proxyDown(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return proxyDown(host, resource, null, null, runMode);
     }
 
@@ -759,22 +609,18 @@ public final class DRBD {
      * Executes the drbdadm proxy-up on the specified host and resource and
      * calls the callback function.
      */
-    public static int proxyDown(final Host host,
-                                final String resource,
-                                final String volume,
-                                final ExecCallback execCallback,
-                                final Application.RunMode runMode) {
+    public static int proxyDown(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.proxyDown",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret = execCommand(host,
-                                              command,
-                                              execCallback,
-                                              false,
-                                              runMode);
-
+                                          command,
+                                          execCallback,
+                                          false,
+                                          runMode);
+        
         return ret.getExitCode();
     }
 
@@ -783,20 +629,17 @@ public final class DRBD {
      * and return the result or null if there are meta-data on the block
      * device.
      */
-    public static String getGI(final Host host,
-                               final String resource,
-                               final String volume,
-                               final Application.RunMode runMode) {
+    public static String getGI(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.get-gi",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret = execCommand(host,
-                                              command,
-                                              null,
-                                              false,
-                                              runMode);
+                                          command,
+                                          null,
+                                          false,
+                                          runMode);
         if (ret.getExitCode() == 0) {
             return ret.getOutput();
         }
@@ -804,10 +647,7 @@ public final class DRBD {
     }
 
     /** Executes the drbdadm down on the specified host and resource. */
-    public static boolean down(final Host host,
-                               final String resource,
-                               final String volume,
-                               final Application.RunMode runMode) {
+    public static boolean down(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return down(host, resource, volume, null, runMode);
     }
 
@@ -815,26 +655,19 @@ public final class DRBD {
      * Executes the drbdadm down on the specified host and resource and
      * calls the callback function.
      */
-    public static boolean down(final Host host,
-                               final String resource,
-                               final String volume,
-                               final ExecCallback execCallback,
-                               final Application.RunMode runMode) {
+    public static boolean down(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.down",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Executes the drbdadm up on the specified host and resource. */
-    public static boolean up(final Host host,
-                             final String resource,
-                             final String volume,
-                             final Application.RunMode runMode) {
+    public static boolean up(final Host host, final String resource, final String volume, final Application.RunMode runMode) {
         return up(host, resource, volume, null, runMode);
     }
 
@@ -842,18 +675,14 @@ public final class DRBD {
      * Executes the drbdadm up on the specified host and resource and calls the
      * callback function.
      */
-    public static boolean up(final Host host,
-                             final String resource,
-                             final String volume,
-                             final ExecCallback execCallback,
-                             final Application.RunMode runMode) {
+    public static boolean up(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.up",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       volume));
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -866,13 +695,11 @@ public final class DRBD {
      * Start the drbd. Probably /etc/init.d/drbd start and calls the callback
      * function after it is done.
      */
-    public static boolean start(final Host host,
-                                final ExecCallback execCallback,
-                                final Application.RunMode runMode) {
+    public static boolean start(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.start",
                                                    (ConvertCmdCallback) null);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
 
     }
@@ -886,13 +713,11 @@ public final class DRBD {
      * Executes load drbd command on the specified host and calls the callback
      * function after it is done.
      */
-    public static boolean load(final Host host,
-                               final ExecCallback execCallback,
-                               final Application.RunMode runMode) {
+    public static boolean load(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.load",
                                                    (ConvertCmdCallback) null);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -905,15 +730,13 @@ public final class DRBD {
      * Start DRBD proxy on the specified host and call the callback function
      * after it is done.
      */
-    public static boolean startProxy(final Host host,
-                                     final ExecCallback execCallback,
-                                     final Application.RunMode runMode) {
+    public static boolean startProxy(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.startProxy",
                                                    (ConvertCmdCallback) null);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         host.updateDrbdParameters(); /* deamon could be started even if ret != 0
-                                      */
+        */
         return ret.getExitCode() == 0;
     }
 
@@ -926,48 +749,39 @@ public final class DRBD {
      * Stop DRBD proxy on the specified host and call the callback function
      * after it is done.
      */
-    public static boolean stopProxy(final Host host,
-                                    final ExecCallback execCallback,
-                                    final Application.RunMode runMode) {
+    public static boolean stopProxy(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.stopProxy",
                                                    (ConvertCmdCallback) null);
         final SSHOutput ret =
-                    execCommand(host, command, execCallback, true, runMode);
+            execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Delete minor, from DRBD 8.4. */
-    public static boolean delMinor(final Host host,
-                                   final String blockDevice,
-                                   final Application.RunMode runMode) {
+    public static boolean delMinor(final Host host, final String blockDevice, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DRBDDEV_PH, blockDevice);
         final String command = host.getDistCommand("DRBD.delMinor",
                                                    replaceHash);
         final SSHOutput ret =
-                    execCommand(host, command, null, true, runMode);
+            execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Delete connection, from DRBD 8.4. */
-    public static boolean delConnection(final Host host,
-                                        final String resource,
-                                        final Application.RunMode runMode) {
+    public static boolean delConnection(final Host host, final String resource, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.resDelConnection",
                                                    getResVolReplaceHash(
-                                                                      host,
+                                                       host,
                                                                       resource,
                                                                       null));
         final SSHOutput ret =
-                    execCommand(host, command, null, true, runMode);
+            execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }
 
     /** Return command with replaced placeholders. */
-    public static String getDistCommand(final String cmd,
-                                        final Host host,
-                                        final String resource,
-                                        final String volume) {
+    public static String getDistCommand(final String cmd, final Host host, final String resource, final String volume) {
         return host.getDistCommand(cmd,
                                    getResVolReplaceHash(host,
                                                         resource,
@@ -975,8 +789,7 @@ public final class DRBD {
     }
 
     /** Return whether DRBD util and module versions are compatible. */
-    public static boolean compatibleVersions(final CharSequence utilV,
-                                             final CharSequence moduleV) {
+    public static boolean compatibleVersions(final CharSequence utilV, final CharSequence moduleV) {
         if (utilV == null || moduleV == null) {
             return false;
         }
@@ -1000,5 +813,10 @@ public final class DRBD {
         } catch (final IllegalVersionException e) {
             return false;
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DRBD() {
+        /* Cannot be instantiated. */
     }
 }

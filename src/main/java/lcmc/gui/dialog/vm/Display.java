@@ -23,19 +23,17 @@
 
 package lcmc.gui.dialog.vm;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSGraphicsInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.data.VMSXML.GraphicsData;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import lcmc.data.VMSXML.GraphicsData;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.gui.resources.vms.GraphicsInfo;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -44,8 +42,6 @@ import java.awt.Dimension;
  * @version $Id$
  */
 final class Display extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {GraphicsData.TYPE,
                                             GraphicsData.PORT,
@@ -54,14 +50,16 @@ final class Display extends VMConfig {
                                             GraphicsData.KEYMAP,
                                             GraphicsData.DISPLAY,
                                             GraphicsData.XAUTH};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS graphics info object. */
-    private VMSGraphicsInfo vmsgi = null;
+    private GraphicsInfo vmsgi = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Display} object. */
     Display(final WizardDialog previousDialog,
-            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+            final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -139,9 +137,9 @@ final class Display extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsgi.savePreferredValues();
         vmsgi.getResource().setValue(GraphicsData.TYPE,
-                                     VMSGraphicsInfo.TYPE_VNC);
+                                     GraphicsInfo.TYPE_VNC);
         vmsgi.getResource().setValue(GraphicsData.PORT,
-                                     VMSGraphicsInfo.PORT_AUTO);
+                                     GraphicsInfo.PORT_AUTO);
 
         vmsgi.addWizardParams(
                       optionsPanel,

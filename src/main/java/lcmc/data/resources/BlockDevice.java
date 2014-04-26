@@ -23,14 +23,20 @@
 
 package lcmc.data.resources;
 
-import lcmc.utilities.Tools;
-
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
-
+import java.util.regex.Pattern;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds data of one block device.
@@ -39,10 +45,42 @@ import lcmc.utilities.LoggerFactory;
  * @version $Id$
  *
  */
-public final class BlockDevice extends Resource {
+public class BlockDevice extends Resource {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(BlockDevice.class);
+    /** States that means that we are connected. */
+    private static final Set<String> CONNECTED_STATES =
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                           "Connected",
+                                                           "SyncTarget",
+                                                           "SyncSource",
+                                                           "StartingSyncS",
+                                                           "StartingSyncT",
+                                                           "WFBitMapS",
+                                                           "WFBitMapT",
+                                                           "WFSyncUUID",
+                                                           "PausedSyncS",
+                                                           "PausedSyncT",
+                                                           "VerifyS",
+                                                           "VerifyT")));
+
+    /** Syncing states. */
+    private static final Set<String> SYNCING_STATES =
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+                                                            "SyncTarget",
+                                                            "SyncSource",
+                                                            "PausedSyncS",
+                                                            "PausedSyncT")));
+
+    private static final String TOKEN_UUID    = "uuid";
+    private static final String TOKEN_SIZE    = "size";
+    private static final String TOKEN_MP      = "mp";
+    private static final String TOKEN_FS      = "fs";
+    private static final String TOKEN_VG      = "vg";
+    private static final String TOKEN_LV      = "lv";
+    private static final String TOKEN_PV      = "pv";
+    private static final String TOKEN_DISK_ID = "disk-id";
     /** Block size in blocks. */
     private String blockSize;
     /** Disk UUID. */
@@ -91,38 +129,6 @@ public final class BlockDevice extends Resource {
     private BlockDevice drbdBlockDevice = null;
     /* Backing disk that is used in drbd config. */
     private String drbdBackingDisk = null;
-    /** States that means that we are connected. */
-    private static final Set<String> CONNECTED_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                                                           "Connected",
-                                                           "SyncTarget",
-                                                           "SyncSource",
-                                                           "StartingSyncS",
-                                                           "StartingSyncT",
-                                                           "WFBitMapS",
-                                                           "WFBitMapT",
-                                                           "WFSyncUUID",
-                                                           "PausedSyncS",
-                                                           "PausedSyncT",
-                                                           "VerifyS",
-                                                           "VerifyT")));
-
-    /** Syncing states. */
-    private static final Set<String> SYNCING_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                                                            "SyncTarget",
-                                                            "SyncSource",
-                                                            "PausedSyncS",
-                                                            "PausedSyncT")));
-
-    private static final String TOKEN_UUID    = "uuid";
-    private static final String TOKEN_SIZE    = "size";
-    private static final String TOKEN_MP      = "mp";
-    private static final String TOKEN_FS      = "fs";
-    private static final String TOKEN_VG      = "vg";
-    private static final String TOKEN_LV      = "lv";
-    private static final String TOKEN_PV      = "pv";
-    private static final String TOKEN_DISK_ID = "disk-id";
 
     /**
      * Creates a new {@code BlockDevice} object.
@@ -137,7 +143,7 @@ public final class BlockDevice extends Resource {
     }
 
     /** Updates the block device. */
-    public void update(final String line) {
+    public final void update(final String line) {
         final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
         if (cols.length < 2) {

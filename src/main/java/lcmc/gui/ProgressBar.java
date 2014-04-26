@@ -23,21 +23,19 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.MyButton;
-import javax.swing.JProgressBar;
-import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.Dimension;
-
-import lcmc.utilities.Tools;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.border.TitledBorder;
 import lcmc.utilities.CancelCallback;
-
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
 
 /**
  * This class creates titled pane with progress bar and functions that update
@@ -47,6 +45,16 @@ public final class ProgressBar implements ActionListener {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(ProgressBar.class);
+    /** Default timeout. */
+    private static final int DEFAULT_TIMEOUT = 50 * 1000;
+    /** This is threshold to catch threads that are out of the line.
+     * TODO: not for production. */
+    private static final int DEBUG_THRESHOLD = 120000;
+    /** Max value in the progress bar. */
+    private static final int MAX_PB_VALUE = 100;
+    /** Cancel icon. */
+    private static final ImageIcon CANCEL_ICON =
+            Tools.createImageIcon(Tools.getDefault("ProgressBar.CancelIcon"));
     /** The progress bar. */
     private final JProgressBar progressBar;
     /** Progress bar panel. */
@@ -61,23 +69,13 @@ public final class ProgressBar implements ActionListener {
     private int time = 0;
     /** Timeout for the progress bar in milliseconds. */
     private int timeout;
-    /** Default timeout. */
-    private static final int DEFAULT_TIMEOUT = 50 * 1000;
     /** Thread with progress bar. */
     private Thread progressThread = null;
-    /** This is threshold to catch threads that are out of the line.
-     * TODO: not for production. */
-    private static final int DEBUG_THRESHOLD = 120000;
-    /** Max value in the progress bar. */
-    private static final int MAX_PB_VALUE = 100;
     /** Cancel button. */
     private MyButton cancelButton = null;
     /** Cancel callback function that will be called, when cancel was pressed.
      */
     private final CancelCallback cancelCallback;
-    /** Cancel icon. */
-    private static final ImageIcon CANCEL_ICON =
-            Tools.createImageIcon(Tools.getDefault("ProgressBar.CancelIcon"));
 
     /** Prepares a new {@code ProgressBar} object. */
     ProgressBar(final String title,

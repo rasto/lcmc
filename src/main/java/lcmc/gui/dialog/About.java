@@ -22,12 +22,12 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
-import lcmc.gui.SpringUtilities;
-import javax.swing.SpringLayout;
-import javax.swing.JPanel;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SpringLayout;
+import lcmc.gui.SpringUtilities;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of an About dialog.

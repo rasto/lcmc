@@ -23,25 +23,26 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.StringValue;
+import lcmc.data.Value;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
@@ -52,26 +53,26 @@ import java.util.Arrays;
  *
  */
 public final class Start extends WizardDialog {
-    /** DRBD resource pulldown menu. */
-    private Widget drbdResourceWi;
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
+    /** DRBD resource pulldown menu. */
+    private Widget drbdResourceWi;
     /** DRBD info object. */
-    private final DrbdInfo drbdInfo;
+    private final GlobalInfo globalInfo;
     /** The first block device info object. */
     private final BlockDevInfo blockDevInfo1;
     /** The second block device info object. */
     private final BlockDevInfo blockDevInfo2;
     /** DRBD resource info object. */
-    private DrbdResourceInfo drbdResourceInfo;
+    private ResourceInfo resourceInfo;
 
     /** Prepares a new {@code Start} object. */
     public Start(final WizardDialog previousDialog,
-                 final DrbdInfo drbdInfo,
+                 final GlobalInfo globalInfo,
                  final BlockDevInfo blockDevInfo1,
                  final BlockDevInfo blockDevInfo2) {
         super(previousDialog);
-        this.drbdInfo = drbdInfo;
+        this.globalInfo = globalInfo;
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;
     }
@@ -85,23 +86,23 @@ public final class Start extends WizardDialog {
             final Iterable<BlockDevInfo> bdis =
                     new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
                                                               blockDevInfo2));
-            drbdResourceInfo = drbdInfo.getNewDrbdResource(
-                               DrbdVolumeInfo.getHostsFromBlockDevices(bdis));
-            drbdInfo.addDrbdResource(drbdResourceInfo);
+            resourceInfo = globalInfo.getNewDrbdResource(
+                               VolumeInfo.getHostsFromBlockDevices(bdis));
+            globalInfo.addDrbdResource(resourceInfo);
             newResource = true;
         } else {
-            drbdResourceInfo = (DrbdResourceInfo) i;
+            resourceInfo = (ResourceInfo) i;
         }
-        final DrbdVolumeInfo dvi = drbdInfo.getNewDrbdVolume(
-                                drbdResourceInfo,
+        final VolumeInfo dvi = globalInfo.getNewDrbdVolume(
+                                resourceInfo,
                                 new ArrayList<BlockDevInfo>(Arrays.asList(
                                                               blockDevInfo1,
                                                               blockDevInfo2)));
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                drbdResourceInfo.addDrbdVolume(dvi);
-                drbdInfo.addDrbdVolume(dvi);
+                resourceInfo.addDrbdVolume(dvi);
+                globalInfo.addDrbdVolume(dvi);
             }
         });
         if (newResource) {
@@ -158,7 +159,7 @@ public final class Start extends WizardDialog {
                     Tools.getString("Dialog.DrbdConfig.Start.NewDrbdResource");
         final List<Value> choices = new ArrayList<Value>();
         choices.add(new StringValue(null, newDrbdResource));
-        for (final DrbdResourceInfo dri : drbdInfo.getDrbdResources()) {
+        for (final ResourceInfo dri : globalInfo.getDrbdResources()) {
             choices.add(dri);
         }
         drbdResourceWi = WidgetFactory.createInstance(

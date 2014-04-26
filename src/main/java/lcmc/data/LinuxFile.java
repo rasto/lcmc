@@ -24,11 +24,10 @@ package lcmc.data;
 
 import java.io.File;
 import java.io.IOException;
-
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
 import lcmc.configs.DistResource;
-import lcmc.gui.resources.VMSHardwareInfo;
+import lcmc.gui.resources.vms.HardwareInfo;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
@@ -53,10 +52,10 @@ public final class LinuxFile extends File {
     /** Is true if this file exists, false it doesn't, null - it is not known.*/
     private Boolean existCache = null;
     /** VMs disk info object. */
-    private final VMSHardwareInfo vmsHardwareInfo;
+    private final HardwareInfo vmsHardwareInfo;
 
     /** Creates new LinuxFile object. */
-    public LinuxFile(final VMSHardwareInfo vmsHardwareInfo,
+    public LinuxFile(final HardwareInfo vmsHardwareInfo,
                      final Host host,
                      final String name,
                      final String type,

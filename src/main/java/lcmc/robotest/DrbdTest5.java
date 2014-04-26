@@ -21,8 +21,26 @@
 package lcmc.robotest;
 
 import lcmc.data.Cluster;
-import static lcmc.robotest.RoboTest.*;
-import static lcmc.robotest.DrbdTest1.*;
+import static lcmc.robotest.DrbdTest1.createLV;
+import static lcmc.robotest.DrbdTest1.createLVMulti;
+import static lcmc.robotest.DrbdTest1.createPV;
+import static lcmc.robotest.DrbdTest1.createVG;
+import static lcmc.robotest.DrbdTest1.createVGMulti;
+import static lcmc.robotest.DrbdTest1.lvRemove;
+import static lcmc.robotest.DrbdTest1.lvRemoveMulti;
+import static lcmc.robotest.DrbdTest1.pvRemove;
+import static lcmc.robotest.DrbdTest1.resizeLV;
+import static lcmc.robotest.DrbdTest1.vgRemove;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.controlLeftClick;
+import static lcmc.robotest.RoboTest.getY;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.moveToGraph;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.sleepNoFactor;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 
@@ -34,11 +52,6 @@ import lcmc.utilities.LoggerFactory;
 final class DrbdTest5 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest5.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest5() {
-        /* Cannot be instantiated. */
-    }
 
     static void start(final Cluster cluster, final int blockDevY) {
         /* Two bds. */
@@ -135,5 +148,10 @@ final class DrbdTest5 {
             pvRemove(534, blockDevY + offset);
             offset += 40;
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest5() {
+        /* Cannot be instantiated. */
     }
 }

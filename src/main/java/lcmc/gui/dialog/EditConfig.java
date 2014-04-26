@@ -20,33 +20,32 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
-import lcmc.data.Host;
-import lcmc.configs.DistResource;
-import javax.swing.JPanel;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.text.Document;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-import java.awt.Color;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.FlowLayout;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashMap;
-
+import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
+import lcmc.configs.DistResource;
+import lcmc.data.Host;
+import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.SSH;
+import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of an edit config dialog.

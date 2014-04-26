@@ -23,9 +23,18 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import lcmc.data.Cluster;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import static lcmc.robotest.RoboTest.PROXY;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.checkDRBDTest;
+import static lcmc.robotest.RoboTest.confirmRemove;
+import static lcmc.robotest.RoboTest.dialogColorTest;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.rightClick;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
 
 /**
@@ -34,14 +43,6 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  */
 final class DrbdTest1 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(DrbdTest1.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest1() {
-        /* Cannot be instantiated. */
-    }
-
     static void start(final Cluster cluster, final int blockDevY) {
         slowFactor = 0.2f;
         aborted = false;
@@ -65,8 +66,7 @@ final class DrbdTest1 {
         checkDRBDTest(drbdTest, 2);
     }
 
-    static void addDrbdResource(final Cluster cluster,
-                                final int blockDevY) {
+    static void addDrbdResource(final Cluster cluster, final int blockDevY) {
         moveTo(334, blockDevY); /* add drbd resource */
         rightClick();
         moveTo(Tools.getString("HostBrowser.Drbd.AddDrbdResource"));
@@ -90,8 +90,7 @@ final class DrbdTest1 {
         rightClick();
     }
 
-    static void chooseDrbdResourceInterface(final String hostName,
-                                            final boolean proxy) {
+    static void chooseDrbdResourceInterface(final String hostName, final boolean proxy) {
         moveTo("on " + hostName, MComboBox.class); /* interface */
         leftClick();
         if (proxy) {
@@ -258,5 +257,10 @@ final class DrbdTest1 {
         leftClick();
         moveTo("Remove"); /* button */
         leftClick();
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private DrbdTest1() {
+        /* Cannot be instantiated. */
     }
 }

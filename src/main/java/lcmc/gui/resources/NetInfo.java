@@ -22,15 +22,15 @@
 
 package lcmc.gui.resources;
 
-import lcmc.gui.Browser;
-import lcmc.gui.HostBrowser;
-import lcmc.data.resources.NetInterface;
-import lcmc.utilities.Tools;
-import lcmc.utilities.SSH;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 import lcmc.data.Application;
 import lcmc.data.Value;
+import lcmc.data.resources.NetInterface;
+import lcmc.gui.Browser;
+import lcmc.gui.HostBrowser;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 /**
  * This class holds info data for a net interface.
@@ -38,10 +38,10 @@ import lcmc.data.Value;
 @SuppressWarnings("SingleCharacterStringConcatenation")
 public class NetInfo extends Info {
     /** Net interface icon. */
-    static final ImageIcon NET_I_ICON = Tools.createImageIcon(
+    public static final ImageIcon NET_I_ICON = Tools.createImageIcon(
                                    Tools.getDefault("HostBrowser.NetIntIcon"));
     /** Net interface icon. */
-    static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
+    public static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
                               Tools.getDefault("HostBrowser.NetIntIconLarge"));
     /** Placeholder where user can enter an ip. */
     public static final String IP_PLACEHOLDER = "--.--.--.--";
@@ -55,7 +55,7 @@ public class NetInfo extends Info {
 
     /** Returns browser object of this info. */
     @Override
-    protected final HostBrowser getBrowser() {
+    public final HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 

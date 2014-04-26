@@ -21,38 +21,19 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.MyMenuItem;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.ServiceInfo;
-import lcmc.gui.resources.GroupInfo;
-import lcmc.gui.resources.HbConnectionInfo;
-import lcmc.gui.resources.HostInfo;
-import lcmc.gui.resources.ConstraintPHInfo;
-import lcmc.gui.resources.PcmkMultiSelectionInfo;
-import lcmc.data.Subtext;
-import lcmc.data.Host;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.visualization.Layer;
 import edu.uci.ics.jung.visualization.picking.PickedState;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-
-import edu.uci.ics.jung.graph.util.Pair;
-import java.awt.Shape;
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.Color;
-import java.awt.Paint;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.GradientPaint;
 import java.awt.BasicStroke;
-
-import javax.swing.JMenu;
-import javax.swing.ImageIcon;
-import edu.uci.ics.jung.visualization.Layer;
-
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,7 +47,22 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.Subtext;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.crm.ConstraintPHInfo;
+import lcmc.gui.resources.crm.GroupInfo;
+import lcmc.gui.resources.crm.HbConnectionInfo;
+import lcmc.gui.resources.crm.HostInfo;
+import lcmc.gui.resources.crm.PcmkMultiSelectionInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
@@ -77,54 +73,6 @@ import javax.swing.JPopupMenu;
  *
  */
 public final class CRMGraph extends ResourceGraph {
-    /** List with edges that are order constraints. */
-    private final Collection<Edge> edgeIsOrderList = new HashSet<Edge>();
-    /** List with edges that should be kept as order constraints. */
-    private final Collection<Edge> keepEdgeIsOrderList = new HashSet<Edge>();
-    /** List with edges that are colocation constraints. */
-    private final Collection<Edge> edgeIsColocationList = new HashSet<Edge>();
-    /** List with edges that should be kept as colocation constraints. */
-    private final Collection<Edge> keepEdgeIsColocationList = new HashSet<Edge>();
-    /** Vertex is present lock. */
-    private final Lock mVertexIsPresentListLock = new ReentrantLock();
-    /** List with vertices that are present. */
-    private Set<Vertex> vertexIsPresentList = new HashSet<Vertex>();
-    /** Map from vertex to 'Add service' menu. */
-    private final Map<Vertex, JMenu> vertexToAddServiceMap =
-                                                new HashMap<Vertex, JMenu>();
-    /** Map from vertex to 'Add existing service' menu. */
-    private final Map<Vertex, JMenu> vertexToAddExistingServiceMap =
-                                                new HashMap<Vertex, JMenu>();
-    /** Map from edge to the hb connection info of this constraint. */
-    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap =
-                                new LinkedHashMap<Edge, HbConnectionInfo>();
-    /** Map from hb connection info to the edge. */
-    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
-                                new LinkedHashMap<HbConnectionInfo, Edge>();
-    /** Pcmk connection lock. */
-    private final ReadWriteLock mHbConnectionLock =
-                                                  new ReentrantReadWriteLock();
-    /** Pcmk connection read lock. */
-    private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
-    /** Pcmk connection write lock. */
-    private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
-    /** Map from the vertex to the host. */
-    private final Map<Vertex, HostInfo> vertexToHostMap =
-                                         new LinkedHashMap<Vertex, HostInfo>();
-    /** Map from the host to the vertex. */
-    private final Map<Info, Vertex> hostToVertexMap =
-                                         new LinkedHashMap<Info, Vertex>();
-    /** Map from the vertex to the constraint placeholder. */
-    private final Map<Vertex, ConstraintPHInfo> vertexToConstraintPHMap =
-                                 new HashMap<Vertex, ConstraintPHInfo>();
-    /** Map from the host to the vertex. */
-    private final Map<Info, Vertex> constraintPHToVertexMap =
-                                         new HashMap<Info, Vertex>();
-
-    /** The first X position of the host. */
-    private int hostDefaultXPos = 10;
-    /** Interval beetween two animation frames. */
-    private Info multiSelectionInfo = null;
     /** X position of a new block device. */
     private static final int BD_X_POS = 15;
     /** Y position of the host. */
@@ -174,6 +122,54 @@ public final class CRMGraph extends ResourceGraph {
     private static final ImageIcon SERVICE_MIGRATED_ICON =
                                      Tools.createImageIcon(Tools.getDefault(
                                               "CRMGraph.ServiceMigratedIcon"));
+    /** List with edges that are order constraints. */
+    private final Collection<Edge> edgeIsOrderList = new HashSet<Edge>();
+    /** List with edges that should be kept as order constraints. */
+    private final Collection<Edge> keepEdgeIsOrderList = new HashSet<Edge>();
+    /** List with edges that are colocation constraints. */
+    private final Collection<Edge> edgeIsColocationList = new HashSet<Edge>();
+    /** List with edges that should be kept as colocation constraints. */
+    private final Collection<Edge> keepEdgeIsColocationList = new HashSet<Edge>();
+    /** Vertex is present lock. */
+    private final Lock mVertexIsPresentListLock = new ReentrantLock();
+    /** List with vertices that are present. */
+    private Set<Vertex> vertexIsPresentList = new HashSet<Vertex>();
+    /** Map from vertex to 'Add service' menu. */
+    private final Map<Vertex, JMenu> vertexToAddServiceMap =
+                                                new HashMap<Vertex, JMenu>();
+    /** Map from vertex to 'Add existing service' menu. */
+    private final Map<Vertex, JMenu> vertexToAddExistingServiceMap =
+                                                new HashMap<Vertex, JMenu>();
+    /** Map from edge to the hb connection info of this constraint. */
+    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap =
+                                new LinkedHashMap<Edge, HbConnectionInfo>();
+    /** Map from hb connection info to the edge. */
+    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
+                                new LinkedHashMap<HbConnectionInfo, Edge>();
+    /** Pcmk connection lock. */
+    private final ReadWriteLock mHbConnectionLock =
+                                                  new ReentrantReadWriteLock();
+    /** Pcmk connection read lock. */
+    private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
+    /** Pcmk connection write lock. */
+    private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
+    /** Map from the vertex to the host. */
+    private final Map<Vertex, HostInfo> vertexToHostMap =
+                                         new LinkedHashMap<Vertex, HostInfo>();
+    /** Map from the host to the vertex. */
+    private final Map<Info, Vertex> hostToVertexMap =
+                                         new LinkedHashMap<Info, Vertex>();
+    /** Map from the vertex to the constraint placeholder. */
+    private final Map<Vertex, ConstraintPHInfo> vertexToConstraintPHMap =
+                                 new HashMap<Vertex, ConstraintPHInfo>();
+    /** Map from the host to the vertex. */
+    private final Map<Info, Vertex> constraintPHToVertexMap =
+                                         new HashMap<Info, Vertex>();
+
+    /** The first X position of the host. */
+    private int hostDefaultXPos = 10;
+    /** Interval beetween two animation frames. */
+    private Info multiSelectionInfo = null;
     /** Prepares a new {@code CRMGraph} object. */
     CRMGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
@@ -290,7 +286,7 @@ public final class CRMGraph extends ResourceGraph {
             try {
                 lockGraph();
                 final Collection<Vertex> predecessors =
-		                                 getGraph().getPredecessors(v);
+                                                getGraph().getPredecessors(v);
                 if (predecessors != null) {
                     for (final Vertex pV : predecessors) {
                         Edge edge = getGraph().findEdge(pV, v);
@@ -306,7 +302,7 @@ public final class CRMGraph extends ResourceGraph {
                     }
                 }
                 final Collection<Vertex> successors =
-		                                 getGraph().getPredecessors(v);
+                                               getGraph().getPredecessors(v);
                 if (successors != null) {
                     for (final Vertex sV : successors) {
                         Edge edge = getGraph().findEdge(v, sV);

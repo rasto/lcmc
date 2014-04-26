@@ -31,8 +31,8 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import lcmc.data.Cluster;
 import lcmc.data.Application;
+import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.gui.dialog.BugReport;
 
@@ -44,12 +44,6 @@ import lcmc.gui.dialog.BugReport;
  *
  */
 public final class Logger {
-    /** Name of the class. */
-    private final String className;
-    /** Map with all warnings, so that they don't appear more than once. */
-    private final Collection<String> appWarningHash = new HashSet<String>();
-    /** Map with all errors, so that they don't appear more than once. */
-    private final Collection<String> appErrorHash = new HashSet<String>();
     /** String that starts error messages. */
     private static final String ERROR_STRING      = "ERROR   : ";
     /** String that starts info messages. */
@@ -73,6 +67,12 @@ public final class Logger {
         Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
             Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*",
                             Pattern.DOTALL))));
+    /** Name of the class. */
+    private final String className;
+    /** Map with all warnings, so that they don't appear more than once. */
+    private final Collection<String> appWarningHash = new HashSet<String>();
+    /** Map with all errors, so that they don't appear more than once. */
+    private final Collection<String> appErrorHash = new HashSet<String>();
 
     public Logger(final String className) {
         this.className = className;

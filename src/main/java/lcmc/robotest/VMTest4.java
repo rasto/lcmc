@@ -24,9 +24,15 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import lcmc.gui.widget.GenericWidget.MTextField;
-import static lcmc.robotest.RoboTest.*;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import static lcmc.robotest.RoboTest.aborted;
+import static lcmc.robotest.RoboTest.getAppPosition;
+import static lcmc.robotest.RoboTest.info;
+import static lcmc.robotest.RoboTest.isColor;
+import static lcmc.robotest.RoboTest.leftClick;
+import static lcmc.robotest.RoboTest.moveTo;
+import static lcmc.robotest.RoboTest.press;
+import static lcmc.robotest.RoboTest.sleep;
+import static lcmc.robotest.RoboTest.slowFactor;
 
 /**
  * This class is used to test the GUI.
@@ -34,14 +40,6 @@ import lcmc.utilities.LoggerFactory;
  * @author Rasto Levrinc
  */
 final class VMTest4 {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(VMTest4.class);
-
-    /** Private constructor, cannot be instantiated. */
-    private VMTest4() {
-        /* Cannot be instantiated. */
-    }
-
     /** Cluster wizard locked until focus is lost. */
     static void start(final String vmTest, final int count) {
         slowFactor = 0.1f;
@@ -80,5 +78,10 @@ final class VMTest4 {
             moveTo("Cancel"); /* cancel */
             leftClick();
         }
+    }
+
+    /** Private constructor, cannot be instantiated. */
+    private VMTest4() {
+        /* Cannot be instantiated. */
     }
 }

@@ -23,21 +23,19 @@
 
 package lcmc.gui.dialog.vm;
 
-import lcmc.utilities.Tools;
-import lcmc.data.VMSXML;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
-import lcmc.gui.resources.VMSDiskInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.data.VMSXML.DiskData;
-
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.BoxLayout;
-import javax.swing.JScrollPane;
-
 import java.awt.Component;
 import java.awt.Dimension;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
+import lcmc.data.VMSXML;
+import lcmc.data.VMSXML.DiskData;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.vms.DiskInfo;
+import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
@@ -46,8 +44,6 @@ import lcmc.data.StringValue;
  * @version $Id$
  */
 final class Storage extends VMConfig {
-    /** Input pane cache for back button. */
-    private JComponent inputPane = null;
     /** Configuration options of the new domain. */
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
@@ -66,14 +62,16 @@ final class Storage extends VMConfig {
                                             DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE,
                                             DiskData.DRIVER_CACHE};
+    /** Input pane cache for back button. */
+    private JComponent inputPane = null;
     /** VMS disk info object. */
-    private VMSDiskInfo vmsdi = null;
+    private DiskInfo vmsdi = null;
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code Storage} object. */
     Storage(final WizardDialog previousDialog,
-            final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+            final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
@@ -151,9 +149,9 @@ final class Storage extends VMConfig {
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vmsdi.savePreferredValues();
         vmsdi.getResource().setValue(DiskData.TYPE,
-                                     VMSDiskInfo.FILE_TYPE);
+                                     DiskInfo.FILE_TYPE);
         vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE,
-                                     VMSDiskInfo.BUS_TYPE_IDE);
+                                     DiskInfo.BUS_TYPE_IDE);
         vmsdi.getResource().setValue(DiskData.TARGET_DEVICE,
                                      new StringValue("hda"));
         vmsdi.getResource().setValue(DiskData.DRIVER_TYPE,

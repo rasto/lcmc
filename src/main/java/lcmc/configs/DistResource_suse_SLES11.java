@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_suse_SLES11
                                         extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
@@ -107,4 +101,10 @@ public final class DistResource_suse_SLES11
          "if ! PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais status >/dev/null 2>&1; then "
          + "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais start; fi"},
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

@@ -24,7 +24,7 @@
 package lcmc.gui.dialog.vm;
 
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.VMSVirtualDomainInfo;
+import lcmc.gui.resources.vms.DomainInfo;
 
 /**
  * VMConfig super class from which all the vm wizards can be
@@ -35,17 +35,17 @@ import lcmc.gui.resources.VMSVirtualDomainInfo;
  */
 public abstract class VMConfig extends WizardDialog {
     /** VMS Virtual domain info object. */
-    private final VMSVirtualDomainInfo vmsVirtualDomainInfo;
+    private final DomainInfo vmsVirtualDomainInfo;
 
     /** Prepares a new {@code VMConfig} object. */
     protected VMConfig(final WizardDialog previousDialog,
-                       final VMSVirtualDomainInfo vmsVirtualDomainInfo) {
+                       final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog);
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 
     /** Returns vms virtual domain info object. */
-    protected final VMSVirtualDomainInfo getVMSVirtualDomainInfo() {
+    protected final DomainInfo getVMSVirtualDomainInfo() {
         return vmsVirtualDomainInfo;
     }
 }

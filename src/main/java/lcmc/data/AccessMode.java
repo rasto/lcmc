@@ -30,12 +30,12 @@ package lcmc.data;
  *
  */
 public final class AccessMode {
+    /** Advanced mode. */
+    public static final boolean ADVANCED = true;
     /** Access type. */
     private final Application.AccessType accessType;
     /** Whether it is advanced mode or not. */
     private final boolean advancedMode;
-    /** Advanced mode. */
-    public static final boolean ADVANCED = true;
 
     /** Prepares a new {@code AccessMode} object. */
     public AccessMode(final Application.AccessType accessType,

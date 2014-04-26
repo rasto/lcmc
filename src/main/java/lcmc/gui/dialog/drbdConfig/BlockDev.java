@@ -22,28 +22,25 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.DRBD;
-import lcmc.gui.resources.DrbdResourceInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.ClusterBrowser;
-import lcmc.Exceptions;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-import javax.swing.SpringLayout;
-import javax.swing.BoxLayout;
-
 import java.awt.Component;
 import java.net.UnknownHostException;
-
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.Exceptions;
 import lcmc.data.Application;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.ResourceInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd block device
@@ -61,7 +58,7 @@ final class BlockDev extends DrbdConfig {
 
     /** Prepares a new {@code BlockDev} object. */
     BlockDev(final WizardDialog previousDialog,
-             final DrbdVolumeInfo dli,
+             final VolumeInfo dli,
              final BlockDevInfo blockDevInfo) {
         super(previousDialog, dli);
         this.blockDevInfo = blockDevInfo;
@@ -102,9 +99,9 @@ final class BlockDev extends DrbdConfig {
                 final Application.RunMode runMode = Application.RunMode.LIVE;
 
                 /* apply */
-                final DrbdVolumeInfo dvi = getDrbdVolumeInfo();
+                final VolumeInfo dvi = getDrbdVolumeInfo();
                 dvi.getDrbdInfo().apply(runMode);
-                final DrbdResourceInfo dri = dvi.getDrbdResourceInfo();
+                final ResourceInfo dri = dvi.getDrbdResourceInfo();
                 Tools.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
@@ -127,7 +124,7 @@ final class BlockDev extends DrbdConfig {
 
                 /* create config */
                 getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
-                                                    .createDrbdConfig(Application.RunMode.LIVE);
+                                                    .createDrbdConfigLive();
                 final String gi1 = getGI(blockDevInfo);
                 final String gi2 = getGI(oBdi);
                 if (gi1 == null || gi2 == null) {

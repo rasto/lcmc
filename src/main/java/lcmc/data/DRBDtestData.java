@@ -22,10 +22,10 @@
 
 package lcmc.data;
 
-import lcmc.utilities.Tools;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lcmc.utilities.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
@@ -36,11 +36,11 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  *
  */
 public final class DRBDtestData {
-    /** Tool tip. */
-    private final String toolTip;
     /** Pattern for dry run output: drbdsetup 0 disconnect. */
     private static final Pattern DRBD_D_PATTERN =
           Pattern.compile(".*drbdsetup\\s+(\\S+)\\s+(\\S+).*");
+    /** Tool tip. */
+    private final String toolTip;
     /** Hash with host and drbd resource, that will be connected. */
     private final MultiKeyMap<String, Integer> connectedHash =
                                             new MultiKeyMap<String, Integer>();

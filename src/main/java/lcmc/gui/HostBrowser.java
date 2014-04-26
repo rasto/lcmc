@@ -23,29 +23,6 @@
 
 package lcmc.gui;
 
-import lcmc.data.*;
-import lcmc.utilities.Tools;
-import lcmc.data.resources.NetInterface;
-import lcmc.data.resources.BlockDevice;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.FSInfo;
-import lcmc.gui.resources.HostDrbdInfo;
-import lcmc.gui.resources.ProxyHostInfo;
-import lcmc.gui.resources.HostInfo;
-import lcmc.gui.resources.NetInfo;
-import lcmc.gui.dialog.CmdLog;
-
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.SSH;
-import lcmc.gui.resources.CategoryInfo;
-
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.ImageIcon;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeNode;
-
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -58,6 +35,29 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.swing.ImageIcon;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Cluster;
+import lcmc.data.Host;
+import lcmc.data.resources.BlockDevice;
+import lcmc.data.resources.NetInterface;
+import lcmc.gui.dialog.CmdLog;
+import lcmc.gui.resources.CategoryInfo;
+import lcmc.gui.resources.FSInfo;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.NetInfo;
+import lcmc.gui.resources.crm.HostInfo;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
+import lcmc.gui.resources.drbd.ProxyHostInfo;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.SSH;
+import lcmc.utilities.Tools;
 
 
 /**
@@ -69,26 +69,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version $Id$
  *
  */
-public final class HostBrowser extends Browser {
-    /** Net interfaces node in the menu. */
-    private DefaultMutableTreeNode netInterfacesNode;
-    /** Block devices sytems node in the menu. */
-    private DefaultMutableTreeNode blockDevicesNode;
-    /** File sytems node in the menu. */
-    private DefaultMutableTreeNode fileSystemsNode;
-
-    /** List of used network interface ports. */
-    private final Collection<String> usedPorts = new HashSet<String>();
-    /** List of used proxy ports. */
-    private final Collection<String> usedProxyPorts = new HashSet<String>();
-    /** Host object. */
-    private final Host host;
-    /** Host info object of the host of this browser. */
-    private final HostInfo hostInfo;
-    /** Host info object of the host in drbd view of this browser. */
-    private final HostDrbdInfo hostDrbdInfo;
-    /** Proxy host info object. */
-    private ProxyHostInfo proxyHostInfo = null;
+public class HostBrowser extends Browser {
 
     /** Host icon. */
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(
@@ -116,6 +97,25 @@ public final class HostBrowser extends Browser {
     public static final ImageIcon HOST_IN_CLUSTER_ICON_RIGHT_SMALL =
             Tools.createImageIcon(
                Tools.getDefault("HostBrowser.HostInClusterIconRightSmall"));
+    /** Net interfaces node in the menu. */
+    private DefaultMutableTreeNode netInterfacesNode;
+    /** Block devices sytems node in the menu. */
+    private DefaultMutableTreeNode blockDevicesNode;
+    /** File sytems node in the menu. */
+    private DefaultMutableTreeNode fileSystemsNode;
+
+    /** List of used network interface ports. */
+    private final Collection<String> usedPorts = new HashSet<String>();
+    /** List of used proxy ports. */
+    private final Collection<String> usedProxyPorts = new HashSet<String>();
+    /** Host object. */
+    private final Host host;
+    /** Host info object of the host of this browser. */
+    private final HostInfo hostInfo;
+    /** Host info object of the host in drbd view of this browser. */
+    private final HostDrbdInfo hostDrbdInfo;
+    /** Proxy host info object. */
+    private ProxyHostInfo proxyHostInfo = null;
     /** Map of block devices and their info objects. */
     private final Map<BlockDevice, BlockDevInfo> blockDevInfos =
                                 new LinkedHashMap<BlockDevice, BlockDevInfo>();

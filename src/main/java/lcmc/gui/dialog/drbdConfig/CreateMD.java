@@ -23,33 +23,30 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.ExecCallback;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.gui.dialog.WizardDialog;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.WidgetListener;
-import lcmc.data.Application;
-import lcmc.data.AccessMode;
-import lcmc.data.Host;
-
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
-import javax.swing.JPanel;
-import javax.swing.JComponent;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-
+import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SpringLayout;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.dialog.WizardDialog;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
@@ -60,18 +57,18 @@ import lcmc.data.Value;
  *
  */
 final class CreateMD extends DrbdConfig {
-    /** Metadata pulldown choices. */
-    private Widget metadataWi;
-    /** Make Meta-Data button. */
-    private final MyButton makeMDButton = new MyButton();
     /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
     /** Return code of the create md command if fs is already there. */
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
+    /** Metadata pulldown choices. */
+    private Widget metadataWi;
+    /** Make Meta-Data button. */
+    private final MyButton makeMDButton = new MyButton();
 
     /** Prepares a new {@code CreateMD} object. */
     CreateMD(final WizardDialog previousDialog,
-                       final DrbdVolumeInfo dvi) {
+                       final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 

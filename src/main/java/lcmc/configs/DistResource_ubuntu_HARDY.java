@@ -31,12 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_ubuntu_HARDY
                                     extends ListResourceBundle {
 
-    /** Get contents. */
-    @Override
-    protected Object[][] getContents() {
-        return Arrays.copyOf(contents, contents.length);
-    }
-
     /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-HARDY"},
@@ -104,4 +98,10 @@ public final class DistResource_ubuntu_HARDY
          DistResource.SUDO + "/etc/init.d/corosync force-reload"},
 
     };
+
+    /** Get contents. */
+    @Override
+    protected Object[][] getContents() {
+        return Arrays.copyOf(contents, contents.length);
+    }
 }

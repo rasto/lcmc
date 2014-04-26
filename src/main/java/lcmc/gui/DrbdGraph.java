@@ -23,36 +23,32 @@
 
 package lcmc.gui;
 
-import lcmc.utilities.Tools;
-import lcmc.data.Host;
-import lcmc.data.Subtext;
-import lcmc.data.resources.BlockDevice;
-import lcmc.gui.resources.HostDrbdInfo;
-import lcmc.gui.resources.DrbdInfo;
-import lcmc.gui.resources.DrbdVolumeInfo;
-import lcmc.gui.resources.BlockDevInfo;
-import lcmc.gui.resources.Info;
-import lcmc.gui.resources.DrbdMultiSelectionInfo;
-
-import java.awt.Shape;
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.Paint;
-import java.awt.Color;
-import java.awt.BasicStroke;
-
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.visualization.util.VertexShapeFactory;
-
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Shape;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.Subtext;
+import lcmc.data.resources.BlockDevice;
+import lcmc.gui.resources.Info;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
+import lcmc.gui.resources.drbd.MultiSelectionInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.utilities.Tools;
 
 /**
  * This class creates graph and provides methods to add new block device
@@ -63,32 +59,6 @@ import lcmc.data.Application;
  *
  */
 public final class DrbdGraph extends ResourceGraph {
-    /** Map from vertex to host. */
-    private final Map<Vertex, HostDrbdInfo> vertexToHostMap =
-                                 new LinkedHashMap<Vertex, HostDrbdInfo>();
-    /** Map from host to vertex. */
-    private final Map<HostDrbdInfo, Vertex> hostToVertexMap =
-                                 new LinkedHashMap<HostDrbdInfo, Vertex>();
-    /** Map from block device info object to vertex. */
-    private final Map<BlockDevInfo, Vertex> bdiToVertexMap =
-                                 new LinkedHashMap<BlockDevInfo, Vertex>();
-    /** Map from block device to vertex. */
-    private final Map<BlockDevice, Vertex> blockDeviceToVertexMap =
-                                 new LinkedHashMap<BlockDevice, Vertex>();
-    /** Map from host to the list of block devices. */
-    private final Map<HostDrbdInfo, List<Vertex>> hostBDVerticesMap =
-                               new LinkedHashMap<HostDrbdInfo, List<Vertex>>();
-    /** Map from graph edge to the drbd volume info object. */
-    private final Map<Edge, DrbdVolumeInfo> edgeToDrbdVolumeMap =
-                                 new LinkedHashMap<Edge, DrbdVolumeInfo>();
-    /** Map from drbd volume info object to the graph edge. */
-    private final Map<DrbdVolumeInfo, Edge> drbdVolumeToEdgeMap =
-                                 new LinkedHashMap<DrbdVolumeInfo, Edge>();
-
-    /** Drbd info object to which this graph belongs. */
-    private DrbdInfo drbdInfo;
-    /** Interval beetween two animation frames. */
-    private Info multiSelectionInfo = null;
 
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */
@@ -111,15 +81,41 @@ public final class DrbdGraph extends ResourceGraph {
     private static final int MAX_VERTEX_STRING_LENGTH = 18;
     /** Postion offset of block devices from the host x position. */
     private static final int BD_X_OFFSET = 15;
-
-    /** The first X position of the host. */
-    private int hostDefaultXPos = 10;
     /** Minimum vertical position. */
     private static final int MIN_Y_POS = 20;
     /** Maximum horizontal position. */
     private static final int MAX_X_POS = 2600;
     /** Maximum vertical position. */
     private static final int MAX_Y_POS = 2600;
+    /** Map from vertex to host. */
+    private final Map<Vertex, HostDrbdInfo> vertexToHostMap =
+                                 new LinkedHashMap<Vertex, HostDrbdInfo>();
+    /** Map from host to vertex. */
+    private final Map<HostDrbdInfo, Vertex> hostToVertexMap =
+                                 new LinkedHashMap<HostDrbdInfo, Vertex>();
+    /** Map from block device info object to vertex. */
+    private final Map<BlockDevInfo, Vertex> bdiToVertexMap =
+                                 new LinkedHashMap<BlockDevInfo, Vertex>();
+    /** Map from block device to vertex. */
+    private final Map<BlockDevice, Vertex> blockDeviceToVertexMap =
+                                 new LinkedHashMap<BlockDevice, Vertex>();
+    /** Map from host to the list of block devices. */
+    private final Map<HostDrbdInfo, List<Vertex>> hostBDVerticesMap =
+                               new LinkedHashMap<HostDrbdInfo, List<Vertex>>();
+    /** Map from graph edge to the drbd volume info object. */
+    private final Map<Edge, VolumeInfo> edgeToDrbdVolumeMap =
+                                 new LinkedHashMap<Edge, VolumeInfo>();
+    /** Map from drbd volume info object to the graph edge. */
+    private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap =
+                                 new LinkedHashMap<VolumeInfo, Edge>();
+
+    /** Drbd info object to which this graph belongs. */
+    private GlobalInfo globalInfo;
+    /** Interval beetween two animation frames. */
+    private Info multiSelectionInfo = null;
+
+    /** The first X position of the host. */
+    private int hostDefaultXPos = 10;
 
     /** Prepares a new {@code DrbdGraph} object. */
     public DrbdGraph(final ClusterBrowser clusterBrowser) {
@@ -133,13 +129,13 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Sets drbd info object. */
-    public void setDrbdInfo(final DrbdInfo drbdInfo) {
-        this.drbdInfo = drbdInfo;
+    public void setDrbdInfo(final GlobalInfo globalInfo) {
+        this.globalInfo = globalInfo;
     }
 
     /** Returns drbd info object. */
-    public DrbdInfo getDrbdInfo() {
-        return drbdInfo;
+    public GlobalInfo getDrbdInfo() {
+        return globalInfo;
     }
 
     /** Returns whether vertex is block device. */
@@ -201,7 +197,7 @@ public final class DrbdGraph extends ResourceGraph {
                 if (!blockDevInfos.contains(bdi)) {
                     /* removing */
                     final Vertex bdv = bdiToVertexMap.get(bdi);
-                    final DrbdVolumeInfo dvi = bdi.getDrbdVolumeInfo();
+                    final VolumeInfo dvi = bdi.getDrbdVolumeInfo();
                     if (dvi != null) {
                         removeDrbdVolume(dvi);
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(
@@ -288,7 +284,7 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Removes drbd volume from the graph. */
-    public void removeDrbdVolume(final DrbdVolumeInfo dvi) {
+    public void removeDrbdVolume(final VolumeInfo dvi) {
         final Edge e = drbdVolumeToEdgeMap.get(dvi);
         if (e == null) {
             return;
@@ -351,7 +347,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected String getLabelForEdgeStringer(final Edge edge) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
+        final VolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
         if (dvi != null
             && dvi.getName() != null
             && dvi.getDrbdResourceInfo() != null) {
@@ -576,7 +572,7 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Adds drbd volume edge to the graph. */
-    public void addDrbdVolume(final DrbdVolumeInfo dvi,
+    public void addDrbdVolume(final VolumeInfo dvi,
                               final BlockDevInfo bdi1,
                               final BlockDevInfo bdi2) {
         if (bdi1 != null && bdi2 != null) {
@@ -597,7 +593,7 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Returns the source block device in a drbd connection. */
-    public BlockDevInfo getSource(final DrbdVolumeInfo dvi) {
+    public BlockDevInfo getSource(final VolumeInfo dvi) {
         final Edge edge = drbdVolumeToEdgeMap.get(dvi);
         if (edge == null) {
             return null;
@@ -607,7 +603,7 @@ public final class DrbdGraph extends ResourceGraph {
     }
 
     /** Returns the destination block device in a drbd connection. */
-    public BlockDevInfo getDest(final DrbdVolumeInfo dvi) {
+    public BlockDevInfo getDest(final VolumeInfo dvi) {
         final Edge edge = drbdVolumeToEdgeMap.get(dvi);
         if (edge == null) {
             return null;
@@ -630,7 +626,7 @@ public final class DrbdGraph extends ResourceGraph {
     /** Is called after right click on the resource edge. */
     @Override
     protected void handlePopupEdge(final Edge edge, final Point2D pos) {
-        final DrbdVolumeInfo info = edgeToDrbdVolumeMap.get(edge);
+        final VolumeInfo info = edgeToDrbdVolumeMap.get(edge);
         final JPopupMenu p = info.getPopup();
         info.updateMenus(pos);
         showPopup(p, pos);
@@ -643,7 +639,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected void handlePopupBackground(final Point2D pos) {
-        final DrbdInfo info = getDrbdInfo();
+        final GlobalInfo info = getDrbdInfo();
         final JPopupMenu p = info.getPopup();
         info.updateMenus(pos);
         showPopup(p, pos);
@@ -715,8 +711,8 @@ public final class DrbdGraph extends ResourceGraph {
             if (bdi == null) {
                 return;
             }
-            drbdInfo.setSelectedNode(bdi);
-            drbdInfo.selectMyself();
+            globalInfo.setSelectedNode(bdi);
+            globalInfo.selectMyself();
             getClusterBrowser().setRightComponentInView(bdi);
         } else {
             pickHost(v);
@@ -802,7 +798,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected void oneEdgePressed(final Edge e) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(e);
+        final VolumeInfo dvi = edgeToDrbdVolumeMap.get(e);
         if (dvi != null) {
             dvi.selectMyself();
         }
@@ -814,8 +810,8 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected void backgroundClicked() {
-        drbdInfo.setSelectedNode(null);
-        drbdInfo.selectMyself();
+        globalInfo.setSelectedNode(null);
+        globalInfo.selectMyself();
     }
 
     /**
@@ -928,7 +924,7 @@ public final class DrbdGraph extends ResourceGraph {
     /** Returns tool tip when mouse is over a resource edge. */
     @Override
     String getEdgeToolTip(final Edge edge) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
+        final VolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
         return dvi.getToolTipForGraph(getRunMode());
     }
 
@@ -964,7 +960,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected Paint getEdgeDrawPaint(final Edge edge) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
+        final VolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
         if (dvi != null
             && dvi.isConnected(getRunMode())
             && !dvi.isSplitBrain()) {
@@ -982,7 +978,7 @@ public final class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected Paint getEdgePickedPaint(final Edge edge) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
+        final VolumeInfo dvi = edgeToDrbdVolumeMap.get(edge);
         if (dvi != null
             && dvi.isConnected(getRunMode())
             && !dvi.isSplitBrain()) {
@@ -1133,7 +1129,7 @@ public final class DrbdGraph extends ResourceGraph {
     /** Returns whether to show a hollow arrow. */
     @Override
     protected boolean showHollowArrow(final Edge e) {
-        final DrbdVolumeInfo dvi = edgeToDrbdVolumeMap.get(e);
+        final VolumeInfo dvi = edgeToDrbdVolumeMap.get(e);
         if (dvi == null) {
             return false;
         }
@@ -1150,12 +1146,12 @@ public final class DrbdGraph extends ResourceGraph {
                 selectedInfos.add(i);
             }
         }
-        multiSelectionInfo = new DrbdMultiSelectionInfo(selectedInfos,
+        multiSelectionInfo = new MultiSelectionInfo(selectedInfos,
                                                         getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
 
-    Map<DrbdVolumeInfo, Edge> getDrbdVolumeToEdgeMap() {
+    Map<VolumeInfo, Edge> getDrbdVolumeToEdgeMap() {
         return drbdVolumeToEdgeMap;
     }
 }
