@@ -45,7 +45,7 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  * @author Rasto Levrinc
  * @version $Id$
  */
-public final class Application {
+public class Application {
     /** Logger. */
     private static final Logger LOG =
                                    LoggerFactory.getLogger(Application.class);

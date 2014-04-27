@@ -25,19 +25,16 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.CRMXML;
 import lcmc.data.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
@@ -45,7 +42,7 @@ import lcmc.utilities.UpdatableItem;
  * This class holds the information about heartbeat service from the ocfs,
  * to show it to the user.
  */
-public final class AvailableServiceInfo extends HbCategoryInfo {
+public class AvailableServiceInfo extends HbCategoryInfo {
     /** Available services icon. */
     private static final ImageIcon AVAIL_SERVICES_ICON =
         Tools.createImageIcon(
@@ -135,37 +132,12 @@ public final class AvailableServiceInfo extends HbCategoryInfo {
     /** Returns list of menu items. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final UpdatableItem addServiceMenu = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.AddServiceToCluster"),
-                        null,
-                        null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
+        final AvailableServiceMenu availableServiceInfo =
+                                                new AvailableServiceMenu(this);
+        return availableServiceInfo.getPulldownMenu();
+    }
 
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                hidePopup();
-                final ServicesInfo si = getBrowser().getServicesInfo();
-                si.addServicePanel(resourceAgent,
-                                   null, /* pos */
-                                   true,
-                                   null,
-                                   null,
-                                   Application.RunMode.LIVE);
-            }
-        };
-        items.add(addServiceMenu);
-        return items;
+    public ResourceAgent getResourceAgent() {
+        return resourceAgent;
     }
 }

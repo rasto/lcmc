@@ -631,12 +631,10 @@ public final class Tools {
 
     }
 
+    public static void setApplication(final Application app) {
+        application = app;
+    }
 
-    /**
-     * Gets config data object.
-     *
-     * @return config data object.
-     */
     public static Application getApplication() {
         return application;
     }

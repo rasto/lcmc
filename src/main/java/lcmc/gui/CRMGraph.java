@@ -72,7 +72,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
-public final class CRMGraph extends ResourceGraph {
+public class CRMGraph extends ResourceGraph {
     /** X position of a new block device. */
     private static final int BD_X_POS = 15;
     /** Y position of the host. */

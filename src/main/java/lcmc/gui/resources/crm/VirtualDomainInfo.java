@@ -21,14 +21,12 @@
  */
 package lcmc.gui.resources.crm;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.ResourceAgent;
@@ -37,14 +35,12 @@ import lcmc.data.VMSXML;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
  */
-public final class VirtualDomainInfo extends ServiceInfo {
+public class VirtualDomainInfo extends ServiceInfo {
     /** Pattern that captures a name from xml file name. */
     static final Pattern LIBVIRT_CONF_PATTERN =
                                             Pattern.compile(".*?([^/]+).xml$");
@@ -60,7 +56,7 @@ public final class VirtualDomainInfo extends ServiceInfo {
                                                 new StringValue("uml:///system")};
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
     /** VirtualDomain in the VMs menu. */
-    private DomainInfo vmsVirtualDomainInfo = null;
+    private DomainInfo domainInfo = null;
 
     /** Creates the VirtualDomainInfo object. */
     public VirtualDomainInfo(final String name,
@@ -76,17 +72,6 @@ public final class VirtualDomainInfo extends ServiceInfo {
                       final Map<String, String> resourceNode,
                       final Browser browser) {
         super(name, ra, hbId, resourceNode, browser);
-    }
-
-
-    /** Returns the first on which this vm is running. */
-    private Host getRunningOnHost() {
-        final List<String> nodes = getRunningOnNodes(Application.RunMode.LIVE);
-        if (nodes != null
-            && !nodes.isEmpty()) {
-            return getBrowser().getCluster().getHostByName(nodes.get(0));
-        }
-        return null;
     }
 
     /** Returns object with vm data. */
@@ -124,140 +109,12 @@ public final class VirtualDomainInfo extends ServiceInfo {
                 }
             }
         }
-        vmsVirtualDomainInfo = newVMSVDI;
+        domainInfo = newVMSVDI;
         return newVMSVDI;
     }
-
-    /** Adds vnc viewer menu items. */
-    void addVncViewersToTheMenu(final Collection<UpdatableItem> items) {
-        if (Tools.getApplication().isTightvnc()) {
-            /* tight vnc test menu */
-            final UpdatableItem tightvncViewerMenu = new MyMenuItem(
-                            "start TIGHT VNC viewer",
-                            null,
-                            null,
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false)) {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    final VMSXML vxml = getVMSXML(getRunningOnHost());
-                    if (vxml == null || vmsVirtualDomainInfo == null) {
-                        return "VM is not available";
-                    }
-                    final int remotePort = vxml.getRemotePort(
-                                               vmsVirtualDomainInfo.getName());
-                    if (remotePort <= 0) {
-                        return "remote port is not greater than 0";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    hidePopup();
-                    final DomainInfo vvdi = vmsVirtualDomainInfo;
-                    final VMSXML vxml = getVMSXML(getRunningOnHost());
-                    if (vxml != null && vvdi != null) {
-                        final int remotePort = vxml.getRemotePort(
-                                                               vvdi.getName());
-                        final Host host = vxml.getHost();
-                        if (host != null && remotePort > 0) {
-                            Tools.startTightVncViewer(host, remotePort);
-                        }
-                    }
-                }
-            };
-            items.add(tightvncViewerMenu);
-        }
-
-        if (Tools.getApplication().isUltravnc()) {
-            /* ultra vnc test menu */
-            final UpdatableItem ultravncViewerMenu = new MyMenuItem(
-                            "start ULTRA VNC viewer",
-                            null,
-                            null,
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false)) {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    final VMSXML vxml = getVMSXML(getRunningOnHost());
-                    if (vxml == null || vmsVirtualDomainInfo == null) {
-                        return "VM is not available";
-                    }
-                    final int remotePort = vxml.getRemotePort(
-                                               vmsVirtualDomainInfo.getName());
-                    if (remotePort <= 0) {
-                        return "remote port is not greater than 0";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    hidePopup();
-                    final DomainInfo vvdi = vmsVirtualDomainInfo;
-                    final VMSXML vxml = getVMSXML(getRunningOnHost());
-                    if (vxml != null && vvdi != null) {
-                        final int remotePort = vxml.getRemotePort(
-                                                           vvdi.getName());
-                        final Host host = vxml.getHost();
-                        if (host != null && remotePort > 0) {
-                            Tools.startUltraVncViewer(host, remotePort);
-                        }
-                    }
-                }
-            };
-            items.add(ultravncViewerMenu);
-        }
-
-        if (Tools.getApplication().isRealvnc()) {
-            /* real vnc test menu */
-            final UpdatableItem realvncViewerMenu = new MyMenuItem(
-                            "start REAL VNC test",
-                            null,
-                            null,
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false)) {
-
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    final VMSXML vxml = getVMSXML(getRunningOnHost());
-                    if (vxml == null || vmsVirtualDomainInfo == null) {
-                        return "VM is not available";
-                    }
-                    final int remotePort = vxml.getRemotePort(
-                                               vmsVirtualDomainInfo.getName());
-                    if (remotePort <= 0) {
-                        return "remote port is not greater than 0";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    hidePopup();
-                    final DomainInfo vvdi = vmsVirtualDomainInfo;
-                    final VMSXML vxml = getVMSXML(getRunningOnHost());
-                    if (vxml != null && vvdi != null) {
-                        final int remotePort = vxml.getRemotePort(
-                                                            vvdi.getName());
-                        final Host host = vxml.getHost();
-                        if (host != null && remotePort > 0) {
-                            Tools.startRealVncViewer(host, remotePort);
-                        }
-                    }
-                }
-            };
-            items.add(realvncViewerMenu);
-        }
+    
+    public DomainInfo getDomainInfo() {
+        return domainInfo;
     }
 
     /** Returns the possible values for the pulldown menus, if applicable. */
@@ -285,9 +142,8 @@ public final class VirtualDomainInfo extends ServiceInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = super.createPopup();
-        addVncViewersToTheMenu(items);
-        return items;
+        final VirtualDomainMenu virtualDomainMenu = new VirtualDomainMenu(this);
+        return virtualDomainMenu.getPulldownMenu();
     }
 
     /** Returns a name of the service with virtual domain name. */

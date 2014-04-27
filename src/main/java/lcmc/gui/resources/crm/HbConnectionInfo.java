@@ -41,7 +41,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
-import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.ClusterStatus;
 import lcmc.data.Host;
@@ -56,7 +55,6 @@ import lcmc.gui.widget.Check;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
@@ -96,7 +94,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-    public final ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
@@ -499,213 +497,8 @@ public class HbConnectionInfo extends EditableInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-
-        final HbConnectionInfo thisClass = this;
-        final Application.RunMode runMode = Application.RunMode.LIVE;
-
-        final MyMenuItem removeEdgeItem = new MyMenuItem(
-                     Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
-                     ClusterBrowser.REMOVE_ICON,
-                     Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
-                     new AccessMode(Application.AccessType.ADMIN, false),
-                     new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                getBrowser().getCRMGraph().removeConnection(
-                                                      thisClass,
-                                                      getBrowser().getDCHost(),
-                                                      runMode);
-            }
-        };
-        final ButtonCallback removeEdgeCallback =
-                  getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public boolean isEnabled() {
-                return super.isEnabled() && !isNew();
-            }
-            @Override
-            public void action(final Host dcHost) {
-                if (!isNew()) {
-                    getBrowser().getCRMGraph().removeConnection(thisClass,
-                                                                dcHost,
-                                                                Application.RunMode.TEST);
-                }
-            }
-        };
-        addMouseOverListener(removeEdgeItem, removeEdgeCallback);
-        items.add(removeEdgeItem);
-
-        /* remove/add order */
-        final MyMenuItem removeOrderItem =
-            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.RemoveOrder"),
-                ClusterBrowser.REMOVE_ICON,
-                Tools.getString("ClusterBrowser.Hb.RemoveOrder.ToolTip"),
-
-                Tools.getString("ClusterBrowser.Hb.AddOrder"),
-                null,
-                Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip"),
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return getBrowser().getCRMGraph().isOrder(thisClass);
-            }
-
-            @Override
-            public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                if (this.getText().equals(Tools.getString(
-                                       "ClusterBrowser.Hb.RemoveOrder"))) {
-                    getBrowser().getCRMGraph().removeOrder(
-                                                     thisClass,
-                                                     getBrowser().getDCHost(),
-                                                     runMode);
-                } else {
-                    /* there is colocation constraint so let's get the
-                     * endpoints from it. */
-                    addOrder(null,
-                             getLastServiceInfoRsc(),
-                             getLastServiceInfoWithRsc());
-                    getBrowser().getCRMGraph().addOrder(
-                                                      thisClass,
-                                                      getBrowser().getDCHost(),
-                                                      runMode);
-                }
-            }
-        };
-
-        final ButtonCallback removeOrderCallback =
-                 getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public boolean isEnabled() {
-                return super.isEnabled() && !isNew();
-            }
-            @Override
-            public void action(final Host dcHost) {
-                if (!isNew()) {
-                    if (getBrowser().getCRMGraph().isOrder(thisClass)) {
-                        getBrowser().getCRMGraph().removeOrder(thisClass,
-                                                               dcHost,
-                                                               Application.RunMode.TEST);
-                    } else {
-                        /* there is colocation constraint so let's get the
-                         * endpoints from it. */
-                        addOrder(null,
-                                 getLastServiceInfoRsc(),
-                                 getLastServiceInfoWithRsc());
-                        getBrowser().getCRMGraph().addOrder(thisClass,
-                                                            dcHost,
-                                                            Application.RunMode.TEST);
-                    }
-                }
-            }
-        };
-        addMouseOverListener(removeOrderItem, removeOrderCallback);
-        items.add(removeOrderItem);
-
-        /* remove/add colocation */
-        final MyMenuItem removeColocationItem =
-                new MyMenuItem(
-                    Tools.getString("ClusterBrowser.Hb.RemoveColocation"),
-                    ClusterBrowser.REMOVE_ICON,
-                    Tools.getString(
-                            "ClusterBrowser.Hb.RemoveColocation.ToolTip"),
-
-                    Tools.getString("ClusterBrowser.Hb.AddColocation"),
-                    null,
-                    Tools.getString(
-                            "ClusterBrowser.Hb.AddColocation.ToolTip"),
-                    new AccessMode(Application.AccessType.ADMIN, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return getBrowser().getCRMGraph().isColocation(thisClass);
-            }
-
-            @Override
-            public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                if (this.getText().equals(Tools.getString(
-                                  "ClusterBrowser.Hb.RemoveColocation"))) {
-                    getBrowser().getCRMGraph().removeColocation(
-                                                   thisClass,
-                                                   getBrowser().getDCHost(),
-                                                   runMode);
-                } else {
-                    /* add colocation */
-                    /* there is order constraint so let's get the endpoints
-                     * from it. */
-                    addColocation(null,
-                                  getLastServiceInfoParent(),
-                                  getLastServiceInfoChild());
-                    getBrowser().getCRMGraph().addColocation(
-                                                      thisClass,
-                                                      getBrowser().getDCHost(),
-                                                      runMode);
-                }
-            }
-        };
-
-        final ButtonCallback removeColocationCallback =
-                                   getBrowser().new ClMenuItemCallback(null) {
-
-            @Override
-            public boolean isEnabled() {
-                return super.isEnabled() && !isNew();
-            }
-            @Override
-            public void action(final Host dcHost) {
-                if (!isNew()) {
-                    if (getBrowser().getCRMGraph().isColocation(thisClass)) {
-                        getBrowser().getCRMGraph().removeColocation(thisClass,
-                                                                    dcHost,
-                                                                    Application.RunMode.TEST);
-                    } else {
-                        /* add colocation */
-                        /* there is order constraint so let's get the endpoints
-                         * from it. */
-                        addColocation(null,
-                                      getLastServiceInfoParent(),
-                                      getLastServiceInfoChild());
-                        getBrowser().getCRMGraph().addColocation(thisClass,
-                                                                 dcHost,
-                                                                 Application.RunMode.TEST);
-                    }
-                }
-            }
-        };
-        addMouseOverListener(removeColocationItem, removeColocationCallback);
-        items.add(removeColocationItem);
-        return items;
+        final HbConnectionMenu hbConnectionMenu = new HbConnectionMenu(this);
+        return hbConnectionMenu.getPulldownMenu();
     }
 
     /** Removes colocations or orders. */
