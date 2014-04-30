@@ -730,14 +730,14 @@ public final class LCMC extends JPanel {
                 }
             }
         }
-        for (final Map.Entry<String, List<HostOptions>> clusterEntry : clusters.entrySet()) {
-            for (final HostOptions hostOptions : clusterEntry.getValue()) {
-                if (hostsOptions.size() < 1
-                    || hostsOptions.size() == 1
-                       && !Tools.getApplication().isOneHostCluster()) {
-                    throw new ParseException("not enough hosts for cluster: "
-                                             + clusterEntry.getKey());
-                }
+        for (final Map.Entry<String, List<HostOptions>> clusterEntry
+                                                      : clusters.entrySet()) {
+            final List<HostOptions> hostOptions = clusterEntry.getValue();
+            if (hostOptions.size() < 1
+                || (hostOptions.size() == 1
+                    && !Tools.getApplication().isOneHostCluster())) {
+                throw new ParseException("not enough hosts for cluster: "
+                                         + clusterEntry.getKey());
             }
         }
         final String failedHost = Tools.setUserConfigFromOptions(clusters);
