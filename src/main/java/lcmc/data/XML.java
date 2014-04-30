@@ -114,18 +114,12 @@ abstract class XML {
             final DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(new ByteArrayInputStream(xml.getBytes()));
         } catch (final SAXException sxe) {
-            // Error generated during parsing)
             LOG.appWarning("getXMLDocument: could not parse: " + xml);
-            sxe.printStackTrace();
-            return null;
+            throw new RuntimeException("getXMLException: sax", sxe);
         } catch (final ParserConfigurationException pce) {
-            // Parser with specified options can't be built
-            pce.printStackTrace();
-            return null;
+            throw new RuntimeException("getXMLException: parser configuration", pce);
         } catch (final IOException ioe) {
-            // I/O error
-            ioe.printStackTrace();
-            return null;
+            throw new RuntimeException("getXMLException: io error", ioe);
         }
         return document;
     }

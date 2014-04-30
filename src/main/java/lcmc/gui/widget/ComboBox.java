@@ -39,8 +39,6 @@ import javax.swing.text.JTextComponent;
 import lcmc.data.AccessMode;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
 import lcmc.utilities.Tools;
@@ -57,7 +55,6 @@ import lcmc.utilities.WidgetListener;
  */
 //TODO: public final class ComboBox<E> extends Widget {
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
-    private static final Logger LOG = LoggerFactory.getLogger(ComboBox.class);
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Scrollbar max rows. */

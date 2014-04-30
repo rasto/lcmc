@@ -1456,7 +1456,7 @@ public final class SSH {
                                                                       username,
                                                                       dsaKey,
                                                                       key);
-                                    } catch (final Exception e) {
+                                    } catch (final IOException e) {
                                         lastDSAKey = null;
                                         LOG.debug("authenticate: dsa passwordless failed");
                                     }
@@ -1481,7 +1481,7 @@ public final class SSH {
                                                                       username,
                                                                       rsaKey,
                                                                       key);
-                                    } catch (final Exception e) {
+                                    } catch (final IOException e) {
                                         lastRSAKey = null;
                                         LOG.debug("authenticate: rsa passwordless failed");
                                     }
@@ -1514,7 +1514,7 @@ public final class SSH {
                                                                       username,
                                                                       dsaKey,
                                                                       key);
-                                } catch (final Exception e) {
+                                } catch (final IOException e) {
                                         lastDSAKey = null;
                                         LOG.debug("authenticate: dsa key auth failed");
                                 }
@@ -1537,7 +1537,7 @@ public final class SSH {
                                                                       username,
                                                                       rsaKey,
                                                                       key);
-                                } catch (final Exception e) {
+                                } catch (final IOException e) {
                                     lastRSAKey = null;
                                     LOG.debug("authenticate: rsa key auth failed");
                                 }

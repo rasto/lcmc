@@ -21,21 +21,16 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
-
-import lcmc.data.Host;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-
 import static org.mockito.Mockito.when;
-
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)

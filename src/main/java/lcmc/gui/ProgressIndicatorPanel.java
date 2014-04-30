@@ -527,7 +527,7 @@ public final class ProgressIndicatorPanel extends JComponent
 
                 mTextsLock.unlock();
                 try {
-                    Thread.sleep((int) (1000 / FPS));
+                    Thread.sleep((long) (1000 / FPS));
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }

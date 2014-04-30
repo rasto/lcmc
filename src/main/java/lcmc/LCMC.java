@@ -38,11 +38,13 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
@@ -277,48 +279,58 @@ public final class LCMC extends JPanel {
         try {
             /* Metal */
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            MetalLookAndFeel.setCurrentTheme(
-                new OceanTheme() {
-                    /** e.g. arrows on split pane... */
-                    @Override
-                    protected ColorUIResource getPrimary1() {
-                        return new ColorUIResource(
-                            ClusterBrowser.STATUS_BACKGROUND);
-                    }
-
-                    /** unknown to me */
-                    @Override
-                    protected ColorUIResource getPrimary2() {
-                        return new ColorUIResource(
-                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                    /** unknown to me */
-                    @Override
-                    protected ColorUIResource getPrimary3() {
-                        return new ColorUIResource(
-                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                    /** Button and other borders. */
-                    @Override
-                    protected ColorUIResource getSecondary1() {
-                        return new ColorUIResource(AppDefaults.BACKGROUND_DARK);
-                    }
-                    @Override
-                    protected ColorUIResource getSecondary2() {
-                        return new ColorUIResource(
-                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                    /** Split pane divider. Line in the main menu. */
-                    @Override
-                    protected ColorUIResource getSecondary3() {
-                        return new ColorUIResource(
-                            ClusterBrowser.PANEL_BACKGROUND);
-                    }
-                }
-            );
-        } catch (final Exception e) {
-            /* ignore it then */
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(LCMC.class.getName()).
+                log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(LCMC.class.getName()).
+                log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(LCMC.class.getName()).
+                log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(LCMC.class.getName()).
+                log(Level.SEVERE, null, ex);
         }
+        MetalLookAndFeel.setCurrentTheme(
+            new OceanTheme() {
+                /** e.g. arrows on split pane... */
+                @Override
+                protected ColorUIResource getPrimary1() {
+                    return new ColorUIResource(
+                        ClusterBrowser.STATUS_BACKGROUND);
+                }
+
+                /** unknown to me */
+                @Override
+                protected ColorUIResource getPrimary2() {
+                    return new ColorUIResource(
+                        ClusterBrowser.PANEL_BACKGROUND);
+                }
+                /** unknown to me */
+                @Override
+                protected ColorUIResource getPrimary3() {
+                    return new ColorUIResource(
+                        ClusterBrowser.PANEL_BACKGROUND);
+                }
+                /** Button and other borders. */
+                @Override
+                protected ColorUIResource getSecondary1() {
+                    return new ColorUIResource(AppDefaults.BACKGROUND_DARK);
+                }
+                @Override
+                protected ColorUIResource getSecondary2() {
+                    return new ColorUIResource(
+                        ClusterBrowser.PANEL_BACKGROUND);
+                }
+                /** Split pane divider. Line in the main menu. */
+                @Override
+                protected ColorUIResource getSecondary3() {
+                    return new ColorUIResource(
+                        ClusterBrowser.PANEL_BACKGROUND);
+                }
+            }
+        );
         Thread.setDefaultUncaughtExceptionHandler(
             new Thread.UncaughtExceptionHandler() {
                 @Override
@@ -363,7 +375,7 @@ public final class LCMC extends JPanel {
                           false,
                           "disable upgrade check");
         options.addOption(
-            null,
+                      null,
                       NO_PLUGIN_CHECK_OP,
                       false,
                       "disable plugin check, DEPRECATED: there are no plugins");
@@ -795,7 +807,7 @@ public final class LCMC extends JPanel {
         /* no instantiation possible. */
     }
 
-    /** Adds te exit listener and disconnects all hosts prior to exiting. */
+    /** Adds the exit listener and disconnects all hosts prior to exiting. */
     public static class ExitListener extends WindowAdapter {
         /**
          * Called when window is closed.

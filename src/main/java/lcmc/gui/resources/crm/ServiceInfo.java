@@ -581,7 +581,7 @@ public class ServiceInfo extends EditableInfo {
                     value = new StringValue(resourceNode.get(param));
                 }
                 final Value defaultValue = getParamDefault(param);
-                if (value == null || value.isNothingSelected()) {
+                if (value.isNothingSelected()) {
                     value = defaultValue;
                 }
                 final Value oldValue = getResource().getValue(param);
@@ -776,9 +776,12 @@ public class ServiceInfo extends EditableInfo {
                         savedOperation.put(op, param, value);
                         if (infoPanelOk) {
                             mOperationsComboBoxHashReadLock.lock();
-                            final Widget wi = operationsComboBoxHash.get(op,
-                                                                         param);
-                            mOperationsComboBoxHashReadLock.unlock();
+                            final Widget wi;
+                            try {
+                                wi = operationsComboBoxHash.get(op, param);
+                            } finally {
+                                mOperationsComboBoxHashReadLock.unlock();
+                            }
                             Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -842,7 +845,7 @@ public class ServiceInfo extends EditableInfo {
         if (serviceId == null) {
             s.insert(0, "new ");
         } else {
-            if (serviceId != null && !serviceId.isEmpty()) {
+            if (!serviceId.isEmpty()) {
                 s.append(" (");
                 s.append(serviceId);
                 s.append(')');
@@ -1251,8 +1254,13 @@ public class ServiceInfo extends EditableInfo {
                     defaultValue = NOTHING_SELECTED_VALUE;
                 }
                 mOperationsComboBoxHashReadLock.lock();
-                final Widget wi = operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashReadLock.unlock();
+
+                final Widget wi;
+                try {
+                    wi = operationsComboBoxHash.get(op, param);
+                } finally {
+                    mOperationsComboBoxHashReadLock.unlock();
+                }
                 if (wi == null) {
                     continue;
                 }
@@ -1689,7 +1697,7 @@ public class ServiceInfo extends EditableInfo {
             return;
         }
         boolean nothingSelected = false;
-        if (info == null || info.isNothingSelected()) {
+        if (info.isNothingSelected()) {
             nothingSelected = true;
         }
         boolean sameAs = true;
@@ -1723,9 +1731,7 @@ public class ServiceInfo extends EditableInfo {
                     }
                     final Value newValue = defaultValue;
                     if (!Tools.areEqual(oldValue, newValue)) {
-                        if (wi != null) {
-                            wi.setValueNoListeners(newValue);
-                        }
+                        wi.setValueNoListeners(newValue);
                     }
                 }
             }
@@ -1894,9 +1900,13 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = NOTHING_SELECTED_VALUE;
                 }
+                final Widget wi;
                 mOperationsComboBoxHashReadLock.lock();
-                final Widget wi = operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashReadLock.unlock();
+                try {
+                    wi = operationsComboBoxHash.get(op, param);
+                } finally {
+                    mOperationsComboBoxHashReadLock.unlock();
+                }
                 final Value oldValue = wi.getValue();
                 wi.setEnabled(!sameAs || nothingSelected);
                 if (!nothingSelected) {
@@ -2281,7 +2291,7 @@ public class ServiceInfo extends EditableInfo {
                 return null;
             }
             boolean nothingSelected = false;
-            if (info == null || info.isNothingSelected()) {
+            if (info.isNothingSelected()) {
                 nothingSelected = true;
             }
             boolean sameAs = true;
@@ -2526,9 +2536,13 @@ public class ServiceInfo extends EditableInfo {
         if (dv == null || dv.isNothingSelected()) {
             return;
         }
+        final Widget wi;
         mOperationsComboBoxHashReadLock.lock();
-        final Widget wi = operationsComboBoxHash.get(op, param);
-        mOperationsComboBoxHashReadLock.unlock();
+        try {
+            wi = operationsComboBoxHash.get(op, param);
+        } finally {
+            mOperationsComboBoxHashReadLock.unlock();
+        }
         final String[] params = getParametersFromXML();
         wi.addListeners(new WidgetListener() {
                             @Override
@@ -2995,9 +3009,13 @@ public class ServiceInfo extends EditableInfo {
                             || ClusterBrowser.HB_OP_PROMOTE.equals(op))) {
                         continue;
                     }
+                    final Widget wi;
                     mOperationsComboBoxHashReadLock.lock();
-                    final Widget wi = operationsComboBoxHash.get(op, param);
-                    mOperationsComboBoxHashReadLock.unlock();
+                    try {
+                        wi = operationsComboBoxHash.get(op, param);
+                    } finally {
+                        mOperationsComboBoxHashReadLock.unlock();
+                    }
                     final Value value;
                     if (wi == null) {
                         if (CRMXML.PAR_CHECK_LEVEL.equals(param)) {
@@ -3251,9 +3269,13 @@ public class ServiceInfo extends EditableInfo {
                 if (ClusterBrowser.HB_OP_IGNORE_DEFAULT.contains(op)) {
                     defaultValue = null;
                 }
+                final Widget wi;
                 mOperationsComboBoxHashReadLock.lock();
-                final Widget wi = operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashReadLock.unlock();
+                try {
+                    wi = operationsComboBoxHash.get(op, param);
+                } finally {
+                    mOperationsComboBoxHashReadLock.unlock();
+                }
                 Value value = wi.getValue();
                 if (value == null || value.isNothingSelected()) {
                     value = getOpDefaultsDefault(param);
@@ -3292,9 +3314,13 @@ public class ServiceInfo extends EditableInfo {
                 for (final String param
                               : getBrowser().getCRMOperationParams(op)) {
                     final Value value = savedOperation.get(op, param);
+                    final Widget wi;
                     mOperationsComboBoxHashReadLock.lock();
-                    final Widget wi = operationsComboBoxHash.get(op, param);
-                    mOperationsComboBoxHashReadLock.unlock();
+                    try {
+                        wi = operationsComboBoxHash.get(op, param);
+                    } finally {
+                        mOperationsComboBoxHashReadLock.unlock();
+                    }
                     if (wi != null) {
                         Tools.invokeLater(new Runnable() {
                             @Override
@@ -3609,7 +3635,7 @@ public class ServiceInfo extends EditableInfo {
                         || Tools.areEqual(value, gInfo.getParamDefault(param))) {
                         continue;
                     }
-                    if (value != null && !value.isNothingSelected()) {
+                    if (!value.isNothingSelected()) {
                         groupMetaArgs.put(param, value.getValueForConfig());
                     }
                 }
@@ -4937,9 +4963,13 @@ public class ServiceInfo extends EditableInfo {
                 if (defaultValue == null || defaultValue.isNothingSelected()) {
                     continue;
                 }
+                final Widget wi;
                 mOperationsComboBoxHashReadLock.lock();
-                final Widget wi = operationsComboBoxHash.get(op, param);
-                mOperationsComboBoxHashReadLock.unlock();
+                try {
+                    wi = operationsComboBoxHash.get(op, param);
+                } finally {
+                    mOperationsComboBoxHashReadLock.unlock();
+                }
                 savedOperation.put(op, param, wi.getValue());
             }
         }

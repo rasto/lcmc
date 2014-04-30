@@ -788,14 +788,13 @@ public final class VMSXML extends XML {
         final String configName = getConfigName(type, domainName);
         namesConfigsMap.put(domainName, configName);
         /* build xml */
-        final String encoding = "UTF-8";
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
 
+        final DocumentBuilder db;
         try {
              db = dbf.newDocumentBuilder();
         } catch (final ParserConfigurationException pce) {
-             assert false;
+            throw new RuntimeException("cannot configure parser", pce);
         }
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(
@@ -2615,7 +2614,14 @@ public final class VMSXML extends XML {
         static final String BRIDGE_FORWARD_DELAY = "bridge_forward_delay";
 
         /** Creates new NetworkData object. */
-        NetworkData(final String name, final String uuid, final boolean autostart, final String forwardMode, final String bridgeName, final String bridgeSTP, final String bridgeDelay, final String bridgeForwardDelay) {
+        NetworkData(final String name,
+                    final String uuid,
+                    final boolean autostart,
+                    final String forwardMode,
+                    final String bridgeName,
+                    final String bridgeSTP,
+                    final String bridgeDelay,
+                    final String bridgeForwardDelay) {
             super();
             this.name = name;
             this.uuid = uuid;
@@ -2740,7 +2746,23 @@ public final class VMSXML extends XML {
         public static final String SHAREABLE = "shareable";
 
         /** Creates new DiskData object. */
-        public DiskData(final String type, final String targetDev, final String sourceFile, final String sourceDev, final String sourceProtocol, final String sourceName, final String sourceHostName, final String sourceHostPort, final String authUsername, final String authSecretType, final String authSecretUuid, final String targetBusType, final String driverName, final String driverType, final String driverCache, final boolean readonly, final boolean shareable) {
+        public DiskData(final String type,
+                        final String targetDev,
+                        final String sourceFile,
+                        final String sourceDev,
+                        final String sourceProtocol,
+                        final String sourceName,
+                        final String sourceHostName,
+                        final String sourceHostPort,
+                        final String authUsername,
+                        final String authSecretType,
+                        final String authSecretUuid,
+                        final String targetBusType,
+                        final String driverName,
+                        final String driverType,
+                        final String driverCache,
+                        final boolean readonly,
+                        final boolean shareable) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -2891,7 +2913,10 @@ public final class VMSXML extends XML {
         /** Saved target dir string. */
         public static final String SAVED_TARGET_DIR = "saved_target_dir";
         /** Creates new FilesysmteData object. */
-        public FilesystemData(final String type, final String sourceDir, final String sourceName, final String targetDir) {
+        public FilesystemData(final String type,
+                              final String sourceDir,
+                              final String sourceName,
+                              final String targetDir) {
             super();
             this.type = type;
             setValue(TYPE, new StringValue(type));
@@ -2926,8 +2951,7 @@ public final class VMSXML extends XML {
     /** Class that holds data about virtual hardware. */
     private static abstract class HardwareData {
         /** Name value pairs. */
-        private final Map<String, Value> valueMap =
-            new HashMap<String, Value>();
+        private final Map<String, Value> valueMap = new HashMap<String, Value>();
         /** Sets value of this parameter. */
         final void setValue(final String param, final Value value) {
             valueMap.put(param, value);

@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.ListResourceBundle;
 
 /**
- * Here are japanese texts.
+ * Here are Japanese texts.
  */
 public final class TextResource_ja_JP extends ListResourceBundle {
 

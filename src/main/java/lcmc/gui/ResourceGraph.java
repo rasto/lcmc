@@ -115,10 +115,10 @@ public abstract class ResourceGraph {
     private static final Path2D HOLLOW_INSTANCE = new Path2D.Float();
     /** Edge draw paint. */
     private static final Paint EDGE_DRAW_PAINT =
-                  (Paint) Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
+                          Tools.getDefaultColor("ResourceGraph.EdgeDrawPaint");
     /** Edge picked paint. */
     private static final Paint EDGE_PICKED_PAINT =
-                (Paint) Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
+                        Tools.getDefaultColor("ResourceGraph.EdgePickedPaint");
     static {
         final float d = 0.05f;
         for (float i = 0; i < 1.0f; i += d) {
@@ -873,12 +873,12 @@ public abstract class ResourceGraph {
         return visualizationViewer.getPickedEdgeState().isPicked(e);
     }
 
-    /** Retuns border paint color for edge e. */
+    /** Returns border paint color for edge e. */
     protected Paint getEdgeDrawPaint(final Edge e) {
         return EDGE_DRAW_PAINT;
     }
 
-    /** Retuns fill paint color for edge e. */
+    /** Returns fill paint color for edge e. */
     protected Paint getEdgePickedPaint(final Edge e) {
         return EDGE_PICKED_PAINT;
     }
@@ -1764,7 +1764,8 @@ public abstract class ResourceGraph {
             final Subtext rightCornerText = getRightCornerText((Vertex) v,
                                                                getRunMode());
             TextLayout rightCornerTextLayout = null;
-            if (rightCornerText != null && !rightCornerText.equals("")) {
+            if (rightCornerText != null
+                && !"".equals(rightCornerText.getSubtext())) {
                 rightCornerTextLayout = getVertexTextLayout(
                     g2d,
                                rightCornerText.getSubtext(),

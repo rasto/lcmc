@@ -22,7 +22,6 @@ package lcmc.gui.resources.crm;
 
 import java.util.List;
 import lcmc.data.Application;
-import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
@@ -44,8 +43,6 @@ public class VirtualDomainMenuTest {
     private VirtualDomainInfo virtualDomainInfoStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
-    @Mock
-    private Host hostStub;
     @Mock
     private Application applicationStub;
 

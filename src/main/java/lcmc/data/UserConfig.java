@@ -89,13 +89,14 @@ public final class UserConfig extends XML {
     /** Saves data about clusters and hosts to the supplied output stream. */
     public String saveXML(final OutputStream outputStream,
                           final boolean saveAll) throws IOException {
+        LOG.debug1("saveXML: start");
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = null;
 
+        final DocumentBuilder db;
         try {
              db = dbf.newDocumentBuilder();
         } catch (final ParserConfigurationException pce) {
-             LOG.appError("saveXML: can't save: ", pce);
+             throw new IOException("saveXML: cannot configure parser", pce);
         }
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(
@@ -151,14 +152,14 @@ public final class UserConfig extends XML {
         }
 
         final TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer t = null;
+        final Transformer t;
         try {
             t = tf.newTransformer();
             t.setOutputProperty(OutputKeys.INDENT, "yes");
             t.setOutputProperty(OutputKeys.METHOD, "xml");
             t.setOutputProperty(OutputKeys.ENCODING, encoding);
         } catch (final TransformerConfigurationException tce) {
-            assert false;
+            throw new IOException("saveXML: transformer config failed", tce);
         }
         final Source doms = new DOMSource(doc);
         final Result sr = new StreamResult(outputStream);
@@ -167,6 +168,7 @@ public final class UserConfig extends XML {
         } catch (final TransformerException te) {
             throw new IOException("saveXML: transform failed", te);
         }
+        LOG.debug1("saveXML: end");
         return "";
     }
 

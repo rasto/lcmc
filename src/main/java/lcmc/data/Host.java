@@ -2946,8 +2946,8 @@ public class Host implements Comparable<Host>, Value {
         }
         command.append(" 2>&1");
         int i = 0;
-        SSH.SSHOutput out = null;
-        while (i < 5) {
+        SSH.SSHOutput out;
+        do {
             out = getSSH().execCommandAndWait(command.toString(),
                                               false,
                                               false,
@@ -2958,7 +2958,7 @@ public class Host implements Comparable<Host>, Value {
             }
             i++;
             RoboTest.sleepNoFactor(i * 2000);
-        }
+        } while (i < 5);
         String nameS = ' ' + name;
         if (name == null) {
             nameS = "";

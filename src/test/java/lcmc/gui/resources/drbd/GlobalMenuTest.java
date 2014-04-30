@@ -20,14 +20,11 @@
 
 package lcmc.gui.resources.drbd;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.List;
-
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

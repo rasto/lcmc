@@ -584,8 +584,8 @@ public final class ClusterStatus {
 
         /* remove all hashes */
         boolean updated = false;
-        for (String line : lines) {
-            line = line.trim();
+        for (final String linenl : lines) {
+            final String line = linenl.trim();
             if ("---start---".equals(line)
                 || "init".equals(line)
                 || "evt:cib_changed".equals(line)) {

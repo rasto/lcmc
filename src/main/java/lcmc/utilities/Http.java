@@ -80,12 +80,13 @@ public final class Http {
             return;
         }
 
-        DataOutputStream output = null;
+        DataOutputStream output;
 
         try {
             output = new DataOutputStream(conn.getOutputStream());
         } catch (final IOException ex) {
             LOG.appWarning("post: error opening for writing: " + ex.getMessage());
+            return;
         }
         //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
         final Map<String, String> params = new HashMap<String, String>();

@@ -47,7 +47,6 @@ import static lcmc.robotest.RoboTest.moveToSlowly;
 import static lcmc.robotest.RoboTest.press;
 import static lcmc.robotest.RoboTest.removeColocation;
 import static lcmc.robotest.RoboTest.removeConstraint;
-import static lcmc.robotest.RoboTest.removeEverything;
 import static lcmc.robotest.RoboTest.removeGroup;
 import static lcmc.robotest.RoboTest.removeOrder;
 import static lcmc.robotest.RoboTest.removeResource;
@@ -668,13 +667,9 @@ final class PcmkTest1 {
         stopGroup();
         checkTest(testName, 29);
 
-        if (true) {
-            removeResource(ipX, ipY, RoboTest.CONFIRM_REMOVE);
-            removeGroup(gx, gy - 20);
-            removeGroup(statefulX, statefulY);
-        } else {
-            removeEverything();
-        }
+        removeResource(ipX, ipY, RoboTest.CONFIRM_REMOVE);
+        removeGroup(gx, gy - 20);
+        removeGroup(statefulX, statefulY);
         checkTest(testName, 1);
     }
 

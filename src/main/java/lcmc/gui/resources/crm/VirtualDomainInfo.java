@@ -167,7 +167,7 @@ public class VirtualDomainInfo extends ServiceInfo {
         if (string == null) {
             s.insert(0, "new ");
         } else {
-            if (string != null && !string.isEmpty()) {
+            if (!string.isEmpty()) {
                 s.append(" (");
                 s.append(string);
                 s.append(')');

@@ -21,7 +21,6 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-
 import lcmc.data.DrbdXML;
 import lcmc.gui.ClusterBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
@@ -33,9 +32,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-
 import static org.mockito.Mockito.when;
-
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)

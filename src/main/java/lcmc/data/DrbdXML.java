@@ -341,7 +341,7 @@ public class DrbdXML extends XML {
         }
     }
 
-    public String updateDrbdParameters(final Host host) {
+    public final String updateDrbdParameters(final Host host) {
         final String command = host.getDistCommand("Drbd.getParameters",
                                                    (ConvertCmdCallback) null);
 
@@ -357,9 +357,9 @@ public class DrbdXML extends XML {
         return ret.getOutput();
     }
 
-    public void parseDrbdParameters(final Host host,
-                                    final String output,
-                                    final Host[] hosts) {
+    public final void parseDrbdParameters(final Host host,
+                                          final String output,
+                                          final Host[] hosts) {
         final String[] lines = output.split("\\r?\\n");
         final Pattern bp = Pattern.compile("^<command name=\"(.*?)\".*");
         final Pattern ep = Pattern.compile("^</command>$");

@@ -88,7 +88,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
               new ExecCallback() {
                 @Override
                 public void done(final String answer) {
-                    if (answer != null && answer.isEmpty()) {
+                    if (answer == null || answer.isEmpty()) {
                         doneError(null, 1);
                         return;
                     }

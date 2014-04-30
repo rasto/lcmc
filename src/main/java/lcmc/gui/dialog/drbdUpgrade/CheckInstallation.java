@@ -129,7 +129,7 @@ final class CheckInstallation extends DialogHost {
 
     /** Checks if drbd installation was ok. */
     void checkDrbd(final String ans) {
-        if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
+        if (ans == null || ans.isEmpty() || "\n".equals(ans)) {
             DRBD_LABEL.setText(": " + Tools.getString(
                             "Dialog.Host.CheckInstallation.DrbdNotInstalled"));
             DRBD_ICON.setIcon(NOT_INSTALLED_ICON);

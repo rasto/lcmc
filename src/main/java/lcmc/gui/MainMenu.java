@@ -489,11 +489,11 @@ public final class MainMenu extends JPanel implements ActionListener {
                      return;
                 }
                 LOG.debug1("actionPerformed: MENU ACTION: look and feel");
-                try {
-                    final String lookAndFeel =
+                final String lookAndFeel =
                             LOOK_AND_FEEL_MAP.get(
                                     ((AbstractButton) e.getSource()).getText());
 
+                try {
                     UIManager.setLookAndFeel(lookAndFeel);
                     final JComponent componentToSwitch =
                             Tools.getGUIData().getMainFrameRootPane();
@@ -502,13 +502,17 @@ public final class MainMenu extends JPanel implements ActionListener {
                     componentToSwitch.validate();
                     componentToSwitch.repaint();
                 } catch (final ClassNotFoundException ex) {
-                    ex.printStackTrace();
+                    throw new RuntimeException("cannot set look and feel: "
+                                               + lookAndFeel, ex);
                 } catch (final InstantiationException ex) {
-                    ex.printStackTrace();
+                    throw new RuntimeException("cannot set look and feel: "
+                                               + lookAndFeel, ex);
                 } catch (final IllegalAccessException ex) {
-                    ex.printStackTrace();
+                    throw new RuntimeException("cannot set look and feel: "
+                                               + lookAndFeel, ex);
                 } catch (final UnsupportedLookAndFeelException ex) {
-                    ex.printStackTrace();
+                    throw new RuntimeException("cannot set look and feel: "
+                                               + lookAndFeel, ex);
                 }
             }
         };

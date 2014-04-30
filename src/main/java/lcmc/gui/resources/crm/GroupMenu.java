@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
-
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.ResourceAgent;
@@ -29,6 +27,7 @@ public class GroupMenu extends ServiceMenu {
         this.groupInfo = groupInfo;
     }
 
+    @Override
     public List<UpdatableItem> getPulldownMenu() {
         /* add group service */
         final UpdatableItem addGroupServiceMenuItem = new MyMenu(

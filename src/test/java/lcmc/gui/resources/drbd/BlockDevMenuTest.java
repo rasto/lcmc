@@ -1,7 +1,6 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-
 import lcmc.data.Host;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
@@ -11,15 +10,12 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-
 import static org.mockito.Mockito.when;
-
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)

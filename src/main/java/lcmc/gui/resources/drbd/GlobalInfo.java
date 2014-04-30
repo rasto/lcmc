@@ -94,7 +94,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
 
-    private GlobalMenu globalMenu;
+    private final GlobalMenu globalMenu;
 
     /** Prepares a new {@code GlobalInfo} object. */
     public GlobalInfo(final String name, final Browser browser) {

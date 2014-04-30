@@ -452,7 +452,7 @@ public final class Tools {
             while ((line = in.readLine()) != null) {
                 content.append(line);
             }
-        } catch (final Exception ex) {
+        } catch (final IOException ex) {
             if (showError) {
                 infoDialog("Load Error",
                            "The file " + filename + " failed to load",
@@ -1207,7 +1207,7 @@ public final class Tools {
             try {
                 rc1 = Integer.parseInt(m1.group(2));
             } catch (final java.lang.NumberFormatException e) {
-                e.printStackTrace();
+                LOG.appWarning("cannot parse: " + m1.group(2));
             }
         } else {
             version1a = version1;
@@ -1228,7 +1228,7 @@ public final class Tools {
             try {
                 rc2 = Integer.parseInt(m2.group(2));
             } catch (final java.lang.NumberFormatException e) {
-                e.printStackTrace();
+                LOG.appWarning("cannot parse: " + m1.group(2));
             }
         } else {
             version2a = version2;
