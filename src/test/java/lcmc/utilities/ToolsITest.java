@@ -8,6 +8,7 @@ import lcmc.testutils.annotation.type.IntegrationTest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -101,5 +102,21 @@ public final class ToolsITest {
         for (final Host h : testSuite.getHosts()) {
             Tools.versionBeforePacemaker(h);
         }
+    }
+
+    @Test
+    public void helperFieShouldBeLoaded() {
+        final String testFile = "/help-progs/lcmc-gui-helper";
+        assertTrue(Tools.getFile(testFile).indexOf("#!") == 0);
+    }
+
+    @Test
+    public void nullFileShouldReturnNull() {
+        assertNull(Tools.getFile(null));
+    }
+
+    @Test
+    public void nonExistingFileShouldReturnNull() {
+        assertNull(Tools.getFile("not_existing_file"));
     }
 }

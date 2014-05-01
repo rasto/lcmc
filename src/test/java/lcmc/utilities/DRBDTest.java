@@ -3,34 +3,50 @@ package lcmc.utilities;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+import junitparams.JUnitParamsRunner;
+import static junitparams.JUnitParamsRunner.$;
+import junitparams.Parameters;
+import org.junit.runner.RunWith;
 
+@RunWith(JUnitParamsRunner.class)
 public final class DRBDTest {
-
-    private void cvAssertTrue(final String x, final String y) {
-        assertTrue(DRBD.compatibleVersions(x, y));
-        assertTrue(DRBD.compatibleVersions(y, x));
-    }
-
-    private void cvAssertFalse(final String x, final String y) {
-        assertFalse(DRBD.compatibleVersions(x, y));
-        assertFalse(DRBD.compatibleVersions(y, x));
+    @SuppressWarnings("unused")
+    private Object[] parametersForVersionsShouldBeCompatible() {
+        return $( 
+            $("8.3.11", "8.3.11"),
+            $("8.4.1", "8.4.9"),
+            $("8.3.11", "8.3.13"),
+            $("8.4.3.4", "8.4.1"),
+            $("8.4.3", "8.4.1.4"),
+            $("9.0.0", "9.0.5.4")
+        );
     }
 
     @Test
-    public void testCompareVersions() {
-        cvAssertTrue("8.3.11", "8.3.11");
-        cvAssertTrue("8.4.1", "8.4.9");
-        cvAssertTrue("8.3.11", "8.3.13");
-        cvAssertTrue("8.4.3.4", "8.4.1");
-        cvAssertTrue("8.4.3", "8.4.1.4");
-        cvAssertTrue("9.0.0", "9.0.5.4");
+    @Parameters(method="parametersForVersionsShouldBeCompatible")
+    public void versionsShouldBeCompatible(final String versionOne,
+                                           final String versionTwo) {
+        assertTrue(DRBD.compatibleVersions(versionOne, versionTwo));
+        assertTrue(DRBD.compatibleVersions(versionTwo, versionOne));
+    }
 
-        cvAssertFalse("8.4.3", "9.0.5");
-        cvAssertFalse("8.3.13", "8.4.3");
-        cvAssertFalse("8.3.11", "8.4.3");
-        cvAssertFalse("8.3.11", "8.4.3");
-        cvAssertFalse(null, "8.4.1");
-        cvAssertFalse(null, null);
-        cvAssertFalse("1", "8.4.2");
+    @SuppressWarnings("unused")
+    private Object[] parametersForVersionsShouldNotBeCompatible() {
+        return $( 
+            $("8.4.3", "9.0.5"),
+            $("8.3.13", "8.4.3"),
+            $("8.3.11", "8.4.3"),
+            $("8.3.11", "8.4.3"),
+            $(null, "8.4.1"),
+            $(null, null),
+            $("1", "8.4.2")
+        );
+    }
+    @Test
+    @Parameters(method="parametersForVersionsShouldNotBeCompatible")
+    public void versionsShouldNotBeCompatible(final String versionOne,
+                                              final String versionTwo) {
+        assertFalse(DRBD.compatibleVersions(versionOne, versionTwo));
+        assertFalse(DRBD.compatibleVersions(versionTwo, versionOne));
     }
 }

@@ -100,6 +100,12 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>pl.pragmatists</groupId>
+            <artifactId>JUnitParams</artifactId>
+            <version>1.0.2</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
     <repositories>
