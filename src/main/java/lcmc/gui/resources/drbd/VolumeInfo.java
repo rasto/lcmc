@@ -55,6 +55,7 @@ import lcmc.data.resources.DrbdVolume;
 import lcmc.gui.Browser;
 import lcmc.gui.CRMGraph;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
@@ -1184,5 +1185,11 @@ public class VolumeInfo extends EditableInfo
             }
         }
         return true;
+    }
+    
+    public void startDrbdLogsDialog() {
+        final DrbdLogs drbdLogs = new DrbdLogs(getDrbdResourceInfo().getCluster(),
+                                               getDevice());
+        drbdLogs.showDialog();
     }
 }

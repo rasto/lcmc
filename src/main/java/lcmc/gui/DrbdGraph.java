@@ -58,7 +58,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
-public final class DrbdGraph extends ResourceGraph {
+public class DrbdGraph extends ResourceGraph {
 
     /** Horizontal step in pixels by which the block devices are drawn in
      * the graph. */

@@ -22,12 +22,12 @@ package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.DrbdXML;
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
@@ -272,10 +272,7 @@ public class VolumeMenu {
             @Override
             public void action() {
                 volumeInfo.hidePopup();
-                final String dev = volumeInfo.getDevice();
-                final DrbdLogs l = new DrbdLogs(getResourceInfo().getCluster(),
-                                          dev);
-                l.showDialog();
+                volumeInfo.startDrbdLogsDialog();
             }
         };
         items.add(viewLogMenu);

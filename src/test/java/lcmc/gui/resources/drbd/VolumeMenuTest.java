@@ -21,9 +21,12 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+import lcmc.data.Application;
 import lcmc.data.DrbdXML;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.DrbdGraph;
 import lcmc.testutils.annotation.type.GuiTest;
+import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import static org.junit.Assert.assertEquals;
@@ -49,6 +52,12 @@ public class VolumeMenuTest {
     private ClusterBrowser clusterBrowserStub;
     @Mock
     private DrbdXML drbdXmlStub;
+    @Mock
+    private DrbdGraph drbdGraphStub;
+    @Mock
+    private BlockDevInfo sourceStub;
+    @Mock
+    private BlockDevInfo destStub;
 
     private VolumeMenu sut;
 
@@ -56,7 +65,12 @@ public class VolumeMenuTest {
     public void setUp() {
         when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
         when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
+        when(volumeInfoStub.isConnected(Application.RunMode.LIVE)).thenReturn(true);
+        when(resourceInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(clusterBrowserStub.getDrbdXML()).thenReturn(drbdXmlStub);
+        when(clusterBrowserStub.getDrbdGraph()).thenReturn(drbdGraphStub);
+        when(drbdGraphStub.getSource(volumeInfoStub)).thenReturn(sourceStub);
+        when(drbdGraphStub.getDest(volumeInfoStub)).thenReturn(destStub);
         sut = new VolumeMenu(volumeInfoStub);
     }
 
@@ -64,6 +78,10 @@ public class VolumeMenuTest {
     @Category(GuiTest.class)
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
+        
+        for (final UpdatableItem item : items) {
+            ((MyMenuItem) item).action();
+        }
 
         assertEquals(6, items.size());
     }

@@ -48,7 +48,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
-public final class Cluster implements Comparable<Cluster> {
+public class Cluster implements Comparable<Cluster> {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     /** Name of the cluster. */

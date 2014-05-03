@@ -41,7 +41,7 @@ import lcmc.utilities.Unit;
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-abstract class AbstractDrbdInfo extends EditableInfo {
+public abstract class AbstractDrbdInfo extends EditableInfo {
     /** Name of the drbd after parameter. */
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     /** Name of the drbd after parameter. Before 8.4 */
@@ -53,7 +53,7 @@ abstract class AbstractDrbdInfo extends EditableInfo {
 
     /** Returns browser object of this info. */
     @Override
-    public final ClusterBrowser getBrowser() {
+    public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
