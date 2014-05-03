@@ -3,7 +3,7 @@ package lcmc.gui.resources.drbd;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.swing.Action;
+import javax.swing.JMenuItem;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.utilities.MyMenu;
@@ -35,10 +35,9 @@ public class ResourceMenu {
                                     new ArrayList<UpdatableItem>();
                     for (final UpdatableItem u : dvi.createPopup()) {
                         volumeMenus.add(u);
-                        u.updateAndWait();
                     }
                     for (final UpdatableItem u : volumeMenus) {
-                        add((Action) u);
+                        add((JMenuItem) u);
                     }
                     super.updateAndWait();
                 }

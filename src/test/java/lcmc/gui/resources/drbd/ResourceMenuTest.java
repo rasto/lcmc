@@ -19,10 +19,14 @@
  */
 package lcmc.gui.resources.drbd;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import lcmc.data.AccessMode;
+import lcmc.data.Application;
+import lcmc.utilities.MyMenu;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import static org.junit.Assert.assertEquals;
@@ -30,28 +34,38 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceMenuTest {
+    private static final String ANY_NAME = "ANY_NAME";
+
     static {
         Tools.init();
     }
+    private Set<VolumeInfo> volumes;
     @Mock
     private ResourceInfo resourceInfoStub;
     @Mock
     private VolumeInfo drbdVolumeOneStub;
     @Mock
     private VolumeInfo drbdVolumeTwoStub;
+    @Spy
+    private final MyMenu volumeMenuItemSpy =
+                 new MyMenu(ANY_NAME,
+                            new AccessMode(Application.AccessType.ADMIN, false),
+                            new AccessMode(Application.AccessType.OP, false));
 
     private ResourceMenu sut;
 
     @Before
     public void setUp() {
-        final Set<VolumeInfo> volumes = new HashSet<VolumeInfo>(
-                                             Arrays.asList(drbdVolumeOneStub,
-                                                           drbdVolumeTwoStub));
+        volumes = new HashSet<VolumeInfo>(Arrays.asList(drbdVolumeOneStub,
+                                                        drbdVolumeTwoStub
+                                                        ));
         when(resourceInfoStub.getDrbdVolumes()).thenReturn(volumes);
 
         sut = new ResourceMenu(resourceInfoStub);
@@ -59,8 +73,17 @@ public class ResourceMenuTest {
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> volumeMenuItems =
+                                                new ArrayList<UpdatableItem>();
+        volumeMenuItems.add(volumeMenuItemSpy);
+        when(drbdVolumeOneStub.createPopup()).thenReturn(volumeMenuItems);
+        when(resourceInfoStub.getDrbdVolumes()).thenReturn(volumes);
 
+        final List<UpdatableItem> items = sut.getPulldownMenu();
+        for (final UpdatableItem item : items) {
+            item.updateAndWait();
+        }
+        verify(volumeMenuItemSpy).updateAndWait();
         assertEquals(2, items.size());
     }
 }
