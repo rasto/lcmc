@@ -857,6 +857,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             message.append("host: ").append(host.getName());
             message.append('\n');
             message.append("output: ").append(output);
+            message.append('\n');
         }
         LOG.appError(message.toString());
     }
