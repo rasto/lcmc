@@ -1155,38 +1155,6 @@ public class VolumeInfo extends EditableInfo
         return getDeviceByRes();
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 59 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
-        hash = 59 * hash + (this.getUnit() != null ? this.getUnit().hashCode() : 0);
-        hash = 59 * hash + (this.getBrowser() != null ? this.getBrowser().hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Value)) {
-            return false;
-        }
-        final Value other = (Value) obj;
-        if ((this.getValueForConfig() == null) ? (other.getValueForConfig() != null) : !this.getValueForConfig().equals(other.getValueForConfig())) {
-            return false;
-        }
-        if (this.getUnit() != other.getUnit() && (this.getUnit() == null || !this.getUnit().equals(other.getUnit()))) {
-            return false;
-        }
-        if (obj instanceof Info) {
-            if (this.getBrowser() != ((Info) other).getBrowser() && (this.getBrowser() == null || !this.getBrowser().equals(((Info) other).getBrowser()))) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
     public void startDrbdLogsDialog() {
         final DrbdLogs drbdLogs = new DrbdLogs(getDrbdResourceInfo().getCluster(),
                                                getDevice());
