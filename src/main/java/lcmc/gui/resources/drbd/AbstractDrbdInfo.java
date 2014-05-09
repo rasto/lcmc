@@ -368,9 +368,9 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
         final String unitLong = getUnitLong(param);
         final String unitPart = DrbdXML.getUnitPart(unitLong);
         if ("".equals(unitPart)) {
-            return DrbdXML.getUnits(unitPart);
+            return getBrowser().getDrbdXML().getUnits(param, unitPart);
         } else {
-            return DrbdXML.getByteUnits(unitPart);
+            return getBrowser().getDrbdXML().getByteUnits(param, unitPart);
         }
     }
 }

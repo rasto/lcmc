@@ -84,6 +84,8 @@ public class DrbdXML extends XML {
     public static final String PROTOCOL_PARAM = "protocol";
     /** Ping timeout parameter. */
     public static final String PING_TIMEOUT_PARAM = "ping-timeout";
+
+    private static final BigInteger KILO = new BigInteger("1024");
     /** DRBD communication protocols. */
     static final Value[] PROTOCOLS = {PROTOCOL_A, PROTOCOL_B, PROTOCOL_C};
     /** Some non advanced parameters. */
@@ -171,17 +173,63 @@ public class DrbdXML extends XML {
         return new Unit("T", "t", "TiByte" + unitPart, "TiBytes" + unitPart);
     }
 
+    public static Unit getUnitPiBytes(final String unitPart) {
+        return new Unit("P", "p", "PiByte" + unitPart, "PiBytes" + unitPart);
+    }
+
     public static Unit getUnitSectors(final String unitPart) {
-        return new Unit("s", "s", "Sector" + unitPart, "Sectors" + unitPart); }
+        return new Unit("s", "s", "Sector" + unitPart, "Sectors" + unitPart); 
+    }
 
     /** Returns units. */
+    public Unit[] getUnits(final String param, final String unitPart) {
+        final List<Unit> units = new ArrayList<Unit>();
+        if ("k".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitKi(unitPart));
+            units.add(getUnitMi(unitPart));
+            units.add(getUnitGi(unitPart));
+        } else if ("m".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitMi(unitPart));
+            units.add(getUnitGi(unitPart));
+        } else if ("g".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitGi(unitPart));
+        } else {
+            units.add(getUnitDefault(unitPart));
+            units.add(getUnitKi(unitPart));
+            units.add(getUnitMi(unitPart));
+            units.add(getUnitGi(unitPart));
+        }
+        return units.toArray(new Unit[units.size()]);
+    }
 
-    public static Unit[] getByteUnits(final String unitPart) {
-        return new Unit[]{getUnitBytes(unitPart),
-                          getUnitKiBytes(unitPart),
-                          getUnitMiBytes(unitPart),
-                          getUnitGiBytes(unitPart),
-                          getUnitSectors(unitPart)};
+    public Unit[] getByteUnits(final String param, final String unitPart) {
+        final List<Unit> units = new ArrayList<Unit>();
+        if ("1".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitBytes(unitPart));
+            units.add(getUnitKiBytes(unitPart));
+            units.add(getUnitMiBytes(unitPart));
+            units.add(getUnitGiBytes(unitPart));
+            units.add(getUnitSectors(unitPart));
+        } else if ("s".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitSectors(unitPart));
+            units.add(getUnitBytes(unitPart));
+            units.add(getUnitKiBytes(unitPart));
+            units.add(getUnitMiBytes(unitPart));
+            units.add(getUnitGiBytes(unitPart));
+        } else if ("k".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitKiBytes(unitPart));
+            units.add(getUnitMiBytes(unitPart));
+            units.add(getUnitGiBytes(unitPart));
+            units.add(getUnitSectors(unitPart));
+        } else if ("m".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitMiBytes(unitPart));
+            units.add(getUnitGiBytes(unitPart));
+            units.add(getUnitSectors(unitPart));
+        } else if ("g".equalsIgnoreCase(paramDefaultUnitMap.get(param))) {
+            units.add(getUnitGiBytes(unitPart));
+            units.add(getUnitSectors(unitPart));
+        }
+        return units.toArray(new Unit[units.size()]);
     }
 
     public static Unit getUnitDefault(final String unitPart) {
@@ -204,11 +252,8 @@ public class DrbdXML extends XML {
         return new Unit("t", "T", "t", "t");
     }
 
-    public static Unit[] getUnits(final String unitPart) {
-        return new Unit[]{getUnitDefault(unitPart),
-                          getUnitKi(unitPart),
-                          getUnitMi(unitPart),
-                          getUnitGi(unitPart)};
+    public static Unit getUnitPi(final String unitPart) {
+        return new Unit("p", "P", "p", "p");
     }
 
     /** Return part after '/' from the unit long description. */
@@ -497,19 +542,6 @@ public class DrbdXML extends XML {
         final String type = paramTypeMap.get(param);
         boolean correctValue = true;
 
-        //String unit = null;
-        //if (rawValue != null && hasUnitPrefix(param)) {
-        //    /* number with unit */
-        //    final Pattern p = Pattern.compile("\\d*([kmgtsKMGTS])");
-        //    final Matcher m = p.matcher(rawValue.getValueForConfig());
-        //    if (m.matches()) {
-        //        /* remove unit from value */
-        //        unit = m.group(1).toUpperCase();
-        //        value = new StringValue(rawValue.getValueForConfig().substring(0,
-        //                    rawValue.getValueForConfig().length() - unit.length())); //TODO:
-        //    }
-        //}
-
         if (rawValue == null || rawValue.isNothingSelected()) {
             correctValue = !isRequired(param);
         } else if ("boolean".equals(type)) {
@@ -522,35 +554,23 @@ public class DrbdXML extends XML {
             final Matcher m = p.matcher(rawValue.getValueForConfig());
             if (!m.matches()) {
                 correctValue = false;
-            //} else if ((unit == null //TODO:
-            //            || "k".equalsIgnoreCase(unit)
-            //            || "m".equalsIgnoreCase(unit)
-            //            || "g".equalsIgnoreCase(unit)
-            //            || "t".equalsIgnoreCase(unit))
-            //           && "K".equalsIgnoreCase(getDefaultUnit(param))) {
-            //    /* except sectors */
-            //    long v;
-            //    if (unit == null) {
-            //        v = Long.parseLong(rawValue.getValueForConfig()) / 1024;
-            //    } else {
-            //        v = Tools.convertToKilobytes(rawValue.getValueForConfig());
-            //    }
-            //    if (paramMaxMap.get(param) != null
-            //        && v > paramMaxMap.get(param).longValue()) {
-            //        correctValue = false;
-            //    } else if (paramMinMap.get(param) != null
-            //               && v < paramMinMap.get(param).longValue()) {
-            //        correctValue = false;
-            //    }
-            //} else if (!"s".equalsIgnoreCase(unit)) {
-            //    final long v = Tools.convertUnits(rawValue.getValueForConfig());
-            //    if (paramMaxMap.get(param) != null
-            //        && v > paramMaxMap.get(param).longValue()) {
-            //        correctValue = false;
-            //    } else if (paramMinMap.get(param) != null
-            //               && v < paramMinMap.get(param).longValue()) {
-            //        correctValue = false;
-            //    }
+            } else if (rawValue.getUnit() == null
+                       || !"s".equalsIgnoreCase(
+                                        rawValue.getUnit().getShortName())) {
+                //TODO: skipping check for sectors, the size of sector
+                // must be determined first.
+                final BigInteger value = convertToUnit(param, rawValue);
+
+                final BigInteger min = paramMinMap.get(param);
+                final BigInteger max = paramMaxMap.get(param);
+
+                if (min != null && value.compareTo(min) < 0) {
+                    correctValue = false;
+                }
+
+                if (max != null && value.compareTo(max) > 0) {
+                    correctValue = false;
+                }
             }
         } else {
             correctValue = true;
@@ -788,11 +808,19 @@ public class DrbdXML extends XML {
                     final String tag = optionInfo.getNodeName();
                     /* <min>, <max>, <handler>, <default> */
                     if ("min".equals(tag)) {
-                        paramMinMap.put(name,
-                                        new BigInteger(getText(optionInfo)));
+                        final Value minValue =
+                            new StringValue(
+                                   getText(optionInfo),
+                                   parseUnit(name,
+                                             paramDefaultUnitMap.get(name)));
+                        paramMinMap.put(name, convertToUnit(name, minValue));
                     } else if ("max".equals(tag)) {
-                        paramMaxMap.put(name,
-                                        new BigInteger(getText(optionInfo)));
+                        final Value maxValue =
+                            new StringValue(
+                                   getText(optionInfo),
+                                   parseUnit(name,
+                                             paramDefaultUnitMap.get(name)));
+                        paramMaxMap.put(name, convertToUnit(name, maxValue));
                     } else if ("handler".equals(tag)) {
                         paramItemsMap.get(name).add(
                                        new StringValue(getText(optionInfo)));
@@ -1629,5 +1657,41 @@ public class DrbdXML extends XML {
         public Value getOutsidePort() {
             return outsidePort;
         }
+    }
+
+    /** Converts value to unit e.g. bytes. */
+    public BigInteger convertToUnit(final String param, final Value value) {
+        final String unitPart = getUnitPart(getUnitLong(param));
+        final Unit unit = value.getUnit();
+        BigInteger num = new BigInteger(value.getValueForConfig());
+        if (getUnitPiBytes(unitPart).equals(unit)
+            || getUnitPi(unitPart).equals(unit)) {
+            num = num.multiply(KILO)
+                     .multiply(KILO)
+                     .multiply(KILO)
+                     .multiply(KILO)
+                     .multiply(KILO);
+        } else if (getUnitTiBytes(unitPart).equals(unit)
+                   || getUnitTi(unitPart).equals(unit)) {
+            num = num.multiply(KILO)
+                     .multiply(KILO)
+                     .multiply(KILO)
+                     .multiply(KILO);
+        } else if (getUnitGiBytes(unitPart).equals(unit)
+                   || getUnitGi(unitPart).equals(unit)) {
+            num = num.multiply(KILO)
+                     .multiply(KILO)
+                     .multiply(KILO);
+        } else if (getUnitMiBytes(unitPart).equals(unit)
+                   || getUnitMi(unitPart).equals(unit)) {
+            num = num.multiply(KILO)
+                     .multiply(KILO);
+        } else if (getUnitKiBytes(unitPart).equals(unit)
+                   || getUnitKi(unitPart).equals(unit)) {
+            num = num.multiply(KILO);
+        } else {
+            LOG.appWarning("unknown unit: " + unit);
+        }
+        return num;
     }
 }

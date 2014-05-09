@@ -1722,7 +1722,6 @@ sub get_drbd_proxy_xml {
 <command name="proxy">
 	<option name="memlimit" type="numeric">
 		<default>16</default>
-		<min>16777216</min>
 		<unit_prefix>M</unit_prefix>
 		<unit>bytes</unit>
 		<desc>&lt;html&gt;
