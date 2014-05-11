@@ -107,8 +107,8 @@ final class PcmkTest5 {
         stopEverything();
         checkTest("test5", 3.1);
         removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
+        removePlaceHolder(ph1X, ph1Y, CONFIRM_REMOVE);
         removeResource(dummy2X, dummy2Y, CONFIRM_REMOVE);
-        removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
         checkTest("test5", 1);
     }
 
