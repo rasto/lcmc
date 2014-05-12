@@ -327,7 +327,7 @@ public class GroupInfo extends ServiceInfo {
                 if (Tools.areEqual(value, getParamDefault(param))) {
                     continue;
                 }
-                if (!value.isNothingSelected()) {
+                if (value != null && !value.isNothingSelected()) {
                     if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
                         groupMetaArgs.put("ordered", value.getValueForConfig());
                     } else {
