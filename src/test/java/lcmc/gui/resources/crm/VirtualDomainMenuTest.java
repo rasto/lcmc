@@ -21,16 +21,23 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
+
 import lcmc.data.Application;
+import lcmc.data.Host;
+import lcmc.data.resources.Resource;
+import lcmc.data.resources.Service;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.when;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,6 +52,12 @@ public class VirtualDomainMenuTest {
     private ClusterBrowser clusterBrowserStub;
     @Mock
     private Application applicationStub;
+    @Mock
+    private Service serviceStub;
+    @Mock
+    private Resource resourceStub;
+    @Mock
+    private Host hostStub;
 
     private VirtualDomainMenu sut;
 
@@ -57,12 +70,16 @@ public class VirtualDomainMenuTest {
         when(applicationStub.isRealvnc()).thenReturn(true);
         when(applicationStub.isUltravnc()).thenReturn(true);
         sut = new VirtualDomainMenu(virtualDomainInfoStub);
+        when(virtualDomainInfoStub.getService()).thenReturn(serviceStub);
+        when(virtualDomainInfoStub.getResource()).thenReturn(resourceStub);
+        final Host[] clusterHosts = {hostStub};
+        when(clusterBrowserStub.getClusterHosts()).thenReturn(clusterHosts);
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertEquals(3, items.size());
+        assertEquals(18, items.size());
     }
 }

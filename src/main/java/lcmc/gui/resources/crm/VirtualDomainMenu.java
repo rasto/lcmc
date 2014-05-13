@@ -11,20 +11,21 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
-public class VirtualDomainMenu {
+public class VirtualDomainMenu extends ServiceMenu {
     
     private final VirtualDomainInfo virtualDomainInfo;
 
     private final DomainInfo domainInfo;
 
     public VirtualDomainMenu(VirtualDomainInfo virtualDomainInfo) {
-        super();
+        super(virtualDomainInfo);
         this.virtualDomainInfo = virtualDomainInfo;
         domainInfo = virtualDomainInfo.getDomainInfo();
     }
 
+    @Override
     public List<UpdatableItem> getPulldownMenu() {
-        final List<UpdatableItem> items = virtualDomainInfo.createPopup();
+        final List<UpdatableItem> items = super.getPulldownMenu();
         addVncViewersToTheMenu(items);
         return items;
     }
