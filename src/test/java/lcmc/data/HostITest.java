@@ -384,6 +384,7 @@ public final class HostITest {
                               "7.2/7.2",
                               "7.3/7.3",
                               "7.4/7.4",
+                              "7.5/7.5",
                               "16",
                               "17"));
         for (final Host host : getHosts()) {
