@@ -295,7 +295,8 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                                 sectionConfig.append(";\n");
                             } else {
                                 sectionConfig.append(' ');
-                                sectionConfig.append(value);
+                                sectionConfig.append(
+                                        Tools.escapeConfig(value.getValueForConfig()));
                                 sectionConfig.append(";\n");
                             }
                         } else if (!volumesAvailable

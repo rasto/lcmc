@@ -1132,7 +1132,7 @@ public final class Tools {
         if (value == null) {
             return null;
         }
-        if (value.indexOf(' ') > -1 || value.indexOf('"') > -1) {
+        if (!value.matches("[\\w-]*")) {
             return '"' + value.replaceAll("\"", "\\\\\"") + '"';
         }
         return value;
