@@ -961,7 +961,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         for (final Map.Entry<Host, Widget> hostWidgetEntry : addressComboBoxHashClone.entrySet()) {
             final Widget wi = hostWidgetEntry.getValue();
             final Widget wizardWi = addressComboBoxHashWizard.get(hostWidgetEntry.getKey());
-            if (wi.getValue() == null) {
+            if (wi.getValue() == null || wi.getValue().isNothingSelected()) {
                 correct = false;
                 wi.wrongValue();
                 if (wizardWi != null) {
