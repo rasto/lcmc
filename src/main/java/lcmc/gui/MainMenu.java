@@ -263,7 +263,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         opModePanel.add(operatingModesCB);
         opModePanel.add(advancedModeCB);
         // workaround for menuBar invalidating throwing an exception
-        opModePanel.setPreferredSize(new Dimension(1, 1));
+        opModePanel.setPreferredSize(new Dimension(300, 1));
 
         menuBar.add(opModePanel);
         if (Tools.getApplication().isUpgradeCheckEnabled()) {
