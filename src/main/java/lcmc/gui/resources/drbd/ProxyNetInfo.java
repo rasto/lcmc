@@ -79,13 +79,6 @@ public final class ProxyNetInfo extends NetInfo {
     }
 
     @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 29 * hash + (this.getValueForConfig() != null ? this.getValueForConfig().hashCode() : 0);
-        return hash;
-    }
-
-    @Override
     public String getValueForConfig() {
         return toString();
     }

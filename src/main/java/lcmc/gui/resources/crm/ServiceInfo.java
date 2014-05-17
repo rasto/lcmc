@@ -1974,7 +1974,6 @@ public class ServiceInfo extends EditableInfo {
         addToAdvancedList(advancedOpPanel);
         advancedOpPanel.setVisible(Tools.getApplication().isAdvancedMode());
         int advancedRows = 0;
-        int rows = 0;
         boolean allAreDefaultValues = true;
         int normalRows = 0;
         for (final String op : getResourceAgent().getOperationNames()) {
@@ -2053,7 +2052,6 @@ public class ServiceInfo extends EditableInfo {
                 } finally {
                     mOperationsComboBoxHashWriteLock.unlock();
                 }
-                rows++;
                 final String labelText = Tools.ucfirst(op)
                                          + " / "
                                          + Tools.ucfirst(param);

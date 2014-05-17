@@ -135,20 +135,6 @@ public final class SSHGui {
         private String answer;
 
         /** Prepares a new {@code EnterSomethingDialog} object. */
-        EnterSomethingDialog(final Container parent,
-                             final String title,
-                             final String content,
-                             final String underText,
-                             final boolean isPasswordA) {
-            this((JDialog) parent,
-                 title,
-                 new String[] {content},
-                 underText,
-                 null,
-                 isPasswordA);
-        }
-
-        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final JDialog parent,
                              final String title,
                              final String[] content,

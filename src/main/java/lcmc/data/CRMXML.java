@@ -1004,7 +1004,6 @@ public final class CRMXML extends XML {
             return;
         }
         final String[] lines = output.split("\\r?\\n");
-        final Pattern mp = Pattern.compile("^master:\\s*(.*?)\\s*$");
         final Pattern cp = Pattern.compile("^class:\\s*(.*?)\\s*$");
         final Pattern pp = Pattern.compile("^provider:\\s*(.*?)\\s*$");
         final Pattern sp = Pattern.compile("^ra:\\s*(.*?)\\s*$");
@@ -1012,7 +1011,6 @@ public final class CRMXML extends XML {
         String resourceClass = null;
         String provider = null;
         String serviceName = null;
-        final boolean masterSlave = false; /* is probably m/s ...*/
         for (final String line : lines) {
             final Matcher cm = cp.matcher(line);
             if (cm.matches()) {
@@ -2249,8 +2247,6 @@ public final class CRMXML extends XML {
     /** Parse resource defaults. */
     String parseRscDefaults(final Node rscDefaultsNode, final Map<String, String> rscDefaultsParams, final Map<String, String> rscDefaultsParamsNvpairIds) {
         
-        final Map<String, String> nvpairIds =
-            new HashMap<String, String>();
         /* <meta_attributtes> */
         final Node metaAttrsNode = getChildNode(rscDefaultsNode,
                                                 "meta_attributes");
@@ -2288,8 +2284,6 @@ public final class CRMXML extends XML {
     /** Parse op defaults. */
     void parseOpDefaults(final Node opDefaultsNode, final Map<String, Value> opDefaultsParams) {
         
-        final Map<String, String> nvpairIds =
-            new HashMap<String, String>();
         /* <meta_attributtes> */
         final Node metaAttrsNode = getChildNode(opDefaultsNode,
                                                 "meta_attributes");
@@ -3319,8 +3313,6 @@ public final class CRMXML extends XML {
                                 getAttribute(expNode, "attribute");
                             final String op =
                                 getAttribute(expNode, "operation");
-                            final String type =
-                                getAttribute(expNode, "type");
                             final String value =
                                 getAttribute(expNode, "value");
                             if ((booleanOp == null
@@ -3358,7 +3350,6 @@ public final class CRMXML extends XML {
         final Node statusNode = getChildNode(cibNode, "status");
         final Set<String> nodePending = new HashSet<String>();
         if (statusNode != null) {
-            final String hbV = host.getHeartbeatVersion();
             /* <node_state ...> */
             final NodeList nodes = statusNode.getChildNodes();
             for (int i = 0; i < nodes.getLength(); i++) {
@@ -3370,7 +3361,6 @@ public final class CRMXML extends XML {
                         LOG.appWarning("parseCibQuery: skipping " + uname + ' ' + id);
                         continue;
                     }
-                    final String ha = getAttribute(nodeStateNode, "ha");
                     final String join = getAttribute(nodeStateNode, "join");
                     final String inCCM = getAttribute(nodeStateNode, "in_ccm");
                     final String crmd = getAttribute(nodeStateNode, "crmd");

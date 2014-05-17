@@ -1868,13 +1868,11 @@ public class Host implements Comparable<Host>, Value {
                                  outputBuffer.append(output);
                                  final ClusterBrowser cb =
                                               getBrowser().getClusterBrowser();
-                                 int i = 0;
                                  String hw, vm, drbdConfig;
                                  String hwUpdate = null;
                                  String vmUpdate = null;
                                  String drbdUpdate = null;
                                  do {
-                                     i++;
                                      hw = getOutput("hw", outputBuffer);
                                      if (hw != null) {
                                          hwUpdate = hw;

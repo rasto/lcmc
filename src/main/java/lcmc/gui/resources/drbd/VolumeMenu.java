@@ -22,7 +22,6 @@ package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.DrbdXML;

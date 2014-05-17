@@ -2383,7 +2383,6 @@ public final class Tools {
         final Font font = ab.getFont();
         final String name = font.getFontName();
         final int style = font.getStyle();
-        final int size = font.getSize();
         ab.setFont(new Font(name, style, getApplication().scaled(10)));
         ab.setMargin(new Insets(2, 2, 2, 2));
         ab.setIconTextGap(0);

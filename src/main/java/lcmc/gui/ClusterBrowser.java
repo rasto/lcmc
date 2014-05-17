@@ -1329,7 +1329,6 @@ public class ClusterBrowser extends Browser {
                 }
                 continue;
             }
-            final String hostName = host.getName();
             //clStatusCanceled = false;
             host.execClStatusCommand(
                  new ExecCallback() {

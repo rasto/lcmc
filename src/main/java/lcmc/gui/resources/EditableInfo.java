@@ -807,7 +807,7 @@ public abstract class EditableInfo extends Info {
                     (otherParam == null) ? null :
                          paramCorrectValueMap.get(otherParam);
                 if (param == null
-                    || otherParam.equals(param)
+                    || param.equals(otherParam)
                     || correctValueCache == null) {
                     final Widget wizardWi = getWidget(otherParam,
                                                       Widget.WIZARD_PREFIX);

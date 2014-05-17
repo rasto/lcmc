@@ -524,7 +524,6 @@ public final class SSH {
     private boolean enterSudoPassword() {
         if (host.isUseSudo() != null && host.isUseSudo()) {
             final String lastError = "";
-            final String lastSudoPwd = host.getSudoPassword();
             final String sudoPwd = sshGui.enterSomethingDialog(
                      Tools.getString("SSH.SudoAuthentication"),
                     new String[] {lastError,
@@ -669,7 +668,6 @@ public final class SSH {
             backupString.append(".bak;");
             backupString.append(" fi ");
         }
-        final String stacktrace = Tools.getStackTrace();
         if (installCommand == null) {
             installCommand = "mv " + remoteFilename + ".new " + remoteFilename;
         }
@@ -751,8 +749,6 @@ public final class SSH {
     /** Stops port forwarding for vnc. */
     void stopVncPortForwarding(final int remotePort)
         throws IOException {
-        final int localPort =
-                        remotePort + Tools.getApplication().getVncPortOffset();
         try {
             localPortForwarder.close();
         } catch (final IOException e) {

@@ -58,7 +58,6 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.EditableInfo;
-import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.CloneInfo;
 import lcmc.gui.resources.crm.DrbddiskInfo;
 import lcmc.gui.resources.crm.FilesystemInfo;

@@ -544,12 +544,6 @@ implements Widget {
         if (getParent() == null) {
             return;
         }
-        final JComponent comp;
-        if (fieldButton == null) {
-            comp = component;
-        } else {
-            comp = componentPart;
-        }
         final Value value = getValue();
         String labelText = null;
         if (savedLabel != null) {

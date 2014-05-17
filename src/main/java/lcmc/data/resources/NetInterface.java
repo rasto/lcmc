@@ -111,11 +111,14 @@ public final class NetInterface extends Resource implements Value {
             if (IPV6_STRING.equals(af_string)) {
                 af0 = AF.IPV6;
                 size = 16;
+            }else if (IPV4_STRING.equals(af_string)) {
+                af0 = AF.IPV4;
             } else if (SSOCKS_STRING.equals(af_string)) {
                 af0 = AF.SSOCKS;
             } else if (SDP_STRING.equals(af_string)) {
                 af0 = AF.SDP;
             } else {
+                LOG.debug1("NetInterface: af_string: " + af_string + "-> ipv4");
                 af0 = AF.IPV4;
             }
         }

@@ -26,10 +26,12 @@ import java.awt.Color;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import lcmc.Exceptions;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.Network;
@@ -214,14 +216,16 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Gets networks that are common on all hosts in the cluster. */
     public Network[] getCommonNetworks() {
-        Map<String, Integer> networksIntersection = null;
+        Map<String, Integer> networksIntersection =
+                                         new LinkedHashMap<String, Integer>();
         for (final Host host : hosts) {
             networksIntersection =
                             host.getNetworksIntersection(networksIntersection);
         }
 
         final List<Network> commonNetworks = new ArrayList<Network>();
-        for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
+        for (final Map.Entry<String, Integer> stringIntegerEntry
+                                           : networksIntersection.entrySet()) {
             final List<String> ips = new ArrayList<String>();
             for (final Host host : hosts) {
                 ips.addAll(host.getIpsFromNetwork(stringIntegerEntry.getKey()));
@@ -239,7 +243,7 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Gets filesystems that are common on all hosts in the cluster. */
     public String[] getCommonFileSystems() {
-        Set<String> intersection = null;
+        Set<String> intersection = new TreeSet<String>();
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getFileSystemsList(),
                                                  intersection);
@@ -249,7 +253,7 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Gets mount points that are common on all hosts in the cluster. */
     public String[] getCommonMountPoints() {
-        Set<String> intersection = null;
+        Set<String> intersection = new TreeSet<String>();
 
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getMountPointsList(),
