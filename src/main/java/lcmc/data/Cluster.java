@@ -26,12 +26,10 @@ import java.awt.Color;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import lcmc.Exceptions;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.Network;
@@ -216,8 +214,7 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Gets networks that are common on all hosts in the cluster. */
     public Network[] getCommonNetworks() {
-        Map<String, Integer> networksIntersection =
-                                         new LinkedHashMap<String, Integer>();
+        Map<String, Integer> networksIntersection = null;
         for (final Host host : hosts) {
             networksIntersection =
                             host.getNetworksIntersection(networksIntersection);
@@ -243,7 +240,7 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Gets filesystems that are common on all hosts in the cluster. */
     public String[] getCommonFileSystems() {
-        Set<String> intersection = new TreeSet<String>();
+        Set<String> intersection = null;
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getFileSystemsList(),
                                                  intersection);
@@ -253,7 +250,7 @@ public class Cluster implements Comparable<Cluster> {
 
     /** Gets mount points that are common on all hosts in the cluster. */
     public String[] getCommonMountPoints() {
-        Set<String> intersection = new TreeSet<String>();
+        Set<String> intersection = null;
 
         for (final Host host : hosts) {
             intersection = Tools.getIntersection(host.getMountPointsList(),
