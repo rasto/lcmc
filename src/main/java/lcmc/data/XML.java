@@ -114,8 +114,8 @@ abstract class XML {
             final DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(new ByteArrayInputStream(xml.getBytes()));
         } catch (final SAXException sxe) {
-            LOG.appWarning("getXMLDocument: could not parse: " + xml);
-            throw new RuntimeException("getXMLException: sax", sxe);
+            LOG.appError("getXMLDocument: could not parse: " + xml, sxe);
+            return null;
         } catch (final ParserConfigurationException pce) {
             throw new RuntimeException("getXMLException: parser configuration", pce);
         } catch (final IOException ioe) {
