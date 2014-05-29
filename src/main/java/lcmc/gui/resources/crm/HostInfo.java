@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -42,6 +43,7 @@ import javax.swing.SpringLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
@@ -62,9 +64,9 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * This class holds info data for a host.

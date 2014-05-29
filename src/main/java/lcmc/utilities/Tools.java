@@ -72,6 +72,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -101,6 +102,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.text.html.HTMLDocument;
+
 import lcmc.Exceptions;
 import lcmc.configs.DistResource;
 import lcmc.data.Application;
@@ -115,6 +117,7 @@ import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * This class provides tools, that are not classified.

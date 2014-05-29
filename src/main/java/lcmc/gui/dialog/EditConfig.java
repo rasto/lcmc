@@ -27,6 +27,7 @@ import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -38,13 +39,14 @@ import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
+
 import lcmc.configs.DistResource;
 import lcmc.data.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 
 /**

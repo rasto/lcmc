@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -38,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
@@ -57,8 +59,8 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 
 /**

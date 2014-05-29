@@ -39,6 +39,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import lcmc.Exceptions;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
@@ -47,9 +48,10 @@ import lcmc.robotest.RoboTest;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import lcmc.utilities.ssh.SSH;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

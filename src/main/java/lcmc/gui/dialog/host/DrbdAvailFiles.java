@@ -26,9 +26,11 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
@@ -39,9 +41,9 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * An implementation of a dialog where available versions of drbd will be

@@ -26,12 +26,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
@@ -44,8 +46,8 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 

@@ -35,10 +35,12 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
@@ -56,8 +58,8 @@ import lcmc.gui.resources.drbd.HostDrbdInfo;
 import lcmc.gui.resources.drbd.ProxyHostInfo;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.SSH;
 
 
 /**

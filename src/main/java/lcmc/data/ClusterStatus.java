@@ -29,12 +29,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
 import lcmc.data.CRMXML.ResStatus;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.SSH;
+
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**

@@ -25,7 +25,9 @@ package lcmc.gui.dialog.host;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JPanel;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
@@ -37,7 +39,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;

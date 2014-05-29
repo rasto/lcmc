@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.utilities;
+package lcmc.utilities.ssh;
 
 import ch.ethz.ssh2.ChannelCondition;
 import ch.ethz.ssh2.Connection;
@@ -31,16 +31,24 @@ import ch.ethz.ssh2.SCPClient;
 import ch.ethz.ssh2.ServerHostKeyVerifier;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.channel.ChannelManager;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import lcmc.configs.DistResource;
 import lcmc.data.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
+import lcmc.utilities.ConnectionCallback;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.NewOutputCallback;
+import lcmc.utilities.Tools;
 
 /**
  * Verifying server hostkeys with an existing known_hosts file
@@ -731,7 +739,7 @@ public final class SSH {
     }
 
     /** Starts port forwarding for vnc. */
-    void startVncPortForwarding(final String remoteHost,
+    public void startVncPortForwarding(final String remoteHost,
                                 final int remotePort)
         throws IOException {
         final int localPort =
@@ -747,7 +755,7 @@ public final class SSH {
     }
 
     /** Stops port forwarding for vnc. */
-    void stopVncPortForwarding(final int remotePort)
+    public void stopVncPortForwarding(final int remotePort)
         throws IOException {
         try {
             localPortForwarder.close();
@@ -787,7 +795,7 @@ public final class SSH {
         /** Exit code. */
         private final int exitCode;
         /** Creates new SSHOutput object. */
-        SSHOutput(final String output, final int exitCode) {
+        public SSHOutput(final String output, final int exitCode) {
             this.output = output;
             this.exitCode = exitCode;
         }
@@ -1391,7 +1399,7 @@ public final class SSH {
      * the event handler of the "Login" button) then the GUI would not
      * be responsive (missing window repaints if you move the window etc.)
      */
-    private class ConnectionThread extends Thread {
+    public class ConnectionThread extends Thread {
         /** Username with which it will be connected. */
         private final String username;
         /** Hostname of the host to which it will be connect. */

@@ -24,10 +24,11 @@ package lcmc.data;
 
 import java.io.File;
 import java.io.IOException;
+
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.vms.HardwareInfo;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite

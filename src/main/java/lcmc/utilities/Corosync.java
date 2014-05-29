@@ -23,6 +23,7 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
+import lcmc.utilities.ssh.SSH;
 /**
  * This class provides corosync commands. There are commands that
  * operate on /etc/init.d/corosync script and commands etc.

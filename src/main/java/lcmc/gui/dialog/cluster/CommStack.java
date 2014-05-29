@@ -23,11 +23,13 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
@@ -41,8 +43,8 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 
 /**

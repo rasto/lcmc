@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -44,6 +45,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
+
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
@@ -63,10 +65,11 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.ssh.SSH;
+
 import org.w3c.dom.Node;
 
 /**

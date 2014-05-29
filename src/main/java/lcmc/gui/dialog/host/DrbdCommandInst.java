@@ -25,6 +25,7 @@ package lcmc.gui.dialog.host;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -34,8 +35,8 @@ import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * An implementation of a dialog where drbd is installed.

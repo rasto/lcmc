@@ -1,4 +1,4 @@
-package lcmc.utilities;
+package lcmc.utilities.ssh;
 
 import lcmc.data.Host;
 import lcmc.testutils.TestUtils;

@@ -42,7 +42,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.JComponent;
+
 import lcmc.Exceptions;
 import lcmc.configs.DistResource;
 import lcmc.data.resources.BlockDevice;
@@ -61,8 +63,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.NewOutputCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 

@@ -22,11 +22,13 @@ package lcmc.gui.dialog.drbdConfig;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.data.Host;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
@@ -35,8 +37,8 @@ import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * @author Rasto Levrinc

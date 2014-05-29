@@ -24,8 +24,10 @@ package lcmc.utilities;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import lcmc.configs.DistResource;
 import lcmc.data.Host;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * This class provides virsh commands.

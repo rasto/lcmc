@@ -36,6 +36,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.event.CaretEvent;
@@ -49,13 +50,14 @@ import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
 import lcmc.data.Host;
 import lcmc.robotest.RoboTest;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.SSH;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.SSH;
 
 /**
  * An implementation of a terminal panel that show commands and output from

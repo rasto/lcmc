@@ -24,15 +24,17 @@ package lcmc.gui.dialog.host;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
 import lcmc.data.Host;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 
 /**

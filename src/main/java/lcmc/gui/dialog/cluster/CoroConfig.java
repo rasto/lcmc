@@ -39,6 +39,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -47,6 +48,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
+
 import lcmc.Exceptions.IllegalVersionException;
 import lcmc.data.AccessMode;
 import lcmc.data.AisCastAddress;
@@ -67,8 +69,8 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
-import lcmc.utilities.SSH;
-import lcmc.utilities.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SSH.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 
