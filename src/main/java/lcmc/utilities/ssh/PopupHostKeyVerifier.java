@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.utilities.ssh;
 
 import ch.ethz.ssh2.KnownHosts;
@@ -14,8 +34,7 @@ import lcmc.utilities.Tools;
  * cannot be found in the in-memory database.
  */
 public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
-    private static final Logger LOG =
-                            LoggerFactory.getLogger(PopupHostKeyVerifier.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PopupHostKeyVerifier.class);
 
     private final SSHGui sshGui;
 
@@ -28,8 +47,7 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
     public boolean verifyServerHostKey(final String hostname,
                                        final int port,
                                        final String serverHostKeyAlgorithm,
-                                       final byte[] serverHostKey)
-        throws Exception {
+                                       final byte[] serverHostKey) throws Exception {
         final StringBuilder message = new StringBuilder(200);
         /* Check database */
         final int result = Tools.getApplication().getKnownHosts().
@@ -53,8 +71,7 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
                 throw new IllegalStateException();
         }
         /* Include the fingerprints in the message */
-        final String hexFingerprint = KnownHosts.createHexFingerprint(serverHostKeyAlgorithm,
-                                                                      serverHostKey);
+        final String hexFingerprint = KnownHosts.createHexFingerprint(serverHostKeyAlgorithm, serverHostKey);
         final String bubblebabbleFingerprint = KnownHosts.createBubblebabbleFingerprint(serverHostKeyAlgorithm,
                                                                                         serverHostKey);
         message.append("Hex Fingerprint: ");
@@ -67,9 +84,9 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
             /* Be really paranoid. We use a hashed hostname entry */
             final String hashedHostname = KnownHosts.createHashedHostname(hostname);
             /* Add the hostkey to the in-memory database */
-            Tools.getApplication().getKnownHosts().
-                addHostkey(new String[]{hashedHostname}, serverHostKeyAlgorithm,
-                           serverHostKey);
+            Tools.getApplication().getKnownHosts().addHostkey(new String[]{hashedHostname},
+                                                              serverHostKeyAlgorithm,
+                                                              serverHostKey);
             /* Also try to add the key to a known_host file */
             /* It does this only in Linux.
              * TODO: do this also for other OSes, when I find out the
@@ -81,8 +98,8 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
                 try {
                     KnownHosts.addHostkeyToFile(new File(Tools.getApplication().
                         getKnownHostPath()), new String[]{hashedHostname},
-                                                serverHostKeyAlgorithm,
-                                                serverHostKey);
+                                                          serverHostKeyAlgorithm,
+                                                          serverHostKey);
                 } catch (final IOException ignore) {
                     LOG.appWarning("verifyServerHostKey: SSH " + "addHostKeyToFile failed " + ignore.getMessage());
                 }

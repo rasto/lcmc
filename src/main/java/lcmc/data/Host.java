@@ -551,7 +551,7 @@ public class Host implements Comparable<Host>, Value {
      * the old connection.
      */
     public void setUsername(final String username) {
-        if (!username.equals(this.username)) {
+        if (this.username != null && !username.equals(this.username)) {
             ssh.disconnect();
         }
         this.username = username;
@@ -563,7 +563,7 @@ public class Host implements Comparable<Host>, Value {
      */
     public void setIpAddress(final String ipAddress) {
         if (ipAddress != null) {
-            if (!ipAddress.equals(this.ipAddress)) {
+            if (this.ipAddress != null && !ipAddress.equals(this.ipAddress)) {
                 ssh.disconnect();
             }
         } else if (this.ipAddress != null) {
@@ -2747,7 +2747,7 @@ public class Host implements Comparable<Host>, Value {
 
     /** Sets ssh port. */
     public void setSSHPort(final String sshPort) {
-        if (sshPort != null && !sshPort.equals(this.sshPort)) {
+        if (this.sshPort != null && !sshPort.equals(this.sshPort)) {
             ssh.disconnect();
         }
         this.sshPort = sshPort;

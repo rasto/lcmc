@@ -323,9 +323,9 @@ public class Cluster implements Comparable<Cluster> {
                     return false;
                 }
                 if (host.isConnected()) {
-                    dsaKey = host.getSSH().getLastDSAKey();
-                    rsaKey = host.getSSH().getLastRSAKey();
-                    pwd = host.getSSH().getLastPassword();
+                    dsaKey = host.getSSH().getLastSuccessfulDsaKey();
+                    rsaKey = host.getSSH().getLastSuccessfulRsaKey();
+                    pwd = host.getSSH().getLastSuccessfulPassword();
                 }
             }
             first = false;

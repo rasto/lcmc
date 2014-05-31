@@ -1,7 +1,21 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 package lcmc.utilities.ssh;
@@ -24,38 +38,26 @@ import lcmc.utilities.Tools;
 
 /** This class is a thread that executes commands. */
 public final class ExecCommandThread extends Thread {
-    private static final Logger LOG =
-                              LoggerFactory.getLogger(ExecCommandThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExecCommandThread.class);
     private final Host host;
-    private final SshConnection connection;
+    private final SshConnectionThread connectionThread;
     private final SSHGui sshGui;
-    /** Command that should be executed. */
     private String command;
-    /** After the exec callback. */
     private final ExecCallback execCallback;
-    /** After a new output is available callback. */
     private final NewOutputCallback newOutputCallback;
-    /** Cancel the execution flag. */
     private volatile boolean cancelIt = false;
-    /** Whether the output should be visible in the terminal area. */
     private boolean outputVisible;
-    /** Whether the command should be visible in the terminal area. */
     private final boolean commandVisible;
-    /** Session lock. */
     private final Lock mSessionLock = new ReentrantLock();
-    /** Execution session object. */
     private Session sess = null;
-    /** Timeout for ssh command. */
     private final int sshCommandTimeout;
     private final SSH outer;
-    /** Exit code if command failed. */
     private static final int ERROR_EXIT_CODE = 255;
-    /** Size of the buffer for output of commads. */
     private static final int EXEC_OUTPUT_BUFFER_SIZE = 8192;
 
     /** Executes a command in a thread. */
     ExecCommandThread(final Host host,
-                      final SshConnection connection,
+                      final SshConnectionThread connectionThread,
                       final SSHGui sshGui,
                       final String command,
                       final ExecCallback execCallback,
@@ -63,10 +65,10 @@ public final class ExecCommandThread extends Thread {
                       final boolean outputVisible,
                       final boolean commandVisible,
                       final int sshCommandTimeout,
-                      final SSH outer) throws IOException {
+                      final SSH outer) {
         super();
         this.host = host;
-        this.connection = connection;
+        this.connectionThread = connectionThread;
         this.sshGui = sshGui;
         this.outer = outer;
         this.command = command;
@@ -79,8 +81,7 @@ public final class ExecCommandThread extends Thread {
         if (command.length() > 9 && command.substring(0, 9).equals("NOOUTPUT:")) {
             this.outputVisible = false;
             this.command = command.substring(9, command.length());
-        } else if (command.length() > 7 && command.substring(0, 7).
-            equals("OUTPUT:")) {
+        } else if (command.length() > 7 && command.substring(0, 7).equals("OUTPUT:")) {
             this.outputVisible = true;
             this.command = command.substring(7, command.length());
         } else {
@@ -95,17 +96,16 @@ public final class ExecCommandThread extends Thread {
      */
     @Override
     public void run() {
-        if (connection == null) {
+        if (!connectionThread.isConnectionEstablished()) {
             if (execCallback != null) {
                 execCallback.doneError("not connected", 139);
             }
         } else {
-            exec(connection);
+            exec();
         }
     }
 
-    /** Executes the command. */
-    private void exec(final SshConnection conn) {
+    private void exec() {
         // ;;; separates commands, that are to be executed one after one,
         // if previous command has finished successfully.
         final String[] commands = command.split(";;;");
@@ -120,7 +120,10 @@ public final class ExecCommandThread extends Thread {
                     if (!cancelTimeout[0]) {
                         LOG.debug1("exec: " + host.getName() + ": open ssh session: timeout");
                         cancelTimeout[0] = true;
-                        conn.dmcCancel();
+                        final SshConnection sshConnection = connectionThread.getConnection();
+                        if (sshConnection != null) {
+                            sshConnection.dmcCancel();
+                        }
                     }
                 }
             });
@@ -128,7 +131,7 @@ public final class ExecCommandThread extends Thread {
             try {
                 /* it may hang here if we lost connection, so it will be
                  * interrupted after a timeout. */
-                final Session newSession = conn.openSession();
+                final Session newSession = connectionThread.getConnection().openSession();
                 mSessionLock.lock();
                 try {
                     sess = newSession;
@@ -140,10 +143,13 @@ public final class ExecCommandThread extends Thread {
                 }
                 cancelTimeout[0] = true;
             } catch (final IOException e) {
-                throw new RuntimeException("cannot open session");
+                connectionThread.closeConnection();
+                if (execCallback != null) {
+                    execCallback.doneError("could not open session", 45);
+                }
+                break;
             }
             final String cmd = command1.trim();
-            //Tools.commandLock();
             if (commandVisible && outputVisible) {
                 final String consoleCommand = host.replaceVars(cmd, true);
                 host.getTerminalPanel().
@@ -168,23 +174,14 @@ public final class ExecCommandThread extends Thread {
         }
     }
 
-    /**
-     * Executes command on the host.
-     *
-     * @param command
-     *          command that will be executed.
-     * @param outputVisible
-     *          whether the output of the command should be visible
-     */
-    private SshOutput execOneCommand(final String command,
-                                         final boolean outputVisible) {
+    private SshOutput execOneCommand(final String command, final boolean outputVisible) {
         if (sshCommandTimeout > 0 && sshCommandTimeout < 2000) {
             LOG.appWarning("execOneCommand: timeout: " + sshCommandTimeout + " to small for timeout? " + command);
         }
         this.command = command;
         this.outputVisible = outputVisible;
         final StringBuilder res = new StringBuilder("");
-        if (connection.isClosed()) {
+        if (!connectionThread.isConnectionEstablished()) {
             return new SshOutput("SSH.NotConnected", 1);
         }
         if ("installGuiHelper".equals(command)) {
@@ -209,11 +206,14 @@ public final class ExecCommandThread extends Thread {
             to enter sudo password by every command.
             (It would be exposed) */
             thisSession.requestPTY("dumb", 0, 0, 0, 0, null);
-            LOG.debug2("execOneCommand: command: " + host.getName() + ": " + host.getSudoCommand(host.getHoppedCommand(command),
-                                                                                                                 true));
-            thisSession.execCommand("bash -c '" + Tools.escapeSingleQuotes("export LC_ALL=C;" + host.getSudoCommand(host.getHoppedCommand(command),
-                                                                                                                          false),
-                                                                           1) + '\'');
+            LOG.debug2("execOneCommand: command: "
+                       + host.getName()
+                       + ": "
+                       + host.getSudoCommand(host.getHoppedCommand(command), true));
+            thisSession.execCommand("bash -c '"
+                                    + Tools.escapeSingleQuotes("export LC_ALL=C;"
+                                                               + host.getSudoCommand(host.getHoppedCommand(command),
+                                                                                     false), 1) + '\'');
             final InputStream stdout = thisSession.getStdout();
             final OutputStream stdin = thisSession.getStdin();
             final InputStream stderr = thisSession.getStderr();
@@ -233,7 +233,9 @@ public final class ExecCommandThread extends Thread {
                      */
                     int conditions = 0;
                     if (!cancelIt) {
-                        conditions = thisSession.waitForCondition(ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA | ChannelCondition.EOF,
+                        conditions = thisSession.waitForCondition(ChannelCondition.STDOUT_DATA
+                                                                  | ChannelCondition.STDERR_DATA
+                                                                  | ChannelCondition.EOF,
                                                                   sshCommandTimeout);
                     }
                     if (cancelIt) {
@@ -244,13 +246,13 @@ public final class ExecCommandThread extends Thread {
                         /* A timeout occured. */
                         LOG.appWarning("execOneCommand: SSH timeout: " + command);
                         Tools.progressIndicatorFailed(host.getName(),
-                                                      "SSH timeout: " + command.replaceAll(DistResource.SUDO,
-                                                                                           ""));
+                                                      "SSH timeout: " + command.replaceAll(DistResource.SUDO, ""));
                         throw new IOException("Timeout while waiting for data from peer.");
                     }
                     /* Here we do not need to check separately for CLOSED,
                      * since CLOSED implies EOF */
-                    if ((conditions & ChannelCondition.EOF) != 0 && (conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0) {
+                    if ((conditions & ChannelCondition.EOF) != 0
+                        && (conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0) {
                         /* The remote side won't send us further data... */
                         /* ... and we have consumed all data in the
                          * ... local arrival window. */
@@ -271,8 +273,7 @@ public final class ExecCommandThread extends Thread {
                 while (stdout.available() > 0 && !cancelIt) {
                     final int len = stdout.read(buff);
                     if (len > 0) {
-                        final String buffString = new String(buff, 0, len,
-                                                             "UTF-8");
+                        final String buffString = new String(buff, 0, len, "UTF-8");
                         output.append(buffString);
                         if (outputVisible) {
                             host.getTerminalPanel().addContent(buffString);
@@ -309,18 +310,21 @@ public final class ExecCommandThread extends Thread {
                     // if pty is requested.
                     final int len = stderr.read(buff);
                     if (len > 0) {
-                        final String buffString = new String(buff, 0, len,
-                                                             "UTF-8");
+                        final String buffString = new String(buff, 0, len, "UTF-8");
                         output.append(buffString);
                         if (outputVisible) {
-                            host.getTerminalPanel().
-                                addContentErr(buffString);
+                            host.getTerminalPanel().addContentErr(buffString);
                         }
                     }
                 }
                 res.append(errOutput);
                 if (newOutputCallback != null && !cancelIt) {
-                    LOG.debug2("execOneCommand: output: " + exitCode + ": " + host.getName() + ": " + output.toString());
+                    LOG.debug2("execOneCommand: output: "
+                               + exitCode
+                               + ": "
+                               + host.getName()
+                               + ": "
+                               + output.toString());
                     newOutputCallback.output(output.toString());
                 }
                 if (cancelIt) {
@@ -373,17 +377,16 @@ public final class ExecCommandThread extends Thread {
     private boolean enterSudoPassword() {
         if (host.isUseSudo() != null && host.isUseSudo()) {
             final String lastError = "";
-            final String sudoPwd = sshGui.enterSomethingDialog(
-                     Tools.getString("SSH.SudoAuthentication"),
-                    new String[] {lastError,
-                                  "<html>"
-                                  + host.getName()
-                                  + Tools.getString(
-                                      "SSH.Enter.sudoPassword")
-                                  + "</html>"},
-                    null,
-                    null,
-                    true);
+            final String sudoPwd = sshGui.enterSomethingDialog(Tools.getString("SSH.SudoAuthentication"),
+                                                               new String[] {lastError,
+                                                                             "<html>"
+                                                                             + host.getName()
+                                                                             + Tools.getString(
+                                                                                 "SSH.Enter.sudoPassword")
+                                                                             + "</html>"},
+                                                               null,
+                                                               null,
+                                                               true);
             if (sudoPwd == null) {
                 /* cancelled */
                 return true;
@@ -393,5 +396,4 @@ public final class ExecCommandThread extends Thread {
         }
         return false;
     }
-
 }
