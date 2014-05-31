@@ -43,7 +43,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 
@@ -133,7 +133,7 @@ final class CommStack extends DialogCluster {
                              },
                              null,   /* ConvertCmdCallback */
                              false,  /* outputVisible */
-                             SSH.DEFAULT_COMMAND_TIMEOUT);
+                             Ssh.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
         for (final ExecCommandThread t : infoThreads) {

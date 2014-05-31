@@ -33,7 +33,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where heartbeat is installed.
@@ -127,7 +127,7 @@ final class HeartbeatInst extends DialogHost {
                              }
                          },
                          true,
-                         SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
+                         Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
     /** Returns the next dialog. */

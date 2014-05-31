@@ -31,7 +31,7 @@ import lcmc.data.resources.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -73,7 +73,7 @@ public class NetInfo extends Info {
                                                 + getName(),
                                                 null,   /* ExecCallback */
                                                 false,  /* outputVisible */
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
                 ep.setText(ret.getOutput());
             }
         };

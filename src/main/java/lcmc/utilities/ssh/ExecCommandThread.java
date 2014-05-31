@@ -40,7 +40,7 @@ import lcmc.utilities.Tools;
 public final class ExecCommandThread extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(ExecCommandThread.class);
     private final Host host;
-    private final SshConnectionThread connectionThread;
+    private final ConnectionThread connectionThread;
     private final SSHGui sshGui;
     private String command;
     private final ExecCallback execCallback;
@@ -56,7 +56,7 @@ public final class ExecCommandThread extends Thread {
 
     /** Executes a command in a thread. */
     ExecCommandThread(final Host host,
-                      final SshConnectionThread connectionThread,
+                      final ConnectionThread connectionThread,
                       final SSHGui sshGui,
                       final String command,
                       final ExecCallback execCallback,
@@ -273,7 +273,7 @@ public final class ExecCommandThread extends Thread {
                         }
                     }
                 }
-                if (output.indexOf(SSH.SUDO_PROMPT) >= 0) {
+                if (output.indexOf(Ssh.SUDO_PROMPT) >= 0) {
                     if (sudoPwd == null) {
                         cancelSudo = enterSudoPassword();
                     }
@@ -281,7 +281,7 @@ public final class ExecCommandThread extends Thread {
                     stdin.write(pwd.getBytes());
                     skipNextLine = true;
                     continue;
-                } else if (output.indexOf(SSH.SUDO_FAIL) >= 0) {
+                } else if (output.indexOf(Ssh.SUDO_FAIL) >= 0) {
                     host.setSudoPassword(null);
                 } else {
                     if (skipNextLine) {

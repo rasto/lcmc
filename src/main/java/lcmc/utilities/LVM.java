@@ -29,7 +29,7 @@ import java.util.Map;
 import lcmc.configs.DistResource;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -65,7 +65,7 @@ public final class LVM {
                                  + ' '
                                  + command.replaceAll(DistResource.SUDO, " ")
                                  + "...",
-                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /** Resize LVM device. */

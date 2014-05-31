@@ -28,7 +28,7 @@ import lcmc.data.Application;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -82,7 +82,7 @@ public final class FSInfo extends Info {
                                                 + getName(),
                                                 null,   /* ExecCallback */
                                                 false,  /* outputVisible */
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
                     modinfo = ret.getOutput();
                 }
                 ep.setText("<html><pre>" + modinfo + "</html></pre>");

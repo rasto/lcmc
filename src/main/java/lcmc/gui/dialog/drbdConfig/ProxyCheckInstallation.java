@@ -38,7 +38,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * @author Rasto Levrinc
@@ -152,7 +152,7 @@ final class ProxyCheckInstallation extends DialogHost {
                          },
                          null,   /* ConvertCmdCallback */
                          false,  /* outputVisible */
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

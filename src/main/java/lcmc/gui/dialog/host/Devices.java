@@ -33,7 +33,7 @@ import lcmc.data.Host;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 
@@ -116,7 +116,7 @@ public class Devices extends DialogHost {
                          },
                          null, /* ConvertCmdCallback */
                          true, /* outputVisible */
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         Ssh.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 

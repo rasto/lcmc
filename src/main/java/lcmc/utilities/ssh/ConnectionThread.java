@@ -36,8 +36,8 @@ import lcmc.utilities.Tools;
  * the event handler of the "Login" button) then the GUI would not
  * be responsive (missing window repaints if you move the window etc.)
  */
-public class SshConnectionThread extends Thread {
-    private static final Logger LOG = LoggerFactory.getLogger(SshConnectionThread.class);
+public class ConnectionThread extends Thread {
+    private static final Logger LOG = LoggerFactory.getLogger(ConnectionThread.class);
     /** Username with which it will be connected. */
     private final String username;
     /** Hostname of the host to which it will be connect. */
@@ -57,7 +57,7 @@ public class SshConnectionThread extends Thread {
     private volatile boolean connectionFailed;
 
     /** Prepares a new {@code ConnectionThread} object. */
-    SshConnectionThread(final Host host,
+    ConnectionThread(final Host host,
                         final LastSuccessfulPassword lastSuccessfulPassword,
                         final SSHGui sshGui,
                         final ProgressBar progressBar,

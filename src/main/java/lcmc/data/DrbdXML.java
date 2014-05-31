@@ -45,7 +45,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.keyvalue.MultiKey;
@@ -398,7 +398,7 @@ public class DrbdXML extends XML {
                                                 command,
                                                 null,   /* ExecCallback */
                                                 false,  /* outputVisible */
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
         if (ret.getExitCode() != 0) {
             return null;
         }
@@ -452,7 +452,7 @@ public class DrbdXML extends XML {
                                                 command2,
                                                 null,   /* ExecCallback */
                                                 false,  /* outputVisible */
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
         if (ret.getExitCode() == 0) {
             final StringBuffer confSB = new StringBuffer(ret.getOutput());
             return host.getOutput("drbd", confSB);

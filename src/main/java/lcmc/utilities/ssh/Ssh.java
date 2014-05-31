@@ -45,8 +45,8 @@ import lcmc.utilities.Tools;
  * for security).
  * Authentication with DSA, RSA, password and keyboard-interactive methods.
  */
-public final class SSH {
-    private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
+public final class Ssh {
+    private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
     public static final int DEFAULT_COMMAND_TIMEOUT_LONG =
                                                     Tools.getDefaultInt("SSH.Command.Timeout.Long");
@@ -58,7 +58,7 @@ public final class SSH {
     /** Callback when connection is failed or properly closed. */
     private ConnectionCallback connectionCallback;
     private Host host;
-    private volatile SshConnectionThread connectionThread = null;
+    private volatile ConnectionThread connectionThread = null;
     private ProgressBar progressBar = null;
 
     private final LastSuccessfulPassword lastSuccessfulPassword = new LastSuccessfulPassword();
@@ -72,7 +72,7 @@ public final class SSH {
             mConnectionThreadLock.unlock();
         } else {
             try {
-                final SshConnectionThread ct = connectionThread;
+                final ConnectionThread ct = connectionThread;
                 mConnectionThreadLock.unlock();
                 ct.join(20000);
                 if (ct.isAlive()) {
@@ -91,7 +91,7 @@ public final class SSH {
             this.progressBar = null;
             this.sshGui = new SSHGui(Tools.getGUIData().getMainFrame(), host, null);
             host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-            final SshConnectionThread ct = new SshConnectionThread(host,
+            final ConnectionThread ct = new ConnectionThread(host,
                                                                    lastSuccessfulPassword,
                                                                    sshGui,
                                                                    progressBar,
@@ -122,7 +122,7 @@ public final class SSH {
         }
 
         host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-        final SshConnectionThread ct = new SshConnectionThread(host,
+        final ConnectionThread ct = new ConnectionThread(host,
                                                                lastSuccessfulPassword,
                                                                sshGui,
                                                                progressBar,
@@ -167,7 +167,7 @@ public final class SSH {
             mConnectionThreadLock.unlock();
         } else {
             try {
-                final SshConnectionThread ct = connectionThread;
+                final ConnectionThread ct = connectionThread;
                 mConnectionThreadLock.unlock();
                 ct.join();
             } catch (final InterruptedException e) {
@@ -189,7 +189,7 @@ public final class SSH {
     /** Cancels the creating of connection to the sshd. */
     public void cancelConnection() {
         mConnectionThreadLock.lock();
-        final SshConnectionThread ct;
+        final ConnectionThread ct;
         try {
             ct = connectionThread;
         } finally {
@@ -224,7 +224,7 @@ public final class SSH {
     /** Disconnects this host if it has been connected. */
     public void disconnect() {
         mConnectionLock.lock();
-        if (!connectionThread.isConnectionEstablished()) {
+        if (connectionThread == null || !connectionThread.isConnectionEstablished()) {
             mConnectionLock.unlock();
         } else {
             connectionThread.setDisconnectForGood(true);

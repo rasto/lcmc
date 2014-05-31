@@ -59,7 +59,7 @@ import lcmc.gui.resources.drbd.ProxyHostInfo;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 
 /**
@@ -428,7 +428,7 @@ public class HostBrowser extends Browser {
                                  null,
                                  null,
                                  true,
-                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
                 Tools.stopProgressIndicator(hostName,
                                             host.getDistString(command));
             }
@@ -463,7 +463,7 @@ public class HostBrowser extends Browser {
                                  null,
                                  null,
                                  true,
-                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
                 Tools.stopProgressIndicator(hostName,
                                             host.getDistString(command));
             }

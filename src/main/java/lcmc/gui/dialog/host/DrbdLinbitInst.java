@@ -34,7 +34,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where drbd will be installed.
@@ -82,7 +82,7 @@ public class DrbdLinbitInst extends DialogHost {
                           },
                           null,  /* ConvertCmdCallback */
                           true,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /** Checks whether the files have to be downloaded. */
@@ -109,7 +109,7 @@ public class DrbdLinbitInst extends DialogHost {
                           },
                           null,  /* ConvertCmdCallback */
                           true,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /** Download the drbd packages. */
@@ -134,7 +134,7 @@ public class DrbdLinbitInst extends DialogHost {
                           },
                           null,  /* ConvertCmdCallback */
                           true,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /** Install the drbd packages. */
@@ -165,7 +165,7 @@ public class DrbdLinbitInst extends DialogHost {
                           },
                           null,  /* ConvertCmdCallback */
                           true,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT_LONG);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
     }
 
     /** Called after the installation is completed. */

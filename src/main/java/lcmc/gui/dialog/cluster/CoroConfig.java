@@ -69,7 +69,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
@@ -420,7 +420,7 @@ final class CoroConfig extends DialogCluster {
                              },
                              null,   /* ConvertCmdCallback */
                              false,  /* outputVisible */
-                             SSH.DEFAULT_COMMAND_TIMEOUT);
+                             Ssh.DEFAULT_COMMAND_TIMEOUT);
             i++;
         }
         for (final ExecCommandThread t : ts) {

@@ -38,7 +38,7 @@ import lcmc.data.Application;
 import lcmc.data.CRMXML;
 import lcmc.data.Host;
 import lcmc.data.HostLocation;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -97,7 +97,7 @@ public final class CRM {
                                      testCmd + command,
                                      null,
                                      false,
-                                     SSH.DEFAULT_COMMAND_TIMEOUT);
+                                     Ssh.DEFAULT_COMMAND_TIMEOUT);
         } else {
             LOG.debug1("execCommand: crm command: " + command);
             return Tools.execCommandProgressIndicator(
@@ -106,7 +106,7 @@ public final class CRM {
                                     null,
                                     outputVisible,
                                     Tools.getString("CIB.ExecutingCommand"),
-                                    SSH.DEFAULT_COMMAND_TIMEOUT);
+                                    Ssh.DEFAULT_COMMAND_TIMEOUT);
         }
     }
 
@@ -136,7 +136,7 @@ public final class CRM {
                                                 command,
                                                 null,
                                                 false,
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
         M_PTEST_WRITELOCK.lock();
         try {
             final String po = output.getOutput();

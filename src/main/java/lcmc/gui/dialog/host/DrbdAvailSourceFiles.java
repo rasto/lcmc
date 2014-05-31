@@ -42,7 +42,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -145,7 +145,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
               },
               null,   /* ConvertCmdCallback */
               false,  /* outputVisible */
-              SSH.DEFAULT_COMMAND_TIMEOUT);
+              Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**

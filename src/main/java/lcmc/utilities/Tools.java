@@ -117,7 +117,7 @@ import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**

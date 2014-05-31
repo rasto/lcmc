@@ -68,7 +68,7 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.w3c.dom.Node;
@@ -514,7 +514,7 @@ public abstract class HardwareInfo extends EditableInfo {
                                       null,
                                       false,
                                       "executing...",
-                                      SSH.DEFAULT_COMMAND_TIMEOUT);
+                                      Ssh.DEFAULT_COMMAND_TIMEOUT);
                 final List<LinuxFile> files = new ArrayList<LinuxFile>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {

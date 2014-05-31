@@ -41,7 +41,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -157,7 +157,7 @@ public final class FilesystemInfo extends ServiceInfo {
                                     null,
                                     true,
                                     statCmd.replaceAll(DistResource.SUDO, ""),
-                                    SSH.DEFAULT_COMMAND_TIMEOUT);
+                                    Ssh.DEFAULT_COMMAND_TIMEOUT);
 
                 if (ret == null
                     || !"directory".equals(ret.getOutput().trim())) {
@@ -182,7 +182,7 @@ public final class FilesystemInfo extends ServiceInfo {
                                         null,
                                         true,
                                         cmd.replaceAll(DistResource.SUDO, ""),
-                                        SSH.DEFAULT_COMMAND_TIMEOUT);
+                                        Ssh.DEFAULT_COMMAND_TIMEOUT);
                         confirm = true;
                     }
                 }

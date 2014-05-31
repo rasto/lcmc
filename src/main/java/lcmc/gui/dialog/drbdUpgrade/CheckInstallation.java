@@ -38,7 +38,7 @@ import lcmc.gui.dialog.host.DialogHost;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where drbd installation is checked.
@@ -126,7 +126,7 @@ final class CheckInstallation extends DialogHost {
                          },
                          null,   /* ConvertCmdCallback */
                          false,  /* outputVisible */
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /** Checks if drbd installation was ok. */

@@ -23,7 +23,7 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 /**
  * This class provides heartbeat commands. There are commands that
  * operate on /etc/init.d/heartbeat script etc.
@@ -166,7 +166,7 @@ public final class Heartbeat {
                                           null,
                                           null,
                                           true,
-                                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                                          Ssh.DEFAULT_COMMAND_TIMEOUT);
         try {
             t.join();
         } catch (final InterruptedException ie) {

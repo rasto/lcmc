@@ -34,7 +34,7 @@ import lcmc.Exceptions.IllegalVersionException;
 import lcmc.configs.DistResource;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -97,7 +97,7 @@ public final class DRBD {
                                                 cmd,
                                                 null,
                                                 false,
-                                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
             M_DRBD_TEST_WRITELOCK.lock();
             try {
                 if (drbdtestOutput == null) {
@@ -126,7 +126,7 @@ public final class DRBD {
                                      + ' '
                                      + cmd.replaceAll(DistResource.SUDO, " ")
                                      + "...",
-                                     SSH.DEFAULT_COMMAND_TIMEOUT);
+                                     Ssh.DEFAULT_COMMAND_TIMEOUT);
         }
     }
 

@@ -49,7 +49,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * This class holds info data for a host.
@@ -126,7 +126,7 @@ public class ProxyHostInfo extends Info {
                                  execCallback,
                                  null,  /* ConvertCmdCallback */
                                  false,  /* outputVisible */
-                                 SSH.DEFAULT_COMMAND_TIMEOUT);
+                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
             }
         });
         host.registerEnableOnConnect(procDrbdButton);
@@ -166,7 +166,7 @@ public class ProxyHostInfo extends Info {
                          execCallback,
                          null,  /* ConvertCmdCallback */
                          false,  /* outputVisible */
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         Ssh.DEFAULT_COMMAND_TIMEOUT);
         return mainPanel;
     }
 

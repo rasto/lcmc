@@ -47,7 +47,7 @@ public class SSH extends DialogHost {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
 
-    /** Prepares a new {@code SSH} object. */
+    /** *  Prepares a new {@code Ssh} object. */
     public SSH(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
     }
@@ -130,7 +130,7 @@ public class SSH extends DialogHost {
 
     /**
      * Returns the title of the dialog, defined as
-     * Dialog.Host.SSH.Title in TextResources.
+ Dialog.Host.Ssh.Title in TextResources.
      */
     @Override
     protected String getHostDialogTitle() {
@@ -139,7 +139,7 @@ public class SSH extends DialogHost {
 
     /**
      * Returns the description of the dialog, defined as
-     * Dialog.Host.SSH.Description in TextResources.
+ Dialog.Host.Ssh.Description in TextResources.
      */
     @Override
     protected String getDescription() {

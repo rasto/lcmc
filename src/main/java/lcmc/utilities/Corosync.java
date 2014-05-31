@@ -23,7 +23,7 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 /**
  * This class provides corosync commands. There are commands that
  * operate on /etc/init.d/corosync script and commands etc.
@@ -52,7 +52,7 @@ public final class Corosync {
                                 null,
                                 outputVisible,
                                 Tools.getString("Corosync.ExecutingCommand"),
-                                SSH.DEFAULT_COMMAND_TIMEOUT);
+                                Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /** Stops the heartbeat and starts the corosync on the specified host. */

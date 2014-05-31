@@ -63,7 +63,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.NewOutputCallback;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
@@ -107,7 +107,7 @@ public class Host implements Comparable<Host>, Value {
 
     /** Root user name. */
     public static final String ROOT_USER = "root";
-    /** Default SSH port. */
+    /** Default Ssh port. */
     public static final String DEFAULT_SSH_PORT = "22";
     /** Log commands on the servers. */
     private static final String GUI_HELPER_CMD_LOG_OP = "--cmd-log";
@@ -301,11 +301,11 @@ public class Host implements Comparable<Host>, Value {
     /** Whether drbd status is ok. */
     private boolean drbdStatus = false;
 
-    /** SSH object of the connection to this host. */
-    private final SSH ssh = new SSH();
+    /** Ssh object of the connection to this host. */
+    private final Ssh ssh = new Ssh();
     /** Terminal panel of this host. */
     private TerminalPanel terminalPanel = null;
-    /** SSH port. */
+    /** Ssh port. */
     private String sshPort = null;
     /** Whether sudo should be used. */
     private Boolean useSudo = null;
@@ -1381,7 +1381,7 @@ public class Host implements Comparable<Host>, Value {
                 return "sudo -E -n ";
             } else {
                 return "sudo -E -p '"
-                       + SSH.SUDO_PROMPT + "' ";
+                       + Ssh.SUDO_PROMPT + "' ";
             }
         } else {
             return "";
@@ -1511,8 +1511,8 @@ public class Host implements Comparable<Host>, Value {
         return username + '@' + getHostname();
     }
 
-    /** Gets SSH object. */
-    public SSH getSSH() {
+    /** Gets Ssh object. */
+    public Ssh getSSH() {
         return ssh;
     }
 

@@ -35,7 +35,7 @@ import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
@@ -87,7 +87,7 @@ public final class ClusterStatus {
                             null,  /* ExecCallback */
                             false, /* outputVisible */
                             Tools.getString("Heartbeat.getClusterMetadata"),
-                            SSH.DEFAULT_COMMAND_TIMEOUT);
+                            Ssh.DEFAULT_COMMAND_TIMEOUT);
         final String output = ret.getOutput();
         if (ret.getExitCode() != 0) {
             return;

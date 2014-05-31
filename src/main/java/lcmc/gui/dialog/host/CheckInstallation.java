@@ -44,7 +44,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where
@@ -265,7 +265,7 @@ final class CheckInstallation extends DialogHost {
                          },
                          null,   /* ConvertCmdCallback */
                          false,  /* outputVisible */
-                         SSH.DEFAULT_COMMAND_TIMEOUT);
+                         Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
@@ -329,7 +329,7 @@ final class CheckInstallation extends DialogHost {
                          },
                          null,   /* ConvertCmdCallback */
                          false,
-                         SSH.DEFAULT_COMMAND_TIMEOUT); /* outputVisible */
+                         Ssh.DEFAULT_COMMAND_TIMEOUT); /* outputVisible */
     }
 
     /**

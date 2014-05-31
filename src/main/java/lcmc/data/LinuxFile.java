@@ -28,7 +28,7 @@ import java.io.IOException;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.vms.HardwareInfo;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**
@@ -105,7 +105,7 @@ public final class LinuxFile extends File {
                               null,
                               false,
                               "executing...",
-                              SSH.DEFAULT_COMMAND_TIMEOUT);
+                              Ssh.DEFAULT_COMMAND_TIMEOUT);
         existCache = out.getExitCode() == 0;
         return existCache;
     }

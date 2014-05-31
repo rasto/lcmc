@@ -46,7 +46,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
@@ -123,7 +123,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           },
                           null,   /* ConvertCmdCallback */
                           false,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 
@@ -168,7 +168,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           },
                           null,   /* ConvertCmdCallback */
                           false,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 
@@ -221,7 +221,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           },
                           null,   /* ConvertCmdCallback */
                           false,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
         setCommandThread(t);
     }
 
@@ -281,7 +281,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           },
                           null,   /* ConvertCmdCallback */
                           false,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
 
         setCommandThread(t);
     }
@@ -309,7 +309,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                           },
                           null,   /* ConvertCmdCallback */
                           false,  /* outputVisible */
-                          SSH.DEFAULT_COMMAND_TIMEOUT);
+                          Ssh.DEFAULT_COMMAND_TIMEOUT);
 
         setCommandThread(t);
     }

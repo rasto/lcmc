@@ -57,7 +57,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a terminal panel that show commands and output from
@@ -477,7 +477,7 @@ public final class TerminalPanel extends JScrollPane {
              },
              true,
              false,
-             SSH.DEFAULT_COMMAND_TIMEOUT);
+             Ssh.DEFAULT_COMMAND_TIMEOUT);
     }
 
     /**
