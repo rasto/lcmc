@@ -618,17 +618,4 @@ public final class Ssh {
     public boolean isConnectionCanceled() {
         return connectionThread.isDisconnectedForGood();
     }
-
-    private void closeSshConnection() {
-        mConnectionLock.lock();
-        try {
-            if (!connectionThread.isConnectionEstablished()) {
-                return;
-            }
-            connectionThread.closeConnection();
-        } finally {
-            mConnectionLock.unlock();
-        }
-        host.setConnected();
-    }
 }

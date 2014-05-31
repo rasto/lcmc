@@ -40,5 +40,4 @@ public class SshConnection extends Connection {
             cm.closeAllChannels();
         }
     }
-    
 }

@@ -58,10 +58,10 @@ public class ConnectionThread extends Thread {
 
     /** Prepares a new {@code ConnectionThread} object. */
     ConnectionThread(final Host host,
-                        final LastSuccessfulPassword lastSuccessfulPassword,
-                        final SSHGui sshGui,
-                        final ProgressBar progressBar,
-                        final ConnectionCallback connectionCallback) {
+                     final LastSuccessfulPassword lastSuccessfulPassword,
+                     final SSHGui sshGui,
+                     final ProgressBar progressBar,
+                     final ConnectionCallback connectionCallback) {
         super();
         this.host = host;
         this.lastSuccessfulPassword = lastSuccessfulPassword;
@@ -164,13 +164,11 @@ public class ConnectionThread extends Thread {
                                 break;
                             }
                             conn.close();
-                            conn.connect(new PopupHostKeyVerifier(sshGui),
-                                         connectTimeout, kexTimeout);
+                            conn.connect(new PopupHostKeyVerifier(sshGui), connectTimeout, kexTimeout);
                         }
                         if (rsaKey.exists()) {
                             try {
-                                res = conn.authenticateWithPublicKey(username,
-                                                                     rsaKey, key);
+                                res = conn.authenticateWithPublicKey(username, rsaKey, key);
                             } catch (final IOException e) {
                                 lastSuccessfulPassword.setRsaKey(null);
                                 LOG.debug("authenticate: rsa key auth failed");
@@ -183,8 +181,7 @@ public class ConnectionThread extends Thread {
                                 break;
                             }
                             conn.close();
-                            conn.connect(new PopupHostKeyVerifier(sshGui),
-                                         connectTimeout, kexTimeout);
+                            conn.connect(new PopupHostKeyVerifier(sshGui), connectTimeout, kexTimeout);
                         }
                         lastError = Tools.getString("SSH.Publickey.Authentication.Failed");
                     } else {
@@ -198,14 +195,12 @@ public class ConnectionThread extends Thread {
                     continue;
                 }
             }
-            if (enableKeyboardInteractive && conn.isAuthMethodAvailable(username,
-                                                                        "keyboard-interactive")) {
+            if (enableKeyboardInteractive && conn.isAuthMethodAvailable(username, "keyboard-interactive")) {
                 final InteractiveLogic interactiveLogic = new InteractiveLogic(lastError,
                                                                                host,
                                                                                lastSuccessfulPassword,
                                                                                sshGui);
-                final boolean res = conn.authenticateWithKeyboardInteractive(username,
-                                                                             interactiveLogic);
+                final boolean res = conn.authenticateWithKeyboardInteractive(username, interactiveLogic);
                 if (res) {
                     lastSuccessfulPassword.setRsaKey(null);
                     lastSuccessfulPassword.setDsaKey(null);
@@ -235,8 +230,14 @@ public class ConnectionThread extends Thread {
                 final String ans;
                 if (lastSuccessfulPassword.getPassword() == null) {
                     ans = sshGui.enterSomethingDialog(Tools.getString("SSH.PasswordAuthentication"),
-                                                            new String[]{lastError, "<html>" + host.getUserAtHost() + Tools.getString("SSH.Enter.password") + "</html>"},
-                                                            null, null, true);
+                                                      new String[]{lastError,
+                                                                   "<html>"
+                                                                   + host.getUserAtHost()
+                                                                   + Tools.getString("SSH.Enter.password")
+                                                                   + "</html>"},
+                                                      null,
+                                                      null,
+                                                      true);
                     if (ans == null) {
                         cancelIt = true;
                         break;
