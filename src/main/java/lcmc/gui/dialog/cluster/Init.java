@@ -60,7 +60,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
 import lcmc.utilities.ssh.SSH;
-import lcmc.utilities.ssh.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 
 /**

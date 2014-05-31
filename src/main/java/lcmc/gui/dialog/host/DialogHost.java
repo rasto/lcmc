@@ -39,7 +39,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.ssh.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;

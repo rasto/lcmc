@@ -46,6 +46,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.keyvalue.MultiKey;
 import org.apache.commons.collections15.map.LinkedMap;
@@ -392,7 +393,7 @@ public class DrbdXML extends XML {
         final String command = host.getDistCommand("Drbd.getParameters",
                                                    (ConvertCmdCallback) null);
 
-        final SSH.SSHOutput ret =
+        final SshOutput ret =
                               Tools.execCommand(host,
                                                 command,
                                                 null,   /* ExecCallback */
@@ -446,7 +447,7 @@ public class DrbdXML extends XML {
         }
         final String command2 = host.getDistCommand("Drbd.getConfig",
                                                     (ConvertCmdCallback) null);
-        final SSH.SSHOutput ret = Tools.execCommand(
+        final SshOutput ret = Tools.execCommand(
                                                 host,
                                                 command2,
                                                 null,   /* ExecCallback */

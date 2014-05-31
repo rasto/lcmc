@@ -32,6 +32,7 @@ import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class holds info data for a net interface.
@@ -66,7 +67,7 @@ public class NetInfo extends Info {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                final SSH.SSHOutput ret =
+                final SshOutput ret =
                               Tools.execCommand(getBrowser().getHost(),
                                                 "/sbin/ip a l "
                                                 + getName(),

@@ -64,9 +64,10 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.NewOutputCallback;
 import lcmc.utilities.ssh.SSH;
-import lcmc.utilities.ssh.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import lcmc.utilities.ssh.SshOutput;
 
 
 /**
@@ -2946,7 +2947,7 @@ public class Host implements Comparable<Host>, Value {
         }
         command.append(" 2>&1");
         int i = 0;
-        SSH.SSHOutput out;
+        SshOutput out;
         do {
             out = getSSH().execCommandAndWait(command.toString(),
                                               false,

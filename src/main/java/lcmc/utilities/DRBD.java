@@ -35,7 +35,7 @@ import lcmc.configs.DistResource;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.utilities.ssh.SSH;
-import lcmc.utilities.ssh.SSH.SSHOutput;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides drbd commands.
@@ -80,7 +80,7 @@ public final class DRBD {
      *          The flag whether the output should appear in
      *          the terminal panel.
      */
-    private static SSHOutput execCommand(final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final Application.RunMode runMode) {
+    private static SshOutput execCommand(final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final Application.RunMode runMode) {
         if (Application.isTest(runMode)) {
             if (!command.contains("@DRYRUN@")) {
                 /* it would be very bad */
@@ -92,7 +92,7 @@ public final class DRBD {
                 cmd = cmd.replaceAll("@DRYRUNCONF@",
                                      "-c /var/lib/drbd/drbd.conf-lcmc-test");
             }
-            final SSHOutput output = Tools.execCommand(
+            final SshOutput output = Tools.execCommand(
                 host,
                                                 cmd,
                                                 null,
@@ -170,7 +170,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -190,7 +190,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -210,7 +210,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -230,7 +230,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -250,7 +250,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -270,7 +270,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -290,7 +290,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -310,7 +310,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -333,7 +333,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -349,7 +349,7 @@ public final class DRBD {
         replaceHash.put(DEVICE_PH, device);
         final String command = host.getDistCommand("DRBD.createMD",
                                                    replaceHash);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -366,7 +366,7 @@ public final class DRBD {
         replaceHash.put(DEVICE_PH, device);
         final String command = host.getDistCommand("DRBD.createMDDestroyData",
                                                    replaceHash);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -391,7 +391,7 @@ public final class DRBD {
         }
         final String command = host.getDistCommand("DRBD.makeFilesystem",
                                                    replaceHash);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -417,7 +417,7 @@ public final class DRBD {
                                                                    resource,
                                                                    volume));
             }
-            final SSHOutput ret =
+            final SshOutput ret =
                 execCommand(host, command, execCallback, true, runMode);
             return ret.getExitCode() == 0;
         } catch (final IllegalVersionException e) {
@@ -459,7 +459,7 @@ public final class DRBD {
                                                                    resource,
                                                                    volume));
             }
-            final SSHOutput ret =
+            final SshOutput ret =
                 execCommand(host, command, execCallback, true, runMode);
             return ret.getExitCode() == 0;
         } catch (final IllegalVersionException e) {
@@ -483,7 +483,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -506,7 +506,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -526,7 +526,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -539,7 +539,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -564,7 +564,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret = execCommand(host,
+        final SshOutput ret = execCommand(host,
                                           command,
                                           execCallback,
                                           false,
@@ -593,7 +593,7 @@ public final class DRBD {
                                               host,
                                               resource,
                                               volume);
-        final SSHOutput ret = execCommand(host,
+        final SshOutput ret = execCommand(host,
                                           command,
                                           execCallback,
                                           false,
@@ -617,7 +617,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret = execCommand(host,
+        final SshOutput ret = execCommand(host,
                                           command,
                                           execCallback,
                                           false,
@@ -637,7 +637,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret = execCommand(host,
+        final SshOutput ret = execCommand(host,
                                           command,
                                           null,
                                           false,
@@ -663,7 +663,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -683,7 +683,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       volume));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -700,7 +700,7 @@ public final class DRBD {
     public static boolean start(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.start",
                                                    (ConvertCmdCallback) null);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
 
@@ -718,7 +718,7 @@ public final class DRBD {
     public static boolean load(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.load",
                                                    (ConvertCmdCallback) null);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -735,7 +735,7 @@ public final class DRBD {
     public static boolean startProxy(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.startProxy",
                                                    (ConvertCmdCallback) null);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         host.updateDrbdParameters(); /* deamon could be started even if ret != 0
         */
@@ -754,7 +754,7 @@ public final class DRBD {
     public static boolean stopProxy(final Host host, final ExecCallback execCallback, final Application.RunMode runMode) {
         final String command = host.getDistCommand("DRBD.stopProxy",
                                                    (ConvertCmdCallback) null);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, execCallback, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -765,7 +765,7 @@ public final class DRBD {
         replaceHash.put(DRBDDEV_PH, blockDevice);
         final String command = host.getDistCommand("DRBD.delMinor",
                                                    replaceHash);
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }
@@ -777,7 +777,7 @@ public final class DRBD {
                                                        host,
                                                                       resource,
                                                                       null));
-        final SSHOutput ret =
+        final SshOutput ret =
             execCommand(host, command, null, true, runMode);
         return ret.getExitCode() == 0;
     }

@@ -29,6 +29,7 @@ import lcmc.configs.DistResource;
 import lcmc.gui.resources.vms.HardwareInfo;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
@@ -95,7 +96,7 @@ public final class LinuxFile extends File {
         if (existCache != null) {
             return existCache;
         }
-        final SSH.SSHOutput out =
+        final SshOutput out =
                 Tools.execCommandProgressIndicator(
                               host,
                               DistResource.SUDO + "stat "

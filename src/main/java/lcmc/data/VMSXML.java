@@ -59,6 +59,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.VIRSH;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.w3c.dom.Document;
@@ -1476,7 +1477,7 @@ public final class VMSXML extends XML {
     public boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
                                                    (ConvertCmdCallback) null);
-        final SSH.SSHOutput ret = Tools.execCommand(
+        final SshOutput ret = Tools.execCommand(
                                                host,
                                                command,
                                                null,  /* ExecCallback */

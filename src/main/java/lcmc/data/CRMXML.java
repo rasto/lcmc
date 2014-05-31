@@ -51,6 +51,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.w3c.dom.Document;
@@ -984,7 +985,7 @@ public final class CRMXML extends XML {
         final String command =
             host.getDistCommand("Heartbeat.getOCFParametersQuick",
                                         (ConvertCmdCallback) null);
-        final SSH.SSHOutput ret =
+        final SshOutput ret =
             Tools.execCommandProgressIndicator(
                 host,
                             command,
@@ -1098,7 +1099,7 @@ public final class CRMXML extends XML {
 
     /** Initialize resource agents with their meta data. */
     private void initOCFMetaData(final String command) {
-        final SSH.SSHOutput ret = Tools.execCommand(host,
+        final SshOutput ret = Tools.execCommand(host,
                                                     command,
                                                     null,  /* ExecCallback */
                                                     false, /* outputVisible */

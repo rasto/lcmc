@@ -69,6 +69,7 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 import org.w3c.dom.Node;
 
@@ -504,7 +505,7 @@ public abstract class HardwareInfo extends EditableInfo {
                 } else {
                     dirSB.append("/*");
                 }
-                final SSH.SSHOutput out =
+                final SshOutput out =
                         Tools.execCommandProgressIndicator(
                                       host,
                                       "stat -c \"%A %a %Y %s %n\" "

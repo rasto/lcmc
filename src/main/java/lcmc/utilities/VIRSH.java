@@ -28,6 +28,7 @@ import java.util.Map;
 import lcmc.configs.DistResource;
 import lcmc.data.Host;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides virsh commands.
@@ -47,7 +48,7 @@ public final class VIRSH {
     /** Executes the specified virsh commands on the specified host. */
     private static boolean execCommand(final Host host, final String commands, final boolean outputVisible) {
         if (host.isConnected()) {
-            final SSH.SSHOutput ret =
+            final SshOutput ret =
                 Tools.execCommandProgressIndicator(
                     host,
                                  commands,

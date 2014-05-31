@@ -29,6 +29,7 @@ import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class holds info data for a filesystem.
@@ -75,7 +76,7 @@ public final class FSInfo extends Info {
             @Override
             public void run() {
                 if (modinfo == null) {
-                    final SSH.SSHOutput ret =
+                    final SshOutput ret =
                               Tools.execCommand(getBrowser().getHost(),
                                                 "/sbin/modinfo "
                                                 + getName(),

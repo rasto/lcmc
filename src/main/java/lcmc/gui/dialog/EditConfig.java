@@ -46,7 +46,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.SSH;
-import lcmc.utilities.ssh.SSH.ExecCommandThread;
+import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 
 /**

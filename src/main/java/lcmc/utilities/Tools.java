@@ -118,6 +118,7 @@ import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides tools, that are not classified.
@@ -247,7 +248,7 @@ public final class Tools {
     }
 
     /** Executes a command with progress indicator. */
-    public static SSH.SSHOutput execCommandProgressIndicator(final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final String text, final int commandTimeout) {
+    public static SshOutput execCommandProgressIndicator(final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final String text, final int commandTimeout) {
         final String hostName = host.getName();
         Tools.startProgressIndicator(hostName, text);
         final StringBuilder output = new StringBuilder("");
@@ -295,11 +296,11 @@ public final class Tools {
             Thread.currentThread().interrupt();
         }
         Tools.stopProgressIndicator(hostName, text);
-        return new SSH.SSHOutput(output.toString(), exitCodeHolder[0]);
+        return new SshOutput(output.toString(), exitCodeHolder[0]);
     }
 
     /** Executes a command. */
-    public static SSH.SSHOutput execCommand(
+    public static SshOutput execCommand(
         final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final int commandTimeout) {
         final ExecCallback ec;
         final StringBuilder output = new StringBuilder("");
@@ -344,7 +345,7 @@ public final class Tools {
         } catch (final java.lang.InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        return new SSH.SSHOutput(output.toString(), exitCodeHolder[0]);
+        return new SshOutput(output.toString(), exitCodeHolder[0]);
     }
 
     public static String getStackTrace(final Throwable e) {

@@ -42,6 +42,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
@@ -149,7 +150,7 @@ public final class FilesystemInfo extends ServiceInfo {
             for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd =
                         DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
-                final SSH.SSHOutput ret =
+                final SshOutput ret =
                                Tools.execCommandProgressIndicator(
                                     host,
                                     statCmd,

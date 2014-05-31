@@ -30,6 +30,7 @@ import lcmc.configs.DistResource;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.utilities.ssh.SSH;
+import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides LVM commands.
@@ -54,7 +55,7 @@ public final class LVM {
      * Executes the specified LVM command on the specified host and calls the
      * supplied callback function.
      */
-    private static SSH.SSHOutput execCommand(final Host host, final String command, final boolean outputVisible, final Application.RunMode runMode) {
+    private static SshOutput execCommand(final Host host, final String command, final boolean outputVisible, final Application.RunMode runMode) {
         return Tools.execCommandProgressIndicator(
             host,
                                  command,
@@ -73,7 +74,7 @@ public final class LVM {
         replaceHash.put(SIZE_PH, size);
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.resize", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -82,7 +83,7 @@ public final class LVM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.pvcreate", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -91,7 +92,7 @@ public final class LVM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.pvremove", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -100,7 +101,7 @@ public final class LVM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.vgremove", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -109,7 +110,7 @@ public final class LVM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put(DEVICE_PH, blockDevice);
         final String command = host.getDistCommand("LVM.lvremove", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -120,7 +121,7 @@ public final class LVM {
         replaceHash.put(LV_NAME_PH, lvName);
         replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.lvcreate", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -130,7 +131,7 @@ public final class LVM {
         replaceHash.put(PV_NAMES_PH, Tools.join(" ", pvNames));
         replaceHash.put(VG_NAME_PH, vgName);
         final String command = host.getDistCommand("LVM.vgcreate", replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -142,7 +143,7 @@ public final class LVM {
         replaceHash.put(LV_NAME_PH, snapshotName);
         final String command = host.getDistCommand("LVM.lvsnapshot",
                                                    replaceHash);
-        final SSH.SSHOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, true, runMode);
         return ret.getExitCode() == 0;
     }
 
