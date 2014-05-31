@@ -51,7 +51,6 @@ public final class ExecCommandThread extends Thread {
     private final Lock mSessionLock = new ReentrantLock();
     private Session sess = null;
     private final int sshCommandTimeout;
-    private final SSH outer;
     private static final int ERROR_EXIT_CODE = 255;
     private static final int EXEC_OUTPUT_BUFFER_SIZE = 8192;
 
@@ -64,13 +63,11 @@ public final class ExecCommandThread extends Thread {
                       final NewOutputCallback newOutputCallback,
                       final boolean outputVisible,
                       final boolean commandVisible,
-                      final int sshCommandTimeout,
-                      final SSH outer) {
+                      final int sshCommandTimeout) {
         super();
         this.host = host;
         this.connectionThread = connectionThread;
         this.sshGui = sshGui;
-        this.outer = outer;
         this.command = command;
         LOG.debug2("ExecCommandThread: command: " + command);
         this.execCallback = execCallback;
@@ -183,10 +180,6 @@ public final class ExecCommandThread extends Thread {
         final StringBuilder res = new StringBuilder("");
         if (!connectionThread.isConnectionEstablished()) {
             return new SshOutput("SSH.NotConnected", 1);
-        }
-        if ("installGuiHelper".equals(command)) {
-            outer.installGuiHelper();
-            return new SshOutput("", 0);
         }
         int exitCode = 100;
         try {

@@ -161,8 +161,6 @@ public final class DistResource extends ListResourceBundle {
          //+ "/@DISTRIBUTION@/@KERNELVERSIONDIR@/@DRBDMODULEPACKAGE@"},
         {"DrbdInst.start",   SUDO + "/etc/init.d/drbd start"},
 
-        {"installGuiHelper", "installGuiHelper"}, // is treated specially by ssh class.
-
         {"GetHostAllInfo", SUDO + "@GUI-HELPER@ all"},
         {"HostHWInfoDaemon", SUDO + "@GUI-HELPER@ hw-info-daemon"},
         {"GetHostHWInfo", SUDO + "@GUI-HELPER@ hw-info"},

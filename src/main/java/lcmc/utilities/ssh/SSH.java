@@ -326,7 +326,7 @@ public final class SSH {
                                                                           null,
                                                                           outputVisible,
                                                                           commandVisible,
-                                                                          sshCommandTimeout, this);
+                                                                          sshCommandTimeout);
         if (reconnect()) {
             execCommandThread.start();
             try {
@@ -361,8 +361,7 @@ public final class SSH {
                                                                           null,
                                                                           outputVisible,
                                                                           commandVisible,
-                                                                          sshCommandTimeout,
-                                                                          this);
+                                                                          sshCommandTimeout);
         if (reconnect()) {
             execCommandThread.start();
         }
@@ -391,8 +390,7 @@ public final class SSH {
                                                                           newOutputCallback,
                                                                           outputVisible,
                                                                           commandVisible,
-                                                                          sshCommandTimeout,
-                                                                          this);
+                                                                          sshCommandTimeout);
         if (reconnect()) {
             execCommandThread.start();
         }
