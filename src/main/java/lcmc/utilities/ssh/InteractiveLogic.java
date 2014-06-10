@@ -17,7 +17,6 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.utilities.ssh;
 
 import ch.ethz.ssh2.InteractiveCallback;
@@ -30,7 +29,6 @@ import lcmc.gui.SSHGui;
  * authentication shall be supported.
  */
 public class InteractiveLogic implements InteractiveCallback {
-    /** Prompt count. */
     private int promptCount = 0;
     /** To show error only once.  */
     private String lastError;

@@ -17,7 +17,6 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.utilities.ssh;
 
 public class LastSuccessfulPassword {
@@ -49,12 +48,8 @@ public class LastSuccessfulPassword {
         this.dsaKey = dsaKey;
     }
 
-    public void setPasswordsIfNoneIsSet(final String dsaKey,
-                                        final String rsaKey,
-                                        final String password) {
-        if (this.dsaKey == null
-            && this.rsaKey == null
-            && this.password == null) {
+    public void setPasswordsIfNoneIsSet(final String dsaKey, final String rsaKey, final String password) {
+        if (this.dsaKey == null && this.rsaKey == null && this.password == null) {
             this.dsaKey = dsaKey;
             this.rsaKey = rsaKey;
             this.password = password;

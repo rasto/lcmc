@@ -17,7 +17,6 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.utilities.ssh;
 
 public final class SshOutput {
@@ -35,5 +34,9 @@ public final class SshOutput {
 
     public int getExitCode() {
         return exitCode;
+    }
+
+    public boolean isSuccess() {
+        return exitCode == 0;
     }
 }

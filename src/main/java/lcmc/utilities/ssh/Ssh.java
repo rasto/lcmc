@@ -38,13 +38,6 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.NewOutputCallback;
 import lcmc.utilities.Tools;
 
-/**
- * Verifying server hostkeys with an existing known_hosts file
- * Displaying fingerprints of server hostkeys.
- * Adding a server hostkey to a known_hosts file (+hashing the hostname
- * for security).
- * Authentication with DSA, RSA, password and keyboard-interactive methods.
- */
 public final class Ssh {
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
@@ -53,6 +46,10 @@ public final class Ssh {
     public static final int NO_COMMAND_TIMEOUT = 0;
     public static final String SUDO_PROMPT = "DRBD MC sudo pwd: ";
     public static final String SUDO_FAIL = "Sorry, try again";
+    private static final ConnectionCallback NO_CONNECTION_CALLBACK = null;
+    private static final ProgressBar NO_PROGRESS_BAR = null;
+    private static final String MESSAGE_CANCELED = "canceled";
+    private static final String LOGOUT_COMMAND = "logout";
     /** SSHGui object for enter password dialogs etc. */
     private SSHGui sshGui;
     /** Callback when connection is failed or properly closed. */
@@ -67,6 +64,7 @@ public final class Ssh {
     private LocalPortForwarder localPortForwarder = null;
 
     boolean reconnect() {
+        Tools.isNotSwingThread();
         mConnectionThreadLock.lock();
         if (connectionThread == null) {
             mConnectionThreadLock.unlock();
@@ -87,22 +85,10 @@ public final class Ssh {
         }
         if (!isConnected()) {
             LOG.debug1("reconnect: connecting: " + host.getName());
-            this.connectionCallback = null;
-            this.progressBar = null;
+            this.connectionCallback = NO_CONNECTION_CALLBACK;
+            this.progressBar = NO_PROGRESS_BAR;
             this.sshGui = new SSHGui(Tools.getGUIData().getMainFrame(), host, null);
-            host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-            final ConnectionThread ct = new ConnectionThread(host,
-                                                                   lastSuccessfulPassword,
-                                                                   sshGui,
-                                                                   progressBar,
-                                                                   connectionCallback);
-            mConnectionThreadLock.lock();
-            try {
-                connectionThread = ct;
-            } finally {
-                mConnectionThreadLock.unlock();
-            }
-            ct.start();
+            authenticateAndConnect();
         }
         return true;
     }
@@ -120,20 +106,7 @@ public final class Ssh {
             }
             return;
         }
-
-        host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-        final ConnectionThread ct = new ConnectionThread(host,
-                                                               lastSuccessfulPassword,
-                                                               sshGui,
-                                                               progressBar,
-                                                               connectionCallback);
-        mConnectionThreadLock.lock();
-        try {
-            connectionThread = ct;
-        } finally {
-            mConnectionThreadLock.unlock();
-        }
-        ct.start();
+        authenticateAndConnect();
     }
 
     /**
@@ -198,7 +171,7 @@ public final class Ssh {
         if (ct != null) {
             ct.cancel();
         }
-        final String message = "canceled";
+        final String message = MESSAGE_CANCELED;
         LOG.debug1("cancelConnection: message: " + message);
         host.getTerminalPanel().addCommandOutput(message + '\n');
         host.getTerminalPanel().nextCommand();
@@ -206,16 +179,15 @@ public final class Ssh {
         if (connectionCallback != null) {
             connectionCallback.doneError(message);
         }
-
         // connection will be established anyway after cancel in the
         // background and it will be closed after that, because conn.connect
-        // call cannot be interrupted for now.
+        // call cannot be interrupted
     }
 
     /** Cancels the session (execution of command). */
     public void cancelSession(final ExecCommandThread execCommandThread) {
-        execCommandThread.cancel();
-        final String message = "canceled";
+        execCommandThread.cancelTheSession();
+        final String message = MESSAGE_CANCELED;
         LOG.debug1("cancelSession: message" + message);
         host.getTerminalPanel().addCommandOutput("\n");
         host.getTerminalPanel().nextCommand();
@@ -224,16 +196,18 @@ public final class Ssh {
     /** Disconnects this host if it has been connected. */
     public void disconnect() {
         mConnectionLock.lock();
-        if (connectionThread == null || !connectionThread.isConnectionEstablished()) {
-            mConnectionLock.unlock();
-        } else {
-            connectionThread.setDisconnectForGood(true);
+        try {
+            if (connectionThread == null || !connectionThread.isConnectionEstablished()) {
+                return;
+            }
+            connectionThread.disconnectForGood();
             connectionThread.closeConnectionForGood();
+        } finally {
             mConnectionLock.unlock();
-            LOG.debug("disconnect: host: " + host.getName());
-            host.getTerminalPanel().addCommand("logout");
-            host.getTerminalPanel().nextCommand();
         }
+        LOG.debug("disconnect: host: " + host.getName());
+        host.getTerminalPanel().addCommand(LOGOUT_COMMAND);
+        host.getTerminalPanel().nextCommand();
     }
 
     /**
@@ -248,30 +222,34 @@ public final class Ssh {
      */
     public void forceReconnect() {
         mConnectionLock.lock();
-        if (!connectionThread.isConnectionEstablished()) {
-            mConnectionLock.unlock();
-        } else {
+        try {
+            if (!connectionThread.isConnectionEstablished()) {
+                return;
+            }
             connectionThread.closeConnection();
+        } finally {
             mConnectionLock.unlock();
-            LOG.debug("forceReconnect: host: " + host.getName());
-            host.getTerminalPanel().addCommand("logout");
-            host.getTerminalPanel().nextCommand();
         }
+        LOG.debug("forceReconnect: host: " + host.getName());
+        host.getTerminalPanel().addCommand(LOGOUT_COMMAND);
+        host.getTerminalPanel().nextCommand();
     }
 
     /** Force disconnection. */
     public void forceDisconnect() {
         mConnectionLock.lock();
-        if (!connectionThread.isConnectionEstablished()) {
+        try {
+           if (!connectionThread.isConnectionEstablished()) {
+               return;
+           }
+           connectionThread.disconnectForGood();
+           connectionThread.closeConnectionForGood();
+        } finally {
             mConnectionLock.unlock();
-        } else {
-            connectionThread.setDisconnectForGood(true);
-            connectionThread.closeConnectionForGood();
-            mConnectionLock.unlock();
-            LOG.debug("forceDisconnect: host: " + host.getName());
-            host.getTerminalPanel().addCommand("logout");
-            host.getTerminalPanel().nextCommand();
         }
+        LOG.debug("forceDisconnect: host: " + host.getName());
+        host.getTerminalPanel().addCommand("logout");
+        host.getTerminalPanel().nextCommand();
     }
 
     /** Returns true if connection is established. */
@@ -442,10 +420,11 @@ public final class Ssh {
             LOG.appError("installTestFiles: could not copy: " + fileName, "", e);
             return;
         }
-        final SshOutput ret = execCommandAndWait("tar xf /tmp/lcmc-test.tar -C /tmp/",
-                                                 false,
-                                                 false,
-                                                 60000);
+
+        final SshOutput sshOutput = execCommandAndWait("tar xf /tmp/lcmc-test.tar -C /tmp/", false, false, 60000);
+        if (!sshOutput.isSuccess()) {
+            LOG.appWarning("installing test files failed: " + sshOutput.getExitCode());
+        }
     }
 
     /**
@@ -477,8 +456,6 @@ public final class Ssh {
     /**
      * Copies file to the /tmp/ dir on the remote host.
      *
-     * @param fileContent
-     *          content of the file as string
      * @param remoteFilename
      *          new file name on the other host
      */
@@ -489,6 +466,117 @@ public final class Ssh {
                     String installCommand,
                     final String preCommand,
                     final String postCommand) {
+        if  (!isConnected()) {
+            return;
+        }
+        final String commands = buildScpCommand(remoteFilename, makeBackup, preCommand);
+        String modeString = "";
+        if (mode != null) {
+            modeString = " && chmod " + mode + ' ' + remoteFilename + ".new";
+        }
+        String postCommandString = "";
+        if (postCommand != null) {
+            postCommandString = " && " + postCommand;
+        }
+        final String backupString = buildBackupScpCommands(remoteFilename, makeBackup);
+        if (installCommand == null) {
+            installCommand = "mv " + remoteFilename + ".new " + remoteFilename;
+        }
+        final String commandTail = "\">" + remoteFilename + ".new"
+                                   + modeString
+
+                                   + "&& "
+                                   + installCommand
+
+                                   + postCommandString
+                                   + backupString;
+        LOG.debug1("scp: " + commands + "echo \"..." + commandTail);
+        final String escapedBashCommand = DistResource.SUDO
+                                          + "bash -c \""
+                                          + Tools.escapeQuotes(commands
+                                                               + "echo \""
+                                                               + Tools.escapeQuotes(fileContent, 1)
+                                                               + commandTail, 1)
+                                          + '"';
+        final Thread t = execCommand(escapedBashCommand,
+                                     new ExecCallback() {
+                                         @Override
+                                         public void done(final String ans) {
+                                             /* ok */
+                                         }
+
+                                         @Override
+                                         public void doneError(final String ans, final int exitCode) {
+                                             if (ans == null) {
+                                                 return;
+                                             }
+                                             scpCommandFailed(ans);
+                                         }
+                                     },
+                                     false,
+                                     false,
+                                     10000); /* smaller timeout */
+        try {
+            t.join();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public void startVncPortForwarding(final String remoteHost, final int remotePort) throws IOException {
+        final int localPort = remotePort + Tools.getApplication().getVncPortOffset();
+        try {
+            localPortForwarder = connectionThread.getConnection().createLocalPortForwarder(localPort,
+                                                                                           "127.0.0.1",
+                                                                                           remotePort);
+        } catch (final IOException e) {
+            throw e;
+        }
+    }
+
+    public void stopVncPortForwarding(final int remotePort)
+        throws IOException {
+        try {
+            localPortForwarder.close();
+        } catch (final IOException e) {
+            throw e;
+        }
+    }
+
+    public boolean isConnectionCanceled() {
+        return connectionThread.isDisconnectedForGood();
+    }
+
+    private void scpCommandFailed(final String ans) {
+        for (final String line : ans.split("\n")) {
+             if (line.indexOf("error:") != 0) {
+                 continue;
+             }
+             final Thread t = new Thread(
+             new Runnable() {
+                 @Override
+                 public void run() {
+                     Tools.progressIndicatorFailed(host.getName(), line, 3000);
+                 }
+             });
+             t.start();
+         }
+    }
+
+    private void authenticateAndConnect() {
+        host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
+        final Authentication authentication = new Authentication(lastSuccessfulPassword, host, sshGui);
+        final ConnectionThread ct = new ConnectionThread(host, sshGui, progressBar, connectionCallback, authentication);
+        mConnectionThreadLock.lock();
+        try {
+            connectionThread = ct;
+        } finally {
+            mConnectionThreadLock.unlock();
+        }
+        ct.start();
+    }
+
+    private String buildScpCommand(final String remoteFilename, final boolean makeBackup, final String preCommand) {
         final StringBuilder commands = new StringBuilder(40);
         if (preCommand != null) {
             commands.append(preCommand);
@@ -506,17 +594,10 @@ public final class Ssh {
             commands.append(dir);
             commands.append(';');
         }
-        if  (!isConnected()) {
-            return;
-        }
-        String modeString = "";
-        if (mode != null) {
-            modeString = " && chmod " + mode + ' ' + remoteFilename + ".new";
-        }
-        String postCommandString = "";
-        if (postCommand != null) {
-            postCommandString = " && " + postCommand;
-        }
+        return commands.toString();
+    }
+
+    private String buildBackupScpCommands(final String remoteFilename, final boolean makeBackup) {
         final StringBuilder backupString = new StringBuilder(50);
         if (makeBackup) {
             backupString.append(" && if ! diff ");
@@ -531,91 +612,6 @@ public final class Ssh {
             backupString.append(".bak;");
             backupString.append(" fi ");
         }
-        if (installCommand == null) {
-            installCommand = "mv " + remoteFilename + ".new " + remoteFilename;
-        }
-        final String commandTail = "\">" + remoteFilename + ".new"
-                                   + modeString
-
-                                   + "&& "
-                                   + installCommand
-
-                                   + postCommandString
-                                   + backupString.toString();
-        LOG.debug1("scp: " + commands.toString() + "echo \"..." + commandTail);
-        final Thread t = execCommand(DistResource.SUDO + "bash -c \""
-                                     + Tools.escapeQuotes(
-                                         commands.toString()
-                                         + "echo \""
-                                         + Tools.escapeQuotes(fileContent, 1)
-                                         + commandTail, 1)
-                                     + '"',
-                                     new ExecCallback() {
-                                         @Override
-                                         public void done(final String ans) {
-                                             /* ok */
-                                         }
-                                         @Override
-                                         public void doneError(
-                                                                  final String ans,
-                                                                  final int exitCode) {
-                                             if (ans == null) {
-                                                 return;
-                                             }
-                                             for (final String line
-                                                            : ans.split("\n")) {
-                                                 if (line.indexOf(
-                                                             "error:") != 0) {
-                                                     continue;
-                                                 }
-                                                 final Thread t = new Thread(
-                                                 new Runnable() {
-                                                     @Override
-                                                     public void run() {
-                                                         Tools.progressIndicatorFailed(
-                                                                         host.getName(),
-                                                                         line,
-                                                                         3000);
-                                                     }
-                                                 });
-                                                 t.start();
-                                             }
-                                         }
-                                     },
-                                     false,
-                                     false,
-                                     10000); /* smaller timeout */
-        try {
-            t.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    /** Starts port forwarding for vnc. */
-    public void startVncPortForwarding(final String remoteHost, final int remotePort) throws IOException {
-        final int localPort = remotePort + Tools.getApplication().getVncPortOffset();
-        try {
-            localPortForwarder = connectionThread.getConnection().createLocalPortForwarder(localPort,
-                                                                                           "127.0.0.1",
-                                                                                           remotePort);
-        } catch (final IOException e) {
-            throw e;
-        }
-    }
-
-    /** Stops port forwarding for vnc. */
-    public void stopVncPortForwarding(final int remotePort)
-        throws IOException {
-        try {
-            localPortForwarder.close();
-        } catch (final IOException e) {
-            throw e;
-        }
-    }
-
-    /** Returns whether connection was canceled. */
-    public boolean isConnectionCanceled() {
-        return connectionThread.isDisconnectedForGood();
+        return backupString.toString();
     }
 }

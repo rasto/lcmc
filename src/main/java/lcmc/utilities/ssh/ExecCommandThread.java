@@ -53,6 +53,8 @@ public final class ExecCommandThread extends Thread {
     private final int sshCommandTimeout;
     private static final int ERROR_EXIT_CODE = 255;
     private static final int EXEC_OUTPUT_BUFFER_SIZE = 8192;
+    private static final int DEFAULT_EXIT_CODE = 100;
+    private static final String ENCODING = "UTF-8";
 
     /** Executes a command in a thread. */
     ExecCommandThread(final Host host,
@@ -75,10 +77,10 @@ public final class ExecCommandThread extends Thread {
         this.outputVisible = outputVisible;
         this.commandVisible = commandVisible;
         this.sshCommandTimeout = sshCommandTimeout;
-        if (command.length() > 9 && command.substring(0, 9).equals("NOOUTPUT:")) {
+        if (command.length() > 9 && "NOOUTPUT:".equals(command.substring(0, 9))) {
             this.outputVisible = false;
             this.command = command.substring(9, command.length());
-        } else if (command.length() > 7 && command.substring(0, 7).equals("OUTPUT:")) {
+        } else if (command.length() > 7 && "OUTPUT:".equals(command.substring(0, 7))) {
             this.outputVisible = true;
             this.command = command.substring(7, command.length());
         } else {
@@ -102,67 +104,54 @@ public final class ExecCommandThread extends Thread {
         }
     }
 
+    public void cancelTheSession() {
+        cancelIt = true;
+        mSessionLock.lock();
+        final Session thisSession;
+        try {
+            thisSession = sess;
+            sess = null;
+        } finally {
+            mSessionLock.unlock();
+        }
+        if (thisSession != null) {
+            thisSession.close();
+        }
+    }
+
+    static private class ConnectionTimeout {
+        private boolean timeout = false;
+
+        private void setTimeout() {
+            timeout = true;
+        }
+
+        private boolean wasTimeout() {
+            return timeout;
+        }
+    }
+
     private void exec() {
         // ;;; separates commands, that are to be executed one after one,
         // if previous command has finished successfully.
         final String[] commands = command.split(";;;");
         final StringBuilder ans = new StringBuilder("");
         for (final String command1 : commands) {
-            final Boolean[] cancelTimeout = new Boolean[1];
-            cancelTimeout[0] = false;
-            final Thread tt = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Tools.sleep(Tools.getDefaultInt("SSH.ConnectTimeout"));
-                    if (!cancelTimeout[0]) {
-                        LOG.debug1("exec: " + host.getName() + ": open ssh session: timeout");
-                        cancelTimeout[0] = true;
-                        final SshConnection sshConnection = connectionThread.getConnection();
-                        if (sshConnection != null) {
-                            sshConnection.dmcCancel();
-                        }
-                    }
-                }
-            });
-            tt.start();
+            final ConnectionTimeout connectionTimeout = setupConnectionTimeout();
             try {
-                /* it may hang here if we lost connection, so it will be
-                 * interrupted after a timeout. */
-                final Session newSession = connectionThread.getConnection().openSession();
-                mSessionLock.lock();
-                try {
-                    sess = newSession;
-                } finally {
-                    mSessionLock.unlock();
-                }
-                if (cancelTimeout[0]) {
-                    throw new IOException("open session failed");
-                }
-                cancelTimeout[0] = true;
+                openSshSession(connectionTimeout);
             } catch (final IOException e) {
-                connectionThread.closeConnection();
-                if (execCallback != null) {
-                    execCallback.doneError("could not open session", 45);
-                }
+                handleSshSessionFailure();
                 break;
             }
             final String cmd = command1.trim();
-            if (commandVisible && outputVisible) {
-                final String consoleCommand = host.replaceVars(cmd, true);
-                host.getTerminalPanel().
-                    addCommand(consoleCommand.replaceAll(DistResource.SUDO, " "));
-            }
-            final SshOutput ret = execOneCommand(cmd, outputVisible);
+            writeCommandToTerminal(cmd);
+            final SshOutput ret = execOneCommand(cmd);
             ans.append(ret.getOutput());
             final int exitCode = ret.getExitCode();
-            // don't execute after error
             if (exitCode != 0) {
-                if (execCallback != null) {
-                    if (outputVisible) {
-                        Tools.getGUIData().expandTerminalSplitPane(0);
-                    }
-                    execCallback.doneError(ans.toString(), exitCode);
-                }
+                handleCommandFailure(ans, exitCode);
+                // skip the reset
                 return;
             }
         }
@@ -171,17 +160,77 @@ public final class ExecCommandThread extends Thread {
         }
     }
 
-    private SshOutput execOneCommand(final String command, final boolean outputVisible) {
+    private void handleCommandFailure(final StringBuilder ans,
+            final int exitCode) {
+        if (execCallback != null) {
+            if (outputVisible) {
+                Tools.getGUIData().expandTerminalSplitPane(0);
+            }
+            execCallback.doneError(ans.toString(), exitCode);
+        }
+    }
+
+    private void writeCommandToTerminal(final String cmd) {
+        if (commandVisible && outputVisible) {
+            final String consoleCommand = host.replaceVars(cmd, true);
+            host.getTerminalPanel().addCommand(consoleCommand.replaceAll(DistResource.SUDO, " "));
+        }
+    }
+
+    private void handleSshSessionFailure() {
+        connectionThread.closeConnection();
+        if (execCallback != null) {
+            execCallback.doneError("could not open session", 45);
+        }
+    }
+
+    private void openSshSession(final ConnectionTimeout connectionTimeout)
+            throws IOException {
+        /* it may hang here if we lost connection, so it will be
+         * interrupted after a timeout. */
+        final Session newSession = connectionThread.getConnection().openSession();
+        mSessionLock.lock();
+        try {
+            sess = newSession;
+        } finally {
+            mSessionLock.unlock();
+        }
+        if (connectionTimeout.wasTimeout()) {
+            throw new IOException("open session failed");
+        }
+        connectionTimeout.setTimeout();
+    }
+
+    private ConnectionTimeout setupConnectionTimeout() {
+        final ConnectionTimeout connectionTimeout = new ConnectionTimeout();
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Tools.sleep(Tools.getDefaultInt("SSH.ConnectTimeout"));
+                if (!connectionTimeout.wasTimeout()) {
+                    LOG.debug1("exec: " + host.getName() + ": open ssh session: timeout");
+                    connectionTimeout.setTimeout();
+                    final SshConnection sshConnection = connectionThread.getConnection();
+                    if (sshConnection != null) {
+                        sshConnection.cancel();
+                    }
+                }
+            }
+        });
+        thread.start();
+        return connectionTimeout;
+    }
+
+    private SshOutput execOneCommand(final String oneCommand) {
         if (sshCommandTimeout > 0 && sshCommandTimeout < 2000) {
             LOG.appWarning("execOneCommand: timeout: " + sshCommandTimeout + " to small for timeout? " + command);
         }
-        this.command = command;
-        this.outputVisible = outputVisible;
-        final StringBuilder res = new StringBuilder("");
         if (!connectionThread.isConnectionEstablished()) {
             return new SshOutput("SSH.NotConnected", 1);
         }
-        int exitCode = 100;
+
+        int exitCode = DEFAULT_EXIT_CODE;
+        String outputString = "";
         try {
             mSessionLock.lock();
             final Session thisSession;
@@ -202,130 +251,14 @@ public final class ExecCommandThread extends Thread {
             LOG.debug2("execOneCommand: command: "
                        + host.getName()
                        + ": "
-                       + host.getSudoCommand(host.getHoppedCommand(command), true));
+                       + host.getSudoCommand(host.getHoppedCommand(oneCommand), true));
             thisSession.execCommand("bash -c '"
                                     + Tools.escapeSingleQuotes("export LC_ALL=C;"
-                                                               + host.getSudoCommand(host.getHoppedCommand(command),
+                                                               + host.getSudoCommand(host.getHoppedCommand(oneCommand),
                                                                                      false), 1) + '\'');
-            final InputStream stdout = thisSession.getStdout();
-            final OutputStream stdin = thisSession.getStdin();
-            final InputStream stderr = thisSession.getStderr();
-            //byte[] buff = new byte[8192];
-            final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
-            boolean skipNextLine = false;
-            boolean cancelSudo = false;
-            while (true) {
-                final String sudoPwd = host.getSudoPassword();
-                if ((stdout.available() == 0) && (stderr.available() == 0)) {
-                    /* Even though currently there is no data available,
-                     * it may be that new data arrives and the session's
-                     * underlying channel is closed before we call
-                     * waitForCondition(). This means that EOF and
-                     * STDOUT_DATA (or STDERR_DATA, or both) may be set
-                     * together.
-                     */
-                    int conditions = 0;
-                    if (!cancelIt) {
-                        conditions = thisSession.waitForCondition(ChannelCondition.STDOUT_DATA
-                                                                  | ChannelCondition.STDERR_DATA
-                                                                  | ChannelCondition.EOF,
-                                                                  sshCommandTimeout);
-                    }
-                    if (cancelIt) {
-                        LOG.info("execOneCommand: SSH cancel");
-                        throw new IOException("Canceled while waiting for data from peer.");
-                    }
-                    if ((conditions & ChannelCondition.TIMEOUT) != 0) {
-                        /* A timeout occured. */
-                        LOG.appWarning("execOneCommand: SSH timeout: " + command);
-                        Tools.progressIndicatorFailed(host.getName(),
-                                                      "SSH timeout: " + command.replaceAll(DistResource.SUDO, ""));
-                        throw new IOException("Timeout while waiting for data from peer.");
-                    }
-                    /* Here we do not need to check separately for CLOSED,
-                     * since CLOSED implies EOF */
-                    if ((conditions & ChannelCondition.EOF) != 0
-                        && (conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0) {
-                        /* The remote side won't send us further data... */
-                        /* ... and we have consumed all data in the
-                         * ... local arrival window. */
-                        break;
-                    }
-                    /* OK, either STDOUT_DATA or STDERR_DATA (or both) */
-                    /* ... is set. */
-                }
-                /* If you below replace "while" with "if", then the way
-                 * the output appears on the local stdout and stder streams
-                 * is more "balanced". Addtionally reducing the buffer size
-                 * will also improve the interleaving, but performance will
-                 * slightly suffer. OKOK, that all matters only if you get
-                 * HUGE amounts of stdout and stderr data =)
-                 */
-                /* stdout */
-                final StringBuilder output = new StringBuilder("");
-                while (stdout.available() > 0 && !cancelIt) {
-                    final int len = stdout.read(buff);
-                    if (len > 0) {
-                        final String buffString = new String(buff, 0, len, "UTF-8");
-                        output.append(buffString);
-                        if (outputVisible) {
-                            host.getTerminalPanel().addContent(buffString);
-                        }
-                    }
-                }
-                if (output.indexOf(Ssh.SUDO_PROMPT) >= 0) {
-                    if (sudoPwd == null) {
-                        cancelSudo = enterSudoPassword();
-                    }
-                    final String pwd = host.getSudoPassword() + '\n';
-                    stdin.write(pwd.getBytes());
-                    skipNextLine = true;
-                    continue;
-                } else if (output.indexOf(Ssh.SUDO_FAIL) >= 0) {
-                    host.setSudoPassword(null);
-                } else {
-                    if (skipNextLine) {
-                        /* this is the "enter" after pwd */
-                        skipNextLine = false;
-                        if (output.charAt(0) == 13 && output.charAt(1) == 10) {
-                            output.delete(0, 2);
-                            if (output.length() == 0) {
-                                continue;
-                            }
-                        }
-                    }
-                }
-                /* stderr */
-                final CharSequence errOutput = new StringBuilder("");
-                while (stderr.available() > 0 && !cancelIt) {
-                    // this is unreachable.
-                    // stdout and stderr are mixed in the stdout
-                    // if pty is requested.
-                    final int len = stderr.read(buff);
-                    if (len > 0) {
-                        final String buffString = new String(buff, 0, len, "UTF-8");
-                        output.append(buffString);
-                        if (outputVisible) {
-                            host.getTerminalPanel().addContentErr(buffString);
-                        }
-                    }
-                }
-                res.append(errOutput);
-                if (newOutputCallback != null && !cancelIt) {
-                    LOG.debug2("execOneCommand: output: "
-                               + exitCode
-                               + ": "
-                               + host.getName()
-                               + ": "
-                               + output.toString());
-                    newOutputCallback.output(output.toString());
-                }
-                if (cancelIt) {
-                    return new SshOutput("", 130);
-                }
-                if (newOutputCallback == null) {
-                    res.append(output);
-                }
+            outputString = execCommandAndCaptureOutput(oneCommand, thisSession);
+            if (cancelIt) {
+                return new SshOutput("", 130);
             }
             if (outputVisible) {
                 host.getTerminalPanel().nextCommand();
@@ -338,33 +271,145 @@ public final class ExecCommandThread extends Thread {
             thisSession.close();
             sess = null;
         } catch (final IOException e) {
-            LOG.appWarning("execOneCommand: " + host.getName() + ':' + e.getMessage() + ':' + command);
+            LOG.appWarning("execOneCommand: " + host.getName() + ':' + e.getMessage() + ':' + oneCommand);
             exitCode = ERROR_EXIT_CODE;
-            cancel();
+            cancelTheSession();
         }
-        final String outputString = res.toString();
         LOG.debug2("execOneCommand: output: " + exitCode + ": " + host.getName() + ": " + outputString);
         return new SshOutput(outputString, exitCode);
     }
 
-    /** Cancel the session. */
-    public void cancel() {
-        cancelIt = true;
-        mSessionLock.lock();
-        final Session thisSession;
-        try {
-            thisSession = sess;
-            sess = null;
-        } finally {
-            mSessionLock.unlock();
+    private String execCommandAndCaptureOutput(final String oneCommand, final Session thisSession) throws IOException {
+        final InputStream stdout = thisSession.getStdout();
+        final OutputStream stdin = thisSession.getStdin();
+        final InputStream stderr = thisSession.getStderr();
+        final byte[] buff = new byte[EXEC_OUTPUT_BUFFER_SIZE];
+        boolean skipNextLine = false;
+        final StringBuilder res = new StringBuilder("");
+        while (true) {
+            final String sudoPwd = host.getSudoPassword();
+            if ((stdout.available() == 0) && (stderr.available() == 0)) {
+                /* Even though currently there is no data available,
+                 * it may be that new data arrives and the session's
+                 * underlying channel is closed before we call
+                 * waitForCondition(). This means that EOF and
+                 * STDOUT_DATA (or STDERR_DATA, or both) may be set
+                 * together.
+                 */
+                int conditions = 0;
+                if (!cancelIt) {
+                    conditions = thisSession.waitForCondition(ChannelCondition.STDOUT_DATA
+                                                              | ChannelCondition.STDERR_DATA
+                                                              | ChannelCondition.EOF,
+                                                              sshCommandTimeout);
+                }
+                if (cancelIt) {
+                    LOG.info("execOneCommand: SSH cancel");
+                    throw new IOException("Canceled while waiting for data from peer.");
+                }
+                if ((conditions & ChannelCondition.TIMEOUT) != 0) {
+                    /* A timeout occured. */
+                    LOG.appWarning("execOneCommand: SSH timeout: " + oneCommand);
+                    Tools.progressIndicatorFailed(host.getName(),
+                                                  "SSH timeout: " + oneCommand.replaceAll(DistResource.SUDO, ""));
+                    throw new IOException("Timeout while waiting for data from peer.");
+                }
+                /* Here we do not need to check separately for CLOSED,
+                 * since CLOSED implies EOF */
+                if ((conditions & ChannelCondition.EOF) != 0
+                    && (conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0) {
+                    /* The remote side won't send us further data... */
+                    /* ... and we have consumed all data in the
+                     * ... local arrival window. */
+                    break;
+                }
+                /* OK, either STDOUT_DATA or STDERR_DATA (or both) */
+                /* ... is set. */
+            }
+            final StringBuilder output = readStdout(stdout, buff);
+            if (output.indexOf(Ssh.SUDO_PROMPT) >= 0) {
+                if (sudoPwd == null) {
+                    enterSudoPassword();
+                }
+                final String pwd = host.getSudoPassword() + '\n';
+                stdin.write(pwd.getBytes());
+                skipNextLine = true;
+                continue;
+            } else if (output.indexOf(Ssh.SUDO_FAIL) >= 0) {
+                host.setSudoPassword(null);
+            } else {
+                if (skipNextLine) {
+                    /* this is the "enter" after pwd */
+                    skipNextLine = false;
+                    if (output.charAt(0) == 13 && output.charAt(1) == 10) {
+                        output.delete(0, 2);
+                        if (output.length() == 0) {
+                            continue;
+                        }
+                    }
+                }
+            }
+            final StringBuilder errOutput = readStderr(stderr, buff);
+            res.append(errOutput);
+            if (newOutputCallback != null && !cancelIt) {
+                LOG.debug2("execOneCommand: output: "
+                           + ": "
+                           + host.getName()
+                           + ": "
+                           + output.toString());
+                newOutputCallback.output(output.toString());
+            }
+            if (cancelIt) {
+                return res.toString();
+            }
+            if (newOutputCallback == null) {
+                res.append(output);
+            }
         }
-        if (thisSession != null) {
-            thisSession.close();
+        return res.toString();
+    }
+
+    /** If you below replace "while" with "if", then the way
+     * the output appears on the local stdout and stder streams
+     * is more "balanced". Addtionally reducing the buffer size
+     * will also improve the interleaving, but performance will
+     * slightly suffer. OKOK, that all matters only if you get
+     * HUGE amounts of stdout and stderr data =)
+     */
+    private StringBuilder readStdout(final InputStream stdout, final byte[] buff) throws IOException {
+        final StringBuilder output = new StringBuilder();
+        while (stdout.available() > 0 && !cancelIt) {
+            final int len = stdout.read(buff);
+            if (len > 0) {
+                final String buffString = new String(buff, 0, len, ENCODING);
+                output.append(buffString);
+                if (outputVisible) {
+                    host.getTerminalPanel().addContent(buffString);
+                }
+            }
         }
+        return output;
+    }
+
+    private StringBuilder readStderr(final InputStream stderr, final byte[] buff) throws IOException {
+        final StringBuilder output = new StringBuilder();
+        while (stderr.available() > 0 && !cancelIt) {
+            // this is unreachable.
+            // stdout and stderr are mixed in the stdout
+            // if pty is requested.
+            final int len = stderr.read(buff);
+            if (len > 0) {
+                final String buffString = new String(buff, 0, len, ENCODING);
+                output.append(buffString);
+                if (outputVisible) {
+                    host.getTerminalPanel().addContentErr(buffString);
+                }
+            }
+        }
+        return output;
     }
 
     /**
-     * Enter sudo password.
      * Return whether the dialog was cancelled.
      */
     private boolean enterSudoPassword() {

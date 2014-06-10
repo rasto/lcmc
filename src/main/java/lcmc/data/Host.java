@@ -1261,7 +1261,7 @@ public class Host implements Comparable<Host>, Value {
             LOG.appWarning("trying to stop stopped server status");
             return;
         }
-        sst.cancel();
+        sst.cancelTheSession();
         serverStatusThread = null;
     }
 
@@ -1272,7 +1272,7 @@ public class Host implements Comparable<Host>, Value {
             LOG.appWarning("execDrbdStatusCommand: trying to stop stopped drbd status");
             return;
         }
-        dst.cancel();
+        dst.cancelTheSession();
         drbdStatusThread = null;
     }
 
@@ -1330,7 +1330,7 @@ public class Host implements Comparable<Host>, Value {
             LOG.appWarning("stopClStatus: trying to stop stopped status");
             return;
         }
-        cst.cancel();
+        cst.cancelTheSession();
     }
 
     /** Gets ipAddress. There can be more ips, delimited with "," */

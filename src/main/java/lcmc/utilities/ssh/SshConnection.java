@@ -17,7 +17,6 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.utilities.ssh;
 
 import ch.ethz.ssh2.Connection;
@@ -25,13 +24,15 @@ import ch.ethz.ssh2.channel.ChannelManager;
 
 /** Connection class that can cancel it's connection during openSession. */
 public class SshConnection extends Connection {
+    private boolean canceled = false;
+    private boolean disconnectForGood = false;
 
     SshConnection(final String hostname, final int port) {
         super(hostname, port);
     }
 
-    /** Cancel from application. */
-    void dmcCancel() {
+    void cancel() {
+        canceled = true;
         /* public getChannelManager() { return cm }
         has to be added to the Connection.java till
         it's sorted out. */
@@ -39,5 +40,17 @@ public class SshConnection extends Connection {
         if (cm != null) {
             cm.closeAllChannels();
         }
+    }
+
+    boolean isCanceled() {
+        return canceled;
+    }
+
+    void disconnectForGood() {
+        disconnectForGood = true;
+    }
+
+    boolean isDisconnectedForGood() {
+        return disconnectForGood;
     }
 }
