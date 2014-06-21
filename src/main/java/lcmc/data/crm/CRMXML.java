@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.data;
+package lcmc.data.crm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
+import lcmc.data.*;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.resources.crm.ServicesInfo;
@@ -51,7 +52,6 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;

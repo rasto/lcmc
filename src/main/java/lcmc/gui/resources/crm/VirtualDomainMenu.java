@@ -5,7 +5,7 @@ import java.util.List;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.VMSXML;
+import lcmc.data.vm.VMSXML;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;

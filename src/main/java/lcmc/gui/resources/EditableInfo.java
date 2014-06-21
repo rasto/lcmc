@@ -45,7 +45,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.data.CRMXML;
+import lcmc.data.crm.CRMXML;
 import lcmc.data.Value;
 import lcmc.data.resources.Resource;
 import lcmc.gui.Browser;

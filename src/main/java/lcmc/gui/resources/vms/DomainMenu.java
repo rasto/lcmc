@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.VMSXML;
+import lcmc.data.vm.VMSXML;
 import lcmc.data.resources.Resource;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;

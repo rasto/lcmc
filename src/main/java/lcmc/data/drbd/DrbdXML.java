@@ -21,7 +21,7 @@
  */
 
 
-package lcmc.data;
+package lcmc.data.drbd;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
+import lcmc.data.*;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.ProxyNetInfo;
@@ -46,7 +47,6 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.keyvalue.MultiKey;

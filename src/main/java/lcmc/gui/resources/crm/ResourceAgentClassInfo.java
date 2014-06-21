@@ -32,7 +32,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import lcmc.data.ResourceAgent;
+import lcmc.data.crm.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;

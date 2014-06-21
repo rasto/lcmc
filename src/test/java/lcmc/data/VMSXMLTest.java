@@ -21,6 +21,8 @@
 package lcmc.data;
 
 import static org.junit.Assert.assertEquals;
+
+import lcmc.data.vm.VMSXML;
 import org.junit.Test;
 
 

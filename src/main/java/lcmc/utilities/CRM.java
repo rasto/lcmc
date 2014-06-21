@@ -35,11 +35,10 @@ import java.util.regex.Matcher;
 
 import lcmc.configs.DistResource;
 import lcmc.data.Application;
-import lcmc.data.CRMXML;
+import lcmc.data.crm.CRMXML;
 import lcmc.data.Host;
-import lcmc.data.HostLocation;
+import lcmc.data.crm.HostLocation;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**

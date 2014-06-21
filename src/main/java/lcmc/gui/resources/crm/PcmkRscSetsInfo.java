@@ -35,7 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.data.Application;
-import lcmc.data.CRMXML;
+import lcmc.data.crm.CRMXML;
 import lcmc.data.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;

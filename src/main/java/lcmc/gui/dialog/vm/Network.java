@@ -30,7 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
-import lcmc.data.VMSXML.InterfaceData;
+import lcmc.data.vm.VMSXML.InterfaceData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.resources.vms.InterfaceInfo;

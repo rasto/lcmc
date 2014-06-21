@@ -7,7 +7,7 @@ import java.util.Set;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
-import lcmc.data.DrbdXML;
+import lcmc.data.drbd.DrbdXML;
 import lcmc.data.Host;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;

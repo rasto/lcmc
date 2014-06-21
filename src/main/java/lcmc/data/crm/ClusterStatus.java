@@ -21,7 +21,7 @@
  */
 
 
-package lcmc.data;
+package lcmc.data.crm;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,13 +30,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import lcmc.data.CRMXML.ResStatus;
+import lcmc.data.*;
+import lcmc.data.crm.CRMXML.ResStatus;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;

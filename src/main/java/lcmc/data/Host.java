@@ -47,8 +47,10 @@ import javax.swing.JComponent;
 
 import lcmc.Exceptions;
 import lcmc.configs.DistResource;
+import lcmc.data.drbd.DrbdXML;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.NetInterface;
+import lcmc.data.vm.VMSXML;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.ProgressBar;
@@ -696,7 +698,7 @@ public class Host implements Comparable<Host>, Value {
     }
 
     /** Returns available crypto modules as a list of strings. */
-    Set<String> getCryptoModules() {
+    public Set<String> getCryptoModules() {
         return cryptoModules;
     }
 
@@ -2770,12 +2772,12 @@ public class Host implements Comparable<Host>, Value {
     }
 
     /** Returns MD5 checksum of VM Info from server. */
-    String getVMInfoMD5() {
+    public String getVMInfoMD5() {
         return vmInfoMD5;
     }
 
     /** Sets MD5 checksum of VM Info from server. */
-    void setVMInfoMD5(final String vmInfoMD5) {
+    public void setVMInfoMD5(final String vmInfoMD5) {
         this.vmInfoMD5 = vmInfoMD5;
     }
 
@@ -2964,7 +2966,7 @@ public class Host implements Comparable<Host>, Value {
     }
 
     /** Sets libvirt version. */
-    void setLibvirtVersion(final String libvirtVersion) {
+    public void setLibvirtVersion(final String libvirtVersion) {
         this.libvirtVersion = libvirtVersion;
     }
 

@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.data;
+package lcmc.data.crm;
 
 /**
  * This class holds data of host locations.

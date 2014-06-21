@@ -33,7 +33,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.VMSXML;
+import lcmc.data.vm.VMSXML;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.SpringUtilities;

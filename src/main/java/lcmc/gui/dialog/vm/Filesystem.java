@@ -28,7 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import lcmc.data.VMSXML.FilesystemData;
+import lcmc.data.vm.VMSXML.FilesystemData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.resources.vms.FilesystemInfo;

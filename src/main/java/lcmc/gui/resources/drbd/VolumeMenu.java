@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.data.DrbdXML;
+import lcmc.data.drbd.DrbdXML;
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;

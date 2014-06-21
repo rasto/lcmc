@@ -29,7 +29,7 @@ import lcmc.configs.DistResource;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.ResourceAgent;
+import lcmc.data.crm.ResourceAgent;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
@@ -42,7 +42,6 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**

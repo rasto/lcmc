@@ -51,7 +51,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
 import lcmc.data.AccessMode;
-import lcmc.data.AisCastAddress;
+import lcmc.data.crm.AisCastAddress;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
@@ -70,7 +70,6 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;

@@ -93,7 +93,7 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          + "cd drbd-@VERSION@ && "
          + "/usr/bin/apt-get update && "
          + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
-         + "dpkg-divert --add --rename --package lcmc8-module-`uname -r` "
+         + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
            + "/lib/modules/`uname -r`/kernel/ubuntu/drbd/drbd.ko && "
          + "if [ -e configure ]; then"
          + " ./configure --prefix=/usr --with-km --localstatedir=/var"

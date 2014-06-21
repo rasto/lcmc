@@ -20,11 +20,13 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.data;
+package lcmc.data.drbd;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import lcmc.data.Host;
 import lcmc.utilities.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
 

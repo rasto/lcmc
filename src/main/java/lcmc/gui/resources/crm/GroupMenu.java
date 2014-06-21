@@ -9,7 +9,7 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.data.ResourceAgent;
+import lcmc.data.crm.ResourceAgent;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyList;

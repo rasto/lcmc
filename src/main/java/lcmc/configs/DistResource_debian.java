@@ -64,7 +64,7 @@ public final class DistResource_debian extends ListResourceBundle {
 
         {"DrbdInst.install",
          DistResource.SUDO
-         + "dpkg-divert --add --rename --package lcmc8-module-`uname -r` "
+         + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
          + "/lib/modules/`uname -r`/kernel/drivers/block/drbd/drbd.ko; "
          + "echo|"
          + DistResource.SUDO + "dpkg -i --force-confold /tmp/drbdinst/@DRBDPACKAGES@"},

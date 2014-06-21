@@ -8,7 +8,7 @@ import java.util.Locale;
 import javax.swing.JColorChooser;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.data.ClusterStatus;
+import lcmc.data.crm.ClusterStatus;
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;

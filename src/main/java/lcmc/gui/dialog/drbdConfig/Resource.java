@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.configs.AppDefaults;
-import lcmc.data.DrbdXML;
+import lcmc.data.drbd.DrbdXML;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;

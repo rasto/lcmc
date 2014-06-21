@@ -20,7 +20,7 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.data;
+package lcmc.data.crm;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +30,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lcmc.data.Value;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**

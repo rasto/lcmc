@@ -44,7 +44,7 @@ import lcmc.data.Application;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.VMSXML;
+import lcmc.data.vm.VMSXML;
 import lcmc.data.Value;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;

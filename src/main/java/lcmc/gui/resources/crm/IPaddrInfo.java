@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lcmc.data.AccessMode;
-import lcmc.data.ResourceAgent;
+import lcmc.data.crm.ResourceAgent;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
 import lcmc.gui.Browser;

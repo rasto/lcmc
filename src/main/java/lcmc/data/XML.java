@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
  * @version $Id$
  *
  */
-abstract class XML {
+public abstract class XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(XML.class);
     /** Returns child node of the node identified by the tag. */
@@ -76,7 +76,7 @@ abstract class XML {
     }
 
     /** Returns attribute value for node and name of the attribute. */
-    final String getAttribute(final Node node, final String name) {
+    protected final String getAttribute(final Node node, final String name) {
         if (node.getAttributes().getNamedItem(name) == null) {
             return null;
         } else {
@@ -85,7 +85,7 @@ abstract class XML {
     }
 
     /** Returns text in the node. */
-    final String getText(final Node node) {
+    protected final String getText(final Node node) {
         final Node ch = getChildNode(node, "#text");
         if (ch == null) {
             return "";

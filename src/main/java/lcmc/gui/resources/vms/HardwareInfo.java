@@ -51,7 +51,7 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.LinuxFile;
 import lcmc.data.StringValue;
-import lcmc.data.VMSXML;
+import lcmc.data.vm.VMSXML;
 import lcmc.data.Value;
 import lcmc.data.resources.Resource;
 import lcmc.gui.Browser;
@@ -69,7 +69,6 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.w3c.dom.Node;

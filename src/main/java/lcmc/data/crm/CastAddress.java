@@ -21,7 +21,7 @@
  */
 
 
-package lcmc.data;
+package lcmc.data.crm;
 
 /**
  * This class holds data for multicast and broadcast addresses for heartbeat
