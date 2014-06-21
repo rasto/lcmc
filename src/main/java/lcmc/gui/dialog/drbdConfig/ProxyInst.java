@@ -34,6 +34,7 @@ import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.DRBD;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -110,10 +111,10 @@ final class ProxyInst extends DialogHost {
             installCommand = "ProxyInst.install." + installMethod;
         }
 
-        getHost().execCommandInBash(
-                         installCommand,
-                         getProgressBar(),
-                         new ExecCallback() {
+        getHost().execCommandInBash(new ExecCommandConfig()
+                         .commandString(installCommand)
+                         .progressBar(getProgressBar())
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                 checkAnswer(answer, installMethod);
@@ -127,16 +128,15 @@ final class ProxyInst extends DialogHost {
                                          errorCode
                                  );
                              }
-                         },
-                         new ConvertCmdCallback() {
+                         })
+                         .convertCmdCallback(new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
                                  return command.replaceAll("@ARCH@",
                                                            archString);
                              }
-                         },
-                         true,
-                         Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
+                         })
+                         .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
     /** Returns the next dialog. */

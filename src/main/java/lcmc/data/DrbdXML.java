@@ -45,6 +45,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -390,15 +391,10 @@ public class DrbdXML extends XML {
     }
 
     public final String updateDrbdParameters(final Host host) {
-        final String command = host.getDistCommand("Drbd.getParameters",
-                                                   (ConvertCmdCallback) null);
-
-        final SshOutput ret =
-                              Tools.execCommand(host,
-                                                command,
-                                                null,   /* ExecCallback */
-                                                false,  /* outputVisible */
-                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
+        final String command = host.getDistCommand("Drbd.getParameters", (ConvertCmdCallback) null);
+        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command)
+                                                                         .silentCommand()
+                                                                         .silentOutput());
         if (ret.getExitCode() != 0) {
             return null;
         }
@@ -445,14 +441,10 @@ public class DrbdXML extends XML {
         if (!host.isConnected()) {
             return null;
         }
-        final String command2 = host.getDistCommand("Drbd.getConfig",
-                                                    (ConvertCmdCallback) null);
-        final SshOutput ret = Tools.execCommand(
-                                                host,
-                                                command2,
-                                                null,   /* ExecCallback */
-                                                false,  /* outputVisible */
-                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
+        final String command2 = host.getDistCommand("Drbd.getConfig", (ConvertCmdCallback) null);
+        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command2)
+                                                                         .silentCommand()
+                                                                         .silentOutput());
         if (ret.getExitCode() == 0) {
             final StringBuffer confSB = new StringBuffer(ret.getOutput());
             return host.getOutput("drbd", confSB);

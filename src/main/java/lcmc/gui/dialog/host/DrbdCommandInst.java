@@ -36,6 +36,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -123,43 +124,33 @@ final class DrbdCommandInst extends DialogHost {
                    + " arch: " + archString
                    + " version: " + drbdVersionUrlString
                    + '/' + drbdVersion);
-        getHost().execCommandInBash(
-                         installCommand + ";;;DRBD.load",
-                         getProgressBar(),
-                         new ExecCallback() {
+        getHost().execCommandInBash(new ExecCommandConfig()
+                         .commandString(installCommand + ";;;DRBD.load")
+                         .progressBar(getProgressBar())
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                  LOG.debug1("installDrbd: done: " + answer);
                                  checkAnswer(answer);
                              }
+
                              @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 LOG.debug1("installDrbd: done error: "
-                                            + errorCode + " / "
-                                            + answer);
-                                 printErrorAndRetry(
-                                    Tools.getString(
-                                      "Dialog.Host.DrbdCommandInst.InstError"),
-                                         answer,
-                                         errorCode);
+                             public void doneError(final String answer, final int errorCode) {
+                                 LOG.debug1("installDrbd: done error: " + errorCode + " / " + answer);
+                                 printErrorAndRetry(Tools.getString("Dialog.Host.DrbdCommandInst.InstError"),
+                                                    answer,
+                                                    errorCode);
                              }
-                         },
-                         new ConvertCmdCallback() {
+                         })
+                         .convertCmdCallback(new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
-                                 return command.replaceAll("@ARCH@",
-                                                           archString)
-                                               .replaceAll(
-                                                          "@VERSIONSTRING@",
-                                                          drbdVersionUrlString)
-                                               .replaceAll(
-                                                        "@VERSION@",
-                                                        drbdVersion);
+                                 return command.replaceAll("@ARCH@", archString)
+                                               .replaceAll("@VERSIONSTRING@", drbdVersionUrlString)
+                                               .replaceAll("@VERSION@", drbdVersion);
                              }
-                         },
-                         true,
-                         Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
+                         })
+                         .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
     /** Returns the next dialog. */

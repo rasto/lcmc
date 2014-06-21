@@ -27,6 +27,7 @@ import java.util.Map;
 
 import lcmc.configs.DistResource;
 import lcmc.data.Host;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -46,19 +47,13 @@ public final class VIRSH {
     }
 
     /** Executes the specified virsh commands on the specified host. */
-    private static boolean execCommand(final Host host, final String commands, final boolean outputVisible) {
+    private static boolean execCommand(final Host host, final String commands) {
         if (host.isConnected()) {
-            final SshOutput ret =
-                Tools.execCommandProgressIndicator(
-                    host,
-                                 commands,
-                                 null,
-                                 outputVisible,
-                                 Tools.getString("VIRSH.ExecutingCommand")
-                                 + ' '
-                                 + commands.replaceAll(DistResource.SUDO, " ")
-                                 + "...",
-                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
+            final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("VIRSH.ExecutingCommand")
+                                                                       + ' '
+                                                                       + commands.replaceAll(DistResource.SUDO, " ")
+                                                                       + "...",
+                                                                       new ExecCommandConfig().command(commands));
             if (ret.getExitCode() != 0) {
                 return false;
             }
@@ -68,11 +63,11 @@ public final class VIRSH {
 
 
     /** Executes the specified virsh commands on the specified hosts. */
-    private static boolean execCommand(final Host[] hosts, final Map<Host, String> hostCommands, final boolean outputVisible) {
+    private static boolean execCommand(final Host[] hosts, final Map<Host, String> hostCommands) {
         for (final Host host : hosts) {
             final String commands = hostCommands.get(host);
             if (!commands.isEmpty()) {
-                if (!execCommand(host, commands, outputVisible)) {
+                if (!execCommand(host, commands)) {
                     return false;
                 }
             }
@@ -112,7 +107,7 @@ public final class VIRSH {
                 hostCommands.put(host, commands.toString());
             }
         }
-        execCommand(hosts, hostCommands, true);
+        execCommand(hosts, hostCommands);
     }
 
     /** Starts virtual domain. */
@@ -120,9 +115,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Start",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Start", replaceHash);
+        return execCommand(host, command);
     }
 
     /** Shuts down virtual domain. */
@@ -130,9 +124,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Shutdown",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Shutdown", replaceHash);
+        return execCommand(host, command);
     }
 
     /** Reboots virtual domain. */
@@ -140,9 +133,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Reboot",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Reboot", replaceHash);
+        return execCommand(host, command);
     }
 
     /** Destroys virtual domain. */
@@ -150,9 +142,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Destroy",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Destroy", replaceHash);
+        return execCommand(host, command);
     }
 
     /** Suspends virtual domain. */
@@ -160,9 +151,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Suspend",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Suspend", replaceHash);
+        return execCommand(host, command);
     }
 
     /** Resumes virtual domain. */
@@ -170,9 +160,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Resume",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Resume", replaceHash);
+        return execCommand(host, command);
     }
 
     /**
@@ -183,9 +172,8 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", config);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Define",
-                                                   replaceHash);
-        return execCommand(host, command, true);
+        final String command = host.getDistCommand("VIRSH.Define", replaceHash);
+        return execCommand(host, command);
     }
 
     /** Returns command that defines virtual domain. */
@@ -204,7 +192,7 @@ public final class VIRSH {
         replaceHash.put("@OPTIONS@", options);
         final String command = host.getDistCommand("VIRSH.Undefine",
                                                    replaceHash);
-        return execCommand(host, command, true);
+        return execCommand(host, command);
     }
 
     /** Private constructor, cannot be instantiated. */

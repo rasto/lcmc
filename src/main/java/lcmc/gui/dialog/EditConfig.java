@@ -45,6 +45,7 @@ import lcmc.data.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -182,11 +183,8 @@ public final class EditConfig extends ConfigDialog {
                     }
 
                 };
-            threads[i] = host.execCommandRaw(DistResource.SUDO + "cat " + file,
-                                             execCallback,
-                                             false, /* outputVisible */
-                                             true,  /* commandVisible */
-                                             Ssh.DEFAULT_COMMAND_TIMEOUT);
+            threads[i] = host.execCommand(new ExecCommandConfig().command(DistResource.SUDO + "cat " + file)
+                                                                 .execCallback(execCallback));
             i++;
         }
         for (final ExecCommandThread t : threads) {

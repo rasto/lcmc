@@ -33,6 +33,9 @@ import lcmc.data.Host;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -45,7 +48,6 @@ import lcmc.utilities.Tools;
  *
  */
 public class Devices extends DialogHost {
-
     /** Prepares a new {@code Devices} object. */
     public Devices(final WizardDialog previousDialog, final Host host) {
         super(previousDialog, host);
@@ -97,9 +99,10 @@ public class Devices extends DialogHost {
 
     /** Returns info for input pane. */
     protected final void getAllInfo() {
-        final ExecCommandThread t = getHost().execCommand("GetHostAllInfo",
-                         getProgressBar(),
-                         new ExecCallback() {
+        final ExecCommandThread t = getHost().execCommand(
+                         new ExecCommandConfig().commandString("GetHostAllInfo")
+                         .progressBar(getProgressBar())
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                  checkAnswer(answer);
@@ -113,10 +116,9 @@ public class Devices extends DialogHost {
                                          answer,
                                          errorCode);
                              }
-                         },
-                         null, /* ConvertCmdCallback */
-                         true, /* outputVisible */
-                         Ssh.DEFAULT_COMMAND_TIMEOUT);
+                         })
+                         .silentCommand()
+                         .silentOutput());
         setCommandThread(t);
     }
 

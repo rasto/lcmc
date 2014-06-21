@@ -117,6 +117,7 @@ import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -245,107 +246,6 @@ public final class Tools {
             noButton);
         cd.showDialog();
         return cd.isPressedYesButton();
-    }
-
-    /** Executes a command with progress indicator. */
-    public static SshOutput execCommandProgressIndicator(final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final String text, final int commandTimeout) {
-        final String hostName = host.getName();
-        Tools.startProgressIndicator(hostName, text);
-        final StringBuilder output = new StringBuilder("");
-        final Integer[] exitCodeHolder = new Integer[]{0};
-        final ExecCallback ec;
-        if (execCallback == null) {
-            final String stacktrace = getStackTrace();
-            ec = new ExecCallback() {
-                @Override
-                public void done(final String answer) {
-                    output.append(answer);
-                }
-                
-                @Override
-                public void doneError(final String answer,
-                                                   final int errorCode) {
-                    LOG.appWarning("doneError: " + command + ' '
-                                                + answer + " rc: " + errorCode);
-                    if (outputVisible) {
-                        LOG.sshError(host,
-                                                 command,
-                                                 answer,
-                                                 stacktrace,
-                                                 errorCode);
-                    }
-                    exitCodeHolder[0] = errorCode;
-                    output.append(answer);
-                }
-            };
-        } else {
-            ec = execCallback;
-        }
-        final Thread commandThread = host.execCommandRaw(command,
-                                                         ec,
-                                                         outputVisible,
-                                                         true,
-                                                         commandTimeout);
-        
-        
-        try {
-            if (commandThread != null) {
-                commandThread.join(0);
-            }
-        } catch (final java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        Tools.stopProgressIndicator(hostName, text);
-        return new SshOutput(output.toString(), exitCodeHolder[0]);
-    }
-
-    /** Executes a command. */
-    public static SshOutput execCommand(
-        final Host host, final String command, final ExecCallback execCallback, final boolean outputVisible, final int commandTimeout) {
-        final ExecCallback ec;
-        final StringBuilder output = new StringBuilder("");
-        final Integer[] exitCodeHolder = new Integer[]{0};
-        if (execCallback == null) {
-            final String stacktrace = getStackTrace();
-            ec = new ExecCallback() {
-                @Override
-                public void done(final String answer) {
-                    output.append(answer);
-                }
-                
-                @Override
-                public void doneError(final String answer,
-                                                   final int errorCode) {
-                    if (outputVisible) {
-                        LOG.sshError(host,
-                                                 command,
-                                                 answer,
-                                                 stacktrace,
-                                                 errorCode);
-                    }
-                    exitCodeHolder[0] = errorCode;
-                    output.append(answer);
-                }
-            };
-        } else {
-            ec = execCallback;
-        }
-
-        final Thread commandThread = host.execCommandRaw(command,
-                                                         ec,
-                                                         outputVisible,
-                                                         true,
-                                                         commandTimeout);
-        
-        
-        try {
-            if (commandThread != null) {
-                commandThread.join(0);
-            }
-        } catch (final java.lang.InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        return new SshOutput(output.toString(), exitCodeHolder[0]);
     }
 
     public static String getStackTrace(final Throwable e) {

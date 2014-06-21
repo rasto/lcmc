@@ -66,6 +66,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -242,11 +243,11 @@ public class HostInfo extends Info {
                 if (!host.isCsInit()) {
                     command = "HostBrowser.getHostInfoHeartbeat";
                 }
-                host.execCommand(command,
-                                 execCallback,
-                                 null,  /* ConvertCmdCallback */
-                                 false,  /* outputVisible */
-                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
+                host.execCommand(new ExecCommandConfig().commandString(command)
+                                                        .execCallback(execCallback)
+                                                        .silentCommand()
+                                                        .silentOutput()
+                                                        .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
             }
         });
         host.registerEnableOnConnect(hostInfoButton);
@@ -254,20 +255,15 @@ public class HostInfo extends Info {
         crmConfigureShowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(
-                                    ta,
-                                    new AccessMode(Application.AccessType.ADMIN,
-                                                   false));
+                registerComponentEditAccessMode(ta, new AccessMode(Application.AccessType.ADMIN, false));
                 updateAdvancedPanels();
                 crmShowInProgress = true;
                 crmInfo = false;
                 crmConfigureShowButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
-                host.execCommand("HostBrowser.getCrmConfigureShow",
-                                 execCallback,
-                                 null,  /* ConvertCmdCallback */
-                                 false,  /* outputVisible */
-                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
+                host.execCommand(new ExecCommandConfig().commandString("HostBrowser.getCrmConfigureShow")
+                                                        .execCallback(execCallback)
+                                                        .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
             }
         });
         final CRMGraph crmg = getBrowser().getClusterBrowser().getCRMGraph();
@@ -415,11 +411,11 @@ public class HostInfo extends Info {
         if (!host.isCsInit()) {
             command = "HostBrowser.getHostInfoHeartbeat";
         }
-        host.execCommand(command,
-                         execCallback,
-                         null,  /* ConvertCmdCallback */
-                         false,  /* outputVisible */
-                         Ssh.DEFAULT_COMMAND_TIMEOUT);
+        host.execCommand(new ExecCommandConfig().commandString(command)
+                                                .execCallback(execCallback)
+                                                .silentCommand()
+                                                .silentOutput()
+                                                .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
         return mainPanel;
     }
 

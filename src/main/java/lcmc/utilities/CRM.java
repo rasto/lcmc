@@ -38,6 +38,7 @@ import lcmc.data.Application;
 import lcmc.data.CRMXML;
 import lcmc.data.Host;
 import lcmc.data.HostLocation;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -80,7 +81,7 @@ public final class CRM {
     }
 
     /** Executes specified command on the host. */
-    private static SshOutput execCommand(final Host host, final String command, final boolean outputVisible, final Application.RunMode runMode) {
+    private static SshOutput execCommand(final Host host, final String command, final Application.RunMode runMode) {
         M_PTEST_WRITELOCK.lock();
         try {
             ptestOutput = null;
@@ -93,20 +94,13 @@ public final class CRM {
              + "then " + DistResource.SUDO + "/usr/sbin/cibadmin -Ql > "
              + LCMC_TEST_FILE + ";fi;"
              + "export CIB_file=" + LCMC_TEST_FILE + ';';
-            return Tools.execCommand(host,
-                                     testCmd + command,
-                                     null,
-                                     false,
-                                     Ssh.DEFAULT_COMMAND_TIMEOUT);
+            return host.captureCommand(new ExecCommandConfig().command(testCmd + command)
+                                                              .silentCommand()
+                                                              .silentOutput());
         } else {
             LOG.debug1("execCommand: crm command: " + command);
-            return Tools.execCommandProgressIndicator(
-                host,
-                                    command,
-                                    null,
-                                    outputVisible,
-                                    Tools.getString("CIB.ExecutingCommand"),
-                                    Ssh.DEFAULT_COMMAND_TIMEOUT);
+            return host.captureCommandProgressIndicator(Tools.getString("CIB.ExecutingCommand"),
+                                                        new ExecCommandConfig().command(command));
         }
     }
 
@@ -131,12 +125,9 @@ public final class CRM {
                 + PTEST_END_DELIM
                 + "';cat " + LCMC_TEST_FILE + " 2>/dev/null;"
                 + "mv -f " + LCMC_TEST_FILE + "{,.last} 2>/dev/null";
-        final SshOutput output = Tools.execCommand(
-            host,
-                                                command,
-                                                null,
-                                                false,
-                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
+        final SshOutput output = host.captureCommand(new ExecCommandConfig().command(command)
+                                                                            .silentCommand()
+                                                                            .silentOutput());
         M_PTEST_WRITELOCK.lock();
         try {
             final String po = output.getOutput();
@@ -344,10 +335,7 @@ public final class CRM {
         xml.append('\'');
 
         final SshOutput ret = execCommand(host,
-                                          getCibCommand(command,
-                                                            "resources",
-                                                            xml.toString()),
-                                          true,
+                                          getCibCommand(command, "resources", xml.toString()),
                                           runMode);
         return ret.getExitCode() == 0;
     }
@@ -419,10 +407,7 @@ public final class CRM {
         }
 
         final SshOutput ret = execCommand(host,
-                                          getCibCommand(cibadminOpt,
-                                                            "resources",
-                                                            xml.toString()),
-                                          true,
+                                          getCibCommand(cibadminOpt, "resources", xml.toString()),
                                           runMode);
         return ret.getExitCode() == 0;
     }
@@ -580,7 +565,7 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -672,11 +657,9 @@ public final class CRM {
                                           op,
                                           role,
                                           locationId);
-        final SshOutput ret = execCommand(
-            host,
-                                    getCibCommand(command, "constraints", xml),
-                                    true,
-                                    runMode);
+        final SshOutput ret = execCommand(host,
+                                          getCibCommand(command, "constraints", xml),
+                                          runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -711,11 +694,9 @@ public final class CRM {
                                           op,
                                           null, /* role */
                                           locationId);
-        final SshOutput ret = execCommand(
-            host,
-                                    getCibCommand(command, "constraints", xml),
-                                    true,
-                                    runMode);
+        final SshOutput ret = execCommand(host,
+                                          getCibCommand(command, "constraints", xml),
+                                          runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -730,7 +711,7 @@ public final class CRM {
                                           null,
                                           locationId);
         final String command = getCibCommand("-D", "constraints", xml);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -784,7 +765,7 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "resources",
                                              xml.toString());
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -801,7 +782,7 @@ public final class CRM {
             final String command =
                 host.getDistCommand("CRM.cleanupResource",
                                           replaceHash);
-            execCommand(host, command, true, runMode);
+            execCommand(host, command, runMode);
         }
         return true; /* always return true */
     }
@@ -815,7 +796,7 @@ public final class CRM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@ID@", resId);
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -878,7 +859,7 @@ public final class CRM {
         replaceHash.put("@ID@", resId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -895,7 +876,7 @@ public final class CRM {
         replaceHash.put("@ID@", resId);
 
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -907,7 +888,7 @@ public final class CRM {
         final String command = host.getDistCommand("CRM.migrateResource",
                                                    replaceHash);
 
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -918,7 +899,7 @@ public final class CRM {
         final String command = host.getDistCommand("CRM.migrateFromResource",
                                                    replaceHash);
 
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -930,7 +911,7 @@ public final class CRM {
         final String command = host.getDistCommand("CRM.forceMigrateResource",
                                                    replaceHash);
 
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -941,7 +922,7 @@ public final class CRM {
         final String command = host.getDistCommand(
             "CRM.unmigrateResource",
                                              replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1001,8 +982,7 @@ public final class CRM {
                                          "rsc_defaults",
                                          rscdXML.toString()));
         }
-        final SshOutput ret =
-            execCommand(host, command.toString(), true, runMode);
+        final SshOutput ret = execCommand(host, command.toString(), runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1016,7 +996,7 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "constraints",
                                              xml.toString());
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1069,7 +1049,7 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1082,7 +1062,7 @@ public final class CRM {
         final String command = getCibCommand("-D",
                                              "constraints",
                                              xml.toString());
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1128,7 +1108,7 @@ public final class CRM {
         final String command = getCibCommand(cibadminOpt,
                                              "constraints",
                                              xml.toString());
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1141,7 +1121,7 @@ public final class CRM {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@HOST@", standByHost.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1154,7 +1134,7 @@ public final class CRM {
         }
         replaceHash.put("@HOST@", standByHost.getName());
         final String command = host.getDistCommand(cmd, replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1162,7 +1142,7 @@ public final class CRM {
     public static boolean erase(final Host host, final Application.RunMode runMode) {
         final Map<String, String> replaceHash = Collections.emptyMap();
         final String command = host.getDistCommand("CRM.erase", replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         return ret.getExitCode() == 0;
     }
 
@@ -1173,7 +1153,7 @@ public final class CRM {
                         Tools.escapeQuotes(Matcher.quoteReplacement(config), 1));
         final String command = host.getDistCommand("CRM.configureCommit",
                                                    replaceHash);
-        final SshOutput ret = execCommand(host, command, true, runMode);
+        final SshOutput ret = execCommand(host, command, runMode);
         if (ret.getExitCode() == 0) {
             return ret.getOutput();
         }

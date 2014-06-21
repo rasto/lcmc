@@ -25,9 +25,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
 import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -76,13 +78,9 @@ public final class FSInfo extends Info {
             @Override
             public void run() {
                 if (modinfo == null) {
-                    final SshOutput ret =
-                              Tools.execCommand(getBrowser().getHost(),
-                                                "/sbin/modinfo "
-                                                + getName(),
-                                                null,   /* ExecCallback */
-                                                false,  /* outputVisible */
-                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
+                    final Host host = getBrowser().getHost();
+                    final SshOutput ret = host.captureCommand(new ExecCommandConfig()
+                                                                  .command("/sbin/modinfo " + getName()));
                     modinfo = ret.getOutput();
                 }
                 ep.setText("<html><pre>" + modinfo + "</html></pre>");

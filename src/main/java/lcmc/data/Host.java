@@ -63,6 +63,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.NewOutputCallback;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -1104,75 +1105,33 @@ public class Host implements Comparable<Host>, Value {
      * is finished execCallback.done function will be called. In case of error,
      * callback.doneError is called.
      */
-    public ExecCommandThread execCommand(
-                               final String commandString,
-                               final ExecCallback execCallback,
-                               final ConvertCmdCallback convertCmdCallback,
-                               final boolean outputVisible,
-                               final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(Tools.getDistCommand(commandString,
-                                                    dist,
-                                                    distVersionString,
-                                                    arch,
-                                                    convertCmdCallback,
-                                                    false,  /* in bash */
-                                                    false), /* sudo */
-                               execCallback,
-                               outputVisible,
-                               true,
-                               commandTimeout);
+    public ExecCommandThread execCommand(final ExecCommandConfig execCommandConfig) {
+        return ssh.execCommand(execCommandConfig);
+
     }
 
-    /**
-     * Executes command. Command is not converted for different distributions
-     * and is executed in a new thread, after command is finished callback.done
-     * function will be called. In case of error, callback.doneError is called.
-     */
-    public ExecCommandThread execCommandRaw(final String command,
-                                            final ExecCallback callback,
-                                            final boolean outputVisible,
-                                            final boolean commandVisible,
-                                            final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(command,
-                               callback,
-                               outputVisible,
-                               commandVisible,
-                               commandTimeout);
+    public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
+        return ssh.captureCommand(execCommandConfig);
     }
 
-    /**
-     * Executes command. Command is executed in a new thread, after command
-     * is finished callback.done function will be called. In case of error,
-     * callback.doneError is called.
-     */
-    public ExecCommandThread execCommand(
-                               final String commandString,
-                               final ProgressBar progressBar,
-                               final ExecCallback callback,
-                               final ConvertCmdCallback convertCmdCallback,
-                               final boolean outputVisible,
-                               final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
+    public SshOutput captureCommandProgressIndicator(final String text, final ExecCommandConfig execCommandConfig) {
+        final String hostName = getName();
+        Tools.startProgressIndicator(hostName, text);
+        try {
+            return ssh.captureCommand(execCommandConfig);
+        } finally {
+            Tools.stopProgressIndicator(hostName, text);
         }
-        return ssh.execCommand(Tools.getDistCommand(commandString,
-                                                    dist,
-                                                    distVersionString,
-                                                    arch,
-                                                    convertCmdCallback,
-                                                    false,  /* in bash */
-                                                    false), /* sudo */
-                               progressBar,
-                               callback,
-                               outputVisible,
-                               true,
-                               commandTimeout);
+    }
+
+    public void execCommandProgressIndicator(final String text, final ExecCommandConfig execCommandConfig) {
+        final String hostName = getName();
+        Tools.startProgressIndicator(hostName, text);
+        try {
+            ssh.execCommand(execCommandConfig);
+        } finally {
+            Tools.stopProgressIndicator(hostName, text);
+        }
     }
 
     /**
@@ -1180,51 +1139,8 @@ public class Host implements Comparable<Host>, Value {
      * after command * is finished callback.done function will be called.
      * In case of error, callback.doneError is called.
      */
-    public ExecCommandThread execCommandInBash(
-                               final String commandString,
-                               final ProgressBar progressBar,
-                               final ExecCallback callback,
-                               final ConvertCmdCallback convertCmdCallback,
-                               final boolean outputVisible,
-                               final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(Tools.getDistCommand(commandString,
-                                                    dist,
-                                                    distVersionString,
-                                                    arch,
-                                                    convertCmdCallback,
-                                                    true,  /* in bash */
-                                                    true), /* sudo */
-                               progressBar,
-                               callback,
-                               outputVisible,
-                               true,
-                               commandTimeout);
-    }
-
-    /**
-     * Executes command. Command is not converted for different distributions
-     * and is executed in a new thread, after command is finished callback.done
-     * function will be called. In case of error, callback.doneError is called.
-     */
-    public ExecCommandThread execCommandRaw(
-                                   final String command,
-                                   final ProgressBar progressBar,
-                                   final ExecCallback execCallback,
-                                   final boolean outputVisible,
-                                   final boolean commandVisible,
-                                   final int commandTimeout) {
-        if (outputVisible) {
-            Tools.getGUIData().setTerminalPanel(getTerminalPanel());
-        }
-        return ssh.execCommand(command,
-                               progressBar,
-                               execCallback,
-                               outputVisible,
-                               commandVisible,
-                               commandTimeout);
+    public ExecCommandThread execCommandInBash(ExecCommandConfig execCommandConfig) {
+        return ssh.execCommand(execCommandConfig.inBash(true).inSudo(true));
     }
 
     /**
@@ -1235,20 +1151,15 @@ public class Host implements Comparable<Host>, Value {
     public void execDrbdStatusCommand(final ExecCallback execCallback,
                                       final NewOutputCallback outputCallback) {
         if (drbdStatusThread == null) {
-            drbdStatusThread = ssh.execCommand(
-                                Tools.getDistCommand(
-                                                "DRBD.getDrbdStatus",
-                                                dist,
-                                                distVersionString,
-                                                arch,
-                                                null, /* ConvertCmdCallback */
-                                                false,  /* in bash */
-                                                false), /* sudo */
-                                    execCallback,
-                                    outputCallback,
-                                    false,
-                                    false,
-                                    DRBD_EVENTS_TIMEOUT);
+            drbdStatusThread = ssh.execCommand(new ExecCommandConfig()
+                                                   .commandString("DRBD.getDrbdStatus")
+                                                   .inBash(false)
+                                                   .inSudo(false)
+                                                   .execCallback(execCallback)
+                                                   .newOutputCallback(outputCallback)
+                                                   .silentCommand()
+                                                   .silentOutput()
+                                                   .sshCommandTimeout(DRBD_EVENTS_TIMEOUT));
         } else {
             LOG.appWarning("execDrbdStatusCommand: trying to start started drbd status");
         }
@@ -1295,19 +1206,15 @@ public class Host implements Comparable<Host>, Value {
     public void execClStatusCommand(final ExecCallback execCallback,
                                     final NewOutputCallback outputCallback) {
         if (clStatusThread == null) {
-            clStatusThread = ssh.execCommand(
-                            Tools.getDistCommand("Heartbeat.getClStatus",
-                                                 dist,
-                                                 distVersionString,
-                                                 arch,
-                                                 null, /* ConvertCmdCallback */
-                                                 false,  /* in bash */
-                                                 false), /* sudo */
-                                execCallback,
-                                outputCallback,
-                                false,
-                                false,
-                                CLUSTER_EVENTS_TIMEOUT);
+            clStatusThread = ssh.execCommand(new ExecCommandConfig()
+                                                 .commandString("Heartbeat.getClStatus")
+                                                 .inBash(false)
+                                                 .inSudo(false)
+                                                 .execCallback(execCallback)
+                                                 .newOutputCallback(outputCallback)
+                                                 .silentCommand()
+                                                 .silentOutput()
+                                                 .sshCommandTimeout(CLUSTER_EVENTS_TIMEOUT));
         } else {
             LOG.appWarning("execClStatusCommand: trying to start started status");
         }
@@ -1315,8 +1222,12 @@ public class Host implements Comparable<Host>, Value {
 
     /** Waits while the hb status thread finishes. */
     public void waitOnClStatus() {
+        final ExecCommandThread cst = clStatusThread;
+        if (cst == null) {
+            return;
+        }
         try {
-            clStatusThread.join();
+            cst.join();
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -1637,11 +1548,12 @@ public class Host implements Comparable<Host>, Value {
                         @Override
                         public void done(final int flag) {
                             setConnected();
-                            getSSH().execCommandAndWait(":", /* activate sudo */
-                                    false,
-                                    false,
-                                    10000);
-                            getSSH().installGuiHelper();
+                            getSSH().execCommandAndWait(new ExecCommandConfig()
+                                                            .command(":") /* activate sudo */
+                                                            .silentCommand()
+                                                            .silentOutput()
+                                                            .sshCommandTimeout(10000));
+                                    getSSH().installGuiHelper();
                             getAllInfo();
                             if (progressIndicator) {
                                 Tools.stopProgressIndicator(
@@ -1676,28 +1588,23 @@ public class Host implements Comparable<Host>, Value {
 
     /** Gets and stores info about the host. */
     void getAllInfo() {
-        final Thread t = execCommand("GetHostAllInfo",
-                         new ExecCallback() {
-                             @Override
-                             public void done(final String ans) {
-                                 parseHostInfo(ans);
-                                 setLoadingDone();
-                             }
+        execCommand(new ExecCommandConfig().commandString("GetHostAllInfo")
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String ans) {
+                        parseHostInfo(ans);
+                        setLoadingDone();
+                    }
 
-                             @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
-                                 setLoadingError();
-                             }
-                         },
-                         null, /* ConvertCmdCallback */
-                         false,
-                         HW_INFO_TIMEOUT);
-        try {
-            t.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+                    @Override
+                    public void doneError(final String ans, final int exitCode) {
+                        setLoadingError();
+                    }
+                })
+                .sshCommandTimeout(HW_INFO_TIMEOUT)
+                .silentCommand()
+                .silentOutput()
+                .silentCommand()).block();
     }
 
     /** Gets and stores hardware info about the host. */
@@ -1715,13 +1622,12 @@ public class Host implements Comparable<Host>, Value {
         } else {
             cmd = "GetHostHWInfo";
         }
-        final Thread t = execCommand(cmd,
-                         new ExecCallback() {
+        execCommand(new ExecCommandConfig().commandString(cmd)
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String ans) {
                                  parseHostInfo(ans);
-                                 for (final CategoryInfo ci
-                                                     : infosToUpdate) {
+                                 for (final CategoryInfo ci : infosToUpdate) {
                                      ci.updateTable(CategoryInfo.MAIN_TABLE);
                                  }
                                  for (final ResourceGraph g : graphs) {
@@ -1733,20 +1639,14 @@ public class Host implements Comparable<Host>, Value {
                              }
 
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String ans, final int exitCode) {
                                  setLoadingError();
                                  getSSH().forceReconnect();
                              }
-                         },
-                         null, /* ConvertCmdCallback */
-                         false,
-                         HW_INFO_TIMEOUT);
-        try {
-            t.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+                         })
+                         .sshCommandTimeout(HW_INFO_TIMEOUT)
+                         .silentCommand()
+                         .silentOutput()).block();
     }
 
     public String getOutput(final String type, final StringBuffer buffer) {
@@ -1782,39 +1682,28 @@ public class Host implements Comparable<Host>, Value {
     }
 
     public void startPing() {
-        final Thread t = ssh.execCommand(
-                                Tools.getDistCommand(
-                                                "PingCommand",
-                                                dist,
-                                                distVersionString,
-                                                arch,
-                                                null, /* ConvertCmdCallback */
-                                                true,   /* in bash */
-                                                false), /* sudo */
-                         new ExecCallback() {
+        ssh.execCommand(new ExecCommandConfig()
+                         .commandString("PingCommand")
+                         .inBash(true)
+                         .inSudo(false)
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String ans) {
                              }
 
                              @Override
-                             public void doneError(final String ans,
-                                                   final int exitCode) {
+                             public void doneError(final String ans, final int exitCode) {
                              }
-                         },
-                         new NewOutputCallback() {
+                         })
+                         .newOutputCallback(new NewOutputCallback() {
                              @Override
                              public void output(final String output) {
                                  ping.set(true);
                              }
-                         },
-                         false,
-                         false,
-                         PING_TIMEOUT);
-        try {
-            t.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+                         })
+                         .silentCommand()
+                         .silentOutput()
+                         .sshCommandTimeout(PING_TIMEOUT)).block();
     }
 
     /** Gets and stores hardware info about the host. */
@@ -1822,21 +1711,15 @@ public class Host implements Comparable<Host>, Value {
                                   final ResourceGraph[] graphs) {
         final Host host = this;
         LOG.debug1("startHWInfoDaemon: " + getName());
-        serverStatusThread = ssh.execCommand(
-                                Tools.getDistCommand(
-                                                "HostHWInfoDaemon",
-                                                dist,
-                                                distVersionString,
-                                                arch,
-                                                null, /* ConvertCmdCallback */
-                                                false,  /* in bash */
-                                                false), /* sudo */
-                         new ExecCallback() {
+        serverStatusThread = ssh.execCommand(new ExecCommandConfig()
+                         .commandString("HostHWInfoDaemon")
+                         .inBash(false)
+                         .inSudo(false)
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String ans) {
                                  parseHostInfo(ans);
-                                 for (final CategoryInfo ci
-                                                     : infosToUpdate) {
+                                 for (final CategoryInfo ci : infosToUpdate) {
                                      ci.updateTable(CategoryInfo.MAIN_TABLE);
                                  }
                                  for (final ResourceGraph g : graphs) {
@@ -1862,8 +1745,8 @@ public class Host implements Comparable<Host>, Value {
                                  }
                                  setLoadingError();
                              }
-                         },
-                         new NewOutputCallback() {
+                         })
+                         .newOutputCallback(new NewOutputCallback() {
                              private final StringBuffer outputBuffer =
                                                         new StringBuffer(300);
                              @Override
@@ -1941,18 +1824,10 @@ public class Host implements Comparable<Host>, Value {
                                  }
                                  setLoadingDone();
                              }
-                         },
-                         false,
-                         false,
-                         HW_INFO_TIMEOUT);
-        try {
-            final ExecCommandThread sst = serverStatusThread;
-            if (sst != null) {
-                sst.join();
-            }
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+                         })
+                         .silentCommand()
+                         .silentOutput()
+                         .sshCommandTimeout(HW_INFO_TIMEOUT)).block();
     }
 
     /** Starts connection status. */
@@ -2949,10 +2824,12 @@ public class Host implements Comparable<Host>, Value {
         int i = 0;
         SshOutput out;
         do {
-            out = getSSH().execCommandAndWait(command.toString(),
-                                              false,
-                                              false,
-                                              60000);
+            out = getSSH().execCommandAndWait(new ExecCommandConfig().command(command.toString())
+                                                                     .sshCommandTimeout(60000));
+            //out = getSSH().execCommandAndWait(command.toString(),
+            //        false,
+            //        false,
+            //        60000);
             /* 10 - no such file */
             if (out.getExitCode() == 0 || out.getExitCode() == 10) {
                 break;

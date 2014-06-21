@@ -33,6 +33,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -125,10 +126,10 @@ final class PacemakerInst extends DialogHost {
         Tools.getApplication().setLastInstalledClusterStack(
                                                 Application.COROSYNC_NAME);
 
-        getHost().execCommandInBash(
-                         installCommand,
-                         getProgressBar(),
-                         new ExecCallback() {
+        getHost().execCommandInBash(new ExecCommandConfig()
+                         .commandString(installCommand)
+                         .progressBar(getProgressBar())
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                  checkAnswer(answer, installMethod);
@@ -142,16 +143,15 @@ final class PacemakerInst extends DialogHost {
                                          answer,
                                          errorCode);
                              }
-                         },
-                         new ConvertCmdCallback() {
+                         })
+                         .convertCmdCallback(new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
                                  return command.replaceAll("@ARCH@",
                                                            archString);
                              }
-                         },
-                         true,
-                         Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
+                         })
+                         .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
     /** Returns the next dialog. */

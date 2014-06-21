@@ -7,6 +7,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import java.io.IOException;
+
 @Category(IntegrationTest.class)
 public final class SSHITest {
 
@@ -18,7 +20,7 @@ public final class SSHITest {
     }
 
     @Test
-    public void testInstallTestFiles() {
+    public void testInstallTestFiles() throws IOException {
         for (final Host host : testSuite.getHosts()) {
             host.getSSH().installTestFiles();
         }

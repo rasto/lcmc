@@ -35,15 +35,18 @@ import java.awt.Window;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTree;
+
 import lcmc.configs.AppDefaults;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
@@ -305,7 +308,12 @@ public final class RoboTest {
         info("start test " + index + " in 3 seconds");
         if (cluster != null) {
             for (final Host host : getClusterHosts()) {
-                host.getSSH().installTestFiles();
+                try {
+                    host.getSSH().installTestFiles();
+                } catch (IOException e) {
+                    LOG.appError("startTest: could not install filed");
+                    return;
+                }
             }
             final Host firstHost = cluster.getHostsArray()[0];
             Tools.getGUIData().setTerminalPanel(firstHost.getTerminalPanel());

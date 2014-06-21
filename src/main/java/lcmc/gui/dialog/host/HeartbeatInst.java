@@ -33,6 +33,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -102,32 +103,32 @@ final class HeartbeatInst extends DialogHost {
         Tools.getApplication().setLastInstalledClusterStack(
                                                 Application.HEARTBEAT_NAME);
 
-        getHost().execCommandInBash(
-                         installCommand,
-                         getProgressBar(),
-                         new ExecCallback() {
-                             @Override
-                             public void done(final String answer) {
-                                 checkAnswer(answer, installMethod);
-                             }
-                             @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                         "Dialog.Host.HeartbeatInst.InstError"),
-                                         answer,
-                                         errorCode);
-                             }
-                         },
-                         new ConvertCmdCallback() {
-                             @Override
-                             public String convert(final String command) {
-                                 return command.replaceAll("@ARCH@",
-                                                           archString);
-                             }
-                         },
-                         true,
-                         Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
+        getHost().execCommandInBash(new ExecCommandConfig()
+                .commandString(installCommand)
+                .progressBar(getProgressBar())
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        checkAnswer(answer, installMethod);
+                    }
+
+                    @Override
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        printErrorAndRetry(Tools.getString(
+                                        "Dialog.Host.HeartbeatInst.InstError"),
+                                answer,
+                                errorCode);
+                    }
+                })
+                .convertCmdCallback(new ConvertCmdCallback() {
+                    @Override
+                    public String convert(final String command) {
+                        return command.replaceAll("@ARCH@",
+                                archString);
+                    }
+                })
+                .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
     /** Returns the next dialog. */

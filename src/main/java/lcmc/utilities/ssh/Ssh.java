@@ -50,6 +50,7 @@ public final class Ssh {
     private static final ProgressBar NO_PROGRESS_BAR = null;
     private static final String MESSAGE_CANCELED = "canceled";
     private static final String LOGOUT_COMMAND = "logout";
+    private static final SshOutput NOT_CONNECTED_ERROR = new SshOutput("", 112);
     /** SSHGui object for enter password dialogs etc. */
     private SSHGui sshGui;
     /** Callback when connection is failed or properly closed. */
@@ -275,44 +276,36 @@ public final class Ssh {
      * 101 no host
      * 102 no io error
      */
-    public SshOutput execCommandAndWait(final String command,
-                                        final boolean outputVisible,
-                                        final boolean commandVisible,
-                                        final int sshCommandTimeout) {
+    public SshOutput execCommandAndWait(final ExecCommandConfig execCommandConfig) {
         if (host == null) {
             return new SshOutput("", 101);
         }
+
+        if (!reconnect()) {
+            return NOT_CONNECTED_ERROR;
+        }
+
         final String[] answer = new String[]{""};
         final Integer[] exitCode = new Integer[]{100};
-        final ExecCommandThread execCommandThread = new ExecCommandThread(host,
-                                                                          connectionThread,
-                                                                          sshGui,
-                                                                          command,
-                                                                          new ExecCallback() {
-                                                                              @Override
-                                                                              public void done(final String ans) {
-                                                                                  answer[0] = ans;
-                                                                                  exitCode[0] = 0;
-                                                                              }
-                                                                              @Override
-                                                                              public void doneError(final String ans,
-                                                                                                    final int ec) {
-                                                                                  answer[0] = ans;
-                                                                                  exitCode[0] = ec;
-                                                                              }
-                                                                          },
-                                                                          null,
-                                                                          outputVisible,
-                                                                          commandVisible,
-                                                                          sshCommandTimeout);
-        if (reconnect()) {
-            execCommandThread.start();
-            try {
-                execCommandThread.join();
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
+        final ExecCallback execCallback = new ExecCallback() {
+            @Override
+            public void done(final String ans) {
+                answer[0] = ans;
+                exitCode[0] = 0;
             }
-        }
+            @Override
+            public void doneError(final String ans,
+                                  final int ec) {
+                answer[0] = ans;
+                exitCode[0] = ec;
+            }
+        };
+
+        execCommandConfig.host(host)
+                         .connectionThread(connectionThread)
+                         .sshGui(sshGui)
+                         .execCallback(execCallback)
+                         .execute().block();
         return new SshOutput(answer[0], exitCode[0]);
     }
 
@@ -321,78 +314,34 @@ public final class Ssh {
      * is finished execCallback.done function will be called. In case of error,
      * execCallback.doneError is called.
      */
-    public ExecCommandThread execCommand(final String command,
-                                         final ExecCallback execCallback,
-                                         final boolean outputVisible,
-                                         final boolean commandVisible,
-                                         final int sshCommandTimeout) {
+    public ExecCommandThread execCommand(final ExecCommandConfig execCommandConfig) {
         if (host == null) {
             return null;
         }
-        final String realCommand = host.replaceVars(command);
-        LOG.debug2("execCommand: real command: " + realCommand);
-        final ExecCommandThread execCommandThread = new ExecCommandThread(host,
-                                                                          connectionThread,
-                                                                          sshGui,
-                                                                          realCommand,
-                                                                          execCallback,
-                                                                          null,
-                                                                          outputVisible,
-                                                                          commandVisible,
-                                                                          sshCommandTimeout);
-        if (reconnect()) {
-            execCommandThread.start();
+
+        if (!reconnect()) {
+            return null;
         }
-        return execCommandThread;
+
+        return execCommandConfig.host(host)
+                                .connectionThread(connectionThread)
+                                .sshGui(sshGui)
+                                .execute();
     }
 
-    /**
-     * Executes command. Command is executed in a new thread, after command
-     * is finished execCallback.done function will be called. In case of error,
-     * execCallback.doneError is called. During any new output a output
-     * callback will be called.
-     */
-    public ExecCommandThread execCommand(
-                               final String command,
-                               final ExecCallback execCallback,
-                               final NewOutputCallback newOutputCallback,
-                               final boolean outputVisible,
-                               final boolean commandVisible,
-                               final int sshCommandTimeout) {
-        final String realCommand = host.replaceVars(command);
-        final ExecCommandThread execCommandThread = new ExecCommandThread(host,
-                                                                          connectionThread,
-                                                                          sshGui,
-                                                                          realCommand,
-                                                                          execCallback,
-                                                                          newOutputCallback,
-                                                                          outputVisible,
-                                                                          commandVisible,
-                                                                          sshCommandTimeout);
-        if (reconnect()) {
-            execCommandThread.start();
+    public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
+        if (host == null) {
+            return null;
         }
-        return execCommandThread;
-    }
 
-    /**
-     * Executes command and manages a progress bar. Command is executed in a
-     * new thread, after command is finished execCallback.done function will
-     * be called. In case of error, execCallback.doneError is called.
-     */
-    public ExecCommandThread execCommand(final String command,
-                                         final ProgressBar progressBar,
-                                         final ExecCallback execCallback,
-                                         final boolean outputVisible,
-                                         final boolean commandVisible,
-                                         final int sshCommandTimeout) {
-        LOG.debug2("execCommand: with progress bar");
-        this.progressBar = progressBar;
-        if (progressBar != null) {
-            progressBar.start(0);
-            progressBar.hold();
+        if (!reconnect()) {
+            return null;
         }
-        return execCommand(command, execCallback, outputVisible, commandVisible, sshCommandTimeout);
+
+        return execCommandConfig.host(host)
+                                .connectionThread(connectionThread)
+                                .sshGui(sshGui)
+                                .capture();
     }
 
     /** Installs gui-helper on the remote host. */
@@ -407,7 +356,7 @@ public final class Ssh {
     }
 
     /** Installs test suite on the remote host. */
-    public void installTestFiles() {
+    public void installTestFiles() throws IOException {
         if (!connectionThread.isConnectionEstablished()) {
             return;
         }
@@ -421,7 +370,9 @@ public final class Ssh {
             return;
         }
 
-        final SshOutput sshOutput = execCommandAndWait("tar xf /tmp/lcmc-test.tar -C /tmp/", false, false, 60000);
+        final SshOutput sshOutput = execCommandAndWait(new ExecCommandConfig()
+                                                           .command("tar xf /tmp/lcmc-test.tar -C /tmp/")
+                                                           .sshCommandTimeout(60000));
         if (!sshOutput.isSuccess()) {
             LOG.appWarning("installing test files failed: " + sshOutput.getExitCode());
         }
@@ -498,29 +449,25 @@ public final class Ssh {
                                                                + Tools.escapeQuotes(fileContent, 1)
                                                                + commandTail, 1)
                                           + '"';
-        final Thread t = execCommand(escapedBashCommand,
-                                     new ExecCallback() {
-                                         @Override
-                                         public void done(final String ans) {
-                                             /* ok */
-                                         }
+        execCommand(new ExecCommandConfig()
+                        .command(escapedBashCommand)
+                        .execCallback(new ExecCallback() {
+                                          @Override
+                                          public void done(final String ans) {
+                                              /* ok */
+                                          }
 
-                                         @Override
-                                         public void doneError(final String ans, final int exitCode) {
-                                             if (ans == null) {
-                                                 return;
-                                             }
-                                             scpCommandFailed(ans);
-                                         }
-                                     },
-                                     false,
-                                     false,
-                                     10000); /* smaller timeout */
-        try {
-            t.join();
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+                                          @Override
+                                          public void doneError(final String ans, final int exitCode) {
+                                              if (ans == null) {
+                                                  return;
+                                              }
+                                              scpCommandFailed(ans);
+                                          }
+                                      })
+                        .sshCommandTimeout(10000) /* smaller timeout */
+                        .silentCommand()
+                        .silentOutput()).block();
     }
 
     public void startVncPortForwarding(final String remoteHost, final int remotePort) throws IOException {

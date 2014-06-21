@@ -58,6 +58,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.VIRSH;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -1476,13 +1477,10 @@ public final class VMSXML extends XML {
     /** Updates data. */
     public boolean update() {
         final String command = host.getDistCommand("VMSXML.GetData",
-                                                   (ConvertCmdCallback) null);
-        final SshOutput ret = Tools.execCommand(
-                                               host,
-                                               command,
-                                               null,  /* ExecCallback */
-                                               false,  /* outputVisible */
-                                               Ssh.DEFAULT_COMMAND_TIMEOUT);
+                (ConvertCmdCallback) null);
+        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command)
+                                                                         .silentCommand()
+                                                                         .silentOutput());
         if (ret.getExitCode() != 0) {
             return false;
         }

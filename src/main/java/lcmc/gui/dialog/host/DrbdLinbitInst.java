@@ -34,6 +34,7 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -64,34 +65,31 @@ public class DrbdLinbitInst extends DialogHost {
     protected void initDialogAfterVisible() {
         getProgressBar().start(50000);
 
-        getHost().execCommand("DrbdInst.mkdir",
-                          getProgressBar(),
-                          new ExecCallback() {
-                            @Override
-                            public void done(final String answer) {
-                               checkFile(answer);
-                            }
-                            @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(Tools.getString(
-                                      "Dialog.Host.DrbdLinbitInst.MkdirError"),
-                                        answer,
-                                        errorCode);
-                            }
-                          },
-                          null,  /* ConvertCmdCallback */
-                          true,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+        getHost().execCommand(new ExecCommandConfig().commandString("DrbdInst.mkdir")
+                          .progressBar(getProgressBar())
+                          .execCallback(new ExecCallback() {
+                              @Override
+                              public void done(final String answer) {
+                                 checkFile(answer);
+                              }
+                              @Override
+                              public void doneError(final String answer,
+                                                    final int errorCode) {
+                                  printErrorAndRetry(Tools.getString(
+                                        "Dialog.Host.DrbdLinbitInst.MkdirError"),
+                                          answer,
+                                          errorCode);
+                              }
+                          }));
     }
 
     /** Checks whether the files have to be downloaded. */
     final void checkFile(final String ans) {
         answerPaneSetText(
                    Tools.getString("Dialog.Host.DrbdLinbitInst.CheckingFile"));
-        getHost().execCommand("DrbdInst.test",
-                          getProgressBar(),
-                          new ExecCallback() {
+        getHost().execCommand(new ExecCommandConfig().commandString("DrbdInst.test")
+                          .progressBar(getProgressBar())
+                          .execCallback(new ExecCallback() {
                               // TODO: exchange here done and doneError
                               // TODO: treat file exist differently as other
                               // errors.
@@ -104,37 +102,32 @@ public class DrbdLinbitInst extends DialogHost {
                               @Override
                               public void doneError(final String answer,
                                                     final int errorCode) {
+
                                   downloadDrbd();
                               }
-                          },
-                          null,  /* ConvertCmdCallback */
-                          true,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                          }));
     }
 
     /** Download the drbd packages. */
     final void downloadDrbd() {
         answerPaneSetText(
                     Tools.getString("Dialog.Host.DrbdLinbitInst.Downloading"));
-        getHost().execCommand("DrbdInst.wget",
-                          getProgressBar(),
-                          new ExecCallback() {
-                            @Override
-                            public void done(final String answer) {
-                               installDrbd();
-                            }
-                            @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(Tools.getString(
-                                        "Dialog.Host.DrbdLinbitInst.WgetError"),
-                                        answer,
-                                        errorCode);
-                            }
-                          },
-                          null,  /* ConvertCmdCallback */
-                          true,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+        getHost().execCommand(new ExecCommandConfig().commandString("DrbdInst.wget")
+                          .progressBar(getProgressBar())
+                          .execCallback(new ExecCallback() {
+                               @Override
+                               public void done(final String answer) {
+                                  installDrbd();
+                               }
+                               @Override
+                               public void doneError(final String answer,
+                                                     final int errorCode) {
+                                   printErrorAndRetry(Tools.getString(
+                                           "Dialog.Host.DrbdLinbitInst.WgetError"),
+                                           answer,
+                                           errorCode);
+                               }
+                          }));
     }
 
     /** Install the drbd packages. */
@@ -147,25 +140,23 @@ public class DrbdLinbitInst extends DialogHost {
                          + getHost().getDrbdInstallMethod()));
         answerPaneSetText(
                     Tools.getString("Dialog.Host.DrbdLinbitInst.Installing"));
-        getHost().execCommandInBash("DrbdInst.install;;;DRBD.load",
-                          getProgressBar(),
-                          new ExecCallback() {
-                            @Override
-                            public void done(final String answer) {
-                               installationDone();
-                            }
-                            @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(Tools.getString(
-                               "Dialog.Host.DrbdLinbitInst.InstallationFailed"),
-                                        answer,
-                                        errorCode);
-                            }
-                          },
-                          null,  /* ConvertCmdCallback */
-                          true,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT_LONG);
+        getHost().execCommandInBash(new ExecCommandConfig().commandString("DrbdInst.install;;;DRBD.load")
+                          .progressBar(getProgressBar())
+                          .execCallback(new ExecCallback() {
+                               @Override
+                               public void done(final String answer) {
+                                  installationDone();
+                               }
+                               @Override
+                               public void doneError(final String answer,
+                                                     final int errorCode) {
+                                   printErrorAndRetry(Tools.getString(
+                                  "Dialog.Host.DrbdLinbitInst.InstallationFailed"),
+                                           answer,
+                                           errorCode);
+                               }
+                          })
+                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
     /** Called after the installation is completed. */

@@ -23,6 +23,7 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 /**
  * This class provides heartbeat commands. There are commands that
@@ -45,14 +46,10 @@ public final class Heartbeat {
     private static final String AUTHKEYS_CONF_PERMS = "0600";
 
     /** Executes specified command on the host. */
-    private static void execCommand(final Host host, final String command, final boolean outputVisible) {
-        Tools.execCommandProgressIndicator(
-            host,
-                                command,
-                                null,
-                                outputVisible,
-                                Tools.getString("Heartbeat.ExecutingCommand"),
-                                180000);
+    private static void execCommand(final Host host, final String command) {
+        host.execCommandProgressIndicator(Tools.getString("Heartbeat.ExecutingCommand"),
+                                          new ExecCommandConfig().command(command)
+                                                                 .sshCommandTimeout(180000));
     }
 
     /**
@@ -60,9 +57,8 @@ public final class Heartbeat {
      * /etc/init.d/heartbeat start
      */
     public static void startHeartbeat(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.startHeartbeat",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Heartbeat.startHeartbeat", (ConvertCmdCallback) null);
+        execCommand(host, command);
     }
 
     /**
@@ -70,44 +66,39 @@ public final class Heartbeat {
      * /etc/init.d/heartbeat stop
      */
     public static void stopHeartbeat(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.stopHeartbeat",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Heartbeat.stopHeartbeat", (ConvertCmdCallback) null);
+        execCommand(host, command);
     }
 
     /** Starts heartbeat on host and adds it to the rc. */
     public static void startHeartbeatRc(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.startHeartbeat"
-            + ";;;Heartbeat.addToRc",
+        final String command = host.getDistCommand("Heartbeat.startHeartbeat;;;Heartbeat.addToRc",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /** Stops the corosync and starts the heartbeat on the specified host. */
     public static void switchFromCorosyncToHeartbeat(final Host host) {
-        final String command = host.getDistCommand(
-            "Corosync.deleteFromRc"
-                + ";;;Heartbeat.addToRc"
-                + ";;;Heartbeat.startHeartbeat",
-                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.deleteFromRc"
+                                                   + ";;;Heartbeat.addToRc"
+                                                   + ";;;Heartbeat.startHeartbeat",
+                                                   (ConvertCmdCallback) null);
+        execCommand(host, command);
     }
 
     /** Stops the openais and starts the heartbeat on the specified host. */
     public static void switchFromOpenaisToHeartbeat(final Host host) {
-        final String command = host.getDistCommand(
-            "Openais.deleteFromRc"
-                + ";;;Heartbeat.addToRc"
-                + ";;;Heartbeat.startHeartbeat",
-                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Openais.deleteFromRc"
+                                                   + ";;;Heartbeat.addToRc"
+                                                   + ";;;Heartbeat.startHeartbeat",
+                                                   (ConvertCmdCallback) null);
+        execCommand(host, command);
     }
 
     /** Adds heartbeat to the rc. */
     public static void addHeartbeatToRc(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.addToRc",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Heartbeat.addToRc", (ConvertCmdCallback) null);
+        execCommand(host, command);
     }
 
     /**
@@ -115,9 +106,8 @@ public final class Heartbeat {
      * /etc/init.d/heartbeat reload
      */
     public static void reloadHeartbeat(final Host host) {
-        final String command = host.getDistCommand("Heartbeat.reloadHeartbeat",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Heartbeat.reloadHeartbeat", (ConvertCmdCallback) null);
+        execCommand(host, command);
     }
 
     /** Creates heartbeat config on specified hosts. */
@@ -162,16 +152,7 @@ public final class Heartbeat {
         } else {
             cmd = "Heartbeat.enableDopd";
         }
-        final Thread t = host.execCommand(cmd,
-                                          null,
-                                          null,
-                                          true,
-                                          Ssh.DEFAULT_COMMAND_TIMEOUT);
-        try {
-            t.join();
-        } catch (final InterruptedException ie) {
-            Thread.currentThread().interrupt();
-        }
+        host.execCommand(new ExecCommandConfig().commandString(cmd)).block();
     }
 
     /** No instantiation. */

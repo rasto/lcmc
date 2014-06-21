@@ -42,6 +42,7 @@ public class ConnectionThread extends Thread {
     private SshConnection sshConnection = null;
 
     private volatile boolean connectionFailed;
+    private volatile boolean connectionEstablished = false;
 
     ConnectionThread(final Host host,
                      final SSHGui sshGui,
@@ -83,18 +84,16 @@ public class ConnectionThread extends Thread {
     }
 
     public void closeConnection() {
-        sshConnection = null;
+        connectionEstablished = false;
     }
 
     public boolean isConnectionEstablished() {
-        return sshConnection != null;
+        return connectionEstablished;
     }
 
     public void closeConnectionForGood() {
         closeConnection();
-        if (sshConnection != null) {
-            sshConnection.disconnectForGood();
-        }
+        sshConnection.disconnectForGood();
     }
 
     public boolean isConnectionFailed() {
@@ -105,7 +104,10 @@ public class ConnectionThread extends Thread {
         this.connectionFailed = connectionFailed;
     }
 
-    public SshConnection getConnection() {
+    public SshConnection getConnection() throws IOException {
+        if (!connectionEstablished) {
+            throw new IOException("getConnection: connection closed");
+        }
         return sshConnection;
     }
 
@@ -114,7 +116,9 @@ public class ConnectionThread extends Thread {
     }
 
     public void disconnectForGood() {
-        sshConnection.disconnectForGood();
+        if (sshConnection != null) {
+            sshConnection.disconnectForGood();
+        }
     }
 
     private void connect(final SshConnection newSshConnection) throws IOException {
@@ -137,7 +141,7 @@ public class ConnectionThread extends Thread {
     private void handleFailedConnection(final String message) {
         LOG.appWarning("run: connecting failed: " + message);
         connectionFailed = true;
-        if (sshConnection == null || !sshConnection.isCanceled()) {
+        if (!connectionEstablished || !sshConnection.isCanceled()) {
             host.getTerminalPanel().addCommandOutput(message + '\n');
             host.getTerminalPanel().nextCommand();
             if (connectionCallback != null) {
@@ -170,6 +174,7 @@ public class ConnectionThread extends Thread {
 
     private void authenticationOk(final SshConnection newSshConnection) {
         sshConnection = newSshConnection;
+        connectionEstablished = true;
         host.setConnected();
         Tools.invokeLater(new Runnable() {
             @Override

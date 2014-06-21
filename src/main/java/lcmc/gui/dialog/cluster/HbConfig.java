@@ -72,6 +72,7 @@ import lcmc.utilities.Heartbeat;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -541,9 +542,8 @@ final class HbConfig extends DialogCluster {
 
         for (final Host h : hosts) {
             final int index = i;
-            ts[i] = h.execCommand("Heartbeat.getHbConfig",
-                    null,
-                             new ExecCallback() {
+            ts[i] = h.execCommand(new ExecCommandConfig().commandString("Heartbeat.getHbConfig")
+                             .execCallback(new ExecCallback() {
                                  @Override
                                  public void done(final String answer) {
                                      configs[index] = answer;
@@ -553,10 +553,9 @@ final class HbConfig extends DialogCluster {
                                                        final int errorCode) {
                                      configs[index] = HA_CF_ERROR_STRING;
                                  }
-                             },
-                             null,   /* ConvertCmdCallback */
-                             false,  /* outputVisible */
-                             Ssh.DEFAULT_COMMAND_TIMEOUT);
+                             })
+                             .silentCommand()
+                             .silentOutput());
             i++;
         }
         for (final ExecCommandThread t : ts) {

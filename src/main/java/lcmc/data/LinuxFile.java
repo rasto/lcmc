@@ -28,6 +28,7 @@ import java.io.IOException;
 import lcmc.configs.DistResource;
 import lcmc.gui.resources.vms.HardwareInfo;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -96,18 +97,13 @@ public final class LinuxFile extends File {
         if (existCache != null) {
             return existCache;
         }
-        final SshOutput out =
-                Tools.execCommandProgressIndicator(
-                              host,
-                              DistResource.SUDO + "stat "
-                              + Tools.getUnixPath(toString())
-                              + " 2>/dev/null",
-                              null,
-                              false,
-                              "executing...",
-                              Ssh.DEFAULT_COMMAND_TIMEOUT);
-        existCache = out.getExitCode() == 0;
-        return existCache;
+        final SshOutput out = host.captureCommandProgressIndicator("executing...",
+                                                                   new ExecCommandConfig().command(DistResource.SUDO
+                                                                                                   + "stat "
+                                                                                                   + Tools.getUnixPath(toString())
+                                                                                                   + " 2>/dev/null")
+                                                                       .silentOutput());
+        return out.getExitCode() == 0;
     }
 
     /** Returns whether it readable. */

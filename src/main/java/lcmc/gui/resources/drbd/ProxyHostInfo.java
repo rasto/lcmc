@@ -49,6 +49,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -122,11 +123,8 @@ public class ProxyHostInfo extends Info {
         procDrbdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                host.execCommand("DRBD.showProxyInfo",
-                                 execCallback,
-                                 null,  /* ConvertCmdCallback */
-                                 false,  /* outputVisible */
-                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
+                host.execCommand(new ExecCommandConfig().commandString("DRBD.showProxyInfo")
+                                                        .execCallback(execCallback));
             }
         });
         host.registerEnableOnConnect(procDrbdButton);
@@ -162,11 +160,8 @@ public class ProxyHostInfo extends Info {
                 Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JScrollPane(ta));
-        host.execCommand("DRBD.showProxyInfo",
-                         execCallback,
-                         null,  /* ConvertCmdCallback */
-                         false,  /* outputVisible */
-                         Ssh.DEFAULT_COMMAND_TIMEOUT);
+        host.execCommand(new ExecCommandConfig().commandString("DRBD.showProxyInfo")
+                                                .execCallback(execCallback));
         return mainPanel;
     }
 

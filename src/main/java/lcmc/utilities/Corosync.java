@@ -23,7 +23,10 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import lcmc.utilities.ssh.SshOutput;
+
 /**
  * This class provides corosync commands. There are commands that
  * operate on /etc/init.d/corosync script and commands etc.
@@ -44,25 +47,15 @@ public final class Corosync {
     /** Permissions of the authkeys config file. */
     private static final String AUTHKEYS_CONF_PERMS = "0400";
 
-    /** Executes specified command on the host. */
-    private static void execCommand(final Host host, final String command, final boolean outputVisible) {
-        Tools.execCommandProgressIndicator(
-            host,
-                                command,
-                                null,
-                                outputVisible,
-                                Tools.getString("Corosync.ExecutingCommand"),
-                                Ssh.DEFAULT_COMMAND_TIMEOUT);
-    }
+    private static final String PROGRESS_TEXT = Tools.getString("Corosync.ExecutingCommand");
 
     /** Stops the heartbeat and starts the corosync on the specified host. */
     public static void switchToCorosync(final Host host) {
-        final String command = host.getDistCommand(
-            "Heartbeat.deleteFromRc"
-                + ";;;Corosync.addToRc"
-                + ";;;Corosync.startCorosync",
-                                            (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Heartbeat.deleteFromRc"
+                                                   + ";;;Corosync.addToRc"
+                                                   + ";;;Corosync.startCorosync",
+                                                   (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /**
@@ -70,9 +63,8 @@ public final class Corosync {
      * /etc/init.d/corosync start
      */
     public static void startCorosync(final Host host) {
-        final String command = host.getDistCommand("Corosync.startCorosync",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.startCorosync", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /**
@@ -80,10 +72,8 @@ public final class Corosync {
      * /etc/init.d/corosync start && /etc/init.d/pacemaker start
      */
     public static void startCorosyncWithPcmk(final Host host) {
-        final String command = host.getDistCommand(
-            "Corosync.startCorosyncWithPcmk",
-                                              (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.startCorosyncWithPcmk", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /**
@@ -91,9 +81,8 @@ public final class Corosync {
      * /etc/init.d/pacemaker start
      */
     public static void startPacemaker(final Host host) {
-        final String command = host.getDistCommand("Corosync.startPcmk",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.startPcmk", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
 
@@ -102,9 +91,8 @@ public final class Corosync {
      * /etc/init.d/corosync stop
      */
     public static void stopCorosync(final Host host) {
-        final String command = host.getDistCommand("Corosync.stopCorosync",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.stopCorosync", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /**
@@ -112,26 +100,22 @@ public final class Corosync {
      * /etc/init.d/corosync stop && /etc/init.d/pacemaker stop
      */
     public static void stopCorosyncWithPcmk(final Host host) {
-        final String command = host.getDistCommand(
-            "Corosync.stopCorosyncWithPcmk",
-                                              (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.stopCorosyncWithPcmk", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /** Starts Corosync on host and adds it to the rc. */
     public static void startCorosyncRc(final Host host) {
-        final String command = host.getDistCommand(
-            "Corosync.startCorosync"
-                + ";;;Corosync.addToRc",
-                                            (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.startCorosync"
+                                                   + ";;;Corosync.addToRc",
+                                                   (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /** Adds Corosync to the rc. */
     public static void addCorosyncToRc(final Host host) {
-        final String command = host.getDistCommand("Corosync.addToRc",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.addToRc", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /**
@@ -139,9 +123,8 @@ public final class Corosync {
      * /etc/init.d/corosync reload
      */
     public static void reloadCorosync(final Host host) {
-        final String command = host.getDistCommand("Corosync.reloadCorosync",
-                                                   (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        final String command = host.getDistCommand("Corosync.reloadCorosync", (ConvertCmdCallback) null);
+        host.execCommandProgressIndicator(PROGRESS_TEXT, new ExecCommandConfig().command(command));
     }
 
     /** Creates Corosync config on specified hosts. */

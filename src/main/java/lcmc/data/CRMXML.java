@@ -50,6 +50,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -982,17 +983,13 @@ public final class CRMXML extends XML {
 
     /** Initialize resource agents WITHOUT their meta data. */
     private void initOCFMetaDataQuick() {
-        final String command =
-            host.getDistCommand("Heartbeat.getOCFParametersQuick",
-                                        (ConvertCmdCallback) null);
-        final SshOutput ret =
-            Tools.execCommandProgressIndicator(
-                host,
-                            command,
-                            null,  /* ExecCallback */
-                            false, /* outputVisible */
-                            Tools.getString("CRMXML.GetRAMetaData"),
-                            60000);
+        final String command = host.getDistCommand("Heartbeat.getOCFParametersQuick",
+                                                   (ConvertCmdCallback) null);
+        final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("CRMXML.GetRAMetaData"),
+                                                                   new ExecCommandConfig().command(command)
+                                                                                          .silentCommand()
+                                                                                          .silentOutput()
+                                                                                          .sshCommandTimeout(60000));
         boolean linbitDrbdPresent0 = false;
         boolean drbddiskPresent0 = false;
         if (ret.getExitCode() != 0) {
@@ -1099,11 +1096,10 @@ public final class CRMXML extends XML {
 
     /** Initialize resource agents with their meta data. */
     private void initOCFMetaData(final String command) {
-        final SshOutput ret = Tools.execCommand(host,
-                                                    command,
-                                                    null,  /* ExecCallback */
-                                                    false, /* outputVisible */
-                                                    300000);
+        final SshOutput ret = host.captureCommand(new ExecCommandConfig().command(command)
+                                                                         .silentCommand()
+                                                                         .silentOutput()
+                                                                         .sshCommandTimeout(300000));
         if (ret.getExitCode() != 0) {
             return;
         }

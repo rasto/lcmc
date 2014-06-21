@@ -38,6 +38,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -137,9 +138,9 @@ final class ProxyCheckInstallation extends DialogHost {
             }
         );
 
-        getHost().execCommand("ProxyCheck.version",
-                         getProgressBar(),
-                         new ExecCallback() {
+        getHost().execCommand(new ExecCommandConfig().commandString("ProxyCheck.version")
+                         .progressBar(getProgressBar())
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                  checkProxy(answer);
@@ -149,10 +150,7 @@ final class ProxyCheckInstallation extends DialogHost {
                                                    final int errorCode) {
                                  checkProxy(""); // not installed
                              }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         false,  /* outputVisible */
-                         Ssh.DEFAULT_COMMAND_TIMEOUT);
+                         }));
     }
 
     /**

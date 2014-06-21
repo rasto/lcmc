@@ -38,6 +38,7 @@ import lcmc.gui.dialog.host.DialogHost;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -111,22 +112,19 @@ final class CheckInstallation extends DialogHost {
     /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        getHost().execCommand("DrbdCheck.version",
-                         getProgressBar(),
-                         new ExecCallback() {
-                             @Override
-                             public void done(final String answer) {
-                                 checkDrbd(answer);
-                             }
-                             @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 checkDrbd(""); /* not installed */
-                             }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         false,  /* outputVisible */
-                         Ssh.DEFAULT_COMMAND_TIMEOUT);
+        getHost().execCommand(new ExecCommandConfig().commandString("DrbdCheck.version")
+                                                     .progressBar(getProgressBar())
+                                                     .execCallback(new ExecCallback() {
+                                                         @Override
+                                                         public void done(final String answer) {
+                                                             checkDrbd(answer);
+                                                         }
+                                                         @Override
+                                                         public void doneError(final String answer,
+                                                                               final int errorCode) {
+                                                             checkDrbd(""); /* not installed */
+                                                         }
+                                                     }));
     }
 
     /** Checks if drbd installation was ok. */

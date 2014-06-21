@@ -23,6 +23,8 @@
 package lcmc.utilities;
 
 import lcmc.data.Host;
+import lcmc.utilities.ssh.ExecCommandConfig;
+
 /**
  * This class provides openais commands. There are commands that
  * operate on /etc/init.d/openais script and commands etc.
@@ -44,14 +46,10 @@ public final class Openais {
     private static final String AUTHKEYS_CONF_PERMS = "0400";
 
     /** Executes specified command on the host. */
-    private static void execCommand(final Host host, final String command, final boolean outputVisible) {
-        Tools.execCommandProgressIndicator(
-            host,
-                                command,
-                                null,
-                                outputVisible,
-                                Tools.getString("Openais.ExecutingCommand"),
-                                180000);
+    private static void execCommand(final Host host, final String command) {
+        host.execCommandProgressIndicator(Tools.getString("Openais.ExecutingCommand"),
+                                          new ExecCommandConfig().command(command)
+                                                                 .sshCommandTimeout(180000));
     }
 
     /** Stops the heartbeat and starts the openais on the specified host. */
@@ -61,7 +59,7 @@ public final class Openais {
                 + ";;;Openais.addToRc"
                 + ";;;Openais.startOpenais",
                                                 (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /**
@@ -71,7 +69,7 @@ public final class Openais {
     public static void startOpenais(final Host host) {
         final String command = host.getDistCommand("Openais.startOpenais",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /**
@@ -81,7 +79,7 @@ public final class Openais {
     public static void stopOpenais(final Host host) {
         final String command = host.getDistCommand("Openais.stopOpenais",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /**
@@ -92,7 +90,7 @@ public final class Openais {
         final String command = host.getDistCommand(
             "Openais.stopOpenaisWithPcmk",
                                               (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /** Starts openais on host and adds it to the rc. */
@@ -100,14 +98,14 @@ public final class Openais {
         final String command = host.getDistCommand("Openais.startOpenais"
             + ";;;Openais.addToRc",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /** Adds openais to the rc. */
     public static void addOpenaisToRc(final Host host) {
         final String command = host.getDistCommand("Openais.addToRc",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /**
@@ -117,7 +115,7 @@ public final class Openais {
     public static void reloadOpenais(final Host host) {
         final String command = host.getDistCommand("Openais.reloadOpenais",
                                                    (ConvertCmdCallback) null);
-        execCommand(host, command, true);
+        execCommand(host, command);
     }
 
     /** Creates OpenAIS config on specified hosts. */

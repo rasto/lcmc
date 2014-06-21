@@ -42,6 +42,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -84,68 +85,64 @@ final class DrbdAvailSourceFiles extends DialogHost {
 
     /** Finds abailable tarballs. */
     protected void availTarballs() {
-        getHost().execCommand(
-              "DrbdAvailVersionsSource",
-              null, /* ProgresBar */
-              new ExecCallback() {
-                @Override
-                public void done(final String answer) {
-                    if (answer == null || answer.isEmpty()) {
-                        doneError(null, 1);
-                        return;
-                    }
-                    final String[] versions = answer.split("\\r?\\n");
-                    if (versions.length == 0) {
-                        doneError(null, 1);
-                        return;
-                    }
-                    final List<Value> items = new ArrayList<Value>();
-                    for (final String versionString : versions) {
-                        if (versionString != null
-                            && versionString.length() > 16) {
-                            final String version =
-                                    versionString.substring(
-                                               9,
-                                               versionString.length() - 7);
-                            items.add(
-                                    new StringValue(versionString, version));
+        getHost().execCommand(new ExecCommandConfig()
+                .commandString("DrbdAvailVersionsSource")
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        if (answer == null || answer.isEmpty()) {
+                            doneError(null, 1);
+                            return;
                         }
-                    }
-                    drbdTarballCombo.clear();
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!items.isEmpty()) {
-                                drbdTarballCombo.reloadComboBox(
-                                       items.get(0),
-                                       items.toArray(new Value[items.size()]));
+                        final String[] versions = answer.split("\\r?\\n");
+                        if (versions.length == 0) {
+                            doneError(null, 1);
+                            return;
+                        }
+                        final List<Value> items = new ArrayList<Value>();
+                        for (final String versionString : versions) {
+                            if (versionString != null
+                                    && versionString.length() > 16) {
+                                final String version =
+                                        versionString.substring(
+                                                9,
+                                                versionString.length() - 7);
+                                items.add(
+                                        new StringValue(versionString, version));
                             }
-                            final Value selectedItem =
-                                                 drbdTarballCombo.getValue();
-                            drbdTarballCombo.setEnabled(true);
-                            allDone(selectedItem);
                         }
-                    });
-                }
+                        drbdTarballCombo.clear();
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!items.isEmpty()) {
+                                    drbdTarballCombo.reloadComboBox(
+                                            items.get(0),
+                                            items.toArray(new Value[items.size()]));
+                                }
+                                final Value selectedItem =
+                                        drbdTarballCombo.getValue();
+                                drbdTarballCombo.setEnabled(true);
+                                allDone(selectedItem);
+                            }
+                        });
+                    }
 
-                @Override
-                public void doneError(final String answer,
-                                      final int errorCode) {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBarDoneError();
-                            printErrorAndRetry(Tools.getString(
-                                   "Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
-                                    answer,
-                                    errorCode);
-                        }
-                    });
-                }
-              },
-              null,   /* ConvertCmdCallback */
-              false,  /* outputVisible */
-              Ssh.DEFAULT_COMMAND_TIMEOUT);
+                    @Override
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBarDoneError();
+                                printErrorAndRetry(Tools.getString(
+                                                "Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
+                                        answer,
+                                        errorCode);
+                            }
+                        });
+                    }
+                }));
     }
 
     /**

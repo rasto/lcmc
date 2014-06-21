@@ -43,6 +43,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -107,72 +108,68 @@ public class DrbdAvailFiles extends DialogHost {
 
     /** Finds abailable builds. */
     protected final void availBuilds() {
-        getHost().execCommand(
-                          "DrbdAvailBuilds",
-                          null, /* ProgresBar */
-                          new ExecCallback() {
-                            @Override
-                            public void done(final String answer) {
-                                String defaultValue =
-                                            getHost().getDrbdBuildToInstall();
-                                final String[] items = answer.split("\\r?\\n");
-                                boolean found = false;
-                                for (final String item : items) {
-                                    if (item.equals(defaultValue)) {
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                                if (!found) {
+        getHost().execCommand(new ExecCommandConfig()
+                .commandString("DrbdAvailBuilds")
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        String defaultValue =
+                                getHost().getDrbdBuildToInstall();
+                        final String[] items = answer.split("\\r?\\n");
+                        boolean found = false;
+                        for (final String item : items) {
+                            if (item.equals(defaultValue)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
                                     /* try it with underscores */
-                                    defaultValue =
-                                            defaultValue.replaceAll("-", "_");
-                                }
-                                drbdBuildCombo.clear();
-                                drbdBuildCombo.reloadComboBox(
-                                                new StringValue(defaultValue),
-                                                StringValue.getValues(items));
-                                Tools.waitForSwing();
-                                final String selectedItem =
-                                               drbdBuildCombo.getStringValue();
-                                drbdBuildCombo.setEnabled(true);
-                                if (selectedItem == null) {
-                                    allDone();
-                                } else {
-                                    getHost().setDrbdBuildToInstall(
-                                                                 selectedItem);
-                                    if (!listenersAdded) {
-                                        availFiles();
-                                    }
-                                }
+                            defaultValue =
+                                    defaultValue.replaceAll("-", "_");
+                        }
+                        drbdBuildCombo.clear();
+                        drbdBuildCombo.reloadComboBox(
+                                new StringValue(defaultValue),
+                                StringValue.getValues(items));
+                        Tools.waitForSwing();
+                        final String selectedItem =
+                                drbdBuildCombo.getStringValue();
+                        drbdBuildCombo.setEnabled(true);
+                        if (selectedItem == null) {
+                            allDone();
+                        } else {
+                            getHost().setDrbdBuildToInstall(
+                                    selectedItem);
+                            if (!listenersAdded) {
+                                availFiles();
                             }
+                        }
+                    }
 
+                    @Override
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        Tools.invokeLater(new Runnable() {
                             @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        printErrorAndRetry(
-                                         Tools.getString(
-                                         "Dialog.Host.DrbdAvailFiles.NoBuilds"),
-                                                answer,
-                                                errorCode);
-                                    }
-                                });
+                            public void run() {
+                                printErrorAndRetry(
+                                        Tools.getString(
+                                                "Dialog.Host.DrbdAvailFiles.NoBuilds"),
+                                        answer,
+                                        errorCode);
                             }
-                          },
-                          null,   /* ConvertCmdCallback */
-                          false,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                        });
+                    }
+                }));
     }
 
     /** Finds available files. */
     protected final void availFiles() {
         drbdBuildCombo.setEnabled(true);
-        getHost().execCommand("DrbdAvailFiles",
-                      null, /* ProgresBar */
-                      new ExecCallback() {
+        getHost().execCommand(new ExecCommandConfig()
+                      .commandString("DrbdAvailFiles")
+                      .execCallback(new ExecCallback() {
                         @Override
                         public void done(final String answer) {
                             final List<String> files = new ArrayList<String>(
@@ -220,10 +217,7 @@ public class DrbdAvailFiles extends DialogHost {
                                 }
                             });
                         }
-                      },
-                      null,  /* ConvertCmdCallback */
-                      true,  /* outputVisible */
-                      Ssh.DEFAULT_COMMAND_TIMEOUT);
+                      }));
     }
 
     /**

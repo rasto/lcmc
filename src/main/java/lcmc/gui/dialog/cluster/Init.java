@@ -59,6 +59,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -245,26 +246,25 @@ public class Init extends DialogCluster {
                                         new ExecCommandThread[hosts.length];
         int i = 0;
         for (final Host h : hosts) {
-            infoThreads[i] = h.execCommand("Cluster.Init.getInstallationInfo",
-                    null,
-                             new ExecCallback() {
-                                 @Override
-                                 public void done(final String answer) {
-                                     //drbdLoaded[index] = true;
-                                     for (final String line
-                                                    : answer.split("\\r?\\n")) {
-                                         h.parseInstallationInfo(line);
-                                     }
-                                 }
-                                 @Override
-                                 public void doneError(final String answer,
-                                                       final int errorCode) {
-                                     LOG.appWarning("doneError: could not get install info");
-                                 }
-                             },
-                             null,   /* ConvertCmdCallback */
-                             false,  /* outputVisible */
-                             Ssh.DEFAULT_COMMAND_TIMEOUT);
+            infoThreads[i] = h.execCommand(new ExecCommandConfig()
+                                               .commandString("Cluster.Init.getInstallationInfo")
+                                               .execCallback(new ExecCallback() {
+                                                   @Override
+                                                   public void done(final String answer) {
+                                                       //drbdLoaded[index] = true;
+                                                       for (final String line
+                                                                      : answer.split("\\r?\\n")) {
+                                                           h.parseInstallationInfo(line);
+                                                       }
+                                                   }
+                                                   @Override
+                                                   public void doneError(final String answer,
+                                                                         final int errorCode) {
+                                                       LOG.appWarning("doneError: could not get install info");
+                                                   }
+                                               })
+                                               .silentCommand()
+                                               .silentOutput());
             i++;
         }
         for (final ExecCommandThread t : infoThreads) {

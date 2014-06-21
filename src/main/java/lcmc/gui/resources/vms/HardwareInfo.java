@@ -68,6 +68,7 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -505,16 +506,10 @@ public abstract class HardwareInfo extends EditableInfo {
                 } else {
                     dirSB.append("/*");
                 }
-                final SshOutput out =
-                        Tools.execCommandProgressIndicator(
-                                      host,
-                                      "stat -c \"%A %a %Y %s %n\" "
-                                      + dirSB
-                                      + " 2>/dev/null",
-                                      null,
-                                      false,
-                                      "executing...",
-                                      Ssh.DEFAULT_COMMAND_TIMEOUT);
+                final SshOutput out = host.captureCommandProgressIndicator(
+                        "executing...",
+                        new ExecCommandConfig().command("stat -c \"%A %a %Y %s %n\" " + dirSB + " 2>/dev/null")
+                                               .silentOutput());
                 final List<LinuxFile> files = new ArrayList<LinuxFile>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {

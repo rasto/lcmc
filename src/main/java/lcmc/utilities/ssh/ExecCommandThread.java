@@ -39,54 +39,49 @@ import lcmc.utilities.Tools;
 /** This class is a thread that executes commands. */
 public final class ExecCommandThread extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(ExecCommandThread.class);
+
     private final Host host;
     private final ConnectionThread connectionThread;
     private final SSHGui sshGui;
-    private String command;
+    private final String command;
     private final ExecCallback execCallback;
     private final NewOutputCallback newOutputCallback;
-    private volatile boolean cancelIt = false;
-    private boolean outputVisible;
+    private final boolean outputVisible;
     private final boolean commandVisible;
+
+    private volatile boolean cancelIt = false;
     private final Lock mSessionLock = new ReentrantLock();
     private Session sess = null;
     private final int sshCommandTimeout;
+
     private static final int ERROR_EXIT_CODE = 255;
     private static final int EXEC_OUTPUT_BUFFER_SIZE = 8192;
     private static final int DEFAULT_EXIT_CODE = 100;
     private static final String ENCODING = "UTF-8";
 
-    /** Executes a command in a thread. */
-    ExecCommandThread(final Host host,
-                      final ConnectionThread connectionThread,
-                      final SSHGui sshGui,
-                      final String command,
-                      final ExecCallback execCallback,
-                      final NewOutputCallback newOutputCallback,
-                      final boolean outputVisible,
-                      final boolean commandVisible,
-                      final int sshCommandTimeout) {
-        super();
-        this.host = host;
-        this.connectionThread = connectionThread;
-        this.sshGui = sshGui;
-        this.command = command;
-        LOG.debug2("ExecCommandThread: command: " + command);
-        this.execCallback = execCallback;
-        this.newOutputCallback = newOutputCallback;
-        this.outputVisible = outputVisible;
-        this.commandVisible = commandVisible;
-        this.sshCommandTimeout = sshCommandTimeout;
-        if (command.length() > 9 && "NOOUTPUT:".equals(command.substring(0, 9))) {
+    ExecCommandThread(final ExecCommandConfig execCommandConfig) {
+        this.host = execCommandConfig.getHost();
+        this.connectionThread = execCommandConfig.getConnectionThread();
+        this.sshGui = execCommandConfig.getSshGui();
+
+        this.execCallback = execCommandConfig.getExecCallback();
+        this.newOutputCallback = execCommandConfig.getNewOutputCallback();
+        this.commandVisible = execCommandConfig.isCommandVisible();
+        this.sshCommandTimeout = execCommandConfig.getSshCommandTimeout();
+
+        if (execCommandConfig.getCommand().length() > 9
+            && "NOOUTPUT:".equals(execCommandConfig.getCommand().substring(0, 9))) {
             this.outputVisible = false;
-            this.command = command.substring(9, command.length());
-        } else if (command.length() > 7 && "OUTPUT:".equals(command.substring(0, 7))) {
+            this.command = execCommandConfig.getCommand().substring(9, execCommandConfig.getCommand().length());
+        } else if (execCommandConfig.getCommand().length() > 7
+                   && "OUTPUT:".equals(execCommandConfig.getCommand().substring(0, 7))) {
             this.outputVisible = true;
-            this.command = command.substring(7, command.length());
+            this.command = execCommandConfig.getCommand().substring(7, execCommandConfig.getCommand().length());
         } else {
-            this.outputVisible = outputVisible;
-            this.command = command;
+            this.outputVisible = execCommandConfig.isOutputVisible();
+            this.command = execCommandConfig.getCommand();
         }
+        LOG.debug2("ExecCommandThread: command: " + command);
     }
 
     /**
@@ -131,6 +126,15 @@ public final class ExecCommandThread extends Thread {
         }
     }
 
+    public ExecCommandThread block() {
+        try {
+            join();
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return this;
+    }
+
     private void exec() {
         // ;;; separates commands, that are to be executed one after one,
         // if previous command has finished successfully.
@@ -163,7 +167,7 @@ public final class ExecCommandThread extends Thread {
     private void handleCommandFailure(final StringBuilder ans,
             final int exitCode) {
         if (execCallback != null) {
-            if (outputVisible) {
+            if (commandVisible || outputVisible) {
                 Tools.getGUIData().expandTerminalSplitPane(0);
             }
             execCallback.doneError(ans.toString(), exitCode);
@@ -171,7 +175,7 @@ public final class ExecCommandThread extends Thread {
     }
 
     private void writeCommandToTerminal(final String cmd) {
-        if (commandVisible && outputVisible) {
+        if (commandVisible) {
             final String consoleCommand = host.replaceVars(cmd, true);
             host.getTerminalPanel().addCommand(consoleCommand.replaceAll(DistResource.SUDO, " "));
         }
@@ -208,11 +212,15 @@ public final class ExecCommandThread extends Thread {
             public void run() {
                 Tools.sleep(Tools.getDefaultInt("SSH.ConnectTimeout"));
                 if (!connectionTimeout.wasTimeout()) {
-                    LOG.debug1("exec: " + host.getName() + ": open ssh session: timeout");
+                    LOG.debug1("run: " + host.getName() + ": open ssh session: timeout");
                     connectionTimeout.setTimeout();
-                    final SshConnection sshConnection = connectionThread.getConnection();
-                    if (sshConnection != null) {
-                        sshConnection.cancel();
+                    try {
+                        final SshConnection sshConnection = connectionThread.getConnection();
+                        if (sshConnection != null) {
+                            sshConnection.cancel();
+                        }
+                    } catch (IOException e) {
+                        LOG.appWarning("run: " + host.getName() + ": setting timeout failed");
                     }
                 }
             }
@@ -260,7 +268,7 @@ public final class ExecCommandThread extends Thread {
             if (cancelIt) {
                 return new SshOutput("", 130);
             }
-            if (outputVisible) {
+            if (commandVisible) {
                 host.getTerminalPanel().nextCommand();
             }
             thisSession.waitForCondition(ChannelCondition.EXIT_STATUS, 10000);

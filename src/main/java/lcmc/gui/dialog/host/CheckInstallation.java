@@ -44,6 +44,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -250,9 +251,9 @@ final class CheckInstallation extends DialogHost {
             }
         );
 
-        getHost().execCommand("DrbdCheck.version",
-                         getProgressBar(),
-                         new ExecCallback() {
+        getHost().execCommand(new ExecCommandConfig().commandString("DrbdCheck.version")
+                         .progressBar(getProgressBar())
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                  checkDrbd(answer);
@@ -262,10 +263,9 @@ final class CheckInstallation extends DialogHost {
                                                    final int errorCode) {
                                  checkDrbd(""); // not installed
                              }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         false,  /* outputVisible */
-                         Ssh.DEFAULT_COMMAND_TIMEOUT);
+                         })
+                         .silentCommand()
+                         .silentOutput());
     }
 
     /**
@@ -313,23 +313,22 @@ final class CheckInstallation extends DialogHost {
                 }
             });
         }
-        getHost().execCommand("HbCheck.version",
-                         getProgressBar(),
-                         new ExecCallback() {
-                             @Override
-                             public void done(final String answer) {
-                                 LOG.debug2("done: ans: " + answer);
-                                 checkAisHbPm(answer);
-                             }
-                             @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 done("");
-                             }
-                         },
-                         null,   /* ConvertCmdCallback */
-                         false,
-                         Ssh.DEFAULT_COMMAND_TIMEOUT); /* outputVisible */
+        getHost().execCommand(new ExecCommandConfig().commandString("HbCheck.version")
+                                                     .progressBar(getProgressBar())
+                                                     .execCallback(new ExecCallback() {
+                                                         @Override
+                                                         public void done(final String answer) {
+                                                             checkAisHbPm(answer);
+                                                         }
+
+                                                         @Override
+                                                         public void doneError(final String answer,
+                                                                               final int errorCode) {
+                                                             done("");
+                                                         }
+                                                     })
+                                                     .silentCommand()
+                                                     .silentOutput());
     }
 
     /**

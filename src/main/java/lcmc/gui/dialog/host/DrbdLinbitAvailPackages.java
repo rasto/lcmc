@@ -46,6 +46,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -98,10 +99,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdKernelDirCombo.setEnabled(false);
         drbdArchCombo.setEnabled(false);
         getProgressBar().start(20000);
-        final ExecCommandThread t = getHost().execCommand(
-                          "DrbdAvailVersions",
-                          null, /* ProgressBar */
-                          new ExecCallback() {
+        final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
+                       .commandString("DrbdAvailVersions")
+                       .execCallback(new ExecCallback() {
                             @Override
                             public void done(final String answer) {
                                 final String[] items = answer.split(NEWLINE);
@@ -120,10 +120,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                         answer,
                                         errorCode);
                             }
-                          },
-                          null,   /* ConvertCmdCallback */
-                          false,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                       }));
         setCommandThread(t);
     }
 
@@ -136,10 +133,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                 drbdArchCombo.setEnabled(false);
             }
         });
-        final ExecCommandThread t = getHost().execCommand(
-                          "DrbdAvailDistributions",
-                          null, /* ProgressBar */
-                          new ExecCallback() {
+        final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
+                        .commandString("DrbdAvailDistributions")
+                        .execCallback(new ExecCallback() {
                             @Override
                             public void done(String answer) {
                                 answer = NO_MATCH_STRING + '\n' + answer;
@@ -165,10 +161,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                         answer,
                                         errorCode);
                             }
-                          },
-                          null,   /* ConvertCmdCallback */
-                          false,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                         }));
         setCommandThread(t);
     }
 
@@ -187,10 +180,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             availArchs();
             return;
         }
-        final ExecCommandThread t = getHost().execCommand(
-                          "DrbdAvailKernels",
-                          null, /* ProgressBar */
-                          new ExecCallback() {
+        final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
+                        .commandString("DrbdAvailKernels")
+                        .execCallback(new ExecCallback() {
                             @Override
                             public void done(String answer) {
                                 answer = NO_MATCH_STRING + '\n' + answer;
@@ -213,15 +205,11 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             public void doneError(final String answer,
                                                   final int errorCode) {
                                 LOG.debug("doneError:");
-                                printErrorAndRetry(
-               Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoKernels"),
-                                        answer,
-                                        errorCode);
+                                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoKernels"),
+                                                   answer,
+                                                   errorCode);
                             }
-                          },
-                          null,   /* ConvertCmdCallback */
-                          false,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                          }));
         setCommandThread(t);
     }
 
@@ -245,53 +233,48 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             allDone(null);
             return;
         }
-        final ExecCommandThread t = getHost().execCommand(
-                          "DrbdAvailArchs",
-                          null, /* ProgressBar */
-                          new ExecCallback() {
+        final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
+                .commandString("DrbdAvailArchs")
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(String answer) {
+                        answer = NO_MATCH_STRING + '\n' + answer;
+                        final String[] items = answer.split(NEWLINE);
+                        drbdArchItems = Arrays.asList(items);
+                        Tools.invokeLater(new Runnable() {
                             @Override
-                            public void done(String answer) {
-                                answer = NO_MATCH_STRING + '\n' + answer;
-                                final String[] items = answer.split(NEWLINE);
-                                drbdArchItems = Arrays.asList(items);
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        drbdArchCombo.reloadComboBox(
-                                                new StringValue(arch),
-                                                StringValue.getValues(items));
-                                        drbdArchCombo.setEnabled(true);
-                                    }
-                                });
-                                if (drbdArchItems == null) {
-                                    allDone(null);
-                                } else {
-                                    availVersionsForDist();
-                                }
+                            public void run() {
+                                drbdArchCombo.reloadComboBox(
+                                        new StringValue(arch),
+                                        StringValue.getValues(items));
+                                drbdArchCombo.setEnabled(true);
                             }
+                        });
+                        if (drbdArchItems == null) {
+                            allDone(null);
+                        } else {
+                            availVersionsForDist();
+                        }
+                    }
 
-                            @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(Tools.getString(
-                                 "Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
-                                        answer,
-                                        errorCode);
-                            }
-                          },
-                          null,   /* ConvertCmdCallback */
-                          false,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                    @Override
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        printErrorAndRetry(Tools.getString(
+                                        "Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
+                                answer,
+                                errorCode);
+                    }
+                }));
 
         setCommandThread(t);
     }
 
     /** Checks what are the avail drbd versions for this distribution. */
     protected final void availVersionsForDist() {
-        final ExecCommandThread t = getHost().execCommand(
-                          "DrbdAvailVersionsForDist",
-                          null, /* ProgressBar */
-                          new ExecCallback() {
+        final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
+                .commandString("DrbdAvailVersionsForDist")
+                .execCallback(new ExecCallback() {
                             @Override
                             public void done(final String answer) {
                                 allDone(answer);
@@ -306,10 +289,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                         answer,
                                         errorCode);
                             }
-                          },
-                          null,   /* ConvertCmdCallback */
-                          false,  /* outputVisible */
-                          Ssh.DEFAULT_COMMAND_TIMEOUT);
+                          }));
 
         setCommandThread(t);
     }

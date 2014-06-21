@@ -69,6 +69,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -404,23 +405,22 @@ final class CoroConfig extends DialogCluster {
         int i = 0;
         for (final Host h : hosts) {
             final int index = i;
-            ts[i] = h.execCommand(
-                             command,
-                    null,
-                             new ExecCallback() {
-                                 @Override
-                                 public void done(final String answer) {
-                                     configs[index] = answer;
-                                 }
-                                 @Override
-                                 public void doneError(final String answer,
-                                                       final int errorCode) {
-                                     configs[index] = AIS_CONF_ERROR_STRING;
-                                 }
-                             },
-                             null,   /* ConvertCmdCallback */
-                             false,  /* outputVisible */
-                             Ssh.DEFAULT_COMMAND_TIMEOUT);
+            ts[i] = h.execCommand(new ExecCommandConfig()
+                    .commandString(command)
+                    .execCallback(new ExecCallback() {
+                        @Override
+                        public void done(final String answer) {
+                            configs[index] = answer;
+                        }
+
+                        @Override
+                        public void doneError(final String answer,
+                                              final int errorCode) {
+                            configs[index] = AIS_CONF_ERROR_STRING;
+                        }
+                    })
+                    .silentCommand()
+                    .silentOutput());
             i++;
         }
         for (final ExecCommandThread t : ts) {

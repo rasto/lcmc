@@ -57,6 +57,7 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 /**
@@ -457,27 +458,25 @@ public final class TerminalPanel extends JScrollPane {
         if (command != null && !command.isEmpty()) {
             Tools.startProgressIndicator(hostName, "Executing command");
         }
-        host.execCommandRaw(command,
-             new ExecCallback() {
-                 @Override
-                 public void done(final String answer) {
-                     if (command != null && !command.isEmpty()) {
-                        Tools.stopProgressIndicator(hostName,
-                                                    "Executing command");
-                     }
-                 }
+        host.execCommand(new ExecCommandConfig()
+                .command(command)
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        if (command != null && !command.isEmpty()) {
+                            Tools.stopProgressIndicator(hostName,
+                                    "Executing command");
+                        }
+                    }
 
-                 @Override
-                 public void doneError(final String answer, final int errorCode) {
-                     if (command != null && !command.isEmpty()) {
-                        Tools.stopProgressIndicator(hostName,
-                                                    "Executing command");
-                     }
-                 }
-             },
-             true,
-             false,
-             Ssh.DEFAULT_COMMAND_TIMEOUT);
+                    @Override
+                    public void doneError(final String answer, final int errorCode) {
+                        if (command != null && !command.isEmpty()) {
+                            Tools.stopProgressIndicator(hostName,
+                                    "Executing command");
+                        }
+                    }
+                }));
     }
 
     /**

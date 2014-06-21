@@ -35,6 +35,7 @@ import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -77,17 +78,12 @@ public final class ClusterStatus {
     public ClusterStatus(final Host host, final CRMXML crmXML) {
         this.host = host;
         this.crmXML = crmXML;
-        final String command =
-                   host.getDistCommand("Heartbeat.getClusterMetadata",
-                                       (ConvertCmdCallback) null);
-        final SshOutput ret =
-                    Tools.execCommandProgressIndicator(
-                            host,
-                            command,
-                            null,  /* ExecCallback */
-                            false, /* outputVisible */
-                            Tools.getString("Heartbeat.getClusterMetadata"),
-                            Ssh.DEFAULT_COMMAND_TIMEOUT);
+        final String command = host.getDistCommand("Heartbeat.getClusterMetadata",
+                                                   (ConvertCmdCallback) null);
+        final SshOutput ret = host.captureCommandProgressIndicator(Tools.getString("Heartbeat.getClusterMetadata"),
+                                                                   new ExecCommandConfig().command(command)
+                                                                                          .silentCommand()
+                                                                                          .silentOutput());
         final String output = ret.getOutput();
         if (ret.getExitCode() != 0) {
             return;

@@ -36,21 +36,6 @@ public final class ToolsITest {
     }
 
     @Test
-    public void testExecCommandProgressIndicator() {
-        for (int i = 0; i < 3; i++) {
-            for (final Host host : testSuite.getHosts()) {
-                Tools.execCommandProgressIndicator(host,
-                                                   "uname -a",
-                                                   null, /* ExecCallback */
-                                                   true, /* outputVisible */
-                                                   "text h",
-                                                   1000); /* command timeout */
-            }
-        }
-        testSuite.clearStdout();
-    }
-
-    @Test
     public void testIsIp() {
         for (final Host host : testSuite.getHosts()) {
             assertTrue(Tools.isIp(host.getIpAddress()));

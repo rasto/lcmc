@@ -61,6 +61,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 
 /**
  * An implementation of an dialog with log files from many hosts.
@@ -182,9 +183,9 @@ class Logs extends ConfigDialog {
             final int index = i;
             final String command = host.getDistCommand(logFileCommand(),
                                                        replaceHash);
-            threads[index] = host.execCommandRaw(command,
-                    null,
-                         new ExecCallback() {
+            threads[index] = host.execCommand(new ExecCommandConfig()
+                         .command(command)
+                         .execCallback(new ExecCallback() {
                              @Override
                              public void done(final String answer) {
                                  texts[index] = answer;
@@ -201,7 +202,10 @@ class Logs extends ConfigDialog {
                                               stacktrace,
                                          errorCode);
                              }
-                         }, false, false, 30000);
+                         })
+                         .sshCommandTimeout(30000)
+                         .silentCommand()
+                         .silentOutput());
             i++;
         }
         i = 0;

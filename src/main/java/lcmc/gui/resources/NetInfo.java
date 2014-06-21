@@ -26,11 +26,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
 import lcmc.data.Application;
+import lcmc.data.Host;
 import lcmc.data.Value;
 import lcmc.data.resources.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -67,13 +69,9 @@ public class NetInfo extends Info {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                final SshOutput ret =
-                              Tools.execCommand(getBrowser().getHost(),
-                                                "/sbin/ip a l "
-                                                + getName(),
-                                                null,   /* ExecCallback */
-                                                false,  /* outputVisible */
-                                                Ssh.DEFAULT_COMMAND_TIMEOUT);
+                final Host host = getBrowser().getHost();
+                final SshOutput ret = host.captureCommand(new ExecCommandConfig()
+                                                              .command("/sbin/ip a l " + getName()));
                 ep.setText(ret.getOutput());
             }
         };

@@ -41,6 +41,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
@@ -150,14 +151,9 @@ public final class FilesystemInfo extends ServiceInfo {
             for (final Host host : getBrowser().getClusterHosts()) {
                 final String statCmd =
                         DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
-                final SshOutput ret =
-                               Tools.execCommandProgressIndicator(
-                                    host,
-                                    statCmd,
-                                    null,
-                                    true,
-                                    statCmd.replaceAll(DistResource.SUDO, ""),
-                                    Ssh.DEFAULT_COMMAND_TIMEOUT);
+                final String text = statCmd.replaceAll(DistResource.SUDO, "");
+                final SshOutput ret = host.captureCommandProgressIndicator(text,
+                                                                           new ExecCommandConfig().command(statCmd));
 
                 if (ret == null
                     || !"directory".equals(ret.getOutput().trim())) {
@@ -176,13 +172,9 @@ public final class FilesystemInfo extends ServiceInfo {
                           Tools.getString("ClusterBrowser.CreateDir.No"))) {
                         final String cmd = DistResource.SUDO
                                            + "/bin/mkdir " + dir;
-                        Tools.execCommandProgressIndicator(
-                                        host,
-                                        cmd,
-                                        null,
-                                        true,
-                                        cmd.replaceAll(DistResource.SUDO, ""),
-                                        Ssh.DEFAULT_COMMAND_TIMEOUT);
+                        final String progressText = cmd.replaceAll(DistResource.SUDO, "");
+                        final SshOutput out = host.captureCommandProgressIndicator(progressText,
+                                                                                   new ExecCommandConfig().command(cmd));
                         confirm = true;
                     }
                 }

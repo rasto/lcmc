@@ -59,6 +59,7 @@ import lcmc.gui.resources.drbd.ProxyHostInfo;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 
 
@@ -419,18 +420,12 @@ public class HostBrowser extends Browser {
 
             @Override
             public void action() {
-                // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelPanic";
                 Tools.startProgressIndicator(hostName,
                                              host.getDistString(command));
-                host.execCommand(command,
-                                 null,
-                                 null,
-                                 true,
-                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
-                Tools.stopProgressIndicator(hostName,
-                                            host.getDistString(command));
+                host.execCommand(new ExecCommandConfig().commandString(command));
+                Tools.stopProgressIndicator(hostName, host.getDistString(command));
             }
         };
         submenu.add(panicMenuItem);
@@ -454,18 +449,11 @@ public class HostBrowser extends Browser {
 
             @Override
             public void action() {
-                // TODO are you sure dialog.
                 final String hostName = host.getName();
                 final String command = "MakeKernelReboot";
-                Tools.startProgressIndicator(hostName,
-                                             host.getDistString(command));
-                host.execCommand(command,
-                                 null,
-                                 null,
-                                 true,
-                                 Ssh.DEFAULT_COMMAND_TIMEOUT);
-                Tools.stopProgressIndicator(hostName,
-                                            host.getDistString(command));
+                Tools.startProgressIndicator(hostName, host.getDistString(command));
+                host.execCommand(new ExecCommandConfig().commandString(command));
+                Tools.stopProgressIndicator(hostName, host.getDistString(command));
             }
         };
         submenu.add(rebootMenuItem);

@@ -43,6 +43,7 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
@@ -109,10 +110,10 @@ final class CommStack extends DialogCluster {
         getProgressBar().start(10000);
         int i = 0;
         for (final Host host : hosts) {
-            infoThreads[i] = host.execCommand(
-                             "Cluster.Init.getInstallationInfo",
-                             getProgressBar(),
-                             new ExecCallback() {
+            infoThreads[i] = host.execCommand(new ExecCommandConfig()
+                             .commandString("Cluster.Init.getInstallationInfo")
+                             .progressBar(getProgressBar())
+                             .execCallback(new ExecCallback() {
                                  @Override
                                  public void done(final String answer) {
                                      //drbdLoaded[index] = true;
@@ -130,10 +131,9 @@ final class CommStack extends DialogCluster {
                                              + ": could not get install info: "
                                              + answer);
                                  }
-                             },
-                             null,   /* ConvertCmdCallback */
-                             false,  /* outputVisible */
-                             Ssh.DEFAULT_COMMAND_TIMEOUT);
+                             })
+                             .silentCommand()
+                             .silentOutput());
             i++;
         }
         for (final ExecCommandThread t : infoThreads) {
