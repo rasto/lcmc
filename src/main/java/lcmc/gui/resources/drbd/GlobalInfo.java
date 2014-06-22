@@ -112,7 +112,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
 
             final Host proxyHost = cluster.getProxyHostByName(hostName);
             if (proxyHost == null) {
-                final Host hp = new Host();
+                final Host hp = Host.createInstance();
                 hp.setHostname(hostName);
                 cluster.addProxyHost(hp);
                 addProxyHostNode(hp);
@@ -756,12 +756,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
      */
     public boolean atLeastVersion(final String drbdVersion) {
         for (final Host host : getCluster().getHostsArray()) {
-            final String hostDrbdVersion = host.getDrbdVersion();
-            if (hostDrbdVersion == null) {
-                continue;
-            }
             try {
-                if (Tools.compareVersions(hostDrbdVersion, drbdVersion) < 0) {
+                if (host.hasDrbd() && host.drbdVersionSmaller(drbdVersion)) {
                     return false;
                 }
             } catch (final Exceptions.IllegalVersionException e) {
@@ -934,9 +930,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             }
             boolean bigDRBDConf = true;
             try {
-                bigDRBDConf =
-                  Tools.getApplication().getBigDRBDConf()
-                  || Tools.compareVersions(host.getDrbdVersion(), "8.3.7") < 0;
+                bigDRBDConf = Tools.getApplication().getBigDRBDConf()
+                              || host.drbdVersionSmaller("8.3.7");
             } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("createDrbdConfig: " + e.getMessage(), e);
             }

@@ -36,6 +36,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.data.Application;
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -131,10 +132,10 @@ final class CheckInstallation extends DialogHost {
     /** Label of pacemaker that can be with corosync or openais. */
     private final JLabel pmJLabel = new JLabel("Pcmk/Corosync");
 
-    /** Prepares a new {@code CheckInstallation} object. */
     CheckInstallation(final WizardDialog previousDialog,
-                      final Host host) {
-        super(previousDialog, host);
+                      final Host host,
+                      final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Inits dialog. */
@@ -150,7 +151,7 @@ final class CheckInstallation extends DialogHost {
         pmOk = false;
         hbPmOk = false;
 
-        nextDialogObject = new Finish(this, getHost());
+        nextDialogObject = new Finish(this, getHost(), getDrbdInstallation());
         final CheckInstallation thisClass = this;
         Tools.invokeLater(new Runnable() {
             @Override
@@ -170,26 +171,23 @@ final class CheckInstallation extends DialogHost {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     if (drbdOk) {
-                        getHost().setDrbdWillBeUpgraded(true);
+                        getDrbdInstallation().setDrbdWillBeUpgraded(true);
                     }
-                    final InstallMethods im =
-                                  (InstallMethods) drbdInstMethodWi.getValue();
-                    getHost().setDrbdInstallMethod(im.getIndex());
+                    final InstallMethods im = (InstallMethods) drbdInstMethodWi.getValue();
+                    getDrbdInstallation().setDrbdInstallMethod(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
                   "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
                         if (im.isLinbitMethod()) {
                             nextDialogObject =
-                                new DrbdLinbitAvailPackages(thisClass,
-                                                            getHost());
+                                new DrbdLinbitAvailPackages(thisClass, getHost(), getDrbdInstallation());
                         } else if (im.isSourceMethod()) {
                            nextDialogObject =
-                               new DrbdAvailSourceFiles(thisClass, getHost());
+                               new DrbdAvailSourceFiles(thisClass, getHost(), getDrbdInstallation());
                         } else {
                             // TODO: this only when there is no drbd installed
-                            nextDialogObject = new DrbdCommandInst(
-                                                        thisClass, getHost());
-                            getHost().setDrbdInstallMethod(im.getIndex());
+                            nextDialogObject = new DrbdCommandInst(thisClass, getHost(), getDrbdInstallation());
+                            getDrbdInstallation().setDrbdInstallMethod(im.getIndex());
                         }
                         Tools.invokeLater(new Runnable() {
                             @Override
@@ -198,8 +196,7 @@ final class CheckInstallation extends DialogHost {
                             }
                         });
                     } else {
-                        nextDialogObject =
-                                 new LinbitLogin(thisClass, getHost());
+                        nextDialogObject = new LinbitLogin(thisClass, getHost(), getDrbdInstallation());
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -217,7 +214,7 @@ final class CheckInstallation extends DialogHost {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = new HeartbeatInst(thisClass, getHost());
+                    nextDialogObject = new HeartbeatInst(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im =
                                    (InstallMethods) hbPmInstMethodWi.getValue();
                     getHost().setHbPmInstallMethod(im.getIndex());
@@ -237,7 +234,7 @@ final class CheckInstallation extends DialogHost {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = new PacemakerInst(thisClass, getHost());
+                    nextDialogObject = new PacemakerInst(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im =
                                 (InstallMethods) pmInstMethodWi.getValue();
                     getHost().setPmInstallMethod(im.getIndex());
@@ -293,7 +290,7 @@ final class CheckInstallation extends DialogHost {
                 @SuppressWarnings("DeadBranch")
                 public void run() {
                     drbdLabel.setText(": " + ans.trim());
-                    if (getHost().isDrbdUpgradeAvailable(ans.trim())) {
+                    if (getDrbdInstallation().isDrbdUpgradeAvailable(ans.trim())) {
                         drbdIcon.setIcon(UPGR_AVAIL_ICON);
                         drbdButton.setText(Tools.getString(
                           "Dialog.Host.CheckInstallation.DrbdUpgradeButton"));

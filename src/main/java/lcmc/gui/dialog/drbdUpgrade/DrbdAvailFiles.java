@@ -23,6 +23,7 @@
 package lcmc.gui.dialog.drbdUpgrade;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 
 /**
@@ -35,14 +36,15 @@ import lcmc.gui.dialog.WizardDialog;
  */
 final class DrbdAvailFiles extends lcmc.gui.dialog.host.DrbdAvailFiles {
 
-    /** Prepares a new {@code DrbdAvailFiles} object. */
-    DrbdAvailFiles(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    DrbdAvailFiles(final WizardDialog previousDialog,
+                   final Host host,
+                   final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Returns the next dialog.drbdUpgrade.DrbdLinbitInst. */
     @Override
     public WizardDialog nextDialog() {
-        return new DrbdLinbitInst(this, getHost());
+        return new DrbdLinbitInst(this, getHost(), getDrbdInstallation());
     }
 }

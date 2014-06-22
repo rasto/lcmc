@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
@@ -48,9 +49,10 @@ import lcmc.utilities.Tools;
  *
  */
 public class Devices extends DialogHost {
-    /** Prepares a new {@code Devices} object. */
-    public Devices(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    public Devices(final WizardDialog previousDialog,
+                   final Host host,
+                   final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Checks the answer and makes it visible to the user. */
@@ -125,7 +127,7 @@ public class Devices extends DialogHost {
     /** Returns the next dialog object. */
     @Override
     public WizardDialog nextDialog() {
-        return new DistDetection(this, getHost());
+        return new DistDetection(this, getHost(), getDrbdInstallation());
     }
 
     /**

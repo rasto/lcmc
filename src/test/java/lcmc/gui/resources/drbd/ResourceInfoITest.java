@@ -59,7 +59,7 @@ public final class ResourceInfoITest {
         
         final ResourceInfo r1 =
                 new ResourceInfo("name", new LinkedHashSet<Host>(
-                                                 Arrays.asList(new Host())), b);
+                                                 Arrays.asList(Host.createInstance())), b);
         final ResourceInfo r2 = new ResourceInfo("name", null, b);
         assertTrue("equal names", r1.equals(r2));
     }

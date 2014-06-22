@@ -23,6 +23,7 @@ package lcmc.gui.resources.drbd;
 import java.util.Arrays;
 import java.util.List;
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
@@ -50,6 +51,8 @@ public class MultiSelectionMenuTest {
     @Mock
     private Host hostStub;
     @Mock
+    private DrbdInstallation drbdInstallationStub;
+    @Mock
     private ClusterBrowser browserStub;
     @Mock
     private BlockDevice blockDeviceStub;
@@ -67,7 +70,6 @@ public class MultiSelectionMenuTest {
     public void setUp() {
         when(multiSelectionInfoStub.getBrowser()).thenReturn(browserStub);
         when(hostDrbdInfoStub.getHost()).thenReturn(hostStub);
-
         when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
 
         sut = new MultiSelectionMenu(multiSelectionInfoStub, selectedInfos);

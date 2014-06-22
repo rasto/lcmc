@@ -256,22 +256,6 @@ public final class HostITest {
     }
 
     @Test
-    public void testGetAvailableDrbdVersions() {
-        for (final Host host : getHosts()) {
-            assertNull(host.getAvailableDrbdVersions());
-        }
-    }
-
-    @Test
-    public void testGetDrbdVersion() {
-        for (final Host host : getHosts()) {
-            assertNotNull(host.getDrbdVersion());
-            assertEquals(stripVersion(host.getDrbdVersion()),
-                         stripVersion(host.getDrbdModuleVersion()));
-        }
-    }
-
-    @Test
     public void testGetDistFromDistVersion() {
         for (final Host host : getHosts()) {
             assertEquals(host.getDistFromDistVersion("ubuntu-lucid"), "ubuntu");

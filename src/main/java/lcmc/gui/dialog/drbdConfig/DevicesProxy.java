@@ -21,6 +21,7 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Devices;
 import lcmc.gui.resources.drbd.VolumeInfo;
@@ -45,8 +46,9 @@ final class DevicesProxy extends Devices {
     DevicesProxy(final WizardDialog previousDialog,
                  final Host host,
                  final VolumeInfo volumeInfo,
-                 final WizardDialog origDialog) {
-        super(previousDialog, host);
+                 final WizardDialog origDialog,
+                 final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
@@ -54,10 +56,7 @@ final class DevicesProxy extends Devices {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            return new ProxyCheckInstallation(this,
-                                              getHost(),
-                                              volumeInfo,
-                                              origDialog);
+            return new ProxyCheckInstallation(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
         } else {
             return nextDialogObject;
         }

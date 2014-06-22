@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
@@ -85,12 +86,12 @@ final class ProxyCheckInstallation extends DialogHost {
     /** The dialog we came from. */
     private final WizardDialog origDialog;
 
-    /** Prepares a new {@code ProxyCheckInstallation} object. */
     ProxyCheckInstallation(final WizardDialog previousDialog,
                            final Host host,
                            final VolumeInfo volumeInfo,
-                           final WizardDialog origDialog) {
-        super(previousDialog, host);
+                           final WizardDialog origDialog,
+                           final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
         this.host = host;
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
@@ -124,10 +125,11 @@ final class ProxyCheckInstallation extends DialogHost {
                     nextDialogObject = new ProxyInst(thisClass,
                                                      getHost(),
                                                      volumeInfo,
-                                                     origDialog);
+                                                     origDialog,
+                                                     getDrbdInstallation());
                     final InstallMethods im =
                                  (InstallMethods) proxyInstMethodWi.getValue();
-                    getHost().setProxyInstallMethod(im.getIndex());
+                    getDrbdInstallation().setProxyInstallMethod(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {

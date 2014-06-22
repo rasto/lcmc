@@ -21,6 +21,7 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.NewHost;
 import lcmc.gui.resources.drbd.VolumeInfo;
@@ -42,25 +43,20 @@ public final class NewProxyHost extends NewHost {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-
-    /** Prepares a new {@code NewProxyHost} object. */
     public NewProxyHost(final WizardDialog previousDialog,
                         final Host host,
                         final VolumeInfo volumeInfo,
-                        final WizardDialog origDialog) {
-        super(previousDialog, host);
+                        final WizardDialog origDialog,
+                        final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
 
-    /** SetsnextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            return new ConfigurationProxy(this,
-                                          getHost(),
-                                          volumeInfo,
-                                          origDialog);
+            return new ConfigurationProxy(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
         } else {
             return nextDialogObject;
         }

@@ -35,10 +35,12 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
@@ -60,9 +62,10 @@ final class DrbdAvailSourceFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /** Prepares a new {@code DrbdAvailSourceFiles} object. */
-    DrbdAvailSourceFiles(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    DrbdAvailSourceFiles(final WizardDialog previousDialog,
+                         final Host host,
+                         final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /**
@@ -87,6 +90,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     protected void availTarballs() {
         getHost().execCommand(new ExecCommandConfig()
                 .commandString("DrbdAvailVersionsSource")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
                 .execCallback(new ExecCallback() {
                     @Override
                     public void done(final String answer) {
@@ -153,13 +157,14 @@ final class DrbdAvailSourceFiles extends DialogHost {
         if (versionInfo != null) {
             answerPaneSetText("http://oss.linbit.com/drbd/"
                               + versionInfo.getValueForGui());
-            getHost().setDrbdVersionToInstall(versionInfo.toString());
-            getHost().setDrbdVersionUrlStringToInstall(
+            final DrbdInstallation drbdInstallation = getDrbdInstallation();
+            drbdInstallation.setDrbdVersionToInstall(versionInfo.toString());
+            drbdInstallation.setDrbdVersionUrlStringToInstall(
                                             versionInfo.getValueForConfig());
         }
         // TODO: do something different if we did not get any versions
         drbdTarballCombo.setEnabled(true);
-        nextDialogObject = new DrbdCommandInst(this, getHost());
+        nextDialogObject = new DrbdCommandInst(this, getHost(), getDrbdInstallation());
         progressBarDone();
         enableComponents();
         buttonClass(nextButton()).requestFocus();

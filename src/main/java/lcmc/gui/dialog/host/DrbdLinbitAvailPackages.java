@@ -39,18 +39,14 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
-import lcmc.utilities.WidgetListener;
 
 /**
  * An implementation of a dialog where user can choose a distribution of the
@@ -86,8 +82,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
     /** Prepares a new {@code DrbdLinbitAvailPackages} object. */
     public DrbdLinbitAvailPackages(final WizardDialog previousDialog,
-                                   final Host host) {
-        super(previousDialog, host);
+                                   final Host host,
+                                   final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Checks the available drbd verisions. */
@@ -100,27 +97,28 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         drbdArchCombo.setEnabled(false);
         getProgressBar().start(20000);
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
-                       .commandString("DrbdAvailVersions")
-                       .execCallback(new ExecCallback() {
-                            @Override
-                            public void done(final String answer) {
-                                final String[] items = answer.split(NEWLINE);
+                .commandString("DrbdAvailVersions")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(final String answer) {
+                        final String[] items = answer.split(NEWLINE);
                                 /* all drbd versions are stored in form
                                  * {version1,version2,...}. This will be
                                  * later expanded by shell. */
-                                getHost().setDrbdVersionToInstall(
-                                                        Tools.shellList(items));
-                                availDistributions();
-                            }
-                            @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(Tools.getString(
-                              "Dialog.Host.DrbdLinbitAvailPackages.NoVersions"),
-                                        answer,
-                                        errorCode);
-                            }
-                       }));
+                        getDrbdInstallation().setDrbdVersionToInstall(Tools.shellList(items));
+                        availDistributions();
+                    }
+
+                    @Override
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        printErrorAndRetry(Tools.getString(
+                                        "Dialog.Host.DrbdLinbitAvailPackages.NoVersions"),
+                                answer,
+                                errorCode);
+                    }
+                }));
         setCommandThread(t);
     }
 
@@ -134,34 +132,42 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             }
         });
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
-                        .commandString("DrbdAvailDistributions")
-                        .execCallback(new ExecCallback() {
+                .commandString("DrbdAvailDistributions")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
+                .execCallback(new ExecCallback() {
+                    @Override
+                    public void done(String answer) {
+                        answer = NO_MATCH_STRING + '\n' + answer;
+                        final String[] items = answer.split(NEWLINE);
+                        drbdDistItems = Arrays.asList(items);
+                        Tools.invokeLater(new Runnable() {
                             @Override
-                            public void done(String answer) {
-                                answer = NO_MATCH_STRING + '\n' + answer;
-                                final String[] items = answer.split(NEWLINE);
-                                drbdDistItems = Arrays.asList(items);
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        drbdDistCombo.reloadComboBox(
-                                            new StringValue(
-                                                  getHost().getDistVersion()),
-                                            StringValue.getValues(items));
-                                        drbdDistCombo.setEnabled(true);
-                                    }
-                                });
-                                availKernels();
+                            public void run() {
+                                drbdDistCombo.reloadComboBox(
+                                        new StringValue(
+                                                getHost().getDistVersion()),
+                                        StringValue.getValues(items));
+                                drbdDistCombo.setEnabled(true);
                             }
-                            @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(Tools.getString(
-                         "Dialog.Host.DrbdLinbitAvailPackages.NoDistributions"),
-                                        answer,
-                                        errorCode);
-                            }
-                         }));
+                        });
+                        availKernels();
+                    }
+
+                    @Override
+                    public void doneError(final String answer,
+                                          final int errorCode) {
+                        printErrorAndRetry(Tools.getString(
+                                        "Dialog.Host.DrbdLinbitAvailPackages.NoDistributions"),
+                                answer,
+                                errorCode);
+                    }
+                })
+                .convertCmdCallback(new ConvertCmdCallback() {
+                    @Override
+                    public String convert(String command) {
+                        return getDrbdInstallation().replaceVarsInCommand(command);
+                    }
+                }));
         setCommandThread(t);
     }
 
@@ -182,6 +188,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         }
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
                         .commandString("DrbdAvailKernels")
+                        .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
                         .execCallback(new ExecCallback() {
                             @Override
                             public void done(String answer) {
@@ -235,6 +242,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         }
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
                 .commandString("DrbdAvailArchs")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
                 .execCallback(new ExecCallback() {
                     @Override
                     public void done(String answer) {
@@ -330,7 +338,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             printErrorAndRetry(errorText.toString());
         } else {
             final String[] versions = ans.split(NEWLINE);
-            getHost().setAvailableDrbdVersions(versions);
+            getDrbdInstallation().setAvailableDrbdVersions(versions);
             answerPaneSetText(
                     Tools.getString(
                         "Dialog.Host.DrbdLinbitAvailPackages.AvailVersions")
@@ -359,10 +367,10 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     /** Returns the next dialog which is CheckInstallation. */
     @Override
     public WizardDialog nextDialog() {
-        if (getHost().isDrbdUpgraded()) {
-            return new CheckInstallation(this, getHost());
+        if (getDrbdInstallation().isDrbdUpgraded()) {
+            return new CheckInstallation(this, getHost(), getDrbdInstallation());
         } else {
-            return new DrbdAvailFiles(this, getHost());
+            return new DrbdAvailFiles(this, getHost(), getDrbdInstallation());
         }
     }
 

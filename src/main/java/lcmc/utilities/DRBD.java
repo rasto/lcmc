@@ -394,8 +394,7 @@ public final class DRBD {
     public static boolean skipInitialFullSync(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         try {
             final String command;
-            final String drbdV = host.getDrbdVersion();
-            if (Tools.compareVersions(drbdV, "8.3") <= 0) {
+            if (host.drbdVersionSmallerOrEqual("8.3")) {
                 command = host.getDistCommand("DRBD.skipInitSync.8.3",
                                               getResVolReplaceHash(host,
                                                                    resource,
@@ -430,13 +429,12 @@ public final class DRBD {
     public static boolean forcePrimary(final Host host, final String resource, final String volume, final ExecCallback execCallback, final Application.RunMode runMode) {
         try {
             final String command;
-            final String drbdV = host.getDrbdVersion();
-            if (Tools.compareVersions(drbdV, "8.3.7") <= 0) {
+            if (host.drbdVersionSmallerOrEqual("8.3.7")) {
                 command = host.getDistCommand("DRBD.forcePrimary.8.3.7",
                                               getResVolReplaceHash(host,
                                                                    resource,
                                                                    volume));
-            } else if (Tools.compareVersions(drbdV, "8.3") <= 0) {
+            } else if (host.drbdVersionSmallerOrEqual("8.3")) {
                 command = host.getDistCommand("DRBD.forcePrimary.8.3",
                                               getResVolReplaceHash(host,
                                                                    resource,

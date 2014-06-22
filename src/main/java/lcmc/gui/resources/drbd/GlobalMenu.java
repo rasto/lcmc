@@ -116,7 +116,7 @@ public class GlobalMenu {
     }
 
     private void addProxyHostWizard() {
-        final Host proxyHost = new Host();
+        final Host proxyHost = Host.createInstance();
         proxyHost.setCluster(globalInfo.getCluster());
         final ProxyHostWizard w = new ProxyHostWizard(proxyHost, null);
         w.showDialogs();

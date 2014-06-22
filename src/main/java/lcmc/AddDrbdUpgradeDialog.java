@@ -23,6 +23,7 @@
 
 package lcmc;
 
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdUpgrade.Dist;
 import lcmc.gui.resources.drbd.HostDrbdInfo;
@@ -54,7 +55,7 @@ public final class AddDrbdUpgradeDialog {
 
     /** Shows step by step dialogs that upgrade the drbd. */
     public void showDialogs() {
-        WizardDialog dialog = new Dist(null, hostDrbdInfo.getHost());
+        WizardDialog dialog = new Dist(null, hostDrbdInfo.getHost(), new DrbdInstallation());
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());

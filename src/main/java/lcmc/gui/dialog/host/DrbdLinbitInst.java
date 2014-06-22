@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
@@ -49,8 +50,10 @@ public class DrbdLinbitInst extends DialogHost {
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code DrbdLinbitInst} object. */
-    public DrbdLinbitInst(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    public DrbdLinbitInst(final WizardDialog previousDialog,
+                          final Host host,
+                          final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Inits dialog and starts the drbd install procedure. */
@@ -132,14 +135,12 @@ public class DrbdLinbitInst extends DialogHost {
 
     /** Install the drbd packages. */
     final void installDrbd() {
-        getHost().setDrbdWasInstalled(true); /* even if we fail */
-        Tools.getApplication().setLastDrbdInstalledMethod(
-                                            getHost().getDrbdInstallMethod());
-        Tools.getApplication().setLastDrbdInstalledMethod(
-                         getHost().getDistString("DrbdInst.install.text."
-                         + getHost().getDrbdInstallMethod()));
-        answerPaneSetText(
-                    Tools.getString("Dialog.Host.DrbdLinbitInst.Installing"));
+        final DrbdInstallation drbdInstallation = getDrbdInstallation();
+        drbdInstallation.setDrbdWasInstalled(true); /* even if we fail */
+        Tools.getApplication().setLastDrbdInstalledMethod(drbdInstallation.getDrbdInstallMethod());
+        Tools.getApplication().setLastDrbdInstalledMethod(getHost().getDistString("DrbdInst.install.text."
+                                                          + drbdInstallation.getDrbdInstallMethod()));
+        answerPaneSetText(Tools.getString("Dialog.Host.DrbdLinbitInst.Installing"));
         getHost().execCommandInBash(new ExecCommandConfig().commandString("DrbdInst.install;;;DRBD.load")
                           .progressBar(getProgressBar())
                           .execCallback(new ExecCallback() {
@@ -172,10 +173,10 @@ public class DrbdLinbitInst extends DialogHost {
             globalInfo.resetInfoPanel();
             globalInfo.getInfoPanel();
         }
-        nextDialogObject = new CheckInstallation(
-                   getPreviousDialog().getPreviousDialog().getPreviousDialog()
-                                      .getPreviousDialog().getPreviousDialog(),
-                   getHost());
+        nextDialogObject = new CheckInstallation(getPreviousDialog().getPreviousDialog().getPreviousDialog()
+                                                                    .getPreviousDialog().getPreviousDialog(),
+                                                 getHost(),
+                                                 getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(
                Tools.getString("Dialog.Host.DrbdLinbitInst.InstallationDone"));

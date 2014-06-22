@@ -62,7 +62,7 @@ public final class ClusterHostsInfo extends CategoryInfo {
                                                 HostBrowser.HOST_ICON_LARGE);
             hostLabel.setOpaque(true);
             rows.add(new Object[]{hostLabel,
-                                  host.getBrowser().getDrbdInfo(),
+                                  host.getBrowser().host.getDrbdInfoAboutInstallation(),
                                   host.getBrowser().getPacemakerInfo()});
         }
         return rows.toArray(new Object[rows.size()][]);

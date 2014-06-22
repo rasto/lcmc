@@ -47,6 +47,8 @@ import javax.swing.JComponent;
 
 import lcmc.Exceptions;
 import lcmc.configs.DistResource;
+import lcmc.data.drbd.DrbdInstallation;
+import lcmc.data.drbd.DrbdHost;
 import lcmc.data.drbd.DrbdXML;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.NetInterface;
@@ -59,17 +61,10 @@ import lcmc.gui.SSHGui;
 import lcmc.gui.TerminalPanel;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.robotest.RoboTest;
-import lcmc.utilities.ConnectionCallback;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.NewOutputCallback;
+import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
 import lcmc.utilities.ssh.SshOutput;
 
 
@@ -159,6 +154,7 @@ public class Host implements Comparable<Host>, Value {
     private String ipAddress;
     /** Ips in the combo in Dialog.Host.Configuration. */
     private final Map<Integer, String[]> ips = new HashMap<Integer, String[]>();
+    private Cluster cluster = null;
     /** Hostname of the host. */
     private String hostname = DEFAULT_HOSTNAME;
     /** Username, root most of the times. */
@@ -185,22 +181,6 @@ public class Host implements Comparable<Host>, Value {
     private String kernelVersion = "";
     /** Kernel architecture (could be different than detected). */
     private String arch = "";
-    /** Available drbd versions. */
-    private List<String> availableDrbdVersions = null;
-    /** Drbd version, that will be installed. */
-    private String drbdVersionToInstall = null;
-    /** Drbd version of the source tarball, that will be installed . */
-    private String drbdVersionUrlStringToInstall = null;
-    /** Build, which will be installed. */
-    private String drbdBuildToInstall = null;
-    /** Drbd packages, that will be installed. */
-    private String drbdPackagesToInstall = null;
-    /** Cluster data object. */
-    private Cluster cluster = null;
-    /** Drbd version of drbdadm tool. */
-    private String drbdVersion = null;
-    /** Drbd version of drbd module. */
-    private String drbdModuleVersion = null;
     /** Map of network interfaces of this host with bridges. */
     private List<NetInterface> netInterfaces = new ArrayList<NetInterface>();
     /** Bridges. */
@@ -283,26 +263,16 @@ public class Host implements Comparable<Host>, Value {
     private boolean pcmkIsRc = false;
     /** Is "on" if pacemaker is running. */
     private boolean pcmkRunning = false;
-    /** Is "on" if drbd proxy is running. */
-    private boolean drbdProxyRunning = false;
     /** Is "on" if pacemaker has an init script. */
     private boolean pcmkInit = false;
     /** Pacemaker service version. From version 1, use pacamker init script. */
     private int pcmkServiceVersion = -1;
-    /** Is "on" if drbd module is loaded. */
-    private boolean drbdLoaded = false;
     /** Corosync version. */
     private String corosyncVersion = null;
     /** Heartbeat version. */
     private String heartbeatVersion = null;
-    /** Whether drbd will be upgraded. */
-    private boolean drbdWillBeUpgraded = false;
-    /** Whether drbd was newly installed. */
-    private boolean drbdWasInstalled = false;
     /** Whether heartbeat status is ok. */
     private boolean clStatus = false;
-    /** Whether drbd status is ok. */
-    private boolean drbdStatus = false;
 
     /** Ssh object of the connection to this host. */
     private final Ssh ssh = new Ssh();
@@ -327,10 +297,6 @@ public class Host implements Comparable<Host>, Value {
     private String pmInstallMethod;
     /** Heartbeat/pacemaker installation method index. */
     private String hbPmInstallMethod;
-    /** Drbd installation method index. */
-    private String drbdInstallMethod;
-    /** Drbd proxy installation method index. */
-    private String proxyInstallMethod;
     /** Heartbeat lib path. */
     private String hbLibPath = null;
     /** MD5 checksum of VM Info from server. */
@@ -367,11 +333,13 @@ public class Host implements Comparable<Host>, Value {
     private boolean inCluster = false;
     /** Whether dist info was already logged. */
     private boolean distInfoLogged = false;
-    /**
-     * Prepares a new {@code Host} object. Initializes host browser and
-     * host's resources.
-     */
-    public Host() {
+
+    private final DrbdHost drbdHost;
+    /** Whether drbd status is ok. */
+    private boolean drbdStatus = false;
+
+    private Host(final DrbdHost drbdHost) {
+        this.drbdHost = drbdHost;
         if (Tools.getApplication().getHosts().size() == 1) {
             hostnameEntered = Tools.getDefault("SSH.SecHost");
         }
@@ -385,13 +353,16 @@ public class Host implements Comparable<Host>, Value {
         mountPoints.add("/mnt/");
     }
 
-    /** Prepares a new {@code Host} object. */
-    public Host(final String ipAddress) {
-    this();
-    this.ipAddress = ipAddress;
+    public static Host createInstance() {
+        return new Host(new DrbdHost());
     }
 
-    /** Returns borwser object for this host. */
+    public static Host createInstance(final String ipAddress) {
+        final Host instance = createInstance();
+        instance.ipAddress = ipAddress;
+        return instance;
+    }
+
     public HostBrowser getBrowser() {
         return browser;
     }
@@ -435,7 +406,7 @@ public class Host implements Comparable<Host>, Value {
         }
         final Color secColor;
         if (isConnected()) {
-            if (isDrbdStatus() && isDrbdLoaded()) {
+            if (isDrbdStatus() && drbdHost.isDrbdLoaded()) {
                 return new Color[]{col};
             } else {
                 secColor = Tools.getDefaultColor("Host.NoStatusColor");
@@ -495,24 +466,9 @@ public class Host implements Comparable<Host>, Value {
         this.clStatus = clStatus;
     }
 
-    /** Sets if drbd status failed or not. */
-    public void setDrbdStatus(final boolean drbdStatus) {
-        this.drbdStatus = drbdStatus;
-        if (!drbdStatus) {
-            for (final BlockDevice b : getBlockDevices()) {
-                b.resetDrbd();
-            }
-        }
-    }
-
     /** Returns whether cluster status is available. */
     public boolean isClStatus() {
         return clStatus && isConnected();
-    }
-
-    /** Returns whether drbd status is available. */
-    public boolean isDrbdStatus() {
-        return drbdStatus;
     }
 
     /** Returns true when this host is in a cluster. */
@@ -725,98 +681,6 @@ public class Host implements Comparable<Host>, Value {
     /** Returns ips of this host. */
     public String[] getIps(final int hop) {
         return ips.get(hop);
-    }
-
-    /** Sets available drbd versions. */
-    public void setAvailableDrbdVersions(final String[] versions) {
-        availableDrbdVersions = new ArrayList<String>(Arrays.asList(versions));
-    }
-
-    /** Retruns available drbd versions as array of strings. */
-    public String[] getAvailableDrbdVersions() {
-        if (availableDrbdVersions == null) {
-            return null;
-        }
-        return availableDrbdVersions.toArray(
-                                    new String [availableDrbdVersions.size()]);
-    }
-
-    /** Returns whether there is a drbd upgrade available. */
-    public boolean isDrbdUpgradeAvailable(final String versionString) {
-        if (availableDrbdVersions == null || versionString == null) {
-            return false;
-        }
-        final String version = versionString.split(" ")[0];
-        for (final String v : availableDrbdVersions) {
-            try {
-                if (Tools.compareVersions(v, version) > 0) {
-                    return true;
-                }
-            } catch (final Exceptions.IllegalVersionException e) {
-                LOG.appWarning("isDrbdUpgradeAvailable: "+ e.getMessage(), e);
-            }
-        }
-        return false;
-    }
-
-    /** Returns installed drbd version. */
-    public String getDrbdVersion() {
-        return drbdVersion;
-    }
-
-    /** Returns installed drbd module version. */
-    public String getDrbdModuleVersion() {
-        return drbdModuleVersion;
-    }
-
-    /**
-     * Sets drbdVersionToInstall. This version is one that is to be installed.
-     * If drbd is already installed.
-     */
-    public void setDrbdVersionToInstall(final String drbdVersionToInstall) {
-        this.drbdVersionToInstall = drbdVersionToInstall;
-    }
-
-    /**
-     * Sets the drbd version in the form that is in the source tarball on
-     * linbit website, like so: "8.3/drbd-8.3.1.tar.gz".
-     */
-    public void setDrbdVersionUrlStringToInstall(
-                                  final String drbdVersionUrlStringToInstall) {
-        this.drbdVersionUrlStringToInstall = drbdVersionUrlStringToInstall;
-    }
-
-    /**
-     * Gets drbdVersionToInstall. This version is one that is to be installed.
-     * If drbd is already installed.
-     */
-    public String getDrbdVersionToInstall() {
-        return drbdVersionToInstall;
-    }
-
-    /**
-     * Gets drbd version of the source tarball in the form as it is on
-     * the linbit website: "8.3/drbd-8.3.1.tar.gz".
-     */
-    public String getDrbdVersionUrlStringToInstall() {
-        return drbdVersionUrlStringToInstall;
-    }
-
-    /**
-     * Sets drbdBuildToInstall. This build is the one that is to be installed.
-     */
-    public void setDrbdBuildToInstall(final String drbdBuildToInstall) {
-        this.drbdBuildToInstall = drbdBuildToInstall;
-    }
-
-    /** Returns the drbd build to be installed. */
-    public String getDrbdBuildToInstall() {
-        return drbdBuildToInstall;
-    }
-
-    /** Sets drbd packages to install. */
-    public void setDrbdPackagesToInstall(final String drbdPackagesToInstall) {
-        this.drbdPackagesToInstall = drbdPackagesToInstall;
     }
 
     /**
@@ -1892,8 +1756,7 @@ public class Host implements Comparable<Host>, Value {
      *
      * @return command with replaced variables
      */
-    public String replaceVars(String command,
-                              final boolean hidePassword) {
+    public String replaceVars(String command, final boolean hidePassword) {
         if (command.indexOf("@USER@") > -1) {
             command = command.replaceAll(
                                     "@USER@",
@@ -1916,10 +1779,6 @@ public class Host implements Comparable<Host>, Value {
             && command.indexOf("@KERNELVERSIONDIR@") > -1) {
             command = command.replaceAll("@KERNELVERSIONDIR@", kernelVersion);
         }
-        if (drbdVersionToInstall != null
-            && command.indexOf("@DRBDVERSION@") > -1) {
-            command = command.replaceAll("@DRBDVERSION@", drbdVersionToInstall);
-        }
         if (distVersion != null
             && command.indexOf("@DISTRIBUTION@") > -1) {
             command = command.replaceAll("@DISTRIBUTION@", distVersion);
@@ -1927,15 +1786,6 @@ public class Host implements Comparable<Host>, Value {
         if (arch != null
             && command.indexOf("@ARCH@") > -1) {
             command = command.replaceAll("@ARCH@", arch);
-        }
-        if (drbdBuildToInstall != null
-            && command.indexOf("@BUILD@") > -1) {
-            command = command.replaceAll("@BUILD@", drbdBuildToInstall);
-        }
-        if (drbdPackagesToInstall != null
-            && command.indexOf("@DRBDPACKAGES@") > -1) {
-            command = command.replaceAll("@DRBDPACKAGES@",
-                                         drbdPackagesToInstall);
         }
         if (command.indexOf("@SUPPORTDIR@") > -1) {
             command = command.replaceAll("@SUPPORTDIR@", supportDir);
@@ -2158,8 +2008,8 @@ public class Host implements Comparable<Host>, Value {
                    + ", pacemaker: "   + pacemakerVersion
                    + ", corosync: "    + corosyncVersion
                    + ", heartbeat: "   + heartbeatVersion
-                   + ", drbd: "        + drbdVersion
-                   + ", drbd module: " + drbdModuleVersion);
+                   + ", drbd: "        + drbdHost.getDrbdVersion()
+                   + ", drbd module: " + drbdHost.getDrbdModuleVersion());
 
         if (changedTypes.contains(NET_INFO)) {
             netInterfaces = newNetInterfaces;
@@ -2385,9 +2235,9 @@ public class Host implements Comparable<Host>, Value {
             }
         } else if ("drbdp-running".equals(tokens[0])) {
             if (tokens.length == 2) {
-                drbdProxyRunning = "on".equals(tokens[1].trim());
+                drbdHost.setDrbdProxyRunning("on".equals(tokens[1].trim()));
             } else {
-                drbdProxyRunning = false;
+                drbdHost.setDrbdProxyRunning(false);
             }
         } else if ("pcmk-init".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2405,9 +2255,9 @@ public class Host implements Comparable<Host>, Value {
             }
         } else if ("drbd-loaded".equals(tokens[0])) {
             if (tokens.length == 2) {
-                drbdLoaded = "on".equals(tokens[1].trim());
+                drbdHost.setDrbdLoaded("on".equals(tokens[1].trim()));
             } else {
-                drbdLoaded = false;
+                drbdHost.setDrbdLoaded(false);
             }
         } else if ("hb-lib-path".equals(tokens[0])) {
             if (tokens.length == 2) {
@@ -2424,15 +2274,15 @@ public class Host implements Comparable<Host>, Value {
             setName(hostname);
         } else if ("drbd".equals(tokens[0])) {
             if (tokens.length == 2) {
-                drbdVersion = tokens[1].trim();
+                drbdHost.setDrbdVersion(tokens[1].trim());
             } else {
-                drbdVersion = null;
+                drbdHost.setDrbdVersion(null);
             }
         } else if ("drbd-mod".equals(tokens[0])) {
             if (tokens.length == 2) {
-                drbdModuleVersion = tokens[1].trim();
+                drbdHost.setDrbdModuleVersion(tokens[1].trim());
             } else {
-                drbdModuleVersion = null;
+                drbdHost.setDrbdModuleVersion(null);
             }
         }
         corosyncHeartbeatRunning = heartbeatRunning || csRunning || aisRunning;
@@ -2443,7 +2293,7 @@ public class Host implements Comparable<Host>, Value {
         if (pcmkStarting && pcmkRunning) {
             pcmkStarting = false;
         }
-        if (drbdProxyStarting && drbdProxyRunning) {
+        if (drbdProxyStarting && drbdHost.isDrbdProxyRunning()) {
             drbdProxyStarting = false;
         }
         if (commLayerStopping
@@ -2537,24 +2387,6 @@ public class Host implements Comparable<Host>, Value {
     /** Returns the heartbeat version. */
     public String getHeartbeatVersion() {
         return heartbeatVersion;
-    }
-
-    /** Sets that drbd will be upgraded. */
-    public void setDrbdWillBeUpgraded(final boolean drbdWillBeUpgraded) {
-        this.drbdWillBeUpgraded = drbdWillBeUpgraded;
-    }
-
-    /** Sets that drbd was installed. */
-    public void setDrbdWasInstalled(final boolean drbdWasInstalled) {
-        this.drbdWasInstalled = drbdWasInstalled;
-    }
-
-    /**
-     * Returns true if drbd will be upgraded and drbd was installed.
-     * TODO: ???
-     */
-    public boolean isDrbdUpgraded() {
-        return drbdWillBeUpgraded && drbdWasInstalled;
     }
 
     /**
@@ -2670,26 +2502,6 @@ public class Host implements Comparable<Host>, Value {
         return hbPmInstallMethod;
     }
 
-    /** Sets drbd installation method index. */
-    public void setDrbdInstallMethod(final String drbdInstallMethod) {
-        this.drbdInstallMethod = drbdInstallMethod;
-    }
-
-    /** Returns drbd installation method. */
-    public String getDrbdInstallMethod() {
-        return drbdInstallMethod;
-    }
-
-    /** Sets proxy installation method index. */
-    public void setProxyInstallMethod(final String proxyInstallMethod) {
-        this.proxyInstallMethod = proxyInstallMethod;
-    }
-
-    /** Returns proxy installation method. */
-    public String getProxyInstallMethod() {
-        return proxyInstallMethod;
-    }
-
     /** Returns whether Corosync is rc script. */
     public boolean isCsRc() {
        return csIsRc;
@@ -2736,11 +2548,6 @@ public class Host implements Comparable<Host>, Value {
        return pcmkRunning;
     }
 
-    /** Returns whether the drbd proxy is running. */
-    public boolean isDrbdProxyRunning() {
-       return drbdProxyRunning;
-    }
-
     /** Returns whether Openais is running script. */
     public boolean isAisRunning() {
        return aisRunning;
@@ -2764,11 +2571,6 @@ public class Host implements Comparable<Host>, Value {
     /** Returns whether Heartbeat config exists. */
     public boolean isHeartbeatConf() {
        return heartbeatConf;
-    }
-
-    /** Returns whether drbd module is loaded. */
-    public boolean isDrbdLoaded() {
-       return drbdLoaded;
     }
 
     /** Returns MD5 checksum of VM Info from server. */
@@ -2995,7 +2797,7 @@ public class Host implements Comparable<Host>, Value {
     /** Returns whether DRBD has volume feature. */
     public boolean hasVolumes() {
         try {
-            return Tools.compareVersions(getDrbdVersion(), "8.4") >= 0;
+            return Tools.compareVersions(drbdHost.getDrbdVersion(), "8.4") >= 0;
         } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("hasVolumes: " + e.getMessage(), e);
         }
@@ -3136,5 +2938,100 @@ public class Host implements Comparable<Host>, Value {
     public String getNothingSelected() {
         return NOTHING_SELECTED;
     }
-}
 
+    /** Sets if drbd status failed or not. */
+    public void setDrbdStatus(final boolean drbdStatus) {
+        this.drbdStatus = drbdStatus;
+        resetDrbdOnBlockDevices(drbdStatus);
+    }
+
+    /** Returns whether drbd status is available. */
+    public boolean isDrbdStatus() {
+        return drbdStatus;
+    }
+
+    public String isDrbdUtilCompatibleWithDrbdModule() {
+        if (!DRBD.compatibleVersions(drbdHost.getDrbdVersion(),
+                                     drbdHost.getDrbdModuleVersion())) {
+            return "DRBD util and module versions are not compatible: "
+                    + drbdHost.getDrbdVersion()
+                    + " / "
+                    + drbdHost.getDrbdModuleVersion();
+        }
+        return null;
+    }
+
+    /** Returns info string about DRBD installation. */
+    public String getDrbdInfoAboutInstallation() {
+        final StringBuilder tt = new StringBuilder(40);
+        final String drbdV = drbdHost.getDrbdVersion();
+        final String drbdModuleV = drbdHost.getDrbdModuleVersion();
+        final String drbdS;
+        if (drbdV == null || drbdV.isEmpty()) {
+            drbdS = "not installed";
+        } else {
+            drbdS = drbdV;
+        }
+
+        final String drbdModuleS;
+        if (drbdModuleV == null || drbdModuleV.isEmpty()) {
+            drbdModuleS = "not installed";
+        } else {
+            drbdModuleS = drbdModuleV;
+        }
+        tt.append("\nDRBD ");
+        tt.append(drbdS);
+        if (!drbdS.equals(drbdModuleS)) {
+            tt.append("\nDRBD module ");
+            tt.append(drbdModuleS);
+        }
+        if (drbdHost.isDrbdLoaded()) {
+            tt.append(" (running)");
+        } else {
+            tt.append(" (not loaded)");
+        }
+        return tt.toString();
+    }
+
+    public void waitForHostAndDrbd() {
+        while (!isConnected() || !drbdHost.isDrbdLoaded()) {
+            try {
+                Thread.sleep(10000);
+            } catch (final InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+    public boolean drbdVersionHigherOrEqual(final String drbdVersion) throws Exceptions.IllegalVersionException {
+        return Tools.compareVersions(drbdHost.getDrbdVersion(), drbdVersion) >= 0;
+    }
+
+    public boolean drbdVersionSmaller(final String drbdVersion) throws Exceptions.IllegalVersionException {
+        return Tools.compareVersions(drbdHost.getDrbdVersion(), drbdVersion) < 0;
+    }
+
+    public boolean isDrbdLoaded() {
+        return drbdHost.isDrbdLoaded();
+    }
+
+    public boolean isDrbdProxyRunning() {
+        return drbdHost.isDrbdProxyRunning();
+    }
+
+    public boolean hasDrbd() {
+        return drbdHost.getDrbdVersion() != null;
+    }
+
+    public boolean drbdVersionSmallerOrEqual(final String drbdVersion) throws Exceptions.IllegalVersionException {
+        return Tools.compareVersions(drbdHost.getDrbdVersion(), drbdVersion) <= 0;
+    }
+
+    private void resetDrbdOnBlockDevices(boolean drbdStatus) {
+        if (!drbdStatus) {
+            for (final BlockDevice b : getBlockDevices()) {
+                b.resetDrbd();
+            }
+        }
+    }
+
+}

@@ -22,6 +22,7 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
 import lcmc.gui.resources.drbd.VolumeInfo;
@@ -47,8 +48,9 @@ final class ConfigurationProxy extends Configuration {
     ConfigurationProxy(final WizardDialog previousDialog,
                        final Host host,
                        final VolumeInfo volumeInfo,
-                       final WizardDialog origDialog) {
-        super(previousDialog, host);
+                       final WizardDialog origDialog,
+                       final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
@@ -60,10 +62,7 @@ final class ConfigurationProxy extends Configuration {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            return new SSHProxy(this,
-                                getHost(),
-                                volumeInfo,
-                                origDialog);
+            return new SSHProxy(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
         } else {
             return nextDialogObject;
         }

@@ -28,6 +28,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SSHGui;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.CancelCallback;
@@ -47,9 +48,10 @@ public class SSH extends DialogHost {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
 
-    /** *  Prepares a new {@code Ssh} object. */
-    public SSH(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    public SSH(final WizardDialog previousDialog,
+               final Host host,
+               final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Connects to all hosts. */
@@ -106,7 +108,7 @@ public class SSH extends DialogHost {
     /** Returns the next dialog. Devices */
     @Override
     public WizardDialog nextDialog() {
-        return new Devices(getPreviousDialog(), getHost());
+        return new Devices(getPreviousDialog(), getHost(), getDrbdInstallation());
     }
 
     /** Inits the dialog and start connecting to the hosts. */

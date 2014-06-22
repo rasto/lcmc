@@ -46,6 +46,7 @@ import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
@@ -667,19 +668,11 @@ public class Init extends DialogCluster {
                                     Tools.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
-                                            drbdLoadButtons.get(
-                                                      index).setVisible(false);
+                                            drbdLoadButtons.get(index).setVisible(false);
                                         }
                                     });
-                                    final Application.RunMode runMode =
-                                                       Application.RunMode.LIVE;
+                                    final Application.RunMode runMode = Application.RunMode.LIVE;
                                     DRBD.load(host, runMode);
-                                    if (host.isDrbdUpgraded()) {
-                                        DRBD.adjustApply(host,
-                                                    DRBD.ALL,
-                                                    null,
-                                                    runMode);
-                                    }
                                     checkCluster(false);
                                 }
                             }

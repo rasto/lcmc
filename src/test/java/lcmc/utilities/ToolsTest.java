@@ -1016,7 +1016,7 @@ public final class ToolsTest {
     @Parameters(method="parametersForTestVersionBeforePacemaker")
     public void testVersionBeforePacemaker(final String pcmkVersion,
                                            final String hbVersion) {
-        final Host host = new Host();
+        final Host host = Host.createInstance();
 
         host.setPacemakerVersion(pcmkVersion);
         host.setHeartbeatVersion(hbVersion);
@@ -1038,7 +1038,7 @@ public final class ToolsTest {
     @Parameters(method="parametersForTestVersionAfterPacemaker")
     public void testVersionAfterPacemaker(final String pcmkVersion,
                                           final String hbVersion) {
-        final Host host = new Host();
+        final Host host = Host.createInstance();
 
         host.setPacemakerVersion(pcmkVersion);
         host.setHeartbeatVersion(hbVersion);

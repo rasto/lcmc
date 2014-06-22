@@ -24,6 +24,7 @@
 package lcmc;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.NewHost;
 import lcmc.utilities.Logger;
@@ -53,7 +54,7 @@ public final class AddHostDialog {
     /** Shows step by step dialogs that add and configure new host. */
     public void showDialogs() {
         Tools.getGUIData().enableAddHostButtons(false);
-        DialogHost dialog = new NewHost(null, host);
+        DialogHost dialog = new NewHost(null, host, new DrbdInstallation());
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());

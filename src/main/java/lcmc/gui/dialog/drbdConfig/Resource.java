@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.configs.AppDefaults;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.data.drbd.DrbdXML;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
@@ -124,12 +125,9 @@ public final class Resource extends DrbdConfig {
         final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         if (proxyHostNextDialog) {
             proxyHostNextDialog = false;
-            final Host proxyHost = new Host();
+            final Host proxyHost = Host.createInstance();
             proxyHost.setCluster(dri.getCluster());
-            return new NewProxyHost(this,
-                                    proxyHost,
-                                    getDrbdVolumeInfo(),
-                                    this);
+            return new NewProxyHost(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
         }
         final GlobalInfo globalInfo = dri.getDrbdInfo();
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");

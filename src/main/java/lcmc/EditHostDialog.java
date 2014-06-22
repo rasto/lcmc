@@ -24,6 +24,7 @@
 package lcmc;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.utilities.Logger;
@@ -52,7 +53,7 @@ public final class EditHostDialog {
 
     /** Shows step by step dialogs that configure a host. */
     public void showDialogs() {
-        DialogHost dialog = new SSH(null, host);
+        DialogHost dialog = new SSH(null, host, new DrbdInstallation());
         final boolean expanded = Tools.getGUIData().isTerminalPanelExpanded();
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {

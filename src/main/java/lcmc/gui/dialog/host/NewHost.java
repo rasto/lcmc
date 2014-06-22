@@ -35,6 +35,7 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.TerminalPanel;
 import lcmc.gui.dialog.WizardDialog;
@@ -73,9 +74,10 @@ public class NewHost extends DialogHost {
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
 
-    /** Prepares a new {@code NewHost} object. */
-    public NewHost(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    public NewHost(final WizardDialog previousDialog,
+                   final Host host,
+                   final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Finishes the dialog, stores the values and adds the host tab. */
@@ -103,7 +105,7 @@ public class NewHost extends DialogHost {
     /** Sets nextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
-        return new Configuration(this, getHost());
+        return new Configuration(this, getHost(), getDrbdInstallation());
     }
 
     /**

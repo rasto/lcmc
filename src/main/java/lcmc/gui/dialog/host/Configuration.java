@@ -37,6 +37,7 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -72,10 +73,10 @@ public class Configuration extends DialogHost {
     /** Whether the hostname was ok. */
     private volatile boolean hostnameOk = false;
 
-    /** Prepares a new {@code Configuration} object. */
     public Configuration(final WizardDialog previousDialog,
-                         final Host host) {
-        super(previousDialog, host);
+                         final Host host,
+                         final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Finishes the dialog and stores the values. */
@@ -98,9 +99,9 @@ public class Configuration extends DialogHost {
     public WizardDialog nextDialog() {
         if (hostnameOk) {
             if (getHost().isConnected()) {
-                return new Devices(this, getHost());
+                return new Devices(this, getHost(), getDrbdInstallation());
             } else {
-                return new SSH(this, getHost());
+                return new SSH(this, getHost(), getDrbdInstallation());
             }
         } else {
             return this;

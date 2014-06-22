@@ -33,8 +33,7 @@ import lcmc.utilities.LoggerFactory;
  */
 public final class DrbdProxy {
     /** Logger. */
-    private static final Logger LOG =
-                                    LoggerFactory.getLogger(DrbdProxy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DrbdProxy.class);
     public static final boolean PROXY = true;
     private static final boolean DONE = true;
 

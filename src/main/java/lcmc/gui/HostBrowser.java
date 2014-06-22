@@ -60,7 +60,6 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 
 
 /**
@@ -112,7 +111,7 @@ public class HostBrowser extends Browser {
     /** List of used proxy ports. */
     private final Collection<String> usedProxyPorts = new HashSet<String>();
     /** Host object. */
-    private final Host host;
+    public final Host host;
     /** Host info object of the host of this browser. */
     private final HostInfo hostInfo;
     /** Host info object of the host in drbd view of this browser. */
@@ -459,38 +458,6 @@ public class HostBrowser extends Browser {
         submenu.add(rebootMenuItem);
     }
 
-    /** Returns info string about DRBD installation. */
-    public String getDrbdInfo() {
-        final StringBuilder tt = new StringBuilder(40);
-        final String drbdV = host.getDrbdVersion();
-        final String drbdModuleV = host.getDrbdModuleVersion();
-        final String drbdS;
-        if (drbdV == null || drbdV.isEmpty()) {
-            drbdS = "not installed";
-        } else {
-            drbdS = drbdV;
-        }
-
-        final String drbdModuleS;
-        if (drbdModuleV == null || drbdModuleV.isEmpty()) {
-            drbdModuleS = "not installed";
-        } else {
-            drbdModuleS = drbdModuleV;
-        }
-        tt.append("\nDRBD ");
-        tt.append(drbdS);
-        if (!drbdS.equals(drbdModuleS)) {
-            tt.append("\nDRBD module ");
-            tt.append(drbdModuleS);
-        }
-        if (host.isDrbdLoaded()) {
-            tt.append(" (running)");
-        } else {
-            tt.append(" (not loaded)");
-        }
-        return tt.toString();
-    }
-
     /** Returns info string about Pacemaker installation. */
     public String getPacemakerInfo() {
         final StringBuilder tt = new StringBuilder(40);
@@ -589,7 +556,7 @@ public class HostBrowser extends Browser {
             tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
         }
         /* DRBD */
-        tt.append(getDrbdInfo());
+        tt.append(host.getDrbdInfoAboutInstallation());
         /* Pacemaker */
         tt.append(getPacemakerInfo());
         return tt.toString();

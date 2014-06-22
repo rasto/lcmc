@@ -26,6 +26,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
@@ -38,10 +39,10 @@ import lcmc.utilities.Tools;
  *
  */
 final class DistDetection extends DialogHost {
-
-    /** Prepares a new {@code DistDetection} object. */
-    DistDetection(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    DistDetection(final WizardDialog previousDialog,
+                  final Host host,
+                  final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Inits dialog and starts the distribution detection. */
@@ -73,7 +74,7 @@ final class DistDetection extends DialogHost {
     /** Returns the next dialog which is CheckInstallation. */
     @Override
     public WizardDialog nextDialog() {
-        return new CheckInstallation(this, getHost());
+        return new CheckInstallation(this, getHost(), getDrbdInstallation());
     }
 
     /**

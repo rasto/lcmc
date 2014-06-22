@@ -32,17 +32,13 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.CancelCallback;
-import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.MyButton;
+import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
-import lcmc.utilities.WidgetListener;
 
 /**
  * DialogHost.
@@ -56,15 +52,21 @@ public abstract class DialogHost extends WizardDialog {
     /** Thread in which a command can be executed. */
     private ExecCommandThread commandThread = null;
 
+    private DrbdInstallation drbdInstallation;
+
     /** Prepares a new {@code DialogHost} object. */
-    protected DialogHost(final WizardDialog previousDialog, final Host host) {
+    protected DialogHost(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
         super(previousDialog);
         this.host = host;
+        this.drbdInstallation = drbdInstallation;
     }
 
-    /** Returns host for which is this dialog. */
     protected final Host getHost() {
         return host;
+    }
+
+    protected DrbdInstallation getDrbdInstallation() {
+        return drbdInstallation;
     }
 
     /** Sets the command thread, so that it can be canceled. */
@@ -133,6 +135,15 @@ public abstract class DialogHost extends WizardDialog {
             s.append(')');
         }
         return s.toString();
+    }
+
+    protected ConvertCmdCallback getDrbdInstallationConvertCmdCallback() {
+        return new ConvertCmdCallback() {
+            @Override
+            public String convert(final String command) {
+                return drbdInstallation.replaceVarsInCommand(command);
+            }
+        };
     }
 
     /** Return title for getDialogTitle() function. */

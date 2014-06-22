@@ -389,10 +389,8 @@ final class CreateFS extends DrbdConfig {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         try {
-            return Tools.compareVersions(
-                                bdi1.getHost().getDrbdVersion(), "8.3.2") >= 0
-                   && Tools.compareVersions(
-                                bdi2.getHost().getDrbdVersion(), "8.3.2") >= 0;
+            return bdi1.getHost().drbdVersionHigherOrEqual("8.3.2")
+                   && bdi2.getHost().drbdVersionHigherOrEqual("8.3.2");
         } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("skipSyncAvailable: " + e.getMessage(), e);
             return false;

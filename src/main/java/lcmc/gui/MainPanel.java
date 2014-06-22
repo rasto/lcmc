@@ -52,7 +52,7 @@ public final class MainPanel extends JPanel {
     public MainPanel() {
         super(new BorderLayout());
         // TODO: not new Host() but null
-        final TerminalPanel terminalPanel = new TerminalPanel(new Host());
+        final TerminalPanel terminalPanel = new TerminalPanel(Host.createInstance());
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                                     new ClustersPanel(),
                                                     terminalPanel);

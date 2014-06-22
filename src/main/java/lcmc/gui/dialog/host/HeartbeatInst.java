@@ -28,6 +28,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.data.Application;
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ConvertCmdCallback;
@@ -47,9 +48,10 @@ final class HeartbeatInst extends DialogHost {
     /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code HeartbeatInst} object. */
-    HeartbeatInst(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    HeartbeatInst(final WizardDialog previousDialog,
+                  final Host host,
+                  final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /**
@@ -58,9 +60,9 @@ final class HeartbeatInst extends DialogHost {
      */
     void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
-        nextDialogObject = new CheckInstallation(
-                                        getPreviousDialog().getPreviousDialog(),
-                                        getHost());
+        nextDialogObject = new CheckInstallation(getPreviousDialog().getPreviousDialog(),
+                                                 getHost(),
+                                                 getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.HeartbeatInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});

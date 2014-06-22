@@ -170,9 +170,8 @@ final class DrbdTest8 {
         press(KeyEvent.VK_ENTER);
 
         moveScrollBar(true);
-        final String v = cluster.getHostsArray()[0].getDrbdVersion();
         try {
-            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
+            if (cluster.getHostsArray()[0].drbdVersionSmaller("8.4.0")) {
                 moveTo("After", MComboBox.class);
             } else {
                 moveTo("after", MComboBox.class);
@@ -256,7 +255,7 @@ final class DrbdTest8 {
 
         moveScrollBar(true);
         try {
-            if (v != null && Tools.compareVersions(v, "8.4.0") < 0) {
+            if (cluster.getHostsArray()[0].drbdVersionSmaller("8.4.0")) {
                 moveTo("After", MComboBox.class);
             } else {
                 moveTo("after", MComboBox.class);

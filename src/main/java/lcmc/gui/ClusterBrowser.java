@@ -51,6 +51,7 @@ import lcmc.data.crm.CRMXML;
 import lcmc.data.Cluster;
 import lcmc.data.crm.ClusterStatus;
 import lcmc.data.drbd.DRBDtestData;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.data.drbd.DrbdXML;
 import lcmc.data.Host;
 import lcmc.data.crm.PtestData;
@@ -1122,13 +1123,7 @@ public class ClusterBrowser extends Browser {
                            }
                        }
                    });
-            while (!host.isConnected() || !host.isDrbdLoaded()) {
-                try {
-                    Thread.sleep(10000);
-                } catch (final InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-            }
+            host.waitForHostAndDrbd();
             host.waitOnDrbdStatus();
             if (drbdStatusCanceled) {
                 break;
@@ -2561,13 +2556,7 @@ public class ClusterBrowser extends Browser {
         if (drbdParameters.get(host) == null) {
             return "no suitable man pages";
         }
-        if (!DRBD.compatibleVersions(host.getDrbdVersion(),
-                                     host.getDrbdModuleVersion())) {
-            return "DRBD util and module versions are not compatible: "
-                   + host.getDrbdVersion() + " / "
-                   + host.getDrbdModuleVersion();
-        }
-        return null;
+        return host.isDrbdUtilCompatibleWithDrbdModule();
     }
 
     /** Callback to service menu items, that show ptest results in tooltips. */

@@ -31,6 +31,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -55,10 +56,10 @@ public class LinbitLogin extends DialogHost {
     /** Checkbox to save the info. */
     private JCheckBox saveCheckBox;
 
-    /** Prepares a new {@code LinbitLogin} object. */
     public LinbitLogin(final WizardDialog previousDialog,
-                       final Host host) {
-        super(previousDialog, host);
+                       final Host host,
+                       final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Finishes the dialog and sets the information. */
@@ -73,7 +74,7 @@ public class LinbitLogin extends DialogHost {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return new DrbdLinbitInst(this, getHost());
+        return new DrbdLinbitInst(this, getHost(), getDrbdInstallation());
     }
 
     /**

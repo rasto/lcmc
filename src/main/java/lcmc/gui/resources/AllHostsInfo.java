@@ -532,7 +532,7 @@ public final class AllHostsInfo extends Info {
                                                 p + 1, hostName.length());
                                 hostName = hostName.substring(0, p);
                             }
-                            final Host host = new Host(hostName);
+                            final Host host = Host.createInstance(hostName);
                             if (username == null) {
                                 host.setUsername(Host.ROOT_USER);
                             } else {
@@ -807,7 +807,7 @@ public final class AllHostsInfo extends Info {
 
                 @Override
                 public void action() {
-                    final AddHostDialog dialog = new AddHostDialog(new Host());
+                    final AddHostDialog dialog = new AddHostDialog(Host.createInstance());
                     dialog.showDialogs();
                 }
             };

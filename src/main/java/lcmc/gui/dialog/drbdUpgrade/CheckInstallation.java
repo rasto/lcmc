@@ -32,6 +32,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DialogHost;
@@ -79,14 +80,12 @@ final class CheckInstallation extends DialogHost {
     /** Whether drbd was installed without failure. */
     private boolean drbdOk = false;
 
-
-    /** Prepares a new {@code CheckInstallation} object. */
     CheckInstallation(final WizardDialog previousDialog,
-                      final Host host) {
-        super(previousDialog, host);
+                      final Host host,
+                      final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -98,9 +97,9 @@ final class CheckInstallation extends DialogHost {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     if (drbdOk) {
-                        getHost().setDrbdWillBeUpgraded(true);
+                        getDrbdInstallation().setDrbdWillBeUpgraded(true);
                     }
-                    nextDialogObject = new LinbitLogin(thisClass, getHost());
+                    nextDialogObject = new LinbitLogin(thisClass, getHost(), getDrbdInstallation());
                     buttonClass(nextButton()).pressButton();
                 }
             }
@@ -137,7 +136,7 @@ final class CheckInstallation extends DialogHost {
         } else {
             DRBD_LABEL.setText(": " + ans.trim());
             drbdOk = true;
-            if (getHost().isDrbdUpgradeAvailable(ans.trim())) {
+            if (getDrbdInstallation().isDrbdUpgradeAvailable(ans.trim())) {
                 DRBD_ICON.setIcon(UPGR_AVAIL_ICON);
                 DRBD_BUTTON.setText(Tools.getString(
                            "Dialog.Host.CheckInstallation.DrbdUpgradeButton"));

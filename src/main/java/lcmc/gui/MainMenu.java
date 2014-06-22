@@ -311,7 +311,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         final AddHostDialog h = new AddHostDialog(new Host());
+                         final AddHostDialog h = new AddHostDialog(Host.createInstance());
                          h.showDialogs();
                      }
                  });

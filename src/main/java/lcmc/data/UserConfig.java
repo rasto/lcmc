@@ -325,7 +325,7 @@ public final class UserConfig extends XML {
                         final boolean sudo,
                         final boolean savable) {
         Tools.getApplication().setLastEnteredUser(username);
-        final Host host = new Host();
+        final Host host = Host.createInstance();
         host.setSavable(savable);
         host.setHostname(nodeName);
         if (sshPort == null) {

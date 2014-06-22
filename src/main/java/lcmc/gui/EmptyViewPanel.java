@@ -107,8 +107,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
                     new Runnable() {
                         @Override
                         public void run() {
-                            final AddHostDialog ahd = new AddHostDialog(
-                                                                   new Host());
+                            final AddHostDialog ahd = new AddHostDialog(Host.createInstance());
                             ahd.showDialogs();
                         }
                     });

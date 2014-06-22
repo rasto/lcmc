@@ -31,6 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
@@ -62,11 +63,9 @@ final class Finish extends DialogHost {
                                     true);
     /** Next dialog. */
     private WizardDialog nextDialog = null;
-    /**
-     * Prepares a new {@code Finish} object.
-     */
-    Finish(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+
+    Finish(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /** Returns next dialog. */
@@ -160,11 +159,11 @@ final class Finish extends DialogHost {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final Host newHost = new Host();
+                        final Host newHost = Host.createInstance();
                         newHost.getSSH().setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(),
                                                       getHost().getSSH().getLastSuccessfulRsaKey(),
                                                       getHost().getSSH().getLastSuccessfulPassword());
-                        nextDialog = new NewHost(thisClass, newHost);
+                        nextDialog = new NewHost(thisClass, newHost, getDrbdInstallation());
                         Tools.getGUIData().allHostsUpdate();
                         Tools.invokeLater(new Runnable() {
                             @Override

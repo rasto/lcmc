@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
@@ -54,8 +55,10 @@ final class DrbdCommandInst extends DialogHost {
     private WizardDialog nextDialogObject = null;
 
     /** Prepares a new {@code DrbdCommandInst} object. */
-    DrbdCommandInst(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    DrbdCommandInst(final WizardDialog previousDialog,
+                    final Host host,
+                    final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /**
@@ -74,9 +77,8 @@ final class DrbdCommandInst extends DialogHost {
             globalInfo.resetInfoPanel();
             globalInfo.getInfoPanel();
         }
-        nextDialogObject = new CheckInstallation(
-                   getPreviousDialog().getPreviousDialog().getPreviousDialog(),
-                   getHost());
+        nextDialogObject = new CheckInstallation(getPreviousDialog().getPreviousDialog().getPreviousDialog(),
+                                                 getHost(), getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(
                     Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
@@ -111,13 +113,13 @@ final class DrbdCommandInst extends DialogHost {
         }
         final String archString = arch;
         String installCommand = "DrbdInst.install";
-        final String installMethod = getHost().getDrbdInstallMethod();
+        final DrbdInstallation drbdInstallation = getDrbdInstallation();
+        final String installMethod = drbdInstallation.getDrbdInstallMethod();
         if (installMethod != null) {
             installCommand = "DrbdInst.install." + installMethod;
         }
-        final String drbdVersion = getHost().getDrbdVersionToInstall();
-        final String drbdVersionUrlString =
-                              getHost().getDrbdVersionUrlStringToInstall();
+        final String drbdVersion = drbdInstallation.getDrbdVersionToInstall();
+        final String drbdVersionUrlString = drbdInstallation.getDrbdVersionUrlStringToInstall();
         Tools.getApplication().setLastDrbdInstalledMethod(
             getHost().getDistString("DrbdInst.install.text." + installMethod));
         LOG.debug1("installDrbd: cmd: " + installCommand

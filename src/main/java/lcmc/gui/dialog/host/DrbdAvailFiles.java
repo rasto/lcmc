@@ -36,21 +36,20 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
+import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
+import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
  * determined.
- *
- * TODO: this class needs to be made better
  *
  * @author Rasto Levrinc
  * @version $Id$
@@ -65,9 +64,10 @@ public class DrbdAvailFiles extends DialogHost {
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
-    /** Prepares a new {@code DrbdAvailFiles} object. */
-    public DrbdAvailFiles(final WizardDialog previousDialog, final Host host) {
-        super(previousDialog, host);
+    public DrbdAvailFiles(final WizardDialog previousDialog,
+                          final Host host,
+                          final DrbdInstallation drbdInstallation) {
+        super(previousDialog, host, drbdInstallation);
     }
 
     /**
@@ -88,10 +88,9 @@ public class DrbdAvailFiles extends DialogHost {
     @Override
     protected void initDialogAfterVisible() {
         getProgressBar().start(4000);
-        getHost().setDrbdBuildToInstall(getHost().getDetectedKernelVersion());
+        getDrbdInstallation().setDrbdBuildToInstall(getHost().getDetectedKernelVersion());
         /* get drbd available versions and continue with availBuilds */
-        final Value[] versions = StringValue.getValues(
-                                        getHost().getAvailableDrbdVersions());
+        final Value[] versions = StringValue.getValues(getDrbdInstallation().getAvailableDrbdVersions());
         if (versions != null && versions.length != 0) {
             final Value version = versions[versions.length - 1];
             drbdVersionCombo.reloadComboBox(version, versions);
@@ -101,7 +100,7 @@ public class DrbdAvailFiles extends DialogHost {
         if (selectedItem == null) {
             allDone();
         } else {
-            getHost().setDrbdVersionToInstall(selectedItem);
+            getDrbdInstallation().setDrbdVersionToInstall(selectedItem);
             availBuilds();
         }
     }
@@ -110,11 +109,11 @@ public class DrbdAvailFiles extends DialogHost {
     protected final void availBuilds() {
         getHost().execCommand(new ExecCommandConfig()
                 .commandString("DrbdAvailBuilds")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
                 .execCallback(new ExecCallback() {
                     @Override
                     public void done(final String answer) {
-                        String defaultValue =
-                                getHost().getDrbdBuildToInstall();
+                        String defaultValue = getDrbdInstallation().getDrbdBuildToInstall();
                         final String[] items = answer.split("\\r?\\n");
                         boolean found = false;
                         for (final String item : items) {
@@ -124,9 +123,8 @@ public class DrbdAvailFiles extends DialogHost {
                             }
                         }
                         if (!found) {
-                                    /* try it with underscores */
-                            defaultValue =
-                                    defaultValue.replaceAll("-", "_");
+                            /* try it with underscores */
+                            defaultValue = defaultValue.replaceAll("-", "_");
                         }
                         drbdBuildCombo.clear();
                         drbdBuildCombo.reloadComboBox(
@@ -139,8 +137,7 @@ public class DrbdAvailFiles extends DialogHost {
                         if (selectedItem == null) {
                             allDone();
                         } else {
-                            getHost().setDrbdBuildToInstall(
-                                    selectedItem);
+                            getDrbdInstallation().setDrbdBuildToInstall(selectedItem);
                             if (!listenersAdded) {
                                 availFiles();
                             }
@@ -169,6 +166,7 @@ public class DrbdAvailFiles extends DialogHost {
         drbdBuildCombo.setEnabled(true);
         getHost().execCommand(new ExecCommandConfig()
                       .commandString("DrbdAvailFiles")
+                      .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
                       .execCallback(new ExecCallback() {
                         @Override
                         public void done(final String answer) {
@@ -189,8 +187,7 @@ public class DrbdAvailFiles extends DialogHost {
                                                                      filesA));
                                     }
                                 });
-                                getHost().setDrbdPackagesToInstall(
-                                                       Tools.shellList(filesA));
+                                getDrbdInstallation().setDrbdPackagesToInstall(Tools.shellList(filesA));
                                 allDone();
                             } else {
                                 Tools.invokeLater(new Runnable() {
@@ -225,7 +222,7 @@ public class DrbdAvailFiles extends DialogHost {
      * first time.
      */
     protected final void allDone() {
-        nextDialogObject = new LinbitLogin(this, getHost());
+        nextDialogObject = new LinbitLogin(this, getHost(), getDrbdInstallation());
         progressBarDone();
         enableComponents();
         buttonClass(nextButton()).requestFocus();
@@ -315,7 +312,7 @@ public class DrbdAvailFiles extends DialogHost {
                         new Runnable() {
                             @Override
                             public void run() {
-                                getHost().setDrbdVersionToInstall(item);
+                                getDrbdInstallation().setDrbdVersionToInstall(item);
                                 availBuilds();
                             }
                         });
@@ -328,7 +325,7 @@ public class DrbdAvailFiles extends DialogHost {
                 @Override
                 public void check(final Value value) {
                     final String item = drbdBuildCombo.getStringValue();
-                    getHost().setDrbdBuildToInstall(item);
+                    getDrbdInstallation().setDrbdBuildToInstall(item);
                     availFiles();
                 }
             });
