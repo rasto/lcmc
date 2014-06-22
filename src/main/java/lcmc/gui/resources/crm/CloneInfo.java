@@ -35,7 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.crm.ClusterStatus;
 import lcmc.data.Host;
 import lcmc.data.crm.HostLocation;
@@ -49,18 +49,13 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
-
 /**
  * This class holds clone service info object.
  */
 public class CloneInfo extends ServiceInfo {
-    /** Service that belongs to this clone. */
     private ServiceInfo containedService = null;
-    /** Creates new CloneInfo object. */
-    CloneInfo(final ResourceAgent ra,
-                     final String name,
-                     final boolean master,
-                     final Browser browser) {
+
+    CloneInfo(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {
         super(name, ra, browser);
         getService().setMaster(master);
     }
@@ -71,14 +66,12 @@ public class CloneInfo extends ServiceInfo {
      */
     void addCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
-        newServiceInfo.getService().setResourceClass(
-                    newServiceInfo.getResourceAgent().getResourceClass());
+        newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setCloneInfo(this);
 
         getBrowser().addToHeartbeatIdList(newServiceInfo);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
-        final DefaultMutableTreeNode newServiceNode =
-                                new DefaultMutableTreeNode(newServiceInfo);
+        final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -109,7 +102,6 @@ public class CloneInfo extends ServiceInfo {
         getBrowser().reloadAndWait(node, true);
     }
 
-    /** Returns info panel. */
     @Override
     public JComponent getInfoPanel() {
         final ServiceInfo cs = containedService;
@@ -130,10 +122,8 @@ public class CloneInfo extends ServiceInfo {
         return ci != null && ci.isFailed(runMode);
     }
 
-    /** Returns fail count. */
     @Override
-    protected String getFailCount(final String hostName,
-                                  final Application.RunMode runMode) {
+    protected String getFailCount(final String hostName, final Application.RunMode runMode) {
         final ServiceInfo ci = containedService;
         if (ci != null) {
             return ci.getFailCount(hostName, runMode);
@@ -141,7 +131,6 @@ public class CloneInfo extends ServiceInfo {
         return "";
     }
 
-    /** Returns the main text that appears in the graph. */
     @Override
     public String getMainTextForGraph() {
         final ServiceInfo cs = containedService;
@@ -152,7 +141,6 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /** Returns name of this resource, that is used in logs. */
     @Override
     String getNameForLog() {
         final ServiceInfo cs = containedService;
@@ -174,29 +162,23 @@ public class CloneInfo extends ServiceInfo {
             return null;
         }
         if (cs.getResourceAgent().isGroup()) {
-            final List<String> resources = clStatus.getGroupResources(
-                                                   cs.getHeartbeatId(runMode),
-                                                   runMode);
+            final List<String> resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
             if (resources == null) {
                 return null;
             }
             final Set<String> slaves = new TreeSet<String>();
             for (final String hbId : resources) {
-                final List<String> slNodes =
-                                      clStatus.getSlaveOnNodes(hbId, runMode);
+                final List<String> slNodes = clStatus.getSlaveOnNodes(hbId, runMode);
                 if (slNodes != null) {
                     slaves.addAll(slNodes);
                 }
             }
             return new ArrayList<String>(slaves);
         } else {
-            return clStatus.getSlaveOnNodes(cs.getHeartbeatId(runMode),
-                                            runMode);
+            return clStatus.getSlaveOnNodes(cs.getHeartbeatId(runMode), runMode);
         }
     }
 
-
-    /** Returns node name of the host where this cloned service is running. */
     @Override
     protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ServiceInfo cs = containedService;
@@ -210,12 +192,10 @@ public class CloneInfo extends ServiceInfo {
         return null;
     }
 
-    /** Returns whether it is slave on all nodes. */
     @Override
     protected boolean isSlaveOnAllNodes(final Application.RunMode runMode) {
          final List<String> slaves = getSlaveOnNodes(runMode);
-         return slaves != null
-                && slaves.size() == getBrowser().getClusterHosts().length;
+         return slaves != null && slaves.size() == getBrowser().getClusterHosts().length;
     }
 
     /** Returns color for the host vertex. */
@@ -235,7 +215,7 @@ public class CloneInfo extends ServiceInfo {
          }
          if (nodesCount + slavesCount < getBrowser().getClusterHosts().length) {
              final List<Color> colors = new ArrayList<Color>();
-             colors.add(ClusterBrowser.FILL_PAINT_STOPPED);
+             colors.add(ClusterBrowser.SERVICE_STOPPED_FILL_PAINT);
              return colors;
          } else {
              return getBrowser().getCluster().getHostColors(nodes);
@@ -243,14 +223,13 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Returns fail count string that appears in the graph. */
-    private String getFailCountString(final String hostName,
-                                      final Application.RunMode runMode) {
+    private String getFailCountString(final String hostName, final Application.RunMode runMode) {
         String fcString = "";
         final ServiceInfo cs = containedService;
         if (cs != null) {
             final String failCount = cs.getFailCount(hostName, runMode);
             if (failCount != null) {
-                if (CRMXML.INFINITY_STRING.getValueForConfig().equals(failCount)) {
+                if (CrmXml.INFINITY_VALUE.getValueForConfig().equals(failCount)) {
                     fcString = " failed";
                 } else {
                     fcString = " failed: " + failCount;
@@ -264,36 +243,27 @@ public class CloneInfo extends ServiceInfo {
     @Override
     public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
-        final Map<String, String> notRunningOnNodes =
-                                        new LinkedHashMap<String, String>();
+        final Map<String, String> notRunningOnNodes = new LinkedHashMap<String, String>();
         for (final Host h : getBrowser().getClusterHosts()) {
-            notRunningOnNodes.put(h.getName().toLowerCase(Locale.US),
-                                  h.getName());
+            notRunningOnNodes.put(h.getName().toLowerCase(Locale.US), h.getName());
         }
         texts.add(new Subtext(toString(), null, Color.BLACK));
         final ServiceInfo cs = getContainedService();
         if (cs != null && cs.getResourceAgent().isGroup()) {
             final ClusterStatus clStatus = getBrowser().getClusterStatus();
-            final List<String> resources = clStatus.getGroupResources(
-                                                   cs.getHeartbeatId(runMode),
-                                                   runMode);
+            final List<String> resources = clStatus.getGroupResources(cs.getHeartbeatId(runMode), runMode);
             if (resources != null) {
                 for (final String hbId : resources) {
-                    final ServiceInfo si =
-                                   getBrowser().getServiceInfoFromCRMId(hbId);
+                    final ServiceInfo si = getBrowser().getServiceInfoFromCRMId(hbId);
                     if (si == null) {
-                        texts.add(new Subtext("   unknown",
-                                              null,
-                                              Color.BLACK));
+                        texts.add(new Subtext("   unknown", null, Color.BLACK));
                     } else {
-                        texts.add(new Subtext("   " + si,
-                                              null,
-                                              Color.BLACK));
+                        texts.add(new Subtext("   " + si, null, Color.BLACK));
                     }
                 }
             }
         }
-        if (getBrowser().allHostsDown()) {
+        if (getBrowser().allHostsWithoutClusterStatus()) {
             return texts.toArray(new Subtext[texts.size()]);
         }
         final List<String> runningOnNodes = getRunningOnNodes(runMode);
@@ -305,8 +275,7 @@ public class CloneInfo extends ServiceInfo {
             } else {
                 texts.add(new Subtext("running on:", null, Color.BLACK));
             }
-            final List<Color> colors =
-                    getBrowser().getCluster().getHostColors(runningOnNodes);
+            final List<Color> colors = getBrowser().getCluster().getHostColors(runningOnNodes);
             int i = 0;
             for (final String n : runningOnNodes) {
                 final Color color;
@@ -318,7 +287,8 @@ public class CloneInfo extends ServiceInfo {
                 texts.add(new Subtext(ClusterBrowser.IDENT_4 + n
                                       + getPingCountString(n, runMode)
                                       + getFailCountString(n, runMode),
-                                      color, Color.BLACK));
+                                      color,
+                                      Color.BLACK));
                 notRunningOnNodes.remove(n.toLowerCase(Locale.US));
                 i++;
             }
@@ -326,8 +296,7 @@ public class CloneInfo extends ServiceInfo {
         if (getService().isMaster()) {
             final List<String> slaveOnNodes = getSlaveOnNodes(runMode);
             if (slaveOnNodes != null && !slaveOnNodes.isEmpty()) {
-                final List<Color> colors =
-                        getBrowser().getCluster().getHostColors(slaveOnNodes);
+                final List<Color> colors = getBrowser().getCluster().getHostColors(slaveOnNodes);
                 if (cs != null && cs.getResourceAgent().isLinbitDrbd()) {
                     texts.add(new Subtext("secondary on:", null, Color.BLACK));
                 } else {
@@ -351,7 +320,7 @@ public class CloneInfo extends ServiceInfo {
             }
         }
         if (!notRunningOnNodes.isEmpty()) {
-            final Color nColor = ClusterBrowser.FILL_PAINT_STOPPED;
+            final Color nColor = ClusterBrowser.SERVICE_STOPPED_FILL_PAINT;
             if (isStopped(runMode)) {
                 texts.add(new Subtext("stopped", nColor, Color.BLACK));
             } else {
@@ -364,8 +333,7 @@ public class CloneInfo extends ServiceInfo {
                     }
                     texts.add(new Subtext(ClusterBrowser.IDENT_4
                                           + hostName
-                                          + getFailCountString(hostName,
-                                                               runMode),
+                                          + getFailCountString(hostName, runMode),
                                           color,
                                           Color.BLACK));
                 }
@@ -376,8 +344,7 @@ public class CloneInfo extends ServiceInfo {
 
     /** Returns fail ping string that appears in the graph. */
     @Override
-    protected String getPingCountString(final String hostName,
-                                        final Application.RunMode runMode) {
+    protected String getPingCountString(final String hostName, final Application.RunMode runMode) {
         final ServiceInfo cs = getContainedService();
         if (cs != null) {
             return cs.getPingCountString(hostName, runMode);
@@ -411,50 +378,36 @@ public class CloneInfo extends ServiceInfo {
         if (cs != null) {
             cs.removeMyself(runMode);
         }
-        getBrowser().selectServices();
+        getBrowser().highlightServices();
     }
 
     /** Removes the service without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final Application.RunMode runMode) {
+    protected void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
         super.removeMyselfNoConfirm(dcHost, runMode);
         setUpdated(false);
     }
 
     /** In clone resource check its containing service. */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 
-    /** In clone resource check its containing service. */
-    Check checkResourceFields(final String param,
-                              final String[] params,
-                              final boolean fromServicesInfo) {
+    Check checkResourceFields(final String param, final String[] params, final boolean fromServicesInfo) {
         final ServiceInfo cs = containedService;
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         final Check check = new Check(incorrect, changed);
-        check.addCheck(super.checkResourceFields(param,
-                                                 params,
-                                                 fromServicesInfo,
-                                                 true,
-                                                 false));
+        check.addCheck(super.checkResourceFields(param, params, fromServicesInfo, true, false));
         if (cs == null) {
             incorrect.add("no service inside");
         } else {
-            check.addCheck(cs.checkResourceFields(param,
-                                                  cs.getParametersFromXML(),
-                                                  fromServicesInfo,
-                                                  true,
-                                                  false));
+            check.addCheck(cs.checkResourceFields(param, cs.getParametersFromXML(), fromServicesInfo, true, false));
         }
         return check;
     }
 
-    /** Returns whether service is started. */
     @Override
     boolean isStarted(final Application.RunMode runMode) {
         final Host dcHost = getBrowser().getDCHost();
@@ -511,8 +464,7 @@ public class CloneInfo extends ServiceInfo {
         final ServiceInfo cs = containedService;
         if (cs != null) {
             if (Tools.versionBeforePacemaker(dcHost)) {
-                for (int i = 0;
-                     i < getBrowser().getClusterHosts().length; i++) {
+                for (int i = 0; i < getBrowser().getClusterHosts().length; i++) {
                     CRM.cleanupResource(dcHost,
                                         cs.getHeartbeatId(runMode)
                                         + ':' + Integer.toString(i),
@@ -558,45 +510,32 @@ public class CloneInfo extends ServiceInfo {
     }
 
     /** Workaround to call method from super. */
-    public void superMigrateFromResource(final Host dcHost,
-                                          final String fromHost,
-                                          final Application.RunMode runMode) {
+    public void superMigrateFromResource(final Host dcHost, final String fromHost, final Application.RunMode runMode) {
         super.migrateFromResource(dcHost, fromHost, runMode);
     }
     
     /** Migrates resource in heartbeat from current location. */
     @Override
-    void migrateFromResource(final Host dcHost,
-                             final String fromHost,
-                             final Application.RunMode runMode) {
+    void migrateFromResource(final Host dcHost, final String fromHost, final Application.RunMode runMode) {
         String role = null;
         if (getService().isMaster()) {
             role = "Master";
         }
-        final HostLocation hostLoc =
-                                new HostLocation(CRMXML.MINUS_INFINITY_STRING.getValueForConfig(),
-                                                 "eq",
-                                                 null,
-                                                 role);
+        final HostLocation hostLoc = new HostLocation(CrmXml.MINUS_INFINITY_VALUE.getValueForConfig(),
+                                                      "eq",
+                                                      null,
+                                                      role);
         final String action;
         if (getMigratedFrom(runMode) == null) {
             action = "migration";
         } else {
             action = "remigration";
         }
-        CRM.setLocation(dcHost,
-                        getHeartbeatId(runMode),
-                        fromHost,
-                        hostLoc,
-                        action,
-                        runMode);
+        CRM.setLocation(dcHost, getHeartbeatId(runMode), fromHost, hostLoc, action, runMode);
     }
 
-    /** Sets whether the service is managed. */
     @Override
-    void setManaged(final boolean isManaged,
-                    final Host dcHost,
-                    final Application.RunMode runMode) {
+    void setManaged(final boolean isManaged, final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             setUpdated(true);
         }
@@ -624,7 +563,7 @@ public class CloneInfo extends ServiceInfo {
         return cs != null && cs.isInfoPanelOk();
     }
 
-    /** Update menus with positions and calles their update methods. */
+    /** Update menus with positions and calls their update methods. */
     @Override
     public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
@@ -634,7 +573,6 @@ public class CloneInfo extends ServiceInfo {
         }
     }
 
-    /** Returns section to which the specified parameter belongs. */
     @Override
     protected String getSection(final String param) {
         final ServiceInfo cs = containedService;
@@ -650,20 +588,16 @@ public class CloneInfo extends ServiceInfo {
         return super.getSection(param);
     }
 
-    /** Returns possible choices for drop down lists. */
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
-        final CRMXML crmXML = getBrowser().getCRMXML();
+        final CrmXml crmXML = getBrowser().getCrmXml();
         if (isCheckBox(param)) {
             return crmXML.getCheckBoxChoices(getResourceAgent(), param);
         } else {
-            return crmXML.getParamPossibleChoices(getResourceAgent(),
-                                                  param,
-                                                  getService().isMaster());
+            return crmXML.getComboBoxChoices(getResourceAgent(), param, getService().isMaster());
         }
     }
 
-    /** Returns the icon for the category. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return getMenuIcon(runMode);

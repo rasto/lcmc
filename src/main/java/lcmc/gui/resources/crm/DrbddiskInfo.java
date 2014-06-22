@@ -67,7 +67,7 @@ public final class DrbddiskInfo extends ServiceInfo {
                                       final Application.RunMode runMode) {
         super.removeMyselfNoConfirm(dcHost, runMode);
         final ResourceInfo dri =
-                        getBrowser().getDrbdResHash().get(getResourceName());
+                        getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
             dri.setUsedByCRM(null);
@@ -79,7 +79,7 @@ public final class DrbddiskInfo extends ServiceInfo {
     protected void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final ResourceInfo dri =
-                        getBrowser().getDrbdResHash().get(getResourceName());
+                        getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
             if (isManaged(Application.RunMode.LIVE) && !getService().isOrphaned()) {

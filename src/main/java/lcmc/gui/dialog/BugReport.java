@@ -40,9 +40,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import lcmc.data.Cluster;
 import lcmc.data.crm.ClusterStatus;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Http;
 import lcmc.utilities.Logger;
@@ -273,7 +273,7 @@ public final class BugReport extends ConfigDialog {
                     final ClusterBrowser cb = cl.getBrowser();
                     String cib = null;
                     if (cb != null) {
-                        final DrbdXML drbdXml = cb.getDrbdXML();
+                        final DrbdXml drbdXml = cb.getDrbdXml();
                         if (drbdXml != null) {
                             cib = drbdXml.getOldConfig();
                         }
@@ -296,7 +296,7 @@ public final class BugReport extends ConfigDialog {
                         final ClusterBrowser cb = cl.getBrowser();
                         String cfg = null;
                         if (cb != null) {
-                            final VMSXML vmsXml = cb.getVMSXML(host);
+                            final VmsXml vmsXml = cb.getVmsXml(host);
                             if (vmsXml != null) {
                                 cfg = vmsXml.getConfig();
                             }

@@ -38,7 +38,7 @@ import java.util.regex.Matcher;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.crm.ClusterStatus;
 import lcmc.data.Host;
 import lcmc.data.crm.ResourceAgent;
@@ -59,19 +59,15 @@ import lcmc.utilities.UpdatableItem;
  * like normal service, but it can contain other services.
  */
 public class GroupInfo extends ServiceInfo {
-    /** Logger. */
-    private static final Logger LOG =
-                                    LoggerFactory.getLogger(GroupInfo.class);
-    private final List<ServiceInfo> groupServices =
-                                                  new ArrayList<ServiceInfo>();
+    private static final Logger LOG = LoggerFactory.getLogger(GroupInfo.class);
+    private final List<ServiceInfo> groupServices = new ArrayList<ServiceInfo>();
 
-    private final ReadWriteLock mGroupServiceLock =
-                                                  new ReentrantReadWriteLock();
+    private final ReadWriteLock mGroupServiceLock = new ReentrantReadWriteLock();
     private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
-    /** Creates new GroupInfo object. */
+
     GroupInfo(final ResourceAgent ra, final Browser browser) {
-        super(Application.PM_GROUP_NAME, ra, browser);
+        super(Application.PACEMAKER_GROUP_NAME, ra, browser);
     }
 
     /** Applies the the whole group if for example an order has changed. */
@@ -94,11 +90,9 @@ public class GroupInfo extends ServiceInfo {
         getInfoPanel();
         waitForInfoPanel();
 
-        final Map<String, String> groupMetaArgs =
-                                        new LinkedHashMap<String, String>();
+        final Map<String, String> groupMetaArgs = new LinkedHashMap<String, String>();
         for (final String param : params) {
-            if (GUI_ID.equals(param)
-                || PCMK_ID.equals(param)) {
+            if (GUI_ID.equals(param) || PCMK_ID.equals(param)) {
                 continue;
             }
             final Value value = getComboBoxValue(param);
@@ -106,37 +100,28 @@ public class GroupInfo extends ServiceInfo {
                 continue;
             }
             if (!value.isNothingSelected()) {
-                if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
+                if (CrmXml.GROUP_ORDERED_META_ATTR.equals(param)) {
                     groupMetaArgs.put("ordered", value.getValueForConfig());
                 } else {
                     groupMetaArgs.put(param, value.getValueForConfig());
                 }
             }
         }
-        final Map<String, Map<String, String>> pacemakerResAttrs =
-                                 new HashMap<String, Map<String, String>>();
-        final Map<String, Map<String, String>> pacemakerResArgs =
-                                 new HashMap<String, Map<String, String>>();
-        final Map<String, Map<String, String>> pacemakerMetaArgs =
-                                 new HashMap<String, Map<String, String>>();
-        final Map<String, String> instanceAttrId =
-                                              new HashMap<String, String>();
-        final Map<String, Map<String, String>> nvpairIdsHash =
-                                 new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> pacemakerResAttrs = new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> pacemakerResArgs = new HashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> pacemakerMetaArgs = new HashMap<String, Map<String, String>>();
+        final Map<String, String> instanceAttrId = new HashMap<String, String>();
+        final Map<String, Map<String, String>> nvpairIdsHash = new HashMap<String, Map<String, String>>();
         final Map<String, Map<String, Map<String, String>>> pacemakerOps =
-                    new HashMap<String, Map<String, Map<String, String>>>();
-        final Map<String, String> operationsId =
-                                              new HashMap<String, String>();
-        final Map<String, String> metaAttrsRefId =
-                                              new HashMap<String, String>();
-        final Map<String, String> operationsRefId =
-                                              new HashMap<String, String>();
+                                                             new HashMap<String, Map<String, Map<String, String>>>();
+        final Map<String, String> operationsId = new HashMap<String, String>();
+        final Map<String, String> metaAttrsRefId = new HashMap<String, String>();
+        final Map<String, String> operationsRefId = new HashMap<String, String>();
         final Map<String, Boolean> stonith = new HashMap<String, Boolean>();
 
         final ClusterStatus cs = getBrowser().getClusterStatus();
         for (final String resId : newOrder) {
-            final ServiceInfo gsi =
-                               getBrowser().getServiceInfoFromCRMId(resId);
+            final ServiceInfo gsi = getBrowser().getServiceInfoFromCRMId(resId);
             if (gsi == null) {
                 continue;
             }
@@ -149,8 +134,7 @@ public class GroupInfo extends ServiceInfo {
         }
         Tools.waitForSwing();
         for (final String resId : newOrder) {
-            final ServiceInfo gsi =
-                               getBrowser().getServiceInfoFromCRMId(resId);
+            final ServiceInfo gsi = getBrowser().getServiceInfoFromCRMId(resId);
             if (gsi == null) {
                 continue;
             }
@@ -168,8 +152,7 @@ public class GroupInfo extends ServiceInfo {
         final CloneInfo ci = getCloneInfo();
         String cloneId = null;
         boolean master = false;
-        final Map<String, String> cloneMetaArgs =
-                                            new LinkedHashMap<String, String>();
+        final Map<String, String> cloneMetaArgs = new LinkedHashMap<String, String>();
         String cloneMetaAttrsRefIds = null;
         if (createGroup && ci != null) {
             cloneId = ci.getHeartbeatId(runMode);
@@ -177,8 +160,7 @@ public class GroupInfo extends ServiceInfo {
             master = ci.getService().isMaster();
             cloneMetaAttrsRefIds = ci.getMetaAttrsRefId();
             for (final String param : cloneParams) {
-                if (GUI_ID.equals(param)
-                    || PCMK_ID.equals(param)) {
+                if (GUI_ID.equals(param) || PCMK_ID.equals(param)) {
                     continue;
                 }
                 final Value value = ci.getComboBoxValue(param);
@@ -213,9 +195,9 @@ public class GroupInfo extends ServiceInfo {
                          runMode);
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            getBrowser().reload(getNode(), false);
+            getBrowser().reloadNode(getNode(), false);
         }
-        getBrowser().getCRMGraph().repaint();
+        getBrowser().getCrmGraph().repaint();
     }
 
     /** Applies the changes to the group parameters. */
@@ -249,8 +231,7 @@ public class GroupInfo extends ServiceInfo {
             final String oldHeartbeatId = getHeartbeatId(runMode);
             if (oldHeartbeatId != null) {
                 getBrowser().mHeartbeatIdToServiceLock();
-                getBrowser().getHeartbeatIdToServiceInfo().remove(
-                                                               oldHeartbeatId);
+                getBrowser().getHeartbeatIdToServiceInfo().remove(oldHeartbeatId);
                 getBrowser().mHeartbeatIdToServiceUnlock();
             }
             if (getService().isNew()) {
@@ -273,23 +254,17 @@ public class GroupInfo extends ServiceInfo {
         */
         final String heartbeatId = getHeartbeatId(runMode);
         if (getService().isNew()) {
-            final Set<ServiceInfo> parents =
-                                    getBrowser().getCRMGraph().getParents(this);
-            final List<Map<String, String>> colAttrsList =
-                                       new ArrayList<Map<String, String>>();
-            final List<Map<String, String>> ordAttrsList =
-                                       new ArrayList<Map<String, String>>();
+            final Set<ServiceInfo> parents = getBrowser().getCrmGraph().getParents(this);
+            final List<Map<String, String>> colAttrsList = new ArrayList<Map<String, String>>();
+            final List<Map<String, String>> ordAttrsList = new ArrayList<Map<String, String>>();
             final List<String> parentIds = new ArrayList<String>();
             for (final ServiceInfo parentInfo : parents) {
-                final String parentId =
-                                    parentInfo.getService().getHeartbeatId();
+                final String parentId = parentInfo.getService().getHeartbeatId();
                 parentIds.add(parentId);
-                final Map<String, String> colAttrs =
-                                       new LinkedHashMap<String, String>();
-                final Map<String, String> ordAttrs =
-                                       new LinkedHashMap<String, String>();
-                colAttrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
-                ordAttrs.put(CRMXML.SCORE_STRING, CRMXML.INFINITY_STRING.getValueForConfig());
+                final Map<String, String> colAttrs = new LinkedHashMap<String, String>();
+                final Map<String, String> ordAttrs = new LinkedHashMap<String, String>();
+                colAttrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
+                ordAttrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
                 if (getService().isMaster()) {
                     colAttrs.put("with-rsc-role", "Master");
                     ordAttrs.put("first-action", "promote");
@@ -300,8 +275,7 @@ public class GroupInfo extends ServiceInfo {
             }
             CRM.setOrderAndColocation(dcHost,
                                       heartbeatId,
-                                      parentIds.toArray(
-                                                new String [parentIds.size()]),
+                                      parentIds.toArray(new String [parentIds.size()]),
                                       colAttrsList,
                                       ordAttrsList,
                                       runMode);
@@ -313,14 +287,12 @@ public class GroupInfo extends ServiceInfo {
             if (Application.isLive(runMode)) {
                 setApplyButtons(null, params);
             }
-            getBrowser().getCRMGraph().repaint();
+            getBrowser().getCrmGraph().repaint();
             return;
         } else {
-            final Map<String, String> groupMetaArgs =
-                                            new LinkedHashMap<String, String>();
+            final Map<String, String> groupMetaArgs = new LinkedHashMap<String, String>();
             for (final String param : params) {
-                if (GUI_ID.equals(param)
-                    || PCMK_ID.equals(param)) {
+                if (GUI_ID.equals(param) || PCMK_ID.equals(param)) {
                     continue;
                 }
                 final Value value = getComboBoxValue(param);
@@ -328,35 +300,34 @@ public class GroupInfo extends ServiceInfo {
                     continue;
                 }
                 if (value != null && !value.isNothingSelected()) {
-                    if (CRMXML.GROUP_ORDERED_META_ATTR.equals(param)) {
+                    if (CrmXml.GROUP_ORDERED_META_ATTR.equals(param)) {
                         groupMetaArgs.put("ordered", value.getValueForConfig());
                     } else {
                         groupMetaArgs.put(param, value.getValueForConfig());
                     }
                 }
             }
-            CRM.setParameters(
-                        dcHost,
-                        "-R",
-                        null,  /* crm id */
-                        null,  /* TODO: clone id */
-                        false, /* master */
-                        null,  /* cloneMetaArgs, */
-                        groupMetaArgs,
-                        heartbeatId, /* group id */
-                        null,  /* pacemakerResAttrs, */
-                        null,  /* pacemakerResArgs, */
-                        null,  /* pacemakerMetaArgs, */
-                        null,  /* cs.getResourceInstanceAttrId(heartbeatId), */
-                        null,  /* cs.getParametersNvpairsIds(heartbeatId), */
-                        null,  /* getOperations(heartbeatId), */
-                        null,  /* cs.getOperationsId(heartbeatId), */
-                        null,  /* getMetaAttrsRefId(), */
-                        null,  /* cloneMetaAttrsRefIds, */
-                        getMetaAttrsRefId(),
-                        null,  /* getOperationsRefId(), */
-                        false, /* stonith */
-                        runMode);
+            CRM.setParameters(dcHost,
+                              "-R",
+                              null,  /* crm id */
+                              null,  /* TODO: clone id */
+                              false, /* master */
+                              null,  /* cloneMetaArgs, */
+                              groupMetaArgs,
+                              heartbeatId, /* group id */
+                              null,  /* pacemakerResAttrs, */
+                              null,  /* pacemakerResArgs, */
+                              null,  /* pacemakerMetaArgs, */
+                              null,  /* cs.getResourceInstanceAttrId(heartbeatId), */
+                              null,  /* cs.getParametersNvpairsIds(heartbeatId), */
+                              null,  /* getOperations(heartbeatId), */
+                              null,  /* cs.getOperationsId(heartbeatId), */
+                              null,  /* getMetaAttrsRefId(), */
+                              null,  /* cloneMetaAttrsRefIds, */
+                              getMetaAttrsRefId(),
+                              null,  /* getOperationsRefId(), */
+                              false, /* stonith */
+                              runMode);
         }
         final CloneInfo ci = getCloneInfo();
         if (ci == null) {
@@ -367,15 +338,14 @@ public class GroupInfo extends ServiceInfo {
         }
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            getBrowser().reload(getNode(), false);
+            getBrowser().reloadNode(getNode(), false);
         }
         for (final ServiceInfo child : getGroupServices()) {
-            final Check childCheck = 
-                child.checkResourceFields(null,
-                                          child.getParametersFromXML(),
-                                          false,
-                                          false,
-                                          true);
+            final Check childCheck = child.checkResourceFields(null,
+                                                               child.getParametersFromXML(),
+                                                               false,
+                                                               false,
+                                                               true);
             if (childCheck.isCorrect() && childCheck.isChanged()) {
                 child.apply(dcHost, runMode);
             }
@@ -383,12 +353,11 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             setApplyButtons(null, params);
         }
-        getBrowser().getCRMGraph().repaint();
+        getBrowser().getCrmGraph().repaint();
     }
 
-    /** Returns the list of services that can be added to the group. */
     Iterable<ResourceAgent> getAddGroupServiceList(final String cl) {
-        return getBrowser().getCRMXML().getServices(cl);
+        return getBrowser().getCrmXml().getServices(cl);
     }
 
     /**
@@ -398,19 +367,16 @@ public class GroupInfo extends ServiceInfo {
      * @param newServiceInfo
      *      service info object of the new service
      */
-    void addGroupServicePanel(final ServiceInfo newServiceInfo,
-                              final boolean reloadNode) {
+    void addGroupServicePanel(final ServiceInfo newServiceInfo, final boolean reloadNode) {
         final DefaultMutableTreeNode gn = getNode();
         if (gn == null) {
             return;
         }
-        newServiceInfo.getService().setResourceClass(
-                        newServiceInfo.getResourceAgent().getResourceClass());
+        newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
-        final DefaultMutableTreeNode newServiceNode =
-                                   new DefaultMutableTreeNode(newServiceInfo);
+        final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
         mGroupServiceWriteLock.lock();
         try {
@@ -430,12 +396,10 @@ public class GroupInfo extends ServiceInfo {
         });
     }
 
-    /** Adds service to this group and creates new service info object. */
-    ServiceInfo addGroupServicePanel(final ResourceAgent newRA,
-                              final boolean reloadNode) {
+    ServiceInfo addGroupServicePanel(final ResourceAgent newRA, final boolean reloadNode) {
         final ServiceInfo newServiceInfo;
 
-        final String name = newRA.getName();
+        final String name = newRA.getServiceName();
         if (newRA.isFilesystem()) {
             newServiceInfo = new FilesystemInfo(name, newRA, getBrowser());
         } else if (newRA.isLinbitDrbd()) {
@@ -464,9 +428,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     protected List<String> getRunningOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(runMode),
-                                                      runMode);
+        final List<String> resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
         final List<String> allNodes = new ArrayList<String>();
         if (resources != null) {
             for (final String hbId : resources) {
@@ -487,9 +449,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     List<String> getMasterOnNodes(final Application.RunMode runMode) {
         final ClusterStatus cs = getBrowser().getClusterStatus();
-        final List<String> resources = cs.getGroupResources(
-                                                      getHeartbeatId(runMode),
-                                                      runMode);
+        final List<String> resources = cs.getGroupResources(getHeartbeatId(runMode), runMode);
         final List<String> allNodes = new ArrayList<String>();
         if (resources != null) {
             for (final String hbId : resources) {
@@ -541,21 +501,15 @@ public class GroupInfo extends ServiceInfo {
 
     /** Sets whether the group services are managed. */
     @Override
-    void setManaged(final boolean isManaged,
-                    final Host dcHost,
-                    final Application.RunMode runMode) {
+    void setManaged(final boolean isManaged, final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             setUpdated(true);
         }
         for (final ServiceInfo child : getGroupServices()) {
-            CRM.setManaged(dcHost,
-                           child.getHeartbeatId(runMode),
-                           isManaged,
-                           runMode);
+            CRM.setManaged(dcHost, child.getHeartbeatId(runMode), isManaged, runMode);
         }
     }
 
-    /** Returns items for the group popup. */
     @Override
     public List<UpdatableItem> createPopup() {
         final GroupMenu groupMenu = new GroupMenu(this);
@@ -572,8 +526,7 @@ public class GroupInfo extends ServiceInfo {
             getService().doneRemoving();
             return;
         }
-        String desc = Tools.getString(
-                              "ClusterBrowser.confirmRemoveGroup.Description");
+        String desc = Tools.getString("ClusterBrowser.confirmRemoveGroup.Description");
 
         final StringBuilder services = new StringBuilder();
 
@@ -586,16 +539,12 @@ public class GroupInfo extends ServiceInfo {
             first = false;
         }
 
-        desc  = desc.replaceAll(
-                            "@GROUP@",
-                '\'' + Matcher.quoteReplacement(toString()) + '\'');
-        desc  = desc.replaceAll("@SERVICES@",
-                                Matcher.quoteReplacement(services.toString()));
-        if (Tools.confirmDialog(
-                Tools.getString("ClusterBrowser.confirmRemoveGroup.Title"),
-                desc,
-                Tools.getString("ClusterBrowser.confirmRemoveGroup.Yes"),
-                Tools.getString("ClusterBrowser.confirmRemoveGroup.No"))) {
+        desc  = desc.replaceAll("@GROUP@", '\'' + Matcher.quoteReplacement(toString()) + '\'');
+        desc  = desc.replaceAll("@SERVICES@", Matcher.quoteReplacement(services.toString()));
+        if (Tools.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveGroup.Title"),
+                                desc,
+                                Tools.getString("ClusterBrowser.confirmRemoveGroup.Yes"),
+                                Tools.getString("ClusterBrowser.confirmRemoveGroup.No"))) {
             if (Application.isLive(runMode)) {
                 getService().setRemoved(true);
             }
@@ -616,8 +565,7 @@ public class GroupInfo extends ServiceInfo {
 
     /** Remove all the services in the group and the group. */
     @Override
-    public void removeMyselfNoConfirm(final Host dcHost,
-                                      final Application.RunMode runMode) {
+    public void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
         final Collection<ServiceInfo> children = new ArrayList<ServiceInfo>();
         if (Application.isLive(runMode)) {
             for (final ServiceInfo child : getGroupServices()) {
@@ -628,7 +576,7 @@ public class GroupInfo extends ServiceInfo {
         if (getService().isNew()) {
             if (Application.isLive(runMode)) {
                 getService().setNew(false);
-                getBrowser().getCRMGraph().killRemovedVertices();
+                getBrowser().getCrmGraph().killRemovedVertices();
                 getService().doneRemoving();
             }
         } else {
@@ -643,12 +591,7 @@ public class GroupInfo extends ServiceInfo {
             for (final ServiceInfo child : children) {
                 child.removeConstraints(dcHost, runMode);
             }
-            CRM.removeResource(dcHost,
-                               null,
-                               getHeartbeatId(runMode),
-                               cloneId, /* clone id */
-                               master,
-                               runMode);
+            CRM.removeResource(dcHost, null, getHeartbeatId(runMode), cloneId, master, runMode);
             for (final ServiceInfo child : children) {
                 child.cleanupResource(dcHost, runMode);
             }
@@ -656,8 +599,7 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             for (final ServiceInfo child : children) {
                 getBrowser().mHeartbeatIdToServiceLock();
-                getBrowser().getHeartbeatIdToServiceInfo().remove(
-                                         child.getService().getHeartbeatId());
+                getBrowser().getHeartbeatIdToServiceInfo().remove(child.getService().getHeartbeatId());
                 getBrowser().mHeartbeatIdToServiceUnlock();
                 getBrowser().removeFromServiceInfoHash(child);
                 child.cleanup();
@@ -667,8 +609,7 @@ public class GroupInfo extends ServiceInfo {
     }
 
     /** Removes the group, but not the services. */
-    void removeMyselfNoConfirmFromChild(final Host dcHost,
-                                        final Application.RunMode runMode) {
+    void removeMyselfNoConfirmFromChild(final Host dcHost, final Application.RunMode runMode) {
         super.removeMyselfNoConfirm(dcHost, runMode);
     }
 
@@ -687,8 +628,7 @@ public class GroupInfo extends ServiceInfo {
             sb.append(" running on nodes: ");
         }
         if (hostNames != null && !hostNames.isEmpty()) {
-            sb.append(Tools.join(", ", hostNames.toArray(
-                                               new String[hostNames.size()])));
+            sb.append(Tools.join(", ", hostNames.toArray(new String[hostNames.size()])));
         }
         sb.append("</b>");
 
@@ -700,7 +640,6 @@ public class GroupInfo extends ServiceInfo {
         return sb.toString();
     }
 
-    /** Returns whether one of the services on one of the hosts failed. */
     @Override
     boolean isOneFailed(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
@@ -711,7 +650,6 @@ public class GroupInfo extends ServiceInfo {
         return false;
     }
 
-    /** Returns whether one of the services on one of the hosts failed. */
     @Override
     boolean isOneFailedCount(final Application.RunMode runMode) {
         for (final ServiceInfo child : getGroupServices()) {
@@ -746,13 +684,8 @@ public class GroupInfo extends ServiceInfo {
                 continue;
             }
             final Subtext sSubtext = subtexts[0];
-            if (prevSubtext == null
-                || !sSubtext.getSubtext().equals(
-                                      prevSubtext.getSubtext())) {
-                texts.add(new Subtext(sSubtext.getSubtext()
-                                      + ':',
-                                      sSubtext.getColor(),
-                                      Color.BLACK));
+            if (prevSubtext == null || !sSubtext.getSubtext().equals(prevSubtext.getSubtext())) {
+                texts.add(new Subtext(sSubtext.getSubtext() + ':', sSubtext.getColor(), Color.BLACK));
                 prevSubtext = sSubtext;
             }
             String unmanaged = "";
@@ -760,12 +693,10 @@ public class GroupInfo extends ServiceInfo {
                 unmanaged = " / unmanaged";
             }
             String migrated = "";
-            if (child.getMigratedTo(runMode) != null
-                || child.getMigratedFrom(runMode) != null) {
+            if (child.getMigratedTo(runMode) != null || child.getMigratedFrom(runMode) != null) {
                 migrated = " / migrated";
             }
-            final HbConnectionInfo[] hbcis =
-                          getBrowser().getCRMGraph().getHbConnections(child);
+            final HbConnectionInfo[] hbcis = getBrowser().getCrmGraph().getHbConnections(child);
             String constraintLeft = "";
             String constraint = "";
             if (hbcis != null) {
@@ -776,16 +707,13 @@ public class GroupInfo extends ServiceInfo {
                     if (hbci == null) {
                         continue;
                     }
-                    if (!someConnection
-                        && hbci.hasColocationOrOrder(child)) {
+                    if (!someConnection && hbci.hasColocationOrOrder(child)) {
                         someConnection = true;
                     }
-                    if (!scoreFirst
-                        && !hbci.isOrdScoreNull(child, null)) {
+                    if (!scoreFirst && !hbci.isOrdScoreNull(child, null)) {
                         scoreFirst = true;
                     }
-                    if (!scoreThen
-                        && !hbci.isOrdScoreNull(null, child)) {
+                    if (!scoreThen && !hbci.isOrdScoreNull(null, child)) {
                         scoreThen = true;
                     }
                 }
@@ -803,12 +731,7 @@ public class GroupInfo extends ServiceInfo {
                     }
                 }
             }
-            texts.add(new Subtext("   "
-                                  + constraintLeft
-                                  + child
-                                  + unmanaged
-                                  + migrated
-                                  + constraint,
+            texts.add(new Subtext("   " + constraintLeft + child + unmanaged + migrated + constraint,
                                   sSubtext.getColor(),
                                   Color.BLACK));
             boolean skip = true;
@@ -817,9 +740,7 @@ public class GroupInfo extends ServiceInfo {
                     skip = false;
                     continue;
                 }
-                texts.add(new Subtext("   " + st.getSubtext(),
-                                      st.getColor(),
-                                      Color.BLACK));
+                texts.add(new Subtext("   " + st.getSubtext(), st.getColor(), Color.BLACK));
             }
         }
         return texts.toArray(new Subtext[texts.size()]);
@@ -847,7 +768,7 @@ public class GroupInfo extends ServiceInfo {
         return hosts;
     }
 
-    /** Returns whether at least one service is unmaneged. */
+    /** Returns whether at least one service is unmanaged. */
     @Override
     public boolean isManaged(final Application.RunMode runMode) {
         final List<ServiceInfo> gs = getGroupServices();
@@ -917,8 +838,7 @@ public class GroupInfo extends ServiceInfo {
      * cannot by applied.
      */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false, false);
     }
 
@@ -935,19 +855,14 @@ public class GroupInfo extends ServiceInfo {
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         final Check check = new Check(incorrect, changed);
-        check.addCheck(super.checkResourceFields(param,
-                                                 params,
-                                                 fromServicesInfo,
-                                                 fromCloneInfo,
-                                                 true));
+        check.addCheck(super.checkResourceFields(param, params, fromServicesInfo, fromCloneInfo, true));
         boolean hasSevices = false;
         for (final ServiceInfo child : getGroupServices()) {
-            check.addCheck(child.checkResourceFields(
-                                                  null,
-                                                  child.getParametersFromXML(),
-                                                  fromServicesInfo,
-                                                  fromCloneInfo,
-                                                  true));
+            check.addCheck(child.checkResourceFields(null,
+                                                     child.getParametersFromXML(),
+                                                     fromServicesInfo,
+                                                     fromCloneInfo,
+                                                     true));
             hasSevices = true;
         }
         if (!hasSevices) {
@@ -967,10 +882,9 @@ public class GroupInfo extends ServiceInfo {
         }
     }
 
-    /** Returns the icon for the category. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
-        if (getBrowser().allHostsDown() || !isOneRunning(runMode)) {
+        if (getBrowser().allHostsWithoutClusterStatus() || !isOneRunning(runMode)) {
             return ServiceInfo.SERVICE_STOPPED_ICON_SMALL;
         }
         return ServiceInfo.SERVICE_RUNNING_ICON_SMALL;
@@ -981,11 +895,7 @@ public class GroupInfo extends ServiceInfo {
     public void revert() {
         super.revert();
         for (final ServiceInfo child : getGroupServices()) {
-            if (child.checkResourceFields(null,
-                                          child.getParametersFromXML(),
-                                          true,
-                                          false,
-                                          false).isChanged()) {
+            if (child.checkResourceFields(null, child.getParametersFromXML(), true, false, false).isChanged()) {
                 child.revert();
             }
         }
@@ -995,8 +905,7 @@ public class GroupInfo extends ServiceInfo {
     public List<ServiceInfo> getGroupServices() {
         mGroupServiceReadLock.lock();
         try {
-            return Collections.unmodifiableList(
-                                    new ArrayList<ServiceInfo>(groupServices));
+            return Collections.unmodifiableList(new ArrayList<ServiceInfo>(groupServices));
         } finally {
             mGroupServiceReadLock.unlock();
         }

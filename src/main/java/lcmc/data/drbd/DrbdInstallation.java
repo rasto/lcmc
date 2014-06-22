@@ -21,7 +21,6 @@
 package lcmc.data.drbd;
 
 import lcmc.Exceptions;
-import lcmc.data.resources.BlockDevice;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -39,12 +38,9 @@ public class DrbdInstallation {
     private String drbdBuildToInstall = null;
     private String drbdPackagesToInstall = null;
     private boolean drbdWillBeUpgraded = false;
-    /** Whether drbd was newly installed. */
-    private boolean drbdWasInstalled = false;
-    /** Drbd installation method index. */
-    private String drbdInstallMethod;
-    /** Drbd proxy installation method index. */
-    private String proxyInstallMethod;
+    private boolean drbdWasNewlyInstalled = false;
+    private String drbdInstallMethodIndex;
+    private String proxyInstallMethodIndex;
 
     private List<String> availableDrbdVersions = null;
 
@@ -60,8 +56,7 @@ public class DrbdInstallation {
      * Sets the drbd version in the form that is in the source tarball on
      * linbit website, like so: "8.3/drbd-8.3.1.tar.gz".
      */
-    public void setDrbdVersionUrlStringToInstall(
-            final String drbdVersionUrlStringToInstall) {
+    public void setDrbdVersionUrlStringToInstall(final String drbdVersionUrlStringToInstall) {
         this.drbdVersionUrlStringToInstall = drbdVersionUrlStringToInstall;
     }
 
@@ -101,8 +96,8 @@ public class DrbdInstallation {
         this.drbdWillBeUpgraded = drbdWillBeUpgraded;
     }
 
-    public void setDrbdWasInstalled(final boolean drbdWasInstalled) {
-        this.drbdWasInstalled = drbdWasInstalled;
+    public void setDrbdWasNewlyInstalled(final boolean drbdWasNewlyInstalled) {
+        this.drbdWasNewlyInstalled = drbdWasNewlyInstalled;
     }
 
     /**
@@ -110,27 +105,27 @@ public class DrbdInstallation {
      * TODO: ???
      */
     public boolean isDrbdUpgraded() {
-        return drbdWillBeUpgraded && drbdWasInstalled;
+        return drbdWillBeUpgraded && drbdWasNewlyInstalled;
     }
 
     /** Sets drbd installation method index. */
-    public void setDrbdInstallMethod(final String drbdInstallMethod) {
-        this.drbdInstallMethod = drbdInstallMethod;
+    public void setDrbdInstallMethodIndex(final String drbdInstallMethodIndex) {
+        this.drbdInstallMethodIndex = drbdInstallMethodIndex;
     }
 
     /** Returns drbd installation method. */
-    public String getDrbdInstallMethod() {
-        return drbdInstallMethod;
+    public String getDrbdInstallMethodIndex() {
+        return drbdInstallMethodIndex;
     }
 
     /** Sets proxy installation method index. */
-    public void setProxyInstallMethod(final String proxyInstallMethod) {
-        this.proxyInstallMethod = proxyInstallMethod;
+    public void setProxyInstallMethodIndex(final String proxyInstallMethodIndex) {
+        this.proxyInstallMethodIndex = proxyInstallMethodIndex;
     }
 
     /** Returns proxy installation method. */
-    public String getProxyInstallMethod() {
-        return proxyInstallMethod;
+    public String getProxyInstallMethodIndex() {
+        return proxyInstallMethodIndex;
     }
 
     public String replaceVarsInCommand(String command) {

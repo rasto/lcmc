@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.vms;
 
 import java.awt.geom.Point2D;
@@ -9,7 +29,7 @@ import javax.swing.ImageIcon;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.resources.Resource;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
@@ -121,12 +141,12 @@ public class DomainMenu {
                                 }
                                 for (final Host host
                                            : getBrowser().getClusterHosts()) {
-                                    final VMSXML vmsxml =
-                                                getBrowser().getVMSXML(host);
-                                    if (vmsxml == null) {
+                                    final VmsXml vmsXml =
+                                                getBrowser().getVmsXml(host);
+                                    if (vmsXml == null) {
                                         continue;
                                     }
-                                    if (vmsxml.isRunning(domainInfo.getDomainName())) {
+                                    if (vmsXml.isRunning(domainInfo.getDomainName())) {
                                         return "it is running";
                                     }
                                 }
@@ -322,10 +342,10 @@ public class DomainMenu {
 
             @Override
             public boolean visiblePredicate() {
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainInfo.getDomainName())
-                       && !vmsxml.isRunning(domainInfo.getDomainName());
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                return vmsXml != null
+                       && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
+                       && !vmsXml.isRunning(domainInfo.getDomainName());
             }
 
             @Override
@@ -339,7 +359,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.start(host);
                 }
@@ -363,10 +383,10 @@ public class DomainMenu {
 
             @Override
             public boolean visiblePredicate() {
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainInfo.getDomainName())
-                       && vmsxml.isRunning(domainInfo.getDomainName());
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                return vmsXml != null
+                       && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
+                       && vmsXml.isRunning(domainInfo.getDomainName());
             }
 
             @Override
@@ -380,7 +400,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.shutdown(host);
                 }
@@ -404,10 +424,10 @@ public class DomainMenu {
 
             @Override
             public boolean visiblePredicate() {
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainInfo.getDomainName())
-                       && vmsxml.isRunning(domainInfo.getDomainName());
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                return vmsXml != null
+                       && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
+                       && vmsXml.isRunning(domainInfo.getDomainName());
             }
 
             @Override
@@ -421,7 +441,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.reboot(host);
                 }
@@ -445,10 +465,10 @@ public class DomainMenu {
 
             @Override
             public boolean visiblePredicate() {
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                return vmsxml != null
-                       && vmsxml.getDomainNames().contains(domainInfo.getDomainName())
-                       && vmsxml.isSuspended(domainInfo.getDomainName());
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                return vmsXml != null
+                       && vmsXml.getDomainNames().contains(domainInfo.getDomainName())
+                       && vmsXml.isSuspended(domainInfo.getDomainName());
             }
 
             @Override
@@ -456,11 +476,11 @@ public class DomainMenu {
                 if (getResource().isNew()) {
                     return DomainInfo.NOT_APPLIED;
                 }
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                if (vmsxml == null) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                if (vmsXml == null) {
                     return DomainInfo.NO_VM_STATUS_STRING;
                 }
-                if (!vmsxml.isSuspended(domainInfo.getDomainName())) {
+                if (!vmsXml.isSuspended(domainInfo.getDomainName())) {
                     return "it is not suspended";
                 }
                 return null;
@@ -471,7 +491,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.resume(host);
                 }
@@ -504,12 +524,12 @@ public class DomainMenu {
                 if (getResource().isNew()) {
                     return DomainInfo.NOT_APPLIED;
                 }
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                if (vmsxml == null
-                    || !vmsxml.getDomainNames().contains(domainInfo.getDomainName())) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                if (vmsXml == null
+                    || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
                     return DomainInfo.NO_VM_STATUS_STRING;
                 }
-                if (!vmsxml.isRunning(domainInfo.getDomainName())) {
+                if (!vmsXml.isRunning(domainInfo.getDomainName())) {
                     return "not running";
                 }
                 return null;
@@ -518,7 +538,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.destroy(host);
                 }
@@ -545,15 +565,15 @@ public class DomainMenu {
                 if (getResource().isNew()) {
                     return DomainInfo.NOT_APPLIED;
                 }
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                if (vmsxml == null
-                    || !vmsxml.getDomainNames().contains(domainInfo.getDomainName())) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                if (vmsXml == null
+                    || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
                     return DomainInfo.NO_VM_STATUS_STRING;
                 }
-                if (!vmsxml.isRunning(domainInfo.getDomainName())) {
+                if (!vmsXml.isRunning(domainInfo.getDomainName())) {
                     return "not running";
                 }
-                if (vmsxml.isSuspended(domainInfo.getDomainName())) {
+                if (vmsXml.isSuspended(domainInfo.getDomainName())) {
                     return "it is already suspended";
                 }
                 return null;
@@ -562,7 +582,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.suspend(host);
                 }
@@ -589,15 +609,15 @@ public class DomainMenu {
                 if (getResource().isNew()) {
                     return DomainInfo.NOT_APPLIED;
                 }
-                final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                if (vmsxml == null
-                    || !vmsxml.getDomainNames().contains(domainInfo.getDomainName())) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                if (vmsXml == null
+                    || !vmsXml.getDomainNames().contains(domainInfo.getDomainName())) {
                     return DomainInfo.NO_VM_STATUS_STRING;
                 }
-                if (!vmsxml.isRunning(domainInfo.getDomainName())) {
+                if (!vmsXml.isRunning(domainInfo.getDomainName())) {
                     return "not running";
                 }
-                if (!vmsxml.isSuspended(domainInfo.getDomainName())) {
+                if (!vmsXml.isSuspended(domainInfo.getDomainName())) {
                     return "it is not suspended";
                 }
                 return null;
@@ -606,7 +626,7 @@ public class DomainMenu {
             @Override
             public void action() {
                 domainInfo.hidePopup();
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && host != null) {
                     domainInfo.resume(host);
                 }
@@ -634,11 +654,11 @@ public class DomainMenu {
                     if (getResource().isNew()) {
                         return DomainInfo.NOT_APPLIED;
                     }
-                    final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                    if (vmsxml == null) {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null) {
                         return DomainInfo.NO_VM_STATUS_STRING;
                     }
-                    if (!vmsxml.isRunning(domainInfo.getDomainName())) {
+                    if (!vmsXml.isRunning(domainInfo.getDomainName())) {
                         return "not running";
                     }
                     return null;
@@ -647,7 +667,7 @@ public class DomainMenu {
                 @Override
                 public void action() {
                     domainInfo.hidePopup();
-                    final VMSXML vxml = getBrowser().getVMSXML(host);
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
                                                             domainInfo.getDomainName());
@@ -677,11 +697,11 @@ public class DomainMenu {
                     if (getResource().isNew()) {
                         return DomainInfo.NOT_APPLIED;
                     }
-                    final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                    if (vmsxml == null) {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null) {
                         return DomainInfo.NO_VM_STATUS_STRING;
                     }
-                    if (!vmsxml.isRunning(domainInfo.getDomainName())) {
+                    if (!vmsXml.isRunning(domainInfo.getDomainName())) {
                         return "not running";
                     }
                     return null;
@@ -690,7 +710,7 @@ public class DomainMenu {
                 @Override
                 public void action() {
                     domainInfo.hidePopup();
-                    final VMSXML vxml = getBrowser().getVMSXML(host);
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
                                                              domainInfo.getDomainName());
@@ -720,11 +740,11 @@ public class DomainMenu {
                     if (getResource().isNew()) {
                         return DomainInfo.NOT_APPLIED;
                     }
-                    final VMSXML vmsxml = getBrowser().getVMSXML(host);
-                    if (vmsxml == null) {
+                    final VmsXml vmsXml = getBrowser().getVmsXml(host);
+                    if (vmsXml == null) {
                         return DomainInfo.NO_VM_STATUS_STRING;
                     }
-                    if (!vmsxml.isRunning(domainInfo.getDomainName())) {
+                    if (!vmsXml.isRunning(domainInfo.getDomainName())) {
                         return "not running";
                     }
                     return null;
@@ -733,7 +753,7 @@ public class DomainMenu {
                 @Override
                 public void action() {
                     domainInfo.hidePopup();
-                    final VMSXML vxml = getBrowser().getVMSXML(host);
+                    final VmsXml vxml = getBrowser().getVmsXml(host);
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
                                                             domainInfo.getDomainName());

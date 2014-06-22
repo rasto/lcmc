@@ -131,7 +131,7 @@ public class ProxyHostMenu {
                 @Override
                 public String enablePredicate() {
                     if (!getHost().isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     return null;
                 }
@@ -210,7 +210,7 @@ public class ProxyHostMenu {
                 @Override
                 public String enablePredicate() {
                     if (!getHost().isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     return null;
                 }

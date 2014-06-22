@@ -35,7 +35,7 @@ import java.util.regex.Matcher;
 
 import lcmc.configs.DistResource;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.Host;
 import lcmc.data.crm.HostLocation;
 import lcmc.utilities.ssh.ExecCommandConfig;
@@ -175,7 +175,7 @@ public final class CRM {
                     }
                     final String newParamName;
                     if (stonith
-                        && CRMXML.STONITH_PRIORITY_INSTANCE_ATTR.equals(
+                        && CrmXml.STONITH_PRIORITY_INSTANCE_ATTR.equals(
                             paramName)) {
                         newParamName = "priority";
                     } else {
@@ -225,7 +225,7 @@ public final class CRM {
                 xml.append("<op");
                 boolean checkLevel = false;
                 for (final Map.Entry<String, String> opEntry : opHash.entrySet()) {
-                    if (CRMXML.PAR_CHECK_LEVEL.equals(opEntry.getKey())) {
+                    if (CrmXml.PARAM_OCF_CHECK_LEVEL.equals(opEntry.getKey())) {
                         checkLevel = true;
                         continue;
                     }
@@ -244,11 +244,11 @@ public final class CRM {
                     xml.append("\"><nvpair id=\"");
                     xml.append(iaId);
                     xml.append('-');
-                    xml.append(CRMXML.PAR_CHECK_LEVEL);
+                    xml.append(CrmXml.PARAM_OCF_CHECK_LEVEL);
                     xml.append("\" name=\"");
-                    xml.append(CRMXML.PAR_CHECK_LEVEL);
+                    xml.append(CrmXml.PARAM_OCF_CHECK_LEVEL);
                     xml.append("\" value=\"");
-                    xml.append(opHash.get(CRMXML.PAR_CHECK_LEVEL));
+                    xml.append(opHash.get(CrmXml.PARAM_OCF_CHECK_LEVEL));
                     xml.append("\"/></instance_attributes></op>");
                 } else {
                     xml.append("/>");
@@ -440,7 +440,7 @@ public final class CRM {
 
     /** Returns one resource set xml. */
     private static String getOneRscSet(
-        final String rscSetId, final CRMXML.RscSet rscSet, Map<String, String> attrs) {
+        final String rscSetId, final CrmXml.RscSet rscSet, Map<String, String> attrs) {
         final StringBuilder xml = new StringBuilder(120);
         xml.append("<resource_set id=\"");
         xml.append(rscSetId);
@@ -460,8 +460,8 @@ public final class CRM {
             }
             final String requireAll = rscSet.getRequireAll();
             if (requireAll != null
-                && !requireAll.equals(CRMXML.REQUIRE_ALL_TRUE.getValueForConfig())) {
-                attrs.put(CRMXML.REQUIRE_ALL_ATTR, requireAll);
+                && !requireAll.equals(CrmXml.REQUIRE_ALL_TRUE_VALUE.getValueForConfig())) {
+                attrs.put(CrmXml.REQUIRE_ALL_ATTR, requireAll);
             }
         }
         for (final Map.Entry<String, String> attrsEntry : attrs.entrySet()) {
@@ -484,9 +484,9 @@ public final class CRM {
 
     /** Sets resource set. */
     public static boolean setRscSet(final Host host, final String colId, final boolean createCol, final String ordId, final boolean createOrd, final Map<
-        CRMXML.RscSet,
+        CrmXml.RscSet,
         Map<String, String>> rscSetsColAttrs, final Map<
-                                               CRMXML.RscSet,
+                                               CrmXml.RscSet,
                                                Map<String, String>> rscSetsOrdAttrs, final Map<String, String> attrs, final Application.RunMode runMode) {
         if (colId != null) {
             if (rscSetsColAttrs.isEmpty()) {
@@ -531,7 +531,7 @@ public final class CRM {
     }
 
     /** Sets resource set that is either colocation or order. */
-    private static boolean setRscSetConstraint(final Host host, final String tag, final String constraintId, final Map<CRMXML.RscSet, Map<String, String>> rscSetsAttrs, final Map<String, String> attrs, final String cibadminOpt, final Application.RunMode runMode) {
+    private static boolean setRscSetConstraint(final Host host, final String tag, final String constraintId, final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs, final Map<String, String> attrs, final String cibadminOpt, final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append("'<");
         xml.append(tag);
@@ -549,7 +549,7 @@ public final class CRM {
         }
         xml.append("\">");
         int rsId = 0;
-        for (final Map.Entry<CRMXML.RscSet, Map<String, String>> rscSetsEntry : rscSetsAttrs.entrySet()) {
+        for (final Map.Entry<CrmXml.RscSet, Map<String, String>> rscSetsEntry : rscSetsAttrs.entrySet()) {
             if (rscSetsEntry.getKey() != null) {
                 xml.append(getOneRscSet(constraintId + '-' + rsId,
                                         rscSetsEntry.getKey(),

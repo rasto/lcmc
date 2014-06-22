@@ -192,8 +192,8 @@ public final class AllHostsInfo extends Info {
                                 allCheckboxes.remove(cluster);
                                 allLoadButtons.remove(cluster);
                                 mainPanel.remove(p);
-                                getBrowser().reload(getNode(), false);
-                                getBrowser().repaintTree();
+                                getBrowser().reloadNode(getNode(), false);
+                                getBrowser().repaintMenuTree();
                             }
                         }
                     }

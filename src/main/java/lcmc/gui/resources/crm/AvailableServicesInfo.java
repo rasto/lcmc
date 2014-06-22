@@ -48,10 +48,10 @@ public final class AvailableServicesInfo extends HbCategoryInfo {
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
-        for (final String cl : ClusterBrowser.HB_CLASSES) {
+        for (final String cl : ClusterBrowser.CRM_CLASSES) {
             final MyButton className = new MyButton(cl.toUpperCase(Locale.US));
             rows.add(new Object[]{className,
-                                  ClusterBrowser.HB_CLASS_MENU.get(cl)});
+                                  ClusterBrowser.CRM_CLASS_MENU.get(cl)});
         }
         return rows.toArray(new Object[rows.size()][]);
     }

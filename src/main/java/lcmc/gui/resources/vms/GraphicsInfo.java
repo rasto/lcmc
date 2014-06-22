@@ -37,8 +37,8 @@ import javax.swing.JPanel;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.GraphicsData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.GraphicsData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
@@ -250,9 +250,9 @@ public final class GraphicsInfo extends HardwareInfo {
                 if (keymaps == null) {
                     keymaps = new ArrayList<Value>();
                     keymaps.add(new StringValue());
-                    keymaps.addAll(host.getQemuKeymaps());
+                    keymaps.addAll(host.getAvailableQemuKeymaps());
                 } else {
-                    final Set<Value> hostKeymaps = host.getQemuKeymaps();
+                    final Set<Value> hostKeymaps = host.getAvailableQemuKeymaps();
                     final List<Value> newKeymaps = new ArrayList<Value>();
                     newKeymaps.add(new StringValue());
                     for (final Value km : keymaps) {
@@ -367,10 +367,10 @@ public final class GraphicsInfo extends HardwareInfo {
                 }
             }
         }
-        setName(VMSXML.graphicsDisplayName(
-                                getParamSavedForConfig(GraphicsData.TYPE),
-                                getParamSavedForConfig(GraphicsData.PORT),
-                                getParamSavedForConfig(GraphicsData.DISPLAY)));
+        setName(VmsXml.graphicsDisplayName(
+                getParamSavedForConfig(GraphicsData.TYPE),
+                getParamSavedForConfig(GraphicsData.PORT),
+                getParamSavedForConfig(GraphicsData.DISPLAY)));
         return parameters;
     }
 
@@ -393,23 +393,23 @@ public final class GraphicsInfo extends HardwareInfo {
                                      getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 parameters.put(GraphicsData.SAVED_TYPE,
                                getParamSavedForConfig(GraphicsData.TYPE));
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -516,8 +516,8 @@ public final class GraphicsInfo extends HardwareInfo {
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
+                        final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                        if (vmsXml != null) {
                             final Value savedValue =
                                                graphicsData.getValue(param);
                             if (savedValue != null) {
@@ -535,10 +535,10 @@ public final class GraphicsInfo extends HardwareInfo {
                 }
             }
         }
-        setName(VMSXML.graphicsDisplayName(
-                               getParamSavedForConfig(GraphicsData.TYPE),
-                               getParamSavedForConfig(GraphicsData.PORT),
-                               getParamSavedForConfig(GraphicsData.DISPLAY)));
+        setName(VmsXml.graphicsDisplayName(
+                getParamSavedForConfig(GraphicsData.TYPE),
+                getParamSavedForConfig(GraphicsData.PORT),
+                getParamSavedForConfig(GraphicsData.DISPLAY)));
         updateTable(DomainInfo.HEADER_TABLE);
         updateTable(DomainInfo.GRAPHICS_TABLE);
         checkResourceFields(null, getParametersFromXML());
@@ -565,20 +565,20 @@ public final class GraphicsInfo extends HardwareInfo {
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(GraphicsData.SAVED_TYPE,
                                getParamSavedForConfig(GraphicsData.TYPE));
-                vmsxml.removeGraphicsXML(
+                vmsXml.removeGraphicsXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -636,9 +636,9 @@ public final class GraphicsInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml, final Node node, final String domainName, final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyGraphicsXML(node, domainName, params);
+    protected void modifyXML(final VmsXml vmsXml, final Node node, final String domainName, final Map<String, String> params) {
+        if (vmsXml != null) {
+            vmsXml.modifyGraphicsXML(node, domainName, params);
         }
     }
 

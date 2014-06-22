@@ -263,7 +263,7 @@ public class TestUtils {
 
     private Host initHost(final String hostName, final String username, final boolean useSudo) {
         final Host host = Host.createInstance();
-        host.setHostnameEntered(hostName);
+        host.setEnteredHostOrIp(hostName);
         host.setUsername(username);
         host.setSSHPort("22");
         host.setUseSudo(useSudo);

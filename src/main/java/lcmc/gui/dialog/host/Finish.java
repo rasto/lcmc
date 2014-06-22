@@ -163,7 +163,7 @@ final class Finish extends DialogHost {
                         newHost.getSSH().setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(),
                                                       getHost().getSSH().getLastSuccessfulRsaKey(),
                                                       getHost().getSSH().getLastSuccessfulPassword());
-                        nextDialog = new NewHost(thisClass, newHost, getDrbdInstallation());
+                        nextDialog = new NewHostDialog(thisClass, newHost, getDrbdInstallation());
                         Tools.getGUIData().allHostsUpdate();
                         Tools.invokeLater(new Runnable() {
                             @Override

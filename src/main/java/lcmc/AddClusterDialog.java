@@ -23,7 +23,6 @@
 package lcmc;
 
 import lcmc.data.Cluster;
-import lcmc.data.Clusters;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
 import lcmc.utilities.Logger;
@@ -31,24 +30,13 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * AddClusterDialog.
- *
  * Shows step by step dialogs that add and configure new cluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
-
 public final class AddClusterDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                              LoggerFactory.getLogger(AddClusterDialog.class);
-    /** Whether the wizard was canceled. */
-    private boolean canceled = false;
+    private static final Logger LOG = LoggerFactory.getLogger(AddClusterDialog.class);
 
     /**
-     * Shows step by step dialogs that add and configure new cluster.
-     * Must allways be called from thread.
+     * Must always be called from new thread.
      */
     public void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);
@@ -58,13 +46,11 @@ public final class AddClusterDialog {
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
-            final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
+            final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 Tools.getGUIData().removeSelectedClusterTab();
-                Tools.getApplication().getHosts().removeHostsFromCluster(
-                                                                      cluster);
+                Tools.getApplication().getHosts().removeHostsFromCluster(cluster);
                 Tools.getApplication().removeClusterFromClusters(cluster);
-                canceled = true;
                 dialog.cancelDialog();
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -73,19 +59,17 @@ public final class AddClusterDialog {
                     }
                 });
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                if (newDialog == null) {
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setTabClosable(true);
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
-            if (newdialog != null) {
-                dialog = newdialog;
+            if (newDialog != null) {
+                dialog = newDialog;
             }
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
@@ -103,15 +87,5 @@ public final class AddClusterDialog {
             }
         });
         cluster.setTabClosable(true);
-    }
-
-    /** Whether the wizard was canceled. */
-    boolean canceled() {
-        return canceled;
-    }
-
-    /** Returns the clusters. */
-    Clusters getClusters() {
-        return null;
     }
 }

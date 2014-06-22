@@ -55,7 +55,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 
 /**
  * This class holds info data for a host.
@@ -247,7 +246,7 @@ public class HostDrbdInfo extends Info {
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
                texts.add(new Subtext("DRBD not loaded", null, Color.BLACK));
-            } else if (!getHost().isDrbdStatus()) {
+            } else if (!getHost().isDrbdStatusOk()) {
                texts.add(new Subtext("waiting...", null, Color.BLACK));
             }
         } else {

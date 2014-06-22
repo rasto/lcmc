@@ -44,7 +44,7 @@ import lcmc.AddVMConfigDialog;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
@@ -96,7 +96,7 @@ public final class VMListInfo extends CategoryInfo {
         final List<Object[]> rows = new ArrayList<Object[]>();
         final Collection<String> domainNames = new TreeSet<String>();
         for (final Host host : getBrowser().getClusterHosts()) {
-            final VMSXML vxml = getBrowser().getVMSXML(host);
+            final VmsXml vxml = getBrowser().getVmsXml(host);
             if (vxml != null) {
                 domainNames.addAll(vxml.getDomainNames());
             }
@@ -107,7 +107,7 @@ public final class VMListInfo extends CategoryInfo {
         for (final String domainName : domainNames) {
             ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
             for (final Host host : getBrowser().getClusterHosts()) {
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null && vxml.isRunning(domainName)) {
                     final Color bgColor = host.getPmColors()[0];
                     dtc.put(domainName, bgColor);
@@ -206,8 +206,8 @@ public final class VMListInfo extends CategoryInfo {
             return new Comparator<Object>() {
                 @Override
                 public int compare(final Object o1, final Object o2) {
-                    final long i1 = VMSXML.convertToKilobytes((Value) o1);
-                    final long i2 = VMSXML.convertToKilobytes((Value) o2);
+                    final long i1 = VmsXml.convertToKilobytes((Value) o1);
+                    final long i2 = VmsXml.convertToKilobytes((Value) o2);
                     if (i1 < i2) {
                         return -1;
                     } else if (i1 > i2) {

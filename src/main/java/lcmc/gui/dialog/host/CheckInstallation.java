@@ -46,7 +46,6 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where
@@ -174,7 +173,7 @@ final class CheckInstallation extends DialogHost {
                         getDrbdInstallation().setDrbdWillBeUpgraded(true);
                     }
                     final InstallMethods im = (InstallMethods) drbdInstMethodWi.getValue();
-                    getDrbdInstallation().setDrbdInstallMethod(im.getIndex());
+                    getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
                   "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
@@ -187,7 +186,7 @@ final class CheckInstallation extends DialogHost {
                         } else {
                             // TODO: this only when there is no drbd installed
                             nextDialogObject = new DrbdCommandInst(thisClass, getHost(), getDrbdInstallation());
-                            getDrbdInstallation().setDrbdInstallMethod(im.getIndex());
+                            getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                         }
                         Tools.invokeLater(new Runnable() {
                             @Override
@@ -217,7 +216,7 @@ final class CheckInstallation extends DialogHost {
                     nextDialogObject = new HeartbeatInst(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im =
                                    (InstallMethods) hbPmInstMethodWi.getValue();
-                    getHost().setHbPmInstallMethod(im.getIndex());
+                    getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -237,7 +236,7 @@ final class CheckInstallation extends DialogHost {
                     nextDialogObject = new PacemakerInst(thisClass, getHost(), getDrbdInstallation());
                     final InstallMethods im =
                                 (InstallMethods) pmInstMethodWi.getValue();
-                    getHost().setPmInstallMethod(im.getIndex());
+                    getHost().setPacemakerInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -383,7 +382,7 @@ final class CheckInstallation extends DialogHost {
             hbPmOk = true;
             final String text;
             if ("2.1.3".equals(hbVersion)
-                && "sles10".equals(getHost().getDistVersion())) {
+                && "sles10".equals(getHost().getDistributionVersion())) {
                 /* sles10 heartbeat 2.1.3 looks like hb 2.1.4 */
                 hbVersion = "2.1.4";
                 text = "2.1.3 (2.1.4)";

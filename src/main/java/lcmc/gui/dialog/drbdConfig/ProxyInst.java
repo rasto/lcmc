@@ -109,7 +109,7 @@ final class ProxyInst extends DialogHost {
         final String archString = arch.replaceAll("i686", "i386");
 
         String installCommand = "ProxyInst.install";
-        final String installMethod = getDrbdInstallation().getProxyInstallMethod();
+        final String installMethod = getDrbdInstallation().getProxyInstallMethodIndex();
         if (installMethod != null) {
             installCommand = "ProxyInst.install." + installMethod;
         }

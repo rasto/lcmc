@@ -17,8 +17,6 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui.widget;
 
 import java.awt.Color;
@@ -32,10 +30,7 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 
-/**
- */
 public interface Widget {
-    /** Widget type. */
     enum Type {
         LABELFIELD,
         TEXTFIELD,
@@ -53,26 +48,15 @@ public interface Widget {
     Map<String, String> NO_ABBRV = null;
     MyButton NO_BUTTON = null;
     String WIZARD_PREFIX = "wizard";
-    /** Background of the field if the value is wrong. */
     Color ERROR_VALUE_BACKGROUND = Tools.getDefaultColor("Widget.ErrorValue");
-    /** Background of the field if the value has changed. */
     Color CHANGED_VALUE_COLOR = Tools.getDefaultColor("Widget.ChangedValue");
-    /** Background of the field if the value is default. */
     Color DEFAULT_VALUE_COLOR = Tools.getDefaultColor("Widget.DefaultValue");
-    /** Background of the field if the value is saved. */
     Color SAVED_VALUE_COLOR = Tools.getDefaultColor("Widget.SavedValue");
-    /** No scrollbar ever. */
     int SCROLLBAR_MAX_ROWS = 10;
-    /** Widget default height. */
     int WIDGET_HEIGHT = 28;
-    /** Widget enclosing component default height. */
     int WIDGET_COMPONENT_HEIGHT = 30;
-    /** Nothing selected string, that returns null, if selected. */
-    String NOTHING_SELECTED_DISPLAY =
-                                Tools.getString("Widget.NothingSelected");
+    String NOTHING_SELECTED_DISPLAY = Tools.getString("Widget.NothingSelected");
 
-    /** Returns this widget, so that the interface Widget can be used in other
-     *  components. */
     Component getComponent();
 
     void setEnabled(String s, boolean enabled);
@@ -109,7 +93,7 @@ public interface Widget {
     void requestFocus();
 
     String getRegexp();
-    /** Returns document object of the component. */
+
     Document getDocument();
 
     Value getValue();
@@ -125,21 +109,17 @@ public interface Widget {
     void clear();
     /** Sets the width of the widget. */
     void setWidth(int newWidth);
-    /** Sets item/value in the component and waits till it is set. */
     void setValueAndWait(Value item);
     /** Sets combo box editable. */
     void setEditable(boolean editable);
-    /** Sets label for this component. */
     void setLabel(JLabel label, String labelToolTipText);
     /** Return whether this widget was never set. */
     boolean isNew();
-    /** Returns label for this component. */
     JLabel getLabel();
     /** Select the text component. */
     void select(int selectionStart, int selectionEnd);
 
     void selectAll();
-    /** Sets reason why it is disabled. */
     void setDisabledReason(String disabledReason);
     /** Sets this item enabled and visible according to its access type. */
     void processAccessMode();
@@ -149,7 +129,6 @@ public interface Widget {
     void cleanup();
     /** Sets item/value in the component, disable listeners. */
     void setValueNoListeners(Value item);
-    /** Sets the field editable. */
     void setEditable();
     /** Sets extra button enabled. */
     void setTFButtonEnabled(boolean tfButtonEnabled);

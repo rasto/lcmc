@@ -445,12 +445,12 @@ public final class FilesystemInfo extends ServiceInfo {
         final String fsId = getService().getId();
         if (oldDrbddisk) {
             final String drbdId = getBrowser().getFreeId(
-                    getBrowser().getCRMXML().getHbDrbddisk().getName(),
+                    getBrowser().getCrmXml().getDrbddiskResourceAgent().getServiceName(),
                     fsId);
             newDvi.addDrbdDisk(this, dcHost, drbdId, runMode);
         } else {
             final String drbdId = getBrowser().getFreeId(
-                    getBrowser().getCRMXML().getHbLinbitDrbd().getName(),
+                    getBrowser().getCrmXml().getLinbitDrbdResourceAgent().getServiceName(),
                     fsId);
             newDvi.addLinbitDrbd(this, dcHost, drbdId, runMode);
         }

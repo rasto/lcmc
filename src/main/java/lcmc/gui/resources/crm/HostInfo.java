@@ -51,11 +51,8 @@ import lcmc.data.crm.ClusterStatus;
 import lcmc.data.Host;
 import lcmc.data.crm.PtestData;
 import lcmc.data.Subtext;
-import lcmc.gui.Browser;
-import lcmc.gui.CRMGraph;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.SpringUtilities;
+import lcmc.gui.*;
+import lcmc.gui.CrmGraph;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
@@ -240,7 +237,7 @@ public class HostInfo extends Info {
                 hostInfoButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
                 String command = "HostBrowser.getHostInfo";
-                if (!host.isCsInit()) {
+                if (!host.hasCorosyncInitScript()) {
                     command = "HostBrowser.getHostInfoHeartbeat";
                 }
                 host.execCommand(new ExecCommandConfig().commandString(command)
@@ -266,7 +263,7 @@ public class HostInfo extends Info {
                                                         .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT));
             }
         });
-        final CRMGraph crmg = getBrowser().getClusterBrowser().getCRMGraph();
+        final CrmGraph crmg = getBrowser().getClusterBrowser().getCrmGraph();
         final Document taDocument = ta.getDocument();
         taDocument.addDocumentListener(new DocumentListener() {
             private void update() {
@@ -408,7 +405,7 @@ public class HostInfo extends Info {
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
         String command = "HostBrowser.getHostInfo";
-        if (!host.isCsInit()) {
+        if (!host.hasCorosyncInitScript()) {
             command = "HostBrowser.getHostInfoHeartbeat";
         }
         host.execCommand(new ExecCommandConfig().commandString(command)
@@ -465,7 +462,7 @@ public class HostInfo extends Info {
     public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
-            if (!getHost().isClStatus()) {
+            if (!getHost().isCrmStatusOk()) {
                texts.add(new Subtext("waiting for Pacemaker...",
                                      null,
                                      Color.BLACK));
@@ -505,20 +502,20 @@ public class HostInfo extends Info {
             return STOPPING_SUBTEXT;
         } else if (getHost().isCommLayerStarting()) {
             return STARTING_SUBTEXT;
-        } else if (getHost().isPcmkStarting()) {
+        } else if (getHost().isPacemakerStarting()) {
             return STARTING_SUBTEXT;
         }
         final ClusterStatus cs = getClusterStatus();
         if (cs != null && cs.isFencedNode(host.getName())) {
             return FENCED_SUBTEXT;
-        } else if (getHost().isClStatus()) {
+        } else if (getHost().isCrmStatusOk()) {
             if (isStandby(runMode)) {
                 return STANDBY_SUBTEXT;
             } else {
                 return ONLINE_SUBTEXT;
             }
         } else if (getHost().isConnected()) {
-            final Boolean running = getHost().getCorosyncHeartbeatRunning();
+            final Boolean running = getHost().getCorosyncOrHeartbeatRunning();
             if (running == null) {
                 return UNKNOWN_SUBTEXT;
             } else if (!running) {
@@ -526,7 +523,7 @@ public class HostInfo extends Info {
             }
             if (cs != null && cs.isPendingNode(host.getName())) {
                 return PENDING_SUBTEXT;
-            } else if (!getHost().isPcmkRunning()) {
+            } else if (!getHost().isPacemakerRunning()) {
                 return PCMK_STOPPED_SUBTEXT;
             } else if (cs != null
                        && "no".equals(cs.isOnlineNode(host.getName()))) {

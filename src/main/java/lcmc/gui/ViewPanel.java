@@ -19,8 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui;
 
 import java.awt.BorderLayout;
@@ -47,19 +45,10 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a host view with tree of resources. This view is used
  * in the host tab as well in the cluster tab.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class ViewPanel extends JPanel {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Minimum size of the menu tree. */
     private static final Dimension MENU_TREE_MIN_SIZE = new Dimension(200, 200);
-    /** Minimum size of the info panel. */
-    private static final Dimension INFO_PANEL_MIN_SIZE =
-                                                    new Dimension(200, 200);
+    private static final Dimension INFO_PANEL_MIN_SIZE = new Dimension(200, 200);
     /** Preferred size of the menu tree. */
     private static final Dimension MENU_TREE_SIZE = new Dimension(400, 200);
     /** Location of the divider in the split pane. */
@@ -68,12 +57,10 @@ public class ViewPanel extends JPanel {
     private JSplitPane viewSP = null;
     /** Disabled during load. It disables the menu expanding.*/
     private volatile boolean disabledDuringLoad = true;
-    /** Update VMS lock. */
     private final Lock mSetPanelLock = new ReentrantLock();
     /** Last selected info object in the right pane. */
     private Info lastSelectedInfo = null;
 
-    /** Prepares a new {@code ViewPanel} object. */
     ViewPanel() {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
@@ -82,7 +69,7 @@ public class ViewPanel extends JPanel {
     /** Returns the menu tree. */
     final JTree getTree(final Browser browser) {
         final JTree tree = new JTree(browser.getTreeModel());
-        browser.setTree(tree);
+        browser.setMenuTree(tree);
         tree.setOpaque(true);
         tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
         tree.setToggleClickCount(2);
@@ -105,12 +92,10 @@ public class ViewPanel extends JPanel {
             @Override
             public void mousePressed(final MouseEvent e) {
                 final int selRow = tree.getRowForLocation(e.getX(), e.getY());
-                final TreePath selPath = tree.getPathForLocation(e.getX(),
-                                                                 e.getY());
+                final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                 if (selRow != -1 && e.getButton() > 1) {
                     final Info nodeInfo =
-                            (Info) ((DefaultMutableTreeNode) selPath.
-                                       getLastPathComponent()).getUserObject();
+                            (Info) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
                     if (nodeInfo != null) {
                         nodeInfo.showPopup(tree, e.getX(), e.getY());
                         tree.setSelectionPath(selPath);
@@ -125,16 +110,13 @@ public class ViewPanel extends JPanel {
         });
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
-        tree.getSelectionModel().setSelectionMode(
-                                    TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(browser.getCellRenderer());
 
         final JScrollPane resourcesTreePane = new JScrollPane(tree);
 
         final JPanel resourceInfo = new JPanel();
-        viewSP = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                resourcesTreePane,
-                                resourceInfo);
+        viewSP = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, resourcesTreePane, resourceInfo);
 
         resourcesTreePane.setMinimumSize(MENU_TREE_MIN_SIZE);
         resourceInfo.setMinimumSize(INFO_PANEL_MIN_SIZE);
@@ -157,9 +139,7 @@ public class ViewPanel extends JPanel {
                     if (!disabledDuringLoad) {
                         final Object[] selected = e.getChildren();
                         if (selected != null && selected.length > 0) {
-                            final Object o =
-                                ((DefaultMutableTreeNode) selected[0])
-                                                             .getUserObject();
+                            final Object o = ((DefaultMutableTreeNode) selected[0]).getUserObject();
                             setRightComponentInView(browser, (Info) o);
                         }
                     }
@@ -182,11 +162,11 @@ public class ViewPanel extends JPanel {
                         final TreePath tp = new TreePath(path);
                         Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
                                           new Runnable() {
-                            @Override
-                            public void run() {
-                                tree.expandPath(tp);
-                                tree.setSelectionPath(tp);
-                            }
+                                              @Override
+                                              public void run() {
+                                                  tree.expandPath(tp);
+                                                  tree.setSelectionPath(tp);
+                                              }
                         });
                     }
                 }
@@ -206,11 +186,8 @@ public class ViewPanel extends JPanel {
     }
 
     /** Sets the right component in the view. */
-    private void setRightComponentInView(final JTree tree,
-                                         final JSplitPane viewSP,
-                                         final Browser browser) {
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                                           tree.getLastSelectedPathComponent();
+    private void setRightComponentInView(final JTree tree, final JSplitPane viewSP, final Browser browser) {
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
         if (node == null) {
             return;
         }
@@ -230,8 +207,7 @@ public class ViewPanel extends JPanel {
                     if (!mSetPanelLock.tryLock()) {
                         return;
                     }
-                    final JComponent p =
-                            browser.getInfoPanel(nodeInfo, disabledDuringLoad);
+                    final JComponent p = browser.getInfoPanel(nodeInfo, disabledDuringLoad);
                     if (!disabledDuringLoad) {
                         final int loc = viewSP.getDividerLocation();
                         viewSP.setRightComponent(p);
@@ -244,8 +220,7 @@ public class ViewPanel extends JPanel {
     }
 
     /** Sets the right component in the view. */
-    final void setRightComponentInView(final Browser browser,
-                                       final Info nodeInfo) {
+    final void setRightComponentInView(final Browser browser, final Info nodeInfo) {
         if (viewSP != null) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
@@ -253,8 +228,7 @@ public class ViewPanel extends JPanel {
                     if (!mSetPanelLock.tryLock()) {
                         return;
                     }
-                    final JComponent p =
-                            browser.getInfoPanel(nodeInfo, disabledDuringLoad);
+                    final JComponent p = browser.getInfoPanel(nodeInfo, disabledDuringLoad);
                     lastSelectedInfo = nodeInfo;
                     if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();

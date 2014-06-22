@@ -19,7 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui;
 
 import java.util.TreeSet;
@@ -34,18 +33,12 @@ import lcmc.utilities.Tools;
  * This class holds cluster resource data in a tree. It shows panels that allow
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
-    /** All hosts info object of the host of this browser. */
     private final AllHostsInfo allHostsInfo = new AllHostsInfo(this);
 
-    /** Prepares a new {@code CusterBrowser} object. */
     EmptyBrowser() {
         super();
         /* Load the default file */
@@ -58,7 +51,7 @@ public final class EmptyBrowser extends Browser {
         if (xml != null) {
             Tools.loadXML(xml);
         }
-        setTreeTop();
+        setMenuTreeTop();
     }
 
     /** Adds small box with cluster possibility to load it and remove it. */
@@ -68,38 +61,33 @@ public final class EmptyBrowser extends Browser {
         allHostsInfo.addCheckboxListener(cluster);
     }
 
-    /** Set cluster as disconnected. */
     public void setDisconnected(final Cluster cluster) {
         allHostsInfo.setDisconnected(cluster);
     }
 
     /** Initializes hosts tree for the empty view. */
     void initHosts() {
-        /* all hosts */
         allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
         setNode(allHostsNode);
-        topAdd(allHostsNode);
+        topLevelAdd(allHostsNode);
     }
 
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
-        /* all hosts */
-        final Iterable<Host> allHosts =
-              new TreeSet<Host>(Tools.getApplication().getHosts().getHostSet());
+        final Iterable<Host> allHosts = new TreeSet<Host>(Tools.getApplication().getHosts().getHostSet());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 allHostsNode.removeAllChildren();
                 for (final Host host : allHosts) {
                     final HostBrowser hostBrowser = host.getBrowser();
-                    final MutableTreeNode resource = new DefaultMutableTreeNode(
-                            hostBrowser.getHostInfo());
+                    final MutableTreeNode resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
                     //setNode(resource);
                     allHostsNode.add(resource);
                 }
             }
         });
-        reload(allHostsNode, false);
+        reloadNode(allHostsNode, false);
         selectPath(new Object[]{getTreeTop(), allHostsNode});
     }
 }

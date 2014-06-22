@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc;
 
 import lcmc.data.drbd.DrbdInstallation;
@@ -32,28 +31,16 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * AddDrbdUpgradeDialog.
- *
  * Show step by step dialogs that upgrades the drbd.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class AddDrbdUpgradeDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                       LoggerFactory.getLogger(AddDrbdUpgradeDialog.class);
-    /** Whether the wizard was canceled. */
-    private boolean canceled = false;
-    /** Host on which the drbd will be upgraded. */
+    private static final Logger LOG = LoggerFactory.getLogger(AddDrbdUpgradeDialog.class);
     private final HostDrbdInfo hostDrbdInfo;
 
-    /** Prepares a new {@code AddDrbdUpgradeDialog} object. */
     public AddDrbdUpgradeDialog(final HostDrbdInfo hostDrbdInfo) {
         this.hostDrbdInfo = hostDrbdInfo;
     }
 
-    /** Shows step by step dialogs that upgrade the drbd. */
     public void showDialogs() {
         WizardDialog dialog = new Dist(null, hostDrbdInfo.getHost(), new DrbdInstallation());
         Tools.getGUIData().expandTerminalSplitPane(0);
@@ -62,26 +49,18 @@ public final class AddDrbdUpgradeDialog {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
-    }
-
-    /** Returns whether the wizard was canceled. */
-    public boolean isCanceled() {
-        return canceled;
     }
 }

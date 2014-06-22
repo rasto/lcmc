@@ -26,7 +26,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
 import lcmc.data.drbd.DrbdProxy;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
@@ -79,13 +79,13 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
      */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        return getBrowser().getDrbdXML().checkParam(param, newValue);
+        return getBrowser().getDrbdXml().checkParam(param, newValue);
     }
 
     /** Returns default value of the parameter. */
     @Override
     public Value getParamDefault(final String param) {
-        return getBrowser().getDrbdXML().getParamDefault(param);
+        return getBrowser().getDrbdXml().getParamDefault(param);
     }
 
     /** Whether the parameter should be enabled. */
@@ -98,13 +98,13 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     /** Returns the preferred value for the drbd parameter. */
     @Override
     protected final Value getParamPreferred(final String param) {
-        return getBrowser().getDrbdXML().getParamPreferred(param);
+        return getBrowser().getDrbdXml().getParamPreferred(param);
     }
 
     /** Returns the possible values for the pulldown menus, if applicable. */
     @Override
     protected final Value[] getParamPossibleChoices(final String param) {
-        return getBrowser().getDrbdXML().getPossibleChoices(param);
+        return getBrowser().getDrbdXml().getPossibleChoices(param);
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
      */
     @Override
     protected final String getParamShortDesc(final String param) {
-        return getBrowser().getDrbdXML().getParamShortDesc(param);
+        return getBrowser().getDrbdXml().getParamShortDesc(param);
     }
 
     /**
@@ -121,13 +121,13 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
      */
     @Override
     protected final String getParamLongDesc(final String param) {
-        return getBrowser().getDrbdXML().getParamLongDesc(param);
+        return getBrowser().getDrbdXml().getParamLongDesc(param);
     }
 
     /** Returns whether this drbd parameter is required parameter. */
     @Override
     protected final boolean isRequired(final String param) {
-        return getBrowser().getDrbdXML().isRequired(param);
+        return getBrowser().getDrbdXml().isRequired(param);
     }
 
     /** Returns whether this parameter is advanced. */
@@ -138,13 +138,13 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
             /* it changed, show it */
             return false;
         }
-        return getBrowser().getDrbdXML().isAdvanced(param);
+        return getBrowser().getDrbdXml().isAdvanced(param);
     }
 
     /** Returns access type of this parameter. */
     @Override
     protected final Application.AccessType getAccessType(final String param) {
-        return getBrowser().getDrbdXML().getAccessType(param);
+        return getBrowser().getDrbdXml().getAccessType(param);
     }
 
     /** Whether the parameter should be enabled only in advanced mode. */
@@ -156,13 +156,13 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     /** Returns whether this drbd parameter is of integer type. */
     @Override
     protected final boolean isInteger(final String param) {
-        return getBrowser().getDrbdXML().isInteger(param);
+        return getBrowser().getDrbdXml().isInteger(param);
     }
 
     /** Returns whether this drbd parameter is of label type. */
     @Override
     protected final boolean isLabel(final String param) {
-        return getBrowser().getDrbdXML().isLabel(param);
+        return getBrowser().getDrbdXml().isLabel(param);
     }
 
     /** Returns whether this drbd parameter is of time type. */
@@ -175,19 +175,19 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     /** Returns whether this parameter has a unit prefix. */
     @Override
     protected final boolean hasUnitPrefix(final String param) {
-        return getBrowser().getDrbdXML().hasUnitPrefix(param);
+        return getBrowser().getDrbdXml().hasUnitPrefix(param);
     }
 
     /** Returns the long unit name. */
     protected final String getUnitLong(final String param) {
-        return getBrowser().getDrbdXML().getUnitLong(param);
+        return getBrowser().getDrbdXml().getUnitLong(param);
     }
 
     /**
      * Returns the default unit for the parameter.
      */
     protected final String getDefaultUnit(final String param) {
-        return getBrowser().getDrbdXML().getDefaultUnit(param);
+        return getBrowser().getDrbdXml().getDefaultUnit(param);
     }
 
     /**
@@ -196,14 +196,14 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
      */
     @Override
     protected final boolean isCheckBox(final String param) {
-        final String type = getBrowser().getDrbdXML().getParamType(param);
-        return type != null && ClusterBrowser.DRBD_RES_BOOL_TYPE_NAME.equals(type);
+        final String type = getBrowser().getDrbdXml().getParamType(param);
+        return type != null && ClusterBrowser.DRBD_RESOURCE_BOOL_TYPE_NAME.equals(type);
     }
 
     /** Returns the type of the parameter (like boolean). */
     @Override
     protected final String getParamType(final String param) {
-        return getBrowser().getDrbdXML().getParamType(param);
+        return getBrowser().getDrbdXml().getParamType(param);
     }
 
     /**
@@ -242,7 +242,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
         } else {
             paramWi = super.createWidget(param, prefix, width);
             if (possibleChoices != null
-                && !getBrowser().getDrbdXML().isStringType(param)) {
+                && !getBrowser().getDrbdXml().isStringType(param)) {
                 paramWi.setEditable(false);
             }
         }
@@ -256,7 +256,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     protected String drbdSectionsConfig(final Host host)
                      throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder("");
-        final DrbdXML dxml = getBrowser().getDrbdXML();
+        final DrbdXml dxml = getBrowser().getDrbdXml();
         final String[] sections = dxml.getSections();
         final boolean volumesAvailable = host.hasVolumes();
         for (final String sectionString : sections) {
@@ -266,7 +266,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
             if ("resource".equals(section)
-                || DrbdXML.GLOBAL_SECTION.equals(section)) {
+                || DrbdXml.GLOBAL_SECTION.equals(section)) {
                 continue;
             }
             final String[] params = dxml.getSectionParams(sectionString);
@@ -280,16 +280,16 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                         continue;
                     }
                     if (!value.equals(getParamDefault(param))) {
-                        if (param.startsWith(DrbdProxy.PLUGIN_PREFIX)) {
+                        if (param.startsWith(DrbdProxy.PLUGIN_PARAM_PREFIX)) {
                             if (!inPlugin) {
                                 sectionConfig.append("\t\tplugin {\n");
                                 inPlugin = true;
                             }
                             sectionConfig.append("\t\t\t");
                             sectionConfig.append(param.substring(
-                                               DrbdProxy.PLUGIN_PREFIX.length(),
+                                               DrbdProxy.PLUGIN_PARAM_PREFIX.length(),
                                                param.length()));
-                            if (value.equals(DrbdXML.CONFIG_YES)) {
+                            if (value.equals(DrbdXml.CONFIG_YES)) {
                                 /* boolean parameter */
                                 /* also >= DRBD 8.4 */
                                 sectionConfig.append(";\n");
@@ -303,7 +303,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                             && (isCheckBox(param)
                                 || "booleanhandler".equals(
                                                         getParamType(param)))) {
-                            if (value.equals(DrbdXML.CONFIG_YES)) {
+                            if (value.equals(DrbdXml.CONFIG_YES)) {
                                 /* boolean parameter */
                                 sectionConfig.append("\t\t").append(param).append(";\n");
                             }
@@ -325,7 +325,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                             if (!value.getValueForConfig().equals(Tools.getString(
                                                 "ClusterBrowser.None"))) {
                                 final ResourceInfo v0 =
-                                     getBrowser().getDrbdResHash().get(value.getValueForConfig());
+                                     getBrowser().getDrbdResourceNameHash().get(value.getValueForConfig());
                                 getBrowser().putDrbdResHash();
                                 if (v0 != null) {
                                     final String v = v0.getName();
@@ -367,11 +367,11 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     @Override
     protected final Unit[] getUnits(final String param) {
         final String unitLong = getUnitLong(param);
-        final String unitPart = DrbdXML.getUnitPart(unitLong);
+        final String unitPart = DrbdXml.getUnitPart(unitLong);
         if ("".equals(unitPart)) {
-            return getBrowser().getDrbdXML().getUnits(param, unitPart);
+            return getBrowser().getDrbdXml().getUnits(param, unitPart);
         } else {
-            return getBrowser().getDrbdXML().getByteUnits(param, unitPart);
+            return getBrowser().getDrbdXml().getByteUnits(param, unitPart);
         }
     }
 }

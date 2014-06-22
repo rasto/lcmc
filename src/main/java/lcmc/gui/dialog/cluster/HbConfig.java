@@ -1043,7 +1043,7 @@ final class HbConfig extends DialogCluster {
                                                      !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
-        final NetInterface[] ni = hosts[0].getNetInterfaces();
+        final NetInterface[] ni = hosts[0].getNetInterfacesWithBridges();
         NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
@@ -1070,7 +1070,7 @@ final class HbConfig extends DialogCluster {
         /* ucast links */
         final List<UcastLink> ulList = new ArrayList<UcastLink>();
         for (final Host host : hosts) {
-            final NetInterface[] netInterfaces = host.getNetInterfaces();
+            final NetInterface[] netInterfaces = host.getNetInterfacesWithBridges();
             for (final NetInterface n : netInterfaces) {
                 ulList.add(new UcastLink(host, n));
             }

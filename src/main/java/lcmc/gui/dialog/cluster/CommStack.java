@@ -44,7 +44,6 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 
@@ -212,13 +211,13 @@ final class CommStack extends DialogCluster {
                 && host.getOpenaisVersion() == null) {
                 aisImpossible = true;
             }
-            if (host.isCsRc() || host.isAisRc()) {
+            if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
                 aisIsRc++;
             }
-            if (host.isHeartbeatRc()) {
+            if (host.isHeartbeatInRc()) {
                 hbIsRc++;
             }
-            if (host.isCsRunning() || host.isAisRunning()) {
+            if (host.isCorosyncRunning() || host.isOpenaisRunning()) {
                 aisIsRunning++;
             }
             if (host.isHeartbeatRunning()) {

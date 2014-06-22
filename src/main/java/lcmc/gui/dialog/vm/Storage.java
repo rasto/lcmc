@@ -30,8 +30,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.DiskData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.DiskData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DiskInfo;
 import lcmc.gui.resources.vms.DomainInfo;
@@ -159,7 +159,7 @@ final class Storage extends VMConfig {
         vmsdi.getResource().setValue(DiskData.DRIVER_CACHE,
                                      new StringValue("default"));
         if ("xen".equals(getVMSVirtualDomainInfo().getWidget(
-                        VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
+                        VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
             vmsdi.getResource().setValue(DiskData.DRIVER_NAME,
                                          new StringValue("file"));
         } else {
@@ -171,7 +171,7 @@ final class Storage extends VMConfig {
                      new StringValue("/var/lib/libvirt/images/"
                                      +
                                      getVMSVirtualDomainInfo().getComboBoxValue(
-                                                         VMSXML.VM_PARAM_NAME)
+                                                         VmsXml.VM_PARAM_NAME)
                                      + ".img"));
         vmsdi.addWizardParams(
                       optionsPanel,

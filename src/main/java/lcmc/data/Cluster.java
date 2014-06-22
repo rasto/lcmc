@@ -109,15 +109,15 @@ public class Cluster implements Comparable<Cluster> {
         final ClusterBrowser cb = clusterBrowser;
         if (cb != null) {
             cb.stopServerStatus();
-            cb.stopDrbdStatus();
-            cb.stopClStatus();
+            cb.stopDrbdStatusOnAllHosts();
+            cb.stopCrmStatus();
         }
     }
 
     /** Adds host to hosts, that are part of this cluster. */
     public void addHost(final Host host) {
         final int id = hosts.size();
-        host.setIndex(id);
+        host.setPositionInTheCluster(id);
         if (id < hostColors.length) {
             host.setColor(hostColors[id]);
         }

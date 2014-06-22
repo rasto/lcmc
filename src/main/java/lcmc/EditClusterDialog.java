@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc;
 
 import lcmc.data.Cluster;
@@ -31,32 +30,18 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * EditClusterDialog.
- *
  * Show step by step dialogs that configure a cluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class EditClusterDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                             LoggerFactory.getLogger(EditClusterDialog.class);
-    /** Cancel button. */
-    private static final String CANCEL_BTN =
-                                       Tools.getString("Dialog.Dialog.Cancel");
-    /** Finish button. */
-    private static final String FINISH_BTN =
-                                       Tools.getString("Dialog.Dialog.Finish");
-    /** Cluster object. */
+    private static final Logger LOG = LoggerFactory.getLogger(EditClusterDialog.class);
+    private static final String CANCEL_BTN = Tools.getString("Dialog.Dialog.Cancel");
+    private static final String FINISH_BTN = Tools.getString("Dialog.Dialog.Finish");
     private final Cluster cluster;
 
-    /** Prepares new {@code EditClusterDialog} object. */
     public EditClusterDialog(final Cluster cluster) {
         this.cluster = cluster;
     }
 
-    /** Shows step by step dialogs that configure a new cluster. */
     public void showDialogs() {
         cluster.setTabClosable(false);
         DialogCluster dialog = new Name(null, cluster);
@@ -67,14 +52,12 @@ public final class EditClusterDialog {
             if (dialog.isPressedButton(CANCEL_BTN)) {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setTabClosable(true);
                     return;
                 }
             } else if (dialog.isPressedButton(FINISH_BTN)) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

@@ -59,26 +59,26 @@ final class CibQuery {
     /** Map with resource instance_attributes id. */
     private Map<String, String> resourceInstanceAttrId;
     /** Colocation rsc map. */
-    private Map<String, List<CRMXML.ColocationData>> colocationRsc =
-                      new LinkedHashMap<String, List<CRMXML.ColocationData>>();
+    private Map<String, List<CrmXml.ColocationData>> colocationRsc =
+                      new LinkedHashMap<String, List<CrmXml.ColocationData>>();
     /** Colocation id map. */
-    private Map<String, CRMXML.ColocationData> colocationId =
-                      new LinkedHashMap<String, CRMXML.ColocationData>();
+    private Map<String, CrmXml.ColocationData> colocationId =
+                      new LinkedHashMap<String, CrmXml.ColocationData>();
     /** Order rsc map. */
-    private Map<String, List<CRMXML.OrderData>> orderRsc =
-                      new LinkedHashMap<String, List<CRMXML.OrderData>>();
+    private Map<String, List<CrmXml.OrderData>> orderRsc =
+                      new LinkedHashMap<String, List<CrmXml.OrderData>>();
     /** Order id map. */
-    private Map<String, CRMXML.OrderData> orderId =
-                      new LinkedHashMap<String, CRMXML.OrderData>();
+    private Map<String, CrmXml.OrderData> orderId =
+                      new LinkedHashMap<String, CrmXml.OrderData>();
     /** Order id to resource sets map. */
-    private Map<String, List<CRMXML.RscSet>> orderIdRscSets =
-                           new LinkedHashMap<String, List<CRMXML.RscSet>>();
+    private Map<String, List<CrmXml.RscSet>> orderIdRscSets =
+                           new LinkedHashMap<String, List<CrmXml.RscSet>>();
     /** Colocation id to resource sets map. */
-    private Map<String, List<CRMXML.RscSet>> colocationIdRscSets =
-                           new LinkedHashMap<String, List<CRMXML.RscSet>>();
+    private Map<String, List<CrmXml.RscSet>> colocationIdRscSets =
+                           new LinkedHashMap<String, List<CrmXml.RscSet>>();
     /** All connections between resource sets. */
-    private List<CRMXML.RscSetConnectionData> rscSetConnections =
-                                  new ArrayList<CRMXML.RscSetConnectionData>();
+    private List<CrmXml.RscSetConnectionData> rscSetConnections =
+                                  new ArrayList<CrmXml.RscSetConnectionData>();
     /** Node parameters map. */
     private MultiKeyMap<String, String> nodeParameters;
     /** Location map. */
@@ -231,7 +231,7 @@ final class CibQuery {
      * colocation constraints.
      */
     void setColocationRsc(
-              final Map<String, List<CRMXML.ColocationData>> colocationRsc) {
+              final Map<String, List<CrmXml.ColocationData>> colocationRsc) {
         this.colocationRsc = colocationRsc;
     }
 
@@ -240,17 +240,17 @@ final class CibQuery {
      * object.
      */
     void setColocationId(
-                  final Map<String, CRMXML.ColocationData> colocationId) {
+                  final Map<String, CrmXml.ColocationData> colocationId) {
         this.colocationId = colocationId;
     }
 
     /** Returns colocation id map. */
-    Map<String, CRMXML.ColocationData> getColocationId() {
+    Map<String, CrmXml.ColocationData> getColocationId() {
         return colocationId;
     }
 
     /** Returns colocation rsc map. */
-    Map<String, List<CRMXML.ColocationData>> getColocationRsc() {
+    Map<String, List<CrmXml.ColocationData>> getColocationRsc() {
         return colocationRsc;
     }
 
@@ -259,7 +259,7 @@ final class CibQuery {
      * colocation constraints.
      */
     void setOrderRsc(
-              final Map<String, List<CRMXML.OrderData>> orderRsc) {
+              final Map<String, List<CrmXml.OrderData>> orderRsc) {
         this.orderRsc = orderRsc;
     }
 
@@ -267,50 +267,50 @@ final class CibQuery {
      * Sets the order map with resource id as a key with order data
      * object.
      */
-    void setOrderId(final Map<String, CRMXML.OrderData> orderId) {
+    void setOrderId(final Map<String, CrmXml.OrderData> orderId) {
         this.orderId = orderId;
     }
 
     /** Sets the order map with resource id as a key with resource sets. */
     void setOrderIdRscSets(
-                       final Map<String, List<CRMXML.RscSet>> orderIdRscSets) {
+                       final Map<String, List<CrmXml.RscSet>> orderIdRscSets) {
         this.orderIdRscSets = orderIdRscSets;
     }
 
     /** Sets the order map with resource id as a key with resource sets. */
     void setColocationIdRscSets(
-                  final Map<String, List<CRMXML.RscSet>> colocationIdRscSets) {
+                  final Map<String, List<CrmXml.RscSet>> colocationIdRscSets) {
         this.colocationIdRscSets = colocationIdRscSets;
     }
 
     /** Returns rscSetConnections. */
-    List<CRMXML.RscSetConnectionData> getRscSetConnections() {
+    List<CrmXml.RscSetConnectionData> getRscSetConnections() {
         return rscSetConnections;
     }
 
     /** Sets rscSetConnections. */
     void setRscSetConnections(
-                   final List<CRMXML.RscSetConnectionData> rscSetConnections) {
+                   final List<CrmXml.RscSetConnectionData> rscSetConnections) {
         this.rscSetConnections = rscSetConnections;
     }
 
     /** Returns id rsc map. */
-    Map<String, CRMXML.OrderData> getOrderId() {
+    Map<String, CrmXml.OrderData> getOrderId() {
         return orderId;
     }
 
     /** Returns order rsc map. */
-    Map<String, List<CRMXML.OrderData>> getOrderRsc() {
+    Map<String, List<CrmXml.OrderData>> getOrderRsc() {
         return orderRsc;
     }
 
     /** Returns colocation id rsc to resource set map. */
-    Map<String, List<CRMXML.RscSet>> getColocationIdRscSets() {
+    Map<String, List<CrmXml.RscSet>> getColocationIdRscSets() {
         return colocationIdRscSets;
     }
 
     /** Returns order id rsc to resource set map. */
-    Map<String, List<CRMXML.RscSet>> getOrderIdRscSets() {
+    Map<String, List<CrmXml.RscSet>> getOrderIdRscSets() {
         return orderIdRscSets;
     }
 

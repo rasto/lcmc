@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
@@ -38,7 +58,7 @@ public class GroupMenu extends ServiceMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
+                if (getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 } else {
                     return null;
@@ -50,9 +70,9 @@ public class GroupMenu extends ServiceMenu {
                 Tools.isSwingThread();
                 removeAll();
                 final Collection<JDialog> popups = new ArrayList<JDialog>();
-                for (final String cl : ClusterBrowser.HB_CLASSES) {
+                for (final String cl : ClusterBrowser.CRM_CLASSES) {
                     final MyMenu classItem =
-                            new MyMenu(ClusterBrowser.HB_CLASS_MENU.get(cl),
+                            new MyMenu(ClusterBrowser.CRM_CLASS_MENU.get(cl),
                                    new AccessMode(Application.AccessType.ADMIN,
                                                   false),
                                    new AccessMode(Application.AccessType.OP,
@@ -61,7 +81,7 @@ public class GroupMenu extends ServiceMenu {
                     for (final ResourceAgent ra : groupInfo.getAddGroupServiceList(cl)) {
                         final MyMenuItem mmi =
                             new MyMenuItem(
-                                   ra.getMenuName(),
+                                   ra.getPullDownMenuName(),
                                    null,
                                    null,
                                    new AccessMode(Application.AccessType.ADMIN,
@@ -96,7 +116,7 @@ public class GroupMenu extends ServiceMenu {
                         dlm.addElement(mmi);
                     }
                     final boolean ret = Tools.getScrollingMenu(
-                                ClusterBrowser.HB_CLASS_MENU.get(cl),
+                                ClusterBrowser.CRM_CLASS_MENU.get(cl),
                                 null, /* options */
                                 classItem,
                                 dlm,

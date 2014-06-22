@@ -136,10 +136,10 @@ public class DrbdLinbitInst extends DialogHost {
     /** Install the drbd packages. */
     final void installDrbd() {
         final DrbdInstallation drbdInstallation = getDrbdInstallation();
-        drbdInstallation.setDrbdWasInstalled(true); /* even if we fail */
-        Tools.getApplication().setLastDrbdInstalledMethod(drbdInstallation.getDrbdInstallMethod());
+        drbdInstallation.setDrbdWasNewlyInstalled(true); /* even if we fail */
+        Tools.getApplication().setLastDrbdInstalledMethod(drbdInstallation.getDrbdInstallMethodIndex());
         Tools.getApplication().setLastDrbdInstalledMethod(getHost().getDistString("DrbdInst.install.text."
-                                                          + drbdInstallation.getDrbdInstallMethod()));
+                                                          + drbdInstallation.getDrbdInstallMethodIndex()));
         answerPaneSetText(Tools.getString("Dialog.Host.DrbdLinbitInst.Installing"));
         getHost().execCommandInBash(new ExecCommandConfig().commandString("DrbdInst.install;;;DRBD.load")
                           .progressBar(getProgressBar())
@@ -165,7 +165,7 @@ public class DrbdLinbitInst extends DialogHost {
         final ClusterBrowser clusterBrowser =
                                    getHost().getBrowser().getClusterBrowser();
         if (clusterBrowser != null) {
-            clusterBrowser.getDrbdParameters().clear();
+            clusterBrowser.getHostDrbdParameters().clear();
             final GlobalInfo globalInfo =
                                   clusterBrowser.getDrbdGraph().getDrbdInfo();
             globalInfo.clearPanelLists();

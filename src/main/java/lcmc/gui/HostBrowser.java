@@ -19,8 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui;
 
 import java.util.Collection;
@@ -61,150 +59,97 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 
-
 /**
  * This class holds host resource data in a tree. It shows panels that allow
  * to edit data of resources, services etc., hosts and clusters.
  * Every resource has its Info object, that accessible through the tree view.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class HostBrowser extends Browser {
-
-    /** Host icon. */
-    public static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                              Tools.getDefault("HostBrowser.HostIconSmall"));
-    /** Host icon (turned on). */
+    public static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.HostIconSmall"));
     public static final ImageIcon HOST_ON_ICON = Tools.createImageIcon(
-                              Tools.getDefault("HostBrowser.HostOnIconSmall"));
-    /** Host icon (turned off). */
+                                                                   Tools.getDefault("HostBrowser.HostOnIconSmall"));
     public static final ImageIcon HOST_OFF_ICON = Tools.createImageIcon(
-                              Tools.getDefault("HostBrowser.HostOffIconSmall"));
-    /** Large host icon (turned on). */
+                                                                   Tools.getDefault("HostBrowser.HostOffIconSmall"));
     public static final ImageIcon HOST_ON_ICON_LARGE = Tools.createImageIcon(
-                                  Tools.getDefault("HostBrowser.HostOnIcon"));
-    /** Large host icon (turned on). */
+                                                                   Tools.getDefault("HostBrowser.HostOnIcon"));
     public static final ImageIcon HOST_OFF_ICON_LARGE = Tools.createImageIcon(
-                                  Tools.getDefault("HostBrowser.HostOffIcon"));
-    /** Large host icon. */
-    public static final ImageIcon HOST_ICON_LARGE = Tools.createImageIcon(
-                                  Tools.getDefault("HostBrowser.HostIcon"));
-    /** Remove icon. */
-    public static final ImageIcon HOST_REMOVE_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("HostBrowser.RemoveIcon"));
+                                                                   Tools.getDefault("HostBrowser.HostOffIcon"));
+    public static final ImageIcon HOST_ICON_LARGE = Tools.createImageIcon(Tools.getDefault("HostBrowser.HostIcon"));
+    public static final ImageIcon HOST_REMOVE_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.RemoveIcon"));
     /** Small host in cluster icon (right side). */
     public static final ImageIcon HOST_IN_CLUSTER_ICON_RIGHT_SMALL =
-            Tools.createImageIcon(
-               Tools.getDefault("HostBrowser.HostInClusterIconRightSmall"));
-    /** Net interfaces node in the menu. */
+                                 Tools.createImageIcon(Tools.getDefault("HostBrowser.HostInClusterIconRightSmall"));
     private DefaultMutableTreeNode netInterfacesNode;
-    /** Block devices sytems node in the menu. */
     private DefaultMutableTreeNode blockDevicesNode;
-    /** File sytems node in the menu. */
     private DefaultMutableTreeNode fileSystemsNode;
 
     /** List of used network interface ports. */
     private final Collection<String> usedPorts = new HashSet<String>();
-    /** List of used proxy ports. */
     private final Collection<String> usedProxyPorts = new HashSet<String>();
-    /** Host object. */
     public final Host host;
-    /** Host info object of the host of this browser. */
     private final HostInfo hostInfo;
     /** Host info object of the host in drbd view of this browser. */
     private final HostDrbdInfo hostDrbdInfo;
-    /** Proxy host info object. */
     private ProxyHostInfo proxyHostInfo = null;
     /** Map of block devices and their info objects. */
-    private final Map<BlockDevice, BlockDevInfo> blockDevInfos =
-                                new LinkedHashMap<BlockDevice, BlockDevInfo>();
-    /** Block device infos lock. */
-    private final ReadWriteLock mBlockDevInfosLock =
-                                                  new ReentrantReadWriteLock();
-    /** Block device infos read lock. */
+    private final Map<BlockDevice, BlockDevInfo> blockDevInfos = new LinkedHashMap<BlockDevice, BlockDevInfo>();
+    private final ReadWriteLock mBlockDevInfosLock = new ReentrantReadWriteLock();
     private final Lock mBlockDevInfosReadLock = mBlockDevInfosLock.readLock();
-    /** Block device infos write lock. */
     private final Lock mBlockDevInfosWriteLock = mBlockDevInfosLock.writeLock();
-    /** Net Interface infos lock. */
     private final ReadWriteLock mNetInfosLock = new ReentrantReadWriteLock();
-    /** Net Interface infos read lock. */
     private final Lock mNetInfosReadLock = mNetInfosLock.readLock();
-    /** Net Interface infos write lock. */
     private final Lock mNetInfosWriteLock = mNetInfosLock.writeLock();
-    /** File system list lock. */
     private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
-    /** File system list read lock. */
     private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
-    /** File system list write lock. */
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
 
-    /**
-     * Prepares a new {@code HostBrowser} object.
-     *
-     * @param host
-     *          host to which this resource tree belongs
-     */
     public HostBrowser(final Host host) {
         super();
         this.host = host;
         hostInfo = new HostInfo(host, this);
         hostDrbdInfo = new HostDrbdInfo(host, this);
-        setTreeTop(hostInfo);
+        setMenuTreeTop(hostInfo);
     }
 
-    /** Returns host info for this browser. */
     public HostInfo getHostInfo() {
         return hostInfo;
     }
 
-    /** Returns host data object for this browser. */
     public Host getHost() {
         return host;
     }
 
-    /** Returns host for drbd view info for this browser. */
     public HostDrbdInfo getHostDrbdInfo() {
         return hostDrbdInfo;
     }
 
-    /** Return proxy host info object. */
     public ProxyHostInfo getProxyHostInfo() {
         return proxyHostInfo;
     }
 
-    /** Set proxy host info object. */
     public void setProxyHostInfo(final ProxyHostInfo proxyHostInfo) {
         this.proxyHostInfo = proxyHostInfo;
     }
 
-    /** Initializes host resources for host view. */
     public void initHostResources() {
-        /* net interfaces */
-        netInterfacesNode = new DefaultMutableTreeNode(new CategoryInfo(
-                                Tools.getString("HostBrowser.NetInterfaces"),
-                                this));
+        netInterfacesNode = new DefaultMutableTreeNode(
+                                            new CategoryInfo(Tools.getString("HostBrowser.NetInterfaces"), this));
         setNode(netInterfacesNode);
-        topAdd(netInterfacesNode);
+        topLevelAdd(netInterfacesNode);
 
         /* block devices */
-        blockDevicesNode = new DefaultMutableTreeNode(new CategoryInfo(
-                                 Tools.getString("HostBrowser.BlockDevices"),
-                                 this));
+        blockDevicesNode = new DefaultMutableTreeNode(
+                                            new CategoryInfo(Tools.getString("HostBrowser.BlockDevices"), this));
         setNode(blockDevicesNode);
-        topAdd(blockDevicesNode);
+        topLevelAdd(blockDevicesNode);
 
         /* file systems */
-        fileSystemsNode = new DefaultMutableTreeNode(new CategoryInfo(
-                                  Tools.getString("HostBrowser.FileSystems"),
-                                  this));
+        fileSystemsNode = new DefaultMutableTreeNode(
+                                            new CategoryInfo(Tools.getString("HostBrowser.FileSystems"), this));
         setNode(fileSystemsNode);
-        topAdd(fileSystemsNode);
+        topLevelAdd(fileSystemsNode);
     }
 
-    /** Returns cluster browser if available. */
     public ClusterBrowser getClusterBrowser() {
         final Cluster c = host.getCluster();
         if (c == null) {
@@ -213,13 +158,9 @@ public class HostBrowser extends Browser {
         return c.getBrowser();
     }
 
-    /** Updates hardware resources of a host in the tree. */
-    public void updateHWResources(final NetInterface[] nis,
-                                  final BlockDevice[] bds,
-                                  final String[] fss) {
+    public void updateHWResources(final NetInterface[] nis, final BlockDevice[] bds, final String[] fss) {
         /* net interfaces */
-        final Map<NetInterface, NetInfo> oldNetInterfaces =
-                                                        getNetInterfacesMap();
+        final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
         final HostBrowser thisClass = this;
         Tools.invokeLater(new Runnable() {
             @Override
@@ -234,8 +175,7 @@ public class HostBrowser extends Browser {
                         } else {
                             nii = new NetInfo(ni.getName(), ni, thisClass);
                         }
-                        final DefaultMutableTreeNode resource =
-                                               new DefaultMutableTreeNode(nii);
+                        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(nii);
                         setNode(resource);
                         netInterfacesNode.add(resource);
                     }
@@ -251,7 +191,7 @@ public class HostBrowser extends Browser {
         boolean changed = false;
         try {
             final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
-                         new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
+                                                            new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
             if (oldBlockDevices.size() != blockDevInfos.size()) {
                 changed = true;
             }
@@ -279,8 +219,7 @@ public class HostBrowser extends Browser {
                         blockDevicesNode.removeAllChildren();
                         for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
                             final BlockDevInfo bdi = bdEntry.getValue();
-                            final MutableTreeNode resource =
-                                               new DefaultMutableTreeNode(bdi);
+                            final MutableTreeNode resource = new DefaultMutableTreeNode(bdi);
                             blockDevicesNode.add(resource);
                         }
                         reloadAndWait(blockDevicesNode, false);
@@ -298,7 +237,7 @@ public class HostBrowser extends Browser {
             public void run() {
                 mFileSystemsWriteLock.lock();
                 try {
-                            fileSystemsNode.removeAllChildren();
+                    fileSystemsNode.removeAllChildren();
                     for (final String fs : fss) {
                         final FSInfo fsi;
                         if (oldFilesystems.containsKey(fs)) {
@@ -306,8 +245,7 @@ public class HostBrowser extends Browser {
                         } else {
                             fsi = new FSInfo(fs, thisClass);
                         }
-                        final DefaultMutableTreeNode resource =
-                                               new DefaultMutableTreeNode(fsi);
+                        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(fsi);
                         setNode(resource);
                         fileSystemsNode.add(resource);
                     }
@@ -319,10 +257,7 @@ public class HostBrowser extends Browser {
         });
     }
 
-    /**
-     * Return sorted list of block device info objects.
-     */
-    public Set<BlockDevInfo> getBlockDevInfos() {
+    public Set<BlockDevInfo> getSortedBlockDevInfos() {
         mBlockDevInfosReadLock.lock();
         try {
             return new LinkedHashSet<BlockDevInfo>(new TreeSet<BlockDevInfo>(blockDevInfos.values()));
@@ -331,15 +266,12 @@ public class HostBrowser extends Browser {
         }
     }
 
-    /** Returns map of net interface objects with its net info objects. */
     Map<NetInterface, NetInfo> getNetInterfacesMap() {
-        final Map<NetInterface, NetInfo> netInterfaces =
-                                          new HashMap<NetInterface, NetInfo>();
+        final Map<NetInterface, NetInfo> netInterfaces = new HashMap<NetInterface, NetInfo>();
         mNetInfosReadLock.lock();
         try {
             @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e =
-                                                  netInterfacesNode.children();
+            final Enumeration<DefaultMutableTreeNode> e = netInterfacesNode.children();
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode niNode = e.nextElement();
                 final NetInfo nii = (NetInfo) niNode.getUserObject();
@@ -351,14 +283,12 @@ public class HostBrowser extends Browser {
         return netInterfaces;
     }
 
-    /** Returns map of file systems its file system info objects. */
     Map<String, FSInfo> getFilesystemsMap() {
         final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
         mFileSystemsReadLock.lock();
         try {
             @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e =
-                                                    fileSystemsNode.children();
+            final Enumeration<DefaultMutableTreeNode> e = fileSystemsNode.children();
             while (e.hasMoreElements()) {
                 final DefaultMutableTreeNode fsiNode = e.nextElement();
                 final FSInfo fsi = (FSInfo) fsiNode.getUserObject();
@@ -376,18 +306,17 @@ public class HostBrowser extends Browser {
             return;
         }
         /* Command log */
-        final MyMenuItem cmdLogMenuItem = new MyMenuItem(
-                        Tools.getString("HostBrowser.CmdLog"),
-                        Info.LOGFILE_ICON,
-                        "",
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false)) {
+        final MyMenuItem cmdLogMenuItem = new MyMenuItem(Tools.getString("HostBrowser.CmdLog"),
+                                                         Info.LOGFILE_ICON,
+                                                         "",
+                                                         new AccessMode(Application.AccessType.ADMIN, false),
+                                                         new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
             public String enablePredicate() {
                 if (!host.isConnected()) {
-                    return Host.NOT_CONNECTED_STRING;
+                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 }
                 return null;
             }
@@ -401,18 +330,16 @@ public class HostBrowser extends Browser {
         submenu.add(cmdLogMenuItem);
 
         /* panic */
-        final MyMenuItem panicMenuItem = new MyMenuItem(
-                    Tools.getString("HostBrowser.MakeKernelPanic")
-                    + host.getName(),
-                    null,
-                    new AccessMode(Application.AccessType.GOD, false),
-                    new AccessMode(Application.AccessType.ADMIN, false)) {
+        final MyMenuItem panicMenuItem = new MyMenuItem(Tools.getString("HostBrowser.MakeKernelPanic") + host.getName(),
+                                                        null,
+                                                        new AccessMode(Application.AccessType.GOD, false),
+                                                        new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
             public String enablePredicate() {
                 if (!host.isConnected()) {
-                    return Host.NOT_CONNECTED_STRING;
+                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 }
                 return null;
             }
@@ -421,8 +348,7 @@ public class HostBrowser extends Browser {
             public void action() {
                 final String hostName = host.getName();
                 final String command = "MakeKernelPanic";
-                Tools.startProgressIndicator(hostName,
-                                             host.getDistString(command));
+                Tools.startProgressIndicator(hostName, host.getDistString(command));
                 host.execCommand(new ExecCommandConfig().commandString(command));
                 Tools.stopProgressIndicator(hostName, host.getDistString(command));
             }
@@ -431,17 +357,16 @@ public class HostBrowser extends Browser {
 
         /* reboot */
         final MyMenuItem rebootMenuItem = new MyMenuItem(
-                    Tools.getString("HostBrowser.MakeKernelReboot")
-                    + host.getName(),
-                    null,
-                    new AccessMode(Application.AccessType.GOD, false),
-                    new AccessMode(Application.AccessType.ADMIN, false)) {
+                                                     Tools.getString("HostBrowser.MakeKernelReboot") + host.getName(),
+                                                     null,
+                                                     new AccessMode(Application.AccessType.GOD, false),
+                                                     new AccessMode(Application.AccessType.ADMIN, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
             public String enablePredicate() {
                 if (!host.isConnected()) {
-                    return Host.NOT_CONNECTED_STRING;
+                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 }
                 return null;
             }
@@ -460,41 +385,41 @@ public class HostBrowser extends Browser {
 
     /** Returns info string about Pacemaker installation. */
     public String getPacemakerInfo() {
-        final StringBuilder tt = new StringBuilder(40);
+        final StringBuilder pacemakerInfo = new StringBuilder(40);
         final String pmV = host.getPacemakerVersion();
         final String hbV = host.getHeartbeatVersion();
         final StringBuilder hbRunning = new StringBuilder(20);
         if (host.isHeartbeatRunning()) {
             hbRunning.append("running");
-            if (!host.isHeartbeatRc()) {
+            if (!host.isHeartbeatInRc()) {
                 hbRunning.append("/no rc.d");
             }
         } else {
             hbRunning.append("not running");
         }
-        if (host.isHeartbeatRc()) {
+        if (host.isHeartbeatInRc()) {
             hbRunning.append("/rc.d");
         }
         if (pmV == null) {
             if (hbV != null) {
-                tt.append(" \nHeartbeat ");
-                tt.append(hbV);
-                tt.append(" (");
-                tt.append(hbRunning);
-                tt.append(')');
+                pacemakerInfo.append(" \nHeartbeat ");
+                pacemakerInfo.append(hbV);
+                pacemakerInfo.append(" (");
+                pacemakerInfo.append(hbRunning);
+                pacemakerInfo.append(')');
             }
         } else {
             final String pmRunning;
-            if (host.isClStatus()) {
+            if (host.isCrmStatusOk()) {
                 pmRunning = "running";
             } else {
                 pmRunning = "not running";
             }
-            tt.append(" \nPacemaker ");
-            tt.append(pmV);
-            tt.append(" (");
-            tt.append(pmRunning);
-            tt.append(')');
+            pacemakerInfo.append(" \nPacemaker ");
+            pacemakerInfo.append(pmV);
+            pacemakerInfo.append(" (");
+            pacemakerInfo.append(pmRunning);
+            pacemakerInfo.append(')');
             String corOrAis = null;
             final String corV = host.getCorosyncVersion();
             final String aisV = host.getOpenaisVersion();
@@ -505,64 +430,60 @@ public class HostBrowser extends Browser {
             }
 
             if (hbV != null && host.isHeartbeatRunning()) {
-                tt.append(" \nHeartbeat ");
-                tt.append(hbV);
-                tt.append(" (");
-                tt.append(hbRunning);
-                tt.append(')');
+                pacemakerInfo.append(" \nHeartbeat ");
+                pacemakerInfo.append(hbV);
+                pacemakerInfo.append(" (");
+                pacemakerInfo.append(hbRunning);
+                pacemakerInfo.append(')');
             }
             if (corOrAis != null) {
-                tt.append(" \n");
-                tt.append(corOrAis);
-                tt.append(" (");
-                if (host.isCsRunning()
-                    || host.isAisRunning()) {
-                    tt.append("running");
-                    if (!host.isCsRc() && !host.isAisRc()) {
-                        tt.append("/no rc.d");
+                pacemakerInfo.append(" \n");
+                pacemakerInfo.append(corOrAis);
+                pacemakerInfo.append(" (");
+                if (host.isCorosyncRunning()
+                    || host.isOpenaisRunning()) {
+                    pacemakerInfo.append("running");
+                    if (!host.isCorosyncInRc() && !host.isOpenaisInRc()) {
+                        pacemakerInfo.append("/no rc.d");
                     }
                 } else {
-                    tt.append("not running");
+                    pacemakerInfo.append("not running");
                 }
-                if (host.isCsRc() || host.isAisRc()) {
-                    tt.append("/rc.d");
+                if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
+                    pacemakerInfo.append("/rc.d");
                 }
-                tt.append(')');
+                pacemakerInfo.append(')');
             }
             if (hbV != null && !host.isHeartbeatRunning()) {
-                tt.append(" \nHeartbeat ");
-                tt.append(hbV);
-                tt.append(" (");
-                tt.append(hbRunning);
-                tt.append(')');
+                pacemakerInfo.append(" \nHeartbeat ");
+                pacemakerInfo.append(hbV);
+                pacemakerInfo.append(" (");
+                pacemakerInfo.append(hbRunning);
+                pacemakerInfo.append(')');
             }
         }
-        return tt.toString();
+        return pacemakerInfo.toString();
     }
 
-    /** Returns tooltip for host. */
     public String getHostToolTip(final Host host) {
-        final StringBuilder tt = new StringBuilder(80);
-        tt.append("<b>").append(host.getName()).append("</b>");
+        final StringBuilder hostToolTip = new StringBuilder(80);
+        hostToolTip.append("<b>").append(host.getName()).append("</b>");
         final ClusterBrowser b = getClusterBrowser();
         if (b != null && b.isRealDcHost(host)) {
-            tt.append(" (designated co-ordinator)");
+            hostToolTip.append(" (designated co-ordinator)");
         }
         if (!host.isConnected()) {
-            tt.append('\n');
-            tt.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
-        } else if (!host.isDrbdStatus() && !host.isClStatus()) {
-            tt.append('\n');
-            tt.append(Tools.getString("ClusterBrowser.Host.Offline"));
+            hostToolTip.append('\n');
+            hostToolTip.append(Tools.getString("ClusterBrowser.Host.Disconnected"));
+        } else if (!host.isDrbdStatusOk() && !host.isCrmStatusOk()) {
+            hostToolTip.append('\n');
+            hostToolTip.append(Tools.getString("ClusterBrowser.Host.Offline"));
         }
-        /* DRBD */
-        tt.append(host.getDrbdInfoAboutInstallation());
-        /* Pacemaker */
-        tt.append(getPacemakerInfo());
-        return tt.toString();
+        hostToolTip.append(host.getDrbdInfoAboutInstallation());
+        hostToolTip.append(getPacemakerInfo());
+        return hostToolTip.toString();
     }
 
-    /** Returns drbd graph object. */
     public DrbdGraph getDrbdGraph() {
         final ClusterBrowser b = getClusterBrowser();
         if (b == null) {
@@ -576,22 +497,18 @@ public class HostBrowser extends Browser {
         return usedPorts;
     }
 
-    /** Returns a list of used proxy ports. */
     public Collection<String> getUsedProxyPorts() {
         return usedProxyPorts;
     }
 
-    /** Lock block dev info objects. */
     public void lockBlockDevInfosRead() {
         mBlockDevInfosReadLock.lock();
     }
 
-    /** Unlock block dev info objects. */
     public void unlockBlockDevInfosRead() {
         mBlockDevInfosReadLock.unlock();
     }
 
-    /** Returns net interfaces node from the menu. */
     public TreeNode getNetInterfacesNode() {
         return netInterfacesNode;
     }

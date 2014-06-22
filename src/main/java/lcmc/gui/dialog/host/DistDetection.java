@@ -52,8 +52,8 @@ final class DistDetection extends DialogHost {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
         final String support =
                       Tools.getDistString("Support",
-                                          getHost().getDist(),
-                                          getHost().getDistVersionString(),
+                                          getHost().getDistributionName(),
+                                          getHost().getDistributionVersionString(),
                                           getHost().getArch());
         final String answerText = "\nversion: " + getHost().getDetectedInfo()
                         + " (support file: "

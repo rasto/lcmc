@@ -69,7 +69,7 @@ final class DrbdCommandInst extends DialogHost {
         final ClusterBrowser clusterBrowser =
                                    getHost().getBrowser().getClusterBrowser();
         if (clusterBrowser != null) {
-            clusterBrowser.getDrbdParameters().clear();
+            clusterBrowser.getHostDrbdParameters().clear();
             final GlobalInfo globalInfo =
                                   clusterBrowser.getDrbdGraph().getDrbdInfo();
             globalInfo.clearPanelLists();
@@ -114,7 +114,7 @@ final class DrbdCommandInst extends DialogHost {
         final String archString = arch;
         String installCommand = "DrbdInst.install";
         final DrbdInstallation drbdInstallation = getDrbdInstallation();
-        final String installMethod = drbdInstallation.getDrbdInstallMethod();
+        final String installMethod = drbdInstallation.getDrbdInstallMethodIndex();
         if (installMethod != null) {
             installCommand = "DrbdInst.install." + installMethod;
         }

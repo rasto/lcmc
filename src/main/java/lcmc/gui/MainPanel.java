@@ -19,8 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui;
 
 import java.awt.BorderLayout;
@@ -34,28 +32,19 @@ import lcmc.data.Host;
 import lcmc.utilities.Tools;
 
 /**
- * @author rasto
- *
  * The very main panel, where everyting is inside.
- *
  */
 public final class MainPanel extends JPanel {
 
-    /** Serial Version UID. */
-    private static final long serialVersionUID = 1L;
     /** Whether the terminal was already expanded at least once. */
     private boolean expandingDone = false;
     /** Expanding flag mutex. */
     private final transient Lock mExpanding = new ReentrantLock();
 
-    /** Prepares a new {@code MainPanel} object. */
     public MainPanel() {
         super(new BorderLayout());
-        // TODO: not new Host() but null
         final TerminalPanel terminalPanel = new TerminalPanel(Host.createInstance());
-        final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                                    new ClustersPanel(),
-                                                    terminalPanel);
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new ClustersPanel(), terminalPanel);
         Tools.getGUIData().setTerminalSplitPane(splitPane);
 
         splitPane.setContinuousLayout(true);
@@ -67,9 +56,7 @@ public final class MainPanel extends JPanel {
             public void hierarchyChanged(final HierarchyEvent e) {
                 mExpanding.lock();
                 if (!expandingDone
-                    && (e.getChangeFlags()
-                        & HierarchyEvent.SHOWING_CHANGED) != 0) {
-
+                    && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     expandingDone = true;
                     mExpanding.unlock();
                     Tools.getGUIData().expandTerminalSplitPane(1);

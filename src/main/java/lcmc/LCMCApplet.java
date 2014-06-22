@@ -37,9 +37,7 @@ import lcmc.utilities.Tools;
  * This is the central class with main function. It starts the DRBD GUI.
  */
 public final class LCMCApplet extends JApplet {
-    /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(LCMCApplet.class);
     public static final String[] NO_PARAMS = {};
 

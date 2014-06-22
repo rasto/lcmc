@@ -51,87 +51,53 @@ import lcmc.utilities.Tools;
  * panels that allow to edit the data of resources, services etc., hosts and
  * clusters.
  * Every resource has its Info object, that accessible through the tree view.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class Browser {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Browser.class);
-    /** Icon fot the categories. */
-    public static final ImageIcon CATEGORY_ICON =
-            Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
-    /** Apply icon. */
-    public static final ImageIcon APPLY_ICON =
-            Tools.createImageIcon(Tools.getDefault("Browser.ApplyIcon"));
-    /** Revert icon. */
-    public static final ImageIcon REVERT_ICON =
-            Tools.createImageIcon(Tools.getDefault("Browser.RevertIcon"));
-    /** Actions memu icon. */
-    public static final ImageIcon MENU_ICON =
-            Tools.createImageIcon(Tools.getDefault("Browser.MenuIcon"));
-    /** Color of the most of backgrounds. */
-    public static final Color PANEL_BACKGROUND =
-                    Tools.getDefaultColor("ViewPanel.Background");
-    /** Color of the button panel backgrounds. */
-    public static final Color BUTTON_PANEL_BACKGROUND =
-                     Tools.getDefaultColor("ViewPanel.ButtonPanel.Background");
-    /** Color of the status backgrounds. */
-    public static final Color STATUS_BACKGROUND =
-                          Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Tree model of the menu tree. */
+    public static final ImageIcon CATEGORY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
+    public static final ImageIcon APPLY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.ApplyIcon"));
+    public static final ImageIcon REVERT_ICON = Tools.createImageIcon(Tools.getDefault("Browser.RevertIcon"));
+    public static final ImageIcon ACTIONS_MENU_ICON = Tools.createImageIcon(Tools.getDefault("Browser.MenuIcon"));
+    public static final Color PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.Background");
+    public static final Color BUTTON_PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.ButtonPanel.Background");
+    public static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
     private DefaultTreeModel treeModel;
-    /** Top of the menu tree. */
     private DefaultMutableTreeNode treeTop;
-    /** Tree. */
     private JTree tree;
 
-    /** Split pane next to the menu. */
     private JSplitPane infoPanelSplitPane;
-    /** DRBD test lock. */
     private final Lock mDRBDtestLock = new ReentrantLock();
 
-    /** Sets the top of the menu tree. */
-    protected final void setTreeTop() {
-        treeTop = new DefaultMutableTreeNode(new CategoryInfo(
-                                        Tools.getString("Browser.Resources"),
-                                        this));
+    protected final void setMenuTreeTop() {
+        treeTop = new DefaultMutableTreeNode(new CategoryInfo(Tools.getString("Browser.Resources"), this));
         treeModel = new DefaultTreeModel(treeTop);
     }
 
-    /** Sets the top of the menu tree. */
-    protected final void setTreeTop(final Info info) {
+    protected final void setMenuTreeTop(final Info info) {
         treeTop = new DefaultMutableTreeNode(info);
         treeModel = new DefaultTreeModel(treeTop);
     }
 
-    /** Sets the tree instance variable. */
-    protected final void setTree(final JTree tree) {
+    protected final void setMenuTree(final JTree tree) {
         this.tree = tree;
     }
 
-    /** Returns the tree object. */
-    public final JTree getTree() {
+    public final JTree getMenuTree() {
         return tree;
     }
 
-    /** Repaints the menu tree. */
-    public final void repaintTree() {
+    public final void repaintMenuTree() {
         final JTree t = tree;
         if (t != null) {
             t.repaint();
         }
     }
 
-    /** Gets node that is on the top of the tree. */
     final DefaultMutableTreeNode getTreeTop() {
         return treeTop;
     }
 
-    /** Reloads the node. */
-    public final void reloadAndWait(final TreeNode node,
-                                    final boolean select) {
+    public final void reloadAndWait(final TreeNode node, final boolean select) {
         final JTree t = tree;
         DefaultMutableTreeNode oldN = null;
         if (t != null) {
@@ -148,9 +114,7 @@ public class Browser {
         }
     }
 
-    /** Reloads the node. */
-    public final void reload(final TreeNode node,
-                             final boolean select) {
+    public final void reloadNode(final TreeNode node, final boolean select) {
         final JTree t = tree;
         DefaultMutableTreeNode oldN = null;
         if (t != null) {
@@ -176,12 +140,10 @@ public class Browser {
             });
         }
     }
-    /** Sets the node change for the node. */
     public final void nodeChangedAndWait(final TreeNode node) {
         treeModel.nodeChanged(node);
     }
 
-    /** Sets the node change for the node. */
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         final String stacktrace = Tools.getStackTrace();
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -198,13 +160,11 @@ public class Browser {
         });
     }
 
-    /** Adds the node to the top level. */
-    protected final void topAdd(final MutableTreeNode node) {
+    protected final void topLevelAdd(final MutableTreeNode node) {
         Tools.isSwingThread();
         treeTop.add(node);
     }
 
-    /** Repaints the split pane. */
     protected final void repaintSplitPane() {
         if (infoPanelSplitPane != null) {
             infoPanelSplitPane.repaint();
@@ -216,7 +176,6 @@ public class Browser {
         ((Info) node.getUserObject()).setNode(node);
     }
 
-    /** Gets tree model object. */
     final DefaultTreeModel getTreeModel() {
         return treeModel;
     }
@@ -227,8 +186,7 @@ public class Browser {
      * graphical view, it returns a split pane with this view and the info
      * underneath.
      */
-    final JComponent getInfoPanel(final Object nodeInfo,
-                                  final boolean disabledDuringLoad) {
+    final JComponent getInfoPanel(final Object nodeInfo, final boolean disabledDuringLoad) {
         if (nodeInfo == null) {
             return null;
         }
@@ -237,12 +195,9 @@ public class Browser {
         if (gView == null) {
             return iPanel;
         } else {
-            final int maxWidth = ClusterBrowser.SERVICE_LABEL_WIDTH
-                                 + ClusterBrowser.SERVICE_FIELD_WIDTH
-                                 + 36;
+            final int maxWidth = ClusterBrowser.SERVICE_LABEL_WIDTH + ClusterBrowser.SERVICE_FIELD_WIDTH + 36;
             iPanel.setMinimumSize(new Dimension(maxWidth, 0));
-            iPanel.setMaximumSize(new Dimension(maxWidth,
-                                  Integer.MAX_VALUE));
+            iPanel.setMaximumSize(new Dimension(maxWidth, Integer.MAX_VALUE));
             if (infoPanelSplitPane != null) {
                 if (!disabledDuringLoad) {
                     final int loc = infoPanelSplitPane.getDividerLocation();
@@ -252,10 +207,7 @@ public class Browser {
                 }
                 return infoPanelSplitPane;
             }
-            final JSplitPane newSplitPane =
-                                    new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                                   gView,
-                                                   iPanel);
+            final JSplitPane newSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, gView, iPanel);
             newSplitPane.setResizeWeight(1.0);
             newSplitPane.setOneTouchExpandable(true);
             infoPanelSplitPane = newSplitPane;
@@ -264,36 +216,30 @@ public class Browser {
         }
     }
 
-    /** Returns cell rendererer for tree. */
     final TreeCellRenderer getCellRenderer() {
         return new CellRenderer();
     }
 
-    /** Acquire drbd test lock. */
     public final void drbdtestLockAcquire() {
         mDRBDtestLock.lock();
     }
 
-    /** Release drbd test lock. */
     public final void drbdtestLockRelease() {
         mDRBDtestLock.unlock();
     }
 
-    /** Selects specified path. */
     protected void selectPath(final Object[] path) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final TreePath tp = new TreePath(path);
-                getTree().expandPath(tp);
-                getTree().setSelectionPath(tp);
+                getMenuTree().expandPath(tp);
+                getMenuTree().setSelectionPath(tp);
             }
         });
     }
 
-    /** Add node. */
-    public final void addNode(final DefaultMutableTreeNode node,
-                              final MutableTreeNode child) {
+    public final void addNode(final DefaultMutableTreeNode node, final MutableTreeNode child) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
@@ -304,19 +250,14 @@ public class Browser {
 
     /** Renders the cells for the menu. */
     private static class CellRenderer extends DefaultTreeCellRenderer {
-        /** Serial version UUID. */
         private static final long serialVersionUID = 1L;
 
-        /** Creates new CellRenderer object. */
         CellRenderer() {
             super();
             setBackgroundNonSelectionColor(PANEL_BACKGROUND);
-            setBackgroundSelectionColor(
-                    Tools.getDefaultColor("ViewPanel.Status.Background"));
-            setTextNonSelectionColor(
-                    Tools.getDefaultColor("ViewPanel.Foreground"));
-            setTextSelectionColor(
-                    Tools.getDefaultColor("ViewPanel.Status.Foreground"));
+            setBackgroundSelectionColor(Tools.getDefaultColor("ViewPanel.Status.Background"));
+            setTextNonSelectionColor(Tools.getDefaultColor("ViewPanel.Foreground"));
+            setTextSelectionColor(Tools.getDefaultColor("ViewPanel.Status.Foreground"));
         }
 
         /**
@@ -331,13 +272,8 @@ public class Browser {
                                                       final boolean leaf,
                                                       final int row,
                                                       final boolean hasFocus) {
-
-            super.getTreeCellRendererComponent(
-                            tree, value, sel,
-                            expanded, leaf, row,
-                            hasFocus);
-            final Info info =
-                    (Info) ((DefaultMutableTreeNode) value).getUserObject();
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+            final Info info = (Info) ((DefaultMutableTreeNode) value).getUserObject();
             if (info == null) {
                 return this;
             }
@@ -355,7 +291,6 @@ public class Browser {
                 }
                 setIcon(icon);
             }
-
             return this;
         }
     }

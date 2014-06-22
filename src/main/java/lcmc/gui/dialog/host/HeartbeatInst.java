@@ -96,7 +96,7 @@ final class HeartbeatInst extends DialogHost {
         final String archString = arch.replaceAll("i686", "i386");
 
         String installCommand = "HbPmInst.install";
-        final String installMethod = getHost().getHbPmInstallMethod();
+        final String installMethod = getHost().getHeartbeatPacemakerInstallMethodIndex();
         if (installMethod != null) {
             installCommand = "HbPmInst.install." + installMethod;
         }

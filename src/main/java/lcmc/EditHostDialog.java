@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc;
 
 import lcmc.data.Host;
@@ -32,26 +31,16 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * EditHostDialog.
- *
  * Show step by step dialogs that configure a host.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class EditHostDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                              LoggerFactory.getLogger(EditHostDialog.class);
-    /** The host object. */
+    private static final Logger LOG = LoggerFactory.getLogger(EditHostDialog.class);
     private final Host host;
 
-    /** Prepares a new {@code EditHostDialog} object. */
     public EditHostDialog(final Host host) {
         this.host = host;
     }
 
-    /** Shows step by step dialogs that configure a host. */
     public void showDialogs() {
         DialogHost dialog = new SSH(null, host, new DrbdInstallation());
         final boolean expanded = Tools.getGUIData().isTerminalPanelExpanded();
@@ -64,13 +53,11 @@ public final class EditHostDialog {
                     Tools.getGUIData().expandTerminalSplitPane(1);
                 }
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;

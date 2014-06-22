@@ -204,7 +204,7 @@ public class MultiSelectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                getBrowser().getCrmGraph().stopTestAnimation((JComponent) component);
                 component.setToolTipText("");
             }
 
@@ -224,7 +224,7 @@ public class MultiSelectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
+                getBrowser().getCrmGraph().startTestAnimation((JComponent) component,
                                                               startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();

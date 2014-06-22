@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.crm;
 
 import java.awt.Color;
@@ -70,7 +90,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (!getHost().isClStatus()) {
+                    if (!getHost().isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING;
                     }
                     return null;
@@ -115,7 +135,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (!getHost().isClStatus()) {
+                    if (!getHost().isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING;
                     }
                     if (getBrowser().getClusterBrowser()
@@ -196,13 +216,13 @@ public class HostMenu {
                 @Override
                 public boolean predicate() {
                     /* when both are running it's openais. */
-                    return getHost().isCsRunning() && !getHost().isAisRunning();
+                    return getHost().isCorosyncRunning() && !getHost().isOpenaisRunning();
                 }
 
                 @Override
                 public boolean visiblePredicate() {
-                    return getHost().isCsRunning()
-                           || getHost().isAisRunning();
+                    return getHost().isCorosyncRunning()
+                           || getHost().isOpenaisRunning();
                 }
 
                 @Override
@@ -215,17 +235,17 @@ public class HostMenu {
                         final Host thisHost = getHost();
                         thisHost.setCommLayerStopping(true);
                         if (!thisHost.isPcmkStartedByCorosync()
-                            && thisHost.isPcmkInit()
-                            && thisHost.isPcmkRunning()) {
-                            if (getHost().isCsRunning()
-                                && !getHost().isAisRunning()) {
+                            && thisHost.hasPacemakerInitScript()
+                            && thisHost.isPacemakerRunning()) {
+                            if (getHost().isCorosyncRunning()
+                                && !getHost().isOpenaisRunning()) {
                                 Corosync.stopCorosyncWithPcmk(thisHost);
                             } else {
                                 Openais.stopOpenaisWithPcmk(thisHost);
                             }
                         } else {
-                            if (getHost().isCsRunning()
-                                && !getHost().isAisRunning()) {
+                            if (getHost().isCorosyncRunning()
+                                && !getHost().isOpenaisRunning()) {
                                 Corosync.stopCorosync(thisHost);
                             } else {
                                 Openais.stopOpenais(thisHost);
@@ -313,13 +333,13 @@ public class HostMenu {
                 @Override
                 public boolean visiblePredicate() {
                     final Host h = getHost();
-                    return h.isCorosync()
-                           && h.isCsInit()
-                           && h.isCsAisConf()
-                           && !h.isCsRunning()
-                           && !h.isAisRunning()
+                    return h.isCorosyncInstalled()
+                           && h.hasCorosyncInitScript()
+                           && h.corosyncOrOpenaisConfigExists()
+                           && !h.isCorosyncRunning()
+                           && !h.isOpenaisRunning()
                            && !h.isHeartbeatRunning()
-                           && !h.isHeartbeatRc();
+                           && !h.isHeartbeatInRc();
                 }
 
                 @Override
@@ -328,7 +348,7 @@ public class HostMenu {
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
-                    if (h.isAisRc() && !h.isCsRc()) {
+                    if (h.isOpenaisInRc() && !h.isCorosyncInRc()) {
                         return "Openais is in rc.d";
                     }
                     return null;
@@ -337,7 +357,7 @@ public class HostMenu {
                 @Override
                 public void action() {
                     getHost().setCommLayerStarting(true);
-                    if (getHost().isPcmkRc()) {
+                    if (getHost().isPacemakerInRc()) {
                         Corosync.startCorosyncWithPcmk(getHost());
                     } else {
                         Corosync.startCorosync(getHost());
@@ -370,12 +390,12 @@ public class HostMenu {
                 @Override
                 public boolean visiblePredicate() {
                     final Host h = getHost();
-                    return h.isAisInit()
-                           && h.isCsAisConf()
-                           && !h.isCsRunning()
-                           && !h.isAisRunning()
+                    return h.hasOpenaisInitScript()
+                           && h.corosyncOrOpenaisConfigExists()
+                           && !h.isCorosyncRunning()
+                           && !h.isOpenaisRunning()
                            && !h.isHeartbeatRunning()
-                           && !h.isHeartbeatRc();
+                           && !h.isHeartbeatInRc();
                 }
 
                 @Override
@@ -384,7 +404,7 @@ public class HostMenu {
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
-                    if (h.isCsRc() && !h.isAisRc()) {
+                    if (h.isCorosyncInRc() && !h.isOpenaisInRc()) {
                         return "Corosync is in rc.d";
                     }
                     return null;
@@ -422,10 +442,10 @@ public class HostMenu {
                 @Override
                 public boolean visiblePredicate() {
                     final Host h = getHost();
-                    return h.isHeartbeatInit()
-                           && h.isHeartbeatConf()
-                           && !h.isCsRunning()
-                           && !h.isAisRunning()
+                    return h.hasHeartbeatInitScript()
+                           && h.heartbeatConfigExists()
+                           && !h.isCorosyncRunning()
+                           && !h.isOpenaisRunning()
                            && !h.isHeartbeatRunning();
                            //&& !h.isAisRc()
                            //&& !h.isCsRc(); TODO should check /etc/defaults/
@@ -474,9 +494,9 @@ public class HostMenu {
                 public boolean visiblePredicate() {
                     final Host h = getHost();
                     return !h.isPcmkStartedByCorosync()
-                           && !h.isPcmkRunning()
-                           && (h.isCsRunning()
-                               || h.isAisRunning())
+                           && !h.isPacemakerRunning()
+                           && (h.isCorosyncRunning()
+                               || h.isOpenaisRunning())
                            && !h.isHeartbeatRunning();
                 }
 
@@ -491,7 +511,7 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    getHost().setPcmkStarting(true);
+                    getHost().setPacemakerStarting(true);
                     Corosync.startPacemaker(getHost());
                     updateClusterView(getHost());
                 }
@@ -525,7 +545,7 @@ public class HostMenu {
                                             + " color",
                                             getHost().getPmColors()[0]);
                     if (newColor != null) {
-                        getHost().setSavedColor(newColor);
+                        getHost().setSavedHostColorInGraphs(newColor);
                     }
                 }
             };
@@ -543,7 +563,7 @@ public class HostMenu {
                 @Override
                 public String enablePredicate() {
                     if (!getHost().isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     return null;
                 }
@@ -565,7 +585,7 @@ public class HostMenu {
             @Override
             public String enablePredicate() {
                 if (!getHost().isConnected()) {
-                    return Host.NOT_CONNECTED_STRING;
+                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 }
                 return null;
             }

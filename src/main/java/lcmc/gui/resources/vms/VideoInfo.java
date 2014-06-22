@@ -33,8 +33,8 @@ import javax.swing.JPanel;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.VideoData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.VideoData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
@@ -247,23 +247,23 @@ final class VideoInfo extends HardwareInfo {
         final Map<String, String> parameters =
                                     getHWParameters(getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 parameters.put(VideoData.SAVED_MODEL_TYPE,
                                getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
             getResource().setNew(false);
         }
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -352,8 +352,8 @@ final class VideoInfo extends HardwareInfo {
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
+                        final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                        if (vmsXml != null) {
                             final Value savedValue =
                                                   videoData.getValue(param);
                             if (savedValue != null) {
@@ -397,19 +397,19 @@ final class VideoInfo extends HardwareInfo {
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(VideoData.SAVED_MODEL_TYPE,
                                getParamSaved(VideoData.MODEL_TYPE).getValueForConfig());
-                vmsxml.removeVideoXML(getVMSVirtualDomainInfo().getDomainName(),
+                vmsXml.removeVideoXML(getVMSVirtualDomainInfo().getDomainName(),
                                       parameters,
                                       virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -424,9 +424,9 @@ final class VideoInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml, final Node node, final String domainName, final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyVideoXML(node, domainName, params);
+    protected void modifyXML(final VmsXml vmsXml, final Node node, final String domainName, final Map<String, String> params) {
+        if (vmsXml != null) {
+            vmsXml.modifyVideoXML(node, domainName, params);
         }
     }
 }

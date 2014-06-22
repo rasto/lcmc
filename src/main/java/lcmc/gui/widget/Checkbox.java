@@ -17,7 +17,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.awt.Color;
@@ -39,15 +38,8 @@ import lcmc.utilities.WidgetListener;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class Checkbox extends GenericWidget<JComponent> {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-
     static final String CHECKBOX_TRUE = "True";
     static final String CHECKBOX_FALSE = "False";
     /** Name for the 'true' value. */
@@ -55,16 +47,13 @@ public class Checkbox extends GenericWidget<JComponent> {
     /** Name for the 'false' value. */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
 
-    /** Prepares a new {@code Checkbox} object. */
     public Checkbox(final Value selectedValue,
                     final Value[] items,
                     final String regexp,
                     final int width,
                     final AccessMode enableAccessMode,
                     final MyButton fieldButton) {
-        super(regexp,
-              enableAccessMode,
-              fieldButton);
+        super(regexp, enableAccessMode, fieldButton);
         if (items != null && items.length == 2) {
             checkBoxTrue  = items[0];
             checkBoxFalse = items[1];
@@ -81,15 +70,8 @@ public class Checkbox extends GenericWidget<JComponent> {
         return cb;
     }
 
-    ///** Returns whether this field is a check box. */
-    //@Override
-    //public boolean isCheckBox() {
-    //    return true;
-    //}
-
     /**
-     * Returns string value. If object value is null, returns empty string (not
-     * null).
+     * Returns string value. If object value is null, returns empty string (not null).
      */
     @Override
     public String getStringValue() {
@@ -116,13 +98,11 @@ public class Checkbox extends GenericWidget<JComponent> {
         return value;
     }
 
-    /** Returns whether component is editable or not. */
     @Override
     public boolean isEditable() {
         return false;
     }
 
-    /** Sets item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item != null) {
@@ -130,13 +110,11 @@ public class Checkbox extends GenericWidget<JComponent> {
         }
     }
 
-    /** Returns document object of the component. */
     @Override
     public Document getDocument() {
         return null;
     }
 
-    /** Adds item listener to the component. */
     @Override
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
@@ -149,7 +127,6 @@ public class Checkbox extends GenericWidget<JComponent> {
         getInternalComponent().setBackground(backgroundColor);
     }
 
-    /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -161,18 +138,11 @@ public class Checkbox extends GenericWidget<JComponent> {
         });
     }
 
-    /** Returns item at the specified index. */
-    //@Override
-    //Value getItemAt(final int i) {
-    //    return getComponent();
-    //}
-
     /** Cleanup whatever would cause a leak. */
     @Override
     public void cleanup() {
         getWidgetListeners().clear();
-        for (final ItemListener il
-                            : ((AbstractButton) getInternalComponent()).getItemListeners()) {
+        for (final ItemListener il : ((AbstractButton) getInternalComponent()).getItemListeners()) {
             ((ItemSelectable) getInternalComponent()).removeItemListener(il);
         }
     }

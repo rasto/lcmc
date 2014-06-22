@@ -33,7 +33,7 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.SpringUtilities;
@@ -101,9 +101,9 @@ public final class LVSnapshot extends LV {
 
     private void setComboBoxes() {
         final String maxBlockSize = getMaxBlockSize();
-        sizeWi.setValue(VMSXML.convertKilobytes(Long.toString(
-                                     Long.parseLong(maxBlockSize) / 2)));
-        maxSizeWi.setValue(VMSXML.convertKilobytes(maxBlockSize));
+        sizeWi.setValue(VmsXml.convertKilobytes(Long.toString(
+                Long.parseLong(maxBlockSize) / 2)));
+        maxSizeWi.setValue(VmsXml.convertKilobytes(maxBlockSize));
     }
 
     /** Returns the input pane. */
@@ -160,7 +160,7 @@ public final class LVSnapshot extends LV {
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWi = new TextfieldWithUnit(
-                       VMSXML.convertKilobytes(newBlockSize),
+                       VmsXml.convertKilobytes(newBlockSize),
                        getUnits(),
                        Widget.NO_REGEXP,
                        250,
@@ -205,7 +205,7 @@ public final class LVSnapshot extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                        VMSXML.convertKilobytes(maxBlockSize),
+                        VmsXml.convertKilobytes(maxBlockSize),
                         getUnits(),
                         Widget.NO_REGEXP,
                         250,
@@ -278,10 +278,10 @@ public final class LVSnapshot extends LV {
         public void run() {
             boolean e = enable;
             if (enable) {
-                final long size = VMSXML.convertToKilobytes(
-                                                  sizeWi.getValue());
-                final long maxSize = VMSXML.convertToKilobytes(
-                                               maxSizeWi.getValue());
+                final long size = VmsXml.convertToKilobytes(
+                        sizeWi.getValue());
+                final long maxSize = VmsXml.convertToKilobytes(
+                        maxSizeWi.getValue());
                 if (size > maxSize) {
                     e = false;
                 } else if (size <= 0) {

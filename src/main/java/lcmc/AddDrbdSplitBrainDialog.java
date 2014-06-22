@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc;
 
 import lcmc.gui.dialog.drbd.SplitBrain;
@@ -31,56 +30,36 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * AddDrbdSplitBrainDialog.
- *
  * Show step by step dialogs that resolve a drbd split-brain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class AddDrbdSplitBrainDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                       LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
-    /** Whether the wizard was canceled. */
-    private boolean canceled = false;
-    /** Drbd resource info object. */
-    private final VolumeInfo dvi;
+    private static final Logger LOG = LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
+    private final VolumeInfo volumeInfo;
 
-    /** Prepares a new {@code AddDrbdSplitBrainDialog} object. */
-    public AddDrbdSplitBrainDialog(final VolumeInfo dvi) {
-        this.dvi = dvi;
+    public AddDrbdSplitBrainDialog(final VolumeInfo volumeInfo) {
+        this.volumeInfo = volumeInfo;
     }
 
-    /** Shows step by step dialogs that resolve a drbd split-brain. */
     public void showDialogs() {
-        DrbdConfig dialog = new SplitBrain(null, dvi);
+        DrbdConfig dialog = new SplitBrain(null, volumeInfo);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
-    }
-
-    /** Returns whether the wizard was canceled. */
-    public boolean isCanceled() {
-        return canceled;
     }
 }

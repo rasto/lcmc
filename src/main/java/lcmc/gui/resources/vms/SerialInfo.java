@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.SerialData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.SerialData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
@@ -95,8 +95,8 @@ final class SerialInfo extends ParallelSerialInfo {
                      final Widget wi = getWidget(param, null);
                      for (final Host h
                          : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                         if (vmsxml != null) {
+                         final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                         if (vmsXml != null) {
                              final Value savedValue =
                                  serialData.getValue(param);
                              if (savedValue != null) {
@@ -140,20 +140,20 @@ final class SerialInfo extends ParallelSerialInfo {
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                     new HashMap<String, String>();
                 parameters.put(SerialData.SAVED_TYPE,
                                getParamSaved(SerialData.TYPE).getValueForConfig());
-                vmsxml.removeSerialXML(
+                vmsXml.removeSerialXML(
                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-            getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -165,12 +165,12 @@ final class SerialInfo extends ParallelSerialInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
+    protected void modifyXML(final VmsXml vmsXml,
                              final Node node,
                              final String domainName,
                              final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifySerialXML(node, domainName, params);
+        if (vmsXml != null) {
+            vmsXml.modifySerialXML(node, domainName, params);
         }
     }
 

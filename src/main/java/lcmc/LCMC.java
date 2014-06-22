@@ -71,9 +71,7 @@ import org.apache.commons.cli.PosixParser;
  * This is the central class with main function. It starts the LCMC GUI.
  */
 public final class LCMC extends JPanel {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(LCMC.class);
-    /** Serial Version UID. */
     private static final long serialVersionUID = 1L;
     /** Uncaught exception flag. */
     private static volatile boolean uncaughtException = false;

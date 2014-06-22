@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.drbd;
 
 import java.awt.Color;
@@ -107,7 +127,7 @@ public class HostDrbdMenu {
                             return null;
                         }
                     } else {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                 }
 
@@ -221,7 +241,7 @@ public class HostDrbdMenu {
                     if (host.isConnected()) {
                         return null;
                     } else {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                 }
 
@@ -257,7 +277,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (!host.isDrbdStatus()) {
+                    if (!host.isDrbdStatusOk()) {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
                     }
                     return null;
@@ -293,7 +313,7 @@ public class HostDrbdMenu {
                 @Override
                 public String enablePredicate() {
                     if (!host.isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     return null;
                 }
@@ -322,7 +342,7 @@ public class HostDrbdMenu {
                                             + " color",
                                             host.getPmColors()[0]);
                     if (newColor != null) {
-                        host.setSavedColor(newColor);
+                        host.setSavedHostColorInGraphs(newColor);
                     }
                 }
             };
@@ -340,7 +360,7 @@ public class HostDrbdMenu {
                 @Override
                 public String enablePredicate() {
                     if (!host.isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     return null;
                 }
@@ -364,7 +384,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (host.isDrbdStatus()) {
+                    if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
@@ -399,7 +419,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (host.isDrbdStatus()) {
+                    if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
@@ -435,7 +455,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (host.isDrbdStatus()) {
+                    if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
@@ -471,7 +491,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (host.isDrbdStatus()) {
+                    if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
@@ -510,7 +530,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (host.isDrbdStatus()) {
+                    if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
@@ -546,7 +566,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (host.isDrbdStatus()) {
+                    if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
                         return HostDrbdInfo.NO_DRBD_STATUS_STRING;
@@ -609,7 +629,7 @@ public class HostDrbdMenu {
             @Override
             public String enablePredicate() {
                 if (!host.isConnected()) {
-                    return Host.NOT_CONNECTED_STRING;
+                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 }
                 return null;
             }

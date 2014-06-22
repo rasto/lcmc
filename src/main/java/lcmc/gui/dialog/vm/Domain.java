@@ -29,7 +29,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
@@ -44,19 +44,19 @@ import lcmc.utilities.Tools;
  */
 public final class Domain extends VMConfig {
     /** Configuration options of the new domain. */
-    private static final String[] PARAMS = {VMSXML.VM_PARAM_DOMAIN_TYPE,
-                                            VMSXML.VM_PARAM_NAME,
-                                            VMSXML.VM_PARAM_VIRSH_OPTIONS,
-                                            VMSXML.VM_PARAM_EMULATOR,
-                                            VMSXML.VM_PARAM_VCPU,
-                                            VMSXML.VM_PARAM_CURRENTMEMORY,
-                                            VMSXML.VM_PARAM_BOOT,
-                                            VMSXML.VM_PARAM_BOOT_2,
-                                            VMSXML.VM_PARAM_LOADER,
-                                            VMSXML.VM_PARAM_TYPE,
-                                            VMSXML.VM_PARAM_INIT,
-                                            VMSXML.VM_PARAM_TYPE_ARCH,
-                                            VMSXML.VM_PARAM_TYPE_MACHINE};
+    private static final String[] PARAMS = {VmsXml.VM_PARAM_DOMAIN_TYPE,
+                                            VmsXml.VM_PARAM_NAME,
+                                            VmsXml.VM_PARAM_VIRSH_OPTIONS,
+                                            VmsXml.VM_PARAM_EMULATOR,
+                                            VmsXml.VM_PARAM_VCPU,
+                                            VmsXml.VM_PARAM_CURRENTMEMORY,
+                                            VmsXml.VM_PARAM_BOOT,
+                                            VmsXml.VM_PARAM_BOOT_2,
+                                            VmsXml.VM_PARAM_LOADER,
+                                            VmsXml.VM_PARAM_TYPE,
+                                            VmsXml.VM_PARAM_INIT,
+                                            VmsXml.VM_PARAM_TYPE_ARCH,
+                                            VmsXml.VM_PARAM_TYPE_MACHINE};
     /** Input pane cache for back button. */
     private JComponent inputPane = null;
     private Widget domainNameWi;
@@ -150,7 +150,7 @@ public final class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        vdi.getResource().setValue(VMSXML.VM_PARAM_BOOT,
+        vdi.getResource().setValue(VmsXml.VM_PARAM_BOOT,
                                    DomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();
         vdi.addWizardParams(
@@ -160,7 +160,7 @@ public final class Domain extends VMConfig {
                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                       null);
-        domainNameWi = vdi.getWidget(VMSXML.VM_PARAM_NAME,
+        domainNameWi = vdi.getWidget(VmsXml.VM_PARAM_NAME,
                                      Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);
 

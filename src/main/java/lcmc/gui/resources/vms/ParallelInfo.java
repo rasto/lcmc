@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import lcmc.data.Application;
 import lcmc.data.Host;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.ParallelData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.ParallelData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
@@ -95,8 +95,8 @@ final class ParallelInfo extends ParallelSerialInfo {
                      final Widget wi = getWidget(param, null);
                      for (final Host h
                          : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                         final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                         if (vmsxml != null) {
+                         final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                         if (vmsXml != null) {
                              final Value savedValue =
                                  parallelData.getValue(param);
                              if (savedValue != null) {
@@ -140,20 +140,20 @@ final class ParallelInfo extends ParallelSerialInfo {
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                     new HashMap<String, String>();
                 parameters.put(ParallelData.SAVED_TYPE,
                                getParamSaved(ParallelData.TYPE).getValueForConfig());
-                vmsxml.removeParallelXML(
+                vmsXml.removeParallelXML(
                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-            getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -165,12 +165,12 @@ final class ParallelInfo extends ParallelSerialInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
+    protected void modifyXML(final VmsXml vmsXml,
                              final Node node,
                              final String domainName,
                              final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyParallelXML(node, domainName, params);
+        if (vmsXml != null) {
+            vmsXml.modifyParallelXML(node, domainName, params);
         }
     }
 

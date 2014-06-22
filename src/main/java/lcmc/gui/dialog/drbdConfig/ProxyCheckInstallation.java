@@ -40,7 +40,6 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 
 /**
  * @author Rasto Levrinc
@@ -129,7 +128,7 @@ final class ProxyCheckInstallation extends DialogHost {
                                                      getDrbdInstallation());
                     final InstallMethods im =
                                  (InstallMethods) proxyInstMethodWi.getValue();
-                    getDrbdInstallation().setProxyInstallMethod(im.getIndex());
+                    getDrbdInstallation().setProxyInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {

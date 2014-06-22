@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
@@ -7,7 +27,7 @@ import java.util.Set;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
@@ -88,11 +108,11 @@ public class BlockDevMenu {
 
             @Override
             public String enablePredicate() {
-                final DrbdXML dxml = getClusterBrowser().getDrbdXML();
+                final DrbdXml dxml = getClusterBrowser().getDrbdXml();
                 if (getDrbdVolumeInfo() != null) {
                     return "it is already a drbd resouce";
                 } else if (!getHost().isConnected()) {
-                    return Host.NOT_CONNECTED_STRING;
+                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 } else if (!getHost().isDrbdLoaded()) {
                     return "drbd is not loaded";
                 } else if (getBlockDevice().isMounted()) {
@@ -134,10 +154,10 @@ public class BlockDevMenu {
 
                         @Override
                         public String enablePredicate() {
-                            final DrbdXML dxml =
-                                               getClusterBrowser().getDrbdXML();
+                            final DrbdXml dxml =
+                                               getClusterBrowser().getDrbdXml();
                             if (!oHost.isConnected()) {
-                                return Host.NOT_CONNECTED_STRING;
+                                return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                             } else if (!oHost.isDrbdLoaded()) {
                                 return "drbd is not loaded";
                             } else {
@@ -158,7 +178,7 @@ public class BlockDevMenu {
                             super.updateAndWait();
                             removeAll();
                             final Set<BlockDevInfo> blockDevInfos =
-                                        oHost.getBrowser().getBlockDevInfos();
+                                        oHost.getBrowser().getSortedBlockDevInfos();
                             final List<BlockDevInfo> blockDevInfosS =
                                                 new ArrayList<BlockDevInfo>();
                             for (final BlockDevInfo oBdi : blockDevInfos) {
@@ -685,7 +705,7 @@ public class BlockDevMenu {
                         return "not a proxy";
                     }
                     if (!pHost.isConnected()) {
-                        return Host.NOT_CONNECTED_STRING;
+                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     if (!pHost.isDrbdProxyRunning()) {
                         return "proxy daemon is not running";

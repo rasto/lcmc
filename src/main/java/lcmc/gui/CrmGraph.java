@@ -18,7 +18,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -67,12 +66,8 @@ import lcmc.utilities.Tools;
 /**
  * This class creates graph and provides methods to add new nodes, edges,
  * remove or modify them.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
-public class CRMGraph extends ResourceGraph {
+public class CrmGraph extends ResourceGraph {
     /** X position of a new block device. */
     private static final int BD_X_POS = 15;
     /** Y position of the host. */
@@ -85,43 +80,32 @@ public class CRMGraph extends ResourceGraph {
     private static final int MAX_X_POS = 2600;
     /** Maximum vertical position. */
     private static final int MAX_Y_POS = 2600;
-    /** Height of the vertices. */
+
     private static final int VERTEX_HEIGHT = 50;
-    /** Host standby icon. */
     private static final ImageIcon HOST_STANDBY_ICON =
-     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
-    /** Icon that indicates a running service. */
+                                            Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
     private static final ImageIcon SERVICE_RUNNING_ICON =
-                                     Tools.createImageIcon(Tools.getDefault(
-                                               "CRMGraph.ServiceRunningIcon"));
-    /** Icon that indicates a running that failed. */
+                                       Tools.createImageIcon(Tools.getDefault("CRMGraph.ServiceRunningIcon"));
     private static final ImageIcon SERVICE_RUNNING_FAILED_ICON =
-                                Tools.createImageIcon(Tools.getDefault(
-                                         "CRMGraph.ServiceRunningFailedIcon"));
+                                        Tools.createImageIcon(Tools.getDefault("CRMGraph.ServiceRunningFailedIcon"));
     /** Icon that indicates a started service (but not running). */
-    private static final ImageIcon SERVICE_STARTED_ICON =
-                                     Tools.createImageIcon(Tools.getDefault(
-                                               "CRMGraph.ServiceStartedIcon"));
+    private static final ImageIcon SERVICE_STARTED_ICON = Tools.createImageIcon(
+                                                                Tools.getDefault("CRMGraph.ServiceStartedIcon"));
     /** Icon that indicates a stopping service (but not stopped). */
-    private static final ImageIcon SERVICE_STOPPING_ICON =
-                                     Tools.createImageIcon(Tools.getDefault(
-                                              "CRMGraph.ServiceStoppingIcon"));
+    private static final ImageIcon SERVICE_STOPPING_ICON = Tools.createImageIcon(
+                                                                Tools.getDefault("CRMGraph.ServiceStoppingIcon"));
     /** Icon that indicates a not running service. */
-    private static final ImageIcon SERVICE_STOPPED_ICON =
-                                Tools.createImageIcon(Tools.getDefault(
-                                               "CRMGraph.ServiceStoppedIcon"));
+    private static final ImageIcon SERVICE_STOPPED_ICON = Tools.createImageIcon(
+                                                                Tools.getDefault("CRMGraph.ServiceStoppedIcon"));
     /** Icon that indicates a not running service that failed. */
     private static final ImageIcon SERVICE_STOPPED_FAILED_ICON =
-                                Tools.createImageIcon(Tools.getDefault(
-                                         "CRMGraph.ServiceStoppedFailedIcon"));
+                                        Tools.createImageIcon(Tools.getDefault("CRMGraph.ServiceStoppedFailedIcon"));
     /** Icon that indicates an unmanaged service. */
     private static final ImageIcon SERVICE_UNMANAGED_ICON =
-                                     Tools.createImageIcon(Tools.getDefault(
-                                             "CRMGraph.ServiceUnmanagedIcon"));
+                                     Tools.createImageIcon(Tools.getDefault("CRMGraph.ServiceUnmanagedIcon"));
     /** Icon that indicates a migrated service. */
     private static final ImageIcon SERVICE_MIGRATED_ICON =
-                                     Tools.createImageIcon(Tools.getDefault(
-                                              "CRMGraph.ServiceMigratedIcon"));
+                                     Tools.createImageIcon(Tools.getDefault("CRMGraph.ServiceMigratedIcon"));
     /** List with edges that are order constraints. */
     private final Collection<Edge> edgeIsOrderList = new HashSet<Edge>();
     /** List with edges that should be kept as order constraints. */
@@ -130,52 +114,33 @@ public class CRMGraph extends ResourceGraph {
     private final Collection<Edge> edgeIsColocationList = new HashSet<Edge>();
     /** List with edges that should be kept as colocation constraints. */
     private final Collection<Edge> keepEdgeIsColocationList = new HashSet<Edge>();
-    /** Vertex is present lock. */
     private final Lock mVertexIsPresentListLock = new ReentrantLock();
-    /** List with vertices that are present. */
     private Set<Vertex> vertexIsPresentList = new HashSet<Vertex>();
     /** Map from vertex to 'Add service' menu. */
-    private final Map<Vertex, JMenu> vertexToAddServiceMap =
-                                                new HashMap<Vertex, JMenu>();
+    private final Map<Vertex, JMenu> vertexToAddServiceMap = new HashMap<Vertex, JMenu>();
     /** Map from vertex to 'Add existing service' menu. */
-    private final Map<Vertex, JMenu> vertexToAddExistingServiceMap =
-                                                new HashMap<Vertex, JMenu>();
+    private final Map<Vertex, JMenu> vertexToAddExistingServiceMap = new HashMap<Vertex, JMenu>();
     /** Map from edge to the hb connection info of this constraint. */
-    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap =
-                                new LinkedHashMap<Edge, HbConnectionInfo>();
+    private final Map<Edge, HbConnectionInfo> edgeToHbconnectionMap = new LinkedHashMap<Edge, HbConnectionInfo>();
     /** Map from hb connection info to the edge. */
-    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap =
-                                new LinkedHashMap<HbConnectionInfo, Edge>();
-    /** Pcmk connection lock. */
-    private final ReadWriteLock mHbConnectionLock =
-                                                  new ReentrantReadWriteLock();
-    /** Pcmk connection read lock. */
+    private final Map<HbConnectionInfo, Edge> hbconnectionToEdgeMap = new LinkedHashMap<HbConnectionInfo, Edge>();
+    private final ReadWriteLock mHbConnectionLock = new ReentrantReadWriteLock();
     private final Lock mHbConnectionReadLock = mHbConnectionLock.readLock();
-    /** Pcmk connection write lock. */
     private final Lock mHbConnectionWriteLock = mHbConnectionLock.writeLock();
-    /** Map from the vertex to the host. */
-    private final Map<Vertex, HostInfo> vertexToHostMap =
-                                         new LinkedHashMap<Vertex, HostInfo>();
-    /** Map from the host to the vertex. */
-    private final Map<Info, Vertex> hostToVertexMap =
-                                         new LinkedHashMap<Info, Vertex>();
+    private final Map<Vertex, HostInfo> vertexToHostMap = new LinkedHashMap<Vertex, HostInfo>();
+    private final Map<Info, Vertex> hostToVertexMap = new LinkedHashMap<Info, Vertex>();
     /** Map from the vertex to the constraint placeholder. */
-    private final Map<Vertex, ConstraintPHInfo> vertexToConstraintPHMap =
-                                 new HashMap<Vertex, ConstraintPHInfo>();
+    private final Map<Vertex, ConstraintPHInfo> vertexToConstraintPHMap = new HashMap<Vertex, ConstraintPHInfo>();
     /** Map from the host to the vertex. */
-    private final Map<Info, Vertex> constraintPHToVertexMap =
-                                         new HashMap<Info, Vertex>();
+    private final Map<Info, Vertex> constraintPHToVertexMap = new HashMap<Info, Vertex>();
 
-    /** The first X position of the host. */
     private int hostDefaultXPos = 10;
-    /** Interval beetween two animation frames. */
     private Info multiSelectionInfo = null;
-    /** Prepares a new {@code CRMGraph} object. */
-    CRMGraph(final ClusterBrowser clusterBrowser) {
+
+    CrmGraph(final ClusterBrowser clusterBrowser) {
         super(clusterBrowser);
     }
 
-    /** Inits the graph. */
     @Override
     protected void initGraph() {
         super.initGraph(new DirectedSparseGraph<Vertex, Edge>());
@@ -185,9 +150,7 @@ public class CRMGraph extends ResourceGraph {
      * Returns true if vertex v is one of the ancestors or the same as
      * vertex p. The vertex and edge lists must be locked when called.
      */
-    private boolean isAncestor(final Vertex v,
-                               final Vertex p,
-                               final List<Vertex> list) {
+    private boolean isAncestor(final Vertex v, final Vertex p, final List<Vertex> list) {
         if (p.equals(v)) {
             return true;
         }
@@ -207,8 +170,7 @@ public class CRMGraph extends ResourceGraph {
      * Returns true if service exists already in the parent ancestor line
      * or parent already has this service as a child.
      */
-    boolean existsInThePath(final ServiceInfo si,
-                            final ServiceInfo parent) {
+    boolean existsInThePath(final ServiceInfo si, final ServiceInfo parent) {
         if (parent == null) {
             return true;
         }
@@ -226,8 +188,7 @@ public class CRMGraph extends ResourceGraph {
             unlockGraph();
             return false;
         }
-        if (getGraph().isSuccessor(pv, v)
-            || isAncestor(v, pv, new ArrayList<Vertex>())) {
+        if (getGraph().isSuccessor(pv, v) || isAncestor(v, pv, new ArrayList<Vertex>())) {
             unlockGraph();
             return true;
         }
@@ -285,8 +246,7 @@ public class CRMGraph extends ResourceGraph {
             mHbConnectionReadLock.lock();
             try {
                 lockGraph();
-                final Collection<Vertex> predecessors =
-                                                getGraph().getPredecessors(v);
+                final Collection<Vertex> predecessors = getGraph().getPredecessors(v);
                 if (predecessors != null) {
                     for (final Vertex pV : predecessors) {
                         Edge edge = getGraph().findEdge(pV, v);
@@ -301,8 +261,7 @@ public class CRMGraph extends ResourceGraph {
                         }
                     }
                 }
-                final Collection<Vertex> successors =
-                                               getGraph().getPredecessors(v);
+                final Collection<Vertex> successors = getGraph().getPredecessors(v);
                 if (successors != null) {
                     for (final Vertex sV : successors) {
                         Edge edge = getGraph().findEdge(v, sV);
@@ -338,8 +297,7 @@ public class CRMGraph extends ResourceGraph {
     /**
      * Exchanges object in vertex, e.g., wenn ra changes to/from m/s resource.
      */
-    public void exchangeObjectInTheVertex(final ServiceInfo newSI,
-                                          final ServiceInfo oldSI) {
+    public void exchangeObjectInTheVertex(final ServiceInfo newSI, final ServiceInfo oldSI) {
         final Vertex v = getVertex(oldSI);
         removeVertex(oldSI);
         putInfoToVertex(newSI, v);
@@ -367,19 +325,15 @@ public class CRMGraph extends ResourceGraph {
                 if (newPos == null) {
                     final Point2D max = getLastPosition();
                     final float maxYPos = (float) max.getY();
-                    getVertexLocations().put(v,
-                                             new Point2D.Float(BD_X_POS,
-                                                               maxYPos + 40));
+                    getVertexLocations().put(v, new Point2D.Float(BD_X_POS, maxYPos + 40));
                     putVertexLocations();
                 } else {
                     getVertexLocations().put(v, newPos);
                     putVertexLocations();
                 }
             } else {
-                final Point2D p = getVisualizationViewer()
-                                    .getRenderContext()
-                                        .getMultiLayerTransformer()
-                                            .inverseTransform(Layer.VIEW, pos);
+                final Point2D p = getVisualizationViewer().getRenderContext().getMultiLayerTransformer()
+                                                                             .inverseTransform(Layer.VIEW, pos);
                 getVertexLocations().put(v, posWithScrollbar(p));
                 putVertexLocations();
             }
@@ -413,9 +367,7 @@ public class CRMGraph extends ResourceGraph {
     }
 
     /** Adds order constraint from parent to the service. */
-    public void addOrder(final String ordId,
-                         final ServiceInfo parent,
-                         final ServiceInfo serviceInfo) {
+    public void addOrder(final String ordId, final ServiceInfo parent, final ServiceInfo serviceInfo) {
         if (parent == null || serviceInfo == null) {
             return;
         }
@@ -500,8 +452,7 @@ public class CRMGraph extends ResourceGraph {
     }
 
     /** Returns whether these two services are colocated. */
-    public boolean isColocation(final ServiceInfo parent,
-                                final ServiceInfo serviceInfo) {
+    public boolean isColocation(final ServiceInfo parent, final ServiceInfo serviceInfo) {
         final Vertex vP = getVertex(parent);
         final Vertex v = getVertex(serviceInfo);
         if (vP == null || v == null) {
@@ -518,8 +469,7 @@ public class CRMGraph extends ResourceGraph {
     }
 
     /** Returns whether these two services are ordered. */
-    public boolean isOrder(final ServiceInfo parent,
-                           final ServiceInfo serviceInfo) {
+    public boolean isOrder(final ServiceInfo parent, final ServiceInfo serviceInfo) {
         final Vertex vP = getVertex(parent);
         final Vertex v = getVertex(serviceInfo);
         if (vP == null || v == null) {
@@ -536,9 +486,7 @@ public class CRMGraph extends ResourceGraph {
     }
 
     /** Adds colocation constraint from parent to the service. */
-    public void addColocation(final String colId,
-                              final ServiceInfo rsc,
-                              final ServiceInfo withRsc) {
+    public void addColocation(final String colId, final ServiceInfo rsc, final ServiceInfo withRsc) {
         if (rsc == null || withRsc == null) {
             return;
         }
@@ -554,15 +502,13 @@ public class CRMGraph extends ResourceGraph {
             final ConstraintPHInfo cphi;
             if (rsc.isConstraintPH()) {
                 cphi = (ConstraintPHInfo) rsc;
-                final ServiceInfo si = cphi.nextInSequence(withRsc,
-                                                           true);
+                final ServiceInfo si = cphi.nextInSequence(withRsc, true);
                 if (si != null) {
                     vRsc = getVertex(si);
                 }
             } else {
                 cphi = (ConstraintPHInfo) withRsc;
-                final ServiceInfo si = cphi.prevInSequence(rsc,
-                                                           true);
+                final ServiceInfo si = cphi.prevInSequence(rsc, true);
                 if (si != null) {
                     vWithRsc = getVertex(si);
                 }
@@ -683,8 +629,7 @@ public class CRMGraph extends ResourceGraph {
 
     /** Returns shape of the service vertex. */
     @Override
-    protected Shape getVertexShape(final Vertex v,
-                                   final VertexShapeFactory<Vertex> factory) {
+    protected Shape getVertexShape(final Vertex v, final VertexShapeFactory<Vertex> factory) {
         if (vertexToHostMap.containsKey(v)) {
             return factory.getRectangle(v);
         } else if (vertexToConstraintPHMap.containsKey(v)) {
@@ -692,16 +637,10 @@ public class CRMGraph extends ResourceGraph {
         } else {
             final RoundRectangle2D r = factory.getRoundRectangle(v);
 
-            return new RoundRectangle2D.Double(r.getX(),
-                                        r.getY(),
-                                        r.getWidth(),
-                                        r.getHeight(),
-                                        20,
-                                        20);
+            return new RoundRectangle2D.Double(r.getX(), r.getY(), r.getWidth(), r.getHeight(), 20, 20);
         }
     }
 
-    /** Picks info. */
     @Override
     public void pickInfo(final Info i) {
         final GroupInfo groupInfo = ((ServiceInfo) i).getGroupInfo();
@@ -710,10 +649,8 @@ public class CRMGraph extends ResourceGraph {
         } else {
             /* group is picked in the graph, if group service was selected. */
             final Vertex v = getVertex(groupInfo);
-            final PickedState<Edge> psEdge =
-              getVisualizationViewer().getRenderContext().getPickedEdgeState();
-            final PickedState<Vertex> psVertex =
-             getVisualizationViewer().getRenderContext().getPickedVertexState();
+            final PickedState<Edge> psEdge = getVisualizationViewer().getRenderContext().getPickedEdgeState();
+            final PickedState<Vertex> psVertex = getVisualizationViewer().getRenderContext().getPickedVertexState();
             psEdge.clear();
             psVertex.clear();
             psVertex.pick(v, true);
@@ -722,9 +659,7 @@ public class CRMGraph extends ResourceGraph {
 
     /** Handles right click on the service vertex and creates popup menu. */
     @Override
-    protected void handlePopupVertex(final Vertex v,
-                                     final List<Vertex> pickedV,
-                                     final Point2D pos) {
+    protected void handlePopupVertex(final Vertex v, final List<Vertex> pickedV, final Point2D pos) {
         final Info info;
         if (pickedV.size() > 1) {
             info = multiSelectionInfo;
@@ -746,8 +681,7 @@ public class CRMGraph extends ResourceGraph {
      * Recreates the add existing service popup, since it can change in
      * very unlikely event.
      */
-    private void reloadAddExistingServicePopup(final JMenu addServiceMenuItem,
-                                               final Vertex v) {
+    private void reloadAddExistingServicePopup(final JMenu addServiceMenuItem, final Vertex v) {
         if (addServiceMenuItem == null) {
             return;
         }
@@ -758,14 +692,12 @@ public class CRMGraph extends ResourceGraph {
         }
         boolean separatorAdded = false;
         final Application.RunMode runMode = getRunMode();
-        for (final ServiceInfo asi
-                            : getClusterBrowser().getExistingServiceList(si)) {
-            final MyMenuItem mmi = new MyMenuItem(
-                          asi.toString(),
-                          null,
-                          null,
-                          new AccessMode(Application.AccessType.ADMIN, false),
-                          new AccessMode(Application.AccessType.OP, false)) {
+        for (final ServiceInfo asi : getClusterBrowser().getExistingServiceList(si)) {
+            final MyMenuItem mmi = new MyMenuItem(asi.toString(),
+                                                  null,
+                                                  null,
+                                                  new AccessMode(Application.AccessType.ADMIN, false),
+                                                  new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
                 @Override
                 public void action() {
@@ -779,8 +711,7 @@ public class CRMGraph extends ResourceGraph {
                     repaint();
                 }
             };
-            if ("Filesystem".equals(asi.getInternalValue())
-                || "IPaddr2".equals(asi.getInternalValue())) {
+            if ("Filesystem".equals(asi.getInternalValue()) || "IPaddr2".equals(asi.getInternalValue())) {
 
                 mmi.setSpecialFont();
                 addServiceMenuItem.add(mmi);
@@ -829,8 +760,7 @@ public class CRMGraph extends ResourceGraph {
     protected void vertexReleased(final Vertex v, final Point2D pos) {
         double x = pos.getX();
         double y = pos.getY();
-        final double minPos = (getVertexWidth(v)
-                               - getDefaultVertexWidth(v)) / 2;
+        final double minPos = (getVertexWidth(v) - getDefaultVertexWidth(v)) / 2;
         x = x < minPos ? minPos : x;
         x = x > MAX_X_POS ? MAX_X_POS : x;
         y = y < MIN_Y_POS ? MIN_Y_POS : y;
@@ -851,8 +781,7 @@ public class CRMGraph extends ResourceGraph {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
-                Tools.getGUIData().setTerminalPanel(
-                                              hi.getHost().getTerminalPanel());
+                Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
                 getClusterBrowser().setRightComponentInView(hi);
             }
         } else if (vertexToConstraintPHMap.containsKey(v)) {
@@ -931,8 +860,7 @@ public class CRMGraph extends ResourceGraph {
             s.append(" are located");
         }
         if (edgeIsColocation) {
-            final HbConnectionInfo.ColScoreType colSType =
-                                        hbci.getColocationScoreType(null, null);
+            final HbConnectionInfo.ColScoreType colSType = hbci.getColocationScoreType(null, null);
             if (colSType == HbConnectionInfo.ColScoreType.NEGATIVE
                 || colSType == HbConnectionInfo.ColScoreType.MINUS_INFINITY) {
                 s.append(" not on the same host");
@@ -969,15 +897,15 @@ public class CRMGraph extends ResourceGraph {
         }
         final Set<Vertex> vipl = getVertexIsPresentList();
         putVertexIsPresentList();
-        if (getClusterBrowser().allHostsDown()) {
+        if (getClusterBrowser().allHostsWithoutClusterStatus()) {
             return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (si.getService().isOrphaned()) {
             return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (si.isFailed(runMode)) {
             return Tools.getDefaultColor("CRMGraph.FillPaintFailed");
         } else if (!si.isRunning(runMode)) {
-            return ClusterBrowser.FILL_PAINT_STOPPED;
-        } else if (getClusterBrowser().clStatusFailed()) {
+            return ClusterBrowser.SERVICE_STOPPED_FILL_PAINT;
+        } else if (getClusterBrowser().crmStatusFailed()) {
             return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (vipl.contains(v) || Application.isTest(runMode)) {
             final List<Color> colors = si.getHostColors(runMode);
@@ -1000,8 +928,7 @@ public class CRMGraph extends ResourceGraph {
             return Tools.getString("CRMGraph.Simulate");
         }
         final boolean edgeIsOrder = edgeIsOrderList.contains(e);
-        final boolean edgeIsColocation =
-                                    edgeIsColocationList.contains(e);
+        final boolean edgeIsColocation = edgeIsColocationList.contains(e);
         final Pair<Vertex> p = getGraph().getEndpoints(e);
         if (p == null) {
             return "";
@@ -1026,8 +953,7 @@ public class CRMGraph extends ResourceGraph {
         }
         String leftArrow = "\u2190 "; /* <- */
         String rightArrow = " \u2192"; /* -> */
-        final HbConnectionInfo.ColScoreType colSType =
-                                    hbci.getColocationScoreType(null, null);
+        final HbConnectionInfo.ColScoreType colSType = hbci.getColocationScoreType(null, null);
         if (edgeIsColocation) {
             if (hbci.isColocationTwoDirections()) {
                 leftArrow = "\u21AE "; /* </> */
@@ -1049,7 +975,7 @@ public class CRMGraph extends ResourceGraph {
         }
         String ordScore = "";
         if (edgeIsOrder && hbci.isOrdScoreNull(null, null)) {
-                ordScore = "0";
+            ordScore = "0";
         }
 
         String colDesc = null;
@@ -1145,11 +1071,9 @@ public class CRMGraph extends ResourceGraph {
         }
         if (hbci != null && hbci.isNew()) {
             return Tools.getDefaultColor("ResourceGraph.EdgeDrawPaintNew");
-        } else if (edgeIsOrderList.contains(e)
-                   && edgeIsColocationList.contains(e)) {
+        } else if (edgeIsOrderList.contains(e) && edgeIsColocationList.contains(e)) {
             return super.getEdgeDrawPaint(e);
-        } else if (edgeIsOrderList.contains(e)
-                   || edgeIsColocationList.contains(e)) {
+        } else if (edgeIsOrderList.contains(e) || edgeIsColocationList.contains(e)) {
             return Tools.getDefaultColor("ResourceGraph.EdgeDrawPaintBrighter");
         } else {
             return Tools.getDefaultColor("ResourceGraph.EdgeDrawPaintRemoved");
@@ -1168,16 +1092,12 @@ public class CRMGraph extends ResourceGraph {
         }
         if (hbci != null && hbci.isNew()) {
             return Tools.getDefaultColor("ResourceGraph.EdgePickedPaintNew");
-        } else if (edgeIsOrderList.contains(e)
-                   && edgeIsColocationList.contains(e)) {
+        } else if (edgeIsOrderList.contains(e) && edgeIsColocationList.contains(e)) {
             return super.getEdgePickedPaint(e);
-        } else if (edgeIsOrderList.contains(e)
-                   || edgeIsColocationList.contains(e)) {
-            return Tools.getDefaultColor(
-                                    "ResourceGraph.EdgePickedPaintBrighter");
+        } else if (edgeIsOrderList.contains(e) || edgeIsColocationList.contains(e)) {
+            return Tools.getDefaultColor("ResourceGraph.EdgePickedPaintBrighter");
         } else {
-            return Tools.getDefaultColor(
-                                    "ResourceGraph.EdgePickedPaintRemoved");
+            return Tools.getDefaultColor("ResourceGraph.EdgePickedPaintRemoved");
         }
     }
 
@@ -1187,8 +1107,7 @@ public class CRMGraph extends ResourceGraph {
      */
     public void killRemovedEdges() {
         lockGraph();
-        final Collection<Edge> edges =
-                            new ArrayList<Edge>(getGraph().getEdges().size());
+        final Collection<Edge> edges = new ArrayList<Edge>(getGraph().getEdges().size());
         for (final Edge e : getGraph().getEdges()) {
             edges.add(e);
         }
@@ -1196,13 +1115,11 @@ public class CRMGraph extends ResourceGraph {
 
         for (final Edge e : edges) {
             final Pair<Vertex> p = getGraph().getEndpoints(e);
-            final ServiceInfo s1 =
-                    (ServiceInfo) getInfo(p.getSecond());
+            final ServiceInfo s1 = (ServiceInfo) getInfo(p.getSecond());
             if (s1 == null) {
                 continue;
             }
-            final ServiceInfo s2 =
-                    (ServiceInfo) getInfo(p.getFirst());
+            final ServiceInfo s2 = (ServiceInfo) getInfo(p.getFirst());
             if (s2 == null) {
                 continue;
             }
@@ -1213,7 +1130,7 @@ public class CRMGraph extends ResourceGraph {
                 edgeIsColocationList.remove(e);
             }
             if (s1.getService().isNew() && !s1.getService().isRemoved()
-                    || (s2.getService().isNew() && !s2.getService().isRemoved())) {
+                || (s2.getService().isNew() && !s2.getService().isRemoved())) {
                 continue;
             }
             if (!keepEdgeIsOrderList.contains(e)) {
@@ -1241,8 +1158,7 @@ public class CRMGraph extends ResourceGraph {
                     hbci.removeColocations();
                 }
             }
-            if (!keepEdgeIsOrderList.contains(e)
-                    && !keepEdgeIsColocationList.contains(e)) {
+            if (!keepEdgeIsOrderList.contains(e) && !keepEdgeIsColocationList.contains(e)) {
                 removeEdge(e, Application.RunMode.LIVE);
             }
         }
@@ -1261,8 +1177,7 @@ public class CRMGraph extends ResourceGraph {
             unlockGraph();
             mHbConnectionWriteLock.lock();
             try {
-                final HbConnectionInfo hbci =
-                                        edgeToHbconnectionMap.get(e);
+                final HbConnectionInfo hbci = edgeToHbconnectionMap.get(e);
                 edgeToHbconnectionMap.remove(e);
                 if (hbci != null) {
                     hbconnectionToEdgeMap.remove(hbci);
@@ -1288,8 +1203,7 @@ public class CRMGraph extends ResourceGraph {
                 continue;
             }
             lockGraph();
-            if (!getGraph().getInEdges(v).isEmpty()
-                || !getGraph().getOutEdges(v).isEmpty()) {
+            if (!getGraph().getInEdges(v).isEmpty() || !getGraph().getOutEdges(v).isEmpty()) {
                 unlockGraph();
                 continue;
             }
@@ -1303,7 +1217,7 @@ public class CRMGraph extends ResourceGraph {
                 }
                 if (!vipl.contains(v)) {
                     cphi.setUpdated(false);
-                    if (!getClusterBrowser().clStatusFailed()
+                    if (!getClusterBrowser().crmStatusFailed()
                         && cphi.getService().isRemoved()) {
                         getVertexLocations().put(v, null);
                         putVertexLocations();
@@ -1325,10 +1239,7 @@ public class CRMGraph extends ResourceGraph {
             } else {
                 if (!vipl.contains(v)) {
                     final ServiceInfo si = (ServiceInfo) getInfo(v);
-                    if (si != null
-                        && !si.getService().isNew()
-                        && !getClusterBrowser().clStatusFailed()) {
-
+                    if (si != null && !si.getService().isNew() && !getClusterBrowser().crmStatusFailed()) {
                         si.setUpdated(false);
                         getVertexLocations().put(v, null);
                         putVertexLocations();
@@ -1388,7 +1299,6 @@ public class CRMGraph extends ResourceGraph {
         return vertexIsPresentList;
     }
 
-    /** Releases mVertexIsPresentListLock. */
     void putVertexIsPresentList() {
         mVertexIsPresentListLock.unlock();
     }
@@ -1412,26 +1322,13 @@ public class CRMGraph extends ResourceGraph {
         }
     }
 
-    ///** Set vertex as present. */
-    //public final void setVertexIsPresent(final ServiceInfo si) {
-    //    final Vertex v = getVertex(si);
-    //    if (v == null) {
-    //        //Tools.Toolsrror("no vertex associated with service info");
-    //        /* group vertices */
-    //        return;
-    //    }
-    //    getVertexIsPresentList().add(v);
-    //    putVertexIsPresentList();
-    //}
-
     /** Returns an icon for the vertex. */
     @Override
-    protected List<ImageIcon> getIconsForVertex(final Vertex v,
-                                                final Application.RunMode runMode) {
+    protected List<ImageIcon> getIconsForVertex(final Vertex v, final Application.RunMode runMode) {
         final List<ImageIcon> icons = new ArrayList<ImageIcon>();
         final HostInfo hi = vertexToHostMap.get(v);
         if (hi != null) {
-            if (hi.getHost().isClStatus()) {
+            if (hi.getHost().isCrmStatusOk()) {
                 icons.add(HostBrowser.HOST_ON_ICON_LARGE);
             } else {
                 icons.add(HostBrowser.HOST_ICON_LARGE);
@@ -1454,8 +1351,7 @@ public class CRMGraph extends ResourceGraph {
             } else {
                 icons.add(SERVICE_STOPPED_FAILED_ICON);
             }
-        } else if (si.isStopped(runMode)
-                   || getClusterBrowser().allHostsDown()) {
+        } else if (si.isStopped(runMode) || getClusterBrowser().allHostsWithoutClusterStatus()) {
             if (si.isRunning(runMode)) {
                 icons.add(SERVICE_STOPPING_ICON);
             } else {
@@ -1471,8 +1367,7 @@ public class CRMGraph extends ResourceGraph {
         if (!si.isManaged(runMode) || si.getService().isOrphaned()) {
             icons.add(SERVICE_UNMANAGED_ICON);
         }
-        if (si.getMigratedTo(runMode) != null
-            || si.getMigratedFrom(runMode) != null) {
+        if (si.getMigratedTo(runMode) != null || si.getMigratedFrom(runMode) != null) {
             icons.add(SERVICE_MIGRATED_ICON);
         }
         return icons;
@@ -1514,8 +1409,7 @@ public class CRMGraph extends ResourceGraph {
     public void reloadServiceMenus() {
         lockGraph();
         for (final Vertex v : getGraph().getVertices()) {
-            final JMenu existingServiceMenuItem =
-                                vertexToAddExistingServiceMap.get(v);
+            final JMenu existingServiceMenuItem = vertexToAddExistingServiceMap.get(v);
             reloadAddExistingServicePopup(existingServiceMenuItem, v);
         }
         unlockGraph();
@@ -1537,9 +1431,7 @@ public class CRMGraph extends ResourceGraph {
     }
 
     /** Removes the connection, the order, the colocation or both. */
-    public void removeConnection(final HbConnectionInfo hbci,
-                                 final Host dcHost,
-                                 final Application.RunMode runMode) {
+    public void removeConnection(final HbConnectionInfo hbci, final Host dcHost, final Application.RunMode runMode) {
         final ServiceInfo siP = hbci.getLastServiceInfoParent();
         final ServiceInfo siC = hbci.getLastServiceInfoChild();
         mHbConnectionReadLock.lock();
@@ -1584,10 +1476,7 @@ public class CRMGraph extends ResourceGraph {
         }
     }
 
-    /** Removes order. */
-    public void removeOrder(final HbConnectionInfo hbci,
-                            final Host dcHost,
-                            final Application.RunMode runMode) {
+    public void removeOrder(final HbConnectionInfo hbci, final Host dcHost, final Application.RunMode runMode) {
         if (hbci == null) {
             return;
         }
@@ -1621,19 +1510,13 @@ public class CRMGraph extends ResourceGraph {
         }
     }
 
-    /** Adds order. */
     public void addOrder(final HbConnectionInfo hbConnectionInfo,
                          final Host dcHost,
                          final Application.RunMode runMode) {
         final ServiceInfo siRsc = hbConnectionInfo.getLastServiceInfoRsc();
-        final ServiceInfo siWithRsc =
-                                  hbConnectionInfo.getLastServiceInfoWithRsc();
-        if ((siWithRsc != null
-             && siWithRsc.getService() != null
-             && siWithRsc.getService().isNew())
-            || (siRsc != null
-                && siRsc.getService() != null
-                && siRsc.getService().isNew())) {
+        final ServiceInfo siWithRsc = hbConnectionInfo.getLastServiceInfoWithRsc();
+        if ((siWithRsc != null && siWithRsc.getService() != null && siWithRsc.getService().isNew())
+            || (siRsc != null && siRsc.getService() != null && siRsc.getService().isNew())) {
             addOrder(null, siRsc, siWithRsc);
         } else {
             siWithRsc.addOrder(siRsc, dcHost, runMode);
@@ -1650,10 +1533,7 @@ public class CRMGraph extends ResourceGraph {
         }
     }
 
-    /** Removes colocation. */
-    public void removeColocation(final HbConnectionInfo hbci,
-                                 final Host dcHost,
-                                 final Application.RunMode runMode) {
+    public void removeColocation(final HbConnectionInfo hbci, final Host dcHost, final Application.RunMode runMode) {
         final ServiceInfo siRsc = hbci.getLastServiceInfoRsc();
         final ServiceInfo siWithRsc = hbci.getLastServiceInfoWithRsc();
         mHbConnectionReadLock.lock();
@@ -1780,8 +1660,7 @@ public class CRMGraph extends ResourceGraph {
 
     /** Small text that appears in the right corner. */
     @Override
-    protected Subtext getRightCornerText(final Vertex v,
-                                         final Application.RunMode runMode) {
+    protected Subtext getRightCornerText(final Vertex v, final Application.RunMode runMode) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             return hi.getRightCornerTextForGraph(runMode);
@@ -1863,23 +1742,20 @@ public class CRMGraph extends ResourceGraph {
             final int number = colors.size();
             if (number > 1) {
                 for (int i = 1; i < number; i++) {
-                    final Paint p = new GradientPaint(
-                                                (float) x + width / number,
-                                                (float) y,
-                                                getVertexFillSecondaryColor(v),
-                                                (float) x + width / number,
-                                                (float) y + height,
-                                                colors.get(i),
-                                                false);
+                    final Paint p = new GradientPaint((float) x + width / number,
+                                                      (float) y,
+                                                      getVertexFillSecondaryColor(v),
+                                                      (float) x + width / number,
+                                                      (float) y + height,
+                                                      colors.get(i),
+                                                      false);
                     g2d.setPaint(p);
-                    final Shape s =
-                       new RoundRectangle2D.Double(
-                                    x + (width / number) * i - 5,
-                                    y,
-                                    width / number + (i < number - 1 ? 20 : 5),
-                                    height,
-                                    20,
-                                    20);
+                    final Shape s = new RoundRectangle2D.Double(x + (width / number) * i - 5,
+                                                                y,
+                                                                width / number + (i < number - 1 ? 20 : 5),
+                                                                height,
+                                                                20,
+                                                                20);
                     g2d.fill(s);
                 }
             }
@@ -1888,12 +1764,7 @@ public class CRMGraph extends ResourceGraph {
                 /** Show how much is used. */
                 final double freeWidth = width * (100 - used) / 100;
                 final Shape freeShape =
-                   new RoundRectangle2D.Double(x + width - freeWidth,
-                                               y,
-                                               freeWidth,
-                                               height,
-                                               20,
-                                               20);
+                   new RoundRectangle2D.Double(x + width - freeWidth, y, freeWidth, height, 20, 20);
                 g2d.setColor(new Color(255, 255, 255, 180));
                 g2d.fill(freeShape);
             }
@@ -1913,8 +1784,7 @@ public class CRMGraph extends ResourceGraph {
 
     /** Returns all crm connections. */
     Iterable<HbConnectionInfo> getAllHbConnections() {
-        final Collection<HbConnectionInfo> allConnections =
-                                            new ArrayList<HbConnectionInfo>();
+        final Collection<HbConnectionInfo> allConnections = new ArrayList<HbConnectionInfo>();
         mHbConnectionReadLock.lock();
         try {
             for (final HbConnectionInfo hbci : hbconnectionToEdgeMap.keySet()) {
@@ -1958,10 +1828,7 @@ public class CRMGraph extends ResourceGraph {
             if (newPos == null) {
                 final Point2D max = getLastPosition();
                 final float maxYPos = (float) max.getY();
-                getVertexLocations().put(
-                                        v,
-                                        new Point2D.Float(BD_X_POS,
-                                                          maxYPos + 40));
+                getVertexLocations().put(v, new Point2D.Float(BD_X_POS, maxYPos + 40));
                 putVertexLocations();
             } else {
                 getVertexLocations().put(v, newPos);
@@ -1982,7 +1849,6 @@ public class CRMGraph extends ResourceGraph {
         somethingChanged();
     }
 
-    /** Returns height of the vertex. */
     @Override
     protected int getDefaultVertexHeight(final Vertex v) {
         if (vertexToConstraintPHMap.containsKey(v)) {
@@ -1993,7 +1859,6 @@ public class CRMGraph extends ResourceGraph {
     }
 
 
-    /** Returns the width of the service vertex shape. */
     @Override
     protected int getDefaultVertexWidth(final Vertex v) {
         if (vertexToConstraintPHMap.containsKey(v)) {
@@ -2003,13 +1868,11 @@ public class CRMGraph extends ResourceGraph {
         }
     }
 
-    /** Sets the vertex width. */
     @Override
     protected void setVertexWidth(final Vertex v, final int size) {
         super.setVertexWidth(v, size);
     }
 
-    /** Sets the vertex height. */
     @Override
     protected void setVertexHeight(final Vertex v, final int size) {
         super.setVertexHeight(v, size);
@@ -2019,17 +1882,14 @@ public class CRMGraph extends ResourceGraph {
     @Override
     protected void multiSelection() {
         final List<Info> selectedInfos = new ArrayList<Info>();
-        final PickedState<Vertex> ps =
-                getVisualizationViewer().getRenderContext()
-                                                    .getPickedVertexState();
+        final PickedState<Vertex> ps = getVisualizationViewer().getRenderContext().getPickedVertexState();
         for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             if (i != null) {
                 selectedInfos.add(i);
             }
         }
-        multiSelectionInfo = new PcmkMultiSelectionInfo(selectedInfos,
-                                                        getClusterBrowser());
+        multiSelectionInfo = new PcmkMultiSelectionInfo(selectedInfos, getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
 }

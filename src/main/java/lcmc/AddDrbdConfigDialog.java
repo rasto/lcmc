@@ -37,27 +37,15 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * AddDrbdConfigDialog.
- *
  * Show step by step dialogs that add and configure new host.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class AddDrbdConfigDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                           LoggerFactory.getLogger(AddDrbdConfigDialog.class);
-    /** Whether the wizard was canceled. */
-    private boolean canceled = false;
-    /** Drbd resource info object. */
+    private static final Logger LOG = LoggerFactory.getLogger(AddDrbdConfigDialog.class);
+    private boolean wizardCanceled = false;
     private final GlobalInfo globalInfo;
-    /** The first block device. */
     private final BlockDevInfo blockDevInfo1;
-    /** The second block device. */
     private final BlockDevInfo blockDevInfo2;
 
-    /** Prepares new {@code AddDrbdConfigDialog} object. */
     public AddDrbdConfigDialog(final GlobalInfo globalInfo,
                                final BlockDevInfo blockDevInfo1,
                                final BlockDevInfo blockDevInfo2) {
@@ -66,23 +54,16 @@ public final class AddDrbdConfigDialog {
         this.blockDevInfo2 = blockDevInfo2;
     }
 
-    /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
-        //dri.setDialogStarted(true);
         WizardDialog dialog;
-        if (!globalInfo.getDrbdResources().isEmpty()
-            && globalInfo.atLeastVersion("8.4")) {
+        if (!globalInfo.getDrbdResources().isEmpty() && globalInfo.atLeastVersion("8.4")) {
             dialog = new Start(null, globalInfo, blockDevInfo1, blockDevInfo2);
         } else {
-            final List<BlockDevInfo> bdis =
-                                new ArrayList<BlockDevInfo>(Arrays.asList(
-                                                              blockDevInfo1,
-                                                              blockDevInfo2));
-            final ResourceInfo resourceInfo =
-                        globalInfo.getNewDrbdResource(
-                               VolumeInfo.getHostsFromBlockDevices(bdis));
-            final VolumeInfo dvi =
-                            globalInfo.getNewDrbdVolume(resourceInfo, bdis);
+            final List<BlockDevInfo> blockDevices = new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
+                                                                                              blockDevInfo2));
+            final ResourceInfo resourceInfo = globalInfo.getNewDrbdResource(
+                                                            VolumeInfo.getHostsFromBlockDevices(blockDevices));
+            final VolumeInfo dvi = globalInfo.getNewDrbdVolume(resourceInfo, blockDevices);
             resourceInfo.addDrbdVolume(dvi);
             globalInfo.addDrbdResource(resourceInfo);
             Tools.invokeAndWait(new Runnable() {
@@ -99,28 +80,21 @@ public final class AddDrbdConfigDialog {
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                canceled = true;
+                wizardCanceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
-                //dri.getBrowser().reloadAllComboBoxes(null);
-                //dri.setDialogStarted(false);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;
         }
-        //dri.setDialogStarted(false);
-        //dri.getBrowser().reloadAllComboBoxes(null);
     }
 
-    /** Returns whether the wizard was canceled. */
-    public boolean isCanceled() {
-        return canceled;
+    public boolean isWizardCanceled() {
+        return wizardCanceled;
     }
 }

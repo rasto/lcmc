@@ -53,7 +53,7 @@ final class PcmkTestF {
         aborted = false;
         disableStonith();
         final String testName = "testF";
-        final String distro = cluster.getHostsArray()[0].getDist();
+        final String distro = cluster.getHostsArray()[0].getDistributionName();
         checkTest(testName, 1);
         /* group with dummy resources */
         final int gx = 235;

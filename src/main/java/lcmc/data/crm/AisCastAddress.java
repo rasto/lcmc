@@ -25,10 +25,6 @@ package lcmc.data.crm;
 /**
  * This class holds data for multicast and broadcast addresses for openais
  * communication.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class AisCastAddress {
     /** Type of the cast address. */
@@ -37,12 +33,8 @@ public final class AisCastAddress {
     private final String bindnetaddr;
     /** A multicast IP address. */
     private final String address;
-    /** Port. */
     private final String port;
 
-    /**
-     * Prepares a new {@code AisCastAddress} object.
-     */
     public AisCastAddress(final String type,
                           final String bindnetaddr,
                           final String address,
@@ -91,13 +83,11 @@ public final class AisCastAddress {
         }
     }
 
-    /** Compares two mcast addresses if they are the same. */
     public boolean equals(final String tab,
                           final String t,
                           final String b,
                           final String a,
                           final String p) {
-        return convert(tab, type, bindnetaddr, address, port).equals(
-                                                    convert(tab, t, b, a, p));
+        return convert(tab, type, bindnetaddr, address, port).equals(convert(tab, t, b, a, p));
     }
 }

@@ -17,7 +17,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.awt.Color;
@@ -48,19 +47,10 @@ import lcmc.utilities.WidgetListener;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
-//TODO: public final class ComboBox<E> extends Widget {
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Scrollbar max rows. */
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
 
-    /** Add items to the combo box. */
     protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
         Value selectedValueInfo = null;
         if (items != null) {
@@ -78,30 +68,27 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         return selectedValueInfo;
     }
 
-    /** Prepares a new {@code ComboBox} object. */
-    public ComboBox(
-        final Value selectedValue, final Value[] items, final String regexp, final int width, final Map<String, String> abbreviations, final AccessMode enableAccessMode, final MyButton fieldButton) {
-        super(regexp,
-              enableAccessMode,
-              fieldButton);
-        addComponent(getComboBox(selectedValue,
-                                 items,
-                                 regexp,
-                                 abbreviations),
-                     width);
+    public ComboBox(final Value selectedValue,
+                    final Value[] items,
+                    final String regexp,
+                    final int width,
+                    final Map<String, String> abbreviations,
+                    final AccessMode enableAccessMode,
+                    final MyButton fieldButton) {
+        super(regexp, enableAccessMode, fieldButton);
+        addComponent(getComboBox(selectedValue, items, regexp, abbreviations), width);
     }
 
     /** Returns combo box with items in the combo and selectedValue on top. */
-    private MComboBox<Value> getComboBox(final Value selectedValue, final Value[] items, final String regexp, final Map<String, String> abbreviations) {
+    private MComboBox<Value> getComboBox(final Value selectedValue,
+                                         final Value[] items,
+                                         final String regexp,
+                                         final Map<String, String> abbreviations) {
         final List<Value> comboList = new ArrayList<Value>();
 
-        final Value selectedValueInfo = addItems(comboList,
-                                                 selectedValue,
-                                                 items);
-        final MComboBox<Value> cb = new MComboBox<Value>(comboList.toArray(
-            new Value[comboList.size()]));
-        final JTextComponent editor =
-            (JTextComponent) cb.getEditor().getEditorComponent();
+        final Value selectedValueInfo = addItems(comboList, selectedValue, items);
+        final MComboBox<Value> cb = new MComboBox<Value>(comboList.toArray(new Value[comboList.size()]));
+        final JTextComponent editor = (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
@@ -130,23 +117,22 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         return cb;
     }
 
-    /** Returns true if combo box has changed. */
-        private boolean hasComboBoxChanged(final Value[] items) {
-            final MComboBox<Value> cb = getInternalComponent();
-            if (items.length != cb.getItemCount()) {
+    private boolean hasComboBoxChanged(final Value[] items) {
+        final MComboBox<Value> cb = getInternalComponent();
+        if (items.length != cb.getItemCount()) {
+            return true;
+        }
+        
+        for (int i = 0; i < items.length; i++) {
+            if (!Tools.areEqual(items[i], cb.getItemAt(i))) {
                 return true;
             }
-            
-            for (int i = 0; i < items.length; i++) {
-                if (!Tools.areEqual(items[i], cb.getItemAt(i))) {
-                    return true;
-                }
-            }
-            return false;
         }
+        return false;
+    }
 
     /** Reloads combo box with items and selects supplied value. */
-        @Override
+    @Override
     public void reloadComboBox(final Value selectedValue, final Value[] items) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
@@ -160,12 +146,9 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                     selectedItem = (Value) selectedObject;
                 }
                 boolean selectedChanged = false;
-                if (selectedValue == null
-                    && selectedItem != null
-                    && !selectedItem.isNothingSelected()) {
+                if (selectedValue == null && selectedItem != null && !selectedItem.isNothingSelected()) {
                     selectedChanged = true;
-                } else if (selectedValue != null
-                           && !selectedValue.equals(selectedItem)) {
+                } else if (selectedValue != null && !selectedValue.equals(selectedItem)) {
                     selectedChanged = true;
                 }
                 final boolean itemsChanged = hasComboBoxChanged(items);
@@ -177,9 +160,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
                 /* removing dupicates */
 
                 final Collection<Value> comboList = new ArrayList<Value>();
-                final Value selectedValueInfo = addItems(comboList,
-                                                         selectedValue,
-                                                         items);
+                final Value selectedValueInfo = addItems(comboList, selectedValue, items);
                 
                 if (itemsChanged) {
                     final Collection<Value> itemCache = new HashSet<Value>();
@@ -241,8 +222,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     protected Value getValueInternal() {
         final MComboBox<Value> cb = getInternalComponent();
         if (cb.isEditable()) {
-            final JTextComponent editor =
-                        (JTextComponent) cb.getEditor().getEditorComponent();
+            final JTextComponent editor = (JTextComponent) cb.getEditor().getEditorComponent();
             String text = editor.getText();
             if (text == null) {
                 text = "";
@@ -299,14 +279,12 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         }
     }
 
-    /** Set selected index. */
     @Override
     public void setSelectedIndex(final int index) {
         final MComboBox<Value> cb = getInternalComponent();
         cb.setSelectedIndex(index);
     }
 
-    /** Returns document object of the component. */
     @Override
     public Document getDocument() {
         final JTextComponent tc = getTextComponent();
@@ -319,9 +297,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         final JTextComponent tc = getTextComponent();
         final String ip = tc.getText();
         int p = ip.length() - 2;
-        while (p >= 0
-               && Tools.isIp(ip)
-               && ".0".equals(ip.substring(p, p + 2))) {
+        while (p >= 0 && Tools.isIp(ip) && ".0".equals(ip.substring(p, p + 2))) {
             p -= 2;
         }
         final int pos = p + 3;
@@ -335,7 +311,6 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         }
     }
 
-    /** Add item listener to the component. */
     @Override
     public void addListeners(final WidgetListener wl) {
         getWidgetListeners().add(wl);
@@ -344,12 +319,10 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     @Override
-    protected void setComponentBackground(final Color backgroundColor,
-                                          final Color compColor) {
+    protected void setComponentBackground(final Color backgroundColor, final Color compColor) {
         setBackground(Color.WHITE);
     }
 
-    /** Set background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -359,12 +332,6 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
             }
         });
     }
-
-    /** Returns item at the specified index. */
-    //@Override
-    //Value getItemAt(final int i) {
-    //    return (Value) ((MComboBox) getComponent()).getItemAt(i);
-    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override
@@ -380,7 +347,6 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         }
     }
 
-    /** Returns the text component of the combo box. */
     public JTextComponent getTextComponent() {
         final JComponent comp = getInternalComponent();
         final ComboBoxEditor editor = ((JComboBox) comp).getEditor();

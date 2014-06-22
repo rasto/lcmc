@@ -53,7 +53,7 @@ import lcmc.data.Application;
 import lcmc.data.Application.RunMode;
 import lcmc.data.Cluster;
 import lcmc.data.drbd.DRBDtestData;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
@@ -106,7 +106,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
 
     /** Sets stored parameters. */
     public void setParameters() {
-        final DrbdXML dxml = getBrowser().getDrbdXML();
+        final DrbdXml dxml = getBrowser().getDrbdXml();
         final Cluster cluster = getCluster();
         for (final String hostName : dxml.getProxyHostNames()) {
 
@@ -130,7 +130,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             final String section = sectionString.replaceAll("-options$", "");
             Value value;
             final Value defaultValue = getParamDefault(param);
-            if (DrbdXML.GLOBAL_SECTION.equals(section)) {
+            if (DrbdXml.GLOBAL_SECTION.equals(section)) {
                 value = dxml.getGlobalConfigValue(param);
                 if (value == null) {
                     value = defaultValue;
@@ -145,7 +145,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                 value = getComboBoxValue(param);
                 if (value == null || value.isNothingSelected()) {
                     /* we don't get this parameter from the dump. */
-                    value = DrbdXML.CONFIG_YES;
+                    value = DrbdXml.CONFIG_YES;
                 }
             }
             final Value oldValue = getParamSaved(param);
@@ -194,17 +194,17 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     /** Returns lsit of all parameters as an array. */
     @Override
     public String[] getParametersFromXML() {
-        final DrbdXML drbdXML = getBrowser().getDrbdXML();
-        if (drbdXML == null) {
+        final DrbdXml drbdXml = getBrowser().getDrbdXml();
+        if (drbdXml == null) {
             return null;
         }
-        return getEnabledSectionParams(drbdXML.getGlobalParams());
+        return getEnabledSectionParams(drbdXml.getGlobalParams());
     }
 
     /** Section name that is displayed. */
     @Override
     protected String getSectionDisplayName(final String section) {
-        if (DrbdXML.GLOBAL_SECTION.equals(section)) {
+        if (DrbdXml.GLOBAL_SECTION.equals(section)) {
             return super.getSectionDisplayName(section);
         } else {
             return Tools.getString("GlobalInfo.CommonSection")
@@ -218,7 +218,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
      */
     @Override
     protected String getSection(final String param) {
-        return getBrowser().getDrbdXML().getSection(param);
+        return getBrowser().getDrbdXml().getSection(param);
     }
 
     /** Applies changes made in the info panel by user. */
@@ -278,7 +278,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             return infoPanel;
         }
         final JPanel mainPanel = new JPanel();
-        if (getBrowser().getDrbdXML() == null) {
+        if (getBrowser().getDrbdXml() == null) {
             mainPanel.add(new JLabel("drbd info not available"));
             infoPanelDone();
             return mainPanel;
@@ -463,10 +463,10 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     @Override
     public void selectMyself() {
         if (selectedBD == null || !selectedBD.getBlockDevice().isDrbd()) {
-            getBrowser().reload(getNode(), true);
+            getBrowser().reloadNode(getNode(), true);
             getBrowser().nodeChanged(getNode());
         } else {
-            getBrowser().reload(selectedBD.getNode(), true);
+            getBrowser().reloadNode(selectedBD.getNode(), true);
             getBrowser().nodeChanged(selectedBD.getNode());
         }
     }
@@ -474,7 +474,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     /** Returns new drbd resource index, the one that is not used . */
     private int getNewDrbdResourceIndex() {
         final Iterator<String> it =
-                         getBrowser().getDrbdResHash().keySet().iterator();
+                         getBrowser().getDrbdResourceNameHash().keySet().iterator();
         int index = -1;
 
         while (it.hasNext()) {
@@ -537,7 +537,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                         bd1.widgetRemove(p, Widget.WIZARD_PREFIX);
                         bd2.widgetRemove(p, Widget.WIZARD_PREFIX);
                     }
-                    if (adrd.isCanceled()) {
+                    if (adrd.isWizardCanceled()) {
                         final VolumeInfo dvi = bd1.getDrbdVolumeInfo();
                         if (dvi != null) {
                             dvi.removeMyself(runMode);
@@ -572,7 +572,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                                     final ResourceInfo dri,
                                     final List<BlockDevInfo> blockDevInfos) {
         final Map<String, VolumeInfo> drbdDevHash =
-                                                getBrowser().getDrbdDevHash();
+                                                getBrowser().getDrbdDeviceHash();
         int index = 0;
         String drbdDevStr = "/dev/drbd" + Integer.toString(index);
 
@@ -595,12 +595,12 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         dri.getDrbdResource().setDefaultValue(
                                         ResourceInfo.DRBD_RES_PARAM_NAME,
                                         new StringValue(name));
-        getBrowser().getDrbdResHash().put(name, dri);
+        getBrowser().getDrbdResourceNameHash().put(name, dri);
         getBrowser().putDrbdResHash();
 
         final DefaultMutableTreeNode drbdResourceNode =
                                            new DefaultMutableTreeNode(dri);
-        getBrowser().reload(getBrowser().getDrbdNode(), true);
+        getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
@@ -656,7 +656,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         drbdVolumeNode.add(drbdBDNode2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
-        getBrowser().reload(drbdVolumeNode, true);
+        getBrowser().reloadNode(drbdVolumeNode, true);
         getBrowser().resetFilesystems();
     }
 
@@ -664,7 +664,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     public ResourceInfo addDrbdResource(final String name,
                                             final Set<Host> hosts,
                                             final Application.RunMode runMode) {
-        final DrbdXML dxml = getBrowser().getDrbdXML();
+        final DrbdXml dxml = getBrowser().getDrbdXml();
         final ResourceInfo dri =
                                new ResourceInfo(name, hosts, getBrowser());
         final String[] sections = dxml.getSections();
@@ -702,14 +702,14 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                                                    dri.getParametersFromXML(),
                                                    true));
         }
-        if (getBrowser().getDrbdResHash().isEmpty()) {
+        if (getBrowser().getDrbdResourceNameHash().isEmpty()) {
             getBrowser().putDrbdResHash();
             incorrect.add("no resources inside");
         } else {
             getBrowser().putDrbdResHash();
         }
 
-        final DrbdXML dxml = getBrowser().getDrbdXML();
+        final DrbdXml dxml = getBrowser().getDrbdXml();
         if (dxml != null && dxml.isDrbdDisabled()) {
             incorrect.add("DRBD is disabled");
         }
@@ -807,11 +807,11 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         host.getBrowser().setProxyHostInfo(proxyHostInfo);
         final DefaultMutableTreeNode proxyHostNode =
                                    new DefaultMutableTreeNode(proxyHostInfo);
-        getBrowser().reload(getBrowser().getDrbdNode(), true);
+        getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
         proxyHostInfo.setNode(proxyHostNode);
         Tools.isSwingThread();
         getBrowser().getDrbdNode().add(proxyHostNode);
-        getBrowser().reload(proxyHostNode, true);
+        getBrowser().reloadNode(proxyHostNode, true);
     }
 
     /**
@@ -832,15 +832,15 @@ public final class GlobalInfo extends AbstractDrbdInfo {
 
     public void updateDrbdInfo() {
         getBrowser().updateCommonBlockDevices();
-        final DrbdXML newDrbdXML = new DrbdXML(getCluster().getHostsArray(),
-                                               getBrowser().getDrbdParameters());
+        final DrbdXml newDrbdXml = new DrbdXml(getCluster().getHostsArray(),
+                                               getBrowser().getHostDrbdParameters());
         for (final Host host : getCluster().getHosts()) {
-            final String configString = newDrbdXML.getConfig(host);
+            final String configString = newDrbdXml.getConfig(host);
             if (configString != null) {
-                newDrbdXML.update(configString);
+                newDrbdXml.update(configString);
             }
         }
-        getBrowser().setDrbdXML(newDrbdXML);
+        getBrowser().setDrbdXml(newDrbdXml);
         getBrowser().resetFilesystems();
     }
 
@@ -870,17 +870,17 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             globalConfig.append("## generated by drbd-gui\n\n");
 
             final StringBuilder global = new StringBuilder(80);
-            final DrbdXML dxml = getBrowser().getDrbdXML();
+            final DrbdXml dxml = getBrowser().getDrbdXml();
             /* global options */
             final String[] params =
-                                dxml.getSectionParams(DrbdXML.GLOBAL_SECTION);
+                                dxml.getSectionParams(DrbdXml.GLOBAL_SECTION);
             global.append("global {\n");
             final boolean volumesAvailable = host.hasVolumes();
             for (final String param : params) {
                 Value value = getComboBoxValue(param);
                 if (value == null || value.isNothingSelected()) {
                     if ("usage-count".equals(param)) {
-                        value = DrbdXML.CONFIG_YES;
+                        value = DrbdXml.CONFIG_YES;
                     } else {
                         continue;
                     }
@@ -891,7 +891,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                             && (isCheckBox(param)
                                 || "booleanhandler".equals(
                                                        getParamType(param))))) {
-                        if (value.equals(DrbdXML.CONFIG_YES)) {
+                        if (value.equals(DrbdXml.CONFIG_YES)) {
                             /* boolean parameter */
                             global.append("\t\t").append(param).append(";\n");
                         }

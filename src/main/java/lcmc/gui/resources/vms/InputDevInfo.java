@@ -33,8 +33,8 @@ import javax.swing.JPanel;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.InputDevData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.InputDevData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
@@ -235,8 +235,8 @@ final class InputDevInfo extends HardwareInfo {
         final Map<String, String> parameters = getHWParameters(
                                                         getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Value type = getParamSaved(InputDevData.TYPE);
                 if (type == null) {
                     parameters.put(InputDevData.SAVED_TYPE, null);
@@ -255,17 +255,17 @@ final class InputDevInfo extends HardwareInfo {
 
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -356,8 +356,8 @@ final class InputDevInfo extends HardwareInfo {
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                              : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
+                        final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                        if (vmsXml != null) {
                             final Value savedValue =
                                                inputDevData.getValue(param);
                             if (savedValue != null) {
@@ -408,22 +408,22 @@ final class InputDevInfo extends HardwareInfo {
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(InputDevData.SAVED_TYPE,
                                getParamSaved(InputDevData.TYPE).getValueForConfig());
                 parameters.put(InputDevData.SAVED_BUS,
                                getParamSaved(InputDevData.BUS).getValueForConfig());
-                vmsxml.removeInputDevXML(
+                vmsXml.removeInputDevXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 
@@ -444,9 +444,9 @@ final class InputDevInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml, final Node node, final String domainName, final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyInputDevXML(node, domainName, params);
+    protected void modifyXML(final VmsXml vmsXml, final Node node, final String domainName, final Map<String, String> params) {
+        if (vmsXml != null) {
+            vmsXml.modifyInputDevXML(node, domainName, params);
         }
     }
 }

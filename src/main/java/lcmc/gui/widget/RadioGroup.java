@@ -50,42 +50,28 @@ import lcmc.utilities.WidgetListener;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class RadioGroup extends GenericWidget<JComponent> {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Value of the radio group. */
     private Value radioGroupValue;
     /** Radio group hash, from string that is displayed to the object. */
-    private final Map<String, Value> radioGroupHash =
-                                                 new HashMap<String, Value>();
+    private final Map<String, Value> radioGroupHash = new HashMap<String, Value>();
     /** Name to component hash. */
-    private final Map<String, JComponent> componentsHash =
-                                             new HashMap<String, JComponent>();
-    /** group components lock. */
+    private final Map<String, JComponent> componentsHash = new HashMap<String, JComponent>();
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
-    /** Prepares a new {@code RadioGroup} object. */
+
     public RadioGroup(final Value selectedValue,
                       final Value[] items,
                       final String regexp,
                       final int width,
                       final AccessMode enableAccessMode,
                       final MyButton fieldButton) {
-        super(regexp,
-              enableAccessMode,
-              fieldButton);
+        super(regexp, enableAccessMode, fieldButton);
         addComponent(getRadioGroup(selectedValue, items), width);
     }
 
-    /** Returns radio group with selected value. */
-    protected JComponent getRadioGroup(final Value selectedValue,
-                                     final Value[] items) {
+    protected JComponent getRadioGroup(final Value selectedValue, final Value[] items) {
         final ButtonGroup group = new ButtonGroup();
         final JPanel radioPanel = new JPanel(new GridLayout(1, 1));
         mComponentsWriteLock.lock();
@@ -108,8 +94,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
                 public void actionPerformed(final ActionEvent e) {
                     mComponentsReadLock.lock();
                     try {
-                        radioGroupValue =
-                                radioGroupHash.get(e.getActionCommand());
+                        radioGroupValue = radioGroupHash.get(e.getActionCommand());
                     } finally {
                         mComponentsReadLock.unlock();
                     }
@@ -127,8 +112,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
      */
     @Override
     public void setEnabled(final String s, final boolean enabled) {
-        final boolean accessible =
-                   Tools.getApplication().isAccessible(getEnableAccessMode());
+        final boolean accessible = Tools.getApplication().isAccessible(getEnableAccessMode());
         mComponentsReadLock.lock();
         final JComponent c;
         try {
@@ -168,8 +152,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     }
 
     /**
-     * Returns string value. If object value is null, returns empty string (not
-     * null).
+     * Returns string value. If object value is null, returns empty string (not null).
      */
     @Override
     public String getStringValue() {
@@ -215,13 +198,11 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         });
     }
 
-    /** Returns whether component is editable or not. */
     @Override
     public boolean isEditable() {
         return false;
     }
 
-    /** Sets item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item != null) {
@@ -239,13 +220,11 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         }
     }
 
-    /** Returns document object of the component. */
     @Override
     public Document getDocument() {
         return null;
     }
 
-    /** Adds item listener to the component. */
     @Override
     public void addListeners(final WidgetListener widgetListener) {
         getWidgetListeners().add(widgetListener);
@@ -261,8 +240,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     }
 
     @Override
-    protected void setComponentBackground(final Color backgroundColor,
-                                          final Color compColor) {
+    protected void setComponentBackground(final Color backgroundColor, final Color compColor) {
         getInternalComponent().setBackground(backgroundColor);
         mComponentsReadLock.lock();
         try {
@@ -274,7 +252,6 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         }
     }
 
-    /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getInternalComponent();
@@ -295,12 +272,6 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         });
     }
 
-    /** Returns item at the specified index. */
-    //@Override
-    //Component getItemAt(final int i) {
-    //    return getComponent();
-    //}
-
     /** Cleanup whatever would cause a leak. */
     @Override
     public void cleanup() {
@@ -317,7 +288,6 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         }
     }
 
-    /** Sets component enabled or disabled. */
     @Override
     protected void setComponentsEnabled(final boolean enabled) {
         super.setComponentsEnabled(enabled);

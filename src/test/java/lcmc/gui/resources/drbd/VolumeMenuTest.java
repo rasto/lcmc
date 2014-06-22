@@ -22,7 +22,7 @@ package lcmc.gui.resources.drbd;
 
 import java.util.List;
 import lcmc.data.Application;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.DrbdGraph;
 import lcmc.testutils.annotation.type.GuiTest;
@@ -51,7 +51,7 @@ public class VolumeMenuTest {
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private DrbdXML drbdXmlStub;
+    private DrbdXml drbdXmlStub;
     @Mock
     private DrbdGraph drbdGraphStub;
     @Mock
@@ -67,7 +67,7 @@ public class VolumeMenuTest {
         when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(volumeInfoStub.isConnected(Application.RunMode.LIVE)).thenReturn(true);
         when(resourceInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(clusterBrowserStub.getDrbdXML()).thenReturn(drbdXmlStub);
+        when(clusterBrowserStub.getDrbdXml()).thenReturn(drbdXmlStub);
         when(clusterBrowserStub.getDrbdGraph()).thenReturn(drbdGraphStub);
         when(drbdGraphStub.getSource(volumeInfoStub)).thenReturn(sourceStub);
         when(drbdGraphStub.getDest(volumeInfoStub)).thenReturn(destStub);

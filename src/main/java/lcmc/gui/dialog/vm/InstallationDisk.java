@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.data.Application;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML.DiskData;
+import lcmc.data.vm.VmsXml.DiskData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DiskInfo;
 import lcmc.gui.resources.vms.DomainInfo;

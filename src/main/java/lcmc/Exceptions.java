@@ -27,32 +27,25 @@ package lcmc;
  */
 public final class Exceptions {
 
-    /** This class cannot be instantiated. */
     private Exceptions() {
     }
 
     public static class DrbdConfigException extends Exception {
-        /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
-        /** Prepares a new {@code DrbdConfigException} object. */
         public DrbdConfigException(final String msg) {
             super(msg);
         }
     }
 
     public static class IllegalVersionException extends Exception {
-        /** Serial version UID. */
         private static final long serialVersionUID = 1L;
 
-        /** Prepares a new {@code IllegalVersionException} object. */
         public IllegalVersionException(final String v1) {
             super("illegal version: " + v1);
         }
 
-        /** Prepares a new {@code IllegalVersionException} object. */
-        public IllegalVersionException(final String v1,
-                                       final String v2) {
+        public IllegalVersionException(final String v1, final String v2) {
             super("illegal version: " + v1 + ", " + v2);
         }
     }

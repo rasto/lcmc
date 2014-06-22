@@ -35,8 +35,8 @@ import javax.swing.JPanel;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.InterfaceData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.InterfaceData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
@@ -208,9 +208,9 @@ public final class InterfaceInfo extends HardwareInfo {
         LOOP: while (true) {
             mac = Tools.generateVMMacAddress();
             for (final Host h : getBrowser().getClusterHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
-                    if (vmsxml.getMacAddresses().contains(mac)) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                if (vmsXml != null) {
+                    if (vmsXml.getMacAddresses().contains(mac)) {
                         continue LOOP;
                     }
                 }
@@ -246,17 +246,17 @@ public final class InterfaceInfo extends HardwareInfo {
     protected Value[] getParamPossibleChoices(final String param) {
         if (InterfaceData.SOURCE_NETWORK.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
-                    final List<Value> networks = vmsxml.getNetworks();
+                final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                if (vmsXml != null) {
+                    final List<Value> networks = vmsXml.getNetworks();
                     networks.add(0, null);
                     return networks.toArray(new Value[networks.size()]);
                 }
             }
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                if (vmsXml != null) {
                     final List<Value> bridges = h.getBridges();
                     bridges.add(0, null);
                     return bridges.toArray(new Value[bridges.size()]);
@@ -361,12 +361,12 @@ public final class InterfaceInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
+    protected void modifyXML(final VmsXml vmsXml,
                              final Node node,
                              final String domainName,
                              final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyInterfaceXML(node, domainName, params);
+        if (vmsXml != null) {
+            vmsXml.modifyInterfaceXML(node, domainName, params);
         }
     }
 
@@ -389,22 +389,22 @@ public final class InterfaceInfo extends HardwareInfo {
         final Map<String, String> parameters = getHWParameters(
                                                         getResource().isNew());
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
                 final String domainName =
                                     getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
             getResource().setNew(false);
         }
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -516,8 +516,8 @@ public final class InterfaceInfo extends HardwareInfo {
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
+                        final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                        if (vmsXml != null) {
                             final Value savedValue =
                                                interfaceData.getValue(param);
                             if (savedValue != null) {
@@ -578,19 +578,19 @@ public final class InterfaceInfo extends HardwareInfo {
         }
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(InterfaceData.SAVED_MAC_ADDRESS, getName());
-                vmsxml.removeInterfaceXML(
+                vmsXml.removeInterfaceXML(
                                     getVMSVirtualDomainInfo().getDomainName(),
                                     parameters,
                                     virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 

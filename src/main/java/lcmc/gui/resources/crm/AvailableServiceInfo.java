@@ -30,7 +30,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.crm.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
@@ -56,7 +56,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     /** Prepares a new {@code AvailableServiceInfo} object. */
     public AvailableServiceInfo(final ResourceAgent resourceAgent,
                                 final Browser browser) {
-        super(resourceAgent.getName(), browser);
+        super(resourceAgent.getServiceName(), browser);
         this.resourceAgent = resourceAgent;
     }
 
@@ -70,17 +70,17 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     @Override
     public String getInfo() {
         final StringBuilder s = new StringBuilder(80);
-        final CRMXML crmXML = getBrowser().getCRMXML();
+        final CrmXml crmXML = getBrowser().getCrmXml();
         s.append("<h2>");
         s.append(getName());
         s.append(" (");
-        s.append(crmXML.getVersion(resourceAgent));
+        s.append(crmXML.getOcfScriptVersion(resourceAgent));
         s.append(")</h2><h3>");
         s.append(crmXML.getShortDesc(resourceAgent));
         s.append("</h3>");
         s.append(crmXML.getLongDesc(resourceAgent));
         s.append("<br><br>");
-        final List<String> params = crmXML.getParameters(resourceAgent, false);
+        final List<String> params = crmXML.getOcfMetaDataParameters(resourceAgent, false);
         for (final String param : params) {
             if (crmXML.isMetaAttr(resourceAgent, param)
                 || ServiceInfo.RA_PARAM.equals(param)
@@ -91,7 +91,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
             s.append("<b>");
             s.append(param);
             s.append("</b><br>");
-            s.append(crmXML.getParamShortDesc(resourceAgent, param));
+            s.append(crmXML.getShortDesc(resourceAgent, param));
             s.append("<br>");
         }
         return s.toString();

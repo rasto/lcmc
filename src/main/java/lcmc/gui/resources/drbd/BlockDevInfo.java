@@ -46,7 +46,7 @@ import javax.swing.JScrollPane;
 import lcmc.Exceptions;
 import lcmc.data.Application;
 import lcmc.data.drbd.DRBDtestData;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Subtext;
@@ -363,7 +363,7 @@ public class BlockDevInfo extends EditableInfo {
         tt.append("\n</table>");
 
         if (bd.isDrbd()) {
-            if (getHost().isDrbdStatus()) {
+            if (getHost().isDrbdStatusOk()) {
                 String cs = bd.getConnectionState();
                 String st = bd.getNodeState();
                 String ds = bd.getDiskState();
@@ -491,7 +491,7 @@ public class BlockDevInfo extends EditableInfo {
             ret = false;
         } else if (DRBD_MD_PARAM.equals(param)) {
             if (infoPanel != null) {
-                if (!getHost().isServerStatusLatch()) {
+                if (!getHost().getWaitForServerStatusLatch()) {
                     final boolean internal = "internal".equals(newValue.getValueForConfig());
                     final Widget ind = getWidget(DRBD_MD_INDEX_PARAM, null);
                     final Widget indW = getWidget(DRBD_MD_INDEX_PARAM,
@@ -617,7 +617,7 @@ public class BlockDevInfo extends EditableInfo {
             final Value[] blockDevices = getAvailableBlockDevicesForMetaDisk(
             internalMetaDisk,
             getName(),
-            getBrowser().getBlockDevInfos());
+            getBrowser().getSortedBlockDevInfos());
             getBrowser().unlockBlockDevInfosRead();
 
             getBlockDevice().setDefaultValue(DRBD_MD_PARAM,
@@ -1426,7 +1426,7 @@ public class BlockDevInfo extends EditableInfo {
         if (dvi == null) {
             return;
         }
-        final DrbdXML dxml = clusterBrowser.getDrbdXML();
+        final DrbdXml dxml = clusterBrowser.getDrbdXml();
         final String hostName = getHost().getName();
         final DrbdGraph drbdGraph = getBrowser().getDrbdGraph();
         Value value = null;
@@ -1489,7 +1489,7 @@ public class BlockDevInfo extends EditableInfo {
             && !fromDrbdInfo) {
             dvi.setApplyButtons(null, dvi.getParametersFromXML());
         }
-        final DrbdXML dxml = getBrowser().getClusterBrowser().getDrbdXML();
+        final DrbdXml dxml = getBrowser().getClusterBrowser().getDrbdXml();
         final List<String> incorrect = new ArrayList<String>();
         if (dxml != null && dxml.isDrbdDisabled()) {
             incorrect.add("drbd is disabled");

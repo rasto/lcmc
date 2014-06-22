@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc.gui;
 
 import java.awt.BorderLayout;
@@ -31,18 +30,10 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
  * that are in the cluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class ClusterTab extends JPanel {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Cluster data object. */
-    private final transient Cluster cluster;
+    private final Cluster cluster;
 
-    /** Prepares a new {@code ClusterTab} object. */
     ClusterTab(final Cluster cluster) {
         super(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
@@ -62,7 +53,6 @@ public final class ClusterTab extends JPanel {
         repaint();
     }
 
-    /** Returns cluster object. */
     Cluster getCluster() {
         return cluster;
     }

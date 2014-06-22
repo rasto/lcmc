@@ -32,31 +32,20 @@ import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
  * This class holds data that were retrieved while running drbdadm -d commands.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class DRBDtestData {
     /** Pattern for dry run output: drbdsetup 0 disconnect. */
-    private static final Pattern DRBD_D_PATTERN =
-          Pattern.compile(".*drbdsetup\\s+(\\S+)\\s+(\\S+).*");
-    /** Tool tip. */
+    private static final Pattern DRBDSETUP_PATTERN = Pattern.compile(".*drbdsetup\\s+(\\S+)\\s+(\\S+).*");
     private final String toolTip;
     /** Hash with host and drbd resource, that will be connected. */
-    private final MultiKeyMap<String, Integer> connectedHash =
-                                            new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> connectedHash = new MultiKeyMap<String, Integer>();
     /** Hash with host and drbd resource, that will be disconnected. */
-    private final MultiKeyMap<String, Integer> disconnectedHash =
-                                            new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> disconnectedHash = new MultiKeyMap<String, Integer>();
     /** Hash with host and drbd resource, that will be attached. */
-    private final MultiKeyMap<String, Integer> attachedHash =
-                                            new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> attachedHash = new MultiKeyMap<String, Integer>();
     /** Hash with host and drbd resource, that will be dettached. */
-    private final MultiKeyMap<String, Integer> disklessHash =
-                                            new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> disklessHash = new MultiKeyMap<String, Integer>();
 
-    /** Prepares a new {@code DRBDtestData} object. */
     public DRBDtestData(final Map<Host, String> testOutput) {
         if (testOutput == null) {
             toolTip = null;
@@ -76,24 +65,18 @@ public final class DRBDtestData {
                 continue;
             }
             for (final String line : raw.split("\\r?\\n")) {
-                final Matcher m = DRBD_D_PATTERN.matcher(line);
+                final Matcher m = DRBDSETUP_PATTERN.matcher(line);
                 if (m.matches()) {
                     final String resOrVol = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
                         disconnectedHash.put(hostStringEntry.getKey().getName(), resOrVol, 1);
                     } else if ("net".equals(action)) {
-                        connectedHash.put(hostStringEntry.getKey().getName(),
-                                          "/dev/drbd" + resOrVol,
-                                          1);
+                        connectedHash.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
                     } else if ("detach".equals(action)) {
-                        disklessHash.put(hostStringEntry.getKey().getName(),
-                                         "/dev/drbd" + resOrVol,
-                                         1);
+                        disklessHash.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
                     } else if ("disk".equals(action)) {
-                        attachedHash.put(hostStringEntry.getKey().getName(),
-                                         "/dev/drbd" + resOrVol,
-                                         1);
+                        attachedHash.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
                     }
                 }
                 final int index = line.indexOf("--set-defaults");
@@ -113,7 +96,6 @@ public final class DRBDtestData {
         toolTip = sb.toString();
     }
 
-    /** Returns tooltip. */
     public String getToolTip() {
         return toolTip;
     }

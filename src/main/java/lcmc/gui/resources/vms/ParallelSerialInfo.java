@@ -35,8 +35,8 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.ParallelSerialData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.ParallelSerialData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
@@ -312,8 +312,8 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
                                        getHWParameters(getResource().isNew());
 
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Value type = getParamSaved(ParallelSerialData.TYPE);
                 if (type == null) {
                     parameters.put(ParallelSerialData.SAVED_TYPE, null);
@@ -323,17 +323,17 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
                 }
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
             getResource().setNew(false);
         }
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {

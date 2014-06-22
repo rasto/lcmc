@@ -20,41 +20,30 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc;
 
 import lcmc.data.Host;
 import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
-import lcmc.gui.dialog.host.NewHost;
+import lcmc.gui.dialog.host.NewHostDialog;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * AddHostDialog.
- *
  * Show step by step dialogs that add and configure new host.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class AddHostDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(AddHostDialog.class);
-    /** The host object. */
+    private static final Logger LOG = LoggerFactory.getLogger(AddHostDialog.class);
     private final Host host;
 
-    /** Prepares a new {@code EditHostDialog} object. */
     public AddHostDialog(final Host host) {
         this.host = host;
     }
 
-    /** Shows step by step dialogs that add and configure new host. */
     public void showDialogs() {
         Tools.getGUIData().enableAddHostButtons(false);
-        DialogHost dialog = new NewHost(null, host, new DrbdInstallation());
+        DialogHost dialog = new NewHostDialog(null, host, new DrbdInstallation());
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
@@ -67,13 +56,11 @@ public final class AddHostDialog {
                 Tools.getGUIData().enableAddHostButtons(true);
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 Tools.getGUIData().allHostsUpdate();
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -83,10 +70,7 @@ public final class AddHostDialog {
                 });
                 break;
             }
-            /* newdialog can be null, when we are out of memory I guess. */
-            if (newdialog != null) {
-                dialog = newdialog;
-            }
+            dialog = newdialog;
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().enableAddHostButtons(true);

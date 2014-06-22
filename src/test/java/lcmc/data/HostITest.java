@@ -82,8 +82,8 @@ public final class HostITest {
     @Test
     public void testSetClStatus() {
         for (final Host host : getHosts()) {
-            host.setClStatus(false);
-            Tools.sleep(500); host.setClStatus(true);
+            host.setCrmStatusOk(false);
+            Tools.sleep(500); host.setCrmStatusOk(true);
             Tools.sleep(500);
         }
     }
@@ -91,9 +91,9 @@ public final class HostITest {
     @Test
     public void testSetDrbdStatus() {
         for (final Host host : getHosts()) {
-            host.setDrbdStatus(false);
+            host.setDrbdStatusOk(false);
             Tools.sleep(500);
-            host.setDrbdStatus(true);
+            host.setDrbdStatusOk(true);
             Tools.sleep(500);
         }
     }
@@ -101,14 +101,14 @@ public final class HostITest {
     @Test
     public void testIsClStatus() {
         for (final Host host : getHosts()) {
-            assertTrue(host.isClStatus());
+            assertTrue(host.isCrmStatusOk());
         }
     }
 
     @Test
     public void testIsDrbdStatus() {
         for (final Host host : getHosts()) {
-            assertTrue(host.isDrbdStatus());
+            assertTrue(host.isDrbdStatusOk());
         }
     }
 
@@ -124,9 +124,9 @@ public final class HostITest {
     @Test
     public void testGetNetInterfaces() {
         for (final Host host : getHosts()) {
-            assertTrue(host.getNetInterfaces().length > 0);
-            assertNotNull(host.getNetInterfaces()[0]);
-            assertTrue(TestUtils.noValueIsNull(host.getNetInterfaces()));
+            assertTrue(host.getNetInterfacesWithBridges().length > 0);
+            assertNotNull(host.getNetInterfacesWithBridges()[0]);
+            assertTrue(TestUtils.noValueIsNull(host.getNetInterfacesWithBridges()));
         }
     }
 
@@ -207,8 +207,8 @@ public final class HostITest {
     @Test
     public void testGetFileSystems() {
         for (final Host host : getHosts()) {
-            assertTrue(host.getFileSystems().length > 0);
-            assertTrue(TestUtils.noValueIsNull(host.getFileSystems()));
+            assertTrue(host.getAvailableFileSystems().length > 0);
+            assertTrue(TestUtils.noValueIsNull(host.getAvailableFileSystems()));
 
             assertTrue(host.getFileSystemsList().size() > 0);
             assertTrue(TestUtils.noValueIsNull(host.getFileSystemsList()));
@@ -218,16 +218,16 @@ public final class HostITest {
     @Test
     public void testGetCryptoModules() {
         for (final Host host : getHosts()) {
-            assertTrue(host.getCryptoModules().size() > 0);
-            assertTrue(TestUtils.noValueIsNull(host.getCryptoModules()));
+            assertTrue(host.getAvailableCryptoModules().size() > 0);
+            assertTrue(TestUtils.noValueIsNull(host.getAvailableCryptoModules()));
         }
     }
 
     @Test
     public void testGetQemuKeymaps() {
         for (final Host host : getHosts()) {
-            assertTrue(host.getQemuKeymaps().size() >= 0);
-            assertTrue(TestUtils.noValueIsNull(host.getQemuKeymaps()));
+            assertTrue(host.getAvailableQemuKeymaps().size() >= 0);
+            assertTrue(TestUtils.noValueIsNull(host.getAvailableQemuKeymaps()));
         }
     }
 
@@ -278,13 +278,13 @@ public final class HostITest {
         for (final Host host : getHosts()) {
 
             if ("openSUSE 12.1 (x86_64)/12.1".equals(
-                                            host.getDistVersionString())) {
+                                            host.getDistributionVersionString())) {
                 assertTrue("kernel version"
-                           + "(" + host.getDistVersionString() + ")",
+                           + "(" + host.getDistributionVersionString() + ")",
                            host.getKernelVersion() == null);
             } else {
                 assertTrue("kernel version: " + host.getKernelVersion()
-                           + "(" + host.getDistVersionString() + ")",
+                           + "(" + host.getDistributionVersionString() + ")",
                            Character.isDigit(
                                         host.getKernelVersion().charAt(0)));
             }
@@ -317,8 +317,8 @@ public final class HostITest {
                              "debian",
                              "ubuntu"));
         for (final Host host : getHosts()) {
-            assertTrue("unknown: " + host.getDist(),
-                       values.contains(host.getDist()));
+            assertTrue("unknown: " + host.getDistributionName(),
+                       values.contains(host.getDistributionName()));
         }
     }
 
@@ -333,13 +333,13 @@ public final class HostITest {
                               "rhel7"
                               ));
         for (final Host host : getHosts()) {
-            assertTrue("unknown: " + host.getDistVersion()
-                       + "(" + host.getDist() + ")",
-                       values.contains(host.getDistVersion())
-                       || "fedora".equals(host.getDist())
-                       || "suse".equals(host.getDist())
-                       || "debian".equals(host.getDist())
-                       || "ubuntu".equals(host.getDist()));
+            assertTrue("unknown: " + host.getDistributionVersion()
+                       + "(" + host.getDistributionName() + ")",
+                       values.contains(host.getDistributionVersion())
+                       || "fedora".equals(host.getDistributionName())
+                       || "suse".equals(host.getDistributionName())
+                       || "debian".equals(host.getDistributionName())
+                       || "ubuntu".equals(host.getDistributionName()));
         }
     }
 
@@ -372,8 +372,8 @@ public final class HostITest {
                               "16",
                               "17"));
         for (final Host host : getHosts()) {
-            assertTrue("unknown: " + host.getDistVersionString(),
-                       values.contains(host.getDistVersionString()));
+            assertTrue("unknown: " + host.getDistributionVersionString(),
+                       values.contains(host.getDistributionVersionString()));
         }
     }
 

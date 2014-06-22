@@ -36,8 +36,8 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.FilesystemData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.FilesystemData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.BlockDevInfo;
@@ -327,21 +327,21 @@ public final class FilesystemInfo extends HardwareInfo {
                                     getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -356,12 +356,12 @@ public final class FilesystemInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
+    protected void modifyXML(final VmsXml vmsXml,
                              final Node node,
                              final String domainName,
                              final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyFilesystemXML(node, domainName, params);
+        if (vmsXml != null) {
+            vmsXml.modifyFilesystemXML(node, domainName, params);
         }
     }
 
@@ -443,8 +443,8 @@ public final class FilesystemInfo extends HardwareInfo {
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
+                        final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                        if (vmsXml != null) {
                             final Value savedValue =
                                                filesystemData.getValue(param);
                             if (savedValue != null) {
@@ -472,19 +472,19 @@ public final class FilesystemInfo extends HardwareInfo {
     protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(FilesystemData.SAVED_TARGET_DIR, getName());
-                vmsxml.removeFilesystemXML(
+                vmsXml.removeFilesystemXML(
                                      getVMSVirtualDomainInfo().getDomainName(),
                                      parameters,
                                      virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 

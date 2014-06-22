@@ -45,7 +45,7 @@ import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.Value;
 import lcmc.data.resources.Resource;
 import lcmc.gui.Browser;
@@ -64,103 +64,70 @@ import lcmc.utilities.WidgetListener;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**
- * This class provides textfields, combo boxes etc. for editable info
- * objects.
+ * This class provides textfields, combo boxes etc. for editable info objects.
  */
 public abstract class EditableInfo extends Info {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(EditableInfo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EditableInfo.class);
     /** Whether is's a wizard element. */
     public static final boolean WIZARD = true;
-    /** Hash from parameter to boolean value if the last entered value was
-     * correct. */
-    private final Map<String, Boolean> paramCorrectValueMap =
-                                    new ConcurrentHashMap<String, Boolean>();
-    private final MultiKeyMap<String, JPanel> sectionPanels =
-                                             new MultiKeyMap<String, JPanel>();
+    /** Hash from parameter to boolean value if the last entered value was correct. */
+    private final Map<String, Boolean> paramCorrectValueMap = new ConcurrentHashMap<String, Boolean>();
+    private final MultiKeyMap<String, JPanel> sectionPanels = new MultiKeyMap<String, JPanel>();
     /** Old apply button, is used for wizards. */
     private MyButton oldApplyButton = null;
-    /** Apply button. */
     private MyButton applyButton;
-    /** Revert button. */
     private MyButton revertButton;
     /** Is counted down, first time the info panel is initialized. */
     private CountDownLatch infoPanelLatch = new CountDownLatch(1);
-    /** List of advanced panels. */
     private final Collection<JPanel> advancedPanelList = new ArrayList<JPanel>();
-    /** List of messages if advanced panels are hidden. */
-    private final Collection<String> advancedOnlySectionList =
-                                                      new ArrayList<String>();
-    /** More options panel. */
+    private final Collection<String> advancedOnlySectionList = new ArrayList<String>();
     private final JPanel moreOptionsPanel = new JPanel();
     /** Whether dialog was started. It disables the apply button. */
     private boolean dialogStarted = false;
-    /** Disabled section, their not visible. */
+    /** Disabled section, not visible. */
     private final Collection<String> disabledSections = new HashSet<String>();
 
-    /**
-     * Prepares a new {@code EditableInfo} object.
-     *
-     * @param name
-     *      name that will be shown to the user.
-     */
     protected EditableInfo(final String name, final Browser browser) {
         super(name, browser);
     }
 
-    /** Returns section in which is this parameter. */
     protected abstract String getSection(String param);
 
-    /** Returns whether this parameter is required. */
     protected abstract boolean isRequired(String param);
 
-    /** Returns whether this parameter is advanced. */
     protected abstract boolean isAdvanced(String param);
 
     /** Returns null this parameter should be enabled. Otherwise return
     a reason that appears in the tooltip. */
     protected abstract String isEnabled(String param);
 
-    /** Returns access type of this parameter. */
     protected abstract Application.AccessType getAccessType(String param);
 
-    /** Returns whether this parameter is enabled in advanced mode. */
     protected abstract boolean isEnabledOnlyInAdvancedMode(String param);
 
-    /** Returns whether this parameter is of label type. */
     protected abstract boolean isLabel(String param);
 
-    /** Returns whether this parameter is of the integer type. */
     protected abstract boolean isInteger(String param);
 
-    /** Returns whether this parameter is of the time type. */
-    protected abstract boolean isTimeType(
-        String param);
+    protected abstract boolean isTimeType(String param);
 
-    /** Returns whether this parameter has a unit prefix. */
     protected boolean hasUnitPrefix(final String param) {
         return false;
     }
 
-    /** Returns whether this parameter is of the check box type, like
-     * boolean. */
     protected abstract boolean isCheckBox(String param);
 
-    /** Returns type of the field. */
     protected Widget.Type getFieldType(final String param) {
         return null;
     }
 
-    /** Returns the name of the type. */
     protected abstract String getParamType(final String param);
 
-    /** Returns the regexp of the parameter. */
     protected String getParamRegexp(final String param) {
         // TODO: this should be only for Pacemaker
         if (isInteger(param)) {
-            return "^((-?\\d*|(-|\\+)?" + CRMXML.INFINITY_STRING
-                   + '|' + CRMXML.DISABLED_STRING
+            return "^((-?\\d*|(-|\\+)?" + CrmXml.INFINITY_VALUE
+                   + '|' + CrmXml.DISABLED_IN_COMBOBOX
                    + "))|@NOTHING_SELECTED@$";
         }
         return null;
@@ -177,33 +144,24 @@ public abstract class EditableInfo extends Info {
         return -1;
     }
 
-    /** Inits apply button. */
     protected final void initApplyButton(final ButtonCallback buttonCallback) {
-        initApplyButton(buttonCallback,
-                        Tools.getString("Browser.ApplyResource"));
+        initApplyButton(buttonCallback, Tools.getString("Browser.ApplyResource"));
     }
 
-    /** Inits commit button. */
     protected final void initCommitButton(final ButtonCallback buttonCallback) {
-        initApplyButton(buttonCallback,
-                        Tools.getString("Browser.CommitResources"));
+        initApplyButton(buttonCallback, Tools.getString("Browser.CommitResources"));
     }
 
     /** Inits apply or commit button button. */
     protected final void initApplyButton(final ButtonCallback buttonCallback, final String text) {
         if (oldApplyButton == null) {
-            applyButton = new MyButton(
-                text,
-                Browser.APPLY_ICON);
+            applyButton = new MyButton(text, Browser.APPLY_ICON);
             applyButton.miniButton();
             applyButton.setEnabled(false);
             oldApplyButton = applyButton;
-            revertButton = new MyButton(
-                Tools.getString("Browser.RevertResource"),
-                Browser.REVERT_ICON);
+            revertButton = new MyButton(Tools.getString("Browser.RevertResource"), Browser.REVERT_ICON);
             revertButton.setEnabled(false);
-            revertButton.setToolTipText(
-                Tools.getString("Browser.RevertResource.ToolTip"));
+            revertButton.setToolTipText(Tools.getString("Browser.RevertResource.ToolTip"));
             revertButton.miniButton();
             revertButton.setPreferredSize(new Dimension(65, 50));
         } else {
@@ -229,7 +187,12 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Adds jlabel field with tooltip. */
-    public final void addLabelField(final JPanel panel, final String left, final String right, final int leftWidth, final int rightWidth, final int height) {
+    public final void addLabelField(final JPanel panel,
+                                    final String left,
+                                    final String right,
+                                    final int leftWidth,
+                                    final int rightWidth,
+                                    final int height) {
         final JLabel leftLabel = new JLabel(left);
         leftLabel.setToolTipText(left);
         final JLabel rightLabel = new JLabel(right);
@@ -241,18 +204,19 @@ public abstract class EditableInfo extends Info {
      * Adds field with left and right component to the panel. Use panel
      * with spring layout for this.
      */
-    public final void addField(final JPanel panel, final Component left, final Component right, final int leftWidth, final int rightWidth, int height) {
+    public final void addField(final JPanel panel,
+                               final Component left,
+                               final Component right,
+                               final int leftWidth,
+                               final int rightWidth,
+                               int height) {
         /* right component with fixed width. */
         if (height == 0) {
             height = Tools.getDefaultSize("Browser.FieldHeight");
         }
-        Tools.setSize(left,
-                      leftWidth,
-                      height);
+        Tools.setSize(left, leftWidth, height);
         panel.add(left);
-        Tools.setSize(right,
-                      rightWidth,
-                      height);
+        Tools.setSize(right, rightWidth, height);
         panel.add(right);
         right.setBackground(panel.getBackground());
     }
@@ -261,38 +225,39 @@ public abstract class EditableInfo extends Info {
      * Adds parameters to the panel in a wizard.
      * Returns number of rows.
      */
-    public final void addWizardParams(final JPanel optionsPanel, final String[] params, final MyButton wizardApplyButton, final int leftWidth, final int rightWidth, final Map<String, Widget> sameAsFields) {
-        addParams(optionsPanel,
-                  Widget.WIZARD_PREFIX,
-                  params,
-                  wizardApplyButton,
-                  leftWidth,
-                  rightWidth,
-                  sameAsFields);
+    public final void addWizardParams(final JPanel optionsPanel,
+                                      final String[] params,
+                                      final MyButton wizardApplyButton,
+                                      final int leftWidth,
+                                      final int rightWidth,
+                                      final Map<String, Widget> sameAsFields) {
+        addParams(optionsPanel, Widget.WIZARD_PREFIX, params, wizardApplyButton, leftWidth, rightWidth, sameAsFields);
     }
 
     /** Adds parameters to the panel. */
-    public final void addParams(final JPanel optionsPanel, final String[] params, final int leftWidth, final int rightWidth, final Map<String, Widget> sameAsFields) {
-        addParams(optionsPanel,
-                  null,
-                  params,
-                  applyButton,
-                  leftWidth,
-                  rightWidth,
-                  sameAsFields);
+    public final void addParams(final JPanel optionsPanel,
+                                final String[] params,
+                                final int leftWidth,
+                                final int rightWidth,
+                                final Map<String, Widget> sameAsFields) {
+        addParams(optionsPanel, null, params, applyButton, leftWidth, rightWidth, sameAsFields);
     }
 
     /** Adds parameters to the panel. */
-    private void addParams(final JPanel optionsPanel, final String prefix, final String[] params, final MyButton thisApplyButton, final int leftWidth, final int rightWidth, final Map<String, Widget> sameAsFields) {
+    private void addParams(final JPanel optionsPanel,
+                           final String prefix,
+                           final String[] params,
+                           final MyButton thisApplyButton,
+                           final int leftWidth,
+                           final int rightWidth,
+                           final Map<String, Widget> sameAsFields) {
         Tools.isSwingThread();
         if (params == null) {
             return;
         }
-        final MultiKeyMap<String, JPanel> panelPartsMap =
-            new MultiKeyMap<String, JPanel>();
+        final MultiKeyMap<String, JPanel> panelPartsMap = new MultiKeyMap<String, JPanel>();
         final Collection<PanelPart> panelPartsList = new ArrayList<PanelPart>();
-        final MultiKeyMap<String, Integer> panelPartRowsMap =
-            new MultiKeyMap<String, Integer>();
+        final MultiKeyMap<String, Integer> panelPartRowsMap = new MultiKeyMap<String, Integer>();
         
         for (final String param : params) {
             final Widget paramWi = createWidget(param, prefix, rightWidth);
@@ -303,18 +268,12 @@ public abstract class EditableInfo extends Info {
             final String accessTypeString = accessType.toString();
             final Boolean advanced = isAdvanced(param);
             final String advancedString = advanced.toString();
-            if (panelPartsMap.containsKey(section,
-                                          accessTypeString,
-                                          advancedString)) {
-                panel = panelPartsMap.get(section,
-                                          accessTypeString,
-                                          advancedString);
+            if (panelPartsMap.containsKey(section, accessTypeString, advancedString)) {
+                panel = panelPartsMap.get(section, accessTypeString, advancedString);
                 panelPartRowsMap.put(section,
                                      accessTypeString,
                                      advancedString,
-                                     panelPartRowsMap.get(section,
-                                                      accessTypeString,
-                                                      advancedString) + 1);
+                                     panelPartRowsMap.get(section, accessTypeString, advancedString) + 1);
             } else {
                 panel = new JPanel(new SpringLayout());
 
@@ -323,17 +282,9 @@ public abstract class EditableInfo extends Info {
                     advancedPanelList.add(panel);
                     panel.setVisible(Tools.getApplication().isAdvancedMode());
                 }
-                panelPartsMap.put(section,
-                                  accessTypeString,
-                                  advancedString,
-                                  panel);
-                panelPartsList.add(new PanelPart(section,
-                    accessType,
-                    advanced));
-                panelPartRowsMap.put(section,
-                                     accessTypeString,
-                                     advancedString,
-                                     1);
+                panelPartsMap.put(section, accessTypeString, advancedString, panel);
+                panelPartsList.add(new PanelPart(section, accessType, advanced));
+                panelPartRowsMap.put(section, accessTypeString, advancedString, 1);
             }
 
             /* label */
@@ -378,11 +329,7 @@ public abstract class EditableInfo extends Info {
             paramWi.addListeners(new WidgetListener() {
                 @Override
                 public void check(final Value value) {
-                    checkParameterFields(paramWi,
-                                                 realParamWi,
-                                                 param,
-                                                 getParametersFromXML(),
-                                                 thisApplyButton);
+                    checkParameterFields(paramWi, realParamWi, param, getParametersFromXML(), thisApplyButton);
                 }
             });
         }
@@ -398,12 +345,8 @@ public abstract class EditableInfo extends Info {
             final Boolean advanced = panelPart.isAdvanced();
             final String advancedString = advanced.toString();
 
-            final JPanel panel = panelPartsMap.get(section,
-                                                   accessTypeString,
-                                                   advancedString);
-            final int rows = panelPartRowsMap.get(section,
-                                                  accessTypeString,
-                                                  advancedString);
+            final JPanel panel = panelPartsMap.get(section, accessTypeString, advancedString);
+            final int rows = panelPartRowsMap.get(section, accessTypeString, advancedString);
             final int columns = 2;
             SpringUtilities.makeCompactGrid(panel, rows, columns,
                                                          1, 1,  // initX, initY
@@ -412,8 +355,7 @@ public abstract class EditableInfo extends Info {
             if (sectionMap.containsKey(section)) {
                 sectionPanel = sectionMap.get(section);
             } else {
-                sectionPanel = getParamPanel(getSectionDisplayName(section),
-                                             getSectionColor(section));
+                sectionPanel = getParamPanel(getSectionDisplayName(section), getSectionColor(section));
                 sectionMap.put(section, sectionPanel);
                 addSectionPanel(section, wizard, sectionPanel);
                 optionsPanel.add(sectionPanel);
@@ -422,18 +364,12 @@ public abstract class EditableInfo extends Info {
                     if (sameAsCombo != null) {
                         final JPanel saPanel = new JPanel(new SpringLayout());
                         saPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
-                        final JLabel label = new JLabel(
-                            Tools.getString("ClusterBrowser.SameAs"));
+                        final JLabel label = new JLabel(Tools.getString("ClusterBrowser.SameAs"));
                         sameAsCombo.setLabel(label, "");
-                        addField(saPanel,
-                                 label,
-                                 sameAsCombo.getComponent(),
-                                 leftWidth,
-                                 rightWidth,
-                                 0);
+                        addField(saPanel, label, sameAsCombo.getComponent(), leftWidth, rightWidth, 0);
                         SpringUtilities.makeCompactGrid(saPanel, 1, 2,
-                                                                    1, 1,  // initX, initY
-                                                                    1, 1); // xPad, yPad
+                                                                 1, 1,  // initX, initY
+                                                                 1, 1); // xPad, yPad
                         sectionPanel.add(saPanel);
                     }
                 }
@@ -458,15 +394,13 @@ public abstract class EditableInfo extends Info {
                                         && isSectionEnabled(sectionEntry.getKey()));
             }
         }
-        moreOptionsPanel.setVisible(advanced
-                                    && !Tools.getApplication().isAdvancedMode());
+        moreOptionsPanel.setVisible(advanced && !Tools.getApplication().isAdvancedMode());
     }
 
 
     /** Returns a more panel with "more options are available" message. */
     public final JPanel getMoreOptionsPanel(final int width) {
-        final JLabel l = new JLabel(
-            Tools.getString("EditableInfo.MoreOptions"));
+        final JLabel l = new JLabel(Tools.getString("EditableInfo.MoreOptions"));
         final Font font = l.getFont();
         final String name = font.getFontName();
         final int style = Font.ITALIC;
@@ -482,7 +416,11 @@ public abstract class EditableInfo extends Info {
     }
 
     /** Checks ands sets paramter fields. */
-    public void checkParameterFields(final Widget paramWi, final Widget realParamWi, final String param, final String[] params, final MyButton thisApplyButton) {
+    public void checkParameterFields(final Widget paramWi,
+                                     final Widget realParamWi,
+                                     final String param,
+                                     final String[] params,
+                                     final MyButton thisApplyButton) {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -494,8 +432,7 @@ public abstract class EditableInfo extends Info {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (paramWi.getValue() == null
-                                || paramWi.getValue().isNothingSelected()) {
+                            if (paramWi.getValue() == null || paramWi.getValue().isNothingSelected()) {
                                 realParamWi.setValueAndWait(null);
                             } else {
                                 final Value value = paramWi.getValue();
@@ -584,11 +521,11 @@ public abstract class EditableInfo extends Info {
         Map<String, String> abbreviations = new HashMap<String, String>();
         if (isInteger(param)) {
             abbreviations = new HashMap<String, String>();
-            abbreviations.put("i", CRMXML.INFINITY_STRING.getValueForConfig());
-            abbreviations.put("I", CRMXML.INFINITY_STRING.getValueForConfig());
-            abbreviations.put("+", CRMXML.PLUS_INFINITY_STRING.getValueForConfig());
-            abbreviations.put("d", CRMXML.DISABLED_STRING.getValueForConfig());
-            abbreviations.put("D", CRMXML.DISABLED_STRING.getValueForConfig());
+            abbreviations.put("i", CrmXml.INFINITY_VALUE.getValueForConfig());
+            abbreviations.put("I", CrmXml.INFINITY_VALUE.getValueForConfig());
+            abbreviations.put("+", CrmXml.PLUS_INFINITY_VALUE.getValueForConfig());
+            abbreviations.put("d", CrmXml.DISABLED_IN_COMBOBOX.getValueForConfig());
+            abbreviations.put("D", CrmXml.DISABLED_IN_COMBOBOX.getValueForConfig());
         }
         Widget.Type type = getFieldType(param);
         Unit[] units = null;
@@ -604,16 +541,14 @@ public abstract class EditableInfo extends Info {
             type = Widget.Type.LABELFIELD;
         }
         final Widget paramWi = WidgetFactory.createInstance(
-            type,
+                                      type,
                                       initValue,
                                       getPossibleChoices(param),
                                       units,
                                       regexp,
                                       width,
                                       abbreviations,
-                                      new AccessMode(
-                                          getAccessType(param),
-                                          isEnabledOnlyInAdvancedMode(param)),
+                                      new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
                                       null);
         widgetAdd(param, prefix, paramWi);
         paramWi.setEditable(true);
@@ -671,15 +606,12 @@ public abstract class EditableInfo extends Info {
         paramCorrectValueMap.put(param, correctValue);
     }
 
-    /** Returns default value of a parameter. */
-        protected abstract Value getParamDefault(String param);
+    protected abstract Value getParamDefault(String param);
 
-    /** Returns saved value of a parameter. */
     public Value getParamSaved(final String param) {
         return getResource().getValue(param);
     }
 
-    /** Returns saved value of a parameter. */
     protected String getParamSavedForConfig(final String param) {
         final Value v = getResource().getValue(param);
         if (v == null) {
@@ -689,13 +621,10 @@ public abstract class EditableInfo extends Info {
         }
     }
 
-    /** Returns preferred value of a parameter. */
     protected abstract Value getParamPreferred(String param);
 
-    /** Returns short description of a parameter. */
     protected abstract String getParamShortDesc(String param);
 
-    /** Returns long description of a parameter. */
     protected abstract String getParamLongDesc(String param);
 
     /**
@@ -731,26 +660,26 @@ public abstract class EditableInfo extends Info {
      * Returns on mouse over text for parameter. If value is different
      * from default value, default value will be returned.
      */
-        protected final String getToolTipText(final String param, final Widget wi) {
-            final Value defaultValue = getParamDefault(param);
-            final StringBuilder ret = new StringBuilder(120);
-            if (wi != null) {
-                final String value = wi.getStringValue();
-                ret.append("<b>");
-                ret.append(value);
-                ret.append("</b>");
-            }
-            if (defaultValue != null && !defaultValue.isNothingSelected()) {
-                ret.append("<table><tr><td><b>");
-                ret.append(Tools.getString("Browser.ParamDefault"));
-                ret.append("</b></td><td>");
-                ret.append(defaultValue);
-                ret.append("</td></tr></table>");
-            }
-            ret.append(additionalToolTip(param));
-            return ret.toString();
-            
+    protected final String getToolTipText(final String param, final Widget wi) {
+        final Value defaultValue = getParamDefault(param);
+        final StringBuilder ret = new StringBuilder(120);
+        if (wi != null) {
+            final String value = wi.getStringValue();
+            ret.append("<b>");
+            ret.append(value);
+            ret.append("</b>");
         }
+        if (defaultValue != null && !defaultValue.isNothingSelected()) {
+            ret.append("<table><tr><td><b>");
+            ret.append(Tools.getString("Browser.ParamDefault"));
+            ret.append("</b></td><td>");
+            ret.append(defaultValue);
+            ret.append("</td></tr></table>");
+        }
+        ret.append(additionalToolTip(param));
+        return ret.toString();
+        
+    }
 
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param, final String[] params) {
@@ -798,19 +727,13 @@ public abstract class EditableInfo extends Info {
                     oldValue = getParamDefault(otherParam);
                 }
                 if (!Tools.areEqual(newValue, oldValue)) {
-                    changed.add(otherParam + ": " + oldValue
-                                + " \u2192 " + newValue);
+                    changed.add(otherParam + ": " + oldValue + " \u2192 " + newValue);
                 }
 
                 /* check correctness */
-                final Boolean correctValueCache =
-                    (otherParam == null) ? null :
-                         paramCorrectValueMap.get(otherParam);
-                if (param == null
-                    || param.equals(otherParam)
-                    || correctValueCache == null) {
-                    final Widget wizardWi = getWidget(otherParam,
-                                                      Widget.WIZARD_PREFIX);
+                final Boolean correctValueCache = (otherParam == null) ? null : paramCorrectValueMap.get(otherParam);
+                if (param == null || param.equals(otherParam) || correctValueCache == null) {
+                    final Widget wizardWi = getWidget(otherParam, Widget.WIZARD_PREFIX);
                     final String enable = isEnabled(otherParam);
                     if (wizardWi != null) {
                         wizardWi.setDisabledReason(enable);
@@ -819,31 +742,25 @@ public abstract class EditableInfo extends Info {
                     }
                     wi.setDisabledReason(enable);
                     wi.setEnabled(enable == null);
-                    final boolean check = checkParam(otherParam, newValue)
-                                          && checkRegexp(otherParam, newValue);
+                    final boolean check = checkParam(otherParam, newValue) && checkRegexp(otherParam, newValue);
                     if (check) {
-                        if (isTimeType(otherParam)
-                            || hasUnitPrefix(otherParam)) {
-                            wi.setBackground(
-                                getParamDefault(otherParam),
-                                           getParamSaved(otherParam),
-                                           isRequired(otherParam));
+                        if (isTimeType(otherParam) || hasUnitPrefix(otherParam)) {
+                            wi.setBackground(getParamDefault(otherParam),
+                                             getParamSaved(otherParam),
+                                             isRequired(otherParam));
                             if (wizardWi != null) {
-                                wizardWi.setBackground(
-                                    getParamDefault(otherParam),
-                                           getParamSaved(otherParam),
-                                           isRequired(otherParam));
+                                wizardWi.setBackground(getParamDefault(otherParam),
+                                                       getParamSaved(otherParam),
+                                                       isRequired(otherParam));
                             }
                         } else {
-                            wi.setBackground(
-                                getParamDefault(otherParam),
-                                     getParamSaved(otherParam),
-                                     isRequired(otherParam));
+                            wi.setBackground(getParamDefault(otherParam),
+                                             getParamSaved(otherParam),
+                                             isRequired(otherParam));
                             if (wizardWi != null) {
-                                wizardWi.setBackground(
-                                    getParamDefault(otherParam),
-                                            getParamSaved(otherParam),
-                                            isRequired(otherParam));
+                                wizardWi.setBackground(getParamDefault(otherParam),
+                                                       getParamSaved(otherParam),
+                                                       isRequired(otherParam));
                             }
                         }
                     } else {
@@ -883,14 +800,12 @@ public abstract class EditableInfo extends Info {
         infoPanelLatch.countDown();
     }
 
-    /** Reset info panel. */
     public void resetInfoPanel() {
         infoPanelLatch = new CountDownLatch(1);
     }
 
-    /** Adds a panel to the advanced list. */
-    protected final void addToAdvancedList(final JPanel p) {
-        advancedPanelList.add(p);
+    protected final void addToAdvancedList(final JPanel panel) {
+        advancedPanelList.add(panel);
     }
 
     /** Hide/Show advanced panels. */
@@ -909,10 +824,8 @@ public abstract class EditableInfo extends Info {
             advanced = true;
         }
         for (final String section : advancedOnlySectionList) {
-            final JPanel p = sectionPanels.get(section,
-                                               Boolean.toString(!WIZARD));
-            final JPanel pw = sectionPanels.get(section,
-                                                Boolean.toString(WIZARD));
+            final JPanel p = sectionPanels.get(section, Boolean.toString(!WIZARD));
+            final JPanel pw = sectionPanels.get(section, Boolean.toString(WIZARD));
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
@@ -934,9 +847,8 @@ public abstract class EditableInfo extends Info {
         });
     }
 
-    /** Revert valus. */
-    public void revert(
-                                                   ) {
+    /** Revert values. */
+    public void revert() {
         final String[] params = getParametersFromXML();
         if (params == null) {
             return;
@@ -957,22 +869,18 @@ public abstract class EditableInfo extends Info {
         }
     }
 
-    /** Returns apply button. */
     public final MyButton getApplyButton() {
         return applyButton;
     }
 
-    /** Returns revert button. */
     public final MyButton getRevertButton() {
         return revertButton;
     }
 
-    /** Sets apply button. */
     public final void setApplyButton(final MyButton applyButton) {
         this.applyButton = applyButton;
     }
 
-    /** Sets revert button. */
     public final void setRevertButton(final MyButton revertButton) {
         this.revertButton = revertButton;
     }
@@ -987,7 +895,6 @@ public abstract class EditableInfo extends Info {
         this.dialogStarted = dialogStarted;
     }
 
-    /** Clear panel lists. */
     public void clearPanelLists() {
         applyButton = null;
         oldApplyButton = null;
@@ -997,21 +904,18 @@ public abstract class EditableInfo extends Info {
         disabledSections.clear();
     }
 
-    /** Cleanup. */
     @Override
     public final void cleanup() {
         super.cleanup();
         clearPanelLists();
     }
 
-    /** Reload combo boxes. */
     public void reloadComboBoxes() {
     }
 
     /** Return previously selected value of the parameter. This is used, when
      *  primitive changes to and from clone. */
-    protected final Value getPreviouslySelected(final String param,
-                                                final String prefix) {
+    protected final Value getPreviouslySelected(final String param, final String prefix) {
         final Widget prevParamWi = getWidget(param, prefix);
         if (prevParamWi != null) {
             return prevParamWi.getValue();
@@ -1019,36 +923,23 @@ public abstract class EditableInfo extends Info {
         return null;
     }
 
-    /** Section name that is displayed. */
     protected String getSectionDisplayName(final String section) {
         return Tools.ucfirst(section);
     }
 
-    /**
-     * Return section color.
-     */
     protected Color getSectionColor(final String section) {
         return Browser.PANEL_BACKGROUND;
     }
 
-    /**
-     * Return section panel.
-     */
     private JPanel getSectionPanel(final String section, final boolean wizard) {
         return sectionPanels.get(section, Boolean.toString(wizard));
     }
 
-    /** Add section panel. */
-    protected final void addSectionPanel(final String section,
-                                         final boolean wizard,
-                                         final JPanel sectionPanel) {
+    protected final void addSectionPanel(final String section, final boolean wizard, final JPanel sectionPanel) {
         sectionPanels.put(section, Boolean.toString(wizard), sectionPanel);
     }
 
-    /** Enable/disable a section. */
-    protected final void enableSection(final String section,
-                                       final boolean enable,
-                                       final boolean wizard) {
+    protected final void enableSection(final String section, final boolean enable, final boolean wizard) {
         if (enable) {
             disabledSections.remove(section);
         } else {
@@ -1060,12 +951,9 @@ public abstract class EditableInfo extends Info {
         }
     }
 
-    /** Return parameters that are not in disabeld sections. */
-    protected final String[] getEnabledSectionParams(
-                                                   final Iterable<String> params) {
+    protected final String[] getEnabledSectionParams(final Iterable<String> params) {
         final List<String> newParams = new ArrayList<String>();
         for (final String param : params) {
-
             if (isSectionEnabled(getSection(param))) {
                 newParams.add(param);
             }
@@ -1073,12 +961,10 @@ public abstract class EditableInfo extends Info {
         return newParams.toArray(new String[newParams.size()]);
     }
 
-    /** Return whether a section is enabled. */
     protected final boolean isSectionEnabled(final String section) {
         return !disabledSections.contains(section);
     }
 
-    /** Additional tool tip. */
     protected String additionalToolTip(final String param) {
         return "";
     }
@@ -1090,31 +976,23 @@ public abstract class EditableInfo extends Info {
     private static class PanelPart {
         /** Section of this panel part. */
         private final String section;
-        /** Access type of this panel part. */
         private final Application.AccessType accessType;
-        /** Whether it is an advanced panel part. */
         private final boolean advanced;
 
-        /** Creates new panel part object. */
-        PanelPart(final String section,
-                  final Application.AccessType accessType,
-                  final boolean advanced) {
+        PanelPart(final String section, final Application.AccessType accessType, final boolean advanced) {
             this.section = section;
             this.accessType = accessType;
             this.advanced = advanced;
         }
 
-        /** Returns a section to which this panel part belongs. */
         public final String getSection() {
             return section;
         }
 
-        /** Returns access type of this panel part. */
         public final Application.AccessType getAccessType() {
             return accessType;
         }
 
-        /** Whether this panel part has advanced options. */
         public final boolean isAdvanced() {
             return advanced;
         }

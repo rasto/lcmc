@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lcmc.data.*;
-import lcmc.data.crm.CRMXML.ResStatus;
+import lcmc.data.crm.CrmXml.ResourceStatus;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -57,9 +57,9 @@ public final class ClusterStatus {
     /** Data from shadow cib. */
     private volatile CibQuery shadowCibQueryMap = new CibQuery();
     /** CRMXML object. */
-    private final CRMXML crmXML;
+    private final CrmXml crmXML;
     /** On which node the resource is running or is a slave. */
-    private volatile Map<String, ResStatus> resStateMap = null;
+    private volatile Map<String, ResourceStatus> resStateMap = null;
     /** Results from ptest. */
     private volatile PtestData ptestData = null;
     /** Old status in string. */
@@ -75,7 +75,7 @@ public final class ClusterStatus {
      * Prepares a new {@code ClusterStatus} object.
      * Gets and parses metadata from pengine and crmd.
      */
-    public ClusterStatus(final Host host, final CRMXML crmXML) {
+    public ClusterStatus(final Host host, final CrmXml crmXML) {
         this.host = host;
         this.crmXML = crmXML;
         final String command = host.getDistCommand("Heartbeat.getClusterMetadata",
@@ -218,47 +218,47 @@ public final class ClusterStatus {
     }
 
     /** Returns colocation data from id. */
-    public CRMXML.ColocationData getColocationData(final String colId) {
+    public CrmXml.ColocationData getColocationData(final String colId) {
         return cibQueryMap.getColocationId().get(colId);
     }
 
     /** Returns list of colocation data from specified resource. */
-    public List<CRMXML.ColocationData> getColocationDatas(final String rsc) {
+    public List<CrmXml.ColocationData> getColocationDatas(final String rsc) {
         return cibQueryMap.getColocationRsc().get(rsc);
     }
 
     /** Returns colocation rsc map. */
-    public Map<String, List<CRMXML.ColocationData>> getColocationRscMap() {
+    public Map<String, List<CrmXml.ColocationData>> getColocationRscMap() {
         return cibQueryMap.getColocationRsc();
     }
 
     /** Returns order data from id. */
-    public CRMXML.OrderData getOrderData(final String ordId) {
+    public CrmXml.OrderData getOrderData(final String ordId) {
         return cibQueryMap.getOrderId().get(ordId);
     }
 
     /** Returns list of order data from specified resource. */
-    public List<CRMXML.OrderData> getOrderDatas(final String rsc) {
+    public List<CrmXml.OrderData> getOrderDatas(final String rsc) {
         return cibQueryMap.getOrderRsc().get(rsc);
     }
 
     /** Returns order rsc map. */
-    public Map<String, List<CRMXML.OrderData>> getOrderRscMap() {
+    public Map<String, List<CrmXml.OrderData>> getOrderRscMap() {
         return cibQueryMap.getOrderRsc();
     }
 
     /** Returns connections between resource sets. */
-    public List<CRMXML.RscSetConnectionData> getRscSetConnections() {
+    public List<CrmXml.RscSetConnectionData> getRscSetConnections() {
         return cibQueryMap.getRscSetConnections();
     }
 
     /** Returns resource sets associated with the order id. */
-    public List<CRMXML.RscSet> getRscSetsOrd(final String ordId) {
+    public List<CrmXml.RscSet> getRscSetsOrd(final String ordId) {
        return cibQueryMap.getOrderIdRscSets().get(ordId);
     }
 
     /** Returns resource sets associated with the colocation id. */
-    public List<CRMXML.RscSet> getRscSetsCol(final String colId) {
+    public List<CrmXml.RscSet> getRscSetsCol(final String colId) {
        return cibQueryMap.getColocationIdRscSets().get(colId);
     }
 
@@ -385,8 +385,8 @@ public final class ClusterStatus {
         if (resStateMap == null) {
             return true;
         }
-        final ResStatus resStatus = resStateMap.get(hbId);
-        return resStatus == null || resStatus.isManaged();
+        final ResourceStatus resourceStatus = resStateMap.get(hbId);
+        return resourceStatus == null || resourceStatus.isManagedByCrm();
     }
 
 
@@ -404,12 +404,12 @@ public final class ClusterStatus {
         if (resStateMap == null) {
             return null;
         }
-        final ResStatus resStatus = resStateMap.get(hbId);
-        if (resStatus == null) {
+        final ResourceStatus resourceStatus = resStateMap.get(hbId);
+        if (resourceStatus == null) {
             return null;
         }
         /* this one is already sorted. */
-        return resStatus.getRunningOnNodes();
+        return resourceStatus.getRunningOnNodes();
     }
 
     /** Returns on which nodes the resource is slave. */
@@ -426,11 +426,11 @@ public final class ClusterStatus {
         if (resStateMap == null) {
             return null;
         }
-        final ResStatus resStatus = resStateMap.get(hbId);
-        if (resStatus == null) {
+        final ResourceStatus resourceStatus = resStateMap.get(hbId);
+        if (resourceStatus == null) {
             return null;
         }
-        return resStatus.getSlaveOnNodes();
+        return resourceStatus.getSlaveOnNodes();
     }
 
     /** Returns on which nodes the resource is master. */
@@ -447,11 +447,11 @@ public final class ClusterStatus {
         if (resStateMap == null) {
             return null;
         }
-        final ResStatus resStatus = resStateMap.get(hbId);
-        if (resStatus == null) {
+        final ResourceStatus resourceStatus = resStateMap.get(hbId);
+        if (resourceStatus == null) {
             return null;
         }
-        return resStatus.getMasterOnNodes();
+        return resourceStatus.getMasterOnNodes();
     }
 
     public Map<String, String> getAllocationScores(final String crmId,
@@ -459,11 +459,11 @@ public final class ClusterStatus {
         if (resStateMap == null) {
             return Collections.emptyMap();
         }
-        final ResStatus resStatus = resStateMap.get(crmId);
-        if (resStatus == null) {
+        final ResourceStatus resourceStatus = resStateMap.get(crmId);
+        if (resourceStatus == null) {
             return Collections.emptyMap();
         }
-        return resStatus.getAllocationScores();
+        return resourceStatus.getAllocationScores();
     }
 
 

@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.crm.ClusterStatus;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
@@ -91,15 +91,15 @@ final class HbColocationInfo extends EditableInfo
         if (serviceInfoRsc == null
             || serviceInfoWithRsc == null) {
             /* rsc set placeholder */
-            final CRMXML.ColocationData colocationData =
+            final CrmXml.ColocationData colocationData =
                             clStatus.getColocationData(colId);
             final String score = colocationData.getScore();
-            resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
+            resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
         } else if (serviceInfoRsc.isConstraintPH()
                    || serviceInfoWithRsc.isConstraintPH()) {
             /* rsc set edge */
             final ConstraintPHInfo cphi;
-            final CRMXML.RscSet rscSet;
+            final CrmXml.RscSet rscSet;
             if (serviceInfoRsc.isConstraintPH()) {
                 cphi = (ConstraintPHInfo) serviceInfoRsc;
                 rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
@@ -110,14 +110,14 @@ final class HbColocationInfo extends EditableInfo
             resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
             resourceNode.put("role", new StringValue(rscSet.getColocationRole()));
         } else {
-            final CRMXML.ColocationData colocationData =
+            final CrmXml.ColocationData colocationData =
                             clStatus.getColocationData(colId);
             if (colocationData != null) {
                 final String score = colocationData.getScore();
                 final String rscRole = colocationData.getRscRole();
                 final String withRscRole = colocationData.getWithRscRole();
 
-                resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
+                resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
                 resourceNode.put("rsc-role", new StringValue(rscRole));
                 resourceNode.put("with-rsc-role", new StringValue(withRscRole));
             }
@@ -157,7 +157,7 @@ final class HbColocationInfo extends EditableInfo
     protected String getParamLongDesc(final String param) {
 
         final String text =
-                    getBrowser().getCRMXML().getColocationParamLongDesc(param);
+                    getBrowser().getCrmXml().getColocationParamLongDesc(param);
         if (serviceInfoRsc != null && serviceInfoWithRsc != null) {
             return text.replaceAll("@RSC@",
                                    Matcher.quoteReplacement(
@@ -172,7 +172,7 @@ final class HbColocationInfo extends EditableInfo
     /** Returns short description of the parameter, that is used as * label. */
     @Override
     protected String getParamShortDesc(final String param) {
-        return getBrowser().getCRMXML().getColocationParamShortDesc(param);
+        return getBrowser().getCrmXml().getColocationParamShortDesc(param);
     }
 
     /**
@@ -181,19 +181,19 @@ final class HbColocationInfo extends EditableInfo
      */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        return getBrowser().getCRMXML().checkColocationParam(param, newValue);
+        return getBrowser().getCrmXml().checkColocationParam(param, newValue);
     }
 
     /** Returns default for this parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return getBrowser().getCRMXML().getColocationParamDefault(param);
+        return getBrowser().getCrmXml().getColocationParamDefault(param);
     }
 
     /** Returns preferred value for this parameter. */
     @Override
     protected Value getParamPreferred(final String param) {
-        return getBrowser().getCRMXML().getColocationParamPreferred(param);
+        return getBrowser().getCrmXml().getColocationParamPreferred(param);
     }
 
     /** Returns lsit of all parameters as an array. */
@@ -202,20 +202,20 @@ final class HbColocationInfo extends EditableInfo
         if (serviceInfoRsc == null
             || serviceInfoWithRsc == null) {
             /* rsc set colocation */
-            return getBrowser().getCRMXML().getRscSetColocationParameters();
+            return getBrowser().getCrmXml().getResourceSetColocationParameters();
         } else if (serviceInfoRsc.isConstraintPH()
                    || serviceInfoWithRsc.isConstraintPH()) {
             /* when rsc set edges are clicked */
-            return getBrowser().getCRMXML().getRscSetColConnectionParameters();
+            return getBrowser().getCrmXml().getResourceSetColConnectionParameters();
         } else {
-            return getBrowser().getCRMXML().getColocationParameters();
+            return getBrowser().getCrmXml().getColocationParameters();
         }
     }
 
     /** Returns when at least one resource in rsc set can be promoted. */
     private boolean isRscSetMaster() {
         final ConstraintPHInfo cphi;
-        final CRMXML.RscSet rscSet;
+        final CrmXml.RscSet rscSet;
         if (serviceInfoRsc.isConstraintPH()) {
             cphi = (ConstraintPHInfo) serviceInfoRsc;
             rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
@@ -234,34 +234,34 @@ final class HbColocationInfo extends EditableInfo
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         if ("role".equals(param)) {
-            return getBrowser().getCRMXML().getColocationParamPossibleChoices(
-                                param,
-                                isRscSetMaster());
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
+                    param,
+                    isRscSetMaster());
         } else if ("with-rsc-role".equals(param)) {
-            return getBrowser().getCRMXML().getColocationParamPossibleChoices(
-                                param,
-                                serviceInfoWithRsc.getService().isMaster());
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
+                    param,
+                    serviceInfoWithRsc.getService().isMaster());
         } else if ("rsc-role".equals(param)) {
-            return getBrowser().getCRMXML().getColocationParamPossibleChoices(
-                                param,
-                                serviceInfoRsc.getService().isMaster());
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
+                    param,
+                    serviceInfoRsc.getService().isMaster());
         } else {
-            return getBrowser().getCRMXML().getColocationParamPossibleChoices(
-                                param,
-                                false);
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
+                    param,
+                    false);
         }
     }
 
     /** Returns parameter type, boolean etc. */
     @Override
     protected String getParamType(final String param) {
-        return getBrowser().getCRMXML().getColocationParamType(param);
+        return getBrowser().getCrmXml().getColocationParamType(param);
     }
 
     /** Returns section to which the global belongs. */
     @Override
     protected String getSection(final String param) {
-        return getBrowser().getCRMXML().getColocationSection(param);
+        return getBrowser().getCrmXml().getColocationSectionForDisplay(param);
     }
 
     /**
@@ -270,31 +270,31 @@ final class HbColocationInfo extends EditableInfo
      */
     @Override
     protected boolean isCheckBox(final String param) {
-        return getBrowser().getCRMXML().isColocationBoolean(param);
+        return getBrowser().getCrmXml().isColocationBoolean(param);
     }
 
     /** Returns true if the specified parameter is of time type. */
     @Override
     protected boolean isTimeType(final String param) {
-        return getBrowser().getCRMXML().isColocationTimeType(param);
+        return getBrowser().getCrmXml().isColocationTimeType(param);
     }
 
     /** Returns true if the specified parameter is integer. */
     @Override
     protected boolean isInteger(final String param) {
-        return getBrowser().getCRMXML().isColocationInteger(param);
+        return getBrowser().getCrmXml().isColocationInteger(param);
     }
 
     /** Returns true if the specified parameter is label. */
     @Override
     protected boolean isLabel(final String param) {
-        return getBrowser().getCRMXML().isColocationLabel(param);
+        return getBrowser().getCrmXml().isColocationLabel(param);
     }
 
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
-        return getBrowser().getCRMXML().isColocationRequired(param);
+        return getBrowser().getCrmXml().isColocationRequired(param);
     }
 
     /** Returns attributes of this colocation. */
@@ -347,7 +347,7 @@ final class HbColocationInfo extends EditableInfo
                        || serviceInfoWithRsc.isConstraintPH()) {
                 /* edge */
                 final ConstraintPHInfo cphi;
-                final CRMXML.RscSet rscSet;
+                final CrmXml.RscSet rscSet;
                 if (serviceInfoRsc.isConstraintPH()) {
                     cphi = (ConstraintPHInfo) serviceInfoRsc;
                     rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
@@ -433,17 +433,17 @@ final class HbColocationInfo extends EditableInfo
         //                  serviceInfoWithRsc.getService().getHeartbeatId();
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String colId = getService().getHeartbeatId();
-        final CRMXML.ColocationData data = clStatus.getColocationData(colId);
+        final CrmXml.ColocationData data = clStatus.getColocationData(colId);
         if (data == null) {
             return 0;
         }
         final String score = data.getScore();
         if (score == null) {
             return 0;
-        } else if (CRMXML.INFINITY_STRING.getValueForConfig().equals(score)
-                   || CRMXML.PLUS_INFINITY_STRING.getValueForConfig().equals(score)) {
+        } else if (CrmXml.INFINITY_VALUE.getValueForConfig().equals(score)
+                   || CrmXml.PLUS_INFINITY_VALUE.getValueForConfig().equals(score)) {
             return 1000000;
-        } else if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)) {
+        } else if (CrmXml.MINUS_INFINITY_VALUE.getValueForConfig().equals(score)) {
             return -1000000;
         }
         return Integer.parseInt(score);

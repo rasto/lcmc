@@ -19,7 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui;
 
 import java.awt.BorderLayout;
@@ -42,32 +41,16 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Background color of the status panel. */
-    private static final Color STATUS_BACKGROUND =
-                        Tools.getDefaultColor("ViewPanel.Status.Background");
-    /** Add cluster icon. */
-    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
-                                   Tools.getDefault("ClusterTab.ClusterIcon"));
-    /** Add host icon. */
-    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                                        Tools.getDefault("HostTab.HostIcon"));
-    /** Dimension of the big buttons. */
-    private static final Dimension BIG_BUTTON_DIMENSION =
-                                                    new Dimension(300, 100);
-    /** Logo panel for card layout. */
+    private static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
+    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClusterTab.ClusterIcon"));
+    private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostTab.HostIcon"));
+    private static final Dimension BIG_BUTTON_DIMENSION = new Dimension(300, 100);
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
-    /** Browser. */
     private final transient EmptyBrowser browser;
-    /**
-     * Prepares a new {@code ClusterViewPanel} object.
-     */
+
     EmptyViewPanel() {
         super();
         browser = new EmptyBrowser();
@@ -91,13 +74,10 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         logoPanel.add(lPanel, LOGO_PANEL_STRING);
         final JPanel smallButtonPanel = new JPanel();
         smallButtonPanel.setBackground(STATUS_BACKGROUND);
-        smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel,
-                BoxLayout.PAGE_AXIS));
+        smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel, BoxLayout.PAGE_AXIS));
         buttonPanel.add(smallButtonPanel);
         /* add new host button */
-        final MyButton addHostButton = new MyButton(
-                                    Tools.getString("ClusterTab.AddNewHost"),
-                                    HOST_ICON);
+        final MyButton addHostButton = new MyButton(Tools.getString("ClusterTab.AddNewHost"), HOST_ICON);
         addHostButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addHostButton.addActionListener(new ActionListener() {
@@ -122,9 +102,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
         Tools.getGUIData().allHostsUpdate();
 
         /* add new cluster button */
-        final MyButton addClusterButton =
-                new MyButton(Tools.getString("ClusterTab.AddNewCluster"),
-                             CLUSTER_ICON);
+        final MyButton addClusterButton = new MyButton(Tools.getString("ClusterTab.AddNewCluster"), CLUSTER_ICON);
         addClusterButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addClusterButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addClusterButton.setMinimumSize(BIG_BUTTON_DIMENSION);

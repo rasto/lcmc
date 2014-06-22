@@ -79,7 +79,7 @@ public class Application {
     /** Name of the Master/Slave set pacemaker object. */
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     /** Name of the group pacemaker object. */
-    public static final String PM_GROUP_NAME = "Group";
+    public static final String PACEMAKER_GROUP_NAME = "Group";
     /** Default frames per second for animations. */
     public static final float DEFAULT_ANIM_FPS = 20.0f;
     static {

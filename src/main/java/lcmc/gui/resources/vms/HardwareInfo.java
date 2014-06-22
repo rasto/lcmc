@@ -51,7 +51,7 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.LinuxFile;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.Value;
 import lcmc.data.resources.Resource;
 import lcmc.gui.Browser;
@@ -232,7 +232,7 @@ public abstract class HardwareInfo extends EditableInfo {
     /** Returns units. */
     @Override
     protected final Unit[] getUnits(final String param) {
-        return VMSXML.getUnits();
+        return VmsXml.getUnits();
     }
 
     /** Returns the default unit for the parameter. */
@@ -303,8 +303,8 @@ public abstract class HardwareInfo extends EditableInfo {
     /** Get first host that has this vm and is connected. */
     protected final Host getFirstConnectedHost() {
         for (final Host h : getBrowser().getClusterHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null && h.isConnected()) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null && h.isConnected()) {
                 return h;
             }
         }
@@ -392,7 +392,7 @@ public abstract class HardwareInfo extends EditableInfo {
     protected abstract void addHardwareTable(final JPanel mainPanel);
 
     /** Modify device xml. */
-    protected abstract void modifyXML(final VMSXML vmsxml,
+    protected abstract void modifyXML(final VmsXml vmsXml,
                                       final Node node,
                                       final String domainName,
                                       final Map<String, String> params);

@@ -19,8 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui;
 import java.awt.BorderLayout;
 import javax.swing.Box;
@@ -28,23 +26,12 @@ import lcmc.data.Cluster;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.Tools;
 
-
-
 /**
  * An implementation of a custer view with tree of services.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
-public final class ClusterViewPanel extends ViewPanel
-                                    implements AllHostsUpdatable {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Cluster data object. */
+public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private final transient Cluster cluster;
 
-    /** Prepares a new {@code ClusterViewPanel} object. */
     ClusterViewPanel(final Cluster cluster) {
         super();
         this.cluster = cluster;
@@ -61,13 +48,11 @@ public final class ClusterViewPanel extends ViewPanel
     /** This is called when there was added a new host. */
     @Override
     public void allHostsUpdate() {
-        cluster.getBrowser().updateClusterResources(
-                                                cluster.getHostsArray(),
-                                                cluster.getCommonFileSystems(),
-                                                cluster.getCommonMountPoints());
+        cluster.getBrowser().updateClusterResources(cluster.getHostsArray(),
+                                                    cluster.getCommonFileSystems(),
+                                                    cluster.getCommonMountPoints());
     }
 
-    /** Gets cluster object. */
     Cluster getCluster() {
         return cluster;
     }

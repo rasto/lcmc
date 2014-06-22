@@ -84,7 +84,7 @@ public final class LinbitDrbdInfo extends ServiceInfo {
     public void removeMyselfNoConfirm(final Host dcHost,
                                       final Application.RunMode runMode) {
         final ResourceInfo dri =
-                        getBrowser().getDrbdResHash().get(getResourceName());
+                        getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         super.removeMyselfNoConfirm(dcHost, runMode);
         if (dri != null) {
@@ -97,7 +97,7 @@ public final class LinbitDrbdInfo extends ServiceInfo {
     protected void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
         final ResourceInfo dri =
-                        getBrowser().getDrbdResHash().get(getResourceName());
+                        getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
             if (isManaged(Application.RunMode.LIVE) && !getService().isOrphaned()) {

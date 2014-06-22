@@ -19,8 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui;
 
 import java.awt.BorderLayout;
@@ -51,27 +49,16 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of dialogs that are needed for establishing of a ssh
  * connection.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class SSHGui {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSHGui.class);
-    /** Default length of fields. */
     private static final int DEFAULT_FIELD_LENGTH = 20;
     /** Root pane on which the dialogs are comming to. */
     private final Container rootPane;
-    /** Host data object. */
     private final Host host;
-    /** Progress bar. */
     private final ProgressBar progressBar;
 
-    /** Prepares a new {@code SSHGui} object. */
-    public SSHGui(final Container rootPane,
-                  final Host host,
-                  final ProgressBar progressBar) {
+    public SSHGui(final Container rootPane, final Host host, final ProgressBar progressBar) {
         super();
         this.rootPane = rootPane;
         this.host = host;
@@ -102,14 +89,11 @@ public final class SSHGui {
                                        final boolean isPassword) {
         final EnterSomethingDialog esd;
         if (rootPane instanceof JDialog) {
-            esd = new EnterSomethingDialog((JDialog) rootPane, title,
-                    content, underText, defaultValue, isPassword);
+            esd = new EnterSomethingDialog((JDialog) rootPane, title, content, underText, defaultValue, isPassword);
         } else if (rootPane instanceof JApplet) {
-            esd = new EnterSomethingDialog((JApplet) rootPane, title,
-                    content, underText, defaultValue, isPassword);
+            esd = new EnterSomethingDialog((JApplet) rootPane, title, content, underText, defaultValue, isPassword);
         } else {
-            esd = new EnterSomethingDialog((Frame) rootPane, title,
-                    content, underText, defaultValue, isPassword);
+            esd = new EnterSomethingDialog((Frame) rootPane, title, content, underText, defaultValue, isPassword);
         }
 
         esd.setVisible(true);
@@ -122,19 +106,13 @@ public final class SSHGui {
      * The text field can either be plain text or a password field.
      */
     private class EnterSomethingDialog extends JDialog {
-        /** Serial version UID. */
-        private static final long serialVersionUID = 1L;
-
-        /** Answer field. */
         private JTextField answerField;
-        /** Password field. */
         private JPasswordField passwordField;
         /** Whether there is password field. */
         private boolean isPassword;
         /** User answer. */
         private String answer;
 
-        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final JDialog parent,
                              final String title,
                              final String[] content,
@@ -146,7 +124,6 @@ public final class SSHGui {
             setLocationRelativeTo(parent);
         }
 
-        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final Frame parent,
                              final String title,
                              final String[] content,
@@ -158,22 +135,17 @@ public final class SSHGui {
             setLocationRelativeTo(parent);
         }
 
-        /** Prepares a new {@code EnterSomethingDialog} object. */
         EnterSomethingDialog(final JApplet parent,
                              final String title,
                              final String[] content,
                              final String underText,
                              final String defaultValue,
                              final boolean isPasswordA) {
-            super((Frame) SwingUtilities.getAncestorOfClass(Frame.class,
-                                                            parent),
-                  title,
-                  true);
+            super((Frame) SwingUtilities.getAncestorOfClass(Frame.class, parent), title, true);
             init(content, underText, defaultValue, isPasswordA);
             setLocationRelativeTo(parent);
         }
 
-        /** Init. */
         private void init(final String[] content,
                           final String underText,
                           final String defaultValue,
@@ -183,20 +155,17 @@ public final class SSHGui {
             for (final String s : content) {
                 if (s != null && !s.isEmpty()) {
                     /* strip some html */
-                    strippedContent.add(s.replaceAll("\\<.*?\\>", "")
-                                         .replaceAll("&nbsp;", " "));
+                    strippedContent.add(s.replaceAll("\\<.*?\\>", "").replaceAll("&nbsp;", " "));
                 }
             }
-            host.getTerminalPanel().addCommandOutput(
-                  strippedContent.toArray(new String[strippedContent.size()]));
+            host.getTerminalPanel().addCommandOutput(strippedContent.toArray(new String[strippedContent.size()]));
 
             if (progressBar != null) {
                 progressBar.hold();
             }
 
             final JPanel pan = new JPanel();
-            pan.setBorder(new LineBorder(
-                   Tools.getDefaultColor("ConfigDialog.Background.Light"), 5));
+            pan.setBorder(new LineBorder(Tools.getDefaultColor("ConfigDialog.Background.Light"), 5));
             pan.setBackground(Color.WHITE);
             pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
             if (host != null && host.getName() != null) {
@@ -255,7 +224,6 @@ public final class SSHGui {
             pack();
         }
 
-        /** Finish. */
         private void finish() {
             if (isPassword) {
                 answer = new String(passwordField.getPassword());

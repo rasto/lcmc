@@ -230,7 +230,7 @@ public class HbConnectionInfo extends EditableInfo {
     /** Returns heartbeat graphical view. */
     @Override
     public final JPanel getGraphicalView() {
-        return getBrowser().getCRMGraph().getGraphPanel();
+        return getBrowser().getCrmGraph().getGraphPanel();
     }
 
     /** Applies the changes to the constraints. */
@@ -339,7 +339,7 @@ public class HbConnectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                getBrowser().getCrmGraph().stopTestAnimation((JComponent) component);
                 component.setToolTipText("");
             }
 
@@ -359,7 +359,7 @@ public class HbConnectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
+                getBrowser().getCrmGraph().startTestAnimation((JComponent) component,
                                                               startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
@@ -688,7 +688,7 @@ public class HbConnectionInfo extends EditableInfo {
     public final void selectMyself() {
         super.selectMyself();
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                        getBrowser().getTree().getLastSelectedPathComponent();
+                        getBrowser().getMenuTree().getLastSelectedPathComponent();
         if (node != null) {
             // TODO: do this differently, don't need to select it, only reload
             final Info prev = (Info) node.getUserObject();

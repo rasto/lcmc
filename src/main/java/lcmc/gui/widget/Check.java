@@ -17,23 +17,20 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.util.List;
 import lcmc.utilities.Tools;
 
 /**
- * @author Rasto Levrinc
+ * Check if fields has changed and if it is correct.
  */
 public final class Check {
     private String toolTipCache = null;
     private final List<String> incorrectFields;
     private final List<String> changedFields;
 
-    /** Prepares new {@code Check} object. */
-    public Check(final List<String> incorrectFields,
-                 final List<String> changedFields) {
+    public Check(final List<String> incorrectFields, final List<String> changedFields) {
         super();
         this.incorrectFields = incorrectFields;
         this.changedFields = changedFields;
@@ -64,6 +61,7 @@ public final class Check {
     public boolean isChanged() {
         return changedFields != null && !changedFields.isEmpty();
     }
+
     public String getToolTip() {
         if (toolTipCache == null) {
             toolTipCache = getToolTipInside().toString();

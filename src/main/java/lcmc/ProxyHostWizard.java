@@ -23,61 +23,43 @@ package lcmc;
 import lcmc.data.Host;
 import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.dialog.drbdConfig.NewProxyHost;
+import lcmc.gui.dialog.drbdConfig.NewProxyHostDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
-
 /**
  * Show step by step dialogs that add and configure new proxy host.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class ProxyHostWizard {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostWizard.class);
-    /** Whether the wizard was canceled. */
-    private boolean canceled = false;
     private final VolumeInfo volumeInfo;
     private final Host host;
 
-
-    /** Prepares new {@code ProxyHostWizard} object. */
     public ProxyHostWizard(final Host host, final VolumeInfo volumeInfo) {
         this.host = host;
         this.volumeInfo = volumeInfo;
     }
 
-    /** Shows step by step dialogs that add and configure new drbd resource. */
     public void showDialogs() {
-        WizardDialog dialog = new NewProxyHost(null, host, volumeInfo, null, new DrbdInstallation());
+        WizardDialog dialog = new NewProxyHostDialog(null, host, volumeInfo, null, new DrbdInstallation());
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                canceled = true;
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;
         }
-    }
-
-    /** Returns whether the wizard was canceled. */
-    public boolean isCanceled() {
-        return canceled;
     }
 }

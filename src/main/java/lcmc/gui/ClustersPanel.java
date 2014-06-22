@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc.gui;
 
 import java.awt.Color;
@@ -53,39 +52,25 @@ import lcmc.utilities.Tools;
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
  * changes also host that is shown in the terminal panel, to the host, that
  * is active in the cluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class ClustersPanel extends JPanel {
-    /** Logger. */
-    private static final Logger LOG =
-                                LoggerFactory.getLogger(ClustersPanel.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
+    private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
     /** Icon of the cluster. */
-    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
-                                Tools.getDefault("ClustersPanel.ClusterIcon"));
+    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     /** Icon of all clusters. */
     private static final ImageIcon CLUSTERS_ICON = Tools.createImageIcon(
-                               Tools.getDefault("ClustersPanel.ClustersIcon"));
+                                                       Tools.getDefault("ClustersPanel.ClustersIcon"));
     /** Name of all clusters tab. */
-    private static final String CLUSTERS_LABEL =
-                                Tools.getString("ClustersPanel.ClustersTab");
-    /** Width of the tab border. */
+    private static final String CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
     private static final int TAB_BORDER_WIDTH = 3;
-    /** The tabbed pane where the tabs are painted. */
     private JTabbedPane tabbedPane;
     /** New empty cluster tab. */
     private final ClusterTab newClusterTab;
     /** Previously selected tab. */
     private ClusterTab prevSelected = null;
 
-    private final Map<ClusterTab, JLabel> clusterTabLabels =
-                                            new HashMap<ClusterTab, JLabel>();
+    private final Map<ClusterTab, JLabel> clusterTabLabels = new HashMap<ClusterTab, JLabel>();
 
-    /** Prepares a new {@code ClustersPanel} object. */
     ClustersPanel() {
         super(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
@@ -96,13 +81,9 @@ public final class ClustersPanel extends JPanel {
 
     /** Shows the tabbed pane. */
     private void showGUI() {
-        UIManager.put("TabbedPane.selected",
-                      Tools.getDefaultColor("ViewPanel.Status.Background"));
+        UIManager.put("TabbedPane.selected", Tools.getDefaultColor("ViewPanel.Status.Background"));
         UIManager.put("TabbedPane.foreground", Color.WHITE);
-        UIManager.put("TabbedPane.background",
-                      Tools.getDefaultColor("ViewPanel.Background"));
-
-
+        UIManager.put("TabbedPane.background", Tools.getDefaultColor("ViewPanel.Background"));
 
         tabbedPane = new JTabbedPane();
         tabbedPane.setTabPlacement(JTabbedPane.TOP);
@@ -112,9 +93,7 @@ public final class ClustersPanel extends JPanel {
 
         addClustersTab(CLUSTERS_LABEL);
         add(tabbedPane);
-        setBorder(BorderFactory.createLineBorder(
-                        Tools.getDefaultColor("ClustersPanel.Background"),
-                        TAB_BORDER_WIDTH));
+        setBorder(BorderFactory.createLineBorder(Tools.getDefaultColor("ClustersPanel.Background"), TAB_BORDER_WIDTH));
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
 
         /* Register a change listener.
@@ -166,9 +145,7 @@ public final class ClustersPanel extends JPanel {
                                      public void run() {
                                          if (cluster.isTabClosable()) {
                                              Tools.stopCluster(cluster);
-                                             Tools.getGUIData()
-                                                  .getEmptyBrowser()
-                                                  .setDisconnected(cluster);
+                                             Tools.getGUIData().getEmptyBrowser().setDisconnected(cluster);
                                          }
                                      }
                                  });
@@ -176,11 +153,7 @@ public final class ClustersPanel extends JPanel {
                              }
                          };
 
-        addTabComponent(tabbedPane,
-                        cluster.getName(),
-                        CLUSTER_ICON,
-                        ct,
-                        disconnectAction);
+        addTabComponent(tabbedPane, cluster.getName(), CLUSTER_ICON, ct, disconnectAction);
         tabbedPane.setSelectedComponent(ct);
         refresh();
     }
@@ -223,10 +196,7 @@ public final class ClustersPanel extends JPanel {
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
     void addClustersTab(final String label) {
-        tabbedPane.addTab(label,
-                          CLUSTERS_ICON,
-                          newClusterTab,
-                          Tools.getString("ClustersPanel.ClustersTabTip"));
+        tabbedPane.addTab(label, CLUSTERS_ICON, newClusterTab, Tools.getString("ClustersPanel.ClustersTabTip"));
     }
 
     /**
@@ -255,14 +225,12 @@ public final class ClustersPanel extends JPanel {
         removeTab(cluster.getClusterTab());
     }
 
-    /** Removes all tabs. */
     public void removeAllTabs() {
         clusterTabLabels.clear();
         tabbedPane.removeAll();
         addClustersTab("");
     }
 
-    /** Renames selected added tab. */
     void renameSelectedTab(final String newName) {
         final JLabel label = clusterTabLabels.get(getClusterTab());
         if (label != null) {
@@ -290,7 +258,6 @@ public final class ClustersPanel extends JPanel {
 
     /** This class is used to override the tab look. */
     static class MyTabbedPaneUI extends BasicTabbedPaneUI {
-        /** Sets insets. */
         @Override
         protected final Insets getContentBorderInsets(final int tabPlacement) {
             return new Insets(0, 0, 0, 0);
@@ -298,11 +265,8 @@ public final class ClustersPanel extends JPanel {
 
         /** Overrides the content border painting with nothing. */
         @Override
-        protected void paintContentBorder(final Graphics g,
-                                          final int tabPlacement,
-                                          final int selectedIndex) {
+        protected void paintContentBorder(final Graphics g, final int tabPlacement, final int selectedIndex) {
             /* No border */
         }
     }
-
 }

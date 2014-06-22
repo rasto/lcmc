@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.configs.AppDefaults;
 import lcmc.data.drbd.DrbdInstallation;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
@@ -80,8 +80,8 @@ public final class Resource extends DrbdConfig {
     private static final String PROXY_PLUGIN_ZLIB = "plugin-zlib";
     private static final String PROXY_PLUGIN_LZMA = "plugin-lzma";
     /** Common configuration options. */
-    private static final String[] COMMON_PARAMS = {DrbdXML.PROTOCOL_PARAM,
-                                                   DrbdXML.PING_TIMEOUT_PARAM,
+    private static final String[] COMMON_PARAMS = {DrbdXml.PROTOCOL_PARAM,
+                                                   DrbdXml.PING_TIMEOUT_PARAM,
                                                    CRAM_HMAC_ALG,
                                                    SHARED_SECRET,
                                                    WFC_TIMEOUT_PARAM,
@@ -92,8 +92,8 @@ public final class Resource extends DrbdConfig {
                                                    PROXY_PLUGIN_LZMA};
     /** Configuration options of the drbd resource. */
     private static final String[] PARAMS = {"name",
-                                            DrbdXML.PROTOCOL_PARAM,
-                                            DrbdXML.PING_TIMEOUT_PARAM,
+                                            DrbdXml.PROTOCOL_PARAM,
+                                            DrbdXml.PING_TIMEOUT_PARAM,
                                             ALLOW_TWO_PRIMARIES,
                                             CRAM_HMAC_ALG,
                                             SHARED_SECRET,
@@ -127,14 +127,14 @@ public final class Resource extends DrbdConfig {
             proxyHostNextDialog = false;
             final Host proxyHost = Host.createInstance();
             proxyHost.setCluster(dri.getCluster());
-            return new NewProxyHost(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
+            return new NewProxyHostDialog(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
         }
         final GlobalInfo globalInfo = dri.getDrbdInfo();
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
         if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 if (!protocolInNetSection
-                    && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
+                    && DrbdXml.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
                 final Widget wi = globalInfo.getWidget(commonP, null);
@@ -216,20 +216,20 @@ public final class Resource extends DrbdConfig {
         /* common options */
         final Map<String, Value> commonPreferredValue =
                                                 new HashMap<String, Value>();
-        commonPreferredValue.put(DrbdXML.PROTOCOL_PARAM, DrbdXML.PROTOCOL_C);
+        commonPreferredValue.put(DrbdXml.PROTOCOL_PARAM, DrbdXml.PROTOCOL_C);
         commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, new StringValue("0"));
         commonPreferredValue.put(CRAM_HMAC_ALG, new StringValue("sha1"));
         commonPreferredValue.put(SHARED_SECRET, new StringValue(getRandomSecret()));
         commonPreferredValue.put(ON_IO_ERROR, new StringValue("detach"));
         commonPreferredValue.put(PROXY_MEMLIMIT,
                                  new StringValue("100",
-                                                 DrbdXML.getUnitMiBytes("")));
+                                                 DrbdXml.getUnitMiBytes("")));
         commonPreferredValue.put(PROXY_PLUGIN_ZLIB, new StringValue("level 9"));
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
         if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
                 if (!protocolInNetSection
-                    && DrbdXML.PROTOCOL_PARAM.equals(commonP)) {
+                    && DrbdXml.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
                 final Widget wi = globalInfo.getWidget(commonP, null);

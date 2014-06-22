@@ -41,8 +41,8 @@ import lcmc.data.AccessMode;
 import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
-import lcmc.data.vm.VMSXML.DiskData;
+import lcmc.data.vm.VmsXml;
+import lcmc.data.vm.VmsXml.DiskData;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.BlockDevInfo;
@@ -472,7 +472,7 @@ public final class DiskInfo extends HardwareInfo {
     protected Value getParamPreferred(final String param) {
         final String domainType =
                         getVMSVirtualDomainInfo().getWidget(
-                            VMSXML.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
+                            VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue();
         if (DiskData.DRIVER_NAME.equals(param)
             && DomainInfo.DOMAIN_TYPE_KVM.equals(domainType)) {
             return DRIVER_NAME_QEMU;
@@ -511,9 +511,9 @@ public final class DiskInfo extends HardwareInfo {
             final Set<Value> sourceFileDirs = new TreeSet<Value>();
             sourceFileDirs.add(new StringValue(LIBVIRT_IMAGE_LOCATION));
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                if (vmsxml != null) {
-                    for (final String sfd: vmsxml.getSourceFileDirs()) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                if (vmsXml != null) {
+                    for (final String sfd: vmsXml.getSourceFileDirs()) {
                         sourceFileDirs.add(new StringValue(sfd));
                     }
                 }
@@ -521,12 +521,12 @@ public final class DiskInfo extends HardwareInfo {
             return sourceFileDirs.toArray(new Value[sourceFileDirs.size()]);
         } else if (DiskData.SOURCE_DEVICE.equals(param)) {
             for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                final VMSXML vmsxml = getBrowser().getVMSXML(h);
+                final VmsXml vmsXml = getBrowser().getVmsXml(h);
                 final List<Value> bds = new ArrayList<Value>();
                 bds.add(null);
-                if (vmsxml != null) {
+                if (vmsXml != null) {
                     for (final BlockDevInfo bdi
-                            : h.getBrowser().getBlockDevInfos()) {
+                            : h.getBrowser().getSortedBlockDevInfos()) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             bds.add(new StringValue(bdi.getDrbdVolumeInfo().getDeviceByRes()));
                         } else {
@@ -721,11 +721,11 @@ public final class DiskInfo extends HardwareInfo {
                                     getHWParameters(getResource().isNew());
         final String[] params = getRealParametersFromXML();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final String domainName =
                                 getVMSVirtualDomainInfo().getDomainName();
-                final Node domainNode = vmsxml.getDomainNode(domainName);
+                final Node domainNode = vmsXml.getDomainNode(domainName);
                 /* fix host ports */
 
                 fixSourceHostParams(parameters);
@@ -740,16 +740,16 @@ public final class DiskInfo extends HardwareInfo {
                 for (final Map.Entry<String, Widget> entry : sourceHostPortWi.entrySet()) {
                     entry.getValue().setValueAndWait(new StringValue(fixedPorts));
                 }
-                modifyXML(vmsxml, domainNode, domainName, parameters);
+                modifyXML(vmsXml, domainNode, domainName, parameters);
                 final String virshOptions =
                                    getVMSVirtualDomainInfo().getVirshOptions();
-                vmsxml.saveAndDefine(domainNode, domainName, virshOptions);
+                vmsXml.saveAndDefine(domainNode, domainName, virshOptions);
             }
         }
         getResource().setNew(false);
-        getBrowser().reload(getNode(), false);
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().reloadNode(getNode(), false);
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -764,12 +764,12 @@ public final class DiskInfo extends HardwareInfo {
 
     /** Modify device xml. */
     @Override
-    protected void modifyXML(final VMSXML vmsxml,
+    protected void modifyXML(final VmsXml vmsXml,
                              final Node node,
                              final String domainName,
                              final Map<String, String> params) {
-        if (vmsxml != null) {
-            vmsxml.modifyDiskXML(node, domainName, params);
+        if (vmsXml != null) {
+            vmsXml.modifyDiskXML(node, domainName, params);
         }
     }
 
@@ -923,8 +923,8 @@ public final class DiskInfo extends HardwareInfo {
                     final Widget wi = getWidget(param, null);
                     for (final Host h
                             : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                        final VMSXML vmsxml = getBrowser().getVMSXML(h);
-                        if (vmsxml != null) {
+                        final VmsXml vmsXml = getBrowser().getVmsXml(h);
+                        if (vmsXml != null) {
                             final Value savedValue =
                                                diskData.getValue(param);
                             if (savedValue != null) {
@@ -1057,18 +1057,18 @@ public final class DiskInfo extends HardwareInfo {
     protected void removeMyselfNoConfirm(final Application.RunMode runMode) {
         final String virshOptions = getVMSVirtualDomainInfo().getVirshOptions();
         for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-            final VMSXML vmsxml = getBrowser().getVMSXML(h);
-            if (vmsxml != null) {
+            final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            if (vmsXml != null) {
                 final Map<String, String> parameters =
                                                 new HashMap<String, String>();
                 parameters.put(DiskData.SAVED_TARGET_DEVICE, getName());
-                vmsxml.removeDiskXML(getVMSVirtualDomainInfo().getDomainName(),
+                vmsXml.removeDiskXML(getVMSVirtualDomainInfo().getDomainName(),
                                      parameters,
                                      virshOptions);
             }
         }
-        getBrowser().periodicalVMSUpdate(
-                                getVMSVirtualDomainInfo().getDefinedOnHosts());
+        getBrowser().periodicalVmsUpdate(
+                getVMSVirtualDomainInfo().getDefinedOnHosts());
         removeNode();
     }
 

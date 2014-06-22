@@ -52,7 +52,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
-public class NewHost extends DialogHost {
+public class NewHostDialog extends DialogHost {
     /** Normal widths of the fields. */
     private static final int FIELD_WIDTH = 120;
     /** Widths of the fields if hops are used. */
@@ -74,9 +74,9 @@ public class NewHost extends DialogHost {
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
 
-    public NewHost(final WizardDialog previousDialog,
-                   final Host host,
-                   final DrbdInstallation drbdInstallation) {
+    public NewHostDialog(final WizardDialog previousDialog,
+                         final Host host,
+                         final DrbdInstallation drbdInstallation) {
         super(previousDialog, host, drbdInstallation);
     }
 
@@ -84,7 +84,7 @@ public class NewHost extends DialogHost {
     @Override
     protected void finishDialog() {
         final String hostnameEntered = hostField.getStringValue().trim();
-        getHost().setHostnameEntered(hostnameEntered);
+        getHost().setEnteredHostOrIp(hostnameEntered);
         final String username = usernameField.getStringValue().trim();
         getHost().setUsername(username);
         Tools.getApplication().setLastEnteredUser(username);
@@ -152,8 +152,8 @@ public class NewHost extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostField.setBackground(new StringValue(getHost().getHostnameEntered()),
-                                            new StringValue(getHost().getHostnameEntered()),
+                    hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
+                                            new StringValue(getHost().getEnteredHostOrIp()),
                                             true);
                 }
             });
@@ -271,7 +271,7 @@ public class NewHost extends DialogHost {
         final String hostname = getHost().getHostname();
         final String hn;
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
-            hn = getHost().getHostnameEntered();
+            hn = getHost().getEnteredHostOrIp();
         } else {
             hn = hostname;
         }
@@ -298,8 +298,8 @@ public class NewHost extends DialogHost {
         addCheckField(hostField);
         hostLabel.setLabelFor(hostField.getComponent());
         inputPane.add(hostField.getComponent());
-        hostField.setBackground(new StringValue(getHost().getHostnameEntered()),
-                                new StringValue(getHost().getHostnameEntered()),
+        hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
+                                new StringValue(getHost().getEnteredHostOrIp()),
                                 true);
 
         /* SSH Port */

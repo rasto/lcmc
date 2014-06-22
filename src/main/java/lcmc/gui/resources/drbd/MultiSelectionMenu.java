@@ -103,7 +103,7 @@ public class MultiSelectionMenu {
                                 return "already loaded";
                             }
                         } else {
-                            return Host.NOT_CONNECTED_STRING;
+                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                         }
                     }
                     return null;
@@ -136,7 +136,7 @@ public class MultiSelectionMenu {
                 public String enablePredicate() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (!hi.getHost().isConnected()) {
-                            return Host.NOT_CONNECTED_STRING;
+                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                         }
                     }
                     return null;
@@ -184,7 +184,7 @@ public class MultiSelectionMenu {
                 @Override
                 public String enablePredicate() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        if (!hi.getHost().isDrbdStatus()) {
+                        if (!hi.getHost().isDrbdStatusOk()) {
                             return HostDrbdInfo.NO_DRBD_STATUS_STRING;
                         }
                     }
@@ -296,7 +296,7 @@ public class MultiSelectionMenu {
                                             firstHost.getPmColors()[0]);
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (newColor != null) {
-                            hi.getHost().setSavedColor(newColor);
+                            hi.getHost().setSavedHostColorInGraphs(newColor);
                         }
                     }
                 }
@@ -1494,7 +1494,7 @@ public class MultiSelectionMenu {
                             return "";
                         }
                         if (!pHost.isConnected()) {
-                            return Host.PROXY_NOT_CONNECTED_STRING;
+                            return Host.PROXY_NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                         }
                     }
                     return null;
@@ -1574,7 +1574,7 @@ public class MultiSelectionMenu {
                             return "";
                         }
                         if (!pHost.isConnected()) {
-                            return Host.PROXY_NOT_CONNECTED_STRING;
+                            return Host.PROXY_NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                         }
                     }
                     return null;

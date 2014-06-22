@@ -50,41 +50,28 @@ import lcmc.utilities.WidgetListener;
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 final class CreateFS extends DrbdConfig {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
     /** No host string. (none) */
     private static final Value NO_HOST_STRING =
-                    new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
+                                     new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.NoHostString"));
     /** No file system (use existing data). */
     private static final Value NO_FILESYSTEM_STRING =
-                new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem"));
-    /** Width of the combo boxes. */
+                                     new StringValue(Tools.getString("Dialog.DrbdConfig.CreateFS.SelectFilesystem"));
     private static final int COMBOBOX_WIDTH = 250;
-    /** Skip sync false. */
     private static final Value SKIP_SYNC_FALSE = new StringValue("false");
-    /** Skip sync true. */
     private static final Value SKIP_SYNC_TRUE = new StringValue("true");
     /** Pull down menu with hosts (or no host). */
-    private Widget hostW;
+    private Widget hostChoiceWidget;
     /** Pull down menu with file systems. */
-    private Widget filesystemW;
-    /** Whether to skip the initial full sync. */
-    private Widget skipSyncW;
-    /** Whether to skip the initial full sync label. */
-    private JLabel skipSyncLabel;
-    /** Make file system button. */
-    private final MyButton makeFsButton = new MyButton(
-                Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
+    private Widget filesystemWidget;
+    private Widget skipInitialSyncWidget;
+    private JLabel skipInitialSyncLabel;
+    private final MyButton makeFileSystemButton =
+                                        new MyButton(Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
 
-    /** Prepares a new {@code CreateFS} object. */
-    CreateFS(final WizardDialog previousDialog,
-             final VolumeInfo volumeInfo) {
+    CreateFS(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {
         super(previousDialog, volumeInfo);
     }
 
@@ -94,21 +81,20 @@ final class CreateFS extends DrbdConfig {
      */
     @Override
     protected void finishDialog() {
-        final BlockDevInfo bdiPri = getPrimaryBD();
+        final BlockDevInfo bdiPri = getPrimaryBlockDevice();
         if (bdiPri != null) {
             final Application.RunMode runMode = Application.RunMode.LIVE;
-            if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
+            if (SKIP_SYNC_TRUE.equals(skipInitialSyncWidget.getValue())) {
                 bdiPri.skipInitialFullSync(runMode);
             }
             bdiPri.forcePrimary(runMode);
         }
     }
 
-    /** Returns the primary block device. */
-    protected BlockDevInfo getPrimaryBD() {
+    protected BlockDevInfo getPrimaryBlockDevice() {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
-        final String h = hostW.getStringValue();
+        final String h = hostChoiceWidget.getStringValue();
         if (h.equals(bdi1.getHost().getName())) {
             return bdi1;
         } else if (h.equals(bdi2.getHost().getName())) {
@@ -118,37 +104,34 @@ final class CreateFS extends DrbdConfig {
         }
     }
 
-    /** Creates the file system. */
     protected void createFilesystem() {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 getProgressBar().start(1);
-                answerPaneSetText(
-                        Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
+                answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(finishButton()).setEnabled(false);
-                        makeFsButton.setEnabled(false);
+                        makeFileSystemButton.setEnabled(false);
                     }
                 });
-                final BlockDevInfo bdiPri = getPrimaryBD();
+                final BlockDevInfo bdiPri = getPrimaryBlockDevice();
                 final Application.RunMode runMode = Application.RunMode.LIVE;
-                if (SKIP_SYNC_TRUE.equals(skipSyncW.getValue())) {
+                if (SKIP_SYNC_TRUE.equals(skipInitialSyncWidget.getValue())) {
                     bdiPri.skipInitialFullSync(runMode);
                 }
                 bdiPri.forcePrimary(runMode);
-                final String fs = filesystemW.getStringValue();
+                final String fs = filesystemWidget.getStringValue();
                 bdiPri.makeFilesystem(fs, runMode);
                 if (bdiPri.getDrbdVolumeInfo() != null) {
                     /* could be canceled */
                     getDrbdVolumeInfo().setCreatedFs(fs);
                     bdiPri.setSecondary(runMode);
-                    hostW.setValue(NO_HOST_STRING);
-                    filesystemW.setValue(NO_FILESYSTEM_STRING);
-                    answerPaneSetText(
-                     Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS.Done"));
+                    hostChoiceWidget.setValue(NO_HOST_STRING);
+                    filesystemWidget.setValue(NO_FILESYSTEM_STRING);
+                    answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS.Done"));
                 }
                 progressBarDone();
             }
@@ -157,41 +140,28 @@ final class CreateFS extends DrbdConfig {
         thread.start();
     }
 
-    /** Returns the next dialog, null in this dialog. */
     @Override
     public WizardDialog nextDialog() {
         return null;
     }
 
-    /**
-     * Returns title of the dialog.
-     * It is defined in TextResources as "Dialog.DrbdConfig.CreateFS.Title"
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.CreateFS.Title");
     }
 
-    /**
-     * Returns description of the dialog.
-     * It is defined in TextResources as
-     * "Dialog.DrbdConfig.CreateFS.Description"
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.CreateFS.Description");
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        makeFsButton.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
+        makeFileSystemButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
@@ -199,7 +169,7 @@ final class CreateFS extends DrbdConfig {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    makeFsButton.pressButton();
+                    makeFileSystemButton.pressButton();
                 }
             });
         }
@@ -210,20 +180,19 @@ final class CreateFS extends DrbdConfig {
      * was chosen by user.
      */
     protected void checkButtons() {
-        final boolean noHost = hostW.getValue().equals(NO_HOST_STRING);
-        final boolean noFileSystem = filesystemW.getValue().equals(
-                                                        NO_FILESYSTEM_STRING);
+        final boolean noHost = hostChoiceWidget.getValue().equals(NO_HOST_STRING);
+        final boolean noFileSystem = filesystemWidget.getValue().equals(NO_FILESYSTEM_STRING);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (noHost) {
-                    skipSyncW.setEnabled(false);
-                    skipSyncLabel.setEnabled(false);
-                    skipSyncW.setValue(SKIP_SYNC_FALSE);
+                    skipInitialSyncWidget.setEnabled(false);
+                    skipInitialSyncLabel.setEnabled(false);
+                    skipInitialSyncWidget.setValue(SKIP_SYNC_FALSE);
                 } else {
                     if (skipSyncAvailable()) {
-                        skipSyncW.setEnabled(true);
-                        skipSyncLabel.setEnabled(true);
+                        skipInitialSyncWidget.setEnabled(true);
+                        skipInitialSyncLabel.setEnabled(true);
                     }
                 }
             }
@@ -233,8 +202,8 @@ final class CreateFS extends DrbdConfig {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(true);
-                    makeFsButton.setEnabled(false);
-                    skipSyncW.setValue(SKIP_SYNC_FALSE);
+                    makeFileSystemButton.setEnabled(false);
+                    skipInitialSyncWidget.setValue(SKIP_SYNC_FALSE);
                 }
             });
         } else if (noHost) {
@@ -244,16 +213,16 @@ final class CreateFS extends DrbdConfig {
                     buttonClass(finishButton()).setEnabled(false);
                 }
             });
-            makeFsButton.setEnabled(false);
+            makeFileSystemButton.setEnabled(false);
         } else {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);
-                    makeFsButton.setEnabled(true);
+                    makeFileSystemButton.setEnabled(true);
                     if (skipSyncAvailable()) {
-                        skipSyncW.setValue(SKIP_SYNC_TRUE);
-                        skipSyncW.setEnabled(true);
+                        skipInitialSyncWidget.setValue(SKIP_SYNC_TRUE);
+                        skipInitialSyncWidget.setEnabled(true);
                     }
                 }
             });
@@ -266,7 +235,7 @@ final class CreateFS extends DrbdConfig {
      */
     @Override
     protected JComponent getInputPane() {
-        makeFsButton.setEnabled(false);
+        makeFileSystemButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
 
@@ -278,96 +247,82 @@ final class CreateFS extends DrbdConfig {
             hosts[i] = host;
             i++;
         }
-        final JLabel hostLabel = new JLabel(
-                    Tools.getString("Dialog.DrbdConfig.CreateFS.ChooseHost"));
+        final JLabel hostLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.ChooseHost"));
         Value defaultHost = NO_HOST_STRING;
         if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
             defaultHost = hosts[1];
         }
-        hostW = WidgetFactory.createInstance(
-                                       Widget.Type.COMBOBOX,
-                                       defaultHost,
-                                       hosts,
-                                       Widget.NO_REGEXP,
-                                       COMBOBOX_WIDTH,
-                                       Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
-                                       Widget.NO_BUTTON);
-        hostW.addListeners(new WidgetListener() {
-                                @Override
-                                public void check(final Value value) {
-                                    checkButtons();
-                                }
-                            });
+        hostChoiceWidget = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+                                                        defaultHost,
+                                                        hosts,
+                                                        Widget.NO_REGEXP,
+                                                        COMBOBOX_WIDTH,
+                                                        Widget.NO_ABBRV,
+                                                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                                        Widget.NO_BUTTON);
+        hostChoiceWidget.addListeners(new WidgetListener() {
+            @Override
+            public void check(final Value value) {
+                checkButtons();
+            }
+        });
         inputPane.add(hostLabel);
-        inputPane.add(hostW.getComponent());
+        inputPane.add(hostChoiceWidget.getComponent());
         inputPane.add(new JLabel(""));
 
         /* Filesystem */
-        final JLabel filesystemLabel = new JLabel(
-                    Tools.getString("Dialog.DrbdConfig.CreateFS.Filesystem"));
+        final JLabel filesystemLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.Filesystem"));
         final Value defaultValue = NO_FILESYSTEM_STRING;
-        final Value[] filesystems =
-            getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems(
-                                                                defaultValue);
+        final Value[] filesystems = getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems( defaultValue);
 
-        filesystemW = WidgetFactory.createInstance(
-                                     Widget.Type.COMBOBOX,
-                                     defaultValue,
-                                     filesystems,
-                                     Widget.NO_REGEXP,
-                                     COMBOBOX_WIDTH,
-                                     Widget.NO_ABBRV,
-                                     new AccessMode(Application.AccessType.RO,
-                                                    !AccessMode.ADVANCED),
-                                     Widget.NO_BUTTON);
+        filesystemWidget = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+                                                        defaultValue,
+                                                        filesystems,
+                                                        Widget.NO_REGEXP,
+                                                        COMBOBOX_WIDTH,
+                                                        Widget.NO_ABBRV,
+                                                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                                        Widget.NO_BUTTON);
         if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
-            filesystemW.setValueAndWait(new StringValue("ext3"));
+            filesystemWidget.setValueAndWait(new StringValue("ext3"));
         }
         inputPane.add(filesystemLabel);
-        inputPane.add(filesystemW.getComponent());
-        filesystemW.addListeners(new WidgetListener() {
-                            @Override
-                            public void check(final Value value) {
-                                if (NO_HOST_STRING.equals(
-                                                hostW.getValue())
-                                    && !NO_FILESYSTEM_STRING.equals(
-                                            filesystemW.getValue())) {
-                                    hostW.setValue(hosts[1]);
-                                } else {
-                                    checkButtons();
-                                }
-                            }
-                        });
+        inputPane.add(filesystemWidget.getComponent());
+        filesystemWidget.addListeners(new WidgetListener() {
+            @Override
+            public void check(final Value value) {
+                if (NO_HOST_STRING.equals(hostChoiceWidget.getValue())
+                    && !NO_FILESYSTEM_STRING.equals(filesystemWidget.getValue())) {
+                    hostChoiceWidget.setValue(hosts[1]);
+                } else {
+                    checkButtons();
+                }
+            }
+        });
 
-        makeFsButton.addActionListener(new ActionListener() {
+        makeFileSystemButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 createFilesystem();
             }
         });
-        inputPane.add(makeFsButton);
+        inputPane.add(makeFileSystemButton);
         /* skip initial full sync */
-        skipSyncLabel = new JLabel(
-                    Tools.getString("Dialog.DrbdConfig.CreateFS.SkipSync"));
-        skipSyncLabel.setEnabled(false);
-        skipSyncW = WidgetFactory.createInstance(
-                                      Widget.Type.CHECKBOX,
-                                      SKIP_SYNC_FALSE,
-                                      new Value[]{SKIP_SYNC_TRUE,
-                                                  SKIP_SYNC_FALSE},
-                                      Widget.NO_REGEXP,
-                                      COMBOBOX_WIDTH,
-                                      Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO,
-                                                     !AccessMode.ADVANCED),
-                                      Widget.NO_BUTTON);
-        skipSyncW.setEnabled(false);
-        skipSyncW.setBackgroundColor(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        inputPane.add(skipSyncLabel);
-        inputPane.add(skipSyncW.getComponent());
+        skipInitialSyncLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.SkipSync"));
+        skipInitialSyncLabel.setEnabled(false);
+        skipInitialSyncWidget = WidgetFactory.createInstance(Widget.Type.CHECKBOX,
+                                                             SKIP_SYNC_FALSE,
+                                                             new Value[]{SKIP_SYNC_TRUE, SKIP_SYNC_FALSE},
+                                                             Widget.NO_REGEXP,
+                                                             COMBOBOX_WIDTH,
+                                                             Widget.NO_ABBRV,
+                                                             new AccessMode(Application.AccessType.RO,
+                                                                            !AccessMode.ADVANCED),
+                                                             Widget.NO_BUTTON);
+        skipInitialSyncWidget.setEnabled(false);
+        skipInitialSyncWidget.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        inputPane.add(skipInitialSyncLabel);
+        inputPane.add(skipInitialSyncWidget.getComponent());
         inputPane.add(new JLabel(""));
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 3,  // rows, cols

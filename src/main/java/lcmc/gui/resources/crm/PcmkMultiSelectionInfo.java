@@ -98,7 +98,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
 
     @Override
     public JPanel getGraphicalView() {
-        return getBrowser().getCRMGraph().getGraphPanel();
+        return getBrowser().getCrmGraph().getGraphPanel();
     }
 
     @Override
@@ -211,7 +211,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = false;
-                getBrowser().getCRMGraph().stopTestAnimation((JComponent) component);
+                getBrowser().getCrmGraph().stopTestAnimation((JComponent) component);
                 component.setToolTipText("");
             }
 
@@ -231,7 +231,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCRMGraph().startTestAnimation((JComponent) component,
+                getBrowser().getCrmGraph().startTestAnimation((JComponent) component,
                                                               startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();

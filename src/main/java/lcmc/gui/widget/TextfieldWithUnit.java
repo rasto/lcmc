@@ -17,7 +17,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.awt.Color;
@@ -51,18 +50,9 @@ import lcmc.utilities.WidgetListener;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-
-    private static Unit addItems(final Collection<Unit> comboList,
-                                     final Unit selectedValue,
-                                     final Unit[] items) {
+    private static Unit addItems(final Collection<Unit> comboList, final Unit selectedValue, final Unit[] items) {
         Unit selectedUnit = null;
         if (items != null) {
             for (final Unit item : items) {
@@ -82,10 +72,8 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     private final JTextField textFieldPart;
     /** Combo box with units. */
     private final MComboBox<Unit> unitComboBox;
-    /** Whether the unit combo box should be enabled. */
     private boolean unitEnabled = true;
 
-    /** Prepares a new {@code TextfieldWithUnit} object. */
     public TextfieldWithUnit(final Value selectedValue,
                              final Unit[] units,
                              final String regexp,
@@ -93,9 +81,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                              final Map<String, String> abbreviations,
                              final AccessMode enableAccessMode,
                              final MyButton fieldButton) {
-        super(regexp,
-              enableAccessMode,
-              fieldButton);
+        super(regexp, enableAccessMode, fieldButton);
         final JPanel newComp = new JPanel();
         newComp.setLayout(new SpringLayout());
 
@@ -110,9 +96,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         }
 
         /* text field */
-        textFieldPart = (JTextField) getTextField(number,
-                                                  regexp,
-                                                  abbreviations);
+        textFieldPart = (JTextField) getTextField(number, regexp, abbreviations);
         newComp.add(textFieldPart);
 
         /* unit combo box */
@@ -127,42 +111,30 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         textFieldPart.setMinimumSize(textFieldPart.getPreferredSize());
         textFieldPart.setMaximumSize(textFieldPart.getPreferredSize());
 
-        unitComboBox.setPreferredSize(new Dimension(width / 3 << 1,
-                                                    WIDGET_HEIGHT));
+        unitComboBox.setPreferredSize(new Dimension(width / 3 << 1, WIDGET_HEIGHT));
         unitComboBox.setMinimumSize(unitComboBox.getPreferredSize());
         unitComboBox.setMaximumSize(unitComboBox.getPreferredSize());
     }
 
-    /** Return new MTextField with default value. */
-    private JComponent getTextField(final String value,
-                                    final String regexp,
-                                    final Map<String, String> abbreviations) {
+    private JComponent getTextField(final String value, final String regexp, final Map<String, String> abbreviations) {
         final MTextField tf;
         if (regexp == null) {
             tf = new MTextField(value);
         } else {
-            tf = new MTextField(new PatternDocument(regexp, abbreviations),
-                                value,
-                                0);
+            tf = new MTextField(new PatternDocument(regexp, abbreviations), value, 0);
         }
         return tf;
     }
 
-    /** Returns combo box with items in the combo and selectedValue on top. */
-    private MComboBox<Unit> getComboBox(
-                                  final Unit selectedValue,
-                                  final Unit[] items,
-                                  final String regexp,
-                                  final Map<String, String> abbreviations) {
+    private MComboBox<Unit> getComboBox(final Unit selectedValue,
+                                        final Unit[] items,
+                                        final String regexp,
+                                        final Map<String, String> abbreviations) {
         final List<Unit> comboList = new ArrayList<Unit>();
 
-        final Unit selectedValueInfo = addItems(comboList,
-                                                           selectedValue,
-                                                           items);
-        final MComboBox<Unit> cb = new MComboBox<Unit>(comboList.toArray(
-                                            new Unit[comboList.size()]));
-        final JTextComponent editor =
-                        (JTextComponent) cb.getEditor().getEditorComponent();
+        final Unit selectedValueInfo = addItems(comboList, selectedValue, items);
+        final MComboBox<Unit> cb = new MComboBox<Unit>(comboList.toArray(new Unit[comboList.size()]));
+        final JTextComponent editor = (JTextComponent) cb.getEditor().getEditorComponent();
         if (regexp != null) {
             editor.setDocument(new PatternDocument(regexp, abbreviations));
         }
@@ -224,14 +196,12 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 unit.setPlural(!"1".equals(text));
                 unitComboBox.repaint();
             }
-            final boolean accessible =
-                     Tools.getApplication().isAccessible(getEnableAccessMode());
+            final boolean accessible = Tools.getApplication().isAccessible(getEnableAccessMode());
             if (text == null || text.isEmpty()) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                      new Runnable() {
+                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             unitComboBox.repaint();
@@ -244,8 +214,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                     unit.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
-                                          new Runnable() {
+                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                             @Override
                             public void run() {
                                 unitComboBox.repaint();
@@ -263,7 +232,6 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         }
     }
 
-    /** Set component visible or invisible. */
     @Override
     protected void setComponentsVisible(final boolean visible) {
         super.setComponentsEnabled(visible);
@@ -277,7 +245,6 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         });
     }
 
-    /** Set component enabled or disabled. */
     @Override
     protected void setComponentsEnabled(final boolean enabled) {
         super.setComponentsEnabled(enabled);
@@ -285,14 +252,11 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         unitComboBox.setEnabled(enabled && unitEnabled);
     }
 
-
-    /** Return whether component is editable or not. */
     @Override
     public boolean isEditable() {
         return false;
     }
 
-    /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
         if (item == null) {
@@ -303,13 +267,11 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         }
     }
 
-    /** Return document object of the component. */
     @Override
     public Document getDocument() {
         return null;
     }
 
-    /** Add item listener to the component. */
     @Override
     public void addListeners(final WidgetListener widgetListener) {
         super.addListeners(widgetListener);
@@ -318,24 +280,20 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     }
 
     @Override
-    protected void setComponentBackground(final Color backgroundColor,
-                                          final Color compColor) {
+    protected void setComponentBackground(final Color backgroundColor, final Color compColor) {
         textFieldPart.setBackground(Color.WHITE);
     }
 
-    /** Request focus if applicable. */
     @Override
     public void requestFocus() {
         textFieldPart.requestFocus();
     }
 
-    /** Select the whole text in the widget if applicable. */
     @Override
     public void selectAll() {
         textFieldPart.selectAll();
     }
 
-    /** Set background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
@@ -347,18 +305,11 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         });
     }
 
-    /** Return item at the specified index. */
-    //@Override
-    //Value getItemAt(final int i) {
-    //    return getComponent();
-    //}
-
     /** Cleanup whatever would cause a leak. */
     @Override
     public void cleanup() {
         getWidgetListeners().clear();
-        final AbstractDocument dtfp =
-                                (AbstractDocument) textFieldPart.getDocument();
+        final AbstractDocument dtfp = (AbstractDocument) textFieldPart.getDocument();
         for (final DocumentListener dl : dtfp.getDocumentListeners()) {
             dtfp.removeDocumentListener(dl);
         }

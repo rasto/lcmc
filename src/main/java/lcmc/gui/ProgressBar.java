@@ -19,8 +19,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
-
 package lcmc.gui;
 
 import java.awt.Dimension;
@@ -42,24 +40,17 @@ import lcmc.utilities.Tools;
  * the progress bar.
  */
 public final class ProgressBar implements ActionListener {
-    /** Logger. */
-    private static final Logger LOG =
-                                   LoggerFactory.getLogger(ProgressBar.class);
-    /** Default timeout. */
+    private static final Logger LOG = LoggerFactory.getLogger(ProgressBar.class);
     private static final int DEFAULT_TIMEOUT = 50 * 1000;
     /** This is threshold to catch threads that are out of the line.
      * TODO: not for production. */
     private static final int DEBUG_THRESHOLD = 120000;
     /** Max value in the progress bar. */
     private static final int MAX_PB_VALUE = 100;
-    /** Cancel icon. */
-    private static final ImageIcon CANCEL_ICON =
-            Tools.createImageIcon(Tools.getDefault("ProgressBar.CancelIcon"));
-    /** The progress bar. */
+    private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(Tools.getDefault("ProgressBar.CancelIcon"));
     private final JProgressBar progressBar;
     /** Progress bar panel. */
     private final JPanel pbPanel;
-    /** Whether the progress bar should be stopped now. */
     private volatile boolean stopNow = false;
     /** Whether to hold the progress bar. */
     private boolean holdIt = false;
@@ -71,44 +62,32 @@ public final class ProgressBar implements ActionListener {
     private int timeout;
     /** Thread with progress bar. */
     private Thread progressThread = null;
-    /** Cancel button. */
     private MyButton cancelButton = null;
-    /** Cancel callback function that will be called, when cancel was pressed.
-     */
+    /** Cancel callback function that will be called, when cancel was pressed.  */
     private final CancelCallback cancelCallback;
 
-    /** Prepares a new {@code ProgressBar} object. */
-    ProgressBar(final String title,
-                final CancelCallback cancelCallback,
-                final int width,
-                final int height) {
+    ProgressBar(final String title, final CancelCallback cancelCallback, final int width, final int height) {
         super();
         this.cancelCallback = cancelCallback;
         Tools.isSwingThread();
         progressBar = new JProgressBar(0, MAX_PB_VALUE);
         progressBar.setPreferredSize(new Dimension(width, height));
-        progressBar.setBackground(
-                Tools.getDefaultColor("ProgressBar.Background"));
-        progressBar.setForeground(
-                Tools.getDefaultColor("ProgressBar.Foreground"));
+        progressBar.setBackground(Tools.getDefaultColor("ProgressBar.Background"));
+        progressBar.setForeground(Tools.getDefaultColor("ProgressBar.Foreground"));
         pbPanel = new JPanel();
         if (title != null) {
-            final TitledBorder titledBorder =
-                    BorderFactory.createTitledBorder(title);
+            final TitledBorder titledBorder = BorderFactory.createTitledBorder(title);
             pbPanel.setBorder(titledBorder);
         }
         pbPanel.add(progressBar);
 
         if (cancelCallback != null) {
-            cancelButton = new MyButton(Tools.getString("ProgressBar.Cancel"),
-                    CANCEL_ICON);
+            cancelButton = new MyButton(Tools.getString("ProgressBar.Cancel"), CANCEL_ICON);
             cancelButton.setEnabled(false);
             cancelButton.addActionListener(this);
             pbPanel.add(cancelButton);
         }
-        final Dimension d = new Dimension(
-                Integer.MAX_VALUE,
-                (int) pbPanel.getPreferredSize().getHeight());
+        final Dimension d = new Dimension(Integer.MAX_VALUE, (int) pbPanel.getPreferredSize().getHeight());
         pbPanel.setMaximumSize(d);
         pbPanel.setPreferredSize(d);
         progressBar.setVisible(false);
@@ -117,23 +96,17 @@ public final class ProgressBar implements ActionListener {
         }
     }
 
-    /** Prepares a new {@code ProgressBar} object without title. */
-    ProgressBar(final CancelCallback cancelCallbackA,
-                final int width,
-                final int height) {
+    ProgressBar(final CancelCallback cancelCallbackA, final int width, final int height) {
         this(null, cancelCallbackA, width, height);
     }
 
-    /** Prepares a new {@code ProgressBar} object. */
-    public ProgressBar(final String title,
-                       final CancelCallback cancelCallbackA) {
+    public ProgressBar(final String title, final CancelCallback cancelCallbackA) {
         this(title,
              cancelCallbackA,
              Tools.getDefaultInt("ProgressBar.DefaultWidth"),
              Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
 
-    /** Prepares a new {@code ProgressBar} object without title. */
     public ProgressBar(final CancelCallback cancelCallbackA) {
         this(null,
              cancelCallbackA,
@@ -159,14 +132,12 @@ public final class ProgressBar implements ActionListener {
             final Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    LOG.debug2("start: running postgresbar timeout: "
-                               + timeout);
+                    LOG.debug2("start: running postgresbar timeout: " + timeout);
                     final int sleepTime = Tools.getDefaultInt("ProgressBar.Sleep");
-                    final int progressBarDelay =
-                                    Tools.getDefaultInt("ProgressBar.Delay");
+                    final int progressBarDelay = Tools.getDefaultInt("ProgressBar.Delay");
                     int threshold = DEBUG_THRESHOLD;
                     boolean isVisible = false;
-                    while (!stopNow) { // && progress <= timeout) {
+                    while (!stopNow) {
                         try {
                             Thread.sleep(sleepTime);
                         } catch (final InterruptedException ex) {
@@ -189,8 +160,7 @@ public final class ProgressBar implements ActionListener {
                             Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    progressBar.setValue(
-                                            progress * MAX_PB_VALUE / timeout);
+                                    progressBar.setValue(progress * MAX_PB_VALUE / timeout);
                                 }
                             });
                             progress += sleepTime;

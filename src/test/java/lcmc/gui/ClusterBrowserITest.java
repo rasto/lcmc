@@ -34,35 +34,35 @@ public final class ClusterBrowserITest {
             assertNotNull("cb is null", cb);
 
             StringBuffer buffer = new StringBuffer("cd");
-            cb.processClusterOutput("a---reset---\r\nb",
-                                    buffer,
-                                    host,
-                                    nolatch,
-                                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb",
+                    buffer,
+                    host,
+                    nolatch,
+                    Application.RunMode.LIVE);
             assertEquals("cdab", buffer.toString());
 
             buffer = new StringBuffer("");
-            cb.processClusterOutput("a---reset---\r\nb",
-                                    buffer,
-                                    host,
-                                    nolatch,
-                                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb",
+                    buffer,
+                    host,
+                    nolatch,
+                    Application.RunMode.LIVE);
             assertEquals("ab", buffer.toString());
 
             buffer = new StringBuffer("cd");
-            cb.processClusterOutput("a---reset---\r\nb",
-                                    buffer,
-                                    host,
-                                    nolatch,
-                                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb",
+                    buffer,
+                    host,
+                    nolatch,
+                    Application.RunMode.LIVE);
             assertEquals("cdab", buffer.toString());
 
             buffer = new StringBuffer("cd");
-            cb.processClusterOutput("a---reset---\r\nb---reset---\r\nc",
-                                    buffer,
-                                    host,
-                                    nolatch,
-                                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb---reset---\r\nc",
+                    buffer,
+                    host,
+                    nolatch,
+                    Application.RunMode.LIVE);
             assertEquals("cdabc", buffer.toString());
         }
 
@@ -143,24 +143,24 @@ public final class ClusterBrowserITest {
             for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
-                cb.processClusterOutput(cib,
-                                        new StringBuffer(""),
-                                        host,
-                                        firstTime,
-                                        runMode);
+                cb.parseClusterOutput(cib,
+                        new StringBuffer(""),
+                        host,
+                        firstTime,
+                        runMode);
                 Tools.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
-                cb.getCRMGraph().repaint();
+                cb.getCrmGraph().repaint();
             }
             Tools.stopProgressIndicator(i + ": " + file);
             for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 Tools.waitForSwing();
-                cb.processClusterOutput(emptyCib,
-                                        new StringBuffer(""),
-                                        host,
-                                        firstTime,
-                                        runMode);
+                cb.parseClusterOutput(emptyCib,
+                        new StringBuffer(""),
+                        host,
+                        firstTime,
+                        runMode);
                 Tools.waitForSwing();
             }
         }

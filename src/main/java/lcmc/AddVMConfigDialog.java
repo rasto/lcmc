@@ -31,28 +31,16 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
 /**
- * AddVMConfigDialog.
- *
  * Show step by step dialogs that add and configure new virtual domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class AddVMConfigDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                             LoggerFactory.getLogger(AddVMConfigDialog.class);
-    /** Whether the wizard was canceled. */
-    private boolean canceled = false;
-    /** VMS virtual domain info object. */
+    private static final Logger LOG = LoggerFactory.getLogger(AddVMConfigDialog.class);
     private final DomainInfo vmsVirtualDomainInfo;
 
-    /** Prepares new {@code AddVMConfigDialog} object. */
     public AddVMConfigDialog(final DomainInfo vmsVirtualDomainInfo) {
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 
-    /** Shows step by step dialogs that add and configure new vm domain. */
     public void showDialogs() {
         vmsVirtualDomainInfo.setDialogStarted(true);
         VMConfig dialog = new Domain(null, vmsVirtualDomainInfo);
@@ -62,18 +50,15 @@ public final class AddVMConfigDialog {
             final VMConfig newdialog = (VMConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                canceled = true;
                 vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
                 vmsVirtualDomainInfo.removeMyself(Application.RunMode.LIVE);
                 vmsVirtualDomainInfo.setDialogStarted(false);
                 if (newdialog == null) {
-                    LOG.debug1("showDialogs: dialog: "
-                               + dialog.getClass().getName() + " canceled");
+                    LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
-                LOG.debug1("showDialogs: dialog: "
-                           + dialog.getClass().getName() + " finished");
+                LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 break;
             }
             dialog = newdialog;
@@ -82,10 +67,5 @@ public final class AddVMConfigDialog {
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
         Tools.getGUIData().expandTerminalSplitPane(1);
         Tools.getGUIData().getMainFrame().requestFocus();
-    }
-
-    /** Returns whether the wizard was canceled. */
-    public boolean isCanceled() {
-        return canceled;
     }
 }

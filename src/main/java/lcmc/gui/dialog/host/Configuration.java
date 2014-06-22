@@ -194,7 +194,7 @@ public class Configuration extends DialogHost {
 
     /** Returns number of hops. */
     protected final int getHops() {
-        final String hostnameEntered = getHost().getHostnameEntered();
+        final String hostnameEntered = getHost().getEnteredHostOrIp();
         return Tools.charCount(hostnameEntered, ',') + 1;
     }
 
@@ -212,7 +212,7 @@ public class Configuration extends DialogHost {
             final CheckDNSThread[] checkDNSThread = new CheckDNSThread[MAX_HOPS];
             for (int i = 0; i < getHops(); i++) {
                 final String hostnameEntered =
-                                getHost().getHostnameEntered().split(",")[i];
+                                getHost().getEnteredHostOrIp().split(",")[i];
 
                 hostnameField[i].setEnabled(false);
                 if (Tools.isIp(hostnameEntered)) {

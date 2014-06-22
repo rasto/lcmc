@@ -41,7 +41,7 @@ import lcmc.data.Application;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.Value;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;
@@ -175,13 +175,13 @@ public final class LVResize extends LV {
     /** Enable remove button. */
     private void enableResizeButton(boolean enable) {
         if (enable) {
-            final long oldSize = VMSXML.convertToKilobytes(
-                                           oldSizeWi.getValue());
-            final long size = VMSXML.convertToKilobytes(
-                                              sizeWi.getValue());
+            final long oldSize = VmsXml.convertToKilobytes(
+                    oldSizeWi.getValue());
+            final long size = VmsXml.convertToKilobytes(
+                    sizeWi.getValue());
             final String maxBlockSize = getMaxBlockSize();
             final long maxSize = Long.parseLong(maxBlockSize);
-            maxSizeWi.setValue(VMSXML.convertKilobytes(maxBlockSize));
+            maxSizeWi.setValue(VmsXml.convertKilobytes(maxBlockSize));
 
             if (oldSize >= size || size > maxSize) {
                 enable = false;
@@ -198,11 +198,11 @@ public final class LVResize extends LV {
         final String oldBlockSize =
                             blockDevInfo.getBlockDevice().getBlockSize();
         final String maxBlockSize = getMaxBlockSize();
-        oldSizeWi.setValue(VMSXML.convertKilobytes(oldBlockSize));
-        sizeWi.setValue(VMSXML.convertKilobytes(Long.toString(
-                                    (Long.parseLong(oldBlockSize)
-                                     + Long.parseLong(maxBlockSize)) / 2)));
-        maxSizeWi.setValue(VMSXML.convertKilobytes(maxBlockSize));
+        oldSizeWi.setValue(VmsXml.convertKilobytes(oldBlockSize));
+        sizeWi.setValue(VmsXml.convertKilobytes(Long.toString(
+                (Long.parseLong(oldBlockSize)
+                        + Long.parseLong(maxBlockSize)) / 2)));
+        maxSizeWi.setValue(VmsXml.convertKilobytes(maxBlockSize));
     }
 
     /** Returns the input pane. */
@@ -219,7 +219,7 @@ public final class LVResize extends LV {
         final String oldBlockSize =
                             blockDevInfo.getBlockDevice().getBlockSize();
         oldSizeWi = new TextfieldWithUnit(
-                      VMSXML.convertKilobytes(oldBlockSize),
+                      VmsXml.convertKilobytes(oldBlockSize),
                       getUnits(),
                       Widget.NO_REGEXP,
                       250,
@@ -240,7 +240,7 @@ public final class LVResize extends LV {
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWi = new TextfieldWithUnit(
-                       VMSXML.convertKilobytes(newBlockSize),
+                       VmsXml.convertKilobytes(newBlockSize),
                        getUnits(),
                        Widget.NO_REGEXP,
                        250,
@@ -290,7 +290,7 @@ public final class LVResize extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                       VMSXML.convertKilobytes(maxBlockSize),
+                       VmsXml.convertKilobytes(maxBlockSize),
                        getUnits(),
                        Widget.NO_REGEXP,
                        250,

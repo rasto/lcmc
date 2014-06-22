@@ -17,7 +17,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.awt.Color;
@@ -35,28 +34,17 @@ import lcmc.utilities.WidgetListener;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Label extends GenericWidget<JComponent> {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-
-    /** Prepares a new {@code Label} object. */
     public Label(final Value selectedValue,
                  final String regexp,
                  final int width,
                  final AccessMode enableAccessMode,
                  final MyButton fieldButton) {
-        super(regexp,
-              enableAccessMode,
-              fieldButton);
+        super(regexp, enableAccessMode, fieldButton);
         addComponent(getLabelField(selectedValue), width);
     }
 
-    /** Returns new MTextField with default value. */
     private JComponent getLabelField(final Value value) {
         if (value == null || value.isNothingSelected()) {
             return new JLabel("");
@@ -65,8 +53,7 @@ public final class Label extends GenericWidget<JComponent> {
     }
 
     /**
-     * Returns string value. If object value is null, returns empty string (not
-     * null).
+     * Returns string value. If object value is null, returns empty string (not null).
      */
     @Override
     public String getStringValue() {
@@ -83,37 +70,31 @@ public final class Label extends GenericWidget<JComponent> {
         return new StringValue(((JLabel) getInternalComponent()).getText());
     }
 
-    /** Returns whether component is editable or not. */
     @Override
     public boolean isEditable() {
         return false;
     }
 
-    /** Sets item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
         ((JLabel) getInternalComponent()).setText(item.getValueForGui());
     }
 
-    /** Returns document object of the component. */
     @Override
     public Document getDocument() {
         return null;
     }
 
-    /** Adds item listener to the component. */
     @Override
     public void addListeners(final WidgetListener widgetListener) {
         getWidgetListeners().add(widgetListener);
     }
 
     @Override
-    protected void setComponentBackground(final Color backgroundColor,
-                                          final Color compColor) {
+    protected void setComponentBackground(final Color backgroundColor, final Color compColor) {
         getInternalComponent().setBackground(backgroundColor);
     }
 
-    /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
         Tools.invokeLater(new Runnable() {
@@ -124,12 +105,6 @@ public final class Label extends GenericWidget<JComponent> {
             }
         });
     }
-
-    /** Returns item at the specified index. */
-    //@Override
-    //Component getItemAt(final int i) {
-    //    return getComponent();
-    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override

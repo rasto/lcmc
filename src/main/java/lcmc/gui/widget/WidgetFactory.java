@@ -17,7 +17,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.util.Map;
@@ -28,15 +27,17 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Unit;
 
-/**
- * @author Rasto Levrinc
- */
 public final class WidgetFactory {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(WidgetFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WidgetFactory.class);
     /** Without units. */
-    public static Widget createInstance(final Widget.Type type, final Value selectedValue, final Value[] items, final String regexp, final int width, final Map<String, String> abbreviations, final AccessMode enableAccessMode, final MyButton fieldButton) {
+    public static Widget createInstance(final Widget.Type type,
+                                        final Value selectedValue,
+                                        final Value[] items,
+                                        final String regexp,
+                                        final int width,
+                                        final Map<String, String> abbreviations,
+                                        final AccessMode enableAccessMode,
+                                        final MyButton fieldButton) {
         return createInstance(type,
                               selectedValue,
                               items,
@@ -48,10 +49,16 @@ public final class WidgetFactory {
                               fieldButton);
     }
 
-    public static Widget createInstance(Widget.Type type, final Value selectedValue, final Value[] items, final Unit[] units, final String regexp, final int width, final Map<String, String> abbreviations, final AccessMode enableAccessMode, final MyButton fieldButton) {
-        if (type != null
-            && type != Widget.Type.TEXTFIELDWITHUNIT
-            && units != null) {
+    public static Widget createInstance(Widget.Type type,
+                                        final Value selectedValue,
+                                        final Value[] items,
+                                        final Unit[] units,
+                                        final String regexp,
+                                        final int width,
+                                        final Map<String, String> abbreviations,
+                                        final AccessMode enableAccessMode,
+                                        final MyButton fieldButton) {
+        if (type != null && type != Widget.Type.TEXTFIELDWITHUNIT && units != null) {
             LOG.appError("createInstance: wrong type with units: " + type);
         }
         if (type == null) {
@@ -62,11 +69,9 @@ public final class WidgetFactory {
                 type = Widget.Type.TEXTFIELD;
             } else if (items.length == 2) {
                 if (items[0] != null
-                    && items[0].toString().equalsIgnoreCase(
-                        Checkbox.CHECKBOX_TRUE)
+                    && items[0].toString().equalsIgnoreCase(Checkbox.CHECKBOX_TRUE)
                     && items[1] != null
-                    && items[1].toString().equalsIgnoreCase(
-                        Checkbox.CHECKBOX_FALSE)) {
+                    && items[1].toString().equalsIgnoreCase(Checkbox.CHECKBOX_FALSE)) {
                     type = Widget.Type.CHECKBOX;
                 } else {
                     type = Widget.Type.COMBOBOX;
@@ -77,54 +82,25 @@ public final class WidgetFactory {
         }
         switch(type) {
             case LABELFIELD:
-                return new Label(selectedValue,
-                    regexp,
-                    width,
-                    enableAccessMode,
-                    fieldButton);
+                return new Label(selectedValue, regexp, width, enableAccessMode, fieldButton);
             case COMBOBOX:
-                return new ComboBox(selectedValue,
-                    items,
-                    regexp,
-                    width,
-                    abbreviations,
-                    enableAccessMode,
-                    fieldButton);
+                return new ComboBox(selectedValue, items, regexp, width, abbreviations, enableAccessMode, fieldButton);
             case PASSWDFIELD:
-                return new Passwdfield(selectedValue,
-                    regexp,
-                    width,
-                    enableAccessMode,
-                    fieldButton);
+                return new Passwdfield(selectedValue, regexp, width, enableAccessMode, fieldButton);
             case TEXTFIELD:
-                return new Textfield(selectedValue,
-                    regexp,
-                    width,
-                    abbreviations,
-                    enableAccessMode,
-                    fieldButton);
+                return new Textfield(selectedValue, regexp, width, abbreviations, enableAccessMode, fieldButton);
             case TEXTFIELDWITHUNIT:
                 return new TextfieldWithUnit(selectedValue,
-                    units,
-                    regexp,
-                    width,
-                    abbreviations,
-                    enableAccessMode,
-                    fieldButton);
+                                             units,
+                                             regexp,
+                                             width,
+                                             abbreviations,
+                                             enableAccessMode,
+                                             fieldButton);
             case RADIOGROUP:
-                return new RadioGroup(selectedValue,
-                    items,
-                    regexp,
-                    width,
-                    enableAccessMode,
-                    fieldButton);
+                return new RadioGroup(selectedValue, items, regexp, width, enableAccessMode, fieldButton);
             case CHECKBOX:
-                return new Checkbox(selectedValue,
-                    items,
-                    regexp,
-                    width,
-                    enableAccessMode,
-                    fieldButton);
+                return new Checkbox(selectedValue, items, regexp, width, enableAccessMode, fieldButton);
             default:
                 LOG.appError("createInstance: unknown type: " + type);
                 return null;

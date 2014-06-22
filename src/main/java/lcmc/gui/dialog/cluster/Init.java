@@ -46,7 +46,6 @@ import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
 import lcmc.data.Value;
-import lcmc.data.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
@@ -61,7 +60,6 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Openais;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 
@@ -348,17 +346,17 @@ public class Init extends DialogCluster {
 
             final boolean csAisIsInstalled = h.getOpenaisVersion() != null
                                              || h.getCorosyncVersion() != null;
-            final boolean csAisRunning     = h.isCsRunning()
-                                             || h.isAisRunning();
-            final boolean csAisIsRc        = h.isCsRc() || h.isAisRc();
-            final boolean csAisIsConf      = h.isCsAisConf();
+            final boolean csAisRunning     = h.isCorosyncRunning()
+                                             || h.isOpenaisRunning();
+            final boolean csAisIsRc        = h.isCorosyncInRc() || h.isOpenaisInRc();
+            final boolean csAisIsConf      = h.corosyncOrOpenaisConfigExists();
 
             final boolean heartbeatIsInstalled =
                                             h.getHeartbeatVersion() != null;
             final boolean heartbeatIsRunning   = h.isHeartbeatRunning();
-            final boolean heartbeatIsRc      = h.isHeartbeatRc();
-            final boolean heartbeatIsConf      = h.isHeartbeatConf();
-            if (!csAisRunning && h.isCsInit() && h.isAisInit()) {
+            final boolean heartbeatIsRc      = h.isHeartbeatInRc();
+            final boolean heartbeatIsConf      = h.heartbeatConfigExists();
+            if (!csAisRunning && h.hasCorosyncInitScript() && h.hasOpenaisInitScript()) {
                 needOpenaisButton = true;
             }
 
@@ -688,10 +686,10 @@ public class Init extends DialogCluster {
             hbStartedInfos.add(new JLabel(
                         Tools.getString("Dialog.Cluster.Init.CheckingHb")));
             final MyButton btn;
-            if (host.isCsRunning()
-                || host.isAisRunning()
-                || host.isCsRc()
-                || host.isAisRc()) {
+            if (host.isCorosyncRunning()
+                || host.isOpenaisRunning()
+                || host.isCorosyncInRc()
+                || host.isOpenaisInRc()) {
                 btn = new MyButton(HB_BUTTON_SWITCH);
             } else {
                 btn = new MyButton(
@@ -733,7 +731,7 @@ public class Init extends DialogCluster {
                                         Heartbeat.switchFromOpenaisToHeartbeat(
                                                                           host);
                                     } else {
-                                        if (host.isHeartbeatRc()) {
+                                        if (host.isHeartbeatInRc()) {
                                             Heartbeat.startHeartbeat(host);
                                         } else {
                                             Heartbeat.startHeartbeatRc(host);
@@ -793,7 +791,7 @@ public class Init extends DialogCluster {
                                             Openais.switchToOpenais(host);
                                         }
                                     } else {
-                                        if (host.isCsRc() || host.isAisRc()) {
+                                        if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
                                             if (useCorosync(host)) {
                                                 Corosync.startCorosync(host);
                                             } else {
@@ -814,11 +812,11 @@ public class Init extends DialogCluster {
                         thread.start();
                     }
                 });
-            if (host.isCsRunning() && host.isAisRunning()) {
+            if (host.isCorosyncRunning() && host.isOpenaisRunning()) {
                 /* started with openais init script. */
                 oneStartedAsOpenais = true;
             }
-            if (!host.isCsInit()) {
+            if (!host.hasCorosyncInitScript()) {
                 noCorosync = true;
             }
 
@@ -854,8 +852,8 @@ public class Init extends DialogCluster {
 
     /** Whether to use corosync or openais init script. */
     private boolean useCorosync(final Host host) {
-        return !(!host.isCorosync() || !host.isCsInit())
-               && (host.isCsInit() && COROSYNC_INIT_SCRIPT.equals(useOpenaisButton.getStringValue())
-               || !host.isAisInit());
+        return !(!host.isCorosyncInstalled() || !host.hasCorosyncInitScript())
+               && (host.hasCorosyncInitScript() && COROSYNC_INIT_SCRIPT.equals(useOpenaisButton.getStringValue())
+               || !host.hasOpenaisInitScript());
     }
 }

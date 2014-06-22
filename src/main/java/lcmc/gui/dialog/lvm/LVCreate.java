@@ -44,7 +44,7 @@ import lcmc.data.Application;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.Value;
 import lcmc.data.resources.BlockDevice;
 import lcmc.gui.Browser;
@@ -148,9 +148,9 @@ public final class LVCreate extends LV {
             final String maxBlockSize = getMaxBlockSize(
                                                  getSelectedHostCbs());
             final long maxSize = Long.parseLong(maxBlockSize);
-            maxSizeWi.setValue(VMSXML.convertKilobytes(maxBlockSize));
-            final long size = VMSXML.convertToKilobytes(
-                                              sizeWi.getValue());
+            maxSizeWi.setValue(VmsXml.convertKilobytes(maxBlockSize));
+            final long size = VmsXml.convertToKilobytes(
+                    sizeWi.getValue());
             if (size > maxSize || size <= 0) {
                 enable = false;
                 sizeWi.wrongValue();
@@ -241,7 +241,7 @@ public final class LVCreate extends LV {
                                              Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new TextfieldWithUnit(VMSXML.convertKilobytes(newBlockSize),
+        sizeWi = new TextfieldWithUnit(VmsXml.convertKilobytes(newBlockSize),
                                        getUnits(),
                                        Widget.NO_REGEXP,
                                        250,
@@ -285,8 +285,8 @@ public final class LVCreate extends LV {
                         }
                         final String maxBlockSize = getMaxBlockSize(
                                                       getSelectedHostCbs());
-                        maxSizeWi.setValue(VMSXML.convertKilobytes(
-                                                               maxBlockSize));
+                        maxSizeWi.setValue(VmsXml.convertKilobytes(
+                                maxBlockSize));
                         enableComponents();
                         if (oneFailed) {
                             progressBarDoneError();
@@ -303,7 +303,7 @@ public final class LVCreate extends LV {
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
         maxSizeWi = new TextfieldWithUnit(
-                                      VMSXML.convertKilobytes(maxBlockSize),
+                                      VmsXml.convertKilobytes(maxBlockSize),
                                       getUnits(),
                                       Widget.NO_REGEXP,
                                       250,

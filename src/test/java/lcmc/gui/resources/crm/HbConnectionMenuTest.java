@@ -21,7 +21,7 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
-import lcmc.gui.CRMGraph;
+import lcmc.gui.CrmGraph;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
@@ -44,14 +44,14 @@ public class HbConnectionMenuTest {
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private CRMGraph crmGraphStub;
+    private CrmGraph crmGraphStub;
 
     private HbConnectionMenu sut;
 
     @Before
     public void setUp() {
         when(hbConnectionInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(clusterBrowserStub.getCRMGraph()).thenReturn(crmGraphStub);
+        when(clusterBrowserStub.getCrmGraph()).thenReturn(crmGraphStub);
 
         sut = new HbConnectionMenu(hbConnectionInfoStub);
     }

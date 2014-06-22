@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.crm;
 
 import java.util.List;
@@ -83,12 +103,12 @@ public class CloneMenu extends ServiceMenu {
 
                     @Override
                     public boolean predicate() {
-                        return host.isClStatus();
+                        return host.isCrmStatusOk();
                     }
 
                     @Override
                     public boolean visiblePredicate() {
-                        return !host.isClStatus()
+                        return !host.isCrmStatusOk()
                                || enablePredicate() == null;
                     }
 
@@ -108,10 +128,10 @@ public class CloneMenu extends ServiceMenu {
                                 break;
                             }
                         }
-                        if (!getBrowser().clStatusFailed()
+                        if (!getBrowser().crmStatusFailed()
                                && cloneInfo.getService().isAvailable()
                                && runningOnNode
-                               && host.isClStatus()) {
+                               && host.isCrmStatusOk()) {
                             return null;
                         } else {
                             return ""; /* is not visible anyway */

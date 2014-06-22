@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import lcmc.Exceptions;
 import lcmc.data.Application;
-import lcmc.data.crm.CRMXML;
+import lcmc.data.crm.CrmXml;
 import lcmc.data.crm.ClusterStatus;
 import lcmc.data.Host;
 import lcmc.data.StringValue;
@@ -99,14 +99,14 @@ final class HbOrderInfo extends EditableInfo
 
         if (serviceInfoParent == null || serviceInfoChild == null) {
             /* rsc set placeholder */
-            final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
+            final CrmXml.OrderData orderData = clStatus.getOrderData(ordId);
             final String score = orderData.getScore();
-            resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
+            resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
         } else if (serviceInfoParent.isConstraintPH()
                    || serviceInfoChild.isConstraintPH()) {
             /* rsc set edge */
             final ConstraintPHInfo cphi;
-            final CRMXML.RscSet rscSet;
+            final CrmXml.RscSet rscSet;
             if (serviceInfoParent.isConstraintPH()) {
                 cphi = (ConstraintPHInfo) serviceInfoParent;
                 rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -115,17 +115,17 @@ final class HbOrderInfo extends EditableInfo
                 rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
             }
             resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
-            resourceNode.put(CRMXML.REQUIRE_ALL_ATTR, new StringValue(rscSet.getRequireAll()));
+            resourceNode.put(CrmXml.REQUIRE_ALL_ATTR, new StringValue(rscSet.getRequireAll()));
             resourceNode.put("action", new StringValue(rscSet.getOrderAction()));
         } else {
-            final CRMXML.OrderData orderData = clStatus.getOrderData(ordId);
+            final CrmXml.OrderData orderData = clStatus.getOrderData(ordId);
             if (orderData != null) {
                 final String score = orderData.getScore();
                 final String symmetrical = orderData.getSymmetrical();
                 final String firstAction = orderData.getFirstAction();
                 final String thenAction = orderData.getThenAction();
 
-                resourceNode.put(CRMXML.SCORE_STRING, new StringValue(score));
+                resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
                 resourceNode.put("symmetrical", new StringValue(symmetrical));
                 resourceNode.put("first-action", new StringValue(firstAction));
                 resourceNode.put("then-action", new StringValue(thenAction));
@@ -164,7 +164,7 @@ final class HbOrderInfo extends EditableInfo
     @Override
     protected String getParamLongDesc(final String param) {
         final String text =
-                        getBrowser().getCRMXML().getOrderParamLongDesc(param);
+                        getBrowser().getCrmXml().getOrderParamLongDesc(param);
         if (serviceInfoParent != null && serviceInfoChild != null) {
             return text.replaceAll(
                          "@FIRST-RSC@",
@@ -180,7 +180,7 @@ final class HbOrderInfo extends EditableInfo
     /** Returns short description of the parameter, that is used as * label. */
     @Override
     protected String getParamShortDesc(final String param) {
-        return getBrowser().getCRMXML().getOrderParamShortDesc(param);
+        return getBrowser().getCrmXml().getOrderParamShortDesc(param);
     }
 
     /**
@@ -189,19 +189,19 @@ final class HbOrderInfo extends EditableInfo
      */
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
-        return getBrowser().getCRMXML().checkOrderParam(param, newValue);
+        return getBrowser().getCrmXml().checkOrderParam(param, newValue);
     }
 
     /** Returns default for this parameter. */
     @Override
     protected Value getParamDefault(final String param) {
-        return getBrowser().getCRMXML().getOrderParamDefault(param);
+        return getBrowser().getCrmXml().getOrderParamDefault(param);
     }
 
     /** Returns preferred value for this parameter. */
     @Override
     protected Value getParamPreferred(final String param) {
-        return getBrowser().getCRMXML().getOrderParamPreferred(param);
+        return getBrowser().getCrmXml().getOrderParamPreferred(param);
     }
 
     /** Returns lsit of all parameters as an array. */
@@ -209,20 +209,20 @@ final class HbOrderInfo extends EditableInfo
     public String[] getParametersFromXML() {
         if (serviceInfoParent == null || serviceInfoChild == null) {
             /* rsc set order */
-            return getBrowser().getCRMXML().getRscSetOrderParameters();
+            return getBrowser().getCrmXml().getResourceSetOrderParameters();
         } else if (serviceInfoParent.isConstraintPH()
                    || serviceInfoChild.isConstraintPH()) {
             /* when rsc set edges are clicked */
-            return getBrowser().getCRMXML().getRscSetOrdConnectionParameters();
+            return getBrowser().getCrmXml().getRscSetOrdConnectionParameters();
         } else {
-            return getBrowser().getCRMXML().getOrderParameters();
+            return getBrowser().getCrmXml().getOrderParameters();
         }
     }
 
     /** Returns when at least one resource in rsc set can be promoted. */
     private boolean isRscSetMaster() {
         final ConstraintPHInfo cphi;
-        final CRMXML.RscSet rscSet;
+        final CrmXml.RscSet rscSet;
         if (serviceInfoParent.isConstraintPH()) {
             cphi = (ConstraintPHInfo) serviceInfoParent;
             rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -241,19 +241,19 @@ final class HbOrderInfo extends EditableInfo
     protected Value[] getParamPossibleChoices(final String param) {
         if ("action".equals(param)) {
             /* rsc set */
-            return getBrowser().getCRMXML().getOrderParamPossibleChoices(
+            return getBrowser().getCrmXml().getOrderParamPossibleChoices(
                                                             param,
                                                             isRscSetMaster());
         } else if ("first-action".equals(param)) {
-            return getBrowser().getCRMXML().getOrderParamPossibleChoices(
+            return getBrowser().getCrmXml().getOrderParamPossibleChoices(
                                 param,
                                 serviceInfoParent.getService().isMaster());
         } else if ("then-action".equals(param)) {
-            return getBrowser().getCRMXML().getOrderParamPossibleChoices(
+            return getBrowser().getCrmXml().getOrderParamPossibleChoices(
                                 param,
                                 serviceInfoChild.getService().isMaster());
         } else {
-            return getBrowser().getCRMXML().getOrderParamPossibleChoices(param,
+            return getBrowser().getCrmXml().getOrderParamPossibleChoices(param,
                                                                          false);
         }
     }
@@ -261,13 +261,13 @@ final class HbOrderInfo extends EditableInfo
     /** Returns parameter type, boolean etc. */
     @Override
     protected String getParamType(final String param) {
-        return getBrowser().getCRMXML().getOrderParamType(param);
+        return getBrowser().getCrmXml().getOrderParamType(param);
     }
 
     /** Returns section to which the global belongs. */
     @Override
     protected String getSection(final String param) {
-        return getBrowser().getCRMXML().getOrderSection(param);
+        return getBrowser().getCrmXml().getOrderSectionToDisplay(param);
     }
 
     /**
@@ -276,31 +276,31 @@ final class HbOrderInfo extends EditableInfo
      */
     @Override
     protected boolean isCheckBox(final String param) {
-        return getBrowser().getCRMXML().isOrderBoolean(param);
+        return getBrowser().getCrmXml().isOrderBoolean(param);
     }
 
     /** Returns true if the specified parameter is of time type. */
     @Override
     protected boolean isTimeType(final String param) {
-        return getBrowser().getCRMXML().isOrderTimeType(param);
+        return getBrowser().getCrmXml().isOrderTimeType(param);
     }
 
     /** Returns true if the specified parameter is integer. */
     @Override
     protected boolean isInteger(final String param) {
-        return getBrowser().getCRMXML().isOrderInteger(param);
+        return getBrowser().getCrmXml().isOrderInteger(param);
     }
 
     /** Returns true if the specified parameter is label. */
     @Override
     protected boolean isLabel(final String param) {
-        return getBrowser().getCRMXML().isOrderLabel(param);
+        return getBrowser().getCrmXml().isOrderLabel(param);
     }
 
     /** Returns true if the specified parameter is required. */
     @Override
     protected boolean isRequired(final String param) {
-        return getBrowser().getCRMXML().isOrderRequired(param);
+        return getBrowser().getCrmXml().isOrderRequired(param);
     }
 
     /** Returns attributes of this colocation. */
@@ -353,7 +353,7 @@ final class HbOrderInfo extends EditableInfo
             } else if (serviceInfoParent.isConstraintPH()
                        || serviceInfoChild.isConstraintPH()) {
                 final ConstraintPHInfo cphi;
-                final CRMXML.RscSet rscSet;
+                final CrmXml.RscSet rscSet;
                 if (serviceInfoParent.isConstraintPH()) {
                     cphi = (ConstraintPHInfo) serviceInfoParent;
                     rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
@@ -435,13 +435,13 @@ final class HbOrderInfo extends EditableInfo
     /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
-        return !CRMXML.SCORE_STRING.equals(param);
+        return !CrmXml.SCORE_CONSTRAINT_PARAM.equals(param);
     }
 
     /** Whether the parameter should be enabled. */
     @Override
     protected String isEnabled(final String param) {
-        if (CRMXML.REQUIRE_ALL_ATTR.equals(param)) {
+        if (CrmXml.REQUIRE_ALL_ATTR.equals(param)) {
             final String pmV = getBrowser().getDCHost().getPacemakerVersion();
             try {
                 //TODO: get this from constraints-.rng files
@@ -467,17 +467,17 @@ final class HbOrderInfo extends EditableInfo
     int getScore() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String ordId = getService().getHeartbeatId();
-        final CRMXML.OrderData data = clStatus.getOrderData(ordId);
+        final CrmXml.OrderData data = clStatus.getOrderData(ordId);
         if (data == null) {
             return 0;
         }
         final String score = data.getScore();
         if (score == null) {
             return 0;
-        } else if (CRMXML.INFINITY_STRING.getValueForConfig().equals(score)
-                   || CRMXML.PLUS_INFINITY_STRING.getValueForConfig().equals(score)) {
+        } else if (CrmXml.INFINITY_VALUE.getValueForConfig().equals(score)
+                   || CrmXml.PLUS_INFINITY_VALUE.getValueForConfig().equals(score)) {
             return 1000000;
-        } else if (CRMXML.MINUS_INFINITY_STRING.getValueForConfig().equals(score)) {
+        } else if (CrmXml.MINUS_INFINITY_VALUE.getValueForConfig().equals(score)) {
             return -1000000;
         }
         return Integer.parseInt(score);

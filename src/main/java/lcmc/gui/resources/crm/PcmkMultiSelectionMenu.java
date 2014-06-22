@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.crm;
 
 import java.awt.Color;
@@ -77,11 +97,11 @@ public class PcmkMultiSelectionMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     final Host dcHost = getBrowser().getDCHost();
-                    if (!dcHost.isClStatus()) {
+                    if (!dcHost.isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING + " ("
                                + dcHost.getName() + ')';
                     }
@@ -137,11 +157,11 @@ public class PcmkMultiSelectionMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     final Host dcHost = getBrowser().getDCHost();
-                    if (!dcHost.isClStatus()) {
+                    if (!dcHost.isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING + " ("
                                + dcHost.getName() + ')';
                     }
@@ -193,15 +213,15 @@ public class PcmkMultiSelectionMenu {
                 public boolean predicate() {
                     /* when both are running it's openais. */
                     final HostInfo hi = selectedHostInfos.get(0);
-                    return hi.getHost().isCsRunning()
-                           && !hi.getHost().isAisRunning();
+                    return hi.getHost().isCorosyncRunning()
+                           && !hi.getHost().isOpenaisRunning();
                 }
 
                 @Override
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (hi.getHost().isCsRunning()
-                            || hi.getHost().isAisRunning()) {
+                        if (hi.getHost().isCorosyncRunning()
+                            || hi.getHost().isOpenaisRunning()) {
                             return true;
                         }
                     }
@@ -221,17 +241,17 @@ public class PcmkMultiSelectionMenu {
                         for (final HostInfo hi : selectedHostInfos) {
                             final Host host = hi.getHost();
                             if (!host.isPcmkStartedByCorosync()
-                                && host.isPcmkInit()
-                                && host.isPcmkRunning()) {
-                                if (host.isCsRunning()
-                                    && !host.isAisRunning()) {
+                                && host.hasPacemakerInitScript()
+                                && host.isPacemakerRunning()) {
+                                if (host.isCorosyncRunning()
+                                    && !host.isOpenaisRunning()) {
                                     Corosync.stopCorosyncWithPcmk(host);
                                 } else {
                                     Openais.stopOpenaisWithPcmk(host);
                                 }
                             } else {
-                                if (host.isCsRunning()
-                                    && !host.isAisRunning()) {
+                                if (host.isCorosyncRunning()
+                                    && !host.isOpenaisRunning()) {
                                     Corosync.stopCorosync(host);
                                 } else {
                                     Openais.stopOpenais(host);
@@ -331,13 +351,13 @@ public class PcmkMultiSelectionMenu {
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
                         final Host h = hi.getHost();
-                        if (h.isCorosync()
-                            && h.isCsInit()
-                            && h.isCsAisConf()
-                            && !h.isCsRunning()
-                            && !h.isAisRunning()
+                        if (h.isCorosyncInstalled()
+                            && h.hasCorosyncInitScript()
+                            && h.corosyncOrOpenaisConfigExists()
+                            && !h.isCorosyncRunning()
+                            && !h.isOpenaisRunning()
                             && !h.isHeartbeatRunning()
-                            && !h.isHeartbeatRc()) {
+                            && !h.isHeartbeatInRc()) {
                             return true;
                         }
                     }
@@ -348,7 +368,7 @@ public class PcmkMultiSelectionMenu {
                 public String enablePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
                         final Host h = hi.getHost();
-                        if (h.isAisRc() && !h.isCsRc()) {
+                        if (h.isOpenaisInRc() && !h.isCorosyncInRc()) {
                             return "Openais is in rc.d";
                         }
                     }
@@ -362,7 +382,7 @@ public class PcmkMultiSelectionMenu {
                     }
                     for (final HostInfo hi : selectedHostInfos) {
                         final Host h = hi.getHost();
-                        if (h.isPcmkRc()) {
+                        if (h.isPacemakerInRc()) {
                             Corosync.startCorosyncWithPcmk(h);
                         } else {
                             Corosync.startCorosync(h);
@@ -398,12 +418,12 @@ public class PcmkMultiSelectionMenu {
               public boolean visiblePredicate() {
                   for (final HostInfo hi : selectedHostInfos) {
                       final Host h = hi.getHost();
-                      if (h.isAisInit()
-                          && h.isCsAisConf()
-                          && !h.isCsRunning()
-                          && !h.isAisRunning()
+                      if (h.hasOpenaisInitScript()
+                          && h.corosyncOrOpenaisConfigExists()
+                          && !h.isCorosyncRunning()
+                          && !h.isOpenaisRunning()
                           && !h.isHeartbeatRunning()
-                          && !h.isHeartbeatRc()) {
+                          && !h.isHeartbeatInRc()) {
                           return true;
                       }
                   }
@@ -414,7 +434,7 @@ public class PcmkMultiSelectionMenu {
               public String enablePredicate() {
                   for (final HostInfo hi : selectedHostInfos) {
                       final Host h = hi.getHost();
-                      if (h.isCsRc() && !h.isAisRc()) {
+                      if (h.isCorosyncInRc() && !h.isOpenaisInRc()) {
                           return "Corosync is in rc.d";
                       }
                   }
@@ -458,10 +478,10 @@ public class PcmkMultiSelectionMenu {
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
                         final Host h = hi.getHost();
-                        if (h.isHeartbeatInit()
-                            && h.isHeartbeatConf()
-                            && !h.isCsRunning()
-                            && !h.isAisRunning()
+                        if (h.hasHeartbeatInitScript()
+                            && h.heartbeatConfigExists()
+                            && !h.isCorosyncRunning()
+                            && !h.isOpenaisRunning()
                             && !h.isHeartbeatRunning()) {
                             return true;
                         }
@@ -510,9 +530,9 @@ public class PcmkMultiSelectionMenu {
                     for (final HostInfo hi : selectedHostInfos) {
                         final Host h = hi.getHost();
                         if (!h.isPcmkStartedByCorosync()
-                            && !h.isPcmkRunning()
-                            && (h.isCsRunning()
-                                || h.isAisRunning())
+                            && !h.isPacemakerRunning()
+                            && (h.isCorosyncRunning()
+                                || h.isOpenaisRunning())
                             && !h.isHeartbeatRunning()) {
                             return true;
                         }
@@ -561,7 +581,7 @@ public class PcmkMultiSelectionMenu {
                                             firstHost.getPmColors()[0]);
                     for (final HostInfo hi : selectedHostInfos) {
                         if (newColor != null) {
-                            hi.getHost().setSavedColor(newColor);
+                            hi.getHost().setSavedHostColorInGraphs(newColor);
                         }
                     }
                 }
@@ -585,7 +605,7 @@ public class PcmkMultiSelectionMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     boolean allStarted = true;
@@ -652,7 +672,7 @@ public class PcmkMultiSelectionMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     boolean allStopped = true;
@@ -735,7 +755,7 @@ public class PcmkMultiSelectionMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     boolean failCount = false;
@@ -811,7 +831,7 @@ public class PcmkMultiSelectionMenu {
                 }
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
@@ -886,7 +906,7 @@ public class PcmkMultiSelectionMenu {
                 }
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().clStatusFailed()) {
+                    if (getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
@@ -955,12 +975,12 @@ public class PcmkMultiSelectionMenu {
 
                     @Override
                     public boolean predicate() {
-                        return host.isClStatus();
+                        return host.isCrmStatusOk();
                     }
 
                     @Override
                     public boolean visiblePredicate() {
-                        return !host.isClStatus()
+                        return !host.isCrmStatusOk()
                                || enablePredicate() == null;
                     }
 
@@ -972,8 +992,8 @@ public class PcmkMultiSelectionMenu {
                                 || si.getService().isOrphaned()) {
                                 continue;
                             }
-                            if (getBrowser().clStatusFailed()
-                                || !host.isClStatus()) {
+                            if (getBrowser().crmStatusFailed()
+                                || !host.isCrmStatusOk()) {
                                 return "not available on this host";
                             }
                             final List<String> runningOnNodes =
@@ -1055,7 +1075,7 @@ public class PcmkMultiSelectionMenu {
                             || si.getService().isOrphaned()) {
                             continue;
                         }
-                        if (!getBrowser().clStatusFailed()
+                        if (!getBrowser().crmStatusFailed()
                              && si.getService().isAvailable()
                              && (si.getMigratedTo(Application.RunMode.LIVE) != null
                                  || si.getMigratedFrom(Application.RunMode.LIVE) != null)) {
@@ -1107,7 +1127,7 @@ public class PcmkMultiSelectionMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
+                if (getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 final ClusterStatus cs = getBrowser().getClusterStatus();
@@ -1159,7 +1179,7 @@ public class PcmkMultiSelectionMenu {
                         si.removeMyselfNoConfirm(dcHost, Application.RunMode.LIVE);
                     }
                 }
-                getBrowser().getCRMGraph().repaint();
+                getBrowser().getCrmGraph().repaint();
             }
         };
         final ButtonCallback removeItemCallback =

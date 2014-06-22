@@ -54,7 +54,7 @@ public class Service extends Resource {
     private static final String MASTER_SLAVE_SET_NAME =
                                         Application.PM_MASTER_SLAVE_SET_NAME;
     /** Name of the group pacemaker object. */
-    private static final String GROUP_NAME = Application.PM_GROUP_NAME;
+    private static final String GROUP_NAME = Application.PACEMAKER_GROUP_NAME;
     /** Id is crmId whithout name of the service. */
     private String id = null;
     /** Heartbeat id of this service. */

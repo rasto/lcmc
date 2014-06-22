@@ -1,3 +1,23 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
 package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
@@ -34,7 +54,7 @@ public class HbConnectionMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
+                if (getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
@@ -42,7 +62,7 @@ public class HbConnectionMenu {
 
             @Override
             public void action() {
-                getBrowser().getCRMGraph().removeConnection(
+                getBrowser().getCrmGraph().removeConnection(
                                                       hbConnectionInfo,
                                                       getBrowser().getDCHost(),
                                                       runMode);
@@ -57,7 +77,7 @@ public class HbConnectionMenu {
             @Override
             public void action(final Host dcHost) {
                 if (!hbConnectionInfo.isNew()) {
-                    getBrowser().getCRMGraph().removeConnection(hbConnectionInfo,
+                    getBrowser().getCrmGraph().removeConnection(hbConnectionInfo,
                                                                 dcHost,
                                                                 Application.RunMode.TEST);
                 }
@@ -81,12 +101,12 @@ public class HbConnectionMenu {
 
             @Override
             public boolean predicate() {
-                return getBrowser().getCRMGraph().isOrder(hbConnectionInfo);
+                return getBrowser().getCrmGraph().isOrder(hbConnectionInfo);
             }
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
+                if (getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
@@ -96,7 +116,7 @@ public class HbConnectionMenu {
             public void action() {
                 if (this.getText().equals(Tools.getString(
                                        "ClusterBrowser.Hb.RemoveOrder"))) {
-                    getBrowser().getCRMGraph().removeOrder(
+                    getBrowser().getCrmGraph().removeOrder(
                                                      hbConnectionInfo,
                                                      getBrowser().getDCHost(),
                                                      runMode);
@@ -106,7 +126,7 @@ public class HbConnectionMenu {
                     hbConnectionInfo.addOrder(null,
                                               hbConnectionInfo.getLastServiceInfoRsc(),
                                               hbConnectionInfo.getLastServiceInfoWithRsc());
-                    getBrowser().getCRMGraph().addOrder(
+                    getBrowser().getCrmGraph().addOrder(
                                                       hbConnectionInfo,
                                                       getBrowser().getDCHost(),
                                                       runMode);
@@ -123,8 +143,8 @@ public class HbConnectionMenu {
             @Override
             public void action(final Host dcHost) {
                 if (!hbConnectionInfo.isNew()) {
-                    if (getBrowser().getCRMGraph().isOrder(hbConnectionInfo)) {
-                        getBrowser().getCRMGraph().removeOrder(hbConnectionInfo,
+                    if (getBrowser().getCrmGraph().isOrder(hbConnectionInfo)) {
+                        getBrowser().getCrmGraph().removeOrder(hbConnectionInfo,
                                                                dcHost,
                                                                Application.RunMode.TEST);
                     } else {
@@ -133,7 +153,7 @@ public class HbConnectionMenu {
                         hbConnectionInfo.addOrder(null,
                                                   hbConnectionInfo.getLastServiceInfoRsc(),
                                                   hbConnectionInfo.getLastServiceInfoWithRsc());
-                        getBrowser().getCRMGraph().addOrder(hbConnectionInfo,
+                        getBrowser().getCrmGraph().addOrder(hbConnectionInfo,
                                                             dcHost,
                                                             Application.RunMode.TEST);
                     }
@@ -161,12 +181,12 @@ public class HbConnectionMenu {
 
             @Override
             public boolean predicate() {
-                return getBrowser().getCRMGraph().isColocation(hbConnectionInfo);
+                return getBrowser().getCrmGraph().isColocation(hbConnectionInfo);
             }
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().clStatusFailed()) {
+                if (getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
@@ -176,7 +196,7 @@ public class HbConnectionMenu {
             public void action() {
                 if (this.getText().equals(Tools.getString(
                                   "ClusterBrowser.Hb.RemoveColocation"))) {
-                    getBrowser().getCRMGraph().removeColocation(
+                    getBrowser().getCrmGraph().removeColocation(
                                                    hbConnectionInfo,
                                                    getBrowser().getDCHost(),
                                                    runMode);
@@ -187,7 +207,7 @@ public class HbConnectionMenu {
                     hbConnectionInfo.addColocation(null,
                                                    hbConnectionInfo.getLastServiceInfoParent(),
                                                    hbConnectionInfo.getLastServiceInfoChild());
-                    getBrowser().getCRMGraph().addColocation(
+                    getBrowser().getCrmGraph().addColocation(
                                                       hbConnectionInfo,
                                                       getBrowser().getDCHost(),
                                                       runMode);
@@ -205,8 +225,8 @@ public class HbConnectionMenu {
             @Override
             public void action(final Host dcHost) {
                 if (!hbConnectionInfo.isNew()) {
-                    if (getBrowser().getCRMGraph().isColocation(hbConnectionInfo)) {
-                        getBrowser().getCRMGraph().removeColocation(hbConnectionInfo,
+                    if (getBrowser().getCrmGraph().isColocation(hbConnectionInfo)) {
+                        getBrowser().getCrmGraph().removeColocation(hbConnectionInfo,
                                                                     dcHost,
                                                                     Application.RunMode.TEST);
                     } else {
@@ -216,7 +236,7 @@ public class HbConnectionMenu {
                         hbConnectionInfo.addColocation(null,
                                                        hbConnectionInfo.getLastServiceInfoParent(),
                                                        hbConnectionInfo.getLastServiceInfoChild());
-                        getBrowser().getCRMGraph().addColocation(hbConnectionInfo,
+                        getBrowser().getCrmGraph().addColocation(hbConnectionInfo,
                                                                  dcHost,
                                                                  Application.RunMode.TEST);
                     }

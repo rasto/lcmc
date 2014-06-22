@@ -31,7 +31,7 @@ import lcmc.data.Application;
 import lcmc.data.Host;
 import lcmc.data.crm.ResourceAgent;
 import lcmc.data.StringValue;
-import lcmc.data.vm.VMSXML;
+import lcmc.data.vm.VmsXml;
 import lcmc.data.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.vms.DomainInfo;
@@ -75,8 +75,8 @@ public class VirtualDomainInfo extends ServiceInfo {
     }
 
     /** Returns object with vm data. */
-    VMSXML getVMSXML(final Host host) {
-        return getBrowser().getVMSXML(host);
+    VmsXml getVMSXML(final Host host) {
+        return getBrowser().getVmsXml(host);
     }
 
     /** Removes the service without confirmation dialog. */
@@ -99,7 +99,7 @@ public class VirtualDomainInfo extends ServiceInfo {
         final Value config = getParamSaved(CONFIG_PARAM);
         DomainInfo newVMSVDI = null;
         for (final Host host : getBrowser().getClusterHosts()) {
-            final VMSXML vxml = getBrowser().getVMSXML(host);
+            final VmsXml vxml = getBrowser().getVmsXml(host);
             if (vxml != null) {
                 final String name = vxml.getNameFromConfig(config.getValueForConfig());
                 newVMSVDI = getBrowser().findVMSVirtualDomainInfo(name);
@@ -123,7 +123,7 @@ public class VirtualDomainInfo extends ServiceInfo {
         if (CONFIG_PARAM.equals(param)) {
             final Set<Value> configs = new TreeSet<Value>();
             for (final Host host : getBrowser().getClusterHosts()) {
-                final VMSXML vxml = getBrowser().getVMSXML(host);
+                final VmsXml vxml = getBrowser().getVmsXml(host);
                 if (vxml != null) {
                     configs.addAll(vxml.getConfigs());
                 }

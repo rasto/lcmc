@@ -188,14 +188,14 @@ final class CoroConfig extends DialogCluster {
                                 config.append(aisConfigPacemaker(
                                                     "\t",
                                                     serviceVersion));
-                                if (hosts[0].isCorosync()) {
+                                if (hosts[0].isCorosyncInstalled()) {
                                     Corosync.createCorosyncConfig(hosts,
                                                                   config);
                                 } else {
                                     Openais.createAISConfig(hosts, config);
                                 }
                                 final boolean configOk = updateOldAisConfig();
-                                if (hosts[0].isCorosync()
+                                if (hosts[0].isCorosyncInstalled()
                                     && !hosts[0].isOpenaisWrapper()) {
                                     Corosync.reloadCorosyncs(hosts);
                                 } else {
@@ -396,7 +396,7 @@ final class CoroConfig extends DialogCluster {
 
         String cf = "/etc/corosync/corosync.conf";
         String command = "Corosync.getAisConfig";
-        if (!hosts[0].isCorosync()) {
+        if (!hosts[0].isCorosyncInstalled()) {
             cf = "/etc/ais/openais.conf";
             command = "OpenAIS.getAisConfig";
         }
@@ -956,7 +956,7 @@ final class CoroConfig extends DialogCluster {
                                    Widget.NO_BUTTON);
         typeW.setEnabled(false);
 
-        final NetInterface[] ni = hosts[0].getNetInterfaces();
+        final NetInterface[] ni = hosts[0].getNetInterfacesWithBridges();
         NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */

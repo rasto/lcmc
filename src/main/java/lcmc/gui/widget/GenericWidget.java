@@ -17,7 +17,6 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-
 package lcmc.gui.widget;
 
 import java.awt.BorderLayout;
@@ -66,75 +65,44 @@ import lcmc.utilities.WidgetListener;
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
-public abstract class GenericWidget<T extends JComponent>
-extends JPanel
-implements Widget {
-    /** Logger. */
+public abstract class GenericWidget<T extends JComponent> extends JPanel implements Widget {
     private static final Logger LOG = LoggerFactory.getLogger(GenericWidget.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Component of this widget. */
     private T component;
-    /** Whether the field is editable. */
     private boolean editable = false;
-    /** Whether the field should be always editable. */
     private boolean alwaysEditable = false;
     /** File chooser button or some other button. */
     private final MyButton fieldButton;
     /** Component part of field with button. */
     private T componentPart = null;
-    /** Label of this component. */
     private JLabel label = null;
-    /** Whether the component should be enabled. */
     private boolean enablePredicate = true;
     /** Whether the extra text field button should be enabled. */
     private boolean tfButtonEnabled = true;
-    /** Access Type for this component to become enabled. */
-    private AccessMode enableAccessMode = new AccessMode(
-                                                    Application.AccessType.RO,
-                                                    false);
-    /** Tooltip if element is enabled. */
+    private AccessMode enableAccessMode = new AccessMode(Application.AccessType.RO, false);
     private String toolTipText = null;
-    /** Tooltip for label if it is enabled. */
     private String labelToolTipText = null;
-    /** getValue setValue lock. */
     private final ReadWriteLock mValueLock = new ReentrantReadWriteLock();
     private final Lock mValueReadLock = mValueLock.readLock();
     private final Lock mValueWriteLock = mValueLock.writeLock();
     /** Regexp that this field must match. */
     private final String regexp;
-    /** Reason why it is disabled. */
     private String disabledReason = null;
-    /** List of widget listeners. */
-    private final Collection<WidgetListener> widgetListeners =
-                                              new ArrayList<WidgetListener>();
+    private final Collection<WidgetListener> widgetListeners = new ArrayList<WidgetListener>();
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
 
-    /** Prepares a new {@code GenericWidget} object. */
-    public GenericWidget(final String regexp,
-                  final AccessMode enableAccessMode) {
-        this(regexp,
-             enableAccessMode,
-             NO_BUTTON); /* without button */
+    public GenericWidget(final String regexp, final AccessMode enableAccessMode) {
+        this(regexp, enableAccessMode, NO_BUTTON);
     }
 
-    /** Prepares a new {@code GenericWidget} object. */
-    public GenericWidget(final String regexp,
-                  final AccessMode enableAccessMode,
-                  final MyButton fieldButton) {
+    public GenericWidget(final String regexp, final AccessMode enableAccessMode, final MyButton fieldButton) {
         super();
         this.enableAccessMode = enableAccessMode;
         this.fieldButton = fieldButton;
         setLayout(new BorderLayout(0, 0));
         if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
-            this.regexp =
-             regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED_DISPLAY);
+            this.regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED_DISPLAY);
         } else {
             this.regexp = regexp;
         }
@@ -173,11 +141,9 @@ implements Widget {
     }
 
     @Override
-    public void reloadComboBox(final Value selectedValue,
-                               final Value[] items) {
+    public void reloadComboBox(final Value selectedValue, final Value[] items) {
     }
 
-    /** Sets the tooltip text. */
     @Override
     public void setToolTipText(String text) {
         toolTipText = text;
@@ -186,8 +152,7 @@ implements Widget {
             text = text + "<br>" + disabledReason0;
         }
         if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
-            final boolean accessible =
-                     Tools.getApplication().isAccessible(enableAccessMode);
+            final boolean accessible = Tools.getApplication().isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
             }
@@ -199,7 +164,6 @@ implements Widget {
         }
     }
 
-    /** Sets label tooltip text. */
     private void setLabelToolTipText(String text) {
         labelToolTipText = text;
         if (text == null || label == null) {
@@ -207,8 +171,7 @@ implements Widget {
         }
         String disabledTooltip = null;
         if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
-            final boolean accessible =
-                     Tools.getApplication().isAccessible(enableAccessMode);
+            final boolean accessible = Tools.getApplication().isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
             }
@@ -224,8 +187,7 @@ implements Widget {
                 tt.append(disabledTooltip);
             }
             if (text.length() > 6 && "<html>".equals(text.substring(0, 6))) {
-                text = "<html>" + tt.toString() + "<br>" + "<br>"
-                       + text.substring(6);
+                text = "<html>" + tt.toString() + "<br>" + "<br>" + text.substring(6);
             } else {
                 text = Tools.html(text + "<br>" + tt.toString());
             }
@@ -233,7 +195,6 @@ implements Widget {
         label.setToolTipText(text);
     }
 
-    /** Returns tooltip for disabled element. */
     private String getDisabledTooltip() {
         String advanced = "";
         if (enableAccessMode.isAdvancedMode()) {
@@ -242,8 +203,7 @@ implements Widget {
         final StringBuilder sb = new StringBuilder(100);
         sb.append("editable in \"");
         sb.append(advanced);
-        sb.append(
-                Application.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
+        sb.append(Application.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
         sb.append("\" mode");
 
         if (disabledReason != null) {
@@ -251,7 +211,6 @@ implements Widget {
             sb.append(' ');
             sb.append(disabledReason);
         }
-
         return sb.toString();
     }
 
@@ -268,8 +227,7 @@ implements Widget {
     }
 
     /**
-     * Returns string value. If object value is null, returns empty string (not
-     * null).
+     * Returns string value. If object value is null, returns empty string (not null).
      */
     @Override
     public abstract String getStringValue();
@@ -298,7 +256,6 @@ implements Widget {
         setComponentsVisible(visible);
     }
 
-    /** Sets component visible or invisible. */
     protected void setComponentsVisible(final boolean visible) {
         final JComponent c;
         if (fieldButton == null) {
@@ -330,9 +287,7 @@ implements Widget {
     @Override
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
-        setComponentsEnabled(
-                   enablePredicate
-                   && Tools.getApplication().isAccessible(enableAccessMode));
+        setComponentsEnabled(enablePredicate && Tools.getApplication().isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -359,7 +314,6 @@ implements Widget {
     public void setEnabled(final String s, final boolean enabled) {
     }
 
-    /** Returns whether component is editable or not. */
     @Override
     public abstract boolean isEditable();
 
@@ -436,15 +390,13 @@ implements Widget {
     public void selectSubnet() {
     }
 
-    protected final void addDocumentListener(final Document doc,
-                                             final WidgetListener wl) {
+    protected final void addDocumentListener(final Document doc, final WidgetListener wl) {
         doc.addDocumentListener(
                 new DocumentListener() {
                     private void check(final DocumentEvent e) {
                         if (wl.isEnabled()) {
                             try {
-                                final String text =
-                                   e.getDocument().getText(0, doc.getLength());
+                                final String text = e.getDocument().getText(0, doc.getLength());
 
                                 final Thread t = new Thread(new Runnable() {
                                     @Override
@@ -475,7 +427,6 @@ implements Widget {
                     }
                 }
             );
-
     }
 
     protected ItemListener getItemListener(final WidgetListener wl) {
@@ -502,7 +453,6 @@ implements Widget {
         };
     }
 
-    /** Adds item listener to the component. */
     @Override
     public void addListeners(final WidgetListener widgetListener) {
         widgetListeners.add(widgetListener);
@@ -521,9 +471,7 @@ implements Widget {
 
     /** Sets background without considering the label. */
     @Override
-    public final void setBackground(final Value defaultValue,
-                                    final Value savedValue,
-                                    final boolean required) {
+    public final void setBackground(final Value defaultValue, final Value savedValue, final boolean required) {
         setBackground(null, defaultValue, null, savedValue, required);
     }
 
@@ -563,8 +511,7 @@ implements Widget {
                 label.setForeground(CHANGED_VALUE_COLOR);
             }
         } else if (Tools.areEqual(value, defaultValue)
-                   && (savedLabel == null
-                       || Tools.areEqual(labelText, defaultLabel))) {
+                   && (savedLabel == null || Tools.areEqual(labelText, defaultLabel))) {
             if (label != null) {
                 label.setForeground(DEFAULT_VALUE_COLOR);
             }
@@ -579,11 +526,9 @@ implements Widget {
         processAccessMode();
     }
 
-    protected void setComponentBackground(final Color backgroundColor,
-                                          final Color compColor) {
+    protected void setComponentBackground(final Color backgroundColor, final Color compColor) {
     }
 
-    /** Sets flag that determines whether the combo box is always editable. */
     @Override
     public final void setAlwaysEditable(final boolean alwaysEditable) {
         this.alwaysEditable = alwaysEditable;
@@ -594,17 +539,14 @@ implements Widget {
         return alwaysEditable;
     }
 
-    /** Requests focus if applicable. */
     @Override
     public void requestFocus() {
     }
 
-    /** Selects the whole text in the widget if applicable. */
     @Override
     public void selectAll() {
     }
 
-    /** Sets the width of the widget. */
     @Override
     public final void setWidth(final int newWidth) {
         final JComponent c;
@@ -613,19 +555,12 @@ implements Widget {
         } else {
             c = componentPart;
         }
-        c.setMinimumSize(new Dimension(newWidth,
-                                       (int) c.getMinimumSize().getHeight()));
-        c.setPreferredSize(
-                       new Dimension(newWidth,
-                                     (int) c.getPreferredSize().getHeight()));
-        c.setMaximumSize(new Dimension(newWidth,
-                                       (int) c.getMaximumSize().getHeight()));
-        setMinimumSize(new Dimension(newWidth,
-                                     (int) getMinimumSize().getHeight()));
-        setPreferredSize(new Dimension(newWidth,
-                                       (int) getPreferredSize().getHeight()));
-        setMaximumSize(new Dimension(newWidth,
-                                     (int) getMaximumSize().getHeight()));
+        c.setMinimumSize(new Dimension(newWidth, (int) c.getMinimumSize().getHeight()));
+        c.setPreferredSize(new Dimension(newWidth, (int) c.getPreferredSize().getHeight()));
+        c.setMaximumSize(new Dimension(newWidth, (int) c.getMaximumSize().getHeight()));
+        setMinimumSize(new Dimension(newWidth, (int) getMinimumSize().getHeight()));
+        setPreferredSize(new Dimension(newWidth, (int) getPreferredSize().getHeight()));
+        setMaximumSize(new Dimension(newWidth, (int) getMaximumSize().getHeight()));
         final Container p = getParent();
         if (p != null) {
             p.validate();
@@ -641,28 +576,16 @@ implements Widget {
         } else {
             c = componentPart;
         }
-        c.setMinimumSize(new Dimension((int) c.getMinimumSize().getWidth(),
-                                       newHeight));
-        c.setPreferredSize(new Dimension((int) c.getPreferredSize().getWidth(),
-                                         newHeight));
-        c.setMaximumSize(new Dimension((int) c.getMaximumSize().getWidth(),
-                                       newHeight));
-        setMinimumSize(new Dimension((int) getMinimumSize().getWidth(),
-                                     newHeight));
-        setPreferredSize(new Dimension((int) getPreferredSize().getWidth(),
-                                       newHeight));
-        setMaximumSize(new Dimension((int) getMaximumSize().getWidth(),
-                                     newHeight));
+        c.setMinimumSize(new Dimension((int) c.getMinimumSize().getWidth(), newHeight));
+        c.setPreferredSize(new Dimension((int) c.getPreferredSize().getWidth(), newHeight));
+        c.setMaximumSize(new Dimension((int) c.getMaximumSize().getWidth(), newHeight));
+        setMinimumSize(new Dimension((int) getMinimumSize().getWidth(), newHeight));
+        setPreferredSize(new Dimension((int) getPreferredSize().getWidth(), newHeight));
+        setMaximumSize(new Dimension((int) getMaximumSize().getWidth(), newHeight));
         if (label != null) {
-            label.setMinimumSize(
-                        new Dimension((int) label.getMinimumSize().getWidth(),
-                                      newHeight));
-            label.setPreferredSize(
-                        new Dimension((int) label.getPreferredSize().getWidth(),
-                                      newHeight));
-            label.setMaximumSize(
-                        new Dimension((int) label.getMaximumSize().getWidth(),
-                                      newHeight));
+            label.setMinimumSize(new Dimension((int) label.getMinimumSize().getWidth(), newHeight));
+            label.setPreferredSize(new Dimension((int) label.getPreferredSize().getWidth(), newHeight));
+            label.setMaximumSize(new Dimension((int) label.getMaximumSize().getWidth(), newHeight));
         }
         final Container p = getParent();
         if (p != null) {
@@ -689,8 +612,7 @@ implements Widget {
 
     /** Sets label for this component. */
     @Override
-    public final void setLabel(final JLabel label,
-                               final String labelToolTipText) {
+    public final void setLabel(final JLabel label, final String labelToolTipText) {
         this.label = label;
         this.labelToolTipText = labelToolTipText;
     }
@@ -704,8 +626,7 @@ implements Widget {
     /** Sets this item enabled and visible according to its access type. */
     @Override
     public final void processAccessMode() {
-        final boolean accessible =
-                       Tools.getApplication().isAccessible(enableAccessMode);
+        final boolean accessible = Tools.getApplication().isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);
@@ -717,11 +638,6 @@ implements Widget {
             label.setEnabled(enablePredicate && accessible);
         }
     }
-
-    /** Returns item at the specified index. */
-    //Value getItemAt(final int i) {
-    //    return null;
-    //}
 
     /** Cleanup whatever would cause a leak. */
     @Override
@@ -735,13 +651,11 @@ implements Widget {
         return regexp;
     }
 
-    /** Sets reason why it is disabled. */
     @Override
     public final void setDisabledReason(final String disabledReason) {
         this.disabledReason = disabledReason;
     }
 
-    /** Returns component. */
     protected final T getInternalComponent() {
         if (fieldButton == null) {
             return component;
@@ -757,22 +671,17 @@ implements Widget {
         return this;
     }
 
-    /** Returns widget listeners. */
     protected final Collection<WidgetListener> getWidgetListeners() {
         return widgetListeners;
     }
 
-    /** Return enable predicate. */
     protected final boolean isEnablePredicate() {
         return enablePredicate;
     }
 
-    /** Return access mode at which this component is enabled. */
     protected final AccessMode getEnableAccessMode() {
         return enableAccessMode;
     }
-
-    
 
     /** Return whether this widget was never set. */
     @Override
@@ -791,18 +700,15 @@ implements Widget {
     }
 
     /** Workaround for jcombobox so that it works with default button. */
-    static class ActivateDefaultButtonListener<E> extends KeyAdapter
-                                               implements ActionListener {
+    static class ActivateDefaultButtonListener<E> extends KeyAdapter implements ActionListener {
         /** Combobox, that should work with default button. */
         private final JComboBox<E> box;
 
-        /** Creates new ActivateDefaultButtonListener. */
         ActivateDefaultButtonListener(final JComboBox<E> box) {
             super();
             this.box = box;
         }
 
-        /** Is called when a key was pressed. */
         @Override
         public void keyPressed(final KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -811,13 +717,11 @@ implements Widget {
             }
         }
 
-        /** Is called when an action was performed. */
         @Override
         public void actionPerformed(final ActionEvent e) {
             doClick(e);
         }
 
-        /** Do click. */
         private void doClick(final EventObject e) {
             final Component c = (Component) e.getSource();
 
@@ -839,30 +743,21 @@ implements Widget {
      * TextField that selects all when focused.
      */
     public static final class MTextField extends JTextField {
-        /** Serial Version UID. */
-        private static final long serialVersionUID = 1L;
         /** To select all only once. */
         private volatile boolean selected = false;
 
-        /** Creates a new MTextField object. */
         public MTextField(final String text) {
             super(text);
         }
 
-        /** Creates a new MTextField object. */
-        public MTextField(final String text,
-                          final int columns) {
+        public MTextField(final String text, final int columns) {
             super(text, columns);
         }
 
-        /** Creates a new MTextField object. */
-        MTextField(final Document doc,
-                   final String text,
-                   final int columns) {
+        MTextField(final Document doc, final String text, final int columns) {
             super(doc, text, columns);
         }
 
-        /** Focus event. */
         @Override
         protected void processFocusEvent(final FocusEvent e) {
             super.processFocusEvent(e);

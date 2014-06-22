@@ -51,7 +51,7 @@ import lcmc.configs.AppDefaults;
 import lcmc.data.Application;
 import lcmc.data.Cluster;
 import lcmc.data.Host;
-import lcmc.gui.CRMGraph;
+import lcmc.gui.CrmGraph;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.Info;
 import lcmc.gui.widget.GenericWidget.MTextField;
@@ -1903,7 +1903,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        final CRMGraph graph = cluster.getBrowser().getCRMGraph();
+        final CrmGraph graph = cluster.getBrowser().getCrmGraph();
         int i = 0;
         while (i < 10 && should != graph.getNumberOfVertices()) {
             LOG.info("checkNumberOfVertices: " + name

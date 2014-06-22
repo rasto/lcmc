@@ -20,33 +20,20 @@
 
 package lcmc.data.drbd;
 
-import lcmc.Exceptions;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class DrbdHost {
-    private static final Logger LOG = LoggerFactory.getLogger(DrbdHost.class);
-
-    /** Drbd version of drbdadm tool. */
-    private String drbdVersion = null;
+    private String drbdUtilVersion = null;
     private String drbdModuleVersion = null;
     private boolean drbdProxyRunning = false;
     private boolean drbdLoaded = false;
 
-    public String getDrbdVersion() {
-        return drbdVersion;
+    public String getDrbdUtilVersion() {
+        return drbdUtilVersion;
     }
 
     public String getDrbdModuleVersion() {
         return drbdModuleVersion;
     }
 
-    /** Returns whether drbd module is loaded. */
     public boolean isDrbdLoaded() {
         return drbdLoaded;
     }
@@ -55,8 +42,8 @@ public class DrbdHost {
         return drbdProxyRunning;
     }
 
-    public void setDrbdVersion(String drbdVersion) {
-        this.drbdVersion = drbdVersion;
+    public void setDrbdUtilVersion(String drbdUtilVersion) {
+        this.drbdUtilVersion = drbdUtilVersion;
     }
 
     public void setDrbdProxyRunning(boolean drbdProxyRunning) {

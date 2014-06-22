@@ -145,7 +145,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             public void run() {
                                 drbdDistCombo.reloadComboBox(
                                         new StringValue(
-                                                getHost().getDistVersion()),
+                                                getHost().getDistributionVersion()),
                                         StringValue.getValues(items));
                                 drbdDistCombo.setEnabled(true);
                             }
@@ -173,7 +173,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
     /** Checks what are the available kernels for this distribution. */
     protected final void availKernels() {
-        final String distVersion = getHost().getDistVersion();
+        final String distVersion = getHost().getDistributionVersion();
         if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -227,7 +227,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         if (drbdDistItems == null
             || drbdKernelDirItems == null
             || arch == null
-            || !drbdDistItems.contains(getHost().getDistVersion())
+            || !drbdDistItems.contains(getHost().getDistributionVersion())
             || !drbdKernelDirItems.contains(kernelVersion)) {
             Tools.invokeLater(new Runnable() {
                 @Override
@@ -312,7 +312,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         enableComponents();
         if (ans == null) {
             final StringBuilder errorText = new StringBuilder(80);
-            final String dist = getHost().getDistVersion();
+            final String dist = getHost().getDistributionVersion();
             final String kernel = getHost().getKernelVersion();
             final String arch = getHost().getArch();
             if (drbdDistItems == null || !drbdDistItems.contains(dist)) {
@@ -453,7 +453,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             new WidgetListener() {
                 @Override
                 public void check(final Value value) {
-                    String v = getHost().getDistVersion();
+                    String v = getHost().getDistributionVersion();
                     if (drbdDistItems == null || !drbdDistItems.contains(v)) {
                         v = NO_MATCH_STRING;
                     }

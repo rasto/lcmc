@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lcmc.data.AccessMode;
 import lcmc.data.Application;
-import lcmc.data.drbd.DrbdXML;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.data.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
@@ -246,7 +246,7 @@ public class VolumeMenu {
     
             @Override
             public String enablePredicate() {
-                final DrbdXML dxml = getBrowser().getDrbdXML();
+                final DrbdXml dxml = getBrowser().getDrbdXml();
                 if (!Tools.getApplication().isAdvancedMode()
                     && getResourceInfo().isUsedByCRM()) {
                     return VolumeInfo.IS_USED_BY_CRM_STRING;

@@ -53,9 +53,9 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Prepares a new {@code ResourceAgentClassInfo} object. */
     public ResourceAgentClassInfo(final String name, final Browser browser) {
         super(name, browser);
-        for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
+        for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(
                                                                       name)) {
-            raMap.put(ra.getName(), ra);
+            raMap.put(ra.getServiceName(), ra);
         }
     }
 
@@ -70,9 +70,9 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
-        for (final ResourceAgent ra : getBrowser().getCRMXML().getServices(
+        for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(
                                                                   getName())) {
-            final MyButton nameLabel = new MyButton(ra.getName());
+            final MyButton nameLabel = new MyButton(ra.getServiceName());
             rows.add(new Object[]{nameLabel,
                                   ra.getProvider()});
         }

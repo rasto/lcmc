@@ -81,9 +81,9 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  *
  */
-public final class VMSXML extends XML {
+public final class VmsXml extends XML {
     /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(VMSXML.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VmsXml.class);
     /** Pattern that maches display e.g. :4. */
     private static final Pattern DISPLAY_PATTERN =
                                                  Pattern.compile(".*:(\\d+)$");
@@ -566,7 +566,7 @@ public final class VMSXML extends XML {
     private String oldConfig = null;
 
     /** Prepares a new {@code VMSXML} object. */
-    public VMSXML(final Host host) {
+    public VmsXml(final Host host) {
         super();
         this.host = host;
     }
