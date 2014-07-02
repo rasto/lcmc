@@ -64,10 +64,12 @@ import lcmc.gui.dialog.BugReport;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a menu panel.
  */
+@Component
 public final class MainMenu extends JPanel implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(MainMenu.class);
     /** Look and feel map. */

@@ -26,14 +26,18 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.PostConstruct;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import lcmc.data.Host;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
- * The very main panel, where everyting is inside.
+ * The very main panel, where everything is inside.
  */
+@Component
 public final class MainPanel extends JPanel {
 
     /** Whether the terminal was already expanded at least once. */
@@ -41,10 +45,14 @@ public final class MainPanel extends JPanel {
     /** Expanding flag mutex. */
     private final transient Lock mExpanding = new ReentrantLock();
 
-    public MainPanel() {
-        super(new BorderLayout());
+    @Autowired
+    private ClustersPanel clustersPanel;
+
+    @PostConstruct
+    public void init() {
+        setLayout(new BorderLayout());
         final TerminalPanel terminalPanel = new TerminalPanel(Host.createInstance());
-        final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new ClustersPanel(), terminalPanel);
+        final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, terminalPanel);
         Tools.getGUIData().setTerminalSplitPane(splitPane);
 
         splitPane.setContinuousLayout(true);

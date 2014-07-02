@@ -51,6 +51,7 @@ import javax.swing.plaf.metal.OceanTheme;
 import lcmc.configs.AppDefaults;
 import lcmc.data.Application;
 import lcmc.data.HostOptions;
+import lcmc.data.drbd.DrbdHost;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.MainMenu;
 import lcmc.gui.MainPanel;
@@ -66,6 +67,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
@@ -167,6 +170,8 @@ public final class LCMC extends JPanel {
     /** The --check-swing. */
     private static final String CHECK_SWING_OP = "check-swing";
 
+    private static AnnotationConfigApplicationContext context;
+
     /** Create the GUI and show it. */
     protected static void createAndShowGUI(final Container mainFrame) {
         final List<Object> buttonGradient = Arrays.asList(
@@ -226,7 +231,7 @@ public final class LCMC extends JPanel {
     }
     /** Returns the main panel. */
     protected static JPanel getMainPanel() {
-        final JPanel mainPanel = new MainPanel();
+        final JPanel mainPanel = context.getBean(MainPanel.class);
         Tools.getGUIData().setMainPanel(mainPanel);
         mainPanel.setOpaque(true); //content panes must be opaque
         return mainPanel;
@@ -235,7 +240,7 @@ public final class LCMC extends JPanel {
     /** Returns the menu bar. */
     protected static JMenuBar getMenuBar() {
         /* glass pane is used for progress bar etc. */
-        final MainMenu menu = new MainMenu();
+        final MainMenu menu = context.getBean(MainMenu.class);
         Tools.getGUIData().setMainMenu(menu);
         return menu.getMenuBar();
     }
@@ -274,6 +279,7 @@ public final class LCMC extends JPanel {
 
     /** Inits the application. */
     protected static String initApp(final String[] args) {
+        context = new AnnotationConfigApplicationContext("lcmc");
         try {
             /* Metal */
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");

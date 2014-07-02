@@ -23,7 +23,6 @@
 package lcmc.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -33,6 +32,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -42,17 +43,21 @@ import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
+
 import lcmc.data.Cluster;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 
+import org.springframework.stereotype.Component;
+
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
  * changes also host that is shown in the terminal panel, to the host, that
  * is active in the cluster.
  */
+@Component
 public final class ClustersPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
     /** Icon of the cluster. */
@@ -65,22 +70,20 @@ public final class ClustersPanel extends JPanel {
     private static final int TAB_BORDER_WIDTH = 3;
     private JTabbedPane tabbedPane;
     /** New empty cluster tab. */
-    private final ClusterTab newClusterTab;
+    private ClusterTab newClusterTab;
     /** Previously selected tab. */
     private ClusterTab prevSelected = null;
 
     private final Map<ClusterTab, JLabel> clusterTabLabels = new HashMap<ClusterTab, JLabel>();
 
-    ClustersPanel() {
-        super(new GridLayout(1, 1));
+    /** Shows the tabbed pane. */
+    @PostConstruct
+    private void init() {
+        setLayout(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
         newClusterTab = new ClusterTab(null);
         setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
-        showGUI();
-    }
 
-    /** Shows the tabbed pane. */
-    private void showGUI() {
         UIManager.put("TabbedPane.selected", Tools.getDefaultColor("ViewPanel.Status.Background"));
         UIManager.put("TabbedPane.foreground", Color.WHITE);
         UIManager.put("TabbedPane.background", Tools.getDefaultColor("ViewPanel.Background"));
@@ -248,7 +251,7 @@ public final class ClustersPanel extends JPanel {
 
     /** Return cluster tab, that is in the JScrollPane. */
     ClusterTab getClusterTab() {
-        final Component sp = tabbedPane.getSelectedComponent();
+        final java.awt.Component sp = tabbedPane.getSelectedComponent();
         if (sp == null) {
             return null;
         } else  {
