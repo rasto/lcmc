@@ -1,7 +1,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>../build/jar/LCMC.jar</jar>
+  <jar>../target/LCMC.jar</jar>
   <outfile>../LCMC-@LCMC-VERSION@-windows.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

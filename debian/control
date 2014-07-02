@@ -2,7 +2,7 @@ Source: lcmc
 Section: admin
 Priority: extra
 Maintainer: Rasto Levrinc <rasto.levrinc@gmail.com>
-Build-Depends: ant, cdbs
+Build-Depends: maven, cdbs
 Build-Depends-Indep: openjdk-7-jdk, libxalan2-java, libjava3d-java,
 Standards-Version: 3.8.3
 Homepage: http://lcmc.sourceforge.net

@@ -1,4 +1,4 @@
-build/jar/LCMC.jar usr/share/java
+target/LCMC.jar usr/share/java
 debian/wrappers/lcmc usr/bin
 debian/lcmc.xpm usr/share/pixmaps
 src/main/resources/images/Icons/128x128/lcmc.png usr/share/pixmaps

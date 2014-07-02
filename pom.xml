@@ -8,16 +8,11 @@
     <name>LCMC</name>
     <url>lcmc.sf.net</url>
     <properties>
-        <project.build.sourceEncoding>
-        UTF-8
-        </project.build.sourceEncoding>
-        <project.reporting.outputEncoding>
-        UTF-8
-        </project.reporting.outputEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lib.src>${project.basedir}/src/lib</lib.src>
-        <junit.category.exclude>
-            lcmc.testutils.annotation.type.IntegrationTest
-        </junit.category.exclude>
+        <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
+        <spring.version>4.0.5.RELEASE</spring.version>
     </properties>
     <profiles>
         <profile>
@@ -106,10 +101,10 @@
             <version>1.0.2</version>
             <scope>test</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>4.0.5.RELEASE</version>
+            <version>${spring.version}</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -121,12 +116,30 @@
             <id>thirdparty-releases</id>
             <name>JBoss Thirdparty Releases</name>
             <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
-      </repository>
+        </repository>
     </repositories>
 
     <build>
-        <finalName>LCMC</finalName>
         <plugins>
+            <!-- property file -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>src/main/resources/release.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- compiler -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -261,93 +274,147 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- find bugs -->
-<!--
+            <!-- jar -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>LCMC</id>
+                        <goals><goal>jar</goal></goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <finalName>LCMC-${release}</finalName>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <mainClass>lcmc.LCMC</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>LCMC-applet</id>
+                        <goals><goal>jar</goal></goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <finalName>LCMC-applet-${release}</finalName>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <mainClass>lcmc.LCMCApplet</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- assembly:single -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <effort>Max</effort>
-                    <outputDirectory>${basedir}/target/checks/findbugs</outputDirectory>
+<useProjectArtifact>false</useProjectArtifact>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <attach>false</attach>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>local</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>app</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>findbugs</goal>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>LCMC</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>lcmc.LCMC</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>applet</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>LCMC-applet</finalName>
+                            <archive>
+                                <manifest>
+                                    <mainClass>lcmc.LCMCApplet</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${project.build.directory}/classes"/>
+                                <copy todir="${project.build.directory}/classes">
+                                    <fileset dir="src/main/resources/"/>
+                                </copy>
+                                <tar tarfile="${project.build.directory}/classes/lcmc-test.tar"
+                                     basedir="${project.build.directory}/classes/"
+                                     includes="lcmc-test/**"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
--->
-              <plugin>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-jar-plugin</artifactId>
-                  <configuration>
-                      <archive>
-                          <manifest>
-                              <addClasspath>true</addClasspath>
-                              <mainClass>lcmc.LCMC</mainClass>
-                          </manifest>
-                      </archive>
-                  </configuration>
-              </plugin>
-              <plugin>
-                  <artifactId>maven-assembly-plugin</artifactId>
-                  <configuration>
-                      <archive>
-                          <manifest>
-                              <mainClass>lcmc.LCMC</mainClass>
-                          </manifest>
-                      </archive>
-                      <descriptorRefs>
-                          <descriptorRef>jar-with-dependencies</descriptorRef>
-                      </descriptorRefs>
-                  </configuration>
-              </plugin>
-              <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.1</version>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.3.1</version>
+                <configuration>
+                    <mainClass>lcmc.LCMC</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.8</version>
                 <executions>
-                  <execution>
-                    <phase>generate-sources</phase>
-                    <configuration>
-                      <tasks>
-                        <mkdir dir="${project.build.directory}/classes"/>
-                        <copy todir="${project.build.directory}/classes">
-                                <fileset dir="src/main/resources/"/>
-                        </copy>
-                        <tar tarfile="${project.build.directory}/classes/lcmc-test.tar"
-                             basedir="${project.build.directory}/classes/"
-                             includes="lcmc-test/**"/>
-
-                      </tasks>
-                    </configuration>
-                    <goals>
-                      <goal>run</goal>
-                    </goals>
-                  </execution>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${lib.src}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
-              </plugin>
-              <plugin>
-                  <groupId>org.codehaus.mojo</groupId>
-                  <artifactId>build-helper-maven-plugin</artifactId>
-                  <version>1.8</version>
-                  <executions>
-                      <execution>
-                          <id>add-source</id>
-                          <phase>generate-sources</phase>
-                          <goals>
-                              <goal>add-source</goal>
-                          </goals>
-                          <configuration>
-                              <sources>
-                                  <source>${lib.src}</source>
-                              </sources>
-                          </configuration>
-                      </execution>
-                  </executions>
-              </plugin>
-          </plugins>
-      </build>
+            </plugin>
+        </plugins>
+    </build>
 </project>
