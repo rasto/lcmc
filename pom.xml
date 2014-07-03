@@ -38,6 +38,7 @@
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-api</artifactId>
@@ -52,6 +53,12 @@
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
             <version>2.0.1</version>
+            </dependency>
+        -->
+        <dependency>
+            <groupId>colt</groupId> <!-- for young -->
+            <artifactId>colt</artifactId>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
