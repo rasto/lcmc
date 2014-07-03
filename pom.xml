@@ -274,53 +274,13 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- jar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>none</phase>
-                    </execution>
-                    <execution>
-                        <id>LCMC</id>
-                        <goals><goal>jar</goal></goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <finalName>LCMC-${release}</finalName>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <mainClass>lcmc.LCMC</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>LCMC-applet</id>
-                        <goals><goal>jar</goal></goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <finalName>LCMC-applet-${release}</finalName>
-                            <archive>
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <mainClass>lcmc.LCMCApplet</mainClass>
-                                </manifest>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- assembly:single -->
+            <!-- assembly -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-<useProjectArtifact>false</useProjectArtifact>
+                    <useProjectArtifact>false</useProjectArtifact>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
