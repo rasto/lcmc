@@ -1368,58 +1368,6 @@ public final class Tools {
         }
     }
 
-    /**
-     * Parses arguments from --auto command line option, it makes some
-     * automatical gui actions, that help to test the gui and can find some
-     * other uses later.
-     * To find out which options are available, you'd have to grep for
-     * getAutoOptionHost and getAutoOptionCluster
-     */
-    public static void parseAutoArgs(final String line) {
-        if (line == null) {
-            return;
-        }
-        final String[] args = line.split(",");
-        String host = null;
-        String cluster = null;
-        boolean global = false;
-        for (final String arg : args) {
-            final String[] pair = arg.split(":");
-            if (pair == null || pair.length != 2) {
-                LOG.appWarning("parseAutoArgs: cannot parse: " + line);
-                return;
-            }
-            final String option = pair[0];
-            final String value = pair[1];
-            if ("host".equals(option)) {
-                cluster = null;
-                host = value;
-                Tools.getApplication().addAutoHost(host);
-                continue;
-            } else if ("cluster".equals(option)) {
-                host = null;
-                cluster = value;
-                Tools.getApplication().addAutoCluster(cluster);
-                continue;
-            } else if ("global".equals(option)) {
-                host = null;
-                cluster = null;
-                global = true;
-                continue;
-            }
-            if (host != null) {
-                Tools.getApplication().addAutoOption(host, option, value);
-            } else if (cluster != null) {
-                Tools.getApplication().addAutoOption(cluster, option, value);
-            } else if (global) {
-                Tools.getApplication().addAutoOption("global", option, value);
-            } else {
-                LOG.appWarning("parseAutoArgs: cannot parse: " + line);
-                return;
-            }
-        }
-    }
-
     /** Convenience sleep wrapper. */
     public static void sleep(final int ms) {
         try {

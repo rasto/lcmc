@@ -77,8 +77,7 @@ public final class ClustersPanel extends JPanel {
     private final Map<ClusterTab, JLabel> clusterTabLabels = new HashMap<ClusterTab, JLabel>();
 
     /** Shows the tabbed pane. */
-    @PostConstruct
-    private void init() {
+    public void init() {
         setLayout(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
         newClusterTab = new ClusterTab(null);

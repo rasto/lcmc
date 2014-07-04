@@ -48,10 +48,10 @@ public final class MainPanel extends JPanel {
     @Autowired
     private ClustersPanel clustersPanel;
 
-    @PostConstruct
     public void init() {
         setLayout(new BorderLayout());
         final TerminalPanel terminalPanel = new TerminalPanel(Host.createInstance());
+        clustersPanel.init();
         final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, terminalPanel);
         Tools.getGUIData().setTerminalSplitPane(splitPane);
 

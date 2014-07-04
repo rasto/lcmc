@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
 import junitparams.Parameters;
+import lcmc.ArgumentParser;
 import lcmc.Exceptions;
 import lcmc.data.Host;
 import lcmc.testutils.TestUtils;
@@ -819,13 +820,6 @@ public final class ToolsTest {
     @Test
     public void charCountInNullShouldReturnZero() {
         assertEquals(0, Tools.charCount(null, 'b'));
-    }
-
-    @Test
-    public void testParseAutoArgs() {
-        Tools.parseAutoArgs(null);
-        Tools.parseAutoArgs("test");
-        testSuite.clearStdout();
     }
 
     @Test

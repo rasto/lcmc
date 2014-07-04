@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -75,15 +76,15 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Look and feel map. */
     private static final Map<String, String> LOOK_AND_FEEL_MAP = new HashMap<String, String>();
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("MainMenu.HostIcon"));
-    private final JMenuBar menuBar;
+    private JMenuBar menuBar;
     /**
      * because glassPane does not capture key events in my version of java,
      * the menu must turned off explicitly. */
     private boolean turnOff = false;
     /** Combo box with operating modes. */
-    private final JComboBox<String> operatingModesCB;
+    private JComboBox<String> operatingModesCB;
     /** Advanced mode button. */
-    private final JCheckBox advancedModeCB;
+    private JCheckBox advancedModeCB;
     /** Upgrade check text field. */
     private final JEditorPane upgradeTextField = new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
     private final JEditorPane infoTextField = new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
@@ -92,8 +93,7 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
 
-    public MainMenu() {
-        super();
+    public void init() {
         if (Tools.getApplication().isUpgradeCheckEnabled()) {
             upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
         } else {
