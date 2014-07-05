@@ -425,30 +425,19 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private void removeMyselfNoConfirm(final Application.RunMode runMode) {
         Tools.isNotSwingThread();
         final ClusterBrowser clusterBrowser = getBrowser();
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                removeMyselfNoConfirm0(runMode, clusterBrowser);
-                clusterBrowser.updateDrbdResources();
-                if (Application.isLive(runMode)) {
-                    removeNode();
-                }
-                clusterBrowser.getDrbdGraph().scale();
-            }
-        });
+        removeMyselfNoConfirm0(runMode, clusterBrowser);
     }
 
     /**
      * Removes this object from jtree and from list of drbd volume
      * infos without confirmation dialog.
      */
-    private void removeMyselfNoConfirm0(final Application.RunMode runMode, final ClusterBrowser cb) {
-        cb.drbdStatusLock();
-        cb.getDrbdXml().removeVolume(getDrbdResourceInfo().getName(), getDevice(), getName());
-        cb.getDrbdGraph().removeDrbdVolume(this);
+    private void removeMyselfNoConfirm0(final Application.RunMode runMode, final ClusterBrowser clusterBrowser) {
+        clusterBrowser.drbdStatusLock();
+        clusterBrowser.getDrbdXml().removeVolume(getDrbdResourceInfo().getName(), getDevice(), getName());
+        clusterBrowser.getDrbdGraph().removeDrbdVolume(this);
         final Set<Host> hosts0 = getHosts();
-        final boolean lastVolume =
-            getDrbdResourceInfo().removeDrbdVolume(this);
+        final boolean lastVolume = getDrbdResourceInfo().removeDrbdVolume(this);
         if (getDrbdVolume().isCommited()) {
             for (final Host host : hosts0) {
                 DRBD.setSecondary(host, getDrbdResourceInfo().getName(), getName(), runMode);
@@ -472,9 +461,15 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
         }
         super.removeMyself(runMode);
-        cb.reloadNode(cb.getDrbdNode(), true);
-        cb.getDrbdDeviceHash().remove(getDevice());
-        cb.putDrbdDevHash();
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                clusterBrowser.reloadNode(clusterBrowser.getDrbdNode(), true);
+            }
+        });
+
+        clusterBrowser.getDrbdDeviceHash().remove(getDevice());
+        clusterBrowser.putDrbdDevHash();
         for (final BlockDevInfo bdi : getBlockDevInfos()) {
             bdi.removeFromDrbd();
             bdi.removeMyself(runMode);
@@ -488,30 +483,40 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
             dri.removeMyself(runMode);
         }
-        cb.updateCommonBlockDevices();
-        
+        clusterBrowser.updateCommonBlockDevices();
+
         try {
             getDrbdInfo().createDrbdConfig(runMode);
             getDrbdInfo().setSelectedNode(null);
             getDrbdInfo().selectMyself();
-            cb.getDrbdGraph().updatePopupMenus();
-            cb.resetFilesystems();
-            
+            clusterBrowser.resetFilesystems();
+
             final DrbdXml dxml = new DrbdXml(hosts0.toArray(new Host[hosts0.size()]),
-                cb.getHostDrbdParameters());
+                clusterBrowser.getHostDrbdParameters());
             for (final Host host : hosts0) {
                 final String conf = dxml.getConfig(host);
                 if (conf != null) {
                     dxml.update(conf);
                 }
             }
-            cb.setDrbdXml(dxml);
+            clusterBrowser.setDrbdXml(dxml);
+            clusterBrowser.updateDrbdResources();
+            if (Application.isLive(runMode)) {
+                Tools.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        clusterBrowser.getDrbdGraph().updatePopupMenus();
+                        removeNode();
+                        clusterBrowser.getDrbdGraph().scale();
+                    }
+                });
+            }
         } catch (final Exceptions.DrbdConfigException dce) {
             LOG.appError("removeMyselfNoConfirm: config failed", dce);
         } catch (final UnknownHostException e) {
             LOG.appError("removeMyselfNoConfirm: config failed", e);
         } finally {
-            cb.drbdStatusUnlock();
+            clusterBrowser.drbdStatusUnlock();
         }
     }
 
