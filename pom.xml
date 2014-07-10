@@ -15,7 +15,6 @@
         <scripts.dir>${project.basedir}/scripts</scripts.dir>
         <man.file>lcmc.1</man.file>
         <iss.file>lcmc.iss</iss.file>
-        <launch4j.conf>launch4j.xml</launch4j.conf>
         <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
         <spring.version>4.0.5.RELEASE</spring.version>
         <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
@@ -413,8 +412,7 @@
                 </executions>
                 <configuration>
                     <filesToInclude>${doc.dir}/${man.file}.in,
-                                    ${scripts.dir}/${iss.file}.in,
-                                    ${scripts.dir}/${launch4j.conf}.in</filesToInclude>
+                                    ${scripts.dir}/${iss.file}.in</filesToInclude>
                     <inputFilePattern>(.*).in</inputFilePattern>
                     <outputFilePattern>$1</outputFilePattern>
                     <regex>false</regex>
@@ -425,7 +423,7 @@
                         </replacement>
                         <replacement>
                             <token>@LCMC-VERSION@</token>
-                            <value>${release}</value>
+                            <value>${version}</value>
                         </replacement>
                     </replacements>
                 </configuration>
@@ -548,6 +546,59 @@
                         </mapping>
                     </mappings>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>${artifactId}-${version}-shaded</finalName>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <id>l4j-gui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/${artifactId}-${version}-windows.exe</outfile>
+                            <jar>target/${artifactId}-${version}-shaded.jar</jar>
+                            <classPath>
+                                <mainClass>lcmc.LCMC</mainClass>
+                            </classPath>
+                            <icon>scripts/lcmc.ico</icon>
+                            <jre>
+                                <minVersion>1.6.0</minVersion>
+                                <maxVersion></maxVersion>
+                                <initialHeapSize>128</initialHeapSize>
+                                <maxHeapSize>1024</maxHeapSize> </jre>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
