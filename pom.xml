@@ -2,17 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>lcmc</groupId>
-    <artifactId>LCMC</artifactId>
+    <artifactId>lcmc</artifactId>
     <packaging>jar</packaging>
-    <version>${release.properties}</version>
-    <name>LCMC</name>
+    <version>${release}</version>
+    <name>lcmc</name>
     <url>lcmc.sf.net</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lib.src>${project.basedir}/src/lib</lib.src>
+        <doc.dir>${project.basedir}/doc</doc.dir>
+        <scripts.dir>${project.basedir}/scripts</scripts.dir>
+        <man.file>lcmc.1</man.file>
+        <iss.file>lcmc.iss</iss.file>
+        <launch4j.conf>launch4j.xml</launch4j.conf>
         <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
         <spring.version>4.0.5.RELEASE</spring.version>
+        <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
     </properties>
     <profiles>
         <profile>
@@ -64,7 +70,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
-            <scope>test</scope> 
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>java3d</groupId>
@@ -119,6 +125,12 @@
             <version>1.2.17</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>maven-replacer-plugin</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+
     </dependencies>
     <repositories>
         <repository>
@@ -387,6 +399,155 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <filesToInclude>${doc.dir}/${man.file}.in,
+                                    ${scripts.dir}/${iss.file}.in,
+                                    ${scripts.dir}/${launch4j.conf}.in</filesToInclude>
+                    <inputFilePattern>(.*).in</inputFilePattern>
+                    <outputFilePattern>$1</outputFilePattern>
+                    <regex>false</regex>
+                    <replacements>
+                        <replacement>
+                            <token>@LCMC-DATE@</token>
+                            <value>${maven.build.timestamp}</value>
+                        </replacement>
+                        <replacement>
+                            <token>@LCMC-VERSION@</token>
+                            <value>${release}</value>
+                        </replacement>
+                    </replacements>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals><goal>rpm</goal></goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <description>Linux Cluster Management Console.</description>
+                    <summary>Pacemaker/KVM/DRBD HA Cluster GUI</summary>
+                    <url>http://lcmc.sourceforge.net</url>
+                    <group>Applications/System</group>
+                    <filemode>644</filemode>
+                    <copyright>GPLv2+</copyright>
+                    <source0>http://sourceforge.net/projects/lcmc/files/%{_name}-source-%{version}.tar.gz</source0>
+                    <mappings>
+                        <mapping>
+                            <filemode>755</filemode>
+                            <directory>%{_bindir}/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>scripts/lcmc</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/applications</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>scripts/lcmc.desktop</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/applications</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>scripts/lcmc.desktop</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/application-registry</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>scripts/lcmc.applications</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/java/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>target/LCMC.jar</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/pixmaps/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>src/main/resources/images/Icons/128x128/lcmc.png</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/pixmaps/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>src/main/resources/images/Icons/128x128/lcmc.png</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/icons/hicolor/32x32/apps/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>src/main/resources/images/Icons/32x32/lcmc.png</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/icons/hicolor/64x64/apps/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>src/main/resources/images/Icons/64x64/lcmc.png</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/icons/hicolor/128x128/apps/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>src/main/resources/images/Icons/128x128/lcmc.png</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_datadir}/icons/hicolor/256x256/apps/</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source><location>src/main/resources/images/Icons/256x256/lcmc.png</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>%{_mandir}/man1</directory>
+                            <sources>
+                                <source><location>doc/${man.file}</location></source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>/usr/share/doc/lcmc</directory>
+                            <sources>
+                                <source><location>README.txt</location></source>
+                            </sources>
+                            <documentation>true</documentation>
+                        </mapping>
+                        <mapping>
+                            <directory>/usr/share/doc/lcmc</directory>
+                            <sources>
+                                <source><location>LICENSE.txt</location></source>
+                            </sources>
+                            <documentation>true</documentation>
+                        </mapping>
+                    </mappings>
+                </configuration>
             </plugin>
         </plugins>
     </build>
