@@ -179,65 +179,6 @@
                     <optimize>true</optimize>
                 </configuration>
             </plugin>
-            <!-- checkstyle -->
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <outputDirectory>target/checks/checkstyle</outputDirectory>
-                    <suppressionsLocation>
-                        ${basedir}/conf/checkstyle-suppressions.xml
-                    </suppressionsLocation>
-                    <suppressionsFileExpression>
-                         checkstyle.suppressions.file
-                    </suppressionsFileExpression>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>checkstyle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- pmd -->
-            <plugin>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <configuration>
-                    <linkXref>true</linkXref>
-                    <outputDirectory>target/checks/pmd</outputDirectory>
-                    <targetJdk>1.6</targetJdk>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>pmd</goal>
-                            <goal>cpd</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- cobertura -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <formats>
-                        <format>html</format>
-                        <format>xml</format>
-                    </formats>
-                    <outputDirectory>target/checks/cobertura</outputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>cobertura</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- surefire -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -281,21 +222,6 @@
                                 <include>**/*.class</include>
                             </includes>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- jdepend -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jdepend-maven-plugin</artifactId>
-                <configuration>
-                    <outputDirectory>${basedir}/target/checks/jdepend</outputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
                     </execution>
                 </executions>
             </plugin>
