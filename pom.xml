@@ -13,6 +13,7 @@
         <lib.src>${project.basedir}/src/lib</lib.src>
         <doc.dir>${project.basedir}/doc</doc.dir>
         <scripts.dir>${project.basedir}/scripts</scripts.dir>
+        <transformed.files>target/transformed-files</transformed.files>
         <man.file>lcmc.1</man.file>
         <iss.file>lcmc.iss</iss.file>
         <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
@@ -413,8 +414,8 @@
                 <configuration>
                     <filesToInclude>${doc.dir}/${man.file}.in,
                                     ${scripts.dir}/${iss.file}.in</filesToInclude>
-                    <inputFilePattern>(.*).in</inputFilePattern>
-                    <outputFilePattern>$1</outputFilePattern>
+                    <inputFilePattern>.*/(.*).in</inputFilePattern>
+                    <outputFilePattern>${transformed.files}/$1</outputFilePattern>
                     <regex>false</regex>
                     <replacements>
                         <replacement>
@@ -429,8 +430,32 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>compress</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <gzip>true</gzip>
+                    <failOnWarning>true</failOnWarning>
+                    <nosuffix>true</nosuffix>
+                    <aggregations>
+                        <aggregation>
+                            <removeIncluded>false</removeIncluded>
+                            <output>${transformed.files}/${man.file}</output>
+                        </aggregation>
+                    </aggregations>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.1-alpha-4</version>
                 <executions>
                     <execution>
                         <phase>install</phase>
@@ -526,8 +551,9 @@
                         </mapping>
                         <mapping>
                             <directory>%{_mandir}/man1</directory>
+                            <directoryIncluded>false</directoryIncluded>
                             <sources>
-                                <source><location>doc/${man.file}</location></source>
+                                <source><location>${transformed.files}/${man.file}.gz</location></source>
                             </sources>
                         </mapping>
                         <mapping>
@@ -595,7 +621,8 @@
                                 <minVersion>1.6.0</minVersion>
                                 <maxVersion></maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
-                                <maxHeapSize>1024</maxHeapSize> </jre>
+                                <maxHeapSize>1024</maxHeapSize>
+                            </jre>
                         </configuration>
                     </execution>
                 </executions>
