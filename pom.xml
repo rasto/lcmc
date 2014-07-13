@@ -553,6 +553,25 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>net.sf.debian-maven</groupId>
+                <artifactId>debian-maven-plugin</artifactId>
+                <version>1.0.6</version>
+                <configuration>
+                    <packageDescription>Linux Cluster Management Console</packageDescription>
+                    <packageSection>admin</packageSection>
+                    <packagePriority>extra</packagePriority>
+                    <maintainerName>Rasto Levrinc</maintainerName>
+                    <maintainerEmail>rasto.levrinc@gmail.com</maintainerEmail>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
