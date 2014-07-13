@@ -12,3 +12,6 @@ Architecture: all
 Depends: openjdk-6-jre | sun-java6-jre | sun-java6-jre | openjdk-7-jre,
  java-wrappers, ${misc:Depends}
 Description: Linux Cluster Management Console
+ The LCMC is a GUI application that configures, manages and visualizes high-
+ availability clusters. Specifically it manages clusters that use one or more
+ of these components: Pacemaker, Corosync, Heartbeat, DRBD, KVM, XEN and LVM.

@@ -9,12 +9,12 @@ DefaultDirName={pf}\LCMC
 DefaultGroupName="Linux Cluster MC"
 Compression=lzma
 UninstallDisplayIcon={app}\lcmc-@LCMC-VERSION@-windows.exe
-LicenseFile=../LICENSE.txt
+LicenseFile=../../../LICENSE.txt
 
 [Files]
-Source: "../target/lcmc-@LCMC-VERSION@-windows.exe"; DestDir: "{app}"
-Source: "../README.txt"; DestDir: "{app}"; Flags: isreadme
-Source: "../LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../packages/lcmc-@LCMC-VERSION@-windows.exe"; DestDir: "{app}"
+Source: "../../../README.txt"; DestDir: "{app}"; Flags: isreadme
+Source: "../../../LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\LCMC"; Filename: "{app}\lcmc-@LCMC-VERSION@-windows.exe"

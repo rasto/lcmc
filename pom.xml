@@ -2,23 +2,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>lcmc</groupId>
-    <artifactId>lcmc</artifactId>
+    <artifactId>LCMC</artifactId>
     <packaging>jar</packaging>
-    <version>${release}</version>
+    <version>1.6.8+</version>
     <name>lcmc</name>
     <url>lcmc.sf.net</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lib.src>${project.basedir}/src/lib</lib.src>
-        <doc.dir>${project.basedir}/doc</doc.dir>
-        <scripts.dir>${project.basedir}/scripts</scripts.dir>
-        <transformed.files>target/transformed-files</transformed.files>
-        <man.file>lcmc.1</man.file>
-        <iss.file>lcmc.iss</iss.file>
+        <transformed.files>${project.build.directory}/transformed-files</transformed.files>
+        <man.file>doc/lcmc.1</man.file>
+        <package.dir>packages</package.dir>
+        <iss.file>scripts/lcmc.iss</iss.file>
+        <rpm.wrapper.script>scripts/lcmc</rpm.wrapper.script>
         <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
         <spring.version>4.0.5.RELEASE</spring.version>
         <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
+        <release>${project.version}</release>
     </properties>
     <profiles>
         <profile>
@@ -153,14 +154,12 @@
                 <version>1.0-alpha-2</version>
                 <executions>
                     <execution>
-                        <phase>initialize</phase>
+                        <phase>generate-resources</phase>
                         <goals>
-                            <goal>read-project-properties</goal>
+                            <goal>write-project-properties</goal>
                         </goals>
                         <configuration>
-                            <files>
-                                <file>src/main/resources/release.properties</file>
-                            </files>
+                            <outputFile>${project.build.directory}/classes/release.properties</outputFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -250,7 +249,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>LCMC</finalName>
+                            <finalName>${package.dir}/${project.artifactId}</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>lcmc.LCMC</mainClass>
@@ -265,7 +264,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>LCMC-applet</finalName>
+                            <finalName>${package.dir}/${project.artifactId}-applet-${version}</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>lcmc.LCMCApplet</mainClass>
@@ -338,9 +337,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <filesToInclude>${doc.dir}/${man.file}.in,
-                                    ${scripts.dir}/${iss.file}.in</filesToInclude>
-                    <inputFilePattern>.*/(.*).in</inputFilePattern>
+                    <filesToInclude>${project.basedir}/${man.file}.in,
+                                    ${project.basedir}/${iss.file}.in
+                    </filesToInclude>
+                    <inputFilePattern>.*/(.*/.*).in</inputFilePattern>
                     <outputFilePattern>${transformed.files}/$1</outputFilePattern>
                     <regex>false</regex>
                     <replacements>
@@ -350,7 +350,7 @@
                         </replacement>
                         <replacement>
                             <token>@LCMC-VERSION@</token>
-                            <value>${version}</value>
+                            <value>${project.version}</value>
                         </replacement>
                     </replacements>
                 </configuration>
@@ -384,25 +384,26 @@
                 <version>2.1-alpha-4</version>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals><goal>rpm</goal></goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <name>${name}</name>
                     <description>Linux Cluster Management Console.</description>
                     <summary>Pacemaker/KVM/DRBD HA Cluster GUI</summary>
                     <url>http://lcmc.sourceforge.net</url>
                     <group>Applications/System</group>
                     <filemode>644</filemode>
                     <copyright>GPLv2+</copyright>
-                    <source0>http://sourceforge.net/projects/lcmc/files/%{_name}-source-%{version}.tar.gz</source0>
+                    <source0>http://sourceforge.net/projects/lcmc/files/%{_name}-source-%{project.version}.tar.gz</source0>
                     <mappings>
                         <mapping>
                             <filemode>755</filemode>
                             <directory>%{_bindir}/</directory>
                             <directoryIncluded>false</directoryIncluded>
                             <sources>
-                                <source><location>scripts/lcmc</location></source>
+                                <source><location>${rpm.wrapper.script}</location></source>
                             </sources>
                         </mapping>
                         <mapping>
@@ -430,7 +431,7 @@
                             <directory>%{_datadir}/java/</directory>
                             <directoryIncluded>false</directoryIncluded>
                             <sources>
-                                <source><location>target/LCMC.jar</location></source>
+                                <source><location>${project.build.directory}/${package.dir}/${project.artifactId}.jar</location></source>
                             </sources>
                         </mapping>
                         <mapping>
@@ -499,31 +500,7 @@
                     </mappings>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <finalName>${artifactId}-${version}-shaded</finalName>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/*.SF</exclude>
-                                <exclude>META-INF/*.RSA</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>com.akathist.maven.plugins.launch4j</groupId>
                 <artifactId>launch4j-maven-plugin</artifactId>
@@ -537,8 +514,8 @@
                         </goals>
                         <configuration>
                             <headerType>gui</headerType>
-                            <outfile>target/${artifactId}-${version}-windows.exe</outfile>
-                            <jar>target/${artifactId}-${version}-shaded.jar</jar>
+                            <outfile>${project.build.directory}/${package.dir}/${project.artifactId}-${project.version}-windows.exe</outfile>
+                            <jar>${project.build.directory}/${package.dir}/${project.artifactId}.jar</jar>
                             <classPath>
                                 <mainClass>lcmc.LCMC</mainClass>
                             </classPath>
@@ -553,25 +530,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>net.sf.debian-maven</groupId>
-                <artifactId>debian-maven-plugin</artifactId>
-                <version>1.0.6</version>
-                <configuration>
-                    <packageDescription>Linux Cluster Management Console</packageDescription>
-                    <packageSection>admin</packageSection>
-                    <packagePriority>extra</packagePriority>
-                    <maintainerName>Rasto Levrinc</maintainerName>
-                    <maintainerEmail>rasto.levrinc@gmail.com</maintainerEmail>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>package</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- jar signer -->
         </plugins>
     </build>
 </project>
