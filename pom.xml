@@ -230,10 +230,6 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <useProjectArtifact>false</useProjectArtifact>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                 </configuration>
@@ -249,6 +245,9 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
                             <finalName>${package.dir}/${project.artifactId}</finalName>
                             <archive>
                                 <manifest>
@@ -264,7 +263,10 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>${package.dir}/${project.artifactId}-applet-${version}</finalName>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <finalName>${package.dir}/${project.artifactId}-applet-${project.version}</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>lcmc.LCMCApplet</mainClass>
@@ -272,9 +274,22 @@
                             </archive>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>tarball</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/tarball.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/${package.dir}</outputDirectory>
+                            <finalName>${project.artifactId}-source-${project.version}</finalName>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.1</version>
@@ -500,7 +515,6 @@
                     </mappings>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>com.akathist.maven.plugins.launch4j</groupId>
                 <artifactId>launch4j-maven-plugin</artifactId>

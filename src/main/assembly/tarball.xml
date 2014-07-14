@@ -1,0 +1,28 @@
+<assembly>
+    <id>tarball</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/src</directory>
+            <excludes>
+                <exclude>**/tags</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}</directory>
+            <includes>
+                <include>pom.xml</include>
+                <include>README.txt</include>
+                <include>debian/**</include>
+                <include>LICENSE.txt</include>
+                <include>doc/lcmc.1.in</include>
+                <include>scripts/lcmc</include>
+                <include>scripts/lcmc.desktop</include>
+                <include>scripts/lcmc.applications</include>
+                <include>scripts/lcmc.ico</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>
