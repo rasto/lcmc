@@ -16,22 +16,23 @@
         <package.dir>packages</package.dir>
         <iss.file>scripts/lcmc.iss</iss.file>
         <rpm.wrapper.script>scripts/lcmc</rpm.wrapper.script>
-        <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
+        <junit.category.exclude>lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
         <spring.version>4.0.5.RELEASE</spring.version>
         <maven.build.timestamp.format>MMM d yyyy</maven.build.timestamp.format>
         <release>${project.version}</release>
     </properties>
     <profiles>
         <profile>
-            <id>FastTests</id>
+            <id>GuiTests</id>
             <properties>
-                <junit.category.exclude>
-                    lcmc.testutils.annotation.type.GuiTest,lcmc.testutils.annotation.type.IntegrationTest
-                </junit.category.exclude>
+                <junit.category.exclude>lcmc.testutils.annotation.type.IntegrationTest</junit.category.exclude>
             </properties>
         </profile>
         <profile>
-            <id>GuiTests</id>
+            <id>IntegrationTests</id>
+            <properties>
+                <junit.category.exclude>lcmc.testutils.annotation.type.GuiTest</junit.category.exclude>
+            </properties>
         </profile>
     </profiles>
     <dependencies>
