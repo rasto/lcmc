@@ -400,8 +400,10 @@
                 <version>2.1-alpha-4</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
-                        <goals><goal>rpm</goal></goals>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <configuration>
@@ -522,8 +524,8 @@
                 <version>1.5.2</version>
                 <executions>
                     <execution>
-                        <id>l4j-gui</id>
-                        <phase>package</phase>
+                        <id>default-cli</id>
+                        <phase>none</phase>
                         <goals>
                             <goal>launch4j</goal>
                         </goals>
