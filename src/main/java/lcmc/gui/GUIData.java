@@ -207,7 +207,9 @@ public final class GUIData  {
     }
 
     public void addClusterTab(final Cluster cluster) {
-        clustersPanel.addTab(cluster);
+        final ClusterTab clusterTab = new ClusterTab();
+        clusterTab.initWithCluster(cluster);
+        clustersPanel.addClusterTab(clusterTab);
     }
 
     public void renameSelectedClusterTab(final String newName) {
@@ -236,7 +238,7 @@ public final class GUIData  {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                clustersPanel.refresh();
+                clustersPanel.refreshView();
             }
         });
     }

@@ -97,8 +97,7 @@ public class NewHostDialog extends DialogHost {
                                                 "true".equals(useSudoString));
         if (!Tools.getApplication().existsHost(getHost())) {
             Tools.getApplication().addHostToHosts(getHost());
-            final TerminalPanel terminalPanel = new TerminalPanel(getHost());
-            Tools.getGUIData().setTerminalPanel(terminalPanel);
+             Tools.getGUIData().setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 

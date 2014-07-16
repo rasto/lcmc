@@ -33,7 +33,6 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -50,6 +49,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -60,112 +60,150 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ClustersPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
-    /** Icon of the cluster. */
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
-    /** Icon of all clusters. */
-    private static final ImageIcon CLUSTERS_ICON = Tools.createImageIcon(
-                                                       Tools.getDefault("ClustersPanel.ClustersIcon"));
-    /** Name of all clusters tab. */
-    private static final String CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
+    private static final ImageIcon ALL_CLUSTERS_ICON = Tools.createImageIcon(
+                                                            Tools.getDefault("ClustersPanel.ClustersIcon"));
+    private static final String ALL_CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
     private static final int TAB_BORDER_WIDTH = 3;
     private JTabbedPane tabbedPane;
-    /** New empty cluster tab. */
-    private ClusterTab newClusterTab;
-    /** Previously selected tab. */
-    private ClusterTab prevSelected = null;
+    @Autowired
+    private ClusterTab newEmptyClusterTab;
+    private ClusterTab previouslySelectedTab = null;
 
     private final Map<ClusterTab, JLabel> clusterTabLabels = new HashMap<ClusterTab, JLabel>();
 
     /** Shows the tabbed pane. */
     public void init() {
-        setLayout(new GridLayout(1, 1));
         Tools.getGUIData().setClustersPanel(this);
-        newClusterTab = new ClusterTab(null);
-        setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
-
-        UIManager.put("TabbedPane.selected", Tools.getDefaultColor("ViewPanel.Status.Background"));
-        UIManager.put("TabbedPane.foreground", Color.WHITE);
-        UIManager.put("TabbedPane.background", Tools.getDefaultColor("ViewPanel.Background"));
-
+        newEmptyClusterTab.initWithCluster(null);
         tabbedPane = new JTabbedPane();
-        tabbedPane.setTabPlacement(JTabbedPane.TOP);
 
-        final MyTabbedPaneUI mtpui = new MyTabbedPaneUI();
-        tabbedPane.setUI(mtpui);
+        setTabLook();
 
-        addClustersTab(CLUSTERS_LABEL);
-        add(tabbedPane);
-        setBorder(BorderFactory.createLineBorder(Tools.getDefaultColor("ClustersPanel.Background"), TAB_BORDER_WIDTH));
-        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        addClustersTab(ALL_CLUSTERS_LABEL);
 
-        /* Register a change listener.
-           This causes terminal panel to show correct host, after clicking on
-           the cluster tab. TODO: is this comment right? */
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
-            public void stateChanged(final ChangeEvent e) {
-                final ClusterTab source = prevSelected;
-                final JTabbedPane prevSource = (JTabbedPane) e.getSource();
-                prevSelected = (ClusterTab) prevSource.getSelectedComponent();
-                String sourceName = null;
-                if (source != null) {
-                    sourceName = source.getName();
-                }
+            public void stateChanged(final ChangeEvent changeEvent) {
+                final JTabbedPane prevSource = (JTabbedPane) changeEvent.getSource();
+                final ClusterTab source = previouslySelectedTab;
+                previouslySelectedTab = (ClusterTab) prevSource.getSelectedComponent();
+
                 /* show dialogs only if got here from other tab. */
-                if (sourceName == null) {
+                if ((source == null || source.getName() == null)) {
                     return;
                 }
 
                 final ClusterTab clusterTab = getClusterTab();
-                if (clusterTab != null) {
-                    final Cluster cluster = clusterTab.getCluster();
-                    if (cluster != null) {
-                        refresh();
-                    }
+                if (clusterTab == null) {
+                    return;
+                }
+
+                final Cluster cluster = clusterTab.getCluster();
+                if (cluster != null) {
+                    refreshView();
                 }
             }
         });
+        add(tabbedPane);
     }
 
-    /** Adds a new cluster tab. */
-    void addTab(final Cluster cluster) {
-        LOG.debug2("addTab: cluster: " + cluster.getName());
-        final ClusterTab ct = new ClusterTab(cluster);
-        cluster.setClusterTab(ct);
+    void addClusterTab(final ClusterTab clusterTab) {
+        LOG.debug2("addTab: cluster: " + clusterTab.getCluster().getName());
         if (tabbedPane.getTabCount() == 1) {
             removeAllTabs();
         }
-        final String title = Tools.join(" ", cluster.getHostNames());
-        tabbedPane.addTab(cluster.getName(), CLUSTER_ICON, ct, title);
+        final String title = Tools.join(" ", clusterTab.getCluster().getHostNames());
+        tabbedPane.addTab(clusterTab.getCluster().getName(), CLUSTER_ICON, clusterTab, title);
 
         final ActionListener disconnectAction =
                          new ActionListener() {
                              @Override
                              public void actionPerformed(final ActionEvent e) {
-                                 final Thread t = new Thread(new Runnable() {
-                                     @Override
-                                     public void run() {
-                                         if (cluster.isTabClosable()) {
-                                             Tools.stopCluster(cluster);
-                                             Tools.getGUIData().getEmptyBrowser().setDisconnected(cluster);
-                                         }
-                                     }
-                                 });
-                                 t.start();
+                                 disconnectCluster(clusterTab);
                              }
                          };
 
-        addTabComponent(tabbedPane, cluster.getName(), CLUSTER_ICON, ct, disconnectAction);
-        tabbedPane.setSelectedComponent(ct);
-        refresh();
+        addTabComponentWithCloseButton(tabbedPane, clusterTab.getCluster().getName(), CLUSTER_ICON, clusterTab, disconnectAction);
+        tabbedPane.setSelectedComponent(clusterTab);
+        refreshView();
     }
 
-    /** Add tab component with close button. */
-    private void addTabComponent(final JTabbedPane tabPane,
-                                 final String title,
-                                 final ImageIcon icon,
-                                 final ClusterTab ct,
-                                 final ActionListener actionListener) {
+    /** Adds an epmty tab, that opens new cluster dialogs. */
+    void addClustersTab(final String label) {
+        tabbedPane.addTab(label, ALL_CLUSTERS_ICON, newEmptyClusterTab, Tools.getString("ClustersPanel.ClustersTabTip"));
+    }
+
+    void removeTab() {
+        removeSelectedTab(getClusterTab());
+    }
+
+    public void removeTabWithCluster(final Cluster cluster) {
+        removeSelectedTab(cluster.getClusterTab());
+    }
+
+    public void removeAllTabs() {
+        clusterTabLabels.clear();
+        tabbedPane.removeAll();
+        addClustersTab("");
+    }
+
+    void renameSelectedTab(final String newName) {
+        final JLabel label = clusterTabLabels.get(getClusterTab());
+        if (label != null) {
+            label.setText(newName);
+        }
+        refreshView();
+    }
+
+    void refreshView() {
+        tabbedPane.invalidate();
+        tabbedPane.validate();
+        tabbedPane.repaint();
+    }
+
+    ClusterTab getClusterTab() {
+        final java.awt.Component sp = tabbedPane.getSelectedComponent();
+        if (sp == null) {
+            return null;
+        } else  {
+            return (ClusterTab) sp;
+        }
+    }
+
+    private void disconnectCluster(final ClusterTab clusterTab) {
+        final Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (clusterTab.getCluster().isTabClosable()) {
+                    Tools.stopCluster(clusterTab.getCluster());
+                    Tools.getGUIData().getEmptyBrowser().setDisconnected(clusterTab.getCluster());
+                }
+            }
+        });
+        t.start();
+    }
+
+    private void setTabLook() {
+        setLayout(new GridLayout(1, 1));
+        setBackground(Tools.getDefaultColor("ClustersPanel.Background"));
+
+        UIManager.put("TabbedPane.selected", Tools.getDefaultColor("ViewPanel.Status.Background"));
+        UIManager.put("TabbedPane.foreground", Color.WHITE);
+        UIManager.put("TabbedPane.background", Tools.getDefaultColor("ViewPanel.Background"));
+        setBorder(BorderFactory.createLineBorder(Tools.getDefaultColor("ClustersPanel.Background"), TAB_BORDER_WIDTH));
+
+        tabbedPane.setTabPlacement(JTabbedPane.TOP);
+        final BorderlessTabbedPaneUI borderlessTabbedPaneUI = new BorderlessTabbedPaneUI();
+        tabbedPane.setUI(borderlessTabbedPaneUI);
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    }
+
+    private void addTabComponentWithCloseButton(final JTabbedPane tabPane,
+                                                final String title,
+                                                final ImageIcon icon,
+                                                final ClusterTab ct,
+                                                final ActionListener actionListener) {
         final int index = tabPane.indexOfComponent(ct);
         final JPanel tabPanel = new JPanel(new GridBagLayout());
         tabPanel.setOpaque(false);
@@ -196,70 +234,25 @@ public final class ClustersPanel extends JPanel {
         clusterButton.addActionListener(actionListener);
     }
 
-    /** Adds an epmty tab, that opens new cluster dialogs. */
-    void addClustersTab(final String label) {
-        tabbedPane.addTab(label, CLUSTERS_ICON, newClusterTab, Tools.getString("ClustersPanel.ClustersTabTip"));
-    }
-
     /**
      * Removes selected tab, after clicking on the cancel button in the config
      * dialogs.
      */
-    private void removeTab(final ClusterTab selected) {
-        if (selected != null) {
-            selected.getCluster().setClusterTab(null);
-            clusterTabLabels.remove(selected);
-            tabbedPane.remove(selected);
+    private void removeSelectedTab(final ClusterTab selectedTab) {
+        if (selectedTab != null) {
+            selectedTab.getCluster().setClusterTab(null);
+            clusterTabLabels.remove(selectedTab);
+            tabbedPane.remove(selectedTab);
         }
         if (tabbedPane.getTabCount() == 1) {
             clusterTabLabels.clear();
             tabbedPane.removeAll();
-            addClustersTab(CLUSTERS_LABEL);
-        }
-    }
-
-    void removeTab() {
-        removeTab(getClusterTab());
-    }
-
-    /** Removes specified tab. */
-    public void removeTab(final Cluster cluster) {
-        removeTab(cluster.getClusterTab());
-    }
-
-    public void removeAllTabs() {
-        clusterTabLabels.clear();
-        tabbedPane.removeAll();
-        addClustersTab("");
-    }
-
-    void renameSelectedTab(final String newName) {
-        final JLabel label = clusterTabLabels.get(getClusterTab());
-        if (label != null) {
-            label.setText(newName);
-        }
-        refresh();
-    }
-
-    /** Refreshes the view. */
-    void refresh() {
-        tabbedPane.invalidate();
-        tabbedPane.validate();
-        tabbedPane.repaint();
-    }
-
-    /** Return cluster tab, that is in the JScrollPane. */
-    ClusterTab getClusterTab() {
-        final java.awt.Component sp = tabbedPane.getSelectedComponent();
-        if (sp == null) {
-            return null;
-        } else  {
-            return (ClusterTab) sp;
+            addClustersTab(ALL_CLUSTERS_LABEL);
         }
     }
 
     /** This class is used to override the tab look. */
-    static class MyTabbedPaneUI extends BasicTabbedPaneUI {
+    private static class BorderlessTabbedPaneUI extends BasicTabbedPaneUI {
         @Override
         protected final Insets getContentBorderInsets(final int tabPlacement) {
             return new Insets(0, 0, 0, 0);

@@ -353,7 +353,7 @@ public final class Tools {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                getGUIData().getClustersPanel().removeTab(cluster);
+                getGUIData().getClustersPanel().removeTabWithCluster(cluster);
             }
         });
     }

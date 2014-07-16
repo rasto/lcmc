@@ -26,18 +26,23 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
  * that are in the cluster.
  */
+@Component
 public final class ClusterTab extends JPanel {
-    private final Cluster cluster;
+    private Cluster cluster;
 
-    ClusterTab(final Cluster cluster) {
-        super(new BorderLayout());
+    public void initWithCluster(final Cluster cluster0) {
+        this.cluster = cluster0;
+        if (cluster != null) {
+            cluster.setClusterTab(this);
+        }
+        setLayout(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
-        this.cluster = cluster;
         if (cluster == null) {
             final EmptyViewPanel p = new EmptyViewPanel();
             p.setDisabledDuringLoad(false);
@@ -45,7 +50,6 @@ public final class ClusterTab extends JPanel {
         }
     }
 
-    /** adds host views to the desktop. */
     public void addClusterView() {
         if (cluster.hostsCount() > 0) {
             add(new ClusterViewPanel(cluster));
@@ -57,9 +61,12 @@ public final class ClusterTab extends JPanel {
         return cluster;
     }
 
-    /** Returns name of the cluster. */
     @Override
     public String getName() {
+        return getClusterName();
+    }
+
+    private String getClusterName() {
         if (cluster == null) {
             return null;
         }

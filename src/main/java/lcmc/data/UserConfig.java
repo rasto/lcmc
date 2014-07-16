@@ -199,8 +199,8 @@ public final class UserConfig extends XML {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.getGUIData().getClustersPanel().removeTab(
-                                                                       cluster);
+                            Tools.getGUIData().getClustersPanel().removeTabWithCluster(
+                                    cluster);
                         }
                     });
                     continue;
@@ -340,7 +340,6 @@ public final class UserConfig extends XML {
         Tools.getApplication().setLastEnteredUseSudo(sudo);
         Tools.getApplication().addHostToHosts(host);
 
-        new TerminalPanel(host);
         host.setIpAddress(ip);
         if (username == null && sudo) {
             username = System.getProperty("user.name");

@@ -26,7 +26,6 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.PostConstruct;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import lcmc.data.Host;
@@ -50,9 +49,10 @@ public final class MainPanel extends JPanel {
 
     public void init() {
         setLayout(new BorderLayout());
-        final TerminalPanel terminalPanel = new TerminalPanel(Host.createInstance());
         clustersPanel.init();
-        final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, terminalPanel);
+        final Host noHost = Host.createInstance();
+        final JSplitPane splitPane =
+                                new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
         Tools.getGUIData().setTerminalSplitPane(splitPane);
 
         splitPane.setContinuousLayout(true);

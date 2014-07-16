@@ -544,7 +544,6 @@ public final class AllHostsInfo extends Info {
                             } else {
                                 host.setSSHPort(port);
                             }
-                            new TerminalPanel(host);
                             host.setCluster(cluster);
                             host.setHostname(hostName);
                             cluster.addHost(host);

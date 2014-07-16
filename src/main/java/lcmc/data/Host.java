@@ -65,6 +65,8 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.ssh.SshOutput;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -196,7 +198,6 @@ public class Host implements Comparable<Host>, Value {
     private String heartbeatVersion = null;
     private boolean crmStatusOk = false;
     private final Ssh ssh = new Ssh();
-    private TerminalPanel terminalPanel = null;
     private String sshPort = null;
     private Boolean useSudo = null;
     private String sudoPassword = "";
@@ -231,8 +232,13 @@ public class Host implements Comparable<Host>, Value {
     private final DrbdHost drbdHost;
     private boolean drbdStatusOk = false;
 
-    private Host(final DrbdHost drbdHost) {
+    private TerminalPanel terminalPanel;
+
+    private Host(final DrbdHost drbdHost, final TerminalPanel terminalPanel) {
         this.drbdHost = drbdHost;
+        this.terminalPanel = terminalPanel;
+
+        terminalPanel.initWithHost(this);
         if (Tools.getApplication().getHosts().size() == 1) {
             enteredHostOrIp = Tools.getDefault("SSH.SecHost");
         }
@@ -247,7 +253,7 @@ public class Host implements Comparable<Host>, Value {
     }
 
     public static Host createInstance() {
-        return new Host(new DrbdHost());
+        return new Host(new DrbdHost(), new TerminalPanel());
     }
 
     public static Host createInstance(final String ipAddress) {
@@ -337,16 +343,12 @@ public class Host implements Comparable<Host>, Value {
         if (savedHostColorInGraphs == null) {
             savedHostColorInGraphs = defaultColor;
         }
-        if (terminalPanel != null) {
-            terminalPanel.resetPromptColor();
-        }
+        terminalPanel.resetPromptColor();
     }
 
     public void setSavedHostColorInGraphs(final Color savedHostColorInGraphs) {
         this.savedHostColorInGraphs = savedHostColorInGraphs;
-        if (terminalPanel != null) {
-            terminalPanel.resetPromptColor();
-        }
+        terminalPanel.resetPromptColor();
     }
 
     public void setCrmStatusOk(final boolean crmStatusOk) {
@@ -1106,15 +1108,6 @@ public class Host implements Comparable<Host>, Value {
         return ssh;
     }
 
-    /**
-     * Sets terminal panel object. This is the panel where the commands and
-     * their results are shown for every host.
-     */
-    public void setTerminalPanel(final TerminalPanel terminalPanel) {
-        this.terminalPanel = terminalPanel;
-    }
-
-    /** Gets terminal panel object. */
     public TerminalPanel getTerminalPanel() {
         return terminalPanel;
     }

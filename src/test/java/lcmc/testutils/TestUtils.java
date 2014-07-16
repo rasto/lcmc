@@ -270,8 +270,6 @@ public class TestUtils {
         
         if (!Tools.getApplication().existsHost(host)) {
             Tools.getApplication().addHostToHosts(host);
-            Tools.getGUIData().setTerminalPanel(new TerminalPanel(host));
-            
         }
         String ip;
         InetAddress[] addresses;

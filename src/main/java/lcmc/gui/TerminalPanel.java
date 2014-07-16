@@ -57,12 +57,14 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a terminal panel that show commands and output from
  * remote host. It is also possible to write commands and execute them.
  */
-public final class TerminalPanel extends JScrollPane {
+@Component
+public class TerminalPanel extends JScrollPane {
     private static final Logger LOG = LoggerFactory.getLogger(TerminalPanel.class);
     /** Command to list all the cheats. */
     private static final String CHEAT_LIST  = "cheatlist";
@@ -144,12 +146,12 @@ public final class TerminalPanel extends JScrollPane {
         }
         CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
     }
-    private final Host host;
-    private final JTextPane terminalArea;
-    private final MutableAttributeSet commandColor;
-    private final MutableAttributeSet errorColor;
-    private final MutableAttributeSet outputColor;
-    private final MutableAttributeSet promptColor;
+    private Host host;
+    private JTextPane terminalArea;
+    private MutableAttributeSet commandColor;
+    private MutableAttributeSet errorColor;
+    private MutableAttributeSet outputColor;
+    private MutableAttributeSet promptColor;
     private int commandOffset = 0;
     private boolean userCommand = false;
     private boolean editEnabled = false;
@@ -163,13 +165,10 @@ public final class TerminalPanel extends JScrollPane {
     private int maxPos = 0;
     /** Terminal output colors. */
     private final Map<String, Color> terminalColor = new HashMap<String, Color>();
-    private final Color defaultOutputColor;
+    private Color defaultOutputColor;
 
-
-    public TerminalPanel(final Host host) {
-        super();
-        this.host = host;
-        host.setTerminalPanel(this);
+    public void initWithHost(final Host host0) {
+        host = host0;
         /* Sets terminal some of the output colors. This is in no way complete
          * or correct and probably doesn't have to be. */
         terminalColor.put("0", Tools.getDefaultColor("TerminalPanel.TerminalWhite"));
