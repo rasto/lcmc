@@ -21,6 +21,10 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+import lcmc.data.Host;
+import lcmc.data.drbd.DrbdInstallation;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
@@ -28,28 +32,43 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@Category(GuiTest.class)
+@RunWith(MockitoJUnitRunner.class)
+public class ProxyHostMenuITest {
+    static {
+        Tools.init();
+    }
 
-public class GlobalMenuTest {
+    private ProxyHostMenu sut;
 
     @Mock
-    private GlobalInfo globalInfo;
-
-    private GlobalMenu sut;
+    private ProxyHostInfo proxyHostInfoStub;
+    @Mock
+    private HostBrowser hostBrowserStub;
+    @Mock
+    private Host hostStub;
+    @Mock
+    private DrbdInstallation drbdInstallationStub;
+    @Mock
+    private ClusterBrowser clusterBrowserStub;
 
     @Before
     public void setUp() {
-        Tools.init();
-
-        sut = new GlobalMenu(globalInfo);
+        when(proxyHostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
+        when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
+        when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
+        sut = new ProxyHostMenu(proxyHostInfoStub);
     }
 
     @Test
-    @Category(GuiTest.class)
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
-        assertEquals(4, items.size());
+        assertEquals(7, items.size());
     }
 }

@@ -21,11 +21,12 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-import lcmc.data.Host;
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.data.Application;
+import lcmc.data.drbd.DrbdXml;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.HostBrowser;
+import lcmc.gui.DrbdGraph;
 import lcmc.testutils.annotation.type.GuiTest;
+import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import static org.junit.Assert.assertEquals;
@@ -37,38 +38,51 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
 
+@Category(GuiTest.class)
 @RunWith(MockitoJUnitRunner.class)
-public class ProxyHostMenuTest {
+public class VolumeMenuITest {
     static {
         Tools.init();
     }
 
-    private ProxyHostMenu sut;
-
     @Mock
-    private ProxyHostInfo proxyHostInfoStub;
+    private VolumeInfo volumeInfoStub;
     @Mock
-    private HostBrowser hostBrowserStub;
-    @Mock
-    private Host hostStub;
-    @Mock
-    private DrbdInstallation drbdInstallationStub;
+    private ResourceInfo resourceInfoStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
+    @Mock
+    private DrbdXml drbdXmlStub;
+    @Mock
+    private DrbdGraph drbdGraphStub;
+    @Mock
+    private BlockDevInfo sourceStub;
+    @Mock
+    private BlockDevInfo destStub;
+
+    private VolumeMenu sut;
 
     @Before
     public void setUp() {
-        when(proxyHostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
-        when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
-        when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
-        sut = new ProxyHostMenu(proxyHostInfoStub);
+        when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
+        when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
+        when(volumeInfoStub.isConnected(Application.RunMode.LIVE)).thenReturn(true);
+        when(resourceInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
+        when(clusterBrowserStub.getDrbdXml()).thenReturn(drbdXmlStub);
+        when(clusterBrowserStub.getDrbdGraph()).thenReturn(drbdGraphStub);
+        when(drbdGraphStub.getSource(volumeInfoStub)).thenReturn(sourceStub);
+        when(drbdGraphStub.getDest(volumeInfoStub)).thenReturn(destStub);
+        sut = new VolumeMenu(volumeInfoStub);
     }
 
     @Test
-    @Category(GuiTest.class)
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
+        
+        for (final UpdatableItem item : items) {
+            ((MyMenuItem) item).action();
+        }
 
-        assertEquals(7, items.size());
+        assertEquals(6, items.size());
     }
 }

@@ -40,8 +40,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
 
+@Category(GuiTest.class)
 @RunWith(MockitoJUnitRunner.class)
-public class MultiSelectionMenuTest {
+public class MultiSelectionMenuITest {
     static {
         Tools.init();
     }
@@ -76,7 +77,6 @@ public class MultiSelectionMenuTest {
     }
 
     @Test
-    @Category(GuiTest.class)
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 

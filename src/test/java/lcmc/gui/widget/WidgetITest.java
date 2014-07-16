@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 @Category(GuiTest.class)
-public final class WidgetTest {
+public final class WidgetITest {
     private final TestUtils testSuite = new TestUtils();
 
     private Widget widget;

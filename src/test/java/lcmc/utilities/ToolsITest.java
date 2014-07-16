@@ -4,14 +4,13 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 import lcmc.data.Host;
 import lcmc.testutils.TestUtils;
+import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+
+import static org.junit.Assert.*;
 
 @Category(IntegrationTest.class)
 public final class ToolsITest {
@@ -29,8 +28,7 @@ public final class ToolsITest {
     public void testSSHError() {
         for (final Host host : testSuite.getHosts()) {
             LOG.sshError(host, "cmd a", "ans a", "stack trace a", 2);
-            assertTrue(
-                testSuite.getStdout().indexOf("returned exit code 2") >= 0);
+            assertTrue(testSuite.getStdout().indexOf("returned exit code 2") >= 0);
             testSuite.clearStdout();
         }
     }
@@ -41,27 +39,6 @@ public final class ToolsITest {
             assertTrue(Tools.isIp(host.getIpAddress()));
             assertFalse(Tools.isIp(host.getHostname()));
         }
-    }
-
-    @Test
-    public void testStartProgressIndicator() {
-        for (int i = 0; i < 10; i++) {
-            for (final Host host : testSuite.getHosts()) {
-                Tools.startProgressIndicator(host.getName(), "test");
-            }
-
-            for (final Host host : testSuite.getHosts()) {
-                Tools.stopProgressIndicator(host.getName(), "test");
-            }
-        }
-    }
-
-    @Test
-    public void testProgressIndicatorFailed() {
-        for (final Host host : testSuite.getHosts()) {
-            Tools.progressIndicatorFailed(host.getName(), "fail");
-        }
-        testSuite.clearStdout();
     }
 
     @Test
@@ -103,5 +80,97 @@ public final class ToolsITest {
     @Test
     public void nonExistingFileShouldReturnNull() {
         assertNull(Tools.getFile("not_existing_file"));
+    }
+
+    @Test
+    @Category(GuiTest.class)
+    public void testLoadFile() {
+        testSuite.initMain();
+        assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK", false));
+        final String testFile = "/tmp/lcmc-test-file";
+        Tools.save(testFile, false);
+        final String file = Tools.loadFile(testFile, false);
+        assertNotNull(file);
+        testSuite.clearStdout();
+        assertFalse("".equals(file));
+    }
+
+    @Test
+    @Category(GuiTest.class)
+    public void testStartProgressIndicator() {
+        testSuite.initMain();
+        for (int i = 0; i < 10; i++) {
+            Tools.startProgressIndicator(null);
+            Tools.startProgressIndicator("test");
+            Tools.startProgressIndicator("test2");
+            Tools.startProgressIndicator("test3");
+            Tools.startProgressIndicator(null, "test4");
+            Tools.startProgressIndicator("name", "test4");
+            Tools.startProgressIndicator("name2", "test4");
+            Tools.startProgressIndicator("name2", null);
+            Tools.startProgressIndicator(null, null);
+            Tools.stopProgressIndicator(null, null);
+            Tools.stopProgressIndicator("name2", null);
+            Tools.stopProgressIndicator("name2", "test4");
+            Tools.stopProgressIndicator("name", "test4");
+            Tools.stopProgressIndicator(null, "test4");
+            Tools.stopProgressIndicator("test3");
+            Tools.stopProgressIndicator("test2");
+            Tools.stopProgressIndicator("test");
+            Tools.stopProgressIndicator(null);
+        }
+    }
+
+    @Test
+    @Category(GuiTest.class)
+    public void testProgressIndicatorFailed() {
+        testSuite.initMain();
+        Tools.progressIndicatorFailed(null, "fail3");
+        Tools.progressIndicatorFailed("name", "fail2");
+        Tools.progressIndicatorFailed("name", null);
+        Tools.progressIndicatorFailed("fail1");
+        Tools.progressIndicatorFailed(null);
+
+        Tools.progressIndicatorFailed("fail two seconds", 2);
+        testSuite.clearStdout();
+    }
+
+    @Test
+    @Category(GuiTest.class)
+    public void testIsLinux() {
+        testSuite.initMain();
+        if (System.getProperty("os.name").indexOf("Windows") >= 0
+            || System.getProperty("os.name").indexOf("windows") >= 0) {
+            assertFalse(Tools.isLinux());
+        }
+        if (System.getProperty("os.name").indexOf("Linux") >= 0
+            || System.getProperty("os.name").indexOf("linux") >= 0) {
+            assertTrue(Tools.isLinux());
+        }
+    }
+
+    @Test
+    @Category(GuiTest.class)
+    public void testIsWindows() {
+        testSuite.initMain();
+        if (System.getProperty("os.name").indexOf("Windows") >= 0
+            || System.getProperty("os.name").indexOf("windows") >= 0) {
+            assertTrue(Tools.isWindows());
+        }
+        if (System.getProperty("os.name").indexOf("Linux") >= 0
+            || System.getProperty("os.name").indexOf("linux") >= 0) {
+            assertFalse(Tools.isWindows());
+        }
+    }
+
+    @Test
+    @Category(GuiTest.class)
+    public void testGetUnixPath() {
+        testSuite.initMain();
+        assertEquals("/bin", Tools.getUnixPath("/bin"));
+        if (Tools.isWindows()) {
+            assertEquals("/bin/dir/file",
+                         Tools.getUnixPath("d:\\bin\\dir\\file"));
+        }
     }
 }

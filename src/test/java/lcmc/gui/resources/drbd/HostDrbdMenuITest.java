@@ -2,7 +2,6 @@ package lcmc.gui.resources.drbd;
 
 import java.util.List;
 import lcmc.data.Host;
-import lcmc.data.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;
@@ -18,46 +17,40 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
 
+@Category(GuiTest.class)
 @RunWith(MockitoJUnitRunner.class)
-public class BlockDevMenuTest {
+public class HostDrbdMenuITest {
     static {
         Tools.init();
     }
-    
+
+    private HostDrbdMenu sut;
+
     @Mock
     private Host hostStub;
     @Mock
-    private BlockDevInfo blockDevInfoStub;
-    @Mock
-    private BlockDevice blockDeviceStub;
+    private HostDrbdInfo hostDrbdInfoStub;
     @Mock
     private HostBrowser hostBrowserStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
 
     @Mock
-    private BlockDevInfo blockDevInfoNoClusterStub;
+    private Host hostNoClusterStub;
+    @Mock
+    private HostDrbdInfo hostDrbdInfoNoClusterStub;
     @Mock
     private HostBrowser hostBrowserNoClusterStub;
 
-    private BlockDevMenu sut;
-
     @Before
     public void setUp() {
-        when(blockDevInfoStub.getBrowser()).thenReturn(hostBrowserStub);
-        when(blockDevInfoStub.getHost()).thenReturn(hostStub);
-        when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
+        when(hostDrbdInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
 
-        when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserStub);
-        when(blockDevInfoNoClusterStub.getHost()).thenReturn(hostStub);
-        when(blockDevInfoNoClusterStub.getBlockDevice()).thenReturn(blockDeviceStub);
-
-        sut = new BlockDevMenu(blockDevInfoStub);
+        sut = new HostDrbdMenu(hostStub, hostDrbdInfoStub);
     }
 
     @Test
-    @Category(GuiTest.class)
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = sut.getPulldownMenu();
 
@@ -65,17 +58,19 @@ public class BlockDevMenuTest {
     }
 
     @Test
-    @Category(GuiTest.class)
     public void menuWithOrWithoutClusterShoulBeTheSameSize() {
+        when(hostDrbdInfoNoClusterStub.getBrowser())
+                                         .thenReturn(hostBrowserNoClusterStub);
+
+        final HostDrbdMenu hostDrbdMenuNoCluster =
+                                    new HostDrbdMenu(hostNoClusterStub,
+                                                     hostDrbdInfoNoClusterStub);
         final List<UpdatableItem> itemsWithCluster = sut.getPulldownMenu();
-        when(blockDevInfoNoClusterStub.getBrowser())
-                .thenReturn(hostBrowserNoClusterStub);
-        final BlockDevMenu blockDevMenuNoCluster =
-                                    new BlockDevMenu(blockDevInfoNoClusterStub);
 
         final List<UpdatableItem> itemsNoCluster =
-                                        blockDevMenuNoCluster.getPulldownMenu();
+                                        hostDrbdMenuNoCluster.getPulldownMenu();
 
         assertTrue(itemsNoCluster.size() == itemsWithCluster.size());
     }
+
 }
