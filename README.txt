@@ -8,7 +8,7 @@ DRBD, KVM, XEN and LVM.
 
 installation from source
 ========================
-to compile and run type: ant
+to compile and run type: mvn package
 
 you may need to install these packages: libxalan2-java, libjava3d-java
 and provide jai_core.jar in build-lib/ directory
