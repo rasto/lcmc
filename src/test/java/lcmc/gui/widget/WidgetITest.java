@@ -20,18 +20,17 @@ public final class WidgetITest {
     public void setUp() {
         testSuite.initMain();
         for (int i = 0; i < 10; i++) {
-            widget = WidgetFactory.createInstance(
-                          Widget.GUESS_TYPE,
-                          Widget.NO_DEFAULT,
-                          new Value[]{new StringValue("a"),
-                                      new StringValue("b"),
-                                      new StringValue("c")},
-                          Widget.NO_REGEXP,
-                          100, /* width */
-                          Widget.NO_ABBRV,
-                          new AccessMode(Application.AccessType.ADMIN,
-                                         AccessMode.ADVANCED),
-                          Widget.NO_BUTTON);
+            widget = WidgetFactory.createInstance(Widget.GUESS_TYPE,
+                                                  Widget.NO_DEFAULT,
+                                                  new Value[]{new StringValue("a"),
+                                                              new StringValue("b"),
+                                                              new StringValue("c")},
+                                                  Widget.NO_REGEXP,
+                                                  100, /* width */
+                                                  Widget.NO_ABBRV,
+                                                  new AccessMode(Application.AccessType.ADMIN,
+                                                                 AccessMode.ADVANCED),
+                                                  Widget.NO_BUTTON);
         }
     }
 
@@ -45,10 +44,9 @@ public final class WidgetITest {
                                                     new StringValue("b"),
                                                     new StringValue("c")});
 
-            widget.reloadComboBox(new StringValue("as"),
-                                  new Value[]{new StringValue("a"),
-                                              new StringValue("b"),
-                                              new StringValue("c")});
+            widget.reloadComboBox(new StringValue("as"), new Value[]{new StringValue("a"),
+                                                                     new StringValue("b"),
+                                                                     new StringValue("c")});
 
             widget.reloadComboBox(null, new Value[]{new StringValue("a"),
                                                     new StringValue("b"),

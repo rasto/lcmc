@@ -24,7 +24,7 @@ public class HostDrbdMenuITest {
         Tools.init();
     }
 
-    private HostDrbdMenu sut;
+    private HostDrbdMenu hostDrbdMenu;
 
     @Mock
     private Host hostStub;
@@ -47,28 +47,24 @@ public class HostDrbdMenuITest {
         when(hostDrbdInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
 
-        sut = new HostDrbdMenu(hostStub, hostDrbdInfoStub);
+        hostDrbdMenu = new HostDrbdMenu(hostStub, hostDrbdInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = hostDrbdMenu.getPulldownMenu();
 
         assertEquals(20, items.size());
     }
 
     @Test
     public void menuWithOrWithoutClusterShoulBeTheSameSize() {
-        when(hostDrbdInfoNoClusterStub.getBrowser())
-                                         .thenReturn(hostBrowserNoClusterStub);
+        when(hostDrbdInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
 
-        final HostDrbdMenu hostDrbdMenuNoCluster =
-                                    new HostDrbdMenu(hostNoClusterStub,
-                                                     hostDrbdInfoNoClusterStub);
-        final List<UpdatableItem> itemsWithCluster = sut.getPulldownMenu();
+        final HostDrbdMenu hostDrbdMenuNoCluster = new HostDrbdMenu(hostNoClusterStub, hostDrbdInfoNoClusterStub);
+        final List<UpdatableItem> itemsWithCluster = hostDrbdMenu.getPulldownMenu();
 
-        final List<UpdatableItem> itemsNoCluster =
-                                        hostDrbdMenuNoCluster.getPulldownMenu();
+        final List<UpdatableItem> itemsNoCluster = hostDrbdMenuNoCluster.getPulldownMenu();
 
         assertTrue(itemsNoCluster.size() == itemsWithCluster.size());
     }

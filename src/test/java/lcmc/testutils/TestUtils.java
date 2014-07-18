@@ -43,10 +43,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * This class provides tools for testing.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class TestUtils {
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
@@ -55,16 +51,11 @@ public class TestUtils {
     public static final String ID_RSA_KEY;
 
     public static final String INFO_STRING       = "INFO    : ";
-    public static final String DEBUG_STRING      = "DEBUG";
-    public static final String ERROR_STRING      = "ERROR   : ";
     public static final String APPWARNING_STRING = "WARN    : ";
-    public static final String APPERROR_STRING   = "APPERROR: ";
     public static final int NUMBER_OF_HOSTS = 2;
     public static final List<Host> HOSTS = new ArrayList<Host>();
-    public static final String TEST_HOSTNAME =
-                                            System.getenv("LCMC_TEST_HOSTNAME");
-    public static final String TEST_USERNAME =
-                                            System.getenv("LCMC_TEST_USERNAME");
+    public static final String TEST_HOSTNAME = System.getenv("LCMC_TEST_HOSTNAME");
+    public static final String TEST_USERNAME = System.getenv("LCMC_TEST_USERNAME");
 
     private static volatile boolean clusterLoaded = false;
     static {
@@ -119,8 +110,7 @@ public class TestUtils {
         return true;
     }
 
-    private final PrintStream realOut = new PrintStream(
-                                    new FileOutputStream(FileDescriptor.out));
+    private final PrintStream realOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
 
     private StringBuilder stdout = new StringBuilder();
 
@@ -131,9 +121,7 @@ public class TestUtils {
          }
 
          @Override
-         public void write(final byte[] b,
-                           final int off,
-                           final int len) throws IOException {
+         public void write(final byte[] b, final int off, final int len) throws IOException {
              stdout.append(new String(b, off, len));
          }
 
@@ -234,8 +222,7 @@ public class TestUtils {
                     }
                 }, 300, 20000);
             if (!r) {
-                error("could not establish connection to "
-                    + host.getName());
+                error("could not establish connection to " + host.getName());
             }
         }
         Tools.getApplication().addClusterToClusters(cluster);

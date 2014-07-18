@@ -63,9 +63,8 @@ public class MultiSelectionMenuITest {
     private final BlockDevInfo blockDevInfoStub = mock(BlockDevInfo.class);
     private final HostDrbdInfo hostDrbdInfoStub = mock(HostDrbdInfo.class);
     
-    private final List<Info> selectedInfos = Arrays.asList(blockDevInfoStub,
-                                                     hostDrbdInfoStub);
-    private MultiSelectionMenu sut;
+    private final List<Info> selectedInfos = Arrays.asList(blockDevInfoStub, hostDrbdInfoStub);
+    private MultiSelectionMenu multiSelectionMenu;
 
     @Before
     public void setUp() {
@@ -73,12 +72,12 @@ public class MultiSelectionMenuITest {
         when(hostDrbdInfoStub.getHost()).thenReturn(hostStub);
         when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
 
-        sut = new MultiSelectionMenu(multiSelectionInfoStub, selectedInfos);
+        multiSelectionMenu = new MultiSelectionMenu(multiSelectionInfoStub, selectedInfos);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = multiSelectionMenu.getPulldownMenu();
 
         assertEquals(26, items.size());
     }

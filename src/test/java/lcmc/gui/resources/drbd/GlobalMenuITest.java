@@ -36,18 +36,18 @@ public class GlobalMenuITest {
     @Mock
     private GlobalInfo globalInfo;
 
-    private GlobalMenu sut;
+    private GlobalMenu globalMenu;
 
     @Before
     public void setUp() {
         Tools.init();
 
-        sut = new GlobalMenu(globalInfo);
+        globalMenu = new GlobalMenu(globalInfo);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = globalMenu.getPulldownMenu();
 
         assertEquals(4, items.size());
     }

@@ -132,7 +132,12 @@
             <artifactId>maven-replacer-plugin</artifactId>
             <version>1.4.1</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.googlecode.catch-exception</groupId>
+            <artifactId>catch-exception</artifactId>
+            <version>1.2.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>

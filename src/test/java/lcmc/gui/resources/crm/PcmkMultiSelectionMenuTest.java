@@ -55,28 +55,24 @@ public class PcmkMultiSelectionMenuTest {
     @Mock
     private Host hostStub;
 
-    private PcmkMultiSelectionMenu sut;
+    private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
 
     @Before
     public void setUp() {
-        final List<Info> selectedInfos = Arrays.asList((Info) serviceInfoStub,
-                                                       (Info) hostInfoStub);
-        when(pcmkMultiSelectionInfoStub.getBrowser())
-            .thenReturn(clusterBrowserStub);
-        when(pcmkMultiSelectionInfoStub.getSelectedInfos())
-            .thenReturn(selectedInfos);
+        final List<Info> selectedInfos = Arrays.asList(serviceInfoStub, hostInfoStub);
+        when(pcmkMultiSelectionInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
+        when(pcmkMultiSelectionInfoStub.getSelectedInfos()).thenReturn(selectedInfos);
         when(clusterBrowserStub.getDCHost()).thenReturn(hostStub);
-        when(clusterBrowserStub.getClusterHosts())
-            .thenReturn(new Host[]{hostStub});
+        when(clusterBrowserStub.getClusterHosts()).thenReturn(new Host[]{hostStub});
         when(hostInfoStub.getHost()).thenReturn(hostStub);
         when(serviceInfoStub.getService()).thenReturn(serviceStub);
 
-        sut = new PcmkMultiSelectionMenu(pcmkMultiSelectionInfoStub);
+        pcmkMultiSelectionMenu = new PcmkMultiSelectionMenu(pcmkMultiSelectionInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = pcmkMultiSelectionMenu.getPulldownMenu();
 
         assertEquals(17, items.size());
     }

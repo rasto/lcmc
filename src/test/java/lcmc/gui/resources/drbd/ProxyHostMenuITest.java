@@ -44,7 +44,7 @@ public class ProxyHostMenuITest {
         Tools.init();
     }
 
-    private ProxyHostMenu sut;
+    private ProxyHostMenu proxyHostMenu;
 
     @Mock
     private ProxyHostInfo proxyHostInfoStub;
@@ -62,12 +62,12 @@ public class ProxyHostMenuITest {
         when(proxyHostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
-        sut = new ProxyHostMenu(proxyHostInfoStub);
+        proxyHostMenu = new ProxyHostMenu(proxyHostInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = proxyHostMenu.getPulldownMenu();
 
         assertEquals(7, items.size());
     }

@@ -56,7 +56,7 @@ public class CloneMenuTest {
     private Host hostStub;
 
     @InjectMocks
-    private CloneMenu sut;
+    private CloneMenu cloneMenu;
 
     @Before
     public void setUp() {
@@ -67,12 +67,12 @@ public class CloneMenuTest {
         when(cloneInfoStub.getContainedService()).thenReturn(containedServiceInfoStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        sut = new CloneMenu(cloneInfoStub);
+        cloneMenu = new CloneMenu(cloneInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = cloneMenu.getPulldownMenu();
 
         assertEquals(17, items.size());
     }

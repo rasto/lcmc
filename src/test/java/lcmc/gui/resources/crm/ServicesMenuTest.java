@@ -46,19 +46,19 @@ public class ServicesMenuTest {
     @Mock
     private Host hostStub;
 
-    private ServicesMenu sut;
+    private ServicesMenu servicesMenu;
 
     @Before
     public void setUp() {
         when(clusterBrowserStub.getDCHost()).thenReturn(hostStub);
         when(servicesInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
 
-        sut = new ServicesMenu(servicesInfoStub);
+        servicesMenu = new ServicesMenu(servicesInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = servicesMenu.getPulldownMenu();
 
         assertEquals(9, items.size());
     }

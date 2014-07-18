@@ -52,7 +52,7 @@ public class ServiceMenuTest {
     @Mock
     private Host hostStub;
 
-    private ServiceMenu sut;
+    private ServiceMenu serviceMenu;
 
     @Before
     public void setUp() {
@@ -61,12 +61,12 @@ public class ServiceMenuTest {
         when(serviceInfoStub.getService()).thenReturn(serviceStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        sut = new ServiceMenu(serviceInfoStub);
+        serviceMenu = new ServiceMenu(serviceInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = serviceMenu.getPulldownMenu();
 
         assertEquals(15, items.size());
     }

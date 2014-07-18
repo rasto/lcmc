@@ -34,35 +34,19 @@ public final class ClusterBrowserITest {
             assertNotNull("cb is null", cb);
 
             StringBuffer buffer = new StringBuffer("cd");
-            cb.parseClusterOutput("a---reset---\r\nb",
-                    buffer,
-                    host,
-                    nolatch,
-                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
             assertEquals("cdab", buffer.toString());
 
             buffer = new StringBuffer("");
-            cb.parseClusterOutput("a---reset---\r\nb",
-                    buffer,
-                    host,
-                    nolatch,
-                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
             assertEquals("ab", buffer.toString());
 
             buffer = new StringBuffer("cd");
-            cb.parseClusterOutput("a---reset---\r\nb",
-                    buffer,
-                    host,
-                    nolatch,
-                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb", buffer, host, nolatch, Application.RunMode.LIVE);
             assertEquals("cdab", buffer.toString());
 
             buffer = new StringBuffer("cd");
-            cb.parseClusterOutput("a---reset---\r\nb---reset---\r\nc",
-                    buffer,
-                    host,
-                    nolatch,
-                    Application.RunMode.LIVE);
+            cb.parseClusterOutput("a---reset---\r\nb---reset---\r\nc", buffer, host, nolatch, Application.RunMode.LIVE);
             assertEquals("cdabc", buffer.toString());
         }
 
@@ -70,8 +54,8 @@ public final class ClusterBrowserITest {
         final String userHome = System.getProperty("user.home");
         files.add(userHome + "/testdir/empty.xml");
         for (final String dirName : new String[]{
-                    /* userHome + "/testdir/pacemaker/shell/regression", */
-                    userHome + "/testdir/pacemaker/pengine/test10"}) {
+            /* userHome + "/testdir/pacemaker/shell/regression", */
+            userHome + "/testdir/pacemaker/pengine/test10"}) {
             final File dir = new File(dirName);
             if (dir.listFiles() == null) {
                 continue;
@@ -143,11 +127,7 @@ public final class ClusterBrowserITest {
             for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
-                cb.parseClusterOutput(cib,
-                        new StringBuffer(""),
-                        host,
-                        firstTime,
-                        runMode);
+                cb.parseClusterOutput(cib, new StringBuffer(""), host, firstTime, runMode);
                 Tools.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
@@ -156,11 +136,7 @@ public final class ClusterBrowserITest {
             for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 Tools.waitForSwing();
-                cb.parseClusterOutput(emptyCib,
-                        new StringBuffer(""),
-                        host,
-                        firstTime,
-                        runMode);
+                cb.parseClusterOutput(emptyCib, new StringBuffer(""), host, firstTime, runMode);
                 Tools.waitForSwing();
             }
         }

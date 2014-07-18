@@ -43,18 +43,18 @@ public class AvailableServiceMenuTest {
     @Mock
     private ClusterBrowser clusterBrowserStub;
 
-    private AvailableServiceMenu sut;
+    private AvailableServiceMenu availableServiceMenu;
 
     @Before
     public void setUp() {
         when(AvailableServiceInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
 
-        sut = new AvailableServiceMenu(AvailableServiceInfoStub);
+        availableServiceMenu = new AvailableServiceMenu(AvailableServiceInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = availableServiceMenu.getPulldownMenu();
 
         assertEquals(1, items.size());
     }

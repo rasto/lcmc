@@ -54,32 +54,28 @@ public class ResourceMenuTest {
     @Mock
     private VolumeInfo drbdVolumeTwoStub;
     @Spy
-    private final MyMenu volumeMenuItemSpy =
-                 new MyMenu(ANY_NAME,
-                            new AccessMode(Application.AccessType.ADMIN, false),
-                            new AccessMode(Application.AccessType.OP, false));
+    private final MyMenu volumeMenuItemSpy = new MyMenu(ANY_NAME,
+                                                        new AccessMode(Application.AccessType.ADMIN, false),
+                                                        new AccessMode(Application.AccessType.OP, false));
 
-    private ResourceMenu sut;
+    private ResourceMenu resourceMenu;
 
     @Before
     public void setUp() {
-        volumes = new HashSet<VolumeInfo>(Arrays.asList(drbdVolumeOneStub,
-                                                        drbdVolumeTwoStub
-                                                        ));
+        volumes = new HashSet<VolumeInfo>(Arrays.asList(drbdVolumeOneStub, drbdVolumeTwoStub));
         when(resourceInfoStub.getDrbdVolumes()).thenReturn(volumes);
 
-        sut = new ResourceMenu(resourceInfoStub);
+        resourceMenu = new ResourceMenu(resourceInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> volumeMenuItems =
-                                                new ArrayList<UpdatableItem>();
+        final List<UpdatableItem> volumeMenuItems = new ArrayList<UpdatableItem>();
         volumeMenuItems.add(volumeMenuItemSpy);
         when(drbdVolumeOneStub.createPopup()).thenReturn(volumeMenuItems);
         when(resourceInfoStub.getDrbdVolumes()).thenReturn(volumes);
 
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = resourceMenu.getPulldownMenu();
         for (final UpdatableItem item : items) {
             item.updateAndWait();
         }

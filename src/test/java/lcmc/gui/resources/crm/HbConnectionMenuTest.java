@@ -46,19 +46,19 @@ public class HbConnectionMenuTest {
     @Mock
     private CrmGraph crmGraphStub;
 
-    private HbConnectionMenu sut;
+    private HbConnectionMenu hbConnectionMenu;
 
     @Before
     public void setUp() {
         when(hbConnectionInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(clusterBrowserStub.getCrmGraph()).thenReturn(crmGraphStub);
 
-        sut = new HbConnectionMenu(hbConnectionInfoStub);
+        hbConnectionMenu = new HbConnectionMenu(hbConnectionInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = hbConnectionMenu.getPulldownMenu();
 
         assertEquals(3, items.size());
     }

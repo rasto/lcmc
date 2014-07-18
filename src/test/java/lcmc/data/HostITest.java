@@ -32,7 +32,6 @@ import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
@@ -308,33 +307,29 @@ public final class HostITest {
 
     @Test
     public void testGetDist() {
-        final Set<String> values = new HashSet<String>(
-                Arrays.asList("suse",
-                             "redhat",
-                             "redhatenterpriseserver",
-                             "rhel",
-                             "fedora",
-                             "debian",
-                             "ubuntu"));
+        final Set<String> values = new HashSet<String>(Arrays.asList("suse",
+                                                                     "redhat",
+                                                                     "redhatenterpriseserver",
+                                                                     "rhel",
+                                                                     "fedora",
+                                                                     "debian",
+                                                                     "ubuntu"));
         for (final Host host : getHosts()) {
-            assertTrue("unknown: " + host.getDistributionName(),
-                       values.contains(host.getDistributionName()));
+            assertTrue("unknown: " + host.getDistributionName(), values.contains(host.getDistributionName()));
         }
     }
 
     @Test
     public void testGetDistVersion() {
-        final Set<String> values = new HashSet<String>(
-                Arrays.asList("debian-squeeze",
-                              "debian-lenny",
-                              "fedora",
-                              "rhel5",
-                              "rhel6",
-                              "rhel7"
-                              ));
+        final Set<String> values = new HashSet<String>(Arrays.asList("debian-squeeze",
+                                                                     "debian-lenny",
+                                                                     "fedora",
+                                                                     "rhel5",
+                                                                     "rhel6",
+                                                                     "rhel7"
+                                                                     ));
         for (final Host host : getHosts()) {
-            assertTrue("unknown: " + host.getDistributionVersion()
-                       + "(" + host.getDistributionName() + ")",
+            assertTrue("unknown: " + host.getDistributionVersion() + "(" + host.getDistributionName() + ")",
                        values.contains(host.getDistributionVersion())
                        || "fedora".equals(host.getDistributionName())
                        || "suse".equals(host.getDistributionName())
@@ -345,35 +340,8 @@ public final class HostITest {
 
     @Test
     public void testGetDistVersionString() {
-        final Set<String> values = new HashSet<String>(
-                Arrays.asList("SQUEEZE",
-                              "LENNY",
-                              "LUCID",
-                              "HARDY",
-                              "wheezy/sid/12.10",
-                              "wheezy/sid/12.04",
-                              "wheezy/sid/11.10",
-                              "wheezy/sid/testing",
-                              "wheezy/sid/13.04",
-                              "openSUSE 12.1 (x86_64)/12.1",
-                              "squeeze/sid/11.04",
-                              "Fedora release 17 (Beefy Miracle)/17",
-                              "Fedora release 18 (Spherical Cow)/18",
-                              "OPENSUSE11_4",
-                              "openSUSE 12.3 (x86_64)/12.3",
-                              "5",
-                              "6",
-                              "7",
-                              "7.1/7.1",
-                              "7.2/7.2",
-                              "7.3/7.3",
-                              "7.4/7.4",
-                              "7.5/7.5",
-                              "16",
-                              "17"));
         for (final Host host : getHosts()) {
-            assertTrue("unknown: " + host.getDistributionVersionString(),
-                       values.contains(host.getDistributionVersionString()));
+            assertNotNull("cannot be null: ", host.getDistributionVersionString());
         }
     }
 
@@ -395,15 +363,6 @@ public final class HostITest {
         }
     }
 
-    private String stripVersion(final String v) {
-        final int i = v.lastIndexOf('.');
-        if (i < 0) {
-            return v;
-        } else {
-            return v.substring(0, i);
-        }
-    }
-    
     private List<Host> getHosts() {
         return testSuite.getHosts();
     }

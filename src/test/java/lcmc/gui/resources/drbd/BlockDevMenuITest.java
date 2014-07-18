@@ -41,7 +41,7 @@ public class BlockDevMenuITest {
     @Mock
     private HostBrowser hostBrowserNoClusterStub;
 
-    private BlockDevMenu sut;
+    private BlockDevMenu blockDevMenu;
 
     @Before
     public void setUp() {
@@ -54,26 +54,23 @@ public class BlockDevMenuITest {
         when(blockDevInfoNoClusterStub.getHost()).thenReturn(hostStub);
         when(blockDevInfoNoClusterStub.getBlockDevice()).thenReturn(blockDeviceStub);
 
-        sut = new BlockDevMenu(blockDevInfoStub);
+        blockDevMenu = new BlockDevMenu(blockDevInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = blockDevMenu.getPulldownMenu();
 
         assertEquals(20, items.size());
     }
 
     @Test
     public void menuWithOrWithoutClusterShoulBeTheSameSize() {
-        final List<UpdatableItem> itemsWithCluster = sut.getPulldownMenu();
-        when(blockDevInfoNoClusterStub.getBrowser())
-                .thenReturn(hostBrowserNoClusterStub);
-        final BlockDevMenu blockDevMenuNoCluster =
-                                    new BlockDevMenu(blockDevInfoNoClusterStub);
+        final List<UpdatableItem> itemsWithCluster = blockDevMenu.getPulldownMenu();
+        when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
+        final BlockDevMenu blockDevMenuNoCluster = new BlockDevMenu(blockDevInfoNoClusterStub);
 
-        final List<UpdatableItem> itemsNoCluster =
-                                        blockDevMenuNoCluster.getPulldownMenu();
+        final List<UpdatableItem> itemsNoCluster = blockDevMenuNoCluster.getPulldownMenu();
 
         assertTrue(itemsNoCluster.size() == itemsWithCluster.size());
     }

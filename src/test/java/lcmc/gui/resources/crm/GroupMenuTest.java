@@ -52,7 +52,7 @@ public class GroupMenuTest {
     @Mock
     private Host hostStub;
 
-    private GroupMenu sut;
+    private GroupMenu groupMenu;
 
     @Before
     public void setUp() {
@@ -61,12 +61,12 @@ public class GroupMenuTest {
         when(groupInfoStub.getService()).thenReturn(serviceStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        sut = new GroupMenu(groupInfoStub);
+        groupMenu = new GroupMenu(groupInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = groupMenu.getPulldownMenu();
 
         assertEquals(16, items.size());
     }

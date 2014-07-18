@@ -24,8 +24,7 @@ public final class DRBDTest {
 
     @Test
     @Parameters(method="parametersForVersionsShouldBeCompatible")
-    public void versionsShouldBeCompatible(final String versionOne,
-                                           final String versionTwo) {
+    public void versionsShouldBeCompatible(final String versionOne, final String versionTwo) {
         assertTrue(DRBD.compatibleVersions(versionOne, versionTwo));
         assertTrue(DRBD.compatibleVersions(versionTwo, versionOne));
     }
@@ -44,8 +43,7 @@ public final class DRBDTest {
     }
     @Test
     @Parameters(method="parametersForVersionsShouldNotBeCompatible")
-    public void versionsShouldNotBeCompatible(final String versionOne,
-                                              final String versionTwo) {
+    public void versionsShouldNotBeCompatible(final String versionOne, final String versionTwo) {
         assertFalse(DRBD.compatibleVersions(versionOne, versionTwo));
         assertFalse(DRBD.compatibleVersions(versionTwo, versionOne));
     }

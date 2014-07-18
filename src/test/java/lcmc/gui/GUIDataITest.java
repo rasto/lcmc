@@ -36,9 +36,7 @@ public final class GUIDataITest {
             }
         }
         if (errors > 0) {
-            assertTrue("terminal area size error: " + (errors / count * 100)
-                       + "%",
-                       false);
+            assertTrue("terminal area size error: " + (errors / count * 100) + "%", false);
         }
     }
 }

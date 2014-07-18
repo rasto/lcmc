@@ -16,14 +16,12 @@ public final class DiskInfoTest {
         vmsdi = new DiskInfo("", null, null);
     }
 
-    private String invokeFixSourceHostParams(final String names,
-                                             final  String ports) {
+    private String invokeFixSourceHostParams(final String names, final  String ports) {
         final Map<String, String> params = new HashMap<String, String>();
         params.put(DiskData.SOURCE_HOST_NAME, names);
         params.put(DiskData.SOURCE_HOST_PORT, ports);
         vmsdi.fixSourceHostParams(params);
-        return params.get(DiskData.SOURCE_HOST_NAME)
-               + ":" + params.get(DiskData.SOURCE_HOST_PORT);
+        return params.get(DiskData.SOURCE_HOST_NAME) + ":" + params.get(DiskData.SOURCE_HOST_PORT);
     }
 
     @Test
@@ -35,13 +33,10 @@ public final class DiskInfoTest {
         assertEquals("null:null", invokeFixSourceHostParams(null, "1,2,3"));
         assertEquals("a:6789", invokeFixSourceHostParams("a", null));
         assertEquals("a:6789", invokeFixSourceHostParams("a", ""));
-        assertEquals("a, b, c:6789, 6789, 6789",
-                     invokeFixSourceHostParams("a,b,c", ""));
+        assertEquals("a, b, c:6789, 6789, 6789", invokeFixSourceHostParams("a,b,c", ""));
         assertEquals("a:1", invokeFixSourceHostParams("a,", "1,2"));
         assertEquals(", a:1, 2", invokeFixSourceHostParams(",a", "1,2"));
-        assertEquals("a, b, c:1, 2, 2",
-                     invokeFixSourceHostParams(" a , b , c", " 1 , 2 "));
-        assertEquals("a, b:1, 2",
-                     invokeFixSourceHostParams(" a , b ", " 1 , 2 , 3 "));
+        assertEquals("a, b, c:1, 2, 2", invokeFixSourceHostParams(" a , b , c", " 1 , 2 "));
+        assertEquals("a, b:1, 2", invokeFixSourceHostParams(" a , b ", " 1 , 2 , 3 "));
     }
 }

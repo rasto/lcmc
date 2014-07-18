@@ -46,20 +46,19 @@ public class ConstraintPHMenuTest {
     @Mock
     private Service serviceStub;
 
-    private ConstraintPHMenu sut;
+    private ConstraintPHMenu constraintPHMenu;
 
     @Before
     public void setUp() {
         when(constraintPHInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(constraintPHInfoStub.getService()).thenReturn(serviceStub);
-        sut = new ConstraintPHMenu(constraintPHInfoStub);
+        constraintPHMenu = new ConstraintPHMenu(constraintPHInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = constraintPHMenu.getPulldownMenu();
 
         assertEquals(4, items.size());
     }
-
 }

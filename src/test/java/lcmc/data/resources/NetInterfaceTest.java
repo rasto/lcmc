@@ -25,71 +25,54 @@ import lcmc.testutils.TestUtils;
 import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public final class NetInterfaceTest {
+    private static final String CANNOT_PARSE_MSG = "cannot parse";
 
     private final TestUtils testSuite = new TestUtils();
 
     @Before
-    public void setUp() {
+    public void initStdout() {
         testSuite.initStdout();
         Tools.init();
     }
 
+    @After
+    public void clearStdout() {
+        testSuite.clearStdout();
+    }
+
     @Test
-    public void testInit() {
-        try {
-            new NetInterface("");
-        } catch (UnknownHostException e) {
-            fail();
-        }
-        assertTrue(testSuite.getStdout().contains("cannot parse"));
-        testSuite.clearStdout();
-        //lo ipv6 ::1 128
-        //    lo ipv4 127.0.0.1 8
-        try {
-            final NetInterface ni =
-                           new NetInterface("eth0 ipv6 2001:db8:0:f101::1 64");
-            assertEquals("2001:db8:0:f101:0:0:0:0", ni.getNetworkIp());
-        } catch (UnknownHostException e) {
-            fail();
-        }
+    public void emptyLineShouldWriteMessageToStdout() throws UnknownHostException {
+        new NetInterface("");
+        assertTrue("stdount does not contain " + CANNOT_PARSE_MSG, testSuite.getStdout().contains(CANNOT_PARSE_MSG));
+    }
 
-        try {
-            final NetInterface ni
-                              = new NetInterface("p5p1 ipv4 192.168.1.101 24");
-            assertEquals("192.168.1.0", ni.getNetworkIp());
-        } catch (UnknownHostException e) {
-            fail();
-        }
+    @Test
+    public void bridgeIpv6WithCidr64ShouldSetNetworkIp() throws UnknownHostException {
+        final NetInterface ni = new NetInterface("eth0 ipv6 2001:db8:0:f101::1 64");
+        assertEquals("2001:db8:0:f101:0:0:0:0", ni.getNetworkIp());
+    }
 
-        try {
-            final NetInterface ni =
-                                new NetInterface("p5p1 ipv4 192.168.1.101 23");
-            assertEquals("192.168.0.0", ni.getNetworkIp());
-        } catch (UnknownHostException e) {
-            fail();
-        }
+    @Test
+    public void ipv4WithCidr23ShouldSetNetworkIp() throws UnknownHostException {
+        final NetInterface ni = new NetInterface("p5p1 ipv4 192.168.1.101 23");
+        assertEquals("192.168.0.0", ni.getNetworkIp());
+    }
 
-        try {
-            final NetInterface ni =
-                       new NetInterface("virbr0 ipv4 192.168.133.1 24 bridge");
-            assertEquals("192.168.133.0", ni.getNetworkIp());
-        } catch (UnknownHostException e) {
-            fail();
-        }
+    @Test
+    public void bridgeIpv4WithCidr24ShouldSetNetworkIp() throws UnknownHostException {
+        final NetInterface ni = new NetInterface("virbr0 ipv4 192.168.133.1 24 bridge");
+        assertEquals("192.168.133.0", ni.getNetworkIp());
+    }
 
-        try {
-            final NetInterface ni =
-                           new NetInterface("virbr1 ipv4 10.10.0.1 16 bridge");
-            assertEquals("10.10.0.0", ni.getNetworkIp());
-        } catch (UnknownHostException e) {
-            fail();
-        }
-
-        testSuite.clearStdout();
+    @Test
+    public void bridgeIpWithCidr16ShouldSetNetworkIp() throws UnknownHostException {
+        final NetInterface ni = new NetInterface("virbr1 ipv4 10.10.0.1 16 bridge");
+        assertEquals("10.10.0.0", ni.getNetworkIp());
     }
 }

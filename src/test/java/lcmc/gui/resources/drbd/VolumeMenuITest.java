@@ -60,7 +60,7 @@ public class VolumeMenuITest {
     @Mock
     private BlockDevInfo destStub;
 
-    private VolumeMenu sut;
+    private VolumeMenu volumeMenu;
 
     @Before
     public void setUp() {
@@ -72,12 +72,12 @@ public class VolumeMenuITest {
         when(clusterBrowserStub.getDrbdGraph()).thenReturn(drbdGraphStub);
         when(drbdGraphStub.getSource(volumeInfoStub)).thenReturn(sourceStub);
         when(drbdGraphStub.getDest(volumeInfoStub)).thenReturn(destStub);
-        sut = new VolumeMenu(volumeInfoStub);
+        volumeMenu = new VolumeMenu(volumeInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = volumeMenu.getPulldownMenu();
         
         for (final UpdatableItem item : items) {
             ((MyMenuItem) item).action();

@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ToolsTest.class);
 
     private final TestUtils testSuite = new TestUtils();
@@ -49,8 +48,7 @@ public final class ToolsTest {
     @Test
     public void testInfo() {
         LOG.info("info a");
-        assertEquals(TestUtils.INFO_STRING + "info a\n",
-                     testSuite.getStdout());
+        assertEquals(TestUtils.INFO_STRING + "info a\n", testSuite.getStdout());
         testSuite.clearStdout();
     }
 
@@ -91,8 +89,7 @@ public final class ToolsTest {
     public void testAppWarning() {
         LOG.appWarning("warning a");
         if (Tools.getDefault("AppWarning").equals("y")) {
-            assertEquals(TestUtils.APPWARNING_STRING + "warning a\n",
-                         testSuite.getStdout());
+            assertEquals(TestUtils.APPWARNING_STRING + "warning a\n", testSuite.getStdout());
         }
         testSuite.clearStdout();
     }
@@ -149,15 +146,13 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForDefaultShouldBeReturned")
-    public void defaultShouldBeReturned(final String default0,
-                                        final String key) {
+    public void defaultShouldBeReturned(final String default0, final String key) {
         assertEquals(default0, Tools.getDefault(key));
     }
 
     @Test
     public void testGetDefaultColor() {
-        assertEquals(java.awt.Color.BLACK,
-                     Tools.getDefaultColor("TerminalPanel.Background"));
+        assertEquals(java.awt.Color.BLACK, Tools.getDefaultColor("TerminalPanel.Background"));
     }
 
     @Test
@@ -167,8 +162,7 @@ public final class ToolsTest {
 
     @Test
     public void testGetString() {
-        assertEquals("Linux Cluster Management Console",
-                     Tools.getString("DrbdMC.Title"));
+        assertEquals("Linux Cluster Management Console", Tools.getString("DrbdMC.Title"));
     }
 
     @Test
@@ -197,10 +191,7 @@ public final class ToolsTest {
                                            final String dist,
                                            final String version,
                                            final String arch) {
-        assertEquals(distString, Tools.getDistString(text,
-                                                     dist,
-                                                     version,
-                                                     arch));
+        assertEquals(distString, Tools.getDistString(text, dist, version, arch));
     }
 
     @Test
@@ -249,8 +240,7 @@ public final class ToolsTest {
         return new lcmc.utilities.ConvertCmdCallback() {
             @Override
             public String convert(final String command) {
-                return command.replaceAll(lcmc.configs.DistResource.SUDO,
-                                          "sudo ");
+                return command.replaceAll(lcmc.configs.DistResource.SUDO, "sudo ");
             }
         };
     }
@@ -281,8 +271,7 @@ public final class ToolsTest {
 
     @Test
     public void multipleCommands() {
-        assertEquals("sudo /etc/init.d/corosync start"
-                     + ";;;sudo /etc/init.d/corosync start",
+        assertEquals("sudo /etc/init.d/corosync start" + ";;;sudo /etc/init.d/corosync start",
                      Tools.getDistCommand("Corosync.startCorosync;;;"
                                           + "Corosync.startCorosync",
                                           "debian",
@@ -295,8 +284,7 @@ public final class ToolsTest {
 
     @Test
     public void undefinedAndCommandShouldBeConverted() {
-        assertEquals("undefined4"
-                     + ";;;sudo /etc/init.d/corosync start",
+        assertEquals("undefined4" + ";;;sudo /etc/init.d/corosync start",
                      Tools.getDistCommand("undefined4;;;"
                                           + "Corosync.startCorosync",
                                           "debian",
@@ -305,8 +293,7 @@ public final class ToolsTest {
                                           getConvertCallback(),
                                           false,
                                           false));
-        assertEquals(TestUtils.APPWARNING_STRING
-                     + "getDistCommand: unknown command: undefined4\n",
+        assertEquals(TestUtils.APPWARNING_STRING + "getDistCommand: unknown command: undefined4\n",
                      testSuite.getStdout());
         testSuite.clearStdout();
     }
@@ -314,35 +301,17 @@ public final class ToolsTest {
     @Test
     public void nullCommandShouldReturnNull() {
         assertNull("null command",
-                   Tools.getDistCommand(null,
-                                        "debian",
-                                        "squeeze",
-                                        "i386",
-                                        getConvertCallback(),
-                                        false,
-                                        false));
+                   Tools.getDistCommand(null, "debian", "squeeze", "i386", getConvertCallback(), false, false));
     }
 
     @Test
     public void nullCommandInBashShouldReturnNull() {
-        assertNull(Tools.getDistCommand(null,
-                                        "debian",
-                                        "squeeze",
-                                        "i386",
-                                        getConvertCallback(),
-                                        true,
-                                        true));
+        assertNull(Tools.getDistCommand(null, "debian", "squeeze", "i386", getConvertCallback(), true, true));
     }
 
     @Test
     public void nullCommandWithNullDistShouldReturnNull() {
-        assertNull(Tools.getDistCommand(null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        true,
-                                        true));
+        assertNull(Tools.getDistCommand(null, null, null, null, null, true, true));
     }
 
     @SuppressWarnings("unused")
@@ -392,10 +361,7 @@ public final class ToolsTest {
                                             final String dist,
                                             final String version,
                                             final String arch) {
-         assertEquals(kernelDir, Tools.getKernelDownloadDir(kernelVersion,
-                                                            dist,
-                                                            version,
-                                                            arch));
+         assertEquals(kernelDir, Tools.getKernelDownloadDir(kernelVersion, dist, version, arch));
     }
 
     @SuppressWarnings("unused")
@@ -430,9 +396,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForDistVersionShouldBeReturned")
-    public void distVersionShouldBeReturned(final String distVersion,
-                                            final String dist,
-                                            final String version) {
+    public void distVersionShouldBeReturned(final String distVersion, final String dist, final String version) {
         assertEquals(distVersion, Tools.getDistVersionString(dist, version));
     }
 
@@ -456,9 +420,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForTestJoin")
-    public void testJoin(final String expected,
-                         final String delim,
-                         final String[] values) {
+    public void testJoin(final String expected, final String delim, final String[] values) {
         assertEquals(expected, Tools.join(delim, values));
     }
 
@@ -500,8 +462,7 @@ public final class ToolsTest {
             bigArray.add("x");
         }
         assertTrue(Tools.join(",", bigArray).length() == 2000 - 1);
-        assertTrue(Tools.join(",", bigArray.toArray(
-                    new String[bigArray.size()]), 500).length() == 1000 - 1);
+        assertTrue(Tools.join(",", bigArray.toArray(new String[bigArray.size()]), 500).length() == 1000 - 1);
     }
 
     @Test
@@ -573,9 +534,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForTestIntersections")
-    public void testIntersections(final Set<String> expected,
-                                  final Set<String> arrayOne,
-                                  final Set<String> arrayTwo) {
+    public void testIntersections(final Set<String> expected, final Set<String> arrayOne, final Set<String> arrayTwo) {
         assertEquals(expected, Tools.getIntersection(arrayOne, arrayTwo));
     }
 
@@ -644,8 +603,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForConfigShouldBeEscaped")
-    public void configShouldBeEscaped(final String escaped,
-                                      final String config) {
+    public void configShouldBeEscaped(final String escaped, final String config) {
         assertEquals(escaped, Tools.escapeConfig(config));
     }
 
@@ -680,8 +638,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForFirstVersionShouldBeSmaller")
-    public void firstVersionShouldBeSmaller(final String versionOne,
-                                            final String versionTwo)
+    public void firstVersionShouldBeSmaller(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
         assertEquals(-1, Tools.compareVersions(versionOne, versionTwo));
     }
@@ -706,8 +663,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForFirstVersionShouldBeGreater")
-    public void firstVersionShouldBeGreater(final String versionOne,
-                                            final String versionTwo)
+    public void firstVersionShouldBeGreater(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
         assertEquals(1, Tools.compareVersions(versionOne, versionTwo));
     }
@@ -746,8 +702,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForVersionsShouldBeEqual")
-    public void versionsShouldBeEqual(final String versionOne,
-                                 final String versionTwo)
+    public void versionsShouldBeEqual(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
         assertEquals(0, Tools.compareVersions(versionOne, versionTwo));
     }
@@ -777,8 +732,7 @@ public final class ToolsTest {
 
     @Test(expected=Exceptions.IllegalVersionException.class)
     @Parameters(method="parametersForCompareVersionsShouldThrowException")
-    public void compareVersionsShouldThrowException(final String versionOne,
-                                                    final String versionTwo)
+    public void compareVersionsShouldThrowException(final String versionOne, final String versionTwo)
     throws Exceptions.IllegalVersionException {
         Tools.compareVersions(versionOne, versionTwo);
     }
@@ -800,9 +754,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForCharCountShouldBeReturned")
-    public void charCountShouldBeReturned(final int count,
-                                          final String string,
-                                          final char character) {
+    public void charCountShouldBeReturned(final int count, final String string, final char character) {
         assertEquals(count, Tools.charCount(string, character));
     }
 
@@ -812,15 +764,13 @@ public final class ToolsTest {
     }
 
     @Test
-    @Parameters({"1", "-1", "0", "-0", "1235", "100000000000000000",
-                 "-100000000000000000"})
+    @Parameters({"1", "-1", "0", "-0", "1235", "100000000000000000", "-100000000000000000"})
     public void shouldBeNumber(final String number) {
         assertTrue(number, Tools.isNumber(number));
     }
 
     @Test
-    @Parameters({"0.1", "1 1", "-", "", "a", ".5", "a1344", "1344a",
-                 "13x44"})
+    @Parameters({"0.1", "1 1", "-", "", "a", ".5", "a1344", "1344a", "13x44"})
     public void shouldNotBeNumber(final String number) {
         assertFalse(number, Tools.isNumber(number));
     }
@@ -843,8 +793,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForShellListShouldBeCreated")
-    public void shellListShouldBeCreated(final String shellList,
-                                         final String[] list) {
+    public void shellListShouldBeCreated(final String shellList, final String[] list) {
         assertEquals(shellList, Tools.shellList(list));
     }
 
@@ -859,8 +808,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForStringsShouldBeEqual")
-    public void stringsShouldBeEqual(final String stringOne,
-                                     final String stringTwo) {
+    public void stringsShouldBeEqual(final String stringOne, final String stringTwo) {
         assertEquals(stringOne, stringTwo);
     }
 
@@ -877,8 +825,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForStringsShouldNotBeEqual")
-    public void stringsShouldNotBeEqual(final String stringOne,
-                                        final String stringTwo) {
+    public void stringsShouldNotBeEqual(final String stringOne, final String stringTwo) {
         assertNotEquals(stringOne, stringTwo);
     }
 
@@ -896,11 +843,8 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForUnitShouldBeExtracted")
-    public void unitShouldBeExtracted(final String value,
-                                      final String unit,
-                                      final String valueWithUnit) {
-        Assert.assertArrayEquals(new Object[]{value, unit},
-                                 Tools.extractUnit(valueWithUnit));
+    public void unitShouldBeExtracted(final String value, final String unit, final String valueWithUnit) {
+        Assert.assertArrayEquals(new Object[]{value, unit}, Tools.extractUnit(valueWithUnit));
     }
 
     @Test
@@ -930,8 +874,7 @@ public final class ToolsTest {
         assertNull(Tools.trimText(null));
         assertEquals("x", Tools.trimText("x"));
         final String x20 = " xxxxxxxxxxxxxxxxxxx";
-        assertEquals(x20 + x20 + x20 + x20,
-                     Tools.trimText(x20 + x20 + x20 + x20));
+        assertEquals(x20 + x20 + x20 + x20, Tools.trimText(x20 + x20 + x20 + x20));
     }
 
     @Test
@@ -939,8 +882,7 @@ public final class ToolsTest {
         assertNull(Tools.trimText(null));
         assertEquals("x", Tools.trimText("x"));
         final String x20 = " xxxxxxxxxxxxxxxxxxx";
-        assertEquals(x20 + x20 + x20 + x20 + "\n" + x20.trim(),
-                     Tools.trimText(x20 + x20 + x20 + x20 + x20));
+        assertEquals(x20 + x20 + x20 + x20 + "\n" + x20.trim(), Tools.trimText(x20 + x20 + x20 + x20 + x20));
     }
 
     @SuppressWarnings("unused")
@@ -957,8 +899,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForDirectoryPartShouldBeExtracted")
-    public void directoryPartShouldBeExtracted(final String extractedDir,
-                                               final String file) {
+    public void directoryPartShouldBeExtracted(final String extractedDir, final String file) {
         assertEquals(extractedDir, Tools.getDirectoryPart(file));
     }
 
@@ -981,9 +922,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForQuotesShouldBeEscaped")
-    public void quotesShouldBeEscaped(final String escaped,
-                                      final String string,
-                                      final int level) {
+    public void quotesShouldBeEscaped(final String escaped, final String string, final int level) {
         assertEquals(escaped, Tools.escapeQuotes(string, level));
     }
 
@@ -997,8 +936,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForTestVersionBeforePacemaker")
-    public void testVersionBeforePacemaker(final String pcmkVersion,
-                                           final String hbVersion) {
+    public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
         final Host host = Host.createInstance();
 
         host.setPacemakerVersion(pcmkVersion);
@@ -1019,8 +957,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForTestVersionAfterPacemaker")
-    public void testVersionAfterPacemaker(final String pcmkVersion,
-                                          final String hbVersion) {
+    public void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
         final Host host = Host.createInstance();
 
         host.setPacemakerVersion(pcmkVersion);
@@ -1044,10 +981,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForTwoNewLineShouldBeOne")
-    public void twoNewLineShouldBeOne(final String chomped,
-                                      final String origString) {
-
-
+    public void twoNewLineShouldBeOne(final String chomped, final String origString) {
         final StringBuffer sb = new StringBuffer(origString);
         Tools.chomp(sb);
         assertEquals(chomped, sb.toString());
@@ -1071,8 +1005,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForNamesShouldBeTheSame")
-    public void namesShouldBeTheSame(final String nameOne,
-                                     final String nameTwo) {
+    public void namesShouldBeTheSame(final String nameOne, final String nameTwo) {
         assertTrue(Tools.compareNames(nameOne, nameTwo) == 0);
     }
 
@@ -1093,8 +1026,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForNameOneShouldBeSmaller")
-    public void nameOneShouldBeSmaller(final String nameOne,
-                                       final String nameTwo) {
+    public void nameOneShouldBeSmaller(final String nameOne, final String nameTwo) {
         assertTrue(Tools.compareNames(nameOne, nameTwo) < 0);
     }
 
@@ -1113,8 +1045,7 @@ public final class ToolsTest {
 
     @Test
     @Parameters(method="parametersForNameOneShouldBeGreater")
-    public void nameOneShouldBeGreater(final String nameOne,
-                                       final String nameTwo) {
+    public void nameOneShouldBeGreater(final String nameOne, final String nameTwo) {
         assertTrue(Tools.compareNames(nameOne, nameTwo) > 0);
     }
 }

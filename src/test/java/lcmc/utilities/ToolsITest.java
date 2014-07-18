@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 
 @Category(IntegrationTest.class)
 public final class ToolsITest {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
 
     private final TestUtils testSuite = new TestUtils();
@@ -51,8 +50,7 @@ public final class ToolsITest {
     @Test
     public void testGetHostCheckBoxes() {
         for (final Host host : testSuite.getHosts()) {
-            final Map<Host, JCheckBox> comps =
-                                    Tools.getHostCheckBoxes(host.getCluster());
+            final Map<Host, JCheckBox> comps = Tools.getHostCheckBoxes(host.getCluster());
             assertNotNull(comps);
             assertTrue(comps.size() == testSuite.getHosts().size());
             assertTrue(comps.containsKey(host));
@@ -169,8 +167,7 @@ public final class ToolsITest {
         testSuite.initMain();
         assertEquals("/bin", Tools.getUnixPath("/bin"));
         if (Tools.isWindows()) {
-            assertEquals("/bin/dir/file",
-                         Tools.getUnixPath("d:\\bin\\dir\\file"));
+            assertEquals("/bin/dir/file", Tools.getUnixPath("d:\\bin\\dir\\file"));
         }
     }
 }

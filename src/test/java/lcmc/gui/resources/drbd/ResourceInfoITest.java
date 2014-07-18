@@ -24,43 +24,36 @@ public final class ResourceInfoITest {
 
     @Test
     public void testNotEqualNames() {
-
-        final ClusterBrowser b =
-                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo("name1", null, b);
-        final ResourceInfo r2 = new ResourceInfo("name2", null, b);
+        final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
+        final ResourceInfo r1 = new ResourceInfo("name1", null, clusterBrowser);
+        final ResourceInfo r2 = new ResourceInfo("name2", null, clusterBrowser);
         assertFalse("not equal names", r1.equals(r2));
     }
 
     @Test
     public void testEqualNames() {
 
-        final ClusterBrowser b =
-                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo("name", null, b);
-        final ResourceInfo r2 = new ResourceInfo("name", null, b);
+        final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
+        final ResourceInfo r1 = new ResourceInfo("name", null, clusterBrowser);
+        final ResourceInfo r2 = new ResourceInfo("name", null, clusterBrowser);
         assertTrue("equal names", r1.equals(r2));
     }
 
     @Test
     public void testNameNull() {
-
-        final ClusterBrowser b =
-                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo("name", null, b);
+        final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
+        final ResourceInfo r1 = new ResourceInfo("name", null, clusterBrowser);
         assertFalse("equal name null", r1.getName() == null);
     }
 
     @Test
     public void testEqualNamesNotEqualsHosts() {
-
-        final ClusterBrowser b =
-                testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
+        final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
         
-        final ResourceInfo r1 =
-                new ResourceInfo("name", new LinkedHashSet<Host>(
-                                                 Arrays.asList(Host.createInstance())), b);
-        final ResourceInfo r2 = new ResourceInfo("name", null, b);
+        final ResourceInfo r1 = new ResourceInfo("name",
+                                                 new LinkedHashSet<Host>(Arrays.asList(Host.createInstance())),
+                                                 clusterBrowser);
+        final ResourceInfo r2 = new ResourceInfo("name", null, clusterBrowser);
         assertTrue("equal names", r1.equals(r2));
     }
 }
