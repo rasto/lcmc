@@ -19,7 +19,7 @@
  * along with drbd; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package lcmc.gui;
+package lcmc.view;
 
 import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import lcmc.data.Host;
+import lcmc.gui.ClustersPanel;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

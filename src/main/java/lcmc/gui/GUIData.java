@@ -137,7 +137,7 @@ public final class GUIData  {
     }
 
     /** Sets split pane that contains terminal as bottom component. */
-    void setTerminalSplitPane(final JSplitPane terminalSplitPane) {
+    public void setTerminalSplitPane(final JSplitPane terminalSplitPane) {
         this.terminalSplitPane = terminalSplitPane;
     }
 

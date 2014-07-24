@@ -46,7 +46,7 @@ import javax.swing.plaf.metal.OceanTheme;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.MainMenu;
-import lcmc.gui.MainPanel;
+import lcmc.view.MainPanel;
 import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

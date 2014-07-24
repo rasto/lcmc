@@ -23,7 +23,8 @@
 package lcmc.gui;
 
 import java.awt.BorderLayout;
-import javax.swing.JPanel;
+import javax.swing.*;
+
 import lcmc.data.Cluster;
 import lcmc.utilities.Tools;
 import org.springframework.stereotype.Component;
@@ -35,12 +36,15 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
+    private JLabel labelTitle;
 
     public void initWithCluster(final Cluster cluster0) {
         this.cluster = cluster0;
         if (cluster != null) {
             cluster.setClusterTab(this);
+            labelTitle = new JLabel(cluster.getName());
         }
+
         setLayout(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         if (cluster == null) {
@@ -64,6 +68,10 @@ public final class ClusterTab extends JPanel {
     @Override
     public String getName() {
         return getClusterName();
+    }
+
+    public JLabel getLabelTitle() {
+        return labelTitle;
     }
 
     private String getClusterName() {
