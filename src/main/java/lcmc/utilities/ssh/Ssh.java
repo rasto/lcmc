@@ -28,14 +28,13 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.configs.DistResource;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.NewOutputCallback;
 import lcmc.utilities.Tools;
 
 public final class Ssh {

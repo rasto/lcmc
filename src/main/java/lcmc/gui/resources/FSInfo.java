@@ -24,13 +24,12 @@ package lcmc.gui.resources;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
-import lcmc.data.Application;
-import lcmc.data.Host;
+import lcmc.model.Application;
+import lcmc.model.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.SshOutput;
 
 /**

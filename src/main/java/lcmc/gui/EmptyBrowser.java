@@ -24,8 +24,8 @@ package lcmc.gui;
 import java.util.TreeSet;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
-import lcmc.data.Cluster;
-import lcmc.data.Host;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
 import lcmc.gui.resources.AllHostsInfo;
 import lcmc.utilities.Tools;
 

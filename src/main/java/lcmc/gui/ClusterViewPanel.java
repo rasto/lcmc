@@ -22,7 +22,7 @@
 package lcmc.gui;
 import java.awt.BorderLayout;
 import javax.swing.Box;
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.Tools;
 

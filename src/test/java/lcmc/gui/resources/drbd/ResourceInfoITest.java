@@ -2,7 +2,7 @@ package lcmc.gui.resources.drbd;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;

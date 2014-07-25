@@ -31,9 +31,9 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import lcmc.data.Application;
-import lcmc.data.Cluster;
-import lcmc.data.Host;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
 import lcmc.gui.dialog.BugReport;
 
 /**

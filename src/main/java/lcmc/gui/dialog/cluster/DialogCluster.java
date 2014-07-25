@@ -23,7 +23,7 @@
 
 package lcmc.gui.dialog.cluster;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.dialog.WizardDialog;
 
 /**

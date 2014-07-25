@@ -1,7 +1,7 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.testutils.annotation.type.GuiTest;

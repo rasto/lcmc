@@ -22,7 +22,7 @@
 
 package lcmc;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
 import lcmc.utilities.Logger;

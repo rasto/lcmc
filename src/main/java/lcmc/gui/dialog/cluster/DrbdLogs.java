@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.dialog.ClusterLogs;
 
 /**

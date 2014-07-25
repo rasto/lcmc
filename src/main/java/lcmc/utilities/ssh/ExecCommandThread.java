@@ -28,7 +28,7 @@ import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.configs.DistResource;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;

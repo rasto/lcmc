@@ -22,7 +22,7 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.utilities.ssh.ExecCommandConfig;
 
 /**

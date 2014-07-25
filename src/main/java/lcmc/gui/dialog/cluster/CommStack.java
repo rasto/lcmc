@@ -30,12 +30,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
-import lcmc.data.Cluster;
-import lcmc.data.Host;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;

@@ -20,8 +20,8 @@
 package lcmc.gui.widget;
 
 import java.util.Map;
-import lcmc.data.AccessMode;
-import lcmc.data.Value;
+import lcmc.model.AccessMode;
+import lcmc.model.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;

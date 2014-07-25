@@ -20,8 +20,8 @@
 
 package lcmc;
 
-import lcmc.data.Host;
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.model.Host;
+import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.NewProxyHostDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;

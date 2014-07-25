@@ -23,9 +23,9 @@ import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import lcmc.data.AccessMode;
-import lcmc.data.StringValue;
-import lcmc.data.Value;
+import lcmc.model.AccessMode;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
 

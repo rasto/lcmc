@@ -22,8 +22,8 @@ package lcmc.gui.resources.crm;
 
 import java.util.Arrays;
 import java.util.List;
-import lcmc.data.Host;
-import lcmc.data.resources.Service;
+import lcmc.model.Host;
+import lcmc.model.resources.Service;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Tools;

@@ -26,7 +26,7 @@ import java.awt.Color;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
 

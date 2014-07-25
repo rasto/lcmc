@@ -41,12 +41,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import lcmc.configs.DistResource;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 

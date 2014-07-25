@@ -20,7 +20,7 @@
 
 package lcmc.robotest;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import static lcmc.robotest.DrbdTest1.addBlockDevice;
 import static lcmc.robotest.DrbdTest1.addDrbdResource;
 import static lcmc.robotest.DrbdTest1.addDrbdVolume;

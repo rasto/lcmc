@@ -21,9 +21,9 @@
 package lcmc.gui.resources.vms;
 
 import java.util.List;
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.resources.Resource;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.resources.Resource;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;

@@ -22,7 +22,7 @@ package lcmc.utilities.ssh;
 
 import java.io.File;
 import java.io.IOException;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

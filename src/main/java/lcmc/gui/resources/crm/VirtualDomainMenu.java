@@ -22,10 +22,10 @@ package lcmc.gui.resources.crm;
 
 import java.util.Collection;
 import java.util.List;
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.vm.VmsXml;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.vm.VmsXml;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;

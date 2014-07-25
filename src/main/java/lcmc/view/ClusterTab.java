@@ -27,7 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterViewPanel;
 import lcmc.gui.EmptyViewPanel;

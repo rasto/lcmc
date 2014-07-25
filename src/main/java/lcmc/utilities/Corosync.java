@@ -22,10 +22,8 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
-import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides corosync commands. There are commands that

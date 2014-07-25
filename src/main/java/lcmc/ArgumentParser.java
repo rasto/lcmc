@@ -20,8 +20,8 @@
 
 package lcmc;
 
-import lcmc.data.Application;
-import lcmc.data.HostOptions;
+import lcmc.model.Application;
+import lcmc.model.HostOptions;
 import lcmc.robotest.RoboTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

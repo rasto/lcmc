@@ -54,7 +54,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;

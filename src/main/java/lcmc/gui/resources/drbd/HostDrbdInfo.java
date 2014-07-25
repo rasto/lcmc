@@ -40,9 +40,9 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.AddDrbdUpgradeDialog;
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.Subtext;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.Subtext;
 import lcmc.gui.Browser;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.HostBrowser;

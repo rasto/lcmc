@@ -29,8 +29,8 @@ import java.util.Collection;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
 
 /**
  * This is a menu object that holds MyMenuItems.

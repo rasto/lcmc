@@ -22,7 +22,7 @@
 
 package lcmc.gui.dialog;
 
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.utilities.Tools;
 
 /**

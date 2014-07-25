@@ -28,11 +28,11 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.Value;
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.Value;
+import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;

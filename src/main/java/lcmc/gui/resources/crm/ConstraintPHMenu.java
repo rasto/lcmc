@@ -22,9 +22,9 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
-import lcmc.data.Host;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyMenuItem;

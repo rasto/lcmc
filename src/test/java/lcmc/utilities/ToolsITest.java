@@ -2,7 +2,7 @@ package lcmc.utilities;
 
 import java.util.Map;
 import javax.swing.JCheckBox;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.testutils.annotation.type.IntegrationTest;

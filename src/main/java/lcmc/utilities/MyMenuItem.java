@@ -40,8 +40,8 @@ import java.awt.geom.Point2D;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JToolTip;
-import lcmc.data.AccessMode;
-import lcmc.data.Application;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()

@@ -1,6 +1,6 @@
 package lcmc.gui;
 
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.utilities.Tools;

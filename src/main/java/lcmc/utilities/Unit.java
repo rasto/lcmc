@@ -22,7 +22,7 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Value;
+import lcmc.model.Value;
 
 /**
  * This class provides unit object with short and long name for combo boxes.

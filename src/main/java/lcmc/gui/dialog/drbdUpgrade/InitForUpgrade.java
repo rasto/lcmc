@@ -23,7 +23,7 @@
 
 package lcmc.gui.dialog.drbdUpgrade;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.cluster.Init;
 

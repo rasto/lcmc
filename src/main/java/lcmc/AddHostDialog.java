@@ -22,8 +22,8 @@
 
 package lcmc;
 
-import lcmc.data.Host;
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.model.Host;
+import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.NewHostDialog;
 import lcmc.utilities.Logger;

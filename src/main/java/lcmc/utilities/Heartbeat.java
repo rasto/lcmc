@@ -22,9 +22,9 @@
 
 package lcmc.utilities;
 
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
+
 /**
  * This class provides heartbeat commands. There are commands that
  * operate on /etc/init.d/heartbeat script etc.

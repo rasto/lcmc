@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.dialog.HostLogs;
 
 /**

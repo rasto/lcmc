@@ -48,9 +48,9 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 
 import lcmc.configs.AppDefaults;
-import lcmc.data.Application;
-import lcmc.data.Cluster;
-import lcmc.data.Host;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
 import lcmc.gui.CrmGraph;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.Info;

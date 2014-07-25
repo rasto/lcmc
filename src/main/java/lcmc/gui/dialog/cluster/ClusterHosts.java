@@ -42,9 +42,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
-import lcmc.data.Cluster;
-import lcmc.data.Host;
-import lcmc.data.Hosts;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
+import lcmc.model.Hosts;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
 

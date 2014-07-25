@@ -20,7 +20,7 @@
 
 package lcmc.robotest;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import static lcmc.robotest.DrbdTest1.createLV;
 import static lcmc.robotest.DrbdTest1.createLVMulti;
 import static lcmc.robotest.DrbdTest1.createPV;

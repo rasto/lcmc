@@ -34,7 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
 import lcmc.AddHostDialog;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;

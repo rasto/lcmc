@@ -26,9 +26,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ConvertCmdCallback;

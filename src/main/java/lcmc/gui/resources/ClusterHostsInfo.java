@@ -24,7 +24,7 @@ package lcmc.gui.resources;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;

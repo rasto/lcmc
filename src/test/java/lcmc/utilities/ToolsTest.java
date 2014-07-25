@@ -12,7 +12,7 @@ import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
 import junitparams.Parameters;
 import lcmc.Exceptions;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.testutils.TestUtils;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;

@@ -22,9 +22,9 @@ package lcmc.gui.resources.drbd;
 
 import java.util.Arrays;
 import java.util.List;
-import lcmc.data.Host;
-import lcmc.data.drbd.DrbdInstallation;
-import lcmc.data.resources.BlockDevice;
+import lcmc.model.Host;
+import lcmc.model.drbd.DrbdInstallation;
+import lcmc.model.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
 import lcmc.testutils.annotation.type.GuiTest;

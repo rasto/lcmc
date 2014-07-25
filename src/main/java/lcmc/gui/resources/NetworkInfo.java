@@ -22,8 +22,8 @@
 package lcmc.gui.resources;
 
 import javax.swing.ImageIcon;
-import lcmc.data.Application;
-import lcmc.data.resources.Network;
+import lcmc.model.Application;
+import lcmc.model.resources.Network;
 import lcmc.gui.Browser;
 import lcmc.utilities.Tools;
 

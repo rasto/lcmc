@@ -21,7 +21,7 @@
 package lcmc.utilities.ssh;
 
 import java.io.IOException;
-import lcmc.data.Host;
+import lcmc.model.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ConnectionCallback;

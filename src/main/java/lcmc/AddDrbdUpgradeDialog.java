@@ -22,7 +22,7 @@
 
 package lcmc;
 
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdUpgrade.Dist;
 import lcmc.gui.resources.drbd.HostDrbdInfo;

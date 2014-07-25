@@ -20,7 +20,7 @@
 
 package lcmc.robotest;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 
 /**
  * This class is used to test the GUI.

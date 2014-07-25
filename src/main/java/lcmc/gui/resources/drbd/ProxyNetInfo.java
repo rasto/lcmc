@@ -21,8 +21,8 @@
 
 package lcmc.gui.resources.drbd;
 
-import lcmc.data.Host;
-import lcmc.data.resources.NetInterface;
+import lcmc.model.Host;
+import lcmc.model.resources.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
 

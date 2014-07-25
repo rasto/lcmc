@@ -24,7 +24,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JCheckBox;
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.aborted;

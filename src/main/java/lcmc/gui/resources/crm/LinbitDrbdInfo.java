@@ -22,9 +22,9 @@
 package lcmc.gui.resources.crm;
 
 import java.util.Map;
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.crm.ResourceAgent;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.ResourceInfo;
 

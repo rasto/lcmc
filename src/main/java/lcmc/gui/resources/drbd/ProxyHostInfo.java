@@ -36,8 +36,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
-import lcmc.data.Application;
-import lcmc.data.Host;
+import lcmc.model.Application;
+import lcmc.model.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.HostBrowser;
@@ -50,7 +50,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
 
 /**
  * This class holds info data for a host.

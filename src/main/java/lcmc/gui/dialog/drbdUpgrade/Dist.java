@@ -22,8 +22,8 @@
 
 package lcmc.gui.dialog.drbdUpgrade;
 
-import lcmc.data.Host;
-import lcmc.data.drbd.DrbdInstallation;
+import lcmc.model.Host;
+import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.DrbdLinbitAvailPackages;
 

@@ -21,8 +21,8 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-import lcmc.data.Application;
-import lcmc.data.drbd.DrbdXml;
+import lcmc.model.Application;
+import lcmc.model.drbd.DrbdXml;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.DrbdGraph;
 import lcmc.testutils.annotation.type.GuiTest;

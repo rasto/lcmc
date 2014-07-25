@@ -20,9 +20,11 @@
 
 package lcmc.presenter;
 
-import lcmc.data.Cluster;
+import lcmc.model.Cluster;
 import lcmc.utilities.Tools;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ClusterPresenter {
     public void onCloseCluster(final Cluster cluster) {
         disconnectCluster(cluster);

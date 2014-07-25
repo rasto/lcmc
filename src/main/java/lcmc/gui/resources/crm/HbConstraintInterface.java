@@ -23,9 +23,9 @@ package lcmc.gui.resources.crm;
 
 import java.util.Map;
 import javax.swing.JPanel;
-import lcmc.data.Application;
-import lcmc.data.Host;
-import lcmc.data.resources.Service;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.resources.Service;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 
