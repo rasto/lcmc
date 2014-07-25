@@ -339,23 +339,8 @@ public final class Tools {
     /** Stops the specified clusters in the gui. */
     public static void stopClusters(final Iterable<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
-            stopCluster(cluster);
+            cluster.removeClusterAndDisconnect();
         }
-    }
-
-    /** Stops the specified clusters in the gui. */
-    public static void stopCluster(final Cluster cluster) {
-        cluster.removeCluster();
-        for (final Host host : cluster.getHosts()) {
-            // TODO: can be run concurrently.
-            host.disconnect();
-        }
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                getGUIData().getClustersPanel().removeTabWithCluster(cluster);
-            }
-        });
     }
 
     /** Removes the specified clusters from the gui. */

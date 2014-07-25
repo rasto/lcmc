@@ -35,7 +35,7 @@ public class ClusterPresenter {
             @Override
             public void run() {
                 if (cluster.isTabClosable()) {
-                    Tools.stopCluster(cluster);
+                    cluster.removeClusterAndDisconnect();
                     Tools.getGUIData().getEmptyBrowser().setDisconnected(cluster);
                 }
             }

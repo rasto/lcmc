@@ -404,4 +404,19 @@ public class Cluster implements Comparable<Cluster> {
     public void setTabClosable(final boolean tabClosable) {
         this.tabClosable = tabClosable;
     }
+
+    public void removeClusterAndDisconnect() {
+        removeCluster();
+        for (final Host host : hosts) {
+            host.disconnect();
+        }
+        final Cluster thisCluster = this;
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                Tools.getGUIData().getClustersPanel().removeTabWithCluster(thisCluster);
+            }
+        });
+    }
+
 }
