@@ -34,7 +34,7 @@ import lcmc.Exceptions;
 import lcmc.data.resources.BlockDevice;
 import lcmc.data.resources.Network;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.ClusterTab;
+import lcmc.view.ClusterTab;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

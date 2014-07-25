@@ -50,6 +50,8 @@ import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import lcmc.view.ClusterTab;
+import lcmc.view.ClustersPanel;
 
 /**
  * Holds global GUI data, so that they can be retrieved easily throughout
@@ -202,7 +204,7 @@ public final class GUIData  {
         return clustersPanel;
     }
 
-    void setClustersPanel(final ClustersPanel clustersPanel) {
+    public void setClustersPanel(final ClustersPanel clustersPanel) {
         this.clustersPanel = clustersPanel;
     }
 

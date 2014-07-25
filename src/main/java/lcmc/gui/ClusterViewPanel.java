@@ -32,7 +32,7 @@ import lcmc.utilities.Tools;
 public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private final transient Cluster cluster;
 
-    ClusterViewPanel(final Cluster cluster) {
+    public ClusterViewPanel(final Cluster cluster) {
         super();
         this.cluster = cluster;
         cluster.createClusterBrowser();

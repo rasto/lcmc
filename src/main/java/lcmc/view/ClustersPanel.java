@@ -20,16 +20,12 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui;
+package lcmc.view;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -44,7 +40,6 @@ import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import lcmc.data.Cluster;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +53,6 @@ import org.springframework.stereotype.Component;
 @Component
 public final class ClustersPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
-    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     private static final ImageIcon ALL_CLUSTERS_ICON = Tools.createImageIcon(
                                                             Tools.getDefault("ClustersPanel.ClustersIcon"));
     private static final String ALL_CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
@@ -104,13 +98,13 @@ public final class ClustersPanel extends JPanel {
         add(tabbedPane);
     }
 
-    void addClusterTab(final ClusterTab clusterTab) {
+    public void addClusterTab(final ClusterTab clusterTab) {
         LOG.debug2("addTab: cluster: " + clusterTab.getCluster().getName());
         if (tabbedPane.getTabCount() == 1) {
             removeAllTabs();
         }
         final String title = Tools.join(" ", clusterTab.getCluster().getHostNames());
-        tabbedPane.addTab(clusterTab.getCluster().getName(), CLUSTER_ICON, clusterTab, title);
+        tabbedPane.addTab(clusterTab.getCluster().getName(), ClusterTab.CLUSTER_ICON, clusterTab, title);
 
         addTabComponentWithCloseButton(clusterTab);
         tabbedPane.setSelectedComponent(clusterTab);
@@ -122,7 +116,7 @@ public final class ClustersPanel extends JPanel {
         tabbedPane.addTab(label, ALL_CLUSTERS_ICON, newEmptyClusterTab, Tools.getString("ClustersPanel.ClustersTabTip"));
     }
 
-    void removeTab() {
+    public void removeTab() {
         removeSelectedTab(getClusterTab());
     }
 
@@ -135,7 +129,7 @@ public final class ClustersPanel extends JPanel {
         addClustersTab("");
     }
 
-    void renameSelectedTab(final String newName) {
+    public void renameSelectedTab(final String newName) {
         final JLabel label = getClusterTab().getLabelTitle();
         if (label != null) {
             label.setText(newName);
@@ -143,13 +137,13 @@ public final class ClustersPanel extends JPanel {
         refreshView();
     }
 
-    void refreshView() {
+    public void refreshView() {
         tabbedPane.invalidate();
         tabbedPane.validate();
         tabbedPane.repaint();
     }
 
-    ClusterTab getClusterTab() {
+    public ClusterTab getClusterTab() {
         final java.awt.Component sp = tabbedPane.getSelectedComponent();
         if (sp == null) {
             return null;
@@ -174,60 +168,11 @@ public final class ClustersPanel extends JPanel {
     }
 
     private void addTabComponentWithCloseButton(final ClusterTab clusterTab) {
-        final JPanel tabPanel = new JPanel(new GridBagLayout());
-        tabPanel.setOpaque(false);
-        final JLabel iconLabel = new JLabel(CLUSTER_ICON);
-
-        final MyButton clusterButton = getClusterButton(clusterTab.getCluster());
-
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 0.0;
-        tabPanel.add(iconLabel, gbc);
-
-        gbc.gridx++;
-        gbc.weightx = 1.0;
-        tabPanel.add(clusterTab.getLabelTitle(), gbc);
-
-        gbc.gridx++;
-        gbc.weightx = 0.0;
-        tabPanel.add(clusterButton, gbc);
+        final JPanel tabPanel = clusterTab.createTabComponentWithCloseButton();
 
         final int index = tabbedPane.indexOfComponent(clusterTab);
         tabbedPane.setTabComponentAt(index, tabPanel);
     }
-
-    private MyButton getClusterButton(final Cluster cluster) {
-        final MyButton clusterButton = new MyButton("X");
-        clusterButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
-        clusterButton.setMargin(new Insets(0, 0, 0, 0));
-        clusterButton.setIconTextGap(0);
-
-        final ActionListener disconnectAction =
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        disconnectCluster(cluster);
-                    }
-                };
-        clusterButton.addActionListener(disconnectAction);
-        return clusterButton;
-    }
-
-    private void disconnectCluster(final Cluster cluster) {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (cluster.isTabClosable()) {
-                    Tools.stopCluster(cluster);
-                    Tools.getGUIData().getEmptyBrowser().setDisconnected(cluster);
-                }
-            }
-        });
-        t.start();
-    }
-
 
     /**
      * Removes selected tab, after clicking on the cancel button in the config

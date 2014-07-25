@@ -42,7 +42,7 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of an empty tab panel with new cluster and host button.
  */
-final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
+public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClusterTab.ClusterIcon"));
@@ -51,7 +51,7 @@ final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
     private final transient EmptyBrowser browser;
 
-    EmptyViewPanel() {
+    public EmptyViewPanel() {
         super();
         browser = new EmptyBrowser();
         Tools.getGUIData().setEmptyBrowser(browser);

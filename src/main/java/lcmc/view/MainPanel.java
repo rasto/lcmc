@@ -29,7 +29,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import lcmc.data.Host;
-import lcmc.gui.ClustersPanel;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

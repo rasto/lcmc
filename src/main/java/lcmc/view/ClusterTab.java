@@ -20,13 +20,21 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.gui;
+package lcmc.view;
 
-import java.awt.BorderLayout;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import lcmc.data.Cluster;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterViewPanel;
+import lcmc.gui.EmptyViewPanel;
+import lcmc.presenter.ClusterPresenter;
+import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,6 +45,11 @@ import org.springframework.stereotype.Component;
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
     private JLabel labelTitle;
+
+    @Autowired
+    private ClusterPresenter clusterPresenter;
+
+    public static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
 
     public void initWithCluster(final Cluster cluster0) {
         this.cluster = cluster0;
@@ -61,7 +74,7 @@ public final class ClusterTab extends JPanel {
         repaint();
     }
 
-    Cluster getCluster() {
+    public Cluster getCluster() {
         return cluster;
     }
 
@@ -79,5 +92,45 @@ public final class ClusterTab extends JPanel {
             return null;
         }
         return cluster.getName();
+    }
+
+    public JPanel createTabComponentWithCloseButton() {
+        final JPanel tabPanel = new JPanel(new GridBagLayout());
+        tabPanel.setOpaque(false);
+        final JLabel iconLabel = new JLabel(CLUSTER_ICON);
+
+        final MyButton clusterButton = getClusterButton();
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        tabPanel.add(iconLabel, gbc);
+
+        gbc.gridx++;
+        gbc.weightx = 1.0;
+        tabPanel.add(labelTitle, gbc);
+
+        gbc.gridx++;
+        gbc.weightx = 0.0;
+        tabPanel.add(clusterButton, gbc);
+        return tabPanel;
+    }
+
+    private MyButton getClusterButton() {
+        final MyButton closeButton = new MyButton("X");
+        closeButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
+        closeButton.setMargin(new Insets(0, 0, 0, 0));
+        closeButton.setIconTextGap(0);
+
+        final ActionListener closeAction =
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        clusterPresenter.onCloseCluster(cluster);
+                    }
+                };
+        closeButton.addActionListener(closeAction);
+        return closeButton;
     }
 }
