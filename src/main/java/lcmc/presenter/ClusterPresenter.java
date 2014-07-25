@@ -34,7 +34,7 @@ public class ClusterPresenter {
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                if (cluster.isTabClosable()) {
+                if (cluster.isClusterTabClosable()) {
                     cluster.removeClusterAndDisconnect();
                     Tools.getGUIData().getEmptyBrowser().setDisconnected(cluster);
                 }

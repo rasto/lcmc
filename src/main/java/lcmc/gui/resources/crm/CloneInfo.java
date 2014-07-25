@@ -218,7 +218,7 @@ public class CloneInfo extends ServiceInfo {
              colors.add(ClusterBrowser.SERVICE_STOPPED_FILL_PAINT);
              return colors;
          } else {
-             return getBrowser().getCluster().getHostColors(nodes);
+             return getBrowser().getCluster().getHostColorsInGraphs(nodes);
          }
     }
 
@@ -275,7 +275,7 @@ public class CloneInfo extends ServiceInfo {
             } else {
                 texts.add(new Subtext("running on:", null, Color.BLACK));
             }
-            final List<Color> colors = getBrowser().getCluster().getHostColors(runningOnNodes);
+            final List<Color> colors = getBrowser().getCluster().getHostColorsInGraphs(runningOnNodes);
             int i = 0;
             for (final String n : runningOnNodes) {
                 final Color color;
@@ -296,7 +296,7 @@ public class CloneInfo extends ServiceInfo {
         if (getService().isMaster()) {
             final List<String> slaveOnNodes = getSlaveOnNodes(runMode);
             if (slaveOnNodes != null && !slaveOnNodes.isEmpty()) {
-                final List<Color> colors = getBrowser().getCluster().getHostColors(slaveOnNodes);
+                final List<Color> colors = getBrowser().getCluster().getHostColorsInGraphs(slaveOnNodes);
                 if (cs != null && cs.getResourceAgent().isLinbitDrbd()) {
                     texts.add(new Subtext("secondary on:", null, Color.BLACK));
                 } else {

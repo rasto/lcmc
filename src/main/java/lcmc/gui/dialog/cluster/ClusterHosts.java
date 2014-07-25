@@ -78,7 +78,7 @@ final class ClusterHosts extends DialogCluster {
     /** It is executed after the dialog is applied. */
     @Override
     protected void finishDialog() {
-        getCluster().clearHosts();
+        getCluster().removeAllHosts();
         for (final Map.Entry<JCheckBox, Host> checkBoxEntry : checkBoxToHost.entrySet()) {
             if (checkBoxEntry.getKey().isSelected()) {
                 final Host host = checkBoxEntry.getValue();

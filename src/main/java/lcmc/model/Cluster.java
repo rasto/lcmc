@@ -43,67 +43,48 @@ import lcmc.utilities.Tools;
 /**
  * This class holds cluster data and implementation of cluster related
  * methods.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class Cluster implements Comparable<Cluster> {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
-    /** Name of the cluster. */
     private String name = null;
-    /** Hosts that belong to this cluster. */
     private final Set<Host> hosts = new LinkedHashSet<Host>();
-    /** Cluster tab of this cluster. */
     private ClusterTab clusterTab = null;
-    /** Cluster browser of this cluster. */
     private ClusterBrowser clusterBrowser;
     /** Default colors of the hosts. */
-    private final Color[] hostColors = {
-                                  new Color(228, 228, 32),
-                                  new Color(102, 204, 255), /* blue */
-                                  Color.PINK,
-                                  new Color(255, 100, 0), /* orange */
-                                  Color.WHITE,
-                                 };
-    /** Whether this cluster should be saved. */
+    private final Color[] defaultHostColors = {new Color(228, 228, 32),
+                                               new Color(102, 204, 255), /* blue */
+                                               Color.PINK,
+                                               new Color(255, 100, 0), /* orange */
+                                               Color.WHITE,
+                                              };
     private boolean savable = true;
-    /** Whether the cluster tab is closable, e.g. during the cluster wizard.*/
-    private boolean tabClosable = true;
+    private boolean clusterTabClosable = true;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
 
-
-    /** Prepares a new {@code Cluster} object. */
-    public Cluster() {
-        /* do nothing */
-    }
-
-    /** Prepares a new {@code Cluster} object. */
     public Cluster(final String name) {
         this.name = name;
     }
 
-    /** Creates a new cluster browser object. */
+    public Cluster() {
+
+    }
+
     public void createClusterBrowser() {
         LOG.debug1("createClusterBrowser: " + name);
         clusterBrowser = new ClusterBrowser(this);
     }
 
-    /** Sets name of this cluster. */
     public void setName(final String name) {
         this.name = name;
     }
 
-    /** returns resource tree for this cluster. */
     public ClusterBrowser getBrowser() {
         return clusterBrowser;
     }
 
-    /** Removes the cluster. */
     public void removeCluster() {
         LOG.debug1("removeCluster: " + name);
         final ClusterBrowser cb = clusterBrowser;
@@ -114,30 +95,24 @@ public class Cluster implements Comparable<Cluster> {
         }
     }
 
-    /** Adds host to hosts, that are part of this cluster. */
     public void addHost(final Host host) {
         final int id = hosts.size();
         host.setPositionInTheCluster(id);
-        if (id < hostColors.length) {
-            host.setColor(hostColors[id]);
+        if (id < defaultHostColors.length) {
+            host.setColor(defaultHostColors[id]);
         }
         hosts.add(host);
         proxyHosts.add(host);
     }
 
-    /** Gets set of hosts that are part of this cluster. */
     public Set<Host> getHosts() {
         return hosts;
     }
 
-    /**
-     * Gets set of hosts that are part of this cluster as an array of strings.
-     */
     public Host[] getHostsArray() {
         return hosts.toArray(new Host [hosts.size()]);
     }
 
-    /** Returns names of the hosts in this cluster. */
     public String[] getHostNames() {
         final List<String> hostNames = new ArrayList<String>();
         for (final Host host : hosts) {
@@ -146,43 +121,36 @@ public class Cluster implements Comparable<Cluster> {
         return hostNames.toArray(new String[hostNames.size()]);
     }
 
-    /** Removes all hosts. */
-    public void clearHosts() {
+    public void removeAllHosts() {
         hosts.clear();
     }
 
-    /** Returns number of hosts. */
     public int hostsCount() {
         return hosts.size();
     }
 
-    /** Gets name of this cluster. */
     public String getName() {
         return name;
     }
 
-    /** Sets cluster panel, that contains host views. */
     public void setClusterTab(final ClusterTab clusterTab) {
         this.clusterTab = clusterTab;
     }
 
-    /** Gets cluster panel. */
     public ClusterTab getClusterTab() {
         return clusterTab;
     }
 
     /**
      * Gets block devices that are common on all hosts in the cluster.
-     * The block devices, that are already in the heartbeat or are used by
+     * The block devices, that are already in the CRM or are used by
      * drbd are not returned.
      */
     public List<String> getCommonBlockDevices() {
         List<String> namesIntersection = null;
 
         for (final Host host : hosts) {
-            namesIntersection =
-                                host.getBlockDevicesNamesIntersection(
-                                                namesIntersection);
+            namesIntersection = host.getBlockDevicesNamesIntersection(namesIntersection);
         }
 
         final List<String> commonBlockDevices = new ArrayList<String>();
@@ -202,7 +170,6 @@ public class Cluster implements Comparable<Cluster> {
         return list.toArray(new BlockDevice [list.size()]);
     }
 
-    /** Returns true if cluster contains the host. */
     public boolean contains(final String hostName) {
         for (final Host host : hosts) {
             if (hostName != null && hostName.equals(host.getName())) {
@@ -212,55 +179,44 @@ public class Cluster implements Comparable<Cluster> {
         return false;
     }
 
-    /** Gets networks that are common on all hosts in the cluster. */
     public Network[] getCommonNetworks() {
         Map<String, Integer> networksIntersection = null;
         for (final Host host : hosts) {
-            networksIntersection =
-                            host.getNetworksIntersection(networksIntersection);
+            networksIntersection = host.getNetworksIntersection(networksIntersection);
         }
 
         final List<Network> commonNetworks = new ArrayList<Network>();
-        for (final Map.Entry<String, Integer> stringIntegerEntry
-                                           : networksIntersection.entrySet()) {
+        for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
             final List<String> ips = new ArrayList<String>();
             for (final Host host : hosts) {
                 ips.addAll(host.getIpsFromNetwork(stringIntegerEntry.getKey()));
             }
             final Integer cidr = stringIntegerEntry.getValue();
-            final Network network =
-                            new Network(stringIntegerEntry.getKey(),
-                                        ips.toArray(new String[ips.size()]),
-                                        cidr);
+            final Network network = new Network(stringIntegerEntry.getKey(), ips.toArray(new String[ips.size()]), cidr);
             commonNetworks.add(network);
         }
 
         return commonNetworks.toArray(new Network[commonNetworks.size()]);
     }
 
-    /** Gets filesystems that are common on all hosts in the cluster. */
     public String[] getCommonFileSystems() {
         Set<String> intersection = null;
         for (final Host host : hosts) {
-            intersection = Tools.getIntersection(host.getFileSystemsList(),
-                                                 intersection);
+            intersection = Tools.getIntersection(host.getFileSystemsList(), intersection);
         }
         return intersection.toArray(new String[intersection.size()]);
     }
 
-    /** Gets mount points that are common on all hosts in the cluster. */
     public String[] getCommonMountPoints() {
         Set<String> intersection = null;
 
         for (final Host host : hosts) {
-            intersection = Tools.getIntersection(host.getMountPointsList(),
-                                                 intersection);
+            intersection = Tools.getIntersection(host.getMountPointsList(), intersection);
         }
         return intersection.toArray(new String[intersection.size()]);
     }
 
-    /** Returns the color for graph for the specified host. */
-    public List<Color> getHostColors(final Collection<String> nodes) {
+    public List<Color> getHostColorsInGraphs(final Collection<String> nodes) {
         final List<Color> colors = new ArrayList<Color>();
         if (nodes == null || nodes.isEmpty()) {
             colors.add(Tools.getDefaultColor("CRMGraph.FillPaintStopped"));
@@ -281,7 +237,6 @@ public class Cluster implements Comparable<Cluster> {
         return colors;
     }
 
-    /** Returns the host object with the specified name. */
     public Host getHostByName(final String name) {
         for (final Host host : hosts) {
             if (name.equals(host.getName())) {
@@ -292,9 +247,7 @@ public class Cluster implements Comparable<Cluster> {
     }
 
     /** Connect all hosts in the cluster. Returns false, if it was canceled. */
-    public boolean connect(final Window rootPane,
-                           final boolean progressIndicator,
-                           final int index) {
+    public boolean connect(final Window rootPane, final boolean progressIndicator, final int index) {
         boolean first = true;
         String dsaKey = null;
         String rsaKey = null;
@@ -311,9 +264,7 @@ public class Cluster implements Comparable<Cluster> {
             if (rootPane == null) {
                 host.connect(null, progressIndicator, index);
             } else {
-                host.connect(new SSHGui(rootPane, host, null),
-                             progressIndicator,
-                             index);
+                host.connect(new SSHGui(rootPane, host, null), progressIndicator, index);
             }
             host.getSSH().waitForConnection();
             if (first) {
@@ -358,28 +309,23 @@ public class Cluster implements Comparable<Cluster> {
         return minVersion;
     }
 
-    /** Set whether this cluster should be saved. */
     public void setSavable(final boolean savable) {
         this.savable = savable;
     }
 
-    /** Return whether this cluster should be saved. */
     public boolean isSavable() {
         return savable;
     }
 
-    /** Return all proxy hosts. */
     public Set<Host> getProxyHosts() {
         return proxyHosts;
     }
 
-    /** Add proxy host. */
     public void addProxyHost(final Host host) {
         proxyHosts.add(host);
         host.setCluster(this);
     }
 
-    /** Return proxy host by name. */
     public Host getProxyHostByName(final String name) {
         for (final Host h : proxyHosts) {
             if (h.getName().equals(name)) {
@@ -395,14 +341,12 @@ public class Cluster implements Comparable<Cluster> {
         return Tools.compareNames(name, o.name);
     }
 
-    /** Return whether the cluster tab is closable. */
-    public boolean isTabClosable() {
-        return tabClosable;
+    public boolean isClusterTabClosable() {
+        return clusterTabClosable;
     }
 
-    /** Set whether the cluster tab is closable. */
-    public void setTabClosable(final boolean tabClosable) {
-        this.tabClosable = tabClosable;
+    public void setClusterTabClosable(final boolean clusterTabClosable) {
+        this.clusterTabClosable = clusterTabClosable;
     }
 
     public void removeClusterAndDisconnect() {
@@ -418,5 +362,4 @@ public class Cluster implements Comparable<Cluster> {
             }
         });
     }
-
 }

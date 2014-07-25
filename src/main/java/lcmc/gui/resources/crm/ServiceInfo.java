@@ -985,7 +985,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     public List<Color> getHostColors(final Application.RunMode runMode) {
-        return getBrowser().getCluster().getHostColors(getRunningOnNodes(runMode));
+        return getBrowser().getCluster().getHostColorsInGraphs(getRunningOnNodes(runMode));
     }
 
     /**
@@ -4181,7 +4181,7 @@ public class ServiceInfo extends EditableInfo {
                         color = Color.RED;
                         textColor = Color.WHITE;
                     } else {
-                        color = getBrowser().getCluster().getHostColors(runningOnNodes).get(0);
+                        color = getBrowser().getCluster().getHostColorsInGraphs(runningOnNodes).get(0);
                     }
                 }
             }

@@ -41,7 +41,7 @@ public final class AddClusterDialog {
     public void showDialogs() {
         Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
-        cluster.setTabClosable(false);
+        cluster.setClusterTabClosable(false);
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -61,7 +61,7 @@ public final class AddClusterDialog {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
-                    cluster.setTabClosable(true);
+                    cluster.setClusterTabClosable(true);
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
@@ -86,6 +86,6 @@ public final class AddClusterDialog {
                 Tools.getGUIData().checkAddClusterButtons();
             }
         });
-        cluster.setTabClosable(true);
+        cluster.setClusterTabClosable(true);
     }
 }

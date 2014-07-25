@@ -43,7 +43,7 @@ public final class EditClusterDialog {
     }
 
     public void showDialogs() {
-        cluster.setTabClosable(false);
+        cluster.setClusterTabClosable(false);
         DialogCluster dialog = new Name(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
@@ -53,7 +53,7 @@ public final class EditClusterDialog {
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
-                    cluster.setTabClosable(true);
+                    cluster.setClusterTabClosable(true);
                     return;
                 }
             } else if (dialog.isPressedButton(FINISH_BTN)) {
@@ -63,6 +63,6 @@ public final class EditClusterDialog {
             dialog = newdialog;
         }
         Tools.getGUIData().expandTerminalSplitPane(1);
-        cluster.setTabClosable(true);
+        cluster.setClusterTabClosable(true);
     }
 }
