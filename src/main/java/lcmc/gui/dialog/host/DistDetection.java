@@ -30,6 +30,8 @@ import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog that shows which distribution was detected.
@@ -38,13 +40,10 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 final class DistDetection extends DialogHost {
-    DistDetection(final WizardDialog previousDialog,
-                  final Host host,
-                  final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
-
+    @Autowired
+    private CheckInstallation checkInstallation;
     /** Inits dialog and starts the distribution detection. */
     @Override
     protected void initDialogBeforeVisible() {
@@ -74,7 +73,8 @@ final class DistDetection extends DialogHost {
     /** Returns the next dialog which is CheckInstallation. */
     @Override
     public WizardDialog nextDialog() {
-        return new CheckInstallation(this, getHost(), getDrbdInstallation());
+        checkInstallation.init(this, getHost(), getDrbdInstallation());
+        return checkInstallation;
     }
 
     /**

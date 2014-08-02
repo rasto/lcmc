@@ -23,7 +23,6 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
@@ -41,6 +40,8 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -51,6 +52,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public class NewHostDialog extends DialogHost {
     /** Normal widths of the fields. */
     private static final int FIELD_WIDTH = 120;
@@ -72,12 +74,8 @@ public class NewHostDialog extends DialogHost {
     private boolean bigFields = false;
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
-
-    public NewHostDialog(final WizardDialog previousDialog,
-                         final Host host,
-                         final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private Configuration configurationDialog;
 
     /** Finishes the dialog, stores the values and adds the host tab. */
     @Override
@@ -103,7 +101,8 @@ public class NewHostDialog extends DialogHost {
     /** Sets nextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
-        return new Configuration(this, getHost(), getDrbdInstallation());
+        configurationDialog.init(this, getHost(), getDrbdInstallation());
+        return configurationDialog;
     }
 
     /**
@@ -260,7 +259,7 @@ public class NewHostDialog extends DialogHost {
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(Tools.getDefaultColor(
                                             "ConfigDialog.Background.Light"));
-        inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Host */
         final JLabel hostLabel = new JLabel(

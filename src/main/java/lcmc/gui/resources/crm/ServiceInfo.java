@@ -192,7 +192,7 @@ public class ServiceInfo extends EditableInfo {
     private Widget typeRadioGroup;
 
     protected ServiceInfo(final String name, final ResourceAgent resourceAgent, final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         this.resourceAgent = resourceAgent;
         if (resourceAgent != null && resourceAgent.isStonith()) {
             setResource(new Service(name.replaceAll("/", "_")));

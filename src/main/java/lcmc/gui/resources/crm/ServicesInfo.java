@@ -23,7 +23,6 @@
 package lcmc.gui.resources.crm;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,11 +66,14 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for services view and global heartbeat
  * config.
  */
+@Component
 public class ServicesInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
@@ -82,9 +84,12 @@ public class ServicesInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
 
-    /** Prepares a new {@code ServicesInfo} object. */
-    public ServicesInfo(final String name, final Browser browser) {
-        super(name, browser);
+    @Autowired
+    private ServicesMenu servicesMenu;
+
+    @Override
+    public void init(final String name, final Browser browser) {
+        super.init(name, browser);
         setResource(new Resource(name));
     }
 
@@ -1030,7 +1035,7 @@ public class ServicesInfo extends EditableInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
@@ -1239,8 +1244,7 @@ public class ServicesInfo extends EditableInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final ServicesMenu servicesMenu = new ServicesMenu(this);
-        return servicesMenu.getPulldownMenu();
+        return servicesMenu.getPulldownMenu(this);
     }
     /**
      * Returns whether all the parameters are correct. If param is null,

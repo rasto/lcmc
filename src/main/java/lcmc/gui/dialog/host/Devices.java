@@ -37,6 +37,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where hardware information is collected.
@@ -45,12 +47,10 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public class Devices extends DialogHost {
-    public Devices(final WizardDialog previousDialog,
-                   final Host host,
-                   final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private DistDetection distDetection;
 
     /** Checks the answer and makes it visible to the user. */
     final void checkAnswer(final String ans) {
@@ -124,7 +124,8 @@ public class Devices extends DialogHost {
     /** Returns the next dialog object. */
     @Override
     public WizardDialog nextDialog() {
-        return new DistDetection(this, getHost(), getDrbdInstallation());
+        distDetection.init(this, getHost(), getDrbdInstallation());
+        return distDetection;
     }
 
     /**

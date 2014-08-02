@@ -22,7 +22,6 @@
 
 package lcmc.gui.dialog.host;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +44,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -53,21 +54,16 @@ import lcmc.utilities.ssh.ExecCommandConfig;
  * @author Rasto Levrinc
  * @version $Id$
  */
+@Component
 public class DrbdAvailFiles extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
+    @Autowired
+    private LinbitLogin linbitLogin;
     /** Combo box with drbd versions. */
     private Widget drbdVersionCombo = null;
     /** Combo box with drbd builds. (kernel, arch) */
     private Widget drbdBuildCombo = null;
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
-
-    public DrbdAvailFiles(final WizardDialog previousDialog,
-                          final Host host,
-                          final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
 
     /**
      * Inits the dialog and starts detecting the available drbd builds and
@@ -79,8 +75,7 @@ public class DrbdAvailFiles extends DialogHost {
         listenersAdded = false;
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
-        disableComponents(new Component[]{drbdVersionCombo.getComponent(),
-                                          drbdBuildCombo.getComponent()});
+        disableComponents(new java.awt.Component[]{drbdVersionCombo.getComponent(), drbdBuildCombo.getComponent()});
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -221,7 +216,7 @@ public class DrbdAvailFiles extends DialogHost {
      * first time.
      */
     protected final void allDone() {
-        nextDialogObject = new LinbitLogin(this, getHost(), getDrbdInstallation());
+        linbitLogin.init(this, getHost(), getDrbdInstallation());
         progressBarDone();
         enableComponents();
         buttonClass(nextButton()).requestFocus();
@@ -238,7 +233,7 @@ public class DrbdAvailFiles extends DialogHost {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return nextDialogObject;
+        return linbitLogin;
     }
 
     /**
@@ -305,7 +300,7 @@ public class DrbdAvailFiles extends DialogHost {
                 public void check(final Value value) {
                     enableComponentsLater(
                             new JComponent[]{buttonClass(nextButton())});
-                    disableComponents(new Component[]{drbdBuildCombo.getComponent()});
+                    disableComponents(new java.awt.Component[]{drbdBuildCombo.getComponent()});
                     final String item = drbdVersionCombo.getStringValue();
                     Tools.invokeLater(
                         new Runnable() {

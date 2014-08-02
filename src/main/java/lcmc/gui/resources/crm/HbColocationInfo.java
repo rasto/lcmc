@@ -58,7 +58,7 @@ final class HbColocationInfo extends EditableInfo
                      final ServiceInfo serviceInfoRsc,
                      final ServiceInfo serviceInfoWithRsc,
                      final Browser browser) {
-        super("Colocation", browser);
+        super.init("Colocation", browser);
         setResource(new Service("Colocation"));
         this.connectionInfo = connectionInfo;
         this.serviceInfoRsc = serviceInfoRsc;

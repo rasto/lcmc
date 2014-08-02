@@ -36,8 +36,12 @@ import java.util.Map;
 import java.util.Set;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
+import lcmc.model.HostFactory;
+import lcmc.model.UserConfig;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import lcmc.view.ClusterTabFactory;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -206,7 +210,7 @@ public class TestUtils {
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = Tools.getApplication().getSaveFile();
-            Tools.save(saveFile, false);
+            Tools.save(new UserConfig(), saveFile, false);
         }
         for (final Host host : HOSTS) {
             host.disconnect();
@@ -228,13 +232,14 @@ public class TestUtils {
         Tools.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Tools.getGUIData().addClusterTab(cluster);
+                final ClusterTabFactory clusterTabFactory = new ClusterTabFactory();
+                clusterTabFactory.createClusterTab(cluster);
             }
         });
         
-        Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
+        //Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
         final String saveFile = Tools.getApplication().getSaveFile();
-        Tools.save(saveFile, false);
+        Tools.save(new UserConfig(), saveFile, false);
         Tools.getGUIData().refreshClustersPanel();
         
         Tools.getGUIData().expandTerminalSplitPane(1);
@@ -248,7 +253,8 @@ public class TestUtils {
     }
 
     private Host initHost(final String hostName, final String username, final boolean useSudo) {
-        final Host host = Host.createInstance();
+        final HostFactory hostFactory = new HostFactory();
+        final Host host = hostFactory.createInstance();
         host.setEnteredHostOrIp(hostName);
         host.setUsername(username);
         host.setSSHPort("22");

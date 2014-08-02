@@ -67,7 +67,7 @@ final class HbOrderInfo extends EditableInfo
                 final ServiceInfo serviceInfoParent,
                 final ServiceInfo serviceInfoChild,
                 final Browser browser) {
-        super("Order", browser);
+        super.init("Order", browser);
         setResource(new Service("Order"));
         this.connectionInfo = connectionInfo;
         this.serviceInfoParent = serviceInfoParent;

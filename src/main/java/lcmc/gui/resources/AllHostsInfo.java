@@ -53,11 +53,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import lcmc.AddHostDialog;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Clusters;
-import lcmc.model.Host;
+import lcmc.model.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.utilities.Logger;
@@ -66,11 +62,14 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
  * hosts in a cluster.
  */
+@Component
 public final class AllHostsInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
@@ -120,9 +119,15 @@ public final class AllHostsInfo extends Info {
                   CLUSTER_ICON,
                   Tools.getString(
                              "EmptyBrowser.RemoveMarkedClusters.ToolTip"));
-    /** Creates a new AllHostsInfo instance. */
-    public AllHostsInfo(final Browser browser) {
-        super(Tools.getString("ClusterBrowser.AllHosts"), browser);
+    @Autowired
+    private UserConfig userConfig;
+    @Autowired
+    private AddHostDialog addHostDialog;
+    @Autowired
+    private HostFactory hostFactory;
+
+    public void init(final Browser browser) {
+        super.init(Tools.getString("ClusterBrowser.AllHosts"), browser);
     }
 
     /** Remove marked clusters. */
@@ -178,7 +183,7 @@ public final class AllHostsInfo extends Info {
                 Tools.stopClusters(selectedRunningClusters);
                 Tools.removeClusters(selectedClusters);
                 final String saveFile = Tools.getApplication().getSaveFile();
-                Tools.save(saveFile, false);
+                Tools.save(userConfig, saveFile, false);
                 mainPanel.repaint();
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -408,7 +413,7 @@ public final class AllHostsInfo extends Info {
                         final Collection<Cluster> selectedClusters =
                                                  new ArrayList<Cluster>();
                         selectedClusters.add(cluster);
-                        Tools.startClusters(selectedClusters);
+                        userConfig.startClusters(selectedClusters);
 
                         if (cluster.getClusterTab() == null) {
                             loadClusterBtn.setEnabled(true);
@@ -531,7 +536,8 @@ public final class AllHostsInfo extends Info {
                                                 p + 1, hostName.length());
                                 hostName = hostName.substring(0, p);
                             }
-                            final Host host = Host.createInstance(hostName);
+                            final Host host = hostFactory.createInstance(hostName);
+                            host.init();
                             if (username == null) {
                                 host.setUsername(Host.ROOT_USER);
                             } else {
@@ -553,7 +559,7 @@ public final class AllHostsInfo extends Info {
                         final Collection<Cluster> selectedClusters =
                                                  new ArrayList<Cluster>();
                         selectedClusters.add(cluster);
-                        Tools.startClusters(selectedClusters);
+                        userConfig.startClusters(selectedClusters);
                     }
                 });
                 t.start();
@@ -674,7 +680,7 @@ public final class AllHostsInfo extends Info {
                 }
             }
         }
-        Tools.startClusters(selectedClusters);
+        userConfig.startClusters(selectedClusters);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -805,8 +811,9 @@ public final class AllHostsInfo extends Info {
 
                 @Override
                 public void action() {
-                    final AddHostDialog dialog = new AddHostDialog(Host.createInstance());
-                    dialog.showDialogs();
+                    final Host host = hostFactory.createInstance();
+                    host.init();
+                    addHostDialog.showDialogs(host);
                 }
             };
         items.add(newHostWizardItem);

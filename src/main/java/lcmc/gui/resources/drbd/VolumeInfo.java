@@ -140,7 +140,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                final ResourceInfo resourceInfo,
                final List<BlockDevInfo> blockDevInfos,
                final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         assert (resourceInfo != null);
         assert (blockDevInfos.size() >= 2);
 

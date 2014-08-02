@@ -32,10 +32,6 @@ import lcmc.utilities.Tools;
  * heartbeat category is clicked.
  */
 public class HbCategoryInfo extends CategoryInfo {
-    /** Creates the new HbCategoryInfo object with name of the category. */
-    public HbCategoryInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
 
     /** Returns browser object of this info. */
     @Override

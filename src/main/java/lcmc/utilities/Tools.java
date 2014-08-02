@@ -131,8 +131,6 @@ public final class Tools {
     /** Config data object. */
     private static Application application;
     private static GUIData guiData;
-    /** Drbd gui xml object. */
-    private static final UserConfig userConfig = new UserConfig();
     private static final int DIALOG_PANEL_WIDTH = 400;
     private static final int DIALOG_PANEL_HEIGHT = 300;
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
@@ -318,24 +316,6 @@ public final class Tools {
         return content.toString();
     }
 
-    public static void loadConfigData(final String filename) {
-        LOG.debug("loadConfigData: start");
-        final String xml = loadFile(filename, true);
-        if (xml == null) {
-            return;
-        }
-        userConfig.startClusters(null);
-        Tools.getGUIData().allHostsUpdate();
-    }
-
-    /**
-     * Starts the specified clusters and connects to the hosts of these
-     * clusters.
-     */
-    public static void startClusters(final Collection<Cluster> selectedClusters) {
-        userConfig.startClusters(selectedClusters);
-    }
-
     /** Stops the specified clusters in the gui. */
     public static void stopClusters(final Iterable<Cluster> selectedClusters) {
         for (final Cluster cluster : selectedClusters) {
@@ -354,57 +334,6 @@ public final class Tools {
         }
     }
 
-    /** Returns cluster names from the parsed save file. */
-    public static void loadXML(final String xml) {
-        userConfig.loadXML(xml);
-    }
-
-    /** Sets user config from command line options.
-    returns host, for which dns lookup failed. */
-    public static String setUserConfigFromOptions(final Map<String, List<HostOptions>> clusters) {
-        final Map<String, List<Host>> hostMap = new LinkedHashMap<String, List<Host>>();
-        for (final String clusterName : clusters.keySet()) {
-            for (final HostOptions hostOptions : clusters.get(clusterName)) {
-                final String hostnameEntered = hostOptions.getHost();
-                InetAddress[] addresses = null;
-                try {
-                    addresses = InetAddress.getAllByName(hostnameEntered);
-                } catch (final UnknownHostException e) {
-                }
-                String ip = null;
-                if (addresses != null) {
-                    if (addresses.length == 0) {
-                        LOG.debug("setUserConfigFromOptions: lookup failed");
-                        /* lookup failed */
-                    } else {
-                        ip = addresses[0].getHostAddress();
-                    }
-                }
-                if (ip == null) {
-                    return hostnameEntered;
-                }
-                userConfig.setHost(hostMap,
-                                   hostOptions.getUser(),
-                                   hostnameEntered,
-                                   ip,
-                                   hostOptions.getPort(),
-                                   null,
-                                   hostOptions.getSudo(),
-                                   false);
-            }
-        }
-        for (final String clusterName : clusters.keySet()) {
-            final Cluster cluster = new Cluster();
-            cluster.setName(clusterName);
-            cluster.setSavable(false);
-            Tools.getApplication().addClusterToClusters(cluster);
-            for (final HostOptions ho : clusters.get(clusterName)) {
-                userConfig.setHostCluster(hostMap, cluster, ho.getHost(), !UserConfig.PROXY_HOST);
-            }
-        }
-        return null;
-    }
-
     /** Removes all the hosts and clusters from all the panels and data. */
     public static void removeEverything() {
         Tools.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
@@ -420,7 +349,7 @@ public final class Tools {
      *          filename where are the data stored.
      * @param saveAll whether to save clusters specified from the command line
      */
-    public static void save(final String filename, final boolean saveAll) {
+    public static void save(final UserConfig userConfig, final String filename, final boolean saveAll) {
         LOG.debug1("save: start");
         final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
                                                                        Matcher.quoteReplacement(filename));

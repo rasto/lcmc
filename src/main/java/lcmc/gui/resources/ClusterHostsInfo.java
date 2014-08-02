@@ -35,11 +35,6 @@ import lcmc.utilities.MyButton;
  * This class holds the information hosts in this cluster.
  */
 public final class ClusterHostsInfo extends CategoryInfo {
-    /** Prepares a new {@code ClusterHostsInfo} object. */
-    public ClusterHostsInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
-
     /** Returns browser object of this info. */
     @Override
     public ClusterBrowser getBrowser() {

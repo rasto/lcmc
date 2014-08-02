@@ -27,8 +27,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ConvertCmdCallback;
@@ -36,6 +34,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where openais with pacemaker is installed.
@@ -44,15 +44,10 @@ import lcmc.utilities.ssh.Ssh;
  * @version $Id$
  *
  */
+@Component
 final class PacemakerInst extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
-
-    PacemakerInst(final WizardDialog previousDialog,
-                  final Host host,
-                  final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private CheckInstallation checkInstallationDialog = null;
 
     /**
      * Checks the answer of the installation and enables/disables the
@@ -60,9 +55,7 @@ final class PacemakerInst extends DialogHost {
      */
     void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
-        nextDialogObject = new CheckInstallation(getPreviousDialog().getPreviousDialog(),
-                                                 getHost(),
-                                                 getDrbdInstallation());
+        checkInstallationDialog.init(getPreviousDialog().getPreviousDialog(), getHost(), getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.PacemakerInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
@@ -159,7 +152,7 @@ final class PacemakerInst extends DialogHost {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return nextDialogObject;
+        return checkInstallationDialog;
     }
 
     /**

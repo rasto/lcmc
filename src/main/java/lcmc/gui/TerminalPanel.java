@@ -56,6 +56,8 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -63,6 +65,7 @@ import org.springframework.stereotype.Component;
  * remote host. It is also possible to write commands and execute them.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class TerminalPanel extends JScrollPane {
     private static final Logger LOG = LoggerFactory.getLogger(TerminalPanel.class);
     /** Command to list all the cheats. */

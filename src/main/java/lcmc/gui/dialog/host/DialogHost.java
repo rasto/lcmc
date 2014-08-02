@@ -39,6 +39,7 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandThread;
+import org.springframework.stereotype.Component;
 
 /**
  * DialogHost.
@@ -46,17 +47,17 @@ import lcmc.utilities.ssh.ExecCommandThread;
  * @author Rasto Levrinc
  * @version $Id$
  */
+@Component
 public abstract class DialogHost extends WizardDialog {
     /** Host for which is this dialog. */
-    private final Host host;
+    private Host host;
     /** Thread in which a command can be executed. */
     private ExecCommandThread commandThread = null;
 
     private DrbdInstallation drbdInstallation;
 
-    /** Prepares a new {@code DialogHost} object. */
-    protected DialogHost(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
-        super(previousDialog);
+    public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
+        setPreviousDialog(previousDialog);
         this.host = host;
         this.drbdInstallation = drbdInstallation;
     }

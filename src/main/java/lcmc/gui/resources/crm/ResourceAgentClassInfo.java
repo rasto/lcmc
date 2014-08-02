@@ -52,7 +52,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
                                          new HashMap<String, ResourceAgent>();
     /** Prepares a new {@code ResourceAgentClassInfo} object. */
     public ResourceAgentClassInfo(final String name, final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(
                                                                       name)) {
             raMap.put(ra.getServiceName(), ra);

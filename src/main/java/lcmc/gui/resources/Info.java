@@ -115,7 +115,7 @@ public class Info implements Comparable<Info>, Value {
     private boolean updated = false;
     private double animationIndex = 0;
     private String infoCache = "";
-    private final Browser browser;
+    private Browser browser;
     private final Map<String, JTable> tables = new HashMap<String, JTable>();
     private final Map<String, DefaultTableModel> tableModels = new HashMap<String, DefaultTableModel>();
     /** Hash from component to the edit access mode. */
@@ -124,11 +124,7 @@ public class Info implements Comparable<Info>, Value {
     /** Hash from component to the enable access mode. */
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
 
-    /**
-     * @param name
-     *      name that will be shown to the user
-     */
-    public Info(final String name, final Browser browser) {
+    public void init(final String name, final Browser browser) {
         this.name = name;
         this.browser = browser;
     }

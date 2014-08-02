@@ -35,8 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -46,6 +44,8 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where
@@ -55,6 +55,7 @@ import lcmc.utilities.ssh.ExecCommandConfig;
  * @version $Id$
  *
  */
+@Component
 final class CheckInstallation extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
@@ -85,8 +86,8 @@ final class CheckInstallation extends DialogHost {
     private static final String PM_AUTO_OPTION = "pminst";
     private static final String HBPM_AUTO_OPTION = "hbinst";
     private static final String DRBD_AUTO_OPTION = "drbdinst";
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
+
+    private DialogHost nextDialogObject = null;
 
     /** Checking drbd label. */
     private final JLabel drbdLabel = new JLabel(
@@ -130,12 +131,20 @@ final class CheckInstallation extends DialogHost {
     private final JLabel hbPmJLabel = new JLabel("Pcmk/Heartbeat");
     /** Label of pacemaker that can be with corosync or openais. */
     private final JLabel pmJLabel = new JLabel("Pcmk/Corosync");
-
-    CheckInstallation(final WizardDialog previousDialog,
-                      final Host host,
-                      final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private HostFinish hostFinishDialog;
+    @Autowired
+    private DrbdLinbitAvailPackages drbdLinbitAvailPackagesDialog;
+    @Autowired
+    private DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
+    @Autowired
+    private DrbdCommandInst drbdCommandInstDialog;
+    @Autowired
+    private LinbitLogin linbitLoginDialog;
+    @Autowired
+    private HeartbeatInst heartbeatInstDialog;
+    @Autowired
+    private PacemakerInst pacemakerInstDialog;
 
     /** Inits dialog. */
     @Override
@@ -150,7 +159,9 @@ final class CheckInstallation extends DialogHost {
         pmOk = false;
         hbPmOk = false;
 
-        nextDialogObject = new Finish(this, getHost(), getDrbdInstallation());
+        hostFinishDialog.init(this, getHost(), getDrbdInstallation());
+        nextDialogObject = hostFinishDialog;
+
         final CheckInstallation thisClass = this;
         Tools.invokeLater(new Runnable() {
             @Override
@@ -176,18 +187,17 @@ final class CheckInstallation extends DialogHost {
                     getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                     final String button = e.getActionCommand();
                     if (!drbdOk || button.equals(Tools.getString(
-                  "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
+                                                      "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
                         if (im.isLinbitMethod()) {
-                            nextDialogObject =
-                                new DrbdLinbitAvailPackages(thisClass, getHost(), getDrbdInstallation());
+                            nextDialogObject = drbdLinbitAvailPackagesDialog;
                         } else if (im.isSourceMethod()) {
-                           nextDialogObject =
-                               new DrbdAvailSourceFiles(thisClass, getHost(), getDrbdInstallation());
+                            nextDialogObject = drbdAvailSourceFilesDialog;
                         } else {
                             // TODO: this only when there is no drbd installed
-                            nextDialogObject = new DrbdCommandInst(thisClass, getHost(), getDrbdInstallation());
+                            nextDialogObject = drbdCommandInstDialog;
                             getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                         }
+                        nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -195,7 +205,8 @@ final class CheckInstallation extends DialogHost {
                             }
                         });
                     } else {
-                        nextDialogObject = new LinbitLogin(thisClass, getHost(), getDrbdInstallation());
+                        nextDialogObject = linbitLoginDialog;
+                        nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -213,9 +224,9 @@ final class CheckInstallation extends DialogHost {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = new HeartbeatInst(thisClass, getHost(), getDrbdInstallation());
-                    final InstallMethods im =
-                                   (InstallMethods) hbPmInstMethodWi.getValue();
+                    nextDialogObject = heartbeatInstDialog;
+                    nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
+                    final InstallMethods im = (InstallMethods) hbPmInstMethodWi.getValue();
                     getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -233,9 +244,9 @@ final class CheckInstallation extends DialogHost {
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    nextDialogObject = new PacemakerInst(thisClass, getHost(), getDrbdInstallation());
-                    final InstallMethods im =
-                                (InstallMethods) pmInstMethodWi.getValue();
+                    nextDialogObject = pacemakerInstDialog;
+                    nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
+                    final InstallMethods im = (InstallMethods) pmInstMethodWi.getValue();
                     getHost().setPacemakerInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override

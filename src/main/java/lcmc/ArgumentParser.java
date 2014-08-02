@@ -20,8 +20,7 @@
 
 package lcmc;
 
-import lcmc.model.Application;
-import lcmc.model.HostOptions;
+import lcmc.model.*;
 import lcmc.robotest.RoboTest;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -33,15 +32,20 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class ArgumentParser {
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentParser.class);
 
@@ -92,6 +96,8 @@ public class ArgumentParser {
     /** The --cmd-log. /var/log/lcmc.log on the servers. */
     private static final String CMD_LOG_OP = "cmd-log";
     private static final String CHECK_SWING_OP = "check-swing";
+    @Autowired
+    private UserConfig userConfig;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -370,7 +376,7 @@ public class ArgumentParser {
                 throw new ParseException("not enough hosts for cluster: " + clusterEntry.getKey());
             }
         }
-        final String failedHost = lcmc.utilities.Tools.setUserConfigFromOptions(clusters);
+        final String failedHost = setUserConfigFromOptions(clusters);
         if (failedHost != null) {
             LOG.appWarning("parseClusterOptions: could not resolve host \"" + failedHost + "\" skipping");
         }
@@ -427,4 +433,50 @@ public class ArgumentParser {
             }
         }
     }
+
+    /** Sets user config from command line options returns host, for which dns lookup failed. */
+    private String setUserConfigFromOptions(final Map<String, List<HostOptions>> clusters) {
+        final Map<String, List<Host>> hostMap = new LinkedHashMap<String, List<Host>>();
+        for (final String clusterName : clusters.keySet()) {
+            for (final HostOptions hostOptions : clusters.get(clusterName)) {
+                final String hostnameEntered = hostOptions.getHost();
+                InetAddress[] addresses = null;
+                try {
+                    addresses = InetAddress.getAllByName(hostnameEntered);
+                } catch (final UnknownHostException e) {
+                }
+                String ip = null;
+                if (addresses != null) {
+                    if (addresses.length == 0) {
+                        LOG.debug("setUserConfigFromOptions: lookup failed");
+                        /* lookup failed */
+                    } else {
+                        ip = addresses[0].getHostAddress();
+                    }
+                }
+                if (ip == null) {
+                    return hostnameEntered;
+                }
+                userConfig.setHost(hostMap,
+                        hostOptions.getUser(),
+                        hostnameEntered,
+                        ip,
+                        hostOptions.getPort(),
+                        null,
+                        hostOptions.getSudo(),
+                        false);
+            }
+        }
+        for (final String clusterName : clusters.keySet()) {
+            final Cluster cluster = new Cluster();
+            cluster.setName(clusterName);
+            cluster.setSavable(false);
+            Tools.getApplication().addClusterToClusters(cluster);
+            for (final HostOptions ho : clusters.get(clusterName)) {
+                userConfig.setHostCluster(hostMap, cluster, ho.getHost(), !UserConfig.PROXY_HOST);
+            }
+        }
+        return null;
+    }
+
 }

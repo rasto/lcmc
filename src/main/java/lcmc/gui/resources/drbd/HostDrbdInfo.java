@@ -39,7 +39,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
-import lcmc.AddDrbdUpgradeDialog;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.Subtext;
@@ -55,25 +54,31 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostDrbdInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
                                   LoggerFactory.getLogger(HostDrbdInfo.class);
     /** String that is displayed as a tool tip for disabled menu item. */
     static final String NO_DRBD_STATUS_STRING = "drbd status is not available";
-    private final HostDrbdMenu hostDrbdMenu;
+    @Autowired
+    private HostDrbdMenu hostDrbdMenu;
     /** Host data. */
-    private final Host host;
+    private Host host;
     /** Prepares a new {@code HostDrbdInfo} object. */
-    public HostDrbdInfo(final Host host, final Browser browser) {
-        super(host.getName(), browser);
+    public void init(final Host host, final Browser browser) {
+        super.init(host.getName(), browser);
         this.host = host;
-        hostDrbdMenu = new HostDrbdMenu(host, this);
     }
 
     /** Returns browser object of this info. */
@@ -98,12 +103,6 @@ public class HostDrbdInfo extends Info {
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
-    }
-
-    /** Start upgrade drbd dialog. */
-    void upgradeDrbd() {
-        final AddDrbdUpgradeDialog adud = new AddDrbdUpgradeDialog(this);
-        adud.showDialogs();
     }
 
     /** Returns tooltip for the host. */
@@ -219,7 +218,7 @@ public class HostDrbdInfo extends Info {
     /** Creates the popup for the host. */
     @Override
     public List<UpdatableItem> createPopup() {
-        return hostDrbdMenu.getPulldownMenu();
+        return hostDrbdMenu.getPulldownMenu(host, this);
     }
 
     /** Returns grahical view if there is any. */

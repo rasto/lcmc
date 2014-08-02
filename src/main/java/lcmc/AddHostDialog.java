@@ -29,21 +29,23 @@ import lcmc.gui.dialog.host.NewHostDialog;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that add and configure new host.
  */
+@Component
 public final class AddHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddHostDialog.class);
-    private final Host host;
+    private Host host;
+    @Autowired
+    private NewHostDialog newHostDialog;
 
-    public AddHostDialog(final Host host) {
-        this.host = host;
-    }
-
-    public void showDialogs() {
+    public void showDialogs(final Host host) {
         Tools.getGUIData().enableAddHostButtons(false);
-        DialogHost dialog = new NewHostDialog(null, host, new DrbdInstallation());
+        DialogHost dialog = newHostDialog;
+        dialog.init(null, host, new DrbdInstallation());
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());

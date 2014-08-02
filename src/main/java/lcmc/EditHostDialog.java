@@ -29,20 +29,22 @@ import lcmc.gui.dialog.host.SSH;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that configure a host.
  */
+@Component
 public final class EditHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditHostDialog.class);
-    private final Host host;
+    private Host host;
+    @Autowired
+    private SSH sshDialog;
 
-    public EditHostDialog(final Host host) {
-        this.host = host;
-    }
-
-    public void showDialogs() {
-        DialogHost dialog = new SSH(null, host, new DrbdInstallation());
+    public void showDialogs(final Host host) {
+        DialogHost dialog = sshDialog;
+        dialog.init(null, host, new DrbdInstallation());
         final boolean expanded = Tools.getGUIData().isTerminalPanelExpanded();
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {

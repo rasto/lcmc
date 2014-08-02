@@ -73,10 +73,6 @@ public final class VMListInfo extends CategoryInfo {
     /** Colors for some rows. */
     private volatile Map<String, Color> domainToColor =
                                                   new HashMap<String, Color>();
-    /** Creates the new VMListInfo object with name of the category. */
-    public VMListInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
 
     /** Returns browser object of this info. */
     @Override

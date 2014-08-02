@@ -39,6 +39,8 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd is installed.
@@ -47,19 +49,14 @@ import lcmc.utilities.ssh.Ssh;
  * @version $Id$
  *
  */
+@Component
 final class DrbdCommandInst extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
                                  LoggerFactory.getLogger(DrbdCommandInst.class);
     /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
-
-    /** Prepares a new {@code DrbdCommandInst} object. */
-    DrbdCommandInst(final WizardDialog previousDialog,
-                    final Host host,
-                    final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private CheckInstallation checkInstallation;
 
     /**
      * Checks the answer of the installation and enables/disables the
@@ -77,8 +74,9 @@ final class DrbdCommandInst extends DialogHost {
             globalInfo.resetInfoPanel();
             globalInfo.getInfoPanel();
         }
-        nextDialogObject = new CheckInstallation(getPreviousDialog().getPreviousDialog().getPreviousDialog(),
-                                                 getHost(), getDrbdInstallation());
+        checkInstallation.init(getPreviousDialog().getPreviousDialog().getPreviousDialog(),
+                getHost(),
+                getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(
                     Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
@@ -158,7 +156,7 @@ final class DrbdCommandInst extends DialogHost {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return nextDialogObject;
+        return checkInstallation;
     }
 
     /**

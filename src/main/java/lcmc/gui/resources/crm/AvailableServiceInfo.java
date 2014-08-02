@@ -56,7 +56,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
     /** Prepares a new {@code AvailableServiceInfo} object. */
     public AvailableServiceInfo(final ResourceAgent resourceAgent,
                                 final Browser browser) {
-        super(resourceAgent.getServiceName(), browser);
+        super.init(resourceAgent.getServiceName(), browser);
         this.resourceAgent = resourceAgent;
     }
 

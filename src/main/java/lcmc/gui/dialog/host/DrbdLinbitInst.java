@@ -27,7 +27,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -37,6 +36,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd will be installed.
@@ -45,16 +46,10 @@ import lcmc.utilities.ssh.Ssh;
  * @version $Id$
  *
  */
+@Component
 public class DrbdLinbitInst extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
-
-    /** Prepares a new {@code DrbdLinbitInst} object. */
-    public DrbdLinbitInst(final WizardDialog previousDialog,
-                          final Host host,
-                          final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private CheckInstallation checkInstallationDialog;
 
     /** Inits dialog and starts the drbd install procedure. */
     @Override
@@ -173,10 +168,9 @@ public class DrbdLinbitInst extends DialogHost {
             globalInfo.resetInfoPanel();
             globalInfo.getInfoPanel();
         }
-        nextDialogObject = new CheckInstallation(getPreviousDialog().getPreviousDialog().getPreviousDialog()
-                                                                    .getPreviousDialog().getPreviousDialog(),
-                                                 getHost(),
-                                                 getDrbdInstallation());
+        checkInstallationDialog.init(getPreviousDialog().getPreviousDialog().getPreviousDialog().getPreviousDialog().getPreviousDialog(),
+                getHost(),
+                getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(
                Tools.getString("Dialog.Host.DrbdLinbitInst.InstallationDone"));
@@ -190,7 +184,7 @@ public class DrbdLinbitInst extends DialogHost {
     /** Returns the next dialog object. */
     @Override
     public WizardDialog nextDialog() {
-        return nextDialogObject;
+        return checkInstallationDialog;
     }
 
     /**

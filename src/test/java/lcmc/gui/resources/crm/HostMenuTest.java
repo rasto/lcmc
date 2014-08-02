@@ -57,12 +57,12 @@ public class HostMenuTest {
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
         when(hostInfoStub.getHost()).thenReturn(hostStub);
 
-        hostMenu = new HostMenu(hostInfoStub);
+        hostMenu = new HostMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = hostMenu.getPulldownMenu();
+        final List<UpdatableItem> items = hostMenu.getPulldownMenu(hostInfoStub);
 
         assertEquals(13, items.size());
     }

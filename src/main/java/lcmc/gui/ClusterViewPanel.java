@@ -25,19 +25,26 @@ import javax.swing.Box;
 import lcmc.model.Cluster;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a custer view with tree of services.
  */
+@Component
 public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
-    private final transient Cluster cluster;
+    private Cluster cluster;
 
-    public ClusterViewPanel(final Cluster cluster) {
-        super();
+    @Autowired
+    private ClusterBrowser clusterBrowser;
+
+    public void init(final Cluster cluster) {
         this.cluster = cluster;
-        cluster.createClusterBrowser();
-        getTree(cluster.getBrowser());
+
+        clusterBrowser.init(cluster);
+        cluster.setBrowser(clusterBrowser);
         cluster.getBrowser().initClusterBrowser();
+        getTree(clusterBrowser);
         cluster.getBrowser().setClusterViewPanel(this);
         add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);
 

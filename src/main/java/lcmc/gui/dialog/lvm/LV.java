@@ -41,7 +41,7 @@ class LV extends WizardDialog {
     }
     /** Prepares a new {@code LV} object. */
     protected LV(final WizardDialog previousDialog) {
-        super(previousDialog);
+        setPreviousDialog(previousDialog);
     }
 
     /** Returns the next dialog. */

@@ -58,7 +58,7 @@ public class MultiSelectionInfo extends EditableInfo {
     /** Prepares a new {@code MultiSelectionInfo} object. */
     public MultiSelectionInfo(final List<Info> selectedInfos,
                                   final Browser browser) {
-        super("selection", browser);
+        super.init("selection", browser);
         this.selectedInfos = selectedInfos;
     }
 

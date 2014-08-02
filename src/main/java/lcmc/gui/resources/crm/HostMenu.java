@@ -40,17 +40,17 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HostMenu {
     private static final String NOT_IN_CLUSTER = "not in cluster";
 
-    private final HostInfo hostInfo;
+    @Autowired
+    private EditHostDialog editHostDialog;
 
-    public HostMenu(final HostInfo hostInfo) {
-        this.hostInfo = hostInfo;
-    }
-
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final HostInfo hostInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* host wizard */
         final MyMenuItem hostWizardItem =
@@ -63,8 +63,7 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    final EditHostDialog dialog = new EditHostDialog(getHost());
-                    dialog.showDialogs();
+                    editHostDialog.showDialogs(hostInfo.getHost());
                 }
             };
         items.add(hostWizardItem);
@@ -90,7 +89,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (!getHost().isCrmStatusOk()) {
+                    if (!hostInfo.getHost().isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING;
                     }
                     return null;
@@ -99,24 +98,24 @@ public class HostMenu {
                 @Override
                 public void action() {
                     final Host dcHost =
-                                  getBrowser().getClusterBrowser().getDCHost();
+                                  hostInfo.getBrowser().getClusterBrowser().getDCHost();
                     if (hostInfo.isStandby(runMode)) {
-                        CRM.standByOff(dcHost, getHost(), runMode);
+                        CRM.standByOff(dcHost, hostInfo.getHost(), runMode);
                     } else {
-                        CRM.standByOn(dcHost, getHost(), runMode);
+                        CRM.standByOn(dcHost, hostInfo.getHost(), runMode);
                     }
                 }
             };
-        final ClusterBrowser cb = getBrowser().getClusterBrowser();
+        final ClusterBrowser cb = hostInfo.getBrowser().getClusterBrowser();
         if (cb != null) {
             final ButtonCallback standbyItemCallback =
-                                              cb.new ClMenuItemCallback(getHost()) {
+                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     if (hostInfo.isStandby(Application.RunMode.LIVE)) {
-                        CRM.standByOff(dcHost, getHost(), Application.RunMode.TEST);
+                        CRM.standByOff(dcHost, hostInfo.getHost(), Application.RunMode.TEST);
                     } else {
-                        CRM.standByOn(dcHost, getHost(), Application.RunMode.TEST);
+                        CRM.standByOn(dcHost, hostInfo.getHost(), Application.RunMode.TEST);
                     }
                 }
             };
@@ -135,10 +134,10 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (!getHost().isCrmStatusOk()) {
+                    if (!hostInfo.getHost().isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING;
                     }
-                    if (getBrowser().getClusterBrowser()
+                    if (hostInfo.getBrowser().getClusterBrowser()
                                     .getExistingServiceList(null).isEmpty()) {
                         return "there are no services to migrate";
                     }
@@ -156,10 +155,10 @@ public class HostMenu {
                                   si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
-                                                        getHost().getName())) {
-                                final Host dcHost = getHost();
+                                                        hostInfo.getHost().getName())) {
+                                final Host dcHost = hostInfo.getHost();
                                 si.migrateFromResource(dcHost,
-                                                       getHost().getName(),
+                                                       hostInfo.getHost().getName(),
                                                        Application.RunMode.LIVE);
                             }
                         }
@@ -168,7 +167,7 @@ public class HostMenu {
             };
         if (cb != null) {
             final ButtonCallback allMigrateFromItemCallback =
-                                              cb.new ClMenuItemCallback(getHost()) {
+                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     for (final ServiceInfo si
@@ -178,9 +177,9 @@ public class HostMenu {
                                                    si.getRunningOnNodes(Application.RunMode.LIVE);
                             if (runningOnNodes != null
                                 && runningOnNodes.contains(
-                                                        getHost().getName())) {
+                                                        hostInfo.getHost().getName())) {
                                 si.migrateFromResource(dcHost,
-                                                       getHost().getName(),
+                                                       hostInfo.getHost().getName(),
                                                        Application.RunMode.TEST);
                             }
                         }
@@ -206,7 +205,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
@@ -216,13 +215,13 @@ public class HostMenu {
                 @Override
                 public boolean predicate() {
                     /* when both are running it's openais. */
-                    return getHost().isCorosyncRunning() && !getHost().isOpenaisRunning();
+                    return hostInfo.getHost().isCorosyncRunning() && !hostInfo.getHost().isOpenaisRunning();
                 }
 
                 @Override
                 public boolean visiblePredicate() {
-                    return getHost().isCorosyncRunning()
-                           || getHost().isOpenaisRunning();
+                    return hostInfo.getHost().isCorosyncRunning()
+                           || hostInfo.getHost().isOpenaisRunning();
                 }
 
                 @Override
@@ -232,36 +231,36 @@ public class HostMenu {
                          Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
                          Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
                          Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
-                        final Host thisHost = getHost();
+                        final Host thisHost = hostInfo.getHost();
                         thisHost.setCommLayerStopping(true);
                         if (!thisHost.isPcmkStartedByCorosync()
                             && thisHost.hasPacemakerInitScript()
                             && thisHost.isPacemakerRunning()) {
-                            if (getHost().isCorosyncRunning()
-                                && !getHost().isOpenaisRunning()) {
+                            if (hostInfo.getHost().isCorosyncRunning()
+                                && !hostInfo.getHost().isOpenaisRunning()) {
                                 Corosync.stopCorosyncWithPcmk(thisHost);
                             } else {
                                 Openais.stopOpenaisWithPcmk(thisHost);
                             }
                         } else {
-                            if (getHost().isCorosyncRunning()
-                                && !getHost().isOpenaisRunning()) {
+                            if (hostInfo.getHost().isCorosyncRunning()
+                                && !hostInfo.getHost().isOpenaisRunning()) {
                                 Corosync.stopCorosync(thisHost);
                             } else {
                                 Openais.stopOpenais(thisHost);
                             }
                         }
-                        updateClusterView(thisHost);
+                        updateClusterView(thisHost, hostInfo);
                     }
                 }
             };
         if (cb != null) {
             final ButtonCallback stopCorosyncItemCallback =
-                                              cb.new ClMenuItemCallback(getHost()) {
+                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     if (!hostInfo.isStandby(Application.RunMode.LIVE)) {
-                        CRM.standByOn(dcHost, getHost(), Application.RunMode.TEST);
+                        CRM.standByOn(dcHost, hostInfo.getHost(), Application.RunMode.TEST);
                     }
                 }
             };
@@ -281,12 +280,12 @@ public class HostMenu {
 
                 @Override
                 public boolean visiblePredicate() {
-                    return getHost().isHeartbeatRunning();
+                    return hostInfo.getHost().isHeartbeatRunning();
                 }
 
                 @Override
                 public String enablePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
@@ -300,19 +299,19 @@ public class HostMenu {
                          Tools.getString("HostInfo.confirmHeartbeatStop.Desc"),
                          Tools.getString("HostInfo.confirmHeartbeatStop.Yes"),
                          Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
-                        getHost().setCommLayerStopping(true);
-                        Heartbeat.stopHeartbeat(getHost());
-                        updateClusterView(getHost());
+                        hostInfo.getHost().setCommLayerStopping(true);
+                        Heartbeat.stopHeartbeat(hostInfo.getHost());
+                        updateClusterView(hostInfo.getHost(), hostInfo);
                     }
                 }
             };
         if (cb != null) {
             final ButtonCallback stopHeartbeatItemCallback =
-                                              cb.new ClMenuItemCallback(getHost()) {
+                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     if (!hostInfo.isStandby(Application.RunMode.LIVE)) {
-                        CRM.standByOn(dcHost, getHost(), Application.RunMode.TEST);
+                        CRM.standByOn(dcHost, hostInfo.getHost(), Application.RunMode.TEST);
                     }
                 }
             };
@@ -332,7 +331,7 @@ public class HostMenu {
 
                 @Override
                 public boolean visiblePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     return h.isCorosyncInstalled()
                            && h.hasCorosyncInitScript()
                            && h.corosyncOrOpenaisConfigExists()
@@ -344,7 +343,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
@@ -356,18 +355,18 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    getHost().setCommLayerStarting(true);
-                    if (getHost().isPacemakerInRc()) {
-                        Corosync.startCorosyncWithPcmk(getHost());
+                    hostInfo.getHost().setCommLayerStarting(true);
+                    if (hostInfo.getHost().isPacemakerInRc()) {
+                        Corosync.startCorosyncWithPcmk(hostInfo.getHost());
                     } else {
-                        Corosync.startCorosync(getHost());
+                        Corosync.startCorosync(hostInfo.getHost());
                     }
-                    updateClusterView(getHost());
+                    updateClusterView(hostInfo.getHost(), hostInfo);
                 }
             };
         if (cb != null) {
             final ButtonCallback startCorosyncItemCallback =
-                                              cb.new ClMenuItemCallback(getHost()) {
+                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
@@ -389,7 +388,7 @@ public class HostMenu {
 
                 @Override
                 public boolean visiblePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     return h.hasOpenaisInitScript()
                            && h.corosyncOrOpenaisConfigExists()
                            && !h.isCorosyncRunning()
@@ -400,7 +399,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
@@ -412,14 +411,14 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    getHost().setCommLayerStarting(true);
-                    Openais.startOpenais(getHost());
-                    updateClusterView(getHost());
+                    hostInfo.getHost().setCommLayerStarting(true);
+                    Openais.startOpenais(hostInfo.getHost());
+                    updateClusterView(hostInfo.getHost(), hostInfo);
                 }
             };
         if (cb != null) {
             final ButtonCallback startOpenaisItemCallback =
-                                              cb.new ClMenuItemCallback(getHost()) {
+                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
@@ -441,7 +440,7 @@ public class HostMenu {
 
                 @Override
                 public boolean visiblePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     return h.hasHeartbeatInitScript()
                            && h.heartbeatConfigExists()
                            && !h.isCorosyncRunning()
@@ -453,7 +452,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
@@ -462,14 +461,14 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    getHost().setCommLayerStarting(true);
-                    Heartbeat.startHeartbeat(getHost());
-                    updateClusterView(getHost());
+                    hostInfo.getHost().setCommLayerStarting(true);
+                    Heartbeat.startHeartbeat(hostInfo.getHost());
+                    updateClusterView(hostInfo.getHost(), hostInfo);
                 }
             };
         if (cb != null) {
             final ButtonCallback startHeartbeatItemCallback =
-                                               cb.new ClMenuItemCallback(getHost()) {
+                                               cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
@@ -492,7 +491,7 @@ public class HostMenu {
 
                 @Override
                 public boolean visiblePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     return !h.isPcmkStartedByCorosync()
                            && !h.isPacemakerRunning()
                            && (h.isCorosyncRunning()
@@ -502,7 +501,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    final Host h = getHost();
+                    final Host h = hostInfo.getHost();
                     if (!h.isInCluster()) {
                         return NOT_IN_CLUSTER;
                     }
@@ -511,14 +510,14 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    getHost().setPacemakerStarting(true);
-                    Corosync.startPacemaker(getHost());
-                    updateClusterView(getHost());
+                    hostInfo.getHost().setPacemakerStarting(true);
+                    Corosync.startPacemaker(hostInfo.getHost());
+                    updateClusterView(hostInfo.getHost(), hostInfo);
                 }
             };
         if (cb != null) {
             final ButtonCallback startPcmkItemCallback =
-                                               cb.new ClMenuItemCallback(getHost()) {
+                                               cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
@@ -541,11 +540,11 @@ public class HostMenu {
                 public void action() {
                     final Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
-                                            "Choose " + getHost().getName()
+                                            "Choose " + hostInfo.getHost().getName()
                                             + " color",
-                                            getHost().getPmColors()[0]);
+                                            hostInfo.getHost().getPmColors()[0]);
                     if (newColor != null) {
-                        getHost().setSavedHostColorInGraphs(newColor);
+                        hostInfo.getHost().setSavedHostColorInGraphs(newColor);
                     }
                 }
             };
@@ -562,7 +561,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (!getHost().isConnected()) {
+                    if (!hostInfo.getHost().isConnected()) {
                         return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                     }
                     return null;
@@ -570,7 +569,7 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    final HostLogs l = new HostLogs(getHost());
+                    final HostLogs l = new HostLogs(hostInfo.getHost());
                     l.showDialog();
                 }
             };
@@ -584,7 +583,7 @@ public class HostMenu {
 
             @Override
             public String enablePredicate() {
-                if (!getHost().isConnected()) {
+                if (!hostInfo.getHost().isConnected()) {
                     return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                 }
                 return null;
@@ -593,7 +592,7 @@ public class HostMenu {
             @Override
             public void updateAndWait() {
                 super.updateAndWait();
-                getBrowser().addAdvancedMenu(this);
+                hostInfo.getBrowser().addAdvancedMenu(this);
             }
         };
         items.add(hostAdvancedSubmenu);
@@ -609,7 +608,7 @@ public class HostMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getHost().isInCluster()) {
+                    if (hostInfo.getHost().isInCluster()) {
                         return "it is a member of a cluster";
                     }
                     return null;
@@ -617,13 +616,13 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    getHost().disconnect();
-                    final ClusterBrowser b = getBrowser().getClusterBrowser();
+                    hostInfo.getHost().disconnect();
+                    final ClusterBrowser b = hostInfo.getBrowser().getClusterBrowser();
                     if (b != null) {
                         Tools.getGUIData().unregisterAllHostsUpdate(
                                                       b.getClusterViewPanel());
                     }
-                    Tools.getApplication().removeHostFromHosts(getHost());
+                    Tools.getApplication().removeHostFromHosts(hostInfo.getHost());
                     Tools.getGUIData().allHostsUpdate();
                 }
             };
@@ -631,17 +630,9 @@ public class HostMenu {
         return items;
     }
     
-    private Host getHost() {
-        return hostInfo.getHost();
-    }
-
-    private HostBrowser getBrowser() {
-        return hostInfo.getBrowser();
-    }
-
     /* Update cluster view if available. */
-    private void updateClusterView(final Host host) {
-        final ClusterBrowser cb = getBrowser().getClusterBrowser();
+    private void updateClusterView(final Host host, final HostInfo hostInfo) {
+        final ClusterBrowser cb = hostInfo.getBrowser().getClusterBrowser();
         if (cb == null) {
             host.setIsLoading();
             host.getHWInfo(!Host.UPDATE_LVM);

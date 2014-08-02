@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
+import lcmc.model.HostFactory;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import static org.junit.Assert.assertFalse;
@@ -49,9 +50,10 @@ public final class ResourceInfoITest {
     @Test
     public void testEqualNamesNotEqualsHosts() {
         final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        
+
+        final HostFactory hostFactory = new HostFactory();
         final ResourceInfo r1 = new ResourceInfo("name",
-                                                 new LinkedHashSet<Host>(Arrays.asList(Host.createInstance())),
+                                                 new LinkedHashSet<Host>(Arrays.asList(hostFactory.createInstance())),
                                                  clusterBrowser);
         final ResourceInfo r2 = new ResourceInfo("name", null, clusterBrowser);
         assertTrue("equal names", r1.equals(r2));

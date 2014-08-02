@@ -24,7 +24,6 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -76,6 +75,7 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
@@ -84,6 +84,7 @@ import lcmc.utilities.WidgetListener;
  * @version $Id$
  *
  */
+@Component
 final class HbConfig extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HbConfig.class);
@@ -238,7 +239,7 @@ final class HbConfig extends DialogCluster {
     /** Add address button. */
     private MyButton addButton;
     /** Array with /etc/ha.d/ha.cf configs from all hosts. */
-    private final String[] configs;
+    private String[] configs;
     /** Status panel. */
     private JPanel statusPanel;
     /** Check box that allows to edit a new config are see the existing
@@ -255,10 +256,9 @@ final class HbConfig extends DialogCluster {
     /** When to start to check the fields. */
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
 
-    /** Prepares a new {@code HbConfig} object. */
-    HbConfig(final WizardDialog previousDialog,
-             final Cluster cluster) {
-        super(previousDialog, cluster);
+    @Override
+    public void init(final WizardDialog previousDialog, final Cluster cluster) {
+        super.init(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
         final StringBuilder config = new StringBuilder();
         boolean first = true;
@@ -382,7 +382,9 @@ final class HbConfig extends DialogCluster {
     /** Returns the successor of this dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return new Init(this, getCluster());
+        final DialogCluster nextDialog = new Init();
+        nextDialog.init(this, getCluster());
+        return nextDialog;
     }
 
     /** Returns title of this dialog. */
@@ -700,7 +702,7 @@ final class HbConfig extends DialogCluster {
                     labelP.setBackground(
                             Tools.getDefaultColor("ConfigDialog.Background"));
                     labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
-                    labelP.setAlignmentX(Component.TOP_ALIGNMENT);
+                    labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
                     labelP.add(l);
                     insideConfigPanel.add(labelP);
                     final JTextArea ta = new JTextArea(configs[i]);
@@ -1290,10 +1292,10 @@ final class HbConfig extends DialogCluster {
             }
         });
         statusPanel.add(configCheckbox);
-        statusPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statusPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         pane.add(statusPanel);
         pane.add(configScrollPane);
-        configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        configScrollPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         mcast = new JPanel(new FlowLayout(FlowLayout.LEADING));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
@@ -1305,7 +1307,7 @@ final class HbConfig extends DialogCluster {
         mcast.add(ucastLink2W.getComponent());
         mcast.add(addButton);
         mcast.setMaximumSize(mcast.getPreferredSize());
-        mcast.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mcast.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         for (final String option : OPTIONS) {
             final int size;
             if (OPTION_SIZES.containsKey(option)) {
@@ -1371,7 +1373,7 @@ final class HbConfig extends DialogCluster {
                     thread.start();
                 }
             });
-        makeConfigButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        makeConfigButton.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         pane.add(makeConfigButton);
         return pane;
     }

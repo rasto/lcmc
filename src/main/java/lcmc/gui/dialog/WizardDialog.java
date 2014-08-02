@@ -70,12 +70,6 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Progress bar. */
     private ProgressBar progressBar = null;
 
-    /** Prepares a new {@code WizardDialog} object. */
-    protected WizardDialog(final WizardDialog previousDialog) {
-        super();
-        this.previousDialog = previousDialog;
-    }
-
     /**
      * Returns previous dialog. It is used to get with the back button to
      * the dialog before this one.

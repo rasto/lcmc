@@ -158,7 +158,7 @@ public class BlockDevInfo extends EditableInfo {
      *      block device
      */
     public BlockDevInfo(final String name, final BlockDevice blockDevice, final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(blockDevice);
     }
 

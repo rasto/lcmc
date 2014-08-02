@@ -199,7 +199,7 @@ public class Host implements Comparable<Host>, Value {
     private String sshPort = null;
     private Boolean useSudo = null;
     private String sudoPassword = "";
-    private HostBrowser browser;
+    private HostBrowser hostBrowser;
     /** A gate that is used to synchronize the loading sequence. */
     private CountDownLatch isLoadingGate;
     private final CountDownLatch waitForServerStatusLatch = new CountDownLatch(1);
@@ -232,36 +232,28 @@ public class Host implements Comparable<Host>, Value {
 
     private TerminalPanel terminalPanel;
 
-    private Host(final DrbdHost drbdHost, final TerminalPanel terminalPanel) {
+    public Host(final DrbdHost drbdHost, final TerminalPanel terminalPanel) {
         this.drbdHost = drbdHost;
         this.terminalPanel = terminalPanel;
 
-        terminalPanel.initWithHost(this);
+
         if (Tools.getApplication().getHosts().size() == 1) {
             enteredHostOrIp = Tools.getDefault("SSH.SecHost");
         }
-        browser = new HostBrowser(this);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
-            @Override
-            public void run() {
-                browser.initHostResources();
-            }
-        });
         mountPoints.add("/mnt/");
     }
 
-    public static Host createInstance() {
-        return new Host(new DrbdHost(), new TerminalPanel());
+    public void init() {
+        hostBrowser.init(this);
+        terminalPanel.initWithHost(this);
     }
 
-    public static Host createInstance(final String ipAddress) {
-        final Host instance = createInstance();
-        instance.ipAddress = ipAddress;
-        return instance;
+    public void setBrowser(final HostBrowser hostBrowser) {
+        this.hostBrowser = hostBrowser;
     }
 
     public HostBrowser getBrowser() {
-        return browser;
+        return hostBrowser;
     }
 
     /**

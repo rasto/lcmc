@@ -28,23 +28,24 @@ import lcmc.gui.dialog.cluster.Name;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that configure a cluster.
  */
+@Component
 public final class EditClusterDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditClusterDialog.class);
     private static final String CANCEL_BTN = Tools.getString("Dialog.Dialog.Cancel");
     private static final String FINISH_BTN = Tools.getString("Dialog.Dialog.Finish");
-    private final Cluster cluster;
+    @Autowired
+    private Name nameDialog;
 
-    public EditClusterDialog(final Cluster cluster) {
-        this.cluster = cluster;
-    }
-
-    public void showDialogs() {
+    public void showDialogs(final Cluster cluster) {
         cluster.setClusterTabClosable(false);
-        DialogCluster dialog = new Name(null, cluster);
+        DialogCluster dialog = nameDialog;
+        dialog.init(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());

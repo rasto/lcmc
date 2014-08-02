@@ -65,11 +65,17 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostInfo extends Info {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
@@ -123,14 +129,16 @@ public class HostInfo extends Info {
     static final String NO_PCMK_STATUS_STRING =
                                              "cluster status is not available";
     /** Host data. */
-    private final Host host;
+    private Host host;
     /** whether crm info is showing. */
     private volatile boolean crmInfo = false;
     /** whether crm show is in progress. */
     private volatile boolean crmShowInProgress = true;
-    /** Prepares a new {@code HostInfo} object. */
-    public HostInfo(final Host host, final Browser browser) {
-        super(host.getName(), browser);
+    @Autowired
+    private HostMenu hostMenu;
+
+    public void init(final Host host, final Browser browser) {
+        super.init(host.getName(), browser);
         this.host = host;
     }
 
@@ -436,8 +444,7 @@ public class HostInfo extends Info {
     /** Creates the popup for the host. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final HostMenu hostMenu = new HostMenu(this);
-        return hostMenu.getPulldownMenu();
+        return hostMenu.getPulldownMenu(this);
     }
 
     /** Returns grahical view if there is any. */

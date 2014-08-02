@@ -28,12 +28,18 @@ import lcmc.gui.dialog.cluster.Name;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Shows step by step dialogs that add and configure new cluster.
  */
+@Component
 public final class AddClusterDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddClusterDialog.class);
+
+    @Autowired
+    Name nameDialog;
 
     /**
      * Must always be called from new thread.
@@ -42,7 +48,8 @@ public final class AddClusterDialog {
         Tools.getGUIData().enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
         cluster.setClusterTabClosable(false);
-        DialogCluster dialog = new Name(null, cluster);
+        DialogCluster dialog = nameDialog;
+        dialog.init(null, cluster);
         Tools.getGUIData().expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());

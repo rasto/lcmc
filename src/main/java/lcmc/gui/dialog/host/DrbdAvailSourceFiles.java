@@ -22,7 +22,6 @@
 
 package lcmc.gui.dialog.host;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +43,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
@@ -52,19 +53,14 @@ import lcmc.utilities.ssh.ExecCommandConfig;
  * @author Rasto Levrinc
  * @version $Id$
  */
+@Component
 final class DrbdAvailSourceFiles extends DialogHost {
-    /** Next dialog object. */
-    private WizardDialog nextDialogObject = null;
+    @Autowired
+    private DrbdCommandInst drbdCommandInst = null;
     /** Combo box with drbd tarballs. */
     private Widget drbdTarballCombo = null;
     /** Whether the listeners where added. */
     private boolean listenersAdded = false;
-
-    DrbdAvailSourceFiles(final WizardDialog previousDialog,
-                         final Host host,
-                         final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
 
     /**
      * Inits the dialog and starts detecting the available drbd source
@@ -74,7 +70,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        disableComponents(new Component[]{drbdTarballCombo.getComponent()});
+        disableComponents(new java.awt.Component[]{drbdTarballCombo.getComponent()});
     }
 
     /** Inits the dialog after it becomes visible. */
@@ -162,7 +158,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
         }
         // TODO: do something different if we did not get any versions
         drbdTarballCombo.setEnabled(true);
-        nextDialogObject = new DrbdCommandInst(this, getHost(), getDrbdInstallation());
+        drbdCommandInst.init(this, getHost(), getDrbdInstallation());
         progressBarDone();
         enableComponents();
         buttonClass(nextButton()).requestFocus();
@@ -178,7 +174,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return nextDialogObject;
+        return drbdCommandInst;
     }
 
     /**

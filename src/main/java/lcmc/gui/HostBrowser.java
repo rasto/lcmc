@@ -58,12 +58,18 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds host resource data in a tree. It shows panels that allow
  * to edit data of resources, services etc., hosts and clusters.
  * Every resource has its Info object, that accessible through the tree view.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostBrowser extends Browser {
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.HostIconSmall"));
     public static final ImageIcon HOST_ON_ICON = Tools.createImageIcon(
@@ -86,10 +92,12 @@ public class HostBrowser extends Browser {
     /** List of used network interface ports. */
     private final Collection<String> usedPorts = new HashSet<String>();
     private final Collection<String> usedProxyPorts = new HashSet<String>();
-    public final Host host;
-    private final HostInfo hostInfo;
+    public Host host;
+    @Autowired
+    private HostInfo hostInfo;
     /** Host info object of the host in drbd view of this browser. */
-    private final HostDrbdInfo hostDrbdInfo;
+    @Autowired
+    private HostDrbdInfo hostDrbdInfo;
     private ProxyHostInfo proxyHostInfo = null;
     /** Map of block devices and their info objects. */
     private final Map<BlockDevice, BlockDevInfo> blockDevInfos = new LinkedHashMap<BlockDevice, BlockDevInfo>();
@@ -103,12 +111,17 @@ public class HostBrowser extends Browser {
     private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
 
-    public HostBrowser(final Host host) {
-        super();
+    public void init(final Host host) {
         this.host = host;
-        hostInfo = new HostInfo(host, this);
-        hostDrbdInfo = new HostDrbdInfo(host, this);
+        hostInfo.init(host, this);
+        hostDrbdInfo.init(host, this);
         setMenuTreeTop(hostInfo);
+        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public void run() {
+                initHostResources();
+            }
+        });
     }
 
     public HostInfo getHostInfo() {
@@ -132,20 +145,24 @@ public class HostBrowser extends Browser {
     }
 
     public void initHostResources() {
-        netInterfacesNode = new DefaultMutableTreeNode(
-                                            new CategoryInfo(Tools.getString("HostBrowser.NetInterfaces"), this));
+        final CategoryInfo netInterfacesCategory = new CategoryInfo();
+        netInterfacesCategory.init(Tools.getString("HostBrowser.NetInterfaces"), this);
+
+        netInterfacesNode = new DefaultMutableTreeNode(netInterfacesCategory);
         setNode(netInterfacesNode);
         topLevelAdd(netInterfacesNode);
 
         /* block devices */
-        blockDevicesNode = new DefaultMutableTreeNode(
-                                            new CategoryInfo(Tools.getString("HostBrowser.BlockDevices"), this));
+        final CategoryInfo blockDevicesCategory = new CategoryInfo();
+        blockDevicesCategory.init(Tools.getString("HostBrowser.BlockDevices"), this);
+        blockDevicesNode = new DefaultMutableTreeNode(blockDevicesCategory);
         setNode(blockDevicesNode);
         topLevelAdd(blockDevicesNode);
 
         /* file systems */
-        fileSystemsNode = new DefaultMutableTreeNode(
-                                            new CategoryInfo(Tools.getString("HostBrowser.FileSystems"), this));
+        final CategoryInfo fileSystemsCategory = new CategoryInfo();
+        fileSystemsCategory.init(Tools.getString("HostBrowser.FileSystems"), this);
+        fileSystemsNode = new DefaultMutableTreeNode(fileSystemsCategory);
         setNode(fileSystemsNode);
         topLevelAdd(fileSystemsNode);
     }
@@ -243,7 +260,8 @@ public class HostBrowser extends Browser {
                         if (oldFilesystems.containsKey(fs)) {
                             fsi = oldFilesystems.get(fs);
                         } else {
-                            fsi = new FSInfo(fs, thisClass);
+                            fsi = new FSInfo();
+                            fsi.init(fs, thisClass);
                         }
                         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(fsi);
                         setNode(resource);

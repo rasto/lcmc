@@ -40,7 +40,7 @@ public abstract class DrbdConfig extends WizardDialog {
     /** Prepares a new {@code DrbdConfig} object. */
     protected DrbdConfig(final WizardDialog previousDialog,
                       final VolumeInfo volumeInfo) {
-        super(previousDialog);
+        setPreviousDialog(previousDialog);
         this.volumeInfo = volumeInfo;
     }
 

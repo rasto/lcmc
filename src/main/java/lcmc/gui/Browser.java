@@ -69,7 +69,9 @@ public class Browser {
     private final Lock mDRBDtestLock = new ReentrantLock();
 
     protected final void setMenuTreeTop() {
-        treeTop = new DefaultMutableTreeNode(new CategoryInfo(Tools.getString("Browser.Resources"), this));
+        final CategoryInfo categoryInfo = new CategoryInfo();
+        categoryInfo.init(Tools.getString("Browser.Resources"), this);
+        treeTop = new DefaultMutableTreeNode(categoryInfo);
         treeModel = new DefaultTreeModel(treeTop);
     }
 

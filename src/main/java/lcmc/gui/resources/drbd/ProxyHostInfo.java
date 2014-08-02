@@ -65,7 +65,7 @@ public class ProxyHostInfo extends Info {
     private final Host host;
     /** Prepares a new {@code ProxyHostInfo} object. */
     public ProxyHostInfo(final Host host, final Browser browser) {
-        super(host.getName(), browser);
+        super.init(host.getName(), browser);
         this.host = host;
     }
 

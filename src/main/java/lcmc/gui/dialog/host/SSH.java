@@ -27,8 +27,7 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
+
 import lcmc.gui.SSHGui;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.CancelCallback;
@@ -36,6 +35,8 @@ import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
@@ -44,15 +45,12 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public class SSH extends DialogHost {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
-
-    public SSH(final WizardDialog previousDialog,
-               final Host host,
-               final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private Devices devicesDialog;
 
     /** Connects to all hosts. */
     private String connectHost() {
@@ -108,7 +106,8 @@ public class SSH extends DialogHost {
     /** Returns the next dialog. Devices */
     @Override
     public WizardDialog nextDialog() {
-        return new Devices(getPreviousDialog(), getHost(), getDrbdInstallation());
+        devicesDialog.init(getPreviousDialog(), getHost(), getDrbdInstallation());
+        return devicesDialog;
     }
 
     /** Inits the dialog and start connecting to the hosts. */

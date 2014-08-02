@@ -18,33 +18,27 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.presenter;
+package lcmc.view;
 
-import lcmc.gui.EmptyBrowser;
 import lcmc.model.Cluster;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
+
 @Component
-public class ClusterPresenter {
+public class ClusterTabFactory {
     @Autowired
-    private EmptyBrowser emptyBrowser;
+    private ClustersPanel clustersPanel;
+    @Autowired
+    private Provider<ClusterTab> clusterTabProvider;
 
-    public void onCloseCluster(final Cluster cluster) {
-        disconnectCluster(cluster);
-    }
-
-    private void disconnectCluster(final Cluster cluster) {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (cluster.isClusterTabClosable()) {
-                    cluster.removeClusterAndDisconnect();
-                    emptyBrowser.setDisconnected(cluster);
-                }
-            }
-        });
-        t.start();
+    public ClusterTab createClusterTab(final Cluster cluster) {
+        final ClusterTab clusterTab = clusterTabProvider.get();
+        clusterTab.initWithCluster(cluster);
+        if (cluster != null) {
+            clustersPanel.addClusterTab(clusterTab);
+        }
+        return clusterTab;
     }
 }

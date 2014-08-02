@@ -24,7 +24,6 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -73,6 +72,8 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all
@@ -82,6 +83,7 @@ import lcmc.utilities.WidgetListener;
  * @version $Id$
  *
  */
+@Component
 final class CoroConfig extends DialogCluster {
     /** Logger. */
     private static final Logger LOG =
@@ -133,7 +135,7 @@ final class CoroConfig extends DialogCluster {
     /** Add address button. */
     private MyButton addButton;
     /** Array with corosync.conf or openais.conf configs from all hosts. */
-    private final String[] configs;
+    private String[] configs;
     /** Status panel. */
     private JPanel statusPanel;
     /** Check box that allows to edit a new config are see the existing
@@ -148,9 +150,11 @@ final class CoroConfig extends DialogCluster {
     /** Whether the config pane was already moved to the position. */
     private volatile boolean alreadyMoved = false;
 
-    /** Prepares a new {@code CoroConfig} object. */
-    CoroConfig(final WizardDialog previousDialog, final Cluster cluster) {
-        super(previousDialog, cluster);
+    @Autowired
+    private Init initDialog;
+
+    public void init(final WizardDialog previousDialog, final Cluster cluster) {
+        super.init(previousDialog, cluster);
         final Host[] hosts = getCluster().getHostsArray();
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(
@@ -230,7 +234,8 @@ final class CoroConfig extends DialogCluster {
     /** Returns the successor of this dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return new Init(this, getCluster());
+        initDialog.init(this, getCluster());
+        return initDialog;
     }
 
     /** Returns title of this dialog. */
@@ -559,7 +564,7 @@ final class CoroConfig extends DialogCluster {
                     labelP.setBackground(
                              Tools.getDefaultColor("ConfigDialog.Background"));
                     labelP.setLayout(new BoxLayout(labelP, BoxLayout.PAGE_AXIS));
-                    labelP.setAlignmentX(Component.TOP_ALIGNMENT);
+                    labelP.setAlignmentX(java.awt.Component.TOP_ALIGNMENT);
                     labelP.add(l);
                     insideConfigPanel.add(labelP);
                     final JTextArea ta = new JTextArea(configs[i]);
@@ -1109,10 +1114,10 @@ final class CoroConfig extends DialogCluster {
             }
         });
         statusPanel.add(configCheckbox);
-        statusPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        statusPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         pane.add(statusPanel);
         pane.add(configScrollPane);
-        configScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        configScrollPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         mcast = new JPanel(new FlowLayout(FlowLayout.LEADING));
         mcast.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mcast.add(new JLabel("# "));
@@ -1122,7 +1127,7 @@ final class CoroConfig extends DialogCluster {
         mcast.add(portW.getComponent());
         mcast.add(addButton);
         mcast.setPreferredSize(mcast.getMinimumSize());
-        mcast.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mcast.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 //        makeConfigButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         pane.add(makeConfigButton);
         return pane;

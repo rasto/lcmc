@@ -24,7 +24,6 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
@@ -47,6 +46,8 @@ import lcmc.model.Host;
 import lcmc.model.Hosts;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
@@ -56,6 +57,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 final class ClusterHosts extends DialogCluster {
     /** Host checked icon. */
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
@@ -69,11 +71,10 @@ final class ClusterHosts extends DialogCluster {
     private final Map<JCheckBox, Host> checkBoxToHost =
                                     new LinkedHashMap<JCheckBox, Host>();
 
-    /** Prepares a new {@code ClusterHosts} object. */
-    ClusterHosts(final WizardDialog previousDialog,
-                 final Cluster cluster) {
-        super(previousDialog, cluster);
-    }
+    @Autowired
+    private CommStack commStackDialog;
+    @Autowired
+    private Connect connectDialog;
 
     /** It is executed after the dialog is applied. */
     @Override
@@ -98,11 +99,14 @@ final class ClusterHosts extends DialogCluster {
                 allConnected = false;
             }
         }
+        DialogCluster nextDialog;
         if (allConnected) {
-            return new CommStack(this, getCluster());
+            nextDialog = commStackDialog;
         } else {
-            return new Connect(this, getCluster());
+            nextDialog = connectDialog;
         }
+        nextDialog.init(this, getCluster());
+        return nextDialog;
     }
 
     /** Checks whether at least two hosts are selected for the cluster. */
@@ -338,7 +342,7 @@ final class ClusterHosts extends DialogCluster {
             int rv = 0;
             final int count = getComponentCount();
             for (int k = 0; k < count; k++) {
-                final Component comp = getComponent(k);
+                final java.awt.Component comp = getComponent(k);
                 final Rectangle r = comp.getBounds();
                 final int height = r.y + r.height;
                 if (height > rv) {

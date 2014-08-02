@@ -18,33 +18,33 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.presenter;
+package lcmc.model;
 
-import lcmc.gui.EmptyBrowser;
-import lcmc.model.Cluster;
-import lcmc.utilities.Tools;
+import lcmc.gui.HostBrowser;
+import lcmc.gui.TerminalPanel;
+import lcmc.model.drbd.DrbdHost;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ClusterPresenter {
-    @Autowired
-    private EmptyBrowser emptyBrowser;
+import javax.inject.Provider;
 
-    public void onCloseCluster(final Cluster cluster) {
-        disconnectCluster(cluster);
+@Component
+public class HostFactory {
+    @Autowired
+    private Provider<HostBrowser> hostBrowserProvider;
+    @Autowired
+    private Provider<TerminalPanel> terminalPanelProvider;
+
+    public Host createInstance() {
+        final TerminalPanel terminalPanel = terminalPanelProvider.get();
+        final Host host = new Host(new DrbdHost(), terminalPanel);
+        host.setBrowser(hostBrowserProvider.get());
+        return host;
     }
 
-    private void disconnectCluster(final Cluster cluster) {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (cluster.isClusterTabClosable()) {
-                    cluster.removeClusterAndDisconnect();
-                    emptyBrowser.setDisconnected(cluster);
-                }
-            }
-        });
-        t.start();
+    public Host createInstance(final String ipAddress) {
+        final Host instance = createInstance();
+        instance.setIpAddress(ipAddress);
+        return instance;
     }
 }

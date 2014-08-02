@@ -53,12 +53,12 @@ public class ServicesMenuTest {
         when(clusterBrowserStub.getDCHost()).thenReturn(hostStub);
         when(servicesInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
 
-        servicesMenu = new ServicesMenu(servicesInfoStub);
+        servicesMenu = new ServicesMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = servicesMenu.getPulldownMenu();
+        final List<UpdatableItem> items = servicesMenu.getPulldownMenu(servicesInfoStub);
 
         assertEquals(9, items.size());
     }

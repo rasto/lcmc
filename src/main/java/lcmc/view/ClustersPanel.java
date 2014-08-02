@@ -38,6 +38,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
 import lcmc.model.Cluster;
+import lcmc.model.UserConfig;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -59,16 +60,20 @@ public final class ClustersPanel extends JPanel {
     private static final int TAB_BORDER_WIDTH = 3;
     private JTabbedPane tabbedPane;
     @Autowired
-    private ClusterTab newEmptyClusterTab;
+    private ClusterTabFactory clusterTabFactory;
     private ClusterTab previouslySelectedTab = null;
+    @Autowired
+    private UserConfig userConfig;
 
     /** Shows the tabbed pane. */
     public void init() {
         Tools.getGUIData().setClustersPanel(this);
-        newEmptyClusterTab.initWithCluster(null);
+        clusterTabFactory.createClusterTab(null);
         tabbedPane = new JTabbedPane();
 
         setTabLook();
+
+        loadDefaultConfigFile();
 
         addClustersTab(ALL_CLUSTERS_LABEL);
 
@@ -99,12 +104,13 @@ public final class ClustersPanel extends JPanel {
     }
 
     public void addClusterTab(final ClusterTab clusterTab) {
-        LOG.debug2("addTab: cluster: " + clusterTab.getCluster().getName());
+        final Cluster cluster = clusterTab.getCluster();
+        LOG.debug2("addTab: cluster: " + cluster.getName());
         if (tabbedPane.getTabCount() == 1) {
-            removeAllTabs();
+           removeAllTabs();
         }
-        final String title = Tools.join(" ", clusterTab.getCluster().getHostNames());
-        tabbedPane.addTab(clusterTab.getCluster().getName(), ClusterTab.CLUSTER_ICON, clusterTab, title);
+        final String title = Tools.join(" ", cluster.getHostNames());
+        tabbedPane.addTab(cluster.getName(), ClusterTab.CLUSTER_ICON, clusterTab, title);
 
         addTabComponentWithCloseButton(clusterTab);
         tabbedPane.setSelectedComponent(clusterTab);
@@ -113,7 +119,10 @@ public final class ClustersPanel extends JPanel {
 
     /** Adds an epmty tab, that opens new cluster dialogs. */
     void addClustersTab(final String label) {
-        tabbedPane.addTab(label, ALL_CLUSTERS_ICON, newEmptyClusterTab, Tools.getString("ClustersPanel.ClustersTabTip"));
+        tabbedPane.addTab(label,
+                          ALL_CLUSTERS_ICON,
+                          clusterTabFactory.createClusterTab(null),
+                          Tools.getString("ClustersPanel.ClustersTabTip"));
     }
 
     public void removeTab() {
@@ -202,4 +211,17 @@ public final class ClustersPanel extends JPanel {
             /* No border */
         }
     }
+
+    private void loadDefaultConfigFile() {
+        final String saveFile = Tools.getApplication().getSaveFile();
+        String xml = Tools.loadFile(saveFile, false);
+        if (xml == null) {
+            final String saveFileOld = Tools.getApplication().getSaveFileOld();
+            xml = Tools.loadFile(saveFileOld, false);
+        }
+        if (xml != null) {
+            userConfig.loadXML(xml);
+        }
+    }
+
 }

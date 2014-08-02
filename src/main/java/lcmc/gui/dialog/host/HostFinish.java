@@ -31,10 +31,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
 import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.model.HostFactory;
+import lcmc.model.UserConfig;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Host finish dialog with buttons to configure next host or configure the
@@ -44,7 +47,8 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
-final class Finish extends DialogHost {
+@Component
+final class HostFinish extends DialogHost {
     /** Host icon for add another host button. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(
                             Tools.getDefault("Dialog.Host.Finish.HostIcon"));
@@ -61,17 +65,19 @@ final class Finish extends DialogHost {
     private final JCheckBox saveCB = new JCheckBox(
                                     Tools.getString("Dialog.Host.Finish.Save"),
                                     true);
-    /** Next dialog. */
-    private WizardDialog nextDialog = null;
-
-    Finish(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private NewHostDialog newHostDialog;
+    @Autowired
+    private UserConfig userConfig;
+    @Autowired
+    private HostFactory hostFactory;
+    @Autowired
+    private AddClusterDialog addClusterDialog;
 
     /** Returns next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return nextDialog;
+        return newHostDialog;
     }
 
     /** Finishes the dialog, and saves the host. */
@@ -79,7 +85,7 @@ final class Finish extends DialogHost {
     protected void finishDialog() {
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getApplication().getSaveFile();
-            Tools.save(saveFile, false);
+            Tools.save(userConfig, saveFile, false);
         }
     }
 
@@ -159,11 +165,12 @@ final class Finish extends DialogHost {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final Host newHost = Host.createInstance();
+                        final Host newHost = hostFactory.createInstance();
+                        newHost.init();
                         newHost.getSSH().setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(),
                                                       getHost().getSSH().getLastSuccessfulRsaKey(),
                                                       getHost().getSSH().getLastSuccessfulPassword());
-                        nextDialog = new NewHostDialog(thisClass, newHost, getDrbdInstallation());
+                        newHostDialog.init(thisClass, newHost, getDrbdInstallation());
                         Tools.getGUIData().allHostsUpdate();
                         Tools.invokeLater(new Runnable() {
                             @Override
@@ -195,8 +202,7 @@ final class Finish extends DialogHost {
                                 buttonClass(finishButton()).pressButton();
                             }
                         });
-                        final AddClusterDialog c = new AddClusterDialog();
-                        c.showDialogs();
+                        addClusterDialog.showDialogs();
                     }
                 });
                 t.start();

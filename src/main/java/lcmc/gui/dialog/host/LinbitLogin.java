@@ -37,6 +37,8 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**.
  * An implementation of a dialog where user can enter the name and password
@@ -46,6 +48,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public class LinbitLogin extends DialogHost {
     /** Width of the check boxes. */
     private static final int CHECKBOX_WIDTH = 120;
@@ -55,12 +58,8 @@ public class LinbitLogin extends DialogHost {
     private Widget downloadPasswordField;
     /** Checkbox to save the info. */
     private JCheckBox saveCheckBox;
-
-    public LinbitLogin(final WizardDialog previousDialog,
-                       final Host host,
-                       final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private DrbdLinbitInst drbdLinbitInst;
 
     /** Finishes the dialog and sets the information. */
     @Override
@@ -74,7 +73,8 @@ public class LinbitLogin extends DialogHost {
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return new DrbdLinbitInst(this, getHost(), getDrbdInstallation());
+        drbdLinbitInst.init(this, getHost(), getDrbdInstallation());
+        return drbdLinbitInst;
     }
 
     /**

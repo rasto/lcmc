@@ -87,10 +87,6 @@ public abstract class EditableInfo extends Info {
     /** Disabled section, not visible. */
     private final Collection<String> disabledSections = new HashSet<String>();
 
-    protected EditableInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
-
     protected abstract String getSection(String param);
 
     protected abstract boolean isRequired(String param);

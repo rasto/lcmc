@@ -17,38 +17,22 @@
  * along with LCMC; see the file COPYING.  If not, write to
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
+package lcmc;
 
-package lcmc.gui.resources.drbd;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
-import lcmc.testutils.annotation.type.GuiTest;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.mockito.Mock;
+public final class AppContext {
+	private static ApplicationContext context;
 
-@Category(GuiTest.class)
-public class GlobalMenuITest {
+	static {
+		context = new AnnotationConfigApplicationContext("lcmc");
+	}
 
-    @Mock
-    private GlobalInfo globalInfo;
+	private AppContext() {
+	}
 
-    private GlobalMenu globalMenu;
-
-    @Before
-    public void setUp() {
-        Tools.init();
-
-        globalMenu = new GlobalMenu();
-    }
-
-    @Test
-    public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = globalMenu.getPulldownMenu(globalInfo);
-
-        assertEquals(4, items.size());
-    }
+	public static <T> T getBean(Class<T> beanClass) {
+		return context.getBean(beanClass);
+	}
 }

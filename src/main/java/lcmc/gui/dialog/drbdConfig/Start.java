@@ -71,7 +71,7 @@ public final class Start extends WizardDialog {
                  final GlobalInfo globalInfo,
                  final BlockDevInfo blockDevInfo1,
                  final BlockDevInfo blockDevInfo2) {
-        super(previousDialog);
+        setPreviousDialog(previousDialog);
         this.globalInfo = globalInfo;
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;

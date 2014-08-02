@@ -41,10 +41,6 @@ public final class FSInfo extends Info {
                                Tools.getDefault("HostBrowser.FileSystemIcon"));
     /** cached output from the modinfo command for the info panel. */
     private String modinfo = null;
-    /** Prepares a new {@code FSInfo} object. */
-    public FSInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
 
     /** Returns browser object of this info. */
     @Override

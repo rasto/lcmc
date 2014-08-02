@@ -36,11 +36,6 @@ public final class CRMInfo extends HbCategoryInfo {
     private static final ImageIcon CRM_ICON =
         Tools.createImageIcon(
                 Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
-    /** Prepares a new {@code ServicesInfo} object. */
-    public CRMInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
-
     /** Returns icon for the heartbeat menu item. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {

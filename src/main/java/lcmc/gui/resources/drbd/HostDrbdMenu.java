@@ -42,7 +42,10 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HostDrbdMenu {
 
     /** LVM menu. */
@@ -57,15 +60,12 @@ public class HostDrbdMenu {
     /** Description create LV. */
     private static final String LV_CREATE_MENU_DESCRIPTION =
                                                     "Create a logical volume.";
-    private final Host host;
-    private final HostDrbdInfo hostDrbdInfo;
+    private Host host;
+    private HostDrbdInfo hostDrbdInfo;
+    @Autowired
+    private EditHostDialog editHostDialog;
 
-    public HostDrbdMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
-        this.host = host;
-        this.hostDrbdInfo = hostDrbdInfo;
-    }
-
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
@@ -81,8 +81,7 @@ public class HostDrbdMenu {
 
                 @Override
                 public void action() {
-                    final EditHostDialog dialog = new EditHostDialog(host);
-                    dialog.showDialogs();
+                    editHostDialog.showDialogs(host);
                 }
             };
         items.add(hostWizardItem);
@@ -299,31 +298,6 @@ public class HostDrbdMenu {
             };
             hostDrbdInfo.addMouseOverListener(upAllItem, upAllItemCallback);
         }
-
-        /* upgrade drbd */
-        final UpdatableItem upgradeDrbdItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.UpgradeDrbd"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.UpgradeDrbd"),
-                           new AccessMode(Application.AccessType.GOD,
-                                          false), // TODO: does not work yet
-                           new AccessMode(Application.AccessType.ADMIN, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (!host.isConnected()) {
-                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    hostDrbdInfo.upgradeDrbd();
-                }
-            };
-        items.add(upgradeDrbdItem);
 
         /* change host color */
         final UpdatableItem changeHostColorItem =

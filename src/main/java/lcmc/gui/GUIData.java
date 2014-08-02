@@ -66,8 +66,6 @@ public final class GUIData  {
     /** Invisible panel with progress indicator. */
     private ProgressIndicatorPanel mainGlassPane;
     private MainMenu mainMenu;
-    /** Browser that appears if there are no clusters. */
-    private EmptyBrowser emptyBrowser;
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
     private final Lock mAddClusterButtonListReadLock = mAddClusterButtonListLock.readLock();
     private final Lock mAddClusterButtonListWriteLock = mAddClusterButtonListLock.writeLock();
@@ -119,14 +117,6 @@ public final class GUIData  {
 
     public MainMenu getMainMenu() {
         return mainMenu;
-    }
-
-    void setEmptyBrowser(final EmptyBrowser emptyBrowser) {
-        this.emptyBrowser = emptyBrowser;
-    }
-
-    public EmptyBrowser getEmptyBrowser() {
-        return emptyBrowser;
     }
 
     /** Returns main glass pane (with progress indicator). */
@@ -206,12 +196,6 @@ public final class GUIData  {
 
     public void setClustersPanel(final ClustersPanel clustersPanel) {
         this.clustersPanel = clustersPanel;
-    }
-
-    public void addClusterTab(final Cluster cluster) {
-        final ClusterTab clusterTab = new ClusterTab();
-        clusterTab.initWithCluster(cluster);
-        clustersPanel.addClusterTab(clusterTab);
     }
 
     public void renameSelectedClusterTab(final String newName) {

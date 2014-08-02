@@ -50,7 +50,7 @@ final class ConfigurationProxy extends Configuration {
                        final VolumeInfo volumeInfo,
                        final WizardDialog origDialog,
                        final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
+        init(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }

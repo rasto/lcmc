@@ -52,7 +52,7 @@ public class NetInfo extends Info {
     public NetInfo(final String name,
                    final NetInterface netInterface,
                    final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(netInterface);
     }
 

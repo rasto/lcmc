@@ -103,7 +103,7 @@ public abstract class HardwareInfo extends EditableInfo {
     HardwareInfo(final String name,
                     final Browser browser,
                     final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(new Resource(name));
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }

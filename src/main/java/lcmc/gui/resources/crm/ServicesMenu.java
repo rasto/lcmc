@@ -46,20 +46,19 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ServicesMenu {
 
     private static final Logger LOG =
                                   LoggerFactory.getLogger(ServicesInfo.class);
 
-    private final ServicesInfo servicesInfo;
-    
-    public ServicesMenu(ServicesInfo servicesInfo) {
-        super();
-        this.servicesInfo = servicesInfo;
-    }
+    @Autowired
+    private EditClusterDialog editClusterDialog;
 
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final ServicesInfo servicesInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final Application.RunMode runMode = Application.RunMode.LIVE;
 
@@ -76,7 +75,7 @@ public class ServicesMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().crmStatusFailed()) {
+                    if (servicesInfo.getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     return null;
@@ -86,13 +85,13 @@ public class ServicesMenu {
                 public void action() {
                     servicesInfo.hidePopup();
                     servicesInfo.addServicePanel(
-                                    getBrowser().getCrmXml().getGroupResourceAgent(),
+                                    servicesInfo.getBrowser().getCrmXml().getGroupResourceAgent(),
                                     getPos(),
                                     true,
                                     null,
                                     null,
                                     runMode);
-                    getBrowser().getCrmGraph().repaint();
+                    servicesInfo.getBrowser().getCrmGraph().repaint();
                 }
             };
         items.add(addGroupMenuItem);
@@ -108,10 +107,10 @@ public class ServicesMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().getCrmXml() == null) {
+                if (servicesInfo.getBrowser().getCrmXml() == null) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
-                if (getBrowser().crmStatusFailed()) {
+                if (servicesInfo.getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
                 return null;
@@ -122,7 +121,7 @@ public class ServicesMenu {
                 Tools.isSwingThread();
                 removeAll();
                 final Point2D pos = getPos();
-                final CrmXml crmXML = getBrowser().getCrmXml();
+                final CrmXml crmXML = servicesInfo.getBrowser().getCrmXml();
                 if (crmXML == null) {
                     return;
                 }
@@ -144,7 +143,7 @@ public class ServicesMenu {
                         @Override
                         public void action() {
                             servicesInfo.hidePopup();
-                            if (!getBrowser().linbitDrbdConfirmDialog()) {
+                            if (!servicesInfo.getBrowser().linbitDrbdConfirmDialog()) {
                                 return;
                             }
 
@@ -157,10 +156,10 @@ public class ServicesMenu {
                                                                 null,
                                                                 runMode);
                             fsi.setDrbddiskIsPreferred(false);
-                            getBrowser().getCrmGraph().repaint();
+                            servicesInfo.getBrowser().getCrmGraph().repaint();
                         }
                     };
-                    if (getBrowser().atLeastOneDrbddiskConfigured()
+                    if (servicesInfo.getBrowser().atLeastOneDrbddiskConfigured()
                         || !crmXML.isLinbitDrbdResourceAgentPresent()) {
                         ldMenuItem.setEnabled(false);
                     }
@@ -191,15 +190,15 @@ public class ServicesMenu {
                                                          null,
                                                          null,
                                                          runMode);
-                            getBrowser().getCrmGraph().repaint();
+                            servicesInfo.getBrowser().getCrmGraph().repaint();
                         }
                     };
                     ipMenuItem.setPos(pos);
                     add(ipMenuItem);
                 }
                 if (crmXML.isDrbddiskResourceAgentPresent()
-                    && (getBrowser().isDrbddiskRAPreferred()
-                        || getBrowser().atLeastOneDrbddiskConfigured()
+                    && (servicesInfo.getBrowser().isDrbddiskRAPreferred()
+                        || servicesInfo.getBrowser().atLeastOneDrbddiskConfigured()
                         || !crmXML.isLinbitDrbdResourceAgentPresent())) {
                     final MyMenuItem ddMenuItem = new MyMenuItem(
                      Tools.getString("ClusterBrowser.DrbddiskMenuName"),
@@ -222,10 +221,10 @@ public class ServicesMenu {
                                                                 null,
                                                                 runMode);
                             fsi.setDrbddiskIsPreferred(true);
-                            getBrowser().getCrmGraph().repaint();
+                            servicesInfo.getBrowser().getCrmGraph().repaint();
                         }
                     };
-                    if (getBrowser().isOneLinbitDrbdRaConfigured()
+                    if (servicesInfo.getBrowser().isOneLinbitDrbdRaConfigured()
                         || !crmXML.isDrbddiskResourceAgentPresent()) {
                         ddMenuItem.setEnabled(false);
                     }
@@ -282,11 +281,11 @@ public class ServicesMenu {
                                 });
                                 if (ra.isLinbitDrbd()
                                     &&
-                                     !getBrowser().linbitDrbdConfirmDialog()) {
+                                     !servicesInfo.getBrowser().linbitDrbdConfirmDialog()) {
                                     return;
                                 } else if (ra.isHbDrbd()
                                     &&
-                                     !getBrowser().hbDrbdConfirmDialog()) {
+                                     !servicesInfo.getBrowser().hbDrbdConfirmDialog()) {
                                     return;
                                 }
                                 servicesInfo.addServicePanel(ra,
@@ -295,7 +294,7 @@ public class ServicesMenu {
                                                              null,
                                                              null,
                                                              runMode);
-                                getBrowser().getCrmGraph().repaint();
+                                servicesInfo.getBrowser().getCrmGraph().repaint();
                             }
                         };
                         mmi.setPos(pos);
@@ -336,7 +335,7 @@ public class ServicesMenu {
 
                 @Override
                 public String enablePredicate() {
-                    if (getBrowser().crmStatusFailed()) {
+                    if (servicesInfo.getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     return null;
@@ -345,16 +344,16 @@ public class ServicesMenu {
                 @Override
                 public void action() {
                     servicesInfo.hidePopup();
-                    final CrmGraph hg = getBrowser().getCrmGraph();
+                    final CrmGraph hg = servicesInfo.getBrowser().getCrmGraph();
                     final ConstraintPHInfo cphi =
-                         new ConstraintPHInfo(getBrowser(),
+                         new ConstraintPHInfo(servicesInfo.getBrowser(),
                                               null,
                                               ConstraintPHInfo.Preference.AND);
                     cphi.getService().setNew(true);
-                    getBrowser().addNameToServiceInfoHash(cphi);
+                    servicesInfo.getBrowser().addNameToServiceInfoHash(cphi);
                     hg.addConstraintPlaceholder(cphi, getPos(), runMode);
                     final PcmkRscSetsInfo prsi =
-                                      new PcmkRscSetsInfo(getBrowser(), cphi);
+                                      new PcmkRscSetsInfo(servicesInfo.getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -382,7 +381,7 @@ public class ServicesMenu {
                 @Override
                 public String enablePredicate() {
                     final String pmV =
-                                getBrowser().getDCHost().getPacemakerVersion();
+                                servicesInfo.getBrowser().getDCHost().getPacemakerVersion();
                     try {
                         //TODO: get this from constraints-.rng files
                         if (pmV == null
@@ -394,7 +393,7 @@ public class ServicesMenu {
                                        + pmV);
                         /* enable it, if version check doesn't work */
                     }
-                    if (getBrowser().crmStatusFailed()) {
+                    if (servicesInfo.getBrowser().crmStatusFailed()) {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     return null;
@@ -403,16 +402,16 @@ public class ServicesMenu {
                 @Override
                 public void action() {
                     servicesInfo.hidePopup();
-                    final CrmGraph hg = getBrowser().getCrmGraph();
+                    final CrmGraph hg = servicesInfo.getBrowser().getCrmGraph();
                     final ConstraintPHInfo cphi =
-                         new ConstraintPHInfo(getBrowser(),
+                         new ConstraintPHInfo(servicesInfo.getBrowser(),
                                               null,
                                               ConstraintPHInfo.Preference.OR);
                     cphi.getService().setNew(true);
-                    getBrowser().addNameToServiceInfoHash(cphi);
+                    servicesInfo.getBrowser().addNameToServiceInfoHash(cphi);
                     hg.addConstraintPlaceholder(cphi, getPos(), runMode);
                     final PcmkRscSetsInfo prsi =
-                                      new PcmkRscSetsInfo(getBrowser(), cphi);
+                                      new PcmkRscSetsInfo(servicesInfo.getBrowser(), cphi);
                     cphi.setPcmkRscSetsInfo(prsi);
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -434,14 +433,14 @@ public class ServicesMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().crmStatusFailed()) {
+                if (servicesInfo.getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
-                if (getBrowser().getExistingServiceList(null).isEmpty()) {
+                if (servicesInfo.getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
                 for (final ServiceInfo si
-                        : getBrowser().getExistingServiceList(null)) {
+                        : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (!si.isStopped(Application.RunMode.LIVE) && !si.getService().isOrphaned()) {
                         return null;
                     }
@@ -452,9 +451,9 @@ public class ServicesMenu {
             @Override
             public void action() {
                 servicesInfo.hidePopup();
-                final Host dcHost = getBrowser().getDCHost();
+                final Host dcHost = servicesInfo.getBrowser().getDCHost();
                 for (final ServiceInfo si
-                        : getBrowser().getExistingServiceList(null)) {
+                        : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
                         && !si.isStopped(Application.RunMode.LIVE)
                         && !si.getService().isOrphaned()
@@ -462,16 +461,16 @@ public class ServicesMenu {
                         si.stopResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
-                getBrowser().getCrmGraph().repaint();
+                servicesInfo.getBrowser().getCrmGraph().repaint();
             }
         };
         final ButtonCallback stopAllItemCallback =
-                                    getBrowser().new ClMenuItemCallback(null) {
+                                    servicesInfo.getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
-                final Host thisDCHost = getBrowser().getDCHost();
+                final Host thisDCHost = servicesInfo.getBrowser().getDCHost();
                 for (final ServiceInfo si
-                        : getBrowser().getExistingServiceList(null)) {
+                        : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
                         && !si.isConstraintPH()
                         && !si.isStopped(Application.RunMode.TEST)
@@ -500,14 +499,14 @@ public class ServicesMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().crmStatusFailed()) {
+                if (servicesInfo.getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
-                if (getBrowser().getExistingServiceList(null).isEmpty()) {
+                if (servicesInfo.getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
                 for (final ServiceInfo si
-                                 : getBrowser().getExistingServiceList(null)) {
+                                 : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getMigratedTo(runMode) != null
                         || si.getMigratedFrom(runMode) != null) {
                         return null;
@@ -519,23 +518,23 @@ public class ServicesMenu {
             @Override
             public void action() {
                 servicesInfo.hidePopup();
-                final Host dcHost = getBrowser().getDCHost();
+                final Host dcHost = servicesInfo.getBrowser().getDCHost();
                 for (final ServiceInfo si
-                                : getBrowser().getExistingServiceList(null)) {
+                                : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getMigratedTo(runMode) != null
                         || si.getMigratedFrom(runMode) != null) {
                         si.unmigrateResource(dcHost, Application.RunMode.LIVE);
                     }
                 }
-                getBrowser().getCrmGraph().repaint();
+                servicesInfo.getBrowser().getCrmGraph().repaint();
             }
         };
         final ButtonCallback unmigrateAllItemCallback =
-                                    getBrowser().new ClMenuItemCallback(null) {
+                                    servicesInfo.getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si
-                                : getBrowser().getExistingServiceList(null)) {
+                                : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getMigratedTo(runMode) != null
                         || si.getMigratedFrom(runMode) != null) {
                         si.unmigrateResource(dcHost, Application.RunMode.TEST);
@@ -556,14 +555,14 @@ public class ServicesMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().crmStatusFailed()) {
+                if (servicesInfo.getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 }
-                if (getBrowser().getExistingServiceList(null).isEmpty()) {
+                if (servicesInfo.getBrowser().getExistingServiceList(null).isEmpty()) {
                     return "there are no services";
                 }
                 for (final ServiceInfo si
-                        : getBrowser().getExistingServiceList(null)) {
+                        : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null) {
                         if (si.isRunning(Application.RunMode.LIVE)) {
                             return "there are running services";
@@ -588,9 +587,9 @@ public class ServicesMenu {
                     final Thread t = new Thread() {
                         @Override
                         public void run() {
-                            final Host dcHost = getBrowser().getDCHost();
+                            final Host dcHost = servicesInfo.getBrowser().getDCHost();
                             final List<ServiceInfo> services =
-                                    getBrowser().getExistingServiceList(null);
+                                    servicesInfo.getBrowser().getExistingServiceList(null);
                             for (final ServiceInfo si : services) {
                                 if (si.getGroupInfo() == null) {
                                     final ResourceAgent ra =
@@ -612,7 +611,7 @@ public class ServicesMenu {
                                     }
                                 }
                             }
-                            getBrowser().getCrmGraph().repaint();
+                            servicesInfo.getBrowser().getCrmGraph().repaint();
                         }
                     };
                     t.start();
@@ -620,7 +619,7 @@ public class ServicesMenu {
             }
         };
         final ButtonCallback removeItemCallback =
-                                    getBrowser().new ClMenuItemCallback(null) {
+                                    servicesInfo.getBrowser().new ClMenuItemCallback(null) {
             @Override
             public void action(final Host dcHost) {
                 CRM.erase(dcHost, Application.RunMode.TEST);
@@ -642,9 +641,7 @@ public class ServicesMenu {
 
                 @Override
                 public void action() {
-                    final EditClusterDialog dialog =
-                              new EditClusterDialog(getBrowser().getCluster());
-                    dialog.showDialogs();
+                    editClusterDialog.showDialogs(servicesInfo.getBrowser().getCluster());
                 }
             };
         items.add(clusterWizardItem);
@@ -662,16 +659,11 @@ public class ServicesMenu {
 
                 @Override
                 public void action() {
-                    final ClusterLogs l = new ClusterLogs(getBrowser().getCluster());
+                    final ClusterLogs l = new ClusterLogs(servicesInfo.getBrowser().getCluster());
                     l.showDialog();
                 }
             };
         items.add(viewLogsItem);
         return items;
     }
-    
-    private ClusterBrowser getBrowser() {
-        return servicesInfo.getBrowser();
-    }
-
 }

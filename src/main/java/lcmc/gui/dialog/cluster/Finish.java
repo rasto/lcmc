@@ -26,9 +26,14 @@ import java.awt.Color;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import lcmc.gui.EmptyBrowser;
 import lcmc.model.Cluster;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish
@@ -38,16 +43,16 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 final class Finish extends DialogCluster {
     /** Save checkbox. */
     private final JCheckBox saveCB = new JCheckBox(
                                   Tools.getString("Dialog.Cluster.Finish.Save"),
                                   true);
-
-    /** Prepares a new {@code Finish} object. */
-    Finish(final WizardDialog previousDialog, final Cluster cluster) {
-        super(previousDialog, cluster);
-    }
+    @Autowired
+    private EmptyBrowser emptyBrowser;
+    @Autowired
+    private UserConfig userConfig;
 
     /** Returns next dialog. Null in this case. */
     @Override
@@ -58,10 +63,10 @@ final class Finish extends DialogCluster {
     /** Finishes the dialog, and saves the cluster. */
     @Override
     protected void finishDialog() {
-        Tools.getGUIData().getEmptyBrowser().addClusterBox(getCluster());
+        emptyBrowser.addClusterBox(getCluster());
         if (saveCB.isSelected()) {
             final String saveFile = Tools.getApplication().getSaveFile();
-            Tools.save(saveFile, false);
+            Tools.save(userConfig, saveFile, false);
         }
     }
 

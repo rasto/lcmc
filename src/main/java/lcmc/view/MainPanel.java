@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import lcmc.model.Host;
+import lcmc.model.HostFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,11 +47,14 @@ public final class MainPanel extends JPanel {
 
     @Autowired
     private ClustersPanel clustersPanel;
+    @Autowired
+    private HostFactory hostFactory;
 
     public void init() {
         setLayout(new BorderLayout());
         clustersPanel.init();
-        final Host noHost = Host.createInstance();
+        final Host noHost = hostFactory.createInstance();
+        noHost.init();
         final JSplitPane splitPane =
                                 new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
         Tools.getGUIData().setTerminalSplitPane(splitPane);

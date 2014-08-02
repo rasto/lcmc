@@ -47,6 +47,8 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can choose a distribution of the
@@ -56,6 +58,7 @@ import lcmc.utilities.ssh.ExecCommandThread;
  * @version $Id$
  *
  */
+@Component
 public class DrbdLinbitAvailPackages extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
@@ -79,13 +82,10 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private List<String> drbdKernelDirItems = null;
     /** List of items in the arch combo. */
     private List<String> drbdArchItems = null;
-
-    /** Prepares a new {@code DrbdLinbitAvailPackages} object. */
-    public DrbdLinbitAvailPackages(final WizardDialog previousDialog,
-                                   final Host host,
-                                   final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private CheckInstallation checkInstallationDialog;
+    @Autowired
+    private DrbdAvailFiles drbdAvailFilesDialog;
 
     /** Checks the available drbd verisions. */
     protected final void availVersions() {
@@ -368,9 +368,11 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     @Override
     public WizardDialog nextDialog() {
         if (getDrbdInstallation().isDrbdUpgraded()) {
-            return new CheckInstallation(this, getHost(), getDrbdInstallation());
+            checkInstallationDialog.init(this, getHost(), getDrbdInstallation());
+            return checkInstallationDialog;
         } else {
-            return new DrbdAvailFiles(this, getHost(), getDrbdInstallation());
+            drbdAvailFilesDialog.init(this, getHost(), getDrbdInstallation());
+            return drbdAvailFilesDialog;
         }
     }
 

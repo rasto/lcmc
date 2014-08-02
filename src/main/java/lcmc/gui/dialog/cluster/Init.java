@@ -24,7 +24,6 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -62,6 +61,8 @@ import lcmc.utilities.Openais;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
@@ -69,6 +70,7 @@ import lcmc.utilities.Tools;
  * @author Rasto Levrinc
  * @version $Id$
  */
+@Component
 public class Init extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Init.class);
@@ -142,12 +144,13 @@ public class Init extends DialogCluster {
                                    new AccessMode(Application.AccessType.ADMIN,
                                                   !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
+    @Autowired
+    private Finish finishDialog;
 
-    /** Prepares a new {@code Init} object. */
-    public Init(final WizardDialog previousDialog,
-                final Cluster cluster) {
-        super(previousDialog, cluster);
+    public void init(final WizardDialog previousDialog, final Cluster cluster) {
+        super.init(previousDialog, cluster);
         setButton(finishButton());
+        finishDialog.init(this, getCluster());
     }
 
     /** Sets button. Which acts as a finish button. */
@@ -186,7 +189,7 @@ public class Init extends DialogCluster {
     @Override
     public final WizardDialog nextDialog() {
         stopCheckCluster();
-        return new Finish(this, getCluster());
+        return finishDialog;
     }
 
     /** Returns the title of the dialog. */
@@ -639,7 +642,7 @@ public class Init extends DialogCluster {
 
             final SpringLayout layout = new SpringLayout();
             final JPanel pane = new JPanel(layout);
-            pane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            pane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
             final TitledBorder titledBorder =
                             BorderFactory.createTitledBorder(host.getName());

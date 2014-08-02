@@ -27,30 +27,25 @@ import javax.swing.tree.MutableTreeNode;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.resources.AllHostsInfo;
+import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
  */
+@Component
 public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
-    private final AllHostsInfo allHostsInfo = new AllHostsInfo(this);
+    @Autowired
+    private AllHostsInfo allHostsInfo;
 
-    EmptyBrowser() {
-        super();
-        /* Load the default file */
-        final String saveFile = Tools.getApplication().getSaveFile();
-        String xml = Tools.loadFile(saveFile, false);
-        if (xml == null) {
-            final String saveFileOld = Tools.getApplication().getSaveFileOld();
-            xml = Tools.loadFile(saveFileOld, false);
-        }
-        if (xml != null) {
-            Tools.loadXML(xml);
-        }
+    void init() {
+        allHostsInfo.init(this);
         setMenuTreeTop();
     }
 
@@ -76,6 +71,11 @@ public final class EmptyBrowser extends Browser {
     void updateHosts() {
         final Iterable<Host> allHosts = new TreeSet<Host>(Tools.getApplication().getHosts().getHostSet());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            @Override
+            public String toString() {
+                return super.toString();
+            }
+
             @Override
             public void run() {
                 allHostsNode.removeAllChildren();

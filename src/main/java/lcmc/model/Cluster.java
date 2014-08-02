@@ -39,17 +39,18 @@ import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds cluster data and implementation of cluster related
  * methods.
  */
+@Component
 public class Cluster implements Comparable<Cluster> {
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     private String name = null;
     private final Set<Host> hosts = new LinkedHashSet<Host>();
     private ClusterTab clusterTab = null;
-    private ClusterBrowser clusterBrowser;
     /** Default colors of the hosts. */
     private final Color[] defaultHostColors = {new Color(228, 228, 32),
                                                new Color(102, 204, 255), /* blue */
@@ -59,6 +60,8 @@ public class Cluster implements Comparable<Cluster> {
                                               };
     private boolean savable = true;
     private boolean clusterTabClosable = true;
+
+    private ClusterBrowser clusterBrowser;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
@@ -72,13 +75,12 @@ public class Cluster implements Comparable<Cluster> {
 
     }
 
-    public void createClusterBrowser() {
-        LOG.debug1("createClusterBrowser: " + name);
-        clusterBrowser = new ClusterBrowser(this);
-    }
-
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public void setBrowser(final ClusterBrowser clusterBrowser) {
+        this.clusterBrowser = clusterBrowser;
     }
 
     public ClusterBrowser getBrowser() {

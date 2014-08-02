@@ -34,6 +34,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.configs.AppDefaults;
+import lcmc.model.HostFactory;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.Host;
@@ -49,6 +50,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
@@ -107,6 +109,8 @@ public final class Resource extends DrbdConfig {
     private static final int SECRET_STRING_LENGTH = 32;
     /** Whether to add proxy host. */
     private boolean proxyHostNextDialog = false;
+    @Autowired
+    private HostFactory hostFactory;
 
     /** Prepares a new {@code Resource} object. */
     public Resource(final WizardDialog previousDialog,
@@ -125,7 +129,8 @@ public final class Resource extends DrbdConfig {
         final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
         if (proxyHostNextDialog) {
             proxyHostNextDialog = false;
-            final Host proxyHost = Host.createInstance();
+            final Host proxyHost = hostFactory.createInstance();
+            proxyHost.init();
             proxyHost.setCluster(dri.getCluster());
             return new NewProxyHostDialog(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
         }

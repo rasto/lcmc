@@ -52,7 +52,7 @@ public final class RscDefaultsInfo extends EditableInfo {
      */
     public RscDefaultsInfo(final String name,
                            final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(new Resource(name));
     }
 

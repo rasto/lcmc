@@ -46,10 +46,6 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     /** Name of the drbd after parameter. Before 8.4 */
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
-    /** Prepares a new {@code AbstractDrbdInfo} object. */
-    AbstractDrbdInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
 
     /** Returns browser object of this info. */
     @Override

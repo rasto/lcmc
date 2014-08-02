@@ -49,14 +49,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.AddDrbdConfigDialog;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
-import lcmc.model.Application;
+import lcmc.model.*;
 import lcmc.model.Application.RunMode;
-import lcmc.model.Cluster;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
 import lcmc.model.resources.Resource;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
@@ -69,6 +65,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class provides drbd info. For one it shows the editable global
@@ -94,14 +91,16 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
 
-    private final GlobalMenu globalMenu;
+    @Autowired
+    private GlobalMenu globalMenu;
+    @Autowired
+    private HostFactory hostFactory;
 
     /** Prepares a new {@code GlobalInfo} object. */
     public GlobalInfo(final String name, final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(new Resource(name));
         ((ClusterBrowser) browser).getDrbdGraph().setDrbdInfo(this);
-        globalMenu = new GlobalMenu(this);
     }
 
     /** Sets stored parameters. */
@@ -112,7 +111,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
 
             final Host proxyHost = cluster.getProxyHostByName(hostName);
             if (proxyHost == null) {
-                final Host hp = Host.createInstance();
+                final Host hp = hostFactory.createInstance();
+                hp.init();
                 hp.setHostname(hostName);
                 cluster.addProxyHost(hp);
                 addProxyHostNode(hp);
@@ -820,7 +820,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        return globalMenu.getPulldownMenu();
+        return globalMenu.getPulldownMenu(this);
     }
 
     /** Reset info panel. */

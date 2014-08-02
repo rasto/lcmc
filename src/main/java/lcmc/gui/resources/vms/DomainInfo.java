@@ -594,7 +594,7 @@ public class DomainInfo extends EditableInfo {
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
 
     public DomainInfo(final String name, final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
         preferredEmulator = firstHost.getDistString("KVM.emulator");
         final List<Value> hostsList = new ArrayList<Value>();

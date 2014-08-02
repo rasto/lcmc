@@ -95,6 +95,8 @@ import lcmc.utilities.Tools;
 import org.apache.commons.collections15.keyvalue.MultiKey;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -102,6 +104,7 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
  */
+@Component
 public class ClusterBrowser extends Browser {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterBrowser.class);
     public static final ImageIcon REMOVE_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.RemoveIcon"));
@@ -199,7 +202,7 @@ public class ClusterBrowser extends Browser {
         return name;
     }
 
-    private final Cluster cluster;
+    private Cluster cluster;
     private DefaultMutableTreeNode clusterHostsNode;
     private DefaultMutableTreeNode networksNode;
     private DefaultMutableTreeNode commonBlockDevicesNode;
@@ -223,8 +226,8 @@ public class ClusterBrowser extends Browser {
     private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo = new HashMap<String, ServiceInfo>();
-    private final CrmGraph crmGraph;
-    private final DrbdGraph drbdGraph;
+    private CrmGraph crmGraph;
+    private DrbdGraph drbdGraph;
     private ClusterStatus clusterStatus;
     private CrmXml crmXml;
     private DrbdXml drbdXml;
@@ -250,7 +253,8 @@ public class ClusterBrowser extends Browser {
     private final Map<ResourceAgent, AvailableServiceInfo> availableServiceMap =
                                                                new HashMap<ResourceAgent, AvailableServiceInfo>();
     private ClusterHostsInfo clusterHostsInfo;
-    private ServicesInfo servicesInfo = null;
+    @Autowired
+    private ServicesInfo servicesInfo;
     private RscDefaultsInfo rscDefaultsInfo = null;
     private final Lock mCrmStatusLock = new ReentrantLock();
     private final Map<String, List<String>> crmOperationParams = new LinkedHashMap<String, List<String>>();
@@ -259,8 +263,7 @@ public class ClusterBrowser extends Browser {
                                                                      new LinkedMap<MultiKey<String>, Integer>());
     private final Map<Host, String> hostDrbdParameters = new HashMap<Host, String>();
 
-    public ClusterBrowser(final Cluster cluster) {
-        super();
+    public void init(final Cluster cluster) {
         this.cluster = cluster;
         crmGraph = new CrmGraph(this);
         drbdGraph = new DrbdGraph(this);
@@ -417,7 +420,9 @@ public class ClusterBrowser extends Browser {
 
     void addVmsNode() {
         if (vmsNode == null) {
-            vmsNode = new DefaultMutableTreeNode(new VMListInfo(Tools.getString("ClusterBrowser.VMs"), this));
+            final VMListInfo vmListInfo = new VMListInfo();
+            vmListInfo.init(Tools.getString("ClusterBrowser.VMs"), this);
+            vmsNode = new DefaultMutableTreeNode(vmListInfo);
             setNode(vmsNode);
             topLevelAdd(vmsNode);
             reloadNode(getTreeTop(), true);
@@ -428,13 +433,16 @@ public class ClusterBrowser extends Browser {
     void initClusterBrowser() {
         LOG.debug1("initClusterBrowser: start");
         /* hosts */
-        clusterHostsInfo = new ClusterHostsInfo(Tools.getString("ClusterBrowser.ClusterHosts"), this);
+        clusterHostsInfo = new ClusterHostsInfo();
+        clusterHostsInfo.init(Tools.getString("ClusterBrowser.ClusterHosts"), this);
         clusterHostsNode = new DefaultMutableTreeNode(clusterHostsInfo);
         setNode(clusterHostsNode);
         topLevelAdd(clusterHostsNode);
 
         /* networks */
-        networksNode = new DefaultMutableTreeNode(new CategoryInfo(Tools.getString("ClusterBrowser.Networks"), this));
+        final CategoryInfo categoryInfo = new CategoryInfo();
+        categoryInfo.init(Tools.getString("ClusterBrowser.Networks"), this);
+        networksNode = new DefaultMutableTreeNode(categoryInfo);
         setNode(networksNode);
         topLevelAdd(networksNode);
 
@@ -444,27 +452,29 @@ public class ClusterBrowser extends Browser {
         topLevelAdd(drbdNode);
 
         /* CRM */
-        final CRMInfo crmInfo = new CRMInfo(Tools.getString("ClusterBrowser.ClusterManager"), this);
+        final CRMInfo crmInfo = new CRMInfo();
+        crmInfo.init(Tools.getString("ClusterBrowser.ClusterManager"), this);
         crmNode = new DefaultMutableTreeNode(crmInfo);
         setNode(crmNode);
         topLevelAdd(crmNode);
 
         /* available services */
-        availableServicesNode = new DefaultMutableTreeNode(
-                                      new AvailableServicesInfo(Tools.getString("ClusterBrowser.availableServices"),
-                                                                this));
+        final AvailableServicesInfo availableServicesInfo = new AvailableServicesInfo();
+        availableServicesInfo.init(Tools.getString("ClusterBrowser.availableServices"), this);
+        availableServicesNode = new DefaultMutableTreeNode(availableServicesInfo);
         setNode(availableServicesNode);
         addNode(crmNode, availableServicesNode);
 
         /* block devices / shared disks, TODO: */
-        commonBlockDevicesNode = new DefaultMutableTreeNode(
-                                     new HbCategoryInfo(Tools.getString("ClusterBrowser.CommonBlockDevices"), this));
+        final HbCategoryInfo hbCategoryInfo = new HbCategoryInfo();
+        hbCategoryInfo.init(Tools.getString("ClusterBrowser.CommonBlockDevices"), this);
+        commonBlockDevicesNode = new DefaultMutableTreeNode(hbCategoryInfo);
         setNode(commonBlockDevicesNode);
 
         /* resource defaults */
         rscDefaultsInfo = new RscDefaultsInfo("rsc_defaults", this);
         /* services */
-        servicesInfo = new ServicesInfo(Tools.getString("ClusterBrowser.Services"), this);
+        servicesInfo.init(Tools.getString("ClusterBrowser.Services"), this);
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
         setNode(servicesNode);
         addNode(crmNode, servicesNode);

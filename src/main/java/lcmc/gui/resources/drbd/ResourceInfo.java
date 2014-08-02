@@ -137,7 +137,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
 
     public ResourceInfo(final String name, final Set<Host> hosts, final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         this.hosts = hosts;
         setResource(new DrbdResource(name));
     }

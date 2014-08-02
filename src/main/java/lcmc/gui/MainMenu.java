@@ -56,14 +56,13 @@ import javax.swing.filechooser.FileFilter;
 import lcmc.AddClusterDialog;
 import lcmc.AddHostDialog;
 import lcmc.Exceptions;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.model.*;
 import lcmc.gui.dialog.About;
 import lcmc.gui.dialog.BugReport;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -91,6 +90,14 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String upgradeCheck = "";
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
+    @Autowired
+    private AddClusterDialog addClusterDialog;
+    @Autowired
+    private UserConfig userConfig;
+    @Autowired
+    private AddHostDialog addHostDialog;
+    @Autowired
+    private HostFactory hostFactory;
 
     public void init() {
         if (Tools.getApplication().isUpgradeCheckEnabled()) {
@@ -272,8 +279,9 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         final AddHostDialog h = new AddHostDialog(Host.createInstance());
-                         h.showDialogs();
+                         final Host host = hostFactory.createInstance();
+                         host.init();
+                         addHostDialog.showDialogs(host);
                      }
                  });
                  t.start();
@@ -319,10 +327,20 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      Tools.getApplication().setSaveFile(name);
-                     Tools.loadConfigData(name);
+                     loadConfigData(name);
                  }
              }
         };
+    }
+
+    private void loadConfigData(final String filename) {
+        LOG.debug("loadConfigData: start");
+        final String xml = Tools.loadFile(filename, true);
+        if (xml == null) {
+            return;
+        }
+        userConfig.startClusters(null);
+        Tools.getGUIData().allHostsUpdate();
     }
 
     private ActionListener removeEverythingActionListener() {
@@ -355,7 +373,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread thread = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         Tools.save(Tools.getApplication().getSaveFile(), true);
+                         Tools.save(userConfig, Tools.getApplication().getSaveFile(), true);
                      }
                  });
                  thread.start();
@@ -400,7 +418,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      Tools.getApplication().setSaveFile(name);
-                     Tools.save(Tools.getApplication().getSaveFile(), true);
+                     Tools.save(userConfig, Tools.getApplication().getSaveFile(), true);
                  }
 
              }
@@ -418,8 +436,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         final AddClusterDialog c = new AddClusterDialog();
-                         c.showDialogs();
+                         addClusterDialog.showDialogs();
                      }
                  });
                  t.start();

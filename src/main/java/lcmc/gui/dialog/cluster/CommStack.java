@@ -46,6 +46,8 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
@@ -55,6 +57,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 final class CommStack extends DialogCluster {
     /** Logger. */
     private static final Logger LOG =
@@ -62,22 +65,25 @@ final class CommStack extends DialogCluster {
     /** Radio Combo box. */
     private Widget chooseStackCombo;
 
-    /** Prepares a new {@code CommStack} object. */
-    CommStack(final WizardDialog previousDialog, final Cluster cluster) {
-        super(previousDialog, cluster);
-    }
+    @Autowired
+    private HbConfig hbConfigDialog;
+    @Autowired
+    private CoroConfig coroConfigDialog;
 
     /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
+        DialogCluster configDialog;
         if (Application.HEARTBEAT_NAME.equals(chooseStackCombo.getValue().getValueForConfig())) {
             Tools.getApplication().setLastInstalledClusterStack(
                                                     Application.HEARTBEAT_NAME);
-            return new HbConfig(this, getCluster());
+            hbConfigDialog.init(this, getCluster());
+            return hbConfigDialog;
         } else {
             Tools.getApplication().setLastInstalledClusterStack(
                                                     Application.COROSYNC_NAME);
-            return new CoroConfig(this, getCluster());
+            coroConfigDialog.init(this, getCluster());
+            return coroConfigDialog;
         }
     }
 

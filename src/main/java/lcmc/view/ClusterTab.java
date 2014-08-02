@@ -35,6 +35,8 @@ import lcmc.presenter.ClusterPresenter;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,12 +44,19 @@ import org.springframework.stereotype.Component;
  * that are in the cluster.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
     private JLabel labelTitle;
 
     @Autowired
+    private EmptyViewPanel emptyViewPanel;
+
+    @Autowired
     private ClusterPresenter clusterPresenter;
+
+    @Autowired
+    private ClusterViewPanel clusterViewPanel;
 
     public static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
 
@@ -61,15 +70,16 @@ public final class ClusterTab extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         if (cluster == null) {
-            final EmptyViewPanel p = new EmptyViewPanel();
-            p.setDisabledDuringLoad(false);
-            add(p);
+            emptyViewPanel.init();
+            emptyViewPanel.setDisabledDuringLoad(false);
+            add(emptyViewPanel);
         }
     }
 
     public void addClusterView() {
         if (cluster.hostsCount() > 0) {
-            add(new ClusterViewPanel(cluster));
+            clusterViewPanel.init(cluster);
+            add(clusterViewPanel);
         }
         repaint();
     }
@@ -99,7 +109,7 @@ public final class ClusterTab extends JPanel {
         tabPanel.setOpaque(false);
         final JLabel iconLabel = new JLabel(CLUSTER_ICON);
 
-        final MyButton clusterButton = getClusterButton();
+        final MyButton clusterButton = getCloseButton();
 
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -117,7 +127,7 @@ public final class ClusterTab extends JPanel {
         return tabPanel;
     }
 
-    private MyButton getClusterButton() {
+    private MyButton getCloseButton() {
         final MyButton closeButton = new MyButton("X");
         closeButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         closeButton.setMargin(new Insets(0, 0, 0, 0));

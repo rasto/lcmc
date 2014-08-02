@@ -63,7 +63,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
     /** Prepares a new {@code PcmkMultiSelectionInfo} object. */
     public PcmkMultiSelectionInfo(final List<Info> selectedInfos,
                                   final Browser browser) {
-        super("selection", browser);
+        super.init("selection", browser);
         this.selectedInfos = selectedInfos;
     }
 

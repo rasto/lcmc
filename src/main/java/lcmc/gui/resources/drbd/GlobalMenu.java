@@ -28,19 +28,21 @@ import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.dialog.cluster.DrbdLogs;
+import lcmc.model.HostFactory;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class GlobalMenu {
-    
-    private final GlobalInfo globalInfo;
+    @Autowired
+    private EditClusterDialog editClusterDialog;
+    @Autowired
+    private HostFactory hostFactory;
 
-    public GlobalMenu(final GlobalInfo globalInfo) {
-        this.globalInfo = globalInfo;
-    }
-
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /** Add proxy host */
@@ -54,7 +56,7 @@ public class GlobalMenu {
 
             @Override
             public void action() {
-                addProxyHostWizard();
+                addProxyHostWizard(globalInfo);
             }
         };
         items.add(addProxyHostMenu);
@@ -70,9 +72,7 @@ public class GlobalMenu {
 
             @Override
             public void action() {
-                final EditClusterDialog dialog = new EditClusterDialog(
-                        globalInfo.getBrowser().getCluster());
-                dialog.showDialogs();
+                editClusterDialog.showDialogs(globalInfo.getBrowser().getCluster());
             }
         };
         items.add(clusterWizardItem);
@@ -115,8 +115,9 @@ public class GlobalMenu {
         return items;
     }
 
-    private void addProxyHostWizard() {
-        final Host proxyHost = Host.createInstance();
+    private void addProxyHostWizard(final GlobalInfo globalInfo) {
+        final Host proxyHost = hostFactory.createInstance();
+        proxyHost.init();
         proxyHost.setCluster(globalInfo.getCluster());
         final ProxyHostWizard w = new ProxyHostWizard(proxyHost, null);
         w.showDialogs();

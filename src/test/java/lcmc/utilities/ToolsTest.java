@@ -12,7 +12,10 @@ import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
 import junitparams.Parameters;
 import lcmc.Exceptions;
+import lcmc.gui.TerminalPanel;
 import lcmc.model.Host;
+import lcmc.model.HostFactory;
+import lcmc.model.drbd.DrbdHost;
 import lcmc.testutils.TestUtils;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
@@ -24,15 +27,23 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
     private static final Logger LOG = LoggerFactory.getLogger(ToolsTest.class);
 
     private final TestUtils testSuite = new TestUtils();
+    @Mock
+    private DrbdHost drbdHostStub;
+    @Mock
+    private TerminalPanel terminalPanelStub;
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         testSuite.initStdout();
         Tools.init();
     }
@@ -937,7 +948,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestVersionBeforePacemaker")
     public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
-        final Host host = Host.createInstance();
+        final Host host = new Host(drbdHostStub, terminalPanelStub);
 
         host.setPacemakerVersion(pcmkVersion);
         host.setHeartbeatVersion(hbVersion);
@@ -958,7 +969,7 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestVersionAfterPacemaker")
     public void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
-        final Host host = Host.createInstance();
+        final Host host = new Host(drbdHostStub, terminalPanelStub);
 
         host.setPacemakerVersion(pcmkVersion);
         host.setHeartbeatVersion(hbVersion);

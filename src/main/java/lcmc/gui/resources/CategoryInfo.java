@@ -38,12 +38,6 @@ public class CategoryInfo extends Info {
     public static final String MAIN_TABLE = "main";
     /** Info panel. */
     private JComponent infoPanel = null;
-    /**
-     * Prepares a new {@code CategoryInfo} object.
-     */
-    public CategoryInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
 
     /** Info panel for the category. */
     @Override

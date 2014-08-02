@@ -35,13 +35,17 @@ import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
 import lcmc.AddHostDialog;
 import lcmc.model.Host;
+import lcmc.model.HostFactory;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
  */
+@Component
 public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -49,13 +53,18 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostTab.HostIcon"));
     private static final Dimension BIG_BUTTON_DIMENSION = new Dimension(300, 100);
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
-    private final transient EmptyBrowser browser;
+    @Autowired
+    private EmptyBrowser emptyBrowser;
+    @Autowired
+    private AddClusterDialog addClusterDialog;
+    @Autowired
+    private AddHostDialog addHostDialog;
+    @Autowired
+    private HostFactory hostFactory;
 
-    public EmptyViewPanel() {
-        super();
-        browser = new EmptyBrowser();
-        Tools.getGUIData().setEmptyBrowser(browser);
-        browser.initHosts();
+    public void init() {
+        emptyBrowser.init();
+        emptyBrowser.initHosts();
 
         final JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setMinimumSize(new Dimension(0, 110));
@@ -87,8 +96,9 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                     new Runnable() {
                         @Override
                         public void run() {
-                            final AddHostDialog ahd = new AddHostDialog(Host.createInstance());
-                            ahd.showDialogs();
+                            final Host host = hostFactory.createInstance();
+                            host.init();
+                            addHostDialog.showDialogs(host);
                         }
                     });
                 thread.start();
@@ -113,8 +123,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                     new Runnable() {
                         @Override
                         public void run() {
-                            final AddClusterDialog acd = new AddClusterDialog();
-                            acd.showDialogs();
+                            addClusterDialog.showDialogs();
                         }
                     });
                 thread.start();
@@ -135,13 +144,13 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
 
     /** creates cluster view and updates the tree. */
     private void createEmptyView() {
-        getTree(browser);
-        browser.updateHosts();
+        getTree(emptyBrowser);
+        emptyBrowser.updateHosts();
     }
 
     /** Updates the all hosts menu item. */
     @Override
     public void allHostsUpdate() {
-        browser.updateHosts();
+        emptyBrowser.updateHosts();
     }
 }

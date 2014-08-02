@@ -40,7 +40,7 @@ public abstract class VMConfig extends WizardDialog {
     /** Prepares a new {@code VMConfig} object. */
     protected VMConfig(final WizardDialog previousDialog,
                        final DomainInfo vmsVirtualDomainInfo) {
-        super(previousDialog);
+        setPreviousDialog(previousDialog);
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 

@@ -1740,12 +1740,6 @@ public final class RoboTest {
         }
     }
 
-    static void saveAndExit() {
-        Tools.save(Tools.getApplication().getSaveFile(), false);
-        sleepNoFactor(5000);
-        System.exit(0);
-    }
-
     static void resetTerminalAreas() {
         for (final Host h : getClusterHosts()) {
             if (!aborted) {

@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.host;
 
-import java.awt.Component;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -45,6 +44,8 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
@@ -54,6 +55,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public class Configuration extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
@@ -72,12 +74,10 @@ public class Configuration extends DialogHost {
     private String[] hostnames = new String[MAX_HOPS];
     /** Whether the hostname was ok. */
     private volatile boolean hostnameOk = false;
-
-    public Configuration(final WizardDialog previousDialog,
-                         final Host host,
-                         final DrbdInstallation drbdInstallation) {
-        super(previousDialog, host, drbdInstallation);
-    }
+    @Autowired
+    private Devices devicesDialog;
+    @Autowired
+    private SSH sshDialog;
 
     /** Finishes the dialog and stores the values. */
     @Override
@@ -99,9 +99,11 @@ public class Configuration extends DialogHost {
     public WizardDialog nextDialog() {
         if (hostnameOk) {
             if (getHost().isConnected()) {
-                return new Devices(this, getHost(), getDrbdInstallation());
+                devicesDialog.init(this, getHost(), getDrbdInstallation());
+                return devicesDialog;
             } else {
-                return new SSH(this, getHost(), getDrbdInstallation());
+                sshDialog.init(this, getHost(), getDrbdInstallation());
+                return sshDialog;
             }
         } else {
             return this;
@@ -293,7 +295,7 @@ public class Configuration extends DialogHost {
     protected final JComponent getInputPane() {
         final int hops = getHops();
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        inputPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Host/Hosts */
         final JLabel hostnameLabel = new JLabel(

@@ -39,7 +39,7 @@ public final class NetworkInfo extends Info {
     public NetworkInfo(final String name,
                        final Network network,
                        final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(network);
     }
 

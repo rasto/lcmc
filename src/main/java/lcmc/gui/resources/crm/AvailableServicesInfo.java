@@ -32,11 +32,6 @@ import lcmc.utilities.MyButton;
  * This class holds the information about available resource agent classes.
  */
 public final class AvailableServicesInfo extends HbCategoryInfo {
-    /** Prepares a new {@code AvailableServicesInfo} object. */
-    public AvailableServicesInfo(final String name, final Browser browser) {
-        super(name, browser);
-    }
-
     /** Returns columns for the table. */
     @Override
     protected String[] getColumnNames(final String tableName) {

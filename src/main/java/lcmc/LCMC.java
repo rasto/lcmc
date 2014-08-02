@@ -46,12 +46,12 @@ import javax.swing.plaf.metal.OceanTheme;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.MainMenu;
+import lcmc.model.UserConfig;
 import lcmc.view.MainPanel;
 import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
@@ -64,15 +64,13 @@ public final class LCMC extends JPanel {
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
 
-    private static AnnotationConfigApplicationContext context;
-
     protected static void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
         displayMainFrame(mainFrame);
     }
 
     protected static JPanel getMainPanel() {
-        final MainPanel mainPanel = context.getBean(MainPanel.class);
+        final MainPanel mainPanel = AppContext.getBean(MainPanel.class);
         mainPanel.init();
         Tools.getGUIData().setMainPanel(mainPanel);
         mainPanel.setOpaque(true); //content panes must be opaque
@@ -81,7 +79,7 @@ public final class LCMC extends JPanel {
 
     protected static JMenuBar getMenuBar() {
         /* glass pane is used for progress bar etc. */
-        final MainMenu menu = context.getBean(MainMenu.class);
+        final MainMenu menu = AppContext.getBean(MainMenu.class);
         menu.init();
         Tools.getGUIData().setMainMenu(menu);
         return menu.getMenuBar();
@@ -113,15 +111,15 @@ public final class LCMC extends JPanel {
         t.start();
         Tools.getGUIData().getMainFrame().setVisible(false);
         final String saveFile = Tools.getApplication().getSaveFile();
-        Tools.save(saveFile, false);
+        final UserConfig userConfig = AppContext.getBean(UserConfig.class);
+        Tools.save(userConfig, saveFile, false);
         Tools.getApplication().disconnectAllHosts();
     }
 
     protected static void initApp(final String[] args) {
-        context = new AnnotationConfigApplicationContext("lcmc");
         setupUiLookupFeelAndFeel();
         setupUncaughtExceptionHandler();
-        final ArgumentParser argumentParser = new ArgumentParser();
+        final ArgumentParser argumentParser = AppContext.getBean(ArgumentParser.class);
         argumentParser.parseOptionsAndReturnAutoArguments(args);
     }
 

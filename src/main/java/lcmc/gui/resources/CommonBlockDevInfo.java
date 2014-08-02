@@ -45,7 +45,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     public CommonBlockDevInfo(final String name,
                               final BlockDevice[] blockDevices,
                               final Browser browser) {
-        super(name, browser);
+        super.init(name, browser);
         setResource(new CommonBlockDevice(name));
         this.blockDevices = blockDevices;
     }

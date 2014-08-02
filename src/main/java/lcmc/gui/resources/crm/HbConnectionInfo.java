@@ -89,7 +89,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Prepares a new {@code HbConnectionInfo} object. */
     public HbConnectionInfo(final Browser browser) {
-        super("HbConnectionInfo", browser);
+        super.init("HbConnectionInfo", browser);
     }
 
     /** Returns browser object of this info. */

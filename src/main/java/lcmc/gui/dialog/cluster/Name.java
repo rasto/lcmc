@@ -36,6 +36,9 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
+import lcmc.view.ClusterTabFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
@@ -44,16 +47,17 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public final class Name extends DialogCluster {
     /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
     /** Name field. */
     private Widget nameField;
 
-    /** Prepares a new {@code Name} object. */
-    public Name(final WizardDialog previousDialog, final Cluster cluster) {
-        super(previousDialog, cluster);
-    }
+    @Autowired
+    private ClusterHosts clusterHostsDialog;
+    @Autowired
+    private ClusterTabFactory clusterTabFactory;
 
     /** Called before the dialog is finished. It saves the value. */
     @Override
@@ -64,7 +68,8 @@ public final class Name extends DialogCluster {
     /** Returns the next dialog after this dialog. */
     @Override
     public WizardDialog nextDialog() {
-        return new ClusterHosts(this, getCluster());
+        clusterHostsDialog.init(this, getCluster());
+        return clusterHostsDialog;
     }
 
     /** Checks the field if it is correct and renames the tab. */
@@ -122,7 +127,10 @@ public final class Name extends DialogCluster {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    Tools.getGUIData().addClusterTab(getCluster());
+                    //Tools.getGUIData().addClusterTab(getCluster());
+                    //clusterTab.initWithCluster(getCluster());
+                    //clustersPanel.addClusterTab(clusterTab);
+                    clusterTabFactory.createClusterTab(getCluster());
                 }
             });
         }

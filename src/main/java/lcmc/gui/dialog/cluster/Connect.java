@@ -33,6 +33,8 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where connection to every host will be checked
@@ -42,20 +44,19 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 final class Connect extends DialogCluster {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 
-    /** Prepares a new {@code Connect} object. */
-    Connect(final WizardDialog previousDialog,
-            final Cluster cluster) {
-        super(previousDialog, cluster);
-    }
+    @Autowired
+    private CommStack commStackDialog;
 
     /** Returns the next dialog which is ClusterDrbdConf. */
     @Override
     public WizardDialog nextDialog() {
-        return new CommStack(getPreviousDialog(), getCluster());
+        commStackDialog.init(getPreviousDialog(), getCluster());
+        return commStackDialog;
     }
 
     /** Returns cluster dialog title. */

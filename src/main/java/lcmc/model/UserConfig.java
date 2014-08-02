@@ -47,6 +47,9 @@ import lcmc.view.ClusterTab;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import lcmc.view.ClusterTabFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,6 +62,7 @@ import org.w3c.dom.NodeList;
  * @author Rasto Levrinc
  * @version $Id$
  */
+@Component
 public final class UserConfig extends XML {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(XML.class);
@@ -84,6 +88,11 @@ public final class UserConfig extends XML {
     private static final String encoding = "UTF-8";
     /** Whether the host is a proxy host. */
     public static final boolean PROXY_HOST = true;
+
+    @Autowired
+    private ClusterTabFactory clusterTabFactory;
+    @Autowired
+    private HostFactory hostFactory;
 
     /** Saves data about clusters and hosts to the supplied output stream. */
     public String saveXML(final OutputStream outputStream,
@@ -187,7 +196,10 @@ public final class UserConfig extends XML {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.getGUIData().addClusterTab(cluster);
+                        //Tools.getGUIData().addClusterTab(cluster);
+                        clusterTabFactory.createClusterTab(cluster);
+                        //clusterTab.initWithCluster(cluster);
+                        //clustersPanel.addClusterTab(clusterTab);
                     }
                 });
                 if (cluster.getHosts().isEmpty()) {
@@ -324,7 +336,8 @@ public final class UserConfig extends XML {
                         final boolean sudo,
                         final boolean savable) {
         Tools.getApplication().setLastEnteredUser(username);
-        final Host host = Host.createInstance();
+        final Host host = hostFactory.createInstance();
+        host.init();
         host.setSavable(savable);
         host.setHostname(nodeName);
         if (sshPort == null) {
