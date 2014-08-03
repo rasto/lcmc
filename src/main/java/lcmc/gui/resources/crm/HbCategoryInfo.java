@@ -42,7 +42,7 @@ public class HbCategoryInfo extends CategoryInfo {
 
     /** Returns type of the info text. text/plain or text/html. */
     @Override
-    protected String getInfoType() {
+    protected String getInfoMimeType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 

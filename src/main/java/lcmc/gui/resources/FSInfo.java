@@ -26,7 +26,6 @@ import javax.swing.JEditorPane;
 
 import lcmc.model.Application;
 import lcmc.model.Host;
-import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
@@ -36,27 +35,21 @@ import lcmc.utilities.ssh.SshOutput;
  * This class holds info data for a filesystem.
  */
 public final class FSInfo extends Info {
-    /** File system icon. */
-    private static final ImageIcon FS_ICON = Tools.createImageIcon(
-                               Tools.getDefault("HostBrowser.FileSystemIcon"));
-    /** cached output from the modinfo command for the info panel. */
-    private String modinfo = null;
+    private static final ImageIcon FS_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.FileSystemIcon"));
+    private String cachedModinfoOutput = null;
 
-    /** Returns browser object of this info. */
     @Override
     public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /** Returns file system icon for the menu. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return FS_ICON;
     }
 
-    /** Returns type of the info text. text/plain or text/html. */
     @Override
-    protected String getInfoType() {
+    protected String getInfoMimeType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
@@ -72,13 +65,13 @@ public final class FSInfo extends Info {
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if (modinfo == null) {
+                if (cachedModinfoOutput == null) {
                     final Host host = getBrowser().getHost();
                     final SshOutput ret = host.captureCommand(new ExecCommandConfig()
                                                                   .command("/sbin/modinfo " + getName()));
-                    modinfo = ret.getOutput();
+                    cachedModinfoOutput = ret.getOutput();
                 }
-                ep.setText("<html><pre>" + modinfo + "</html></pre>");
+                ep.setText("<html><pre>" + cachedModinfoOutput + "</html></pre>");
             }
         };
         final Thread thread = new Thread(runnable);

@@ -29,16 +29,11 @@ import lcmc.gui.resources.crm.ServiceInfo;
  * devices that don't have DRBD over them but are used by CRM.
  */
 public interface CommonDeviceInterface extends Value {
-    /** Returns the name. */
     String getName();
-    /** Returns the device name. */
     String getDevice();
-    /** Sets whether the device is used by CRM. */
     void setUsedByCRM(ServiceInfo isUsedByCRM);
-    /** Returns whether the device is used by CRM. */
     boolean isUsedByCRM();
-    /** Returns the last created filesystem. */
-    String getCreatedFs();
+    String getLastCreatedFs();
     /** Returns how much of the device is used. */
     int getUsed();
 }

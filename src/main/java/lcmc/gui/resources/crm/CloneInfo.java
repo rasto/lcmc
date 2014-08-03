@@ -466,8 +466,7 @@ public class CloneInfo extends ServiceInfo {
             if (Tools.versionBeforePacemaker(dcHost)) {
                 for (int i = 0; i < getBrowser().getClusterHosts().length; i++) {
                     CRM.cleanupResource(dcHost,
-                                        cs.getHeartbeatId(runMode)
-                                        + ':' + Integer.toString(i),
+                                        cs.getHeartbeatId(runMode) + ':' + Integer.toString(i),
                                         getBrowser().getClusterHosts(),
                                         runMode);
                 }

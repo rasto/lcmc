@@ -95,17 +95,17 @@ final class HbColocationInfo extends EditableInfo
                             clStatus.getColocationData(colId);
             final String score = colocationData.getScore();
             resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
-        } else if (serviceInfoRsc.isConstraintPH()
-                   || serviceInfoWithRsc.isConstraintPH()) {
+        } else if (serviceInfoRsc.isConstraintPlaceholder()
+                   || serviceInfoWithRsc.isConstraintPlaceholder()) {
             /* rsc set edge */
             final ConstraintPHInfo cphi;
             final CrmXml.RscSet rscSet;
-            if (serviceInfoRsc.isConstraintPH()) {
+            if (serviceInfoRsc.isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) serviceInfoRsc;
-                rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
+                rscSet = cphi.getRscSetConnectionDataColocation().getRscSet1();
             } else {
                 cphi = (ConstraintPHInfo) serviceInfoWithRsc;
-                rscSet = cphi.getRscSetConnectionDataCol().getRscSet2();
+                rscSet = cphi.getRscSetConnectionDataColocation().getRscSet2();
             }
             resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
             resourceNode.put("role", new StringValue(rscSet.getColocationRole()));
@@ -203,8 +203,8 @@ final class HbColocationInfo extends EditableInfo
             || serviceInfoWithRsc == null) {
             /* rsc set colocation */
             return getBrowser().getCrmXml().getResourceSetColocationParameters();
-        } else if (serviceInfoRsc.isConstraintPH()
-                   || serviceInfoWithRsc.isConstraintPH()) {
+        } else if (serviceInfoRsc.isConstraintPlaceholder()
+                   || serviceInfoWithRsc.isConstraintPlaceholder()) {
             /* when rsc set edges are clicked */
             return getBrowser().getCrmXml().getResourceSetColConnectionParameters();
         } else {
@@ -216,12 +216,12 @@ final class HbColocationInfo extends EditableInfo
     private boolean isRscSetMaster() {
         final ConstraintPHInfo cphi;
         final CrmXml.RscSet rscSet;
-        if (serviceInfoRsc.isConstraintPH()) {
+        if (serviceInfoRsc.isConstraintPlaceholder()) {
             cphi = (ConstraintPHInfo) serviceInfoRsc;
-            rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
+            rscSet = cphi.getRscSetConnectionDataColocation().getRscSet1();
         } else {
             cphi = (ConstraintPHInfo) serviceInfoWithRsc;
-            rscSet = cphi.getRscSetConnectionDataCol().getRscSet2();
+            rscSet = cphi.getRscSetConnectionDataColocation().getRscSet2();
         }
         return rscSet != null && getBrowser().isOneMaster(rscSet.getRscIds());
     }
@@ -343,17 +343,17 @@ final class HbColocationInfo extends EditableInfo
                               null,
                               attrs,
                               runMode);
-            } else if (serviceInfoRsc.isConstraintPH()
-                       || serviceInfoWithRsc.isConstraintPH()) {
+            } else if (serviceInfoRsc.isConstraintPlaceholder()
+                       || serviceInfoWithRsc.isConstraintPlaceholder()) {
                 /* edge */
                 final ConstraintPHInfo cphi;
                 final CrmXml.RscSet rscSet;
-                if (serviceInfoRsc.isConstraintPH()) {
+                if (serviceInfoRsc.isConstraintPlaceholder()) {
                     cphi = (ConstraintPHInfo) serviceInfoRsc;
-                    rscSet = cphi.getRscSetConnectionDataCol().getRscSet1();
+                    rscSet = cphi.getRscSetConnectionDataColocation().getRscSet1();
                 } else {
                     cphi = (ConstraintPHInfo) serviceInfoWithRsc;
-                    rscSet = cphi.getRscSetConnectionDataCol().getRscSet2();
+                    rscSet = cphi.getRscSetConnectionDataColocation().getRscSet2();
                 }
                 final PcmkRscSetsInfo prsi = cphi.getPcmkRscSetsInfo();
 

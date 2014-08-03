@@ -559,7 +559,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     /** Returns the last created filesystem. */
     @Override
-    public String getCreatedFs() {
+    public String getLastCreatedFs() {
         return createdFs;
     }
 

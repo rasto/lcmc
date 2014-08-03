@@ -77,62 +77,29 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostInfo extends Info {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
-    /** Host standby icon. */
     static final ImageIcon HOST_STANDBY_ICON =
      Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
-    /** Host standby off icon. */
     static final ImageIcon HOST_STANDBY_OFF_ICON =
-             Tools.createImageIcon(
-                        Tools.getDefault("CRMGraph.HostStandbyOffIcon"));
-    /** Stop comm layer icon. */
+                                     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyOffIcon"));
     static final ImageIcon HOST_STOP_COMM_LAYER_ICON =
-             Tools.createImageIcon(
-                     Tools.getDefault("CRMGraph.HostStopCommLayerIcon"));
-    /** Start comm layer icon. */
+                                     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStopCommLayerIcon"));
     static final ImageIcon HOST_START_COMM_LAYER_ICON =
-             Tools.createImageIcon(
-                    Tools.getDefault("CRMGraph.HostStartCommLayerIcon"));
-    /** Offline subtext. */
-    private static final Subtext OFFLINE_SUBTEXT =
-                                      new Subtext("offline", null, Color.BLUE);
-    /** Pending subtext. */
-    private static final Subtext PENDING_SUBTEXT =
-                                      new Subtext("pending", null, Color.BLUE);
-    /** Fenced/unclean subtext. */
-    private static final Subtext FENCED_SUBTEXT =
-                                    new Subtext("fencing...", null, Color.RED);
-    /** Corosync stopped subtext. */
-    private static final Subtext CORO_STOPPED_SUBTEXT =
-                                      new Subtext("stopped", null, Color.RED);
-    /** Pacemaker stopped subtext. */
-    private static final Subtext PCMK_STOPPED_SUBTEXT =
-                                  new Subtext("pcmk stopped", null, Color.RED);
-    /** Unknown subtext. */
-    private static final Subtext UNKNOWN_SUBTEXT =
-                                      new Subtext("wait...", null, Color.BLUE);
-    /** Online subtext. */
-    private static final Subtext ONLINE_SUBTEXT =
-                                       new Subtext("online", null, Color.BLUE);
-    /** Standby subtext. */
-    private static final Subtext STANDBY_SUBTEXT =
-                                       new Subtext("STANDBY", null, Color.RED);
-    /** Stopping subtext. */
-    private static final Subtext STOPPING_SUBTEXT =
-                                   new Subtext("stopping...", null, Color.RED);
-    /** Starting subtext. */
-    private static final Subtext STARTING_SUBTEXT =
-                                  new Subtext("starting...", null, Color.BLUE);
+                                     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStartCommLayerIcon"));
+    private static final Subtext OFFLINE_SUBTEXT = new Subtext("offline", null, Color.BLUE);
+    private static final Subtext PENDING_SUBTEXT = new Subtext("pending", null, Color.BLUE);
+    private static final Subtext FENCED_SUBTEXT = new Subtext("fencing...", null, Color.RED);
+    private static final Subtext CORO_STOPPED_SUBTEXT = new Subtext("stopped", null, Color.RED);
+    private static final Subtext PCMK_STOPPED_SUBTEXT = new Subtext("pcmk stopped", null, Color.RED);
+    private static final Subtext UNKNOWN_SUBTEXT = new Subtext("wait...", null, Color.BLUE);
+    private static final Subtext ONLINE_SUBTEXT = new Subtext("online", null, Color.BLUE);
+    private static final Subtext STANDBY_SUBTEXT = new Subtext("STANDBY", null, Color.RED);
+    private static final Subtext STOPPING_SUBTEXT = new Subtext("stopping...", null, Color.RED);
+    private static final Subtext STARTING_SUBTEXT = new Subtext("starting...", null, Color.BLUE);
 
-    /** String that is displayed as a tool tip for disabled menu item. */
-    static final String NO_PCMK_STATUS_STRING =
-                                             "cluster status is not available";
-    /** Host data. */
+    static final String NO_PCMK_STATUS_STRING = "cluster status is not available";
     private Host host;
-    /** whether crm info is showing. */
-    private volatile boolean crmInfo = false;
-    /** whether crm show is in progress. */
+    private volatile boolean crmInfoShowing = false;
     private volatile boolean crmShowInProgress = true;
     @Autowired
     private HostMenu hostMenu;
@@ -142,13 +109,11 @@ public class HostInfo extends Info {
         this.host = host;
     }
 
-    /** Returns browser object of this info. */
     @Override
     public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /** Returns a host icon for the menu. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         final Cluster cl = host.getCluster();
@@ -158,52 +123,40 @@ public class HostInfo extends Info {
         return HostBrowser.HOST_ICON;
     }
 
-    /** Returns id, which is name of the host. */
     @Override
     public String getId() {
         return host.getName();
     }
 
-    /** Returns a host icon for the category in the menu. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
-    /** Returns tooltip for the host. */
     @Override
     public String getToolTipForGraph(final Application.RunMode runMode) {
         return getBrowser().getHostToolTip(host);
     }
 
-    /** Returns info panel. */
     @Override
     public JComponent getInfoPanel() {
         if (getBrowser().getClusterBrowser() == null) {
             return new JPanel();
         }
-        final Font f = new Font("Monospaced",
-                                Font.PLAIN,
-                                Tools.getApplication().scaled(12));
+        final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(12));
         crmShowInProgress = true;
-        final JTextArea ta = new JTextArea(
-                                  Tools.getString("HostInfo.crmShellLoading"));
+        final JTextArea ta = new JTextArea(Tools.getString("HostInfo.crmShellLoading"));
         ta.setEditable(false);
         ta.setFont(f);
 
         final MyButton crmConfigureCommitButton =
-                new MyButton(Tools.getString("HostInfo.crmShellCommitButton"),
-                             Browser.APPLY_ICON);
-        registerComponentEnableAccessMode(
-                                    crmConfigureCommitButton,
-                                    new AccessMode(Application.AccessType.ADMIN,
-                                                   false));
-        final MyButton hostInfoButton =
-                new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
+                                new MyButton(Tools.getString("HostInfo.crmShellCommitButton"), Browser.APPLY_ICON);
+        registerComponentEnableAccessMode(crmConfigureCommitButton,
+                                          new AccessMode(Application.AccessType.ADMIN, false));
+        final MyButton hostInfoButton = new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
         hostInfoButton.miniButton();
 
-        final MyButton crmConfigureShowButton =
-                  new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
+        final MyButton crmConfigureShowButton = new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
         crmConfigureShowButton.miniButton();
         crmConfigureCommitButton.setEnabled(false);
         final ExecCallback execCallback =
@@ -237,11 +190,8 @@ public class HostInfo extends Info {
         hostInfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(
-                                ta,
-                                new AccessMode(Application.AccessType.GOD,
-                                               false));
-                crmInfo = true;
+                registerComponentEditAccessMode(ta, new AccessMode(Application.AccessType.GOD, false));
+                crmInfoShowing = true;
                 hostInfoButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
                 String command = "HostBrowser.getHostInfo";
@@ -263,7 +213,7 @@ public class HostInfo extends Info {
                 registerComponentEditAccessMode(ta, new AccessMode(Application.AccessType.ADMIN, false));
                 updateAdvancedPanels();
                 crmShowInProgress = true;
-                crmInfo = false;
+                crmInfoShowing = false;
                 crmConfigureShowButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
                 host.execCommand(new ExecCommandConfig().commandString("HostBrowser.getCrmConfigureShow")
@@ -275,7 +225,7 @@ public class HostInfo extends Info {
         final Document taDocument = ta.getDocument();
         taDocument.addDocumentListener(new DocumentListener() {
             private void update() {
-                if (!crmShowInProgress && !crmInfo) {
+                if (!crmShowInProgress && !crmInfoShowing) {
                     crmConfigureCommitButton.setEnabled(true);
                 }
             }
@@ -299,9 +249,6 @@ public class HostInfo extends Info {
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
 
-            /**
-             * Whether the whole thing should be enabled.
-             */
             @Override
             public boolean isEnabled() {
                 return !Tools.versionBeforePacemaker(host);
@@ -323,29 +270,22 @@ public class HostInfo extends Info {
                     return;
                 }
                 mouseStillOver = true;
-                component.setToolTipText(
-                                        ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                component.setToolTipBackground(
-                            Tools.getDefaultColor(
-                                    "ClusterBrowser.Test.Tooltip.Background"));
+                component.setToolTipText(ClusterBrowser.STARTING_PTEST_TOOLTIP);
+                component.setToolTipBackground(Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
                     return;
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                crmg.startTestAnimation((JComponent) component,
-                                        startTestLatch);
-                final Host dcHost =
-                                  getBrowser().getClusterBrowser().getDCHost();
+                crmg.startTestAnimation((JComponent) component, startTestLatch);
+                final Host dcHost = getBrowser().getClusterBrowser().getDCHost();
                 getBrowser().getClusterBrowser().ptestLockAcquire();
                 try {
-                    final ClusterStatus clStatus =
-                            getBrowser().getClusterBrowser().getClusterStatus();
+                    final ClusterStatus clStatus = getBrowser().getClusterBrowser().getClusterStatus();
                     clStatus.setPtestData(null);
                     CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.TEST);
-                    final PtestData ptestData =
-                                           new PtestData(CRM.getPtest(dcHost));
+                    final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
                     clStatus.setPtestData(ptestData);
                 } finally {
@@ -365,12 +305,9 @@ public class HostInfo extends Info {
                         public void run() {
                             getBrowser().getClusterBrowser().clStatusLock();
                             try {
-                                CRM.crmConfigureCommit(host,
-                                                       ta.getText(),
-                                                       Application.RunMode.LIVE);
+                                CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.LIVE);
                             } finally {
-                                getBrowser().getClusterBrowser()
-                                                    .clStatusUnlock();
+                                getBrowser().getClusterBrowser().clStatusUnlock();
                             }
                         }
                     }
@@ -403,12 +340,10 @@ public class HostInfo extends Info {
         SpringUtilities.makeCompactGrid(p, 1, 3,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
-        mainPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
-        mainPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setMinimumSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                               Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setPreferredSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                                 Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));
@@ -424,30 +359,25 @@ public class HostInfo extends Info {
         return mainPanel;
     }
 
-    /** Gets host. */
     public Host getHost() {
         return host;
     }
 
-    /** Returns string representation of the host. It's same as name. */
     @Override
     public String toString() {
         return host.getName();
     }
 
-    /** Returns name of the host. */
     @Override
     public String getName() {
         return host.getName();
     }
 
-    /** Creates the popup for the host. */
     @Override
     public List<UpdatableItem> createPopup() {
         return hostMenu.getPulldownMenu(this);
     }
 
-    /** Returns grahical view if there is any. */
     @Override
     public JPanel getGraphicalView() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
@@ -463,16 +393,11 @@ public class HostInfo extends Info {
         return -1;
     }
 
-    /**
-     * Returns subtexts that appears in the host vertex in the cluster graph.
-     */
     public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isCrmStatusOk()) {
-               texts.add(new Subtext("waiting for Pacemaker...",
-                                     null,
-                                     Color.BLACK));
+               texts.add(new Subtext("waiting for Pacemaker...", null, Color.BLACK));
             }
         } else {
             texts.add(new Subtext("connecting...", null, Color.BLACK));
@@ -480,7 +405,6 @@ public class HostInfo extends Info {
         return texts.toArray(new Subtext[texts.size()]);
     }
 
-    /** Returns text that appears above the icon in the graph. */
     public String getIconTextForGraph(final Application.RunMode runMode) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Hb.NoInfoAvailable");
@@ -488,13 +412,11 @@ public class HostInfo extends Info {
         return null;
     }
 
-    /** Returns whether this host is in stand by. */
     public boolean isStandby(final Application.RunMode runMode) {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         return b != null && b.isStandby(host, runMode);
     }
 
-    /** Returns cluster status. */
     ClusterStatus getClusterStatus() {
         final ClusterBrowser b = getBrowser().getClusterBrowser();
         if (b == null) {
@@ -503,7 +425,6 @@ public class HostInfo extends Info {
         return b.getClusterStatus();
     }
 
-    /** Returns text that appears in the corner of the graph. */
     public Subtext getRightCornerTextForGraph(final Application.RunMode runMode) {
         if (getHost().isCommLayerStopping()) {
             return STOPPING_SUBTEXT;
@@ -532,8 +453,7 @@ public class HostInfo extends Info {
                 return PENDING_SUBTEXT;
             } else if (!getHost().isPacemakerRunning()) {
                 return PCMK_STOPPED_SUBTEXT;
-            } else if (cs != null
-                       && "no".equals(cs.isOnlineNode(host.getName()))) {
+            } else if (cs != null && "no".equals(cs.isOnlineNode(host.getName()))) {
                 return OFFLINE_SUBTEXT;
             } else {
                 return UNKNOWN_SUBTEXT;

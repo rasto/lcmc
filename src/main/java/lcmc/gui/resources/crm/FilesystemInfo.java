@@ -52,25 +52,16 @@ import lcmc.utilities.ssh.SshOutput;
 public final class FilesystemInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
-    /** linbit::drbd service object. */
     private LinbitDrbdInfo linbitDrbdInfo = null;
-    /** drbddisk service object. */
     private DrbddiskInfo drbddiskInfo = null;
-    /** Block device combo box. */
-    private Widget blockDeviceParamWi = null;
-    /** Filesystem type combo box. */
-    private Widget fstypeParamWi = null;
-    /** Whether old style drbddisk is preferred. */
+    private Widget blockDeviceParamWidget = null;
+    private Widget fstypeParamWidget = null;
     private boolean drbddiskIsPreferred = false;
 
-    /** Creates the FilesystemInfo object. */
-    FilesystemInfo(final String name,
-                   final ResourceAgent ra,
-                   final Browser browser) {
+    FilesystemInfo(final String name, final ResourceAgent ra, final Browser browser) {
         super(name, ra, browser);
     }
 
-    /** Creates the FilesystemInfo object. */
     FilesystemInfo(final String name,
                    final ResourceAgent ra,
                    final String hbId,
@@ -95,10 +86,6 @@ public final class FilesystemInfo extends ServiceInfo {
         return linbitDrbdInfo;
     }
 
-    /**
-     * Sets DrbddiskInfo object for this Filesystem service if it uses drbd
-     * block device.
-     */
     public void setDrbddiskInfo(final DrbddiskInfo drbddiskInfo) {
         this.drbddiskInfo = drbddiskInfo;
     }
@@ -118,8 +105,7 @@ public final class FilesystemInfo extends ServiceInfo {
      * one value is changed and we don't want to check everything.
      */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         final Widget wi = getWidget(FS_RES_PARAM_DEV, null);
         final List<String> incorrect = new ArrayList<String>();
 
@@ -132,7 +118,6 @@ public final class FilesystemInfo extends ServiceInfo {
         return check;
     }
 
-    /** Applies changes to the Filesystem service parameters. */
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
@@ -148,29 +133,23 @@ public final class FilesystemInfo extends ServiceInfo {
             final String dir = getComboBoxValue("directory").getValueForConfig();
             boolean confirm = false; /* confirm only once */
             for (final Host host : getBrowser().getClusterHosts()) {
-                final String statCmd =
-                        DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
+                final String statCmd = DistResource.SUDO + "stat -c \"%F\" " + dir + "||true";
                 final String text = statCmd.replaceAll(DistResource.SUDO, "");
                 final SshOutput ret = host.captureCommandProgressIndicator(text,
                                                                            new ExecCommandConfig().command(statCmd));
 
-                if (ret == null
-                    || !"directory".equals(ret.getOutput().trim())) {
-                    String title =
-                          Tools.getString("ClusterBrowser.CreateDir.Title");
-                    String desc  = Tools.getString(
-                                    "ClusterBrowser.CreateDir.Description");
+                if (ret == null || !"directory".equals(ret.getOutput().trim())) {
+                    String title = Tools.getString("ClusterBrowser.CreateDir.Title");
+                    String desc  = Tools.getString("ClusterBrowser.CreateDir.Description");
                     title = title.replaceAll("@DIR@", dir);
                     title = title.replaceAll("@HOST@", host.getName());
                     desc  = desc.replaceAll("@DIR@", dir);
                     desc  = desc.replaceAll("@HOST@", host.getName());
-                    if (confirm || Tools.confirmDialog(
-                          title,
-                          desc,
-                          Tools.getString("ClusterBrowser.CreateDir.Yes"),
-                          Tools.getString("ClusterBrowser.CreateDir.No"))) {
-                        final String cmd = DistResource.SUDO
-                                           + "/bin/mkdir " + dir;
+                    if (confirm || Tools.confirmDialog(title,
+                                                       desc,
+                                                       Tools.getString("ClusterBrowser.CreateDir.Yes"),
+                                                       Tools.getString("ClusterBrowser.CreateDir.No"))) {
+                        final String cmd = DistResource.SUDO + "/bin/mkdir " + dir;
                         final String progressText = cmd.replaceAll(DistResource.SUDO, "");
                         final SshOutput out = host.captureCommandProgressIndicator(progressText,
                                                                                    new ExecCommandConfig().command(cmd));
@@ -185,80 +164,65 @@ public final class FilesystemInfo extends ServiceInfo {
 
     /** Adds combo box listener for the parameter. */
     private void addParamComboListeners(final Widget paramWi) {
-        paramWi.addListeners(
-                    new WidgetListener() {
-                        @Override
-                        public void check(final Value value) {
-                            if (fstypeParamWi != null) {
-                                if (!(value instanceof Info)) {
-                                    return;
-                                }
-                                if (value.isNothingSelected()) {
-                                    return;
-                                }
-                                final String selectedValue =
-                                                  getParamSaved("fstype").getValueForConfig();
-                                final String createdFs;
-                                if (selectedValue == null
-                                    || selectedValue.isEmpty()) {
-                                    final CommonDeviceInterface cdi =
-                                             (CommonDeviceInterface) value;
-                                    createdFs = cdi.getCreatedFs();
-                                } else {
-                                    createdFs = selectedValue;
-                                }
-                                if (createdFs != null
-                                    && !createdFs.isEmpty()) {
-                                    fstypeParamWi.setValue(new StringValue(createdFs));
-                                }
-                            }
-                        }
-                    });
+        paramWi.addListeners(new WidgetListener() {
+                                 @Override
+                                 public void check(final Value value) {
+                                     if (fstypeParamWidget != null) {
+                                         if (!(value instanceof Info)) {
+                                             return;
+                                         }
+                                         if (value.isNothingSelected()) {
+                                             return;
+                                         }
+                                         final String selectedValue = getParamSaved("fstype").getValueForConfig();
+                                         final String createdFs;
+                                         if (selectedValue == null || selectedValue.isEmpty()) {
+                                             final CommonDeviceInterface cdi = (CommonDeviceInterface) value;
+                                             createdFs = cdi.getLastCreatedFs();
+                                         } else {
+                                             createdFs = selectedValue;
+                                         }
+                                         if (createdFs != null && !createdFs.isEmpty()) {
+                                             fstypeParamWidget.setValue(new StringValue(createdFs));
+                                         }
+                                     }
+                                 }
+                             });
     }
 
-    /** Returns editable element for the parameter. */
     @Override
-    protected Widget createWidget(final String param,
-                                  final String prefix,
-                                  final int width) {
+    protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget paramWi;
         if (FS_RES_PARAM_DEV.equals(param)) {
             Value selectedValue = getPreviouslySelected(param, prefix);
             if (selectedValue == null) {
                 selectedValue = getParamSaved(param);
             }
-            final VolumeInfo selectedInfo =
-                            getBrowser().getDrbdVolumeFromDev(selectedValue.getValueForConfig());
+            final VolumeInfo selectedInfo = getBrowser().getDrbdVolumeFromDev(selectedValue.getValueForConfig());
             if (selectedInfo != null) {
                 selectedValue = selectedInfo;
             }
             Value defaultValue = null;
             if (selectedValue.isNothingSelected()) {
-                defaultValue = 
-                          new StringValue() {
-                              @Override
-                              public String getNothingSelected() {
-                                  return Tools.getString(
-                                         "ClusterBrowser.SelectBlockDevice");
-                              }
-                          };
+                defaultValue =  new StringValue() {
+                                   @Override
+                                   public String getNothingSelected() {
+                                       return Tools.getString("ClusterBrowser.SelectBlockDevice");
+                                   }
+                               };
             }
-            final Value[] commonBlockDevInfos =
-                                        getCommonBlockDevInfos(defaultValue,
-                                                               getName());
-            blockDeviceParamWi = WidgetFactory.createInstance(
+            final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
+            blockDeviceParamWidget = WidgetFactory.createInstance(
                                    Widget.GUESS_TYPE,
                                    selectedValue,
                                    commonBlockDevInfos,
                                    Widget.NO_REGEXP,
                                    width,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(
-                                           getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)),
+                                   new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
                                    Widget.NO_BUTTON);
-            blockDeviceParamWi.setAlwaysEditable(true);
-            paramWi = blockDeviceParamWi;
+            blockDeviceParamWidget.setAlwaysEditable(true);
+            paramWi = blockDeviceParamWidget;
             addParamComboListeners(paramWi);
             widgetAdd(param, prefix, paramWi);
         } else if ("fstype".equals(param)) {
@@ -285,11 +249,9 @@ public final class FilesystemInfo extends ServiceInfo {
                               Widget.NO_REGEXP,
                               width,
                               Widget.NO_ABBRV,
-                              new AccessMode(
-                                       getAccessType(param),
-                                       isEnabledOnlyInAdvancedMode(param)),
+                              new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
                               Widget.NO_BUTTON);
-            fstypeParamWi = paramWi;
+            fstypeParamWidget = paramWi;
 
             widgetAdd(param, prefix, paramWi);
             paramWi.setEditable(false);
@@ -299,8 +261,7 @@ public final class FilesystemInfo extends ServiceInfo {
             final Value defaultValue = new StringValue() {
                               @Override
                               public String getNothingSelected() {
-                                  return Tools.getString(
-                                            "ClusterBrowser.SelectMountPoint");
+                                  return Tools.getString("ClusterBrowser.SelectMountPoint");
                               }
                           };
             items[0] = defaultValue;
@@ -326,9 +287,7 @@ public final class FilesystemInfo extends ServiceInfo {
                                  regexp,
                                  width,
                                  Widget.NO_ABBRV,
-                                 new AccessMode(
-                                         getAccessType(param),
-                                         isEnabledOnlyInAdvancedMode(param)),
+                                 new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
                                  Widget.NO_BUTTON);
             widgetAdd(param, prefix, paramWi);
             paramWi.setAlwaysEditable(true);
@@ -347,8 +306,7 @@ public final class FilesystemInfo extends ServiceInfo {
         }
 
         final StringBuilder s = new StringBuilder(getName());
-        final VolumeInfo dvi = getBrowser().getDrbdVolumeFromDev(
-                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
+        final VolumeInfo dvi = getBrowser().getDrbdVolumeFromDev(getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         if (dvi == null) {
             id = getParamSaved(FS_RES_PARAM_DEV).getValueForConfig();
         } else {
@@ -357,8 +315,7 @@ public final class FilesystemInfo extends ServiceInfo {
             s.append("Filesystem / Drbd");
         }
         if (id == null || id.isEmpty()) {
-            id = Tools.getString(
-                        "ClusterBrowser.ClusterBlockDevice.Unconfigured");
+            id = Tools.getString("ClusterBrowser.ClusterBlockDevice.Unconfigured");
         }
         s.append(" (");
         s.append(id);
@@ -369,8 +326,7 @@ public final class FilesystemInfo extends ServiceInfo {
 
     /** Removes the service without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final Application.RunMode runMode) {
+    protected void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
         final VolumeInfo oldDvi = getBrowser().getDrbdVolumeFromDev(
                                             getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         super.removeMyselfNoConfirm(dcHost, runMode);
@@ -459,11 +415,9 @@ public final class FilesystemInfo extends ServiceInfo {
     /** Returns how much of the filesystem is used. */
     @Override
     public int getUsed() {
-        if (blockDeviceParamWi != null) {
-            final Value value = blockDeviceParamWi.getValue();
-            if (value == null
-                || value.isNothingSelected()
-                || !(value instanceof CommonDeviceInterface)) {
+        if (blockDeviceParamWidget != null) {
+            final Value value = blockDeviceParamWidget.getValue();
+            if (value == null || value.isNothingSelected() || !(value instanceof CommonDeviceInterface)) {
                 return -1;
             }
             final CommonDeviceInterface cdi = (CommonDeviceInterface) value;
@@ -472,18 +426,15 @@ public final class FilesystemInfo extends ServiceInfo {
         return -1;
     }
 
-    /** Sets whether the old style drbddisk is preferred. */
     void setDrbddiskIsPreferred(final boolean drbddiskIsPreferred) {
         this.drbddiskIsPreferred = drbddiskIsPreferred;
     }
 
-    /** Reload combo boxes. */
     @Override
     public void reloadComboBoxes() {
         super.reloadComboBoxes();
-        final VolumeInfo selectedInfo =
-                                getBrowser().getDrbdVolumeFromDev(
-                                            getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
+        final VolumeInfo selectedInfo = getBrowser().getDrbdVolumeFromDev(
+                                                          getParamSaved(FS_RES_PARAM_DEV).getValueForConfig());
         final Value selectedValue;
         if (selectedInfo == null) {
             selectedValue = getParamSaved(FS_RES_PARAM_DEV);
@@ -495,17 +446,14 @@ public final class FilesystemInfo extends ServiceInfo {
             defaultValue = new StringValue() {
                               @Override
                               public String getNothingSelected() {
-                                  return Tools.getString(
-                                         "ClusterBrowser.SelectBlockDevice");
+                                  return Tools.getString("ClusterBrowser.SelectBlockDevice");
                               }
                           };
         }
-        final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue,
-                                                                   getName());
-        if (blockDeviceParamWi != null) {
-            final Value value = blockDeviceParamWi.getValue();
-            blockDeviceParamWi.reloadComboBox(value,
-                                              commonBlockDevInfos);
+        final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
+        if (blockDeviceParamWidget != null) {
+            final Value value = blockDeviceParamWidget.getValue();
+            blockDeviceParamWidget.reloadComboBox(value, commonBlockDevInfos);
         }
     }
 }

@@ -184,7 +184,7 @@ public final class InterfaceInfo extends HardwareInfo {
     /** Returns service icon in the menu. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
-        return NetInfo.NET_I_ICON;
+        return NetInfo.NET_INTERFACE_ICON;
     }
 
     /** Returns long description of the specified parameter. */

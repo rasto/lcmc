@@ -43,24 +43,16 @@ import lcmc.utilities.UpdatableItem;
  * to show it to the user.
  */
 public class AvailableServiceInfo extends HbCategoryInfo {
-    /** Available services icon. */
     private static final ImageIcon AVAIL_SERVICES_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
-    /** Back to overview icon. */
-    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
-                                            Tools.getDefault("BackIcon"));
-    /** Info about the service. */
+                                    Tools.createImageIcon(Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
+    private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     private final ResourceAgent resourceAgent;
 
-    /** Prepares a new {@code AvailableServiceInfo} object. */
-    public AvailableServiceInfo(final ResourceAgent resourceAgent,
-                                final Browser browser) {
+    public AvailableServiceInfo(final ResourceAgent resourceAgent, final Browser browser) {
         super.init(resourceAgent.getServiceName(), browser);
         this.resourceAgent = resourceAgent;
     }
 
-    /** Returns icon for this menu category. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return AVAIL_SERVICES_ICON;
@@ -97,7 +89,6 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         return s.toString();
     }
 
-    /** Returns back button. */
     @Override
     protected JComponent getBackButton() {
         final JPanel buttonPanel = new JPanel(new BorderLayout());
@@ -105,18 +96,14 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        final MyButton overviewButton = new MyButton(
-                         Tools.getString("ClusterBrowser.RAsOverviewButton"),
-                         BACK_ICON);
-        overviewButton.setPreferredSize(
-                            new Dimension(Tools.getApplication().scaled(180),
-                                          Tools.getApplication().scaled(50)));
+        final MyButton overviewButton = new MyButton(Tools.getString("ClusterBrowser.RAsOverviewButton"),
+                                                     BACK_TO_OVERVIEW_ICON);
+        overviewButton.setPreferredSize(new Dimension(Tools.getApplication().scaled(180),
+                                                      Tools.getApplication().scaled(50)));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                final ResourceAgentClassInfo raci =
-                        getBrowser().getClassInfoMap(
-                                            resourceAgent.getResourceClass());
+                final ResourceAgentClassInfo raci = getBrowser().getClassInfoMap(resourceAgent.getResourceClass());
                 if (raci != null) {
                     raci.selectMyself();
                 }
@@ -129,11 +116,9 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         return buttonPanel;
     }
 
-    /** Returns list of menu items. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final AvailableServiceMenu availableServiceInfo =
-                                                new AvailableServiceMenu(this);
+        final AvailableServiceMenu availableServiceInfo = new AvailableServiceMenu(this);
         return availableServiceInfo.getPulldownMenu();
     }
 

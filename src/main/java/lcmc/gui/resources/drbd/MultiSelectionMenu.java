@@ -185,7 +185,7 @@ public class MultiSelectionMenu {
                 public String enablePredicate() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (!hi.getHost().isDrbdStatusOk()) {
-                            return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                            return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                         }
                     }
                     return null;

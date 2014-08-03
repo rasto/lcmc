@@ -45,15 +45,13 @@ import lcmc.utilities.UpdatableItem;
 public class PcmkMultiSelectionMenu {
     private final PcmkMultiSelectionInfo pcmkMultiSelectionInfo;
 
-    public PcmkMultiSelectionMenu(
-                        final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
+    public PcmkMultiSelectionMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
         this.pcmkMultiSelectionInfo = pcmkMultiSelectionInfo;
     }
 
     public List<UpdatableItem> getPulldownMenu() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final Collection<ServiceInfo> selectedServiceInfos =
-                                                 new ArrayList<ServiceInfo>();
+        final Collection<ServiceInfo> selectedServiceInfos = new ArrayList<ServiceInfo>();
         final List<HostInfo> selectedHostInfos = new ArrayList<HostInfo>();
         for (final Info i : pcmkMultiSelectionInfo.getSelectedInfos()) {
             if (i instanceof ServiceInfo) {
@@ -71,10 +69,8 @@ public class PcmkMultiSelectionMenu {
         return items;
     }
 
-    /** Create menu items for selected hosts. */
-    private void createSelectedHostsPopup(
-                                        final List<HostInfo> selectedHostInfos,
-                                        final Collection<UpdatableItem> items) {
+    private void createSelectedHostsPopup(final List<HostInfo> selectedHostInfos,
+                                          final Collection<UpdatableItem> items) {
         /* cluster manager standby on */
         final MyMenuItem standbyItem =
             new MyMenuItem(Tools.getString("PcmkMultiSelectionInfo.StandByOn"),
@@ -102,8 +98,7 @@ public class PcmkMultiSelectionMenu {
                     }
                     final Host dcHost = getBrowser().getDCHost();
                     if (!dcHost.isCrmStatusOk()) {
-                        return HostInfo.NO_PCMK_STATUS_STRING + " ("
-                               + dcHost.getName() + ')';
+                        return HostInfo.NO_PCMK_STATUS_STRING + " (" + dcHost.getName() + ')';
                     }
                     return null;
                 }
@@ -113,16 +108,12 @@ public class PcmkMultiSelectionMenu {
                     final Host dcHost = getBrowser().getDCHost();
                     for (final HostInfo hi : selectedHostInfos) {
                         if (!hi.isStandby(Application.RunMode.LIVE)) {
-                            CRM.standByOn(dcHost,
-                                          hi.getHost(),
-                                          Application.RunMode.LIVE);
+                            CRM.standByOn(dcHost, hi.getHost(), Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ButtonCallback standbyItemCallback =
-                                   getBrowser().new ClMenuItemCallback(
-                                                    getBrowser().getDCHost()) {
+        final ButtonCallback standbyItemCallback = getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
@@ -162,8 +153,7 @@ public class PcmkMultiSelectionMenu {
                     }
                     final Host dcHost = getBrowser().getDCHost();
                     if (!dcHost.isCrmStatusOk()) {
-                        return HostInfo.NO_PCMK_STATUS_STRING + " ("
-                               + dcHost.getName() + ')';
+                        return HostInfo.NO_PCMK_STATUS_STRING + " (" + dcHost.getName() + ')';
                     }
                     return null;
                 }
@@ -173,16 +163,12 @@ public class PcmkMultiSelectionMenu {
                     final Host dcHost = getBrowser().getDCHost();
                     for (final HostInfo hi : selectedHostInfos) {
                         if (hi.isStandby(Application.RunMode.LIVE)) {
-                            CRM.standByOff(dcHost,
-                                           hi.getHost(),
-                                           Application.RunMode.LIVE);
+                            CRM.standByOff(dcHost, hi.getHost(), Application.RunMode.LIVE);
                         }
                     }
                 }
             };
-        final ButtonCallback onlineItemCallback =
-                                   getBrowser().new ClMenuItemCallback(
-                                                    getBrowser().getDCHost()) {
+        final ButtonCallback onlineItemCallback = getBrowser().new ClMenuItemCallback(getBrowser().getDCHost()) {
             @Override
             public void action(final Host dcHost) {
                 for (final HostInfo hi : selectedHostInfos) {
@@ -213,15 +199,13 @@ public class PcmkMultiSelectionMenu {
                 public boolean predicate() {
                     /* when both are running it's openais. */
                     final HostInfo hi = selectedHostInfos.get(0);
-                    return hi.getHost().isCorosyncRunning()
-                           && !hi.getHost().isOpenaisRunning();
+                    return hi.getHost().isCorosyncRunning() && !hi.getHost().isOpenaisRunning();
                 }
 
                 @Override
                 public boolean visiblePredicate() {
                     for (final HostInfo hi : selectedHostInfos) {
-                        if (hi.getHost().isCorosyncRunning()
-                            || hi.getHost().isOpenaisRunning()) {
+                        if (hi.getHost().isCorosyncRunning() || hi.getHost().isOpenaisRunning()) {
                             return true;
                         }
                     }
@@ -230,11 +214,10 @@ public class PcmkMultiSelectionMenu {
 
                 @Override
                 public void action() {
-                    if (Tools.confirmDialog(
-                         Tools.getString("HostInfo.confirmCorosyncStop.Title"),
-                         Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
-                         Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
-                         Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
+                    if (Tools.confirmDialog(Tools.getString("HostInfo.confirmCorosyncStop.Title"),
+                                            Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
+                                            Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
+                                            Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
                         for (final HostInfo hi : selectedHostInfos) {
                             hi.getHost().setCommLayerStopping(true);
                         }
@@ -610,7 +593,7 @@ public class PcmkMultiSelectionMenu {
                     }
                     boolean allStarted = true;
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -635,7 +618,7 @@ public class PcmkMultiSelectionMenu {
                     pcmkMultiSelectionInfo.hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -649,7 +632,7 @@ public class PcmkMultiSelectionMenu {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    if (si.isConstraintPH()
+                    if (si.isConstraintPlaceholder()
                         || si.getService().isNew()
                         || si.getService().isOrphaned()) {
                         continue;
@@ -677,7 +660,7 @@ public class PcmkMultiSelectionMenu {
                     }
                     boolean allStopped = true;
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -702,7 +685,7 @@ public class PcmkMultiSelectionMenu {
                     pcmkMultiSelectionInfo.hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -716,7 +699,7 @@ public class PcmkMultiSelectionMenu {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    if (si.isConstraintPH()
+                    if (si.isConstraintPlaceholder()
                         || si.getService().isNew()
                         || si.getService().isOrphaned()) {
                         continue;
@@ -760,7 +743,7 @@ public class PcmkMultiSelectionMenu {
                     }
                     boolean failCount = false;
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -773,7 +756,7 @@ public class PcmkMultiSelectionMenu {
                         return "no fail count";
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -792,7 +775,7 @@ public class PcmkMultiSelectionMenu {
                     pcmkMultiSelectionInfo.hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -818,7 +801,7 @@ public class PcmkMultiSelectionMenu {
                 @Override
                 public boolean visiblePredicate() {
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -835,7 +818,7 @@ public class PcmkMultiSelectionMenu {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -854,7 +837,7 @@ public class PcmkMultiSelectionMenu {
                     pcmkMultiSelectionInfo.hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -868,7 +851,7 @@ public class PcmkMultiSelectionMenu {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    if (si.isConstraintPH()
+                    if (si.isConstraintPlaceholder()
                         || si.getService().isNew()
                         || si.getService().isOrphaned()) {
                         continue;
@@ -893,7 +876,7 @@ public class PcmkMultiSelectionMenu {
                 @Override
                 public boolean visiblePredicate() {
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -910,7 +893,7 @@ public class PcmkMultiSelectionMenu {
                         return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                     }
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -929,7 +912,7 @@ public class PcmkMultiSelectionMenu {
                     pcmkMultiSelectionInfo.hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -943,7 +926,7 @@ public class PcmkMultiSelectionMenu {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    if (si.isConstraintPH()
+                    if (si.isConstraintPlaceholder()
                         || si.getService().isNew()
                         || si.getService().isOrphaned()) {
                         continue;
@@ -987,7 +970,7 @@ public class PcmkMultiSelectionMenu {
                     @Override
                     public String enablePredicate() {
                         for (final ServiceInfo si : selectedServiceInfos) {
-                            if (si.isConstraintPH()
+                            if (si.isConstraintPlaceholder()
                                 || si.getService().isNew()
                                 || si.getService().isOrphaned()) {
                                 continue;
@@ -1024,7 +1007,7 @@ public class PcmkMultiSelectionMenu {
                         pcmkMultiSelectionInfo.hidePopup();
                         final Host dcHost = getBrowser().getDCHost();
                         for (final ServiceInfo si : selectedServiceInfos) {
-                            if (si.isConstraintPH()
+                            if (si.isConstraintPlaceholder()
                                 || si.getService().isNew()
                                 || si.getService().isOrphaned()) {
                                 continue;
@@ -1038,7 +1021,7 @@ public class PcmkMultiSelectionMenu {
                 @Override
                 public void action(final Host dcHost) {
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -1070,7 +1053,7 @@ public class PcmkMultiSelectionMenu {
                 public String enablePredicate() {
                     // TODO: if it was migrated
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -1091,7 +1074,7 @@ public class PcmkMultiSelectionMenu {
                     pcmkMultiSelectionInfo.hidePopup();
                     final Host dcHost = getBrowser().getDCHost();
                     for (final ServiceInfo si : selectedServiceInfos) {
-                        if (si.isConstraintPH()
+                        if (si.isConstraintPlaceholder()
                             || si.getService().isNew()
                             || si.getService().isOrphaned()) {
                             continue;
@@ -1105,7 +1088,7 @@ public class PcmkMultiSelectionMenu {
             @Override
             public void action(final Host dcHost) {
                 for (final ServiceInfo si : selectedServiceInfos) {
-                    if (si.isConstraintPH()
+                    if (si.isConstraintPlaceholder()
                         || si.getService().isNew()
                         || si.getService().isOrphaned()) {
                         continue;

@@ -40,23 +40,17 @@ import lcmc.utilities.ssh.SshOutput;
  */
 @SuppressWarnings("SingleCharacterStringConcatenation")
 public class NetInfo extends Info {
-    /** Net interface icon. */
-    public static final ImageIcon NET_I_ICON = Tools.createImageIcon(
-                                   Tools.getDefault("HostBrowser.NetIntIcon"));
-    /** Net interface icon. */
-    public static final ImageIcon NET_I_ICON_LARGE = Tools.createImageIcon(
-                              Tools.getDefault("HostBrowser.NetIntIconLarge"));
-    /** Placeholder where user can enter an ip. */
+    public static final ImageIcon NET_INTERFACE_ICON =
+                                                    Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIcon"));
+    public static final ImageIcon NET_INTERFACE_ICON_LARGE =
+                                               Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIconLarge"));
     public static final String IP_PLACEHOLDER = "--.--.--.--";
-    /** Prepares a new {@code NetInfo} object. */
-    public NetInfo(final String name,
-                   final NetInterface netInterface,
-                   final Browser browser) {
+
+    public NetInfo(final String name, final NetInterface netInterface, final Browser browser) {
         super.init(name, browser);
         setResource(netInterface);
     }
 
-    /** Returns browser object of this info. */
     @Override
     public final HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
@@ -89,10 +83,9 @@ public class NetInfo extends Info {
         return s.toString();
     }
 
-    /** Returns icon of the net interface for the menu. */
     @Override
     public final ImageIcon getMenuIcon(final Application.RunMode runMode) {
-        return NET_I_ICON;
+        return NET_INTERFACE_ICON;
     }
 
     /** Returns ip of the net interface. */
@@ -105,14 +98,10 @@ public class NetInfo extends Info {
         return ni.getIp();
     }
 
-    /** Returns net interface resource. */
     public final NetInterface getNetInterface() {
         return (NetInterface) getResource();
     }
 
-    /**
-     * Whether this interface is localhost.
-     */
     public final boolean isLocalHost() {
         return "lo".equals(getName());
     }
@@ -143,5 +132,4 @@ public class NetInfo extends Info {
         }
         return true;
     }
-
 }

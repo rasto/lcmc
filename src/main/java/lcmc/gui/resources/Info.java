@@ -263,7 +263,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Returns type of the info text. text/plain or text/html. */
-    protected String getInfoType() {
+    protected String getInfoMimeType() {
         return Tools.MIME_TYPE_TEXT_PLAIN;
     }
 
@@ -280,7 +280,7 @@ public class Info implements Comparable<Info>, Value {
             return panel;
         } else {
             final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(12));
-            resourceInfoArea = new JEditorPane(getInfoType(), info);
+            resourceInfoArea = new JEditorPane(getInfoMimeType(), info);
             resourceInfoArea.setMinimumSize(new Dimension(
                                                     Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
                                                     Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));

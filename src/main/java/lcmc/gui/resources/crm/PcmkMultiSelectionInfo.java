@@ -68,7 +68,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
     }
 
     @Override
-    protected String getInfoType() {
+    protected String getInfoMimeType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 

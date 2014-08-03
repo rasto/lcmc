@@ -97,8 +97,7 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    final Host dcHost =
-                                  hostInfo.getBrowser().getClusterBrowser().getDCHost();
+                    final Host dcHost = hostInfo.getBrowser().getClusterBrowser().getDCHost();
                     if (hostInfo.isStandby(runMode)) {
                         CRM.standByOff(dcHost, hostInfo.getHost(), runMode);
                     } else {
@@ -108,8 +107,7 @@ public class HostMenu {
             };
         final ClusterBrowser cb = hostInfo.getBrowser().getClusterBrowser();
         if (cb != null) {
-            final ButtonCallback standbyItemCallback =
-                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback standbyItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     if (hostInfo.isStandby(Application.RunMode.LIVE)) {
@@ -137,8 +135,7 @@ public class HostMenu {
                     if (!hostInfo.getHost().isCrmStatusOk()) {
                         return HostInfo.NO_PCMK_STATUS_STRING;
                     }
-                    if (hostInfo.getBrowser().getClusterBrowser()
-                                    .getExistingServiceList(null).isEmpty()) {
+                    if (hostInfo.getBrowser().getClusterBrowser().getExistingServiceList(null).isEmpty()) {
                         return "there are no services to migrate";
                     }
                     return null;
@@ -146,41 +143,26 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    for (final ServiceInfo si
-                            : cb.getExistingServiceList(null)) {
-                        if (!si.isConstraintPH()
-                            && si.getGroupInfo() == null
-                            && si.getCloneInfo() == null) {
-                            final List<String> runningOnNodes =
-                                  si.getRunningOnNodes(Application.RunMode.LIVE);
-                            if (runningOnNodes != null
-                                && runningOnNodes.contains(
-                                                        hostInfo.getHost().getName())) {
+                    for (final ServiceInfo si : cb.getExistingServiceList(null)) {
+                        if (!si.isConstraintPlaceholder() && si.getGroupInfo() == null && si.getCloneInfo() == null) {
+                            final List<String> runningOnNodes = si.getRunningOnNodes(Application.RunMode.LIVE);
+                            if (runningOnNodes != null && runningOnNodes.contains(hostInfo.getHost().getName())) {
                                 final Host dcHost = hostInfo.getHost();
-                                si.migrateFromResource(dcHost,
-                                                       hostInfo.getHost().getName(),
-                                                       Application.RunMode.LIVE);
+                                si.migrateFromResource(dcHost, hostInfo.getHost().getName(), Application.RunMode.LIVE);
                             }
                         }
                     }
                 }
             };
         if (cb != null) {
-            final ButtonCallback allMigrateFromItemCallback =
-                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback allMigrateFromItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
-                    for (final ServiceInfo si
-                            : cb.getExistingServiceList(null)) {
-                        if (!si.isConstraintPH() && si.getGroupInfo() == null) {
-                            final List<String> runningOnNodes =
-                                                   si.getRunningOnNodes(Application.RunMode.LIVE);
-                            if (runningOnNodes != null
-                                && runningOnNodes.contains(
-                                                        hostInfo.getHost().getName())) {
-                                si.migrateFromResource(dcHost,
-                                                       hostInfo.getHost().getName(),
-                                                       Application.RunMode.TEST);
+                    for (final ServiceInfo si : cb.getExistingServiceList(null)) {
+                        if (!si.isConstraintPlaceholder() && si.getGroupInfo() == null) {
+                            final List<String> runningOnNodes = si.getRunningOnNodes(Application.RunMode.LIVE);
+                            if (runningOnNodes != null && runningOnNodes.contains(hostInfo.getHost().getName())) {
+                                si.migrateFromResource(dcHost, hostInfo.getHost().getName(), Application.RunMode.TEST);
                             }
                         }
                     }
@@ -220,31 +202,27 @@ public class HostMenu {
 
                 @Override
                 public boolean visiblePredicate() {
-                    return hostInfo.getHost().isCorosyncRunning()
-                           || hostInfo.getHost().isOpenaisRunning();
+                    return hostInfo.getHost().isCorosyncRunning() || hostInfo.getHost().isOpenaisRunning();
                 }
 
                 @Override
                 public void action() {
-                    if (Tools.confirmDialog(
-                         Tools.getString("HostInfo.confirmCorosyncStop.Title"),
-                         Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
-                         Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
-                         Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
+                    if (Tools.confirmDialog(Tools.getString("HostInfo.confirmCorosyncStop.Title"),
+                                            Tools.getString("HostInfo.confirmCorosyncStop.Desc"),
+                                            Tools.getString("HostInfo.confirmCorosyncStop.Yes"),
+                                            Tools.getString("HostInfo.confirmCorosyncStop.No"))) {
                         final Host thisHost = hostInfo.getHost();
                         thisHost.setCommLayerStopping(true);
                         if (!thisHost.isPcmkStartedByCorosync()
                             && thisHost.hasPacemakerInitScript()
                             && thisHost.isPacemakerRunning()) {
-                            if (hostInfo.getHost().isCorosyncRunning()
-                                && !hostInfo.getHost().isOpenaisRunning()) {
+                            if (hostInfo.getHost().isCorosyncRunning() && !hostInfo.getHost().isOpenaisRunning()) {
                                 Corosync.stopCorosyncWithPcmk(thisHost);
                             } else {
                                 Openais.stopOpenaisWithPcmk(thisHost);
                             }
                         } else {
-                            if (hostInfo.getHost().isCorosyncRunning()
-                                && !hostInfo.getHost().isOpenaisRunning()) {
+                            if (hostInfo.getHost().isCorosyncRunning() && !hostInfo.getHost().isOpenaisRunning()) {
                                 Corosync.stopCorosync(thisHost);
                             } else {
                                 Openais.stopOpenais(thisHost);
@@ -255,8 +233,7 @@ public class HostMenu {
                 }
             };
         if (cb != null) {
-            final ButtonCallback stopCorosyncItemCallback =
-                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback stopCorosyncItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     if (!hostInfo.isStandby(Application.RunMode.LIVE)) {
@@ -264,8 +241,7 @@ public class HostMenu {
                     }
                 }
             };
-            hostInfo.addMouseOverListener(stopCorosyncItem,
-                                          stopCorosyncItemCallback);
+            hostInfo.addMouseOverListener(stopCorosyncItem, stopCorosyncItemCallback);
         }
         items.add(stopCorosyncItem);
         /* Stop heartbeat. */
@@ -294,11 +270,10 @@ public class HostMenu {
 
                 @Override
                 public void action() {
-                    if (Tools.confirmDialog(
-                         Tools.getString("HostInfo.confirmHeartbeatStop.Title"),
-                         Tools.getString("HostInfo.confirmHeartbeatStop.Desc"),
-                         Tools.getString("HostInfo.confirmHeartbeatStop.Yes"),
-                         Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
+                    if (Tools.confirmDialog(Tools.getString("HostInfo.confirmHeartbeatStop.Title"),
+                                            Tools.getString("HostInfo.confirmHeartbeatStop.Desc"),
+                                            Tools.getString("HostInfo.confirmHeartbeatStop.Yes"),
+                                            Tools.getString("HostInfo.confirmHeartbeatStop.No"))) {
                         hostInfo.getHost().setCommLayerStopping(true);
                         Heartbeat.stopHeartbeat(hostInfo.getHost());
                         updateClusterView(hostInfo.getHost(), hostInfo);
@@ -306,8 +281,7 @@ public class HostMenu {
                 }
             };
         if (cb != null) {
-            final ButtonCallback stopHeartbeatItemCallback =
-                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback stopHeartbeatItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     if (!hostInfo.isStandby(Application.RunMode.LIVE)) {
@@ -315,8 +289,7 @@ public class HostMenu {
                     }
                 }
             };
-            hostInfo.addMouseOverListener(stopHeartbeatItem,
-                                          stopHeartbeatItemCallback);
+            hostInfo.addMouseOverListener(stopHeartbeatItem, stopHeartbeatItemCallback);
         }
         items.add(stopHeartbeatItem);
         /* Start corosync. */
@@ -365,15 +338,13 @@ public class HostMenu {
                 }
             };
         if (cb != null) {
-            final ButtonCallback startCorosyncItemCallback =
-                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback startCorosyncItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
                 }
             };
-            hostInfo.addMouseOverListener(startCorosyncItem,
-                                          startCorosyncItemCallback);
+            hostInfo.addMouseOverListener(startCorosyncItem, startCorosyncItemCallback);
         }
         items.add(startCorosyncItem);
         /* Start openais. */
@@ -417,15 +388,13 @@ public class HostMenu {
                 }
             };
         if (cb != null) {
-            final ButtonCallback startOpenaisItemCallback =
-                                              cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback startOpenaisItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
                 }
             };
-            hostInfo.addMouseOverListener(startOpenaisItem,
-                                          startOpenaisItemCallback);
+            hostInfo.addMouseOverListener(startOpenaisItem, startOpenaisItemCallback);
         }
         items.add(startOpenaisItem);
         /* Start heartbeat. */
@@ -467,15 +436,13 @@ public class HostMenu {
                 }
             };
         if (cb != null) {
-            final ButtonCallback startHeartbeatItemCallback =
-                                               cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback startHeartbeatItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
                 }
             };
-            hostInfo.addMouseOverListener(startHeartbeatItem,
-                                          startHeartbeatItemCallback);
+            hostInfo.addMouseOverListener(startHeartbeatItem, startHeartbeatItemCallback);
         }
         items.add(startHeartbeatItem);
 
@@ -494,8 +461,7 @@ public class HostMenu {
                     final Host h = hostInfo.getHost();
                     return !h.isPcmkStartedByCorosync()
                            && !h.isPacemakerRunning()
-                           && (h.isCorosyncRunning()
-                               || h.isOpenaisRunning())
+                           && (h.isCorosyncRunning() || h.isOpenaisRunning())
                            && !h.isHeartbeatRunning();
                 }
 
@@ -516,15 +482,13 @@ public class HostMenu {
                 }
             };
         if (cb != null) {
-            final ButtonCallback startPcmkItemCallback =
-                                               cb.new ClMenuItemCallback(hostInfo.getHost()) {
+            final ButtonCallback startPcmkItemCallback = cb.new ClMenuItemCallback(hostInfo.getHost()) {
                 @Override
                 public void action(final Host dcHost) {
                     //TODO
                 }
             };
-            hostInfo.addMouseOverListener(startPcmkItem,
-                                          startPcmkItemCallback);
+            hostInfo.addMouseOverListener(startPcmkItem, startPcmkItemCallback);
         }
         items.add(startPcmkItem);
         /* change host color */
@@ -540,8 +504,7 @@ public class HostMenu {
                 public void action() {
                     final Color newColor = JColorChooser.showDialog(
                                             Tools.getGUIData().getMainFrame(),
-                                            "Choose " + hostInfo.getHost().getName()
-                                            + " color",
+                                            "Choose " + hostInfo.getHost().getName() + " color",
                                             hostInfo.getHost().getPmColors()[0]);
                     if (newColor != null) {
                         hostInfo.getHost().setSavedHostColorInGraphs(newColor);
@@ -575,10 +538,9 @@ public class HostMenu {
             };
         items.add(viewLogsItem);
         /* advacend options */
-        final UpdatableItem hostAdvancedSubmenu = new MyMenu(
-                        Tools.getString("HostBrowser.AdvancedSubmenu"),
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
+        final UpdatableItem hostAdvancedSubmenu = new MyMenu(Tools.getString("HostBrowser.AdvancedSubmenu"),
+                                                             new AccessMode(Application.AccessType.OP, false),
+                                                             new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -619,8 +581,7 @@ public class HostMenu {
                     hostInfo.getHost().disconnect();
                     final ClusterBrowser b = hostInfo.getBrowser().getClusterBrowser();
                     if (b != null) {
-                        Tools.getGUIData().unregisterAllHostsUpdate(
-                                                      b.getClusterViewPanel());
+                        Tools.getGUIData().unregisterAllHostsUpdate(b.getClusterViewPanel());
                     }
                     Tools.getApplication().removeHostFromHosts(hostInfo.getHost());
                     Tools.getGUIData().allHostsUpdate();
@@ -630,7 +591,6 @@ public class HostMenu {
         return items;
     }
     
-    /* Update cluster view if available. */
     private void updateClusterView(final Host host, final HostInfo hostInfo) {
         final ClusterBrowser cb = hostInfo.getBrowser().getClusterBrowser();
         if (cb == null) {

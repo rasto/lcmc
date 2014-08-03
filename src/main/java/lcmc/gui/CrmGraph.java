@@ -376,12 +376,12 @@ public class CrmGraph extends ResourceGraph {
         if (vP == v) {
             return;
         }
-        if (parent.isConstraintPH() || serviceInfo.isConstraintPH()) {
+        if (parent.isConstraintPlaceholder() || serviceInfo.isConstraintPlaceholder()) {
             /* if it is sequential rsc set change it to show to the resource
              * instead on placeholder. */
 
             final ConstraintPHInfo cphi;
-            if (parent.isConstraintPH()) {
+            if (parent.isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) parent;
                 final ServiceInfo si = cphi.prevInSequence(serviceInfo, false);
                 if (si != null) {
@@ -495,12 +495,12 @@ public class CrmGraph extends ResourceGraph {
         if (vRsc == vWithRsc) {
             return;
         }
-        if (rsc.isConstraintPH() || withRsc.isConstraintPH()) {
+        if (rsc.isConstraintPlaceholder() || withRsc.isConstraintPlaceholder()) {
             /* if it is sequential rsc set change it to show to the resource
              * instead on placeholder. */
 
             final ConstraintPHInfo cphi;
-            if (rsc.isConstraintPH()) {
+            if (rsc.isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) rsc;
                 final ServiceInfo si = cphi.nextInSequence(withRsc, true);
                 if (si != null) {

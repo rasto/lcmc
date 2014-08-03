@@ -34,14 +34,10 @@ import lcmc.gui.resources.drbd.ResourceInfo;
  */
 public final class DrbddiskInfo extends ServiceInfo {
 
-    /** Creates new DrbddiskInfo object. */
-    DrbddiskInfo(final String name,
-                 final ResourceAgent ra,
-                 final Browser browser) {
+    DrbddiskInfo(final String name, final ResourceAgent ra, final Browser browser) {
         super(name, ra, browser);
     }
 
-    /** Creates new DrbddiskInfo object. */
     DrbddiskInfo(final String name,
                  final ResourceAgent ra,
                  final String hbId,
@@ -61,25 +57,20 @@ public final class DrbddiskInfo extends ServiceInfo {
         return getParamSaved("1").getValueForConfig();
     }
 
-    /** Removes the drbddisk service. */
     @Override
-    public void removeMyselfNoConfirm(final Host dcHost,
-                                      final Application.RunMode runMode) {
+    public void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
         super.removeMyselfNoConfirm(dcHost, runMode);
-        final ResourceInfo dri =
-                        getBrowser().getDrbdResourceNameHash().get(getResourceName());
+        final ResourceInfo dri = getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
             dri.setUsedByCRM(null);
         }
     }
 
-    /** Sets service parameters with values from resourceNode hash. */
     @Override
     protected void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
-        final ResourceInfo dri =
-                        getBrowser().getDrbdResourceNameHash().get(getResourceName());
+        final ResourceInfo dri = getBrowser().getDrbdResourceNameHash().get(getResourceName());
         getBrowser().putDrbdResHash();
         if (dri != null) {
             if (isManaged(Application.RunMode.LIVE) && !getService().isOrphaned()) {
@@ -87,13 +78,13 @@ public final class DrbddiskInfo extends ServiceInfo {
             } else {
                 dri.setUsedByCRM(null);
             }
-            final Thread t = new Thread(new Runnable() {
+            final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     dri.updateMenus(null);
                 }
             });
-            t.start();
+            thread.start();
         }
     }
 }

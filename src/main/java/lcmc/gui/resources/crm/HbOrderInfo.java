@@ -102,17 +102,17 @@ final class HbOrderInfo extends EditableInfo
             final CrmXml.OrderData orderData = clStatus.getOrderData(ordId);
             final String score = orderData.getScore();
             resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
-        } else if (serviceInfoParent.isConstraintPH()
-                   || serviceInfoChild.isConstraintPH()) {
+        } else if (serviceInfoParent.isConstraintPlaceholder()
+                   || serviceInfoChild.isConstraintPlaceholder()) {
             /* rsc set edge */
             final ConstraintPHInfo cphi;
             final CrmXml.RscSet rscSet;
-            if (serviceInfoParent.isConstraintPH()) {
+            if (serviceInfoParent.isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) serviceInfoParent;
-                rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
+                rscSet = cphi.getRscSetConnectionDataOrder().getRscSet2();
             } else {
                 cphi = (ConstraintPHInfo) serviceInfoChild;
-                rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
+                rscSet = cphi.getRscSetConnectionDataOrder().getRscSet1();
             }
             resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
             resourceNode.put(CrmXml.REQUIRE_ALL_ATTR, new StringValue(rscSet.getRequireAll()));
@@ -210,8 +210,8 @@ final class HbOrderInfo extends EditableInfo
         if (serviceInfoParent == null || serviceInfoChild == null) {
             /* rsc set order */
             return getBrowser().getCrmXml().getResourceSetOrderParameters();
-        } else if (serviceInfoParent.isConstraintPH()
-                   || serviceInfoChild.isConstraintPH()) {
+        } else if (serviceInfoParent.isConstraintPlaceholder()
+                   || serviceInfoChild.isConstraintPlaceholder()) {
             /* when rsc set edges are clicked */
             return getBrowser().getCrmXml().getRscSetOrdConnectionParameters();
         } else {
@@ -223,12 +223,12 @@ final class HbOrderInfo extends EditableInfo
     private boolean isRscSetMaster() {
         final ConstraintPHInfo cphi;
         final CrmXml.RscSet rscSet;
-        if (serviceInfoParent.isConstraintPH()) {
+        if (serviceInfoParent.isConstraintPlaceholder()) {
             cphi = (ConstraintPHInfo) serviceInfoParent;
-            rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
+            rscSet = cphi.getRscSetConnectionDataOrder().getRscSet2();
         } else {
             cphi = (ConstraintPHInfo) serviceInfoChild;
-            rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
+            rscSet = cphi.getRscSetConnectionDataOrder().getRscSet1();
         }
         return getBrowser().isOneMaster(rscSet.getRscIds());
     }
@@ -350,16 +350,16 @@ final class HbOrderInfo extends EditableInfo
                                                     runMode),
                               attrs,
                               runMode);
-            } else if (serviceInfoParent.isConstraintPH()
-                       || serviceInfoChild.isConstraintPH()) {
+            } else if (serviceInfoParent.isConstraintPlaceholder()
+                       || serviceInfoChild.isConstraintPlaceholder()) {
                 final ConstraintPHInfo cphi;
                 final CrmXml.RscSet rscSet;
-                if (serviceInfoParent.isConstraintPH()) {
+                if (serviceInfoParent.isConstraintPlaceholder()) {
                     cphi = (ConstraintPHInfo) serviceInfoParent;
-                    rscSet = cphi.getRscSetConnectionDataOrd().getRscSet2();
+                    rscSet = cphi.getRscSetConnectionDataOrder().getRscSet2();
                 } else {
                     cphi = (ConstraintPHInfo) serviceInfoChild;
-                    rscSet = cphi.getRscSetConnectionDataOrd().getRscSet1();
+                    rscSet = cphi.getRscSetConnectionDataOrder().getRscSet1();
                 }
                 final PcmkRscSetsInfo prsi = cphi.getPcmkRscSetsInfo();
 

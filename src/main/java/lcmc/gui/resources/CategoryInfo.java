@@ -34,24 +34,19 @@ import lcmc.gui.Browser;
  * This class holds info data for a category.
  */
 public class CategoryInfo extends Info {
-    /** Main table. */
     public static final String MAIN_TABLE = "main";
-    /** Info panel. */
     private JComponent infoPanel = null;
 
-    /** Info panel for the category. */
     @Override
     public String getInfo() {
         return null;
     }
 
-    /** Returns the icon. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return Browser.CATEGORY_ICON;
     }
 
-    /** Returns info panel for this resource. */
     @Override
     public JComponent getInfoPanel() {
         if (infoPanel != null) {
@@ -81,7 +76,6 @@ public class CategoryInfo extends Info {
         return infoPanel;
     }
 
-    /** Returns new button. */
     protected JComponent getNewButton() {
         return null;
     }

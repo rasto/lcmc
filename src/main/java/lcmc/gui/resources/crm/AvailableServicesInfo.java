@@ -24,7 +24,6 @@ package lcmc.gui.resources.crm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
 
@@ -32,34 +31,28 @@ import lcmc.utilities.MyButton;
  * This class holds the information about available resource agent classes.
  */
 public final class AvailableServicesInfo extends HbCategoryInfo {
-    /** Returns columns for the table. */
     @Override
     protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Description"};
     }
 
-    /** Returns data for the table. */
     @Override
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final String cl : ClusterBrowser.CRM_CLASSES) {
             final MyButton className = new MyButton(cl.toUpperCase(Locale.US));
-            rows.add(new Object[]{className,
-                                  ClusterBrowser.CRM_CLASS_MENU.get(cl)});
+            rows.add(new Object[]{className, ClusterBrowser.CRM_CLASS_MENU.get(cl)});
         }
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /** Execute when row in the table was clicked. */
     @Override
-    protected void rowClicked(final String tableName,
-                              final String key,
-                              final int column) {
-        final ResourceAgentClassInfo raci =
-                     getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
-        if (raci != null) {
-            raci.selectMyself();
+    protected void rowClicked(final String tableName, final String key, final int column) {
+        final ResourceAgentClassInfo resourceAgentClassInfo =
+                                                        getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
+        if (resourceAgentClassInfo != null) {
+            resourceAgentClassInfo.selectMyself();
         }
     }
 }

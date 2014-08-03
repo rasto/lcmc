@@ -1084,7 +1084,7 @@ public class ServiceMenu {
                 final List<JDialog> popups = new ArrayList<JDialog>();
                 for (final ServiceInfo asi
                             : getBrowser().getExistingServiceList(serviceInfo)) {
-                    if (asi.isConstraintPH() && serviceInfo.isConstraintPH()) {
+                    if (asi.isConstraintPlaceholder() && serviceInfo.isConstraintPlaceholder()) {
                         continue;
                     }
                     if (asi.getCloneInfo() != null

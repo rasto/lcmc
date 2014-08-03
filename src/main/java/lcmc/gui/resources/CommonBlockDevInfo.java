@@ -36,33 +36,26 @@ import lcmc.utilities.Tools;
  * in all hosts in the cluster and can be chosen in the scrolling list in
  * the filesystem service.
  */
-public final class CommonBlockDevInfo extends HbCategoryInfo
-                                      implements CommonDeviceInterface {
+public final class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
     private final BlockDevice[] blockDevices;
 
-    /** Prepares a new {@code CommonBlockDevInfo} object. */
-    public CommonBlockDevInfo(final String name,
-                              final BlockDevice[] blockDevices,
-                              final Browser browser) {
+    public CommonBlockDevInfo(final String name, final BlockDevice[] blockDevices, final Browser browser) {
         super.init(name, browser);
         setResource(new CommonBlockDevice(name));
         this.blockDevices = blockDevices;
     }
 
-    /** Returns icon for common block devices menu category. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return BlockDevInfo.HARDDISK_ICON;
     }
 
-    /** Returns device name of this block device. */
     @Override
     public String getDevice() {
         return getCommonBlockDevice().getDevice();
     }
 
-    /** Returns info for this block device. */
     @Override
     public String getInfo() {
         return "Device    : " + getCommonBlockDevice().getName() + '\n';
@@ -81,7 +74,6 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
         return name;
     }
 
-    /** Sets this block device on all nodes ass used by crm. */
     @Override
     public void setUsedByCRM(final ServiceInfo isUsedByCRM) {
         for (final BlockDevice bd : blockDevices) {
@@ -90,7 +82,6 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
     }
 
     /**
-     * Returns if all of the block devices are used by crm.
      * TODO: or any is used by hb?
      */
     @Override
@@ -102,14 +93,12 @@ public final class CommonBlockDevInfo extends HbCategoryInfo
         return is;
     }
 
-    /** Returns resource object of this block device. */
     CommonBlockDevice getCommonBlockDevice() {
         return (CommonBlockDevice) getResource();
     }
 
-    /** Returns the last created filesystem. */
     @Override
-    public String getCreatedFs() {
+    public String getLastCreatedFs() {
         return null;
     }
 

@@ -3203,7 +3203,7 @@ public class DomainInfo extends EditableInfo {
             final InterfaceInfo vii = interfaceToInfo.get(mac);
             iToInfo.put(interf.toString(), vii);
         }
-        final MyButton iLabel = new MyButton(interf.toString(), NetInfo.NET_I_ICON_LARGE);
+        final MyButton iLabel = new MyButton(interf.toString(), NetInfo.NET_INTERFACE_ICON_LARGE);
         iLabel.setOpaque(opaque);
         final StringBuilder source = new StringBuilder(20);
         final String type = interfaceData.getType();

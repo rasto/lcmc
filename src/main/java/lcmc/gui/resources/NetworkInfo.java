@@ -31,14 +31,9 @@ import lcmc.utilities.Tools;
  * This class holds info data for a network.
  */
 public final class NetworkInfo extends Info {
-    /** Network icon. */
-    private static final ImageIcon NETWORK_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.NetworkIcon"));
-    /** Prepares a new {@code NetworkInfo} object. */
-    public NetworkInfo(final String name,
-                       final Network network,
-                       final Browser browser) {
+    private static final ImageIcon NETWORK_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.NetworkIcon"));
+
+    public NetworkInfo(final String name, final Network network, final Browser browser) {
         super.init(name, browser);
         setResource(network);
     }
@@ -52,12 +47,10 @@ public final class NetworkInfo extends Info {
                            + '\n';
     }
 
-    /** Returns network resource object. */
     Network getNetwork() {
         return (Network) getResource();
     }
 
-    /** Returns menu icon for network. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return NETWORK_ICON;

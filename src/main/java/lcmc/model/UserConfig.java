@@ -58,35 +58,20 @@ import org.w3c.dom.NodeList;
 /**
  * This class parses xml from user configs and creates data objects,
  * that describe the hosts and clusters.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 @Component
 public final class UserConfig extends XML {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(XML.class);
-    /** Host name attribute string. */
     private static final String HOST_NAME_ATTR = "name";
-    /** Host ssh port attribute string. */
     private static final String HOST_SSHPORT_ATTR = "ssh";
-    /** Host color attribute string. */
     private static final String HOST_COLOR_ATTR = "color";
-    /** Host use sudo attribute string. */
     private static final String HOST_USESUDO_ATTR = "sudo";
-    /** Cluster name attribute string. */
     private static final String CLUSTER_NAME_ATTR = "name";
-    /** Name of the host node. */
     private static final String HOST_NODE_STRING = "host";
-    /** Name of the proxy host node. */
     private static final String PROXY_HOST_NODE_STRING = "proxy-host";
-    /** Download user. */
     private static final String DOWNLOAD_USER_ATTR = "dwuser";
-    /** Download user password. */
     private static final String DOWNLOAD_PASSWD_ATTR = "dwpasswd";
-    /** Encoding. */
-    private static final String encoding = "UTF-8";
-    /** Whether the host is a proxy host. */
+    private static final String ENCODING = "UTF-8";
     public static final boolean PROXY_HOST = true;
 
     @Autowired
@@ -95,8 +80,7 @@ public final class UserConfig extends XML {
     private HostFactory hostFactory;
 
     /** Saves data about clusters and hosts to the supplied output stream. */
-    public String saveXML(final OutputStream outputStream,
-                          final boolean saveAll) throws IOException {
+    public String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
         LOG.debug1("saveXML: start");
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
@@ -107,13 +91,10 @@ public final class UserConfig extends XML {
              throw new IOException("saveXML: cannot configure parser", pce);
         }
         final Document doc = db.newDocument();
-        final Element root = (Element) doc.appendChild(
-                                                doc.createElement("drbdgui"));
+        final Element root = (Element) doc.appendChild(doc.createElement("drbdgui"));
         if (Tools.getApplication().getLoginSave()) {
-            final String downloadUser =
-                                Tools.getApplication().getDownloadUser();
-            final String downloadPasswd =
-                                Tools.getApplication().getDownloadPassword();
+            final String downloadUser = Tools.getApplication().getDownloadUser();
+            final String downloadPasswd = Tools.getApplication().getDownloadPassword();
             if (downloadUser != null && downloadPasswd != null) {
                 root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
@@ -130,22 +111,19 @@ public final class UserConfig extends XML {
         }
         final Node clusters = root.appendChild(doc.createElement("clusters"));
 
-        final Set<Cluster> clusterSet =
-                        Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusterSet = Tools.getApplication().getClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
             if (!saveAll && !cluster.isSavable()) {
                 continue;
             }
             cluster.setSavable(true);
             final String clusterName = cluster.getName();
-            final Element clusterNode = (Element) clusters.appendChild(
-                                                doc.createElement("cluster"));
+            final Element clusterNode = (Element) clusters.appendChild(doc.createElement("cluster"));
             clusterNode.setAttribute(CLUSTER_NAME_ATTR, clusterName);
             final Set<Host> clusterHosts = cluster.getHosts();
             for (final Host host : clusterHosts) {
                 final String hostName = host.getHostname();
-                final Node hostNode = clusterNode.appendChild(
-                                        doc.createElement(HOST_NODE_STRING));
+                final Node hostNode = clusterNode.appendChild(doc.createElement(HOST_NODE_STRING));
                 hostNode.appendChild(doc.createTextNode(hostName));
             }
             for (final Host pHost : cluster.getProxyHosts()) {
@@ -153,26 +131,25 @@ public final class UserConfig extends XML {
                     continue;
                 }
                 final String hostName = pHost.getHostname();
-                final Node hostNode = clusterNode.appendChild(
-                                    doc.createElement(PROXY_HOST_NODE_STRING));
+                final Node hostNode = clusterNode.appendChild(doc.createElement(PROXY_HOST_NODE_STRING));
                 hostNode.appendChild(doc.createTextNode(hostName));
             }
         }
 
-        final TransformerFactory tf = TransformerFactory.newInstance();
-        final Transformer t;
+        final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        final Transformer transformer;
         try {
-            t = tf.newTransformer();
-            t.setOutputProperty(OutputKeys.INDENT, "yes");
-            t.setOutputProperty(OutputKeys.METHOD, "xml");
-            t.setOutputProperty(OutputKeys.ENCODING, encoding);
+            transformer = transformerFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.ENCODING, ENCODING);
         } catch (final TransformerConfigurationException tce) {
             throw new IOException("saveXML: transformer config failed", tce);
         }
         final Source doms = new DOMSource(doc);
-        final Result sr = new StreamResult(outputStream);
+        final Result streamResult = new StreamResult(outputStream);
         try {
-            t.transform(doms, sr);
+            transformer.transform(doms, streamResult);
         } catch (final TransformerException te) {
             throw new IOException("saveXML: transform failed", te);
         }
@@ -184,22 +161,17 @@ public final class UserConfig extends XML {
      * Starts specified clusters and connects to the hosts of this clusters.
      */
     public void startClusters(final Collection<Cluster> selectedClusters) {
-        final Set<Cluster> clusters =
-                        Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
         if (clusters != null) {
             /* clusters */
             for (final Cluster cluster : clusters) {
-                if (selectedClusters != null
-                    && !selectedClusters.contains(cluster)) {
+                if (selectedClusters != null && !selectedClusters.contains(cluster)) {
                     continue;
                 }
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        //Tools.getGUIData().addClusterTab(cluster);
                         clusterTabFactory.createClusterTab(cluster);
-                        //clusterTab.initWithCluster(cluster);
-                        //clustersPanel.addClusterTab(clusterTab);
                     }
                 });
                 if (cluster.getHosts().isEmpty()) {
@@ -210,8 +182,7 @@ public final class UserConfig extends XML {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.getGUIData().getClustersPanel().removeTabWithCluster(
-                                    cluster);
+                            Tools.getGUIData().getClustersPanel().removeTabWithCluster(cluster);
                         }
                     });
                     continue;
@@ -225,10 +196,10 @@ public final class UserConfig extends XML {
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                final ClusterTab ct = cluster.getClusterTab();
-                                if (ct != null) {
-                                    ct.addClusterView();
-                                    ct.requestFocus();
+                                final ClusterTab clusterTab = cluster.getClusterTab();
+                                if (clusterTab != null) {
+                                    clusterTab.addClusterView();
+                                    clusterTab.requestFocus();
                                 }
                             }
                         });
@@ -251,18 +222,13 @@ public final class UserConfig extends XML {
         }
         /* get root <drbdgui> */
         final Node rootNode = getChildNode(document, "drbdgui");
-        final Map<String, List<Host>> hostMap =
-                                       new LinkedHashMap<String, List<Host>>();
+        final Map<String, List<Host>> hostMap = new LinkedHashMap<String, List<Host>>();
         if (rootNode != null) {
             /* download area */
-            final String downloadUser = getAttribute(rootNode,
-                                                     DOWNLOAD_USER_ATTR);
-            final String downloadPasswd = getAttribute(rootNode,
-                                                       DOWNLOAD_PASSWD_ATTR);
+            final String downloadUser = getAttribute(rootNode, DOWNLOAD_USER_ATTR);
+            final String downloadPasswd = getAttribute(rootNode, DOWNLOAD_PASSWD_ATTR);
             if (downloadUser != null && downloadPasswd != null) {
-                Tools.getApplication().setDownloadLogin(downloadUser,
-                                                       downloadPasswd,
-                                                       true);
+                Tools.getApplication().setDownloadLogin(downloadUser, downloadPasswd, true);
             }
             /* hosts */
             final Node hostsNode = getChildNode(rootNode, "hosts");
@@ -272,33 +238,18 @@ public final class UserConfig extends XML {
                     for (int i = 0; i < hosts.getLength(); i++) {
                         final Node hostNode = hosts.item(i);
                         if (hostNode.getNodeName().equals(HOST_NODE_STRING)) {
-                            final String nodeName =
-                                                getAttribute(hostNode,
-                                                             HOST_NAME_ATTR);
-                            final String sshPort =
-                                                getAttribute(hostNode,
-                                                             HOST_SSHPORT_ATTR);
-                            final String color = getAttribute(hostNode,
-                                                              HOST_COLOR_ATTR);
-                            final String useSudo =
-                                                getAttribute(hostNode,
-                                                             HOST_USESUDO_ATTR);
+                            final String nodeName = getAttribute(hostNode, HOST_NAME_ATTR);
+                            final String sshPort = getAttribute(hostNode, HOST_SSHPORT_ATTR);
+                            final String color = getAttribute(hostNode, HOST_COLOR_ATTR);
+                            final String useSudo = getAttribute(hostNode, HOST_USESUDO_ATTR);
                             final Node ipNode = getChildNode(hostNode, "ip");
                             String ip = null;
                             if (ipNode != null) {
                                 ip = getText(ipNode);
                             }
-                            final Node usernameNode = getChildNode(hostNode,
-                                                                   "user");
+                            final Node usernameNode = getChildNode(hostNode, "user");
                             final String username = getText(usernameNode);
-                            setHost(hostMap,
-                                    username,
-                                    nodeName,
-                                    ip,
-                                    sshPort,
-                                    color,
-                                    "true".equals(useSudo),
-                                    true);
+                            setHost(hostMap, username, nodeName, ip, sshPort, color, "true".equals(useSudo), true);
                         }
                     }
                 }
@@ -312,9 +263,7 @@ public final class UserConfig extends XML {
                     for (int i = 0; i < clusters.getLength(); i++) {
                         final Node clusterNode = clusters.item(i);
                         if ("cluster".equals(clusterNode.getNodeName())) {
-                            final String clusterName =
-                                               getAttribute(clusterNode,
-                                                            CLUSTER_NAME_ATTR);
+                            final String clusterName = getAttribute(clusterNode, CLUSTER_NAME_ATTR);
                             final Cluster cluster = new Cluster();
                             cluster.setName(clusterName);
                             Tools.getApplication().addClusterToClusters(cluster);
@@ -368,7 +317,6 @@ public final class UserConfig extends XML {
         hostList.add(host);
     }
 
-    /** Set host as a cluster host. */
     public void setHostCluster(final Map<String, List<Host>> hostMap,
                                final Cluster cluster,
                                final String nodeName,
@@ -403,8 +351,7 @@ public final class UserConfig extends XML {
                 if (hostNode.getNodeName().equals(HOST_NODE_STRING)) {
                     final String nodeName = getText(hostNode);
                     setHostCluster(hostMap, cluster, nodeName, !PROXY_HOST);
-                } else if (hostNode.getNodeName().equals(
-                                                    PROXY_HOST_NODE_STRING)) {
+                } else if (hostNode.getNodeName().equals(PROXY_HOST_NODE_STRING)) {
                     final String nodeName = getText(hostNode);
                     setHostCluster(hostMap, cluster, nodeName, PROXY_HOST);
                 }
@@ -412,19 +359,14 @@ public final class UserConfig extends XML {
         }
     }
 
-    /** Host node. */
-    private void addHostConfigNode(final Document doc,
-                                   final Node parent,
-                                   final String nodeName,
-                                   final Host host) {
+    private void addHostConfigNode(final Document doc, final Node parent, final String nodeName, final Host host) {
         final String hostName = host.getHostname();
         final String ip = host.getIpAddress();
         final String username = host.getUsername();
         final String sshPort = host.getSSHPort();
         final Boolean useSudo = host.isUseSudo();
         final String color = host.getColor();
-        final Element hostNode = (Element) parent.appendChild(
-                                                  doc.createElement(nodeName));
+        final Element hostNode = (Element) parent.appendChild(doc.createElement(nodeName));
         hostNode.setAttribute(HOST_NAME_ATTR, hostName);
         hostNode.setAttribute(HOST_SSHPORT_ATTR, sshPort);
         if (color != null) {
@@ -439,8 +381,7 @@ public final class UserConfig extends XML {
             ipNode.appendChild(doc.createTextNode(ip));
         }
         if (username != null) {
-            final Node usernameNode =
-                    hostNode.appendChild(doc.createElement("user"));
+            final Node usernameNode = hostNode.appendChild(doc.createElement("user"));
 
             usernameNode.appendChild(doc.createTextNode(username));
         }

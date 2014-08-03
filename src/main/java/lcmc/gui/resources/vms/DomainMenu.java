@@ -214,7 +214,7 @@ public class DomainMenu {
                 /* interface */
                 final MyMenuItem newInterfaceMenuItem = new MyMenuItem(
                    Tools.getString("DomainInfo.AddNewInterface"),
-                   NetInfo.NET_I_ICON_LARGE,
+                   NetInfo.NET_INTERFACE_ICON_LARGE,
                    new AccessMode(Application.AccessType.ADMIN, false),
                    new AccessMode(Application.AccessType.OP, false)) {
                     private static final long serialVersionUID = 1L;

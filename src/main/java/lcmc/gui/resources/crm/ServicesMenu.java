@@ -472,7 +472,7 @@ public class ServicesMenu {
                 for (final ServiceInfo si
                         : servicesInfo.getBrowser().getExistingServiceList(null)) {
                     if (si.getGroupInfo() == null
-                        && !si.isConstraintPH()
+                        && !si.isConstraintPlaceholder()
                         && !si.isStopped(Application.RunMode.TEST)
                         && !si.getService().isOrphaned()
                         && !si.getService().isNew()) {

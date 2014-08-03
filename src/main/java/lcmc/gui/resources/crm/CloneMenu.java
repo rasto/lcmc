@@ -34,7 +34,6 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 
 public class CloneMenu extends ServiceMenu {
-
     private final CloneInfo cloneInfo;
     
     public CloneMenu(final CloneInfo cloneInfo) {
@@ -51,10 +50,8 @@ public class CloneMenu extends ServiceMenu {
         }
         final UpdatableItem csMenu = new MyMenu(
                                      cs.toString(),
-                                     new AccessMode(Application.AccessType.RO,
-                                                    false),
-                                     new AccessMode(Application.AccessType.RO,
-                                                    false)) {
+                                     new AccessMode(Application.AccessType.RO, false),
+                                     new AccessMode(Application.AccessType.RO, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -75,7 +72,6 @@ public class CloneMenu extends ServiceMenu {
         return items;
     }
 
-    /** Adds migrate and unmigrate menu items. */
     @Override
     protected void addMigrateMenuItems(final List<UpdatableItem> items) {
         super.addMigrateMenuItems(items);
@@ -86,15 +82,12 @@ public class CloneMenu extends ServiceMenu {
         for (final Host host : getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateFromMenuItem =
-               new MyMenuItem(Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + ' ' + hostName + " (stop)",
+               new MyMenuItem(Tools.getString("ClusterBrowser.Hb.MigrateFromResource") + ' ' + hostName + " (stop)",
                               ServiceInfo.MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                              Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + ' ' + hostName + " (stop) (offline)",
+                              Tools.getString("ClusterBrowser.Hb.MigrateFromResource")
+                              + ' ' + hostName + " (stop) (offline)",
                               ServiceInfo.MIGRATE_ICON,
                               ClusterBrowser.STARTING_PTEST_TOOLTIP,
                               new AccessMode(Application.AccessType.OP, false),
@@ -108,30 +101,26 @@ public class CloneMenu extends ServiceMenu {
 
                     @Override
                     public boolean visiblePredicate() {
-                        return !host.isCrmStatusOk()
-                               || enablePredicate() == null;
+                        return !host.isCrmStatusOk() || enablePredicate() == null;
                     }
 
                     @Override
                     public String enablePredicate() {
-                        final List<String> runningOnNodes =
-                                            cloneInfo.getRunningOnNodes(runMode);
-                        if (runningOnNodes == null
-                            || runningOnNodes.size() < 1) {
+                        final List<String> runningOnNodes = cloneInfo.getRunningOnNodes(runMode);
+                        if (runningOnNodes == null || runningOnNodes.size() < 1) {
                             return "must run";
                         }
                         boolean runningOnNode = false;
                         for (final String ron : runningOnNodes) {
-                            if (hostName.toLowerCase(Locale.US).equals(
-                                               ron.toLowerCase(Locale.US))) {
+                            if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
                                 runningOnNode = true;
                                 break;
                             }
                         }
                         if (!getBrowser().crmStatusFailed()
-                               && cloneInfo.getService().isAvailable()
-                               && runningOnNode
-                               && host.isCrmStatusOk()) {
+                            && cloneInfo.getService().isAvailable()
+                            && runningOnNode
+                            && host.isCrmStatusOk()) {
                             return null;
                         } else {
                             return ""; /* is not visible anyway */
@@ -143,29 +132,20 @@ public class CloneMenu extends ServiceMenu {
                         cloneInfo.hidePopup();
                         if (cloneInfo.getService().isMaster()) {
                             /* without role=master */
-                            cloneInfo.superMigrateFromResource(getBrowser().getDCHost(),
-                                                      hostName,
-                                                      runMode);
+                            cloneInfo.superMigrateFromResource(getBrowser().getDCHost(), hostName, runMode);
                         } else {
-                            cloneInfo.migrateFromResource(getBrowser().getDCHost(),
-                                                hostName,
-                                                runMode);
+                            cloneInfo.migrateFromResource(getBrowser().getDCHost(), hostName, runMode);
                         }
                     }
                 };
-            final ButtonCallback migrateItemCallback =
-               getBrowser().new ClMenuItemCallback(null) {
+            final ButtonCallback migrateItemCallback = getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     if (cloneInfo.getService().isMaster()) {
                         /* without role=master */
-                        cloneInfo.superMigrateFromResource(dcHost,
-                                                 hostName,
-                                                 Application.RunMode.TEST);
+                        cloneInfo.superMigrateFromResource(dcHost, hostName, Application.RunMode.TEST);
                     } else {
-                        cloneInfo.migrateFromResource(dcHost,
-                                            hostName,
-                                            Application.RunMode.TEST);
+                        cloneInfo.migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
                     }
                 }
             };

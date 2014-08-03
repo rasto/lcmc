@@ -66,71 +66,59 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostDrbdInfo extends Info {
-    /** Logger. */
-    private static final Logger LOG =
-                                  LoggerFactory.getLogger(HostDrbdInfo.class);
-    /** String that is displayed as a tool tip for disabled menu item. */
-    static final String NO_DRBD_STATUS_STRING = "drbd status is not available";
+    private static final Logger LOG = LoggerFactory.getLogger(HostDrbdInfo.class);
+    static final String NO_DRBD_STATUS_TOOLTIP = "drbd status is not available";
     @Autowired
     private HostDrbdMenu hostDrbdMenu;
-    /** Host data. */
     private Host host;
-    /** Prepares a new {@code HostDrbdInfo} object. */
+
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
         this.host = host;
     }
 
-    /** Returns browser object of this info. */
     @Override
     public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /** Returns a host icon for the menu. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
-    /** Returns id, which is name of the host. */
     @Override
     public String getId() {
         return host.getName();
     }
 
-    /** Returns a host icon for the category in the menu. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
-    /** Returns tooltip for the host. */
     @Override
     public String getToolTipForGraph(final Application.RunMode runMode) {
         return getBrowser().getHostToolTip(host);
     }
 
-    /** Returns the info panel. */
     @Override
     public JComponent getInfoPanel() {
-        final Font f = new Font("Monospaced",
-                                Font.PLAIN,
-                                Tools.getApplication().scaled(12));
-        final JTextArea ta = new JTextArea();
-        ta.setFont(f);
+        final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(12));
+        final JTextArea textArea = new JTextArea();
+        textArea.setFont(f);
 
         final String stacktrace = Tools.getStackTrace();
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override
                 public void done(final String answer) {
-                    ta.setText(answer);
+                    textArea.setText(answer);
                 }
 
                 @Override
                 public void doneError(final String answer, final int errorCode) {
-                    ta.setText("error");
+                    textArea.setText("error");
                     LOG.sshError(host, "", answer, stacktrace, errorCode);
                 }
 
@@ -165,32 +153,27 @@ public class HostDrbdInfo extends Info {
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
-        buttonPanel.setMinimumSize(
-                        new Dimension(0, Tools.getApplication().scaled(50)));
-        buttonPanel.setPreferredSize(
-                        new Dimension(0, Tools.getApplication().scaled(50)));
-        buttonPanel.setMaximumSize(
-             new Dimension(Short.MAX_VALUE, Tools.getApplication().scaled(50)));
+        buttonPanel.setMinimumSize(new Dimension(0, Tools.getApplication().scaled(50)));
+        buttonPanel.setPreferredSize(new Dimension(0, Tools.getApplication().scaled(50)));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, Tools.getApplication().scaled(50)));
         mainPanel.add(buttonPanel);
 
         /* Actions */
         buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
-        final JPanel p = new JPanel(new SpringLayout());
-        p.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
+        final JPanel panel = new JPanel(new SpringLayout());
+        panel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
 
-        p.add(procDrbdButton);
-        p.add(drbdProcsButton);
-        SpringUtilities.makeCompactGrid(p, 2, 1,  // rows, cols
+        panel.add(procDrbdButton);
+        panel.add(drbdProcsButton);
+        SpringUtilities.makeCompactGrid(panel, 2, 1,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
-        mainPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
-        mainPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
-        buttonPanel.add(p);
-        mainPanel.add(new JScrollPane(ta));
+        mainPanel.setMinimumSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                               Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setPreferredSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                                 Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        buttonPanel.add(panel);
+        mainPanel.add(new JScrollPane(textArea));
         host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcDrbd")
                                                 .silentCommand()
                                                 .silentOutput()
@@ -198,30 +181,25 @@ public class HostDrbdInfo extends Info {
         return mainPanel;
     }
 
-    /** Returns host. */
     public Host getHost() {
         return host;
     }
 
-    /** Returns string representation of the host. It's same as name. */
     @Override
     public String toString() {
         return host.getName();
     }
 
-    /** Returns name of the host. */
     @Override
     public String getName() {
         return host.getName();
     }
 
-    /** Creates the popup for the host. */
     @Override
     public List<UpdatableItem> createPopup() {
         return hostDrbdMenu.getPulldownMenu(host, this);
     }
 
-    /** Returns grahical view if there is any. */
     @Override
     public JPanel getGraphicalView() {
         final DrbdGraph dg = getBrowser().getDrbdGraph();
@@ -238,9 +216,7 @@ public class HostDrbdInfo extends Info {
         return -1;
     }
 
-    /** Returns subtexts that appears in the host vertex in the drbd graph. */
-    public Subtext[] getSubtextsForDrbdGraph(
-                                         final Application.RunMode runMode) {
+    public Subtext[] getSubtextsForDrbdGraph(final Application.RunMode runMode) {
         final List<Subtext> texts = new ArrayList<Subtext>();
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
@@ -254,7 +230,6 @@ public class HostDrbdInfo extends Info {
         return texts.toArray(new Subtext[texts.size()]);
     }
 
-    /** Returns text that appears above the icon in the drbd graph. */
     public String getIconTextForDrbdGraph(final Application.RunMode runMode) {
         if (!getHost().isConnected()) {
             return Tools.getString("HostBrowser.Drbd.NoInfoAvailable");
@@ -262,16 +237,12 @@ public class HostDrbdInfo extends Info {
         return null;
     }
 
-    /** Returns text that appears in the corner of the drbd graph. */
-    public Subtext getRightCornerTextForDrbdGraph(
-                                         final Application.RunMode runMode) {
+    public Subtext getRightCornerTextForDrbdGraph(final Application.RunMode runMode) {
         return null;
     }
 
-    /** Tool tip for menu items. */
     String getMenuToolTip(final String cmd, final String res) {
-        return getHost().getDistString(cmd).replaceAll("@RES-VOL@", res)
-                                           .replaceAll("@.*?@", "");
+        return getHost().getDistString(cmd).replaceAll("@RES-VOL@", res).replaceAll("@.*?@", "");
     }
 
     @Override

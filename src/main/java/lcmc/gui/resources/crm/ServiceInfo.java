@@ -3126,7 +3126,7 @@ public class ServiceInfo extends EditableInfo {
                 }
                 final Set<ServiceInfo> parents = getBrowser().getCrmGraph().getParents(infoForDependency);
                 for (final ServiceInfo parentInfo : parents) {
-                    if (parentInfo.isConstraintPH()) {
+                    if (parentInfo.isConstraintPlaceholder()) {
                         final Collection<ServiceInfo> with = new TreeSet<ServiceInfo>();
                         with.add(infoForDependency);
                         final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
@@ -3290,20 +3290,20 @@ public class ServiceInfo extends EditableInfo {
         }
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
 
-        if (isConstraintPH() || parent.isConstraintPH()) {
+        if (isConstraintPlaceholder() || parent.isConstraintPlaceholder()) {
             final ConstraintPHInfo cphi;
-            if (isConstraintPH()) {
+            if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
             } else {
                 cphi = (ConstraintPHInfo) parent;
             }
             final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs =
                                                             new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
-            final CrmXml.RscSetConnectionData rdata = cphi.getRscSetConnectionDataOrd();
+            final CrmXml.RscSetConnectionData rdata = cphi.getRscSetConnectionDataOrder();
             /** resource set */
             final String ordId = rdata.getConstraintId();
             String idToRemove;
-            if (isConstraintPH()) {
+            if (isConstraintPlaceholder()) {
                 idToRemove = parent.getService().getHeartbeatId();
             } else {
                 idToRemove = getService().getHeartbeatId();
@@ -3334,7 +3334,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (Application.isLive(runMode) && rscSetsOrdAttrs.isEmpty()) {
-                cphi.getRscSetConnectionDataOrd().setConstraintId(null);
+                cphi.getRscSetConnectionDataOrder().setConstraintId(null);
             }
             final Map<String, String> attrs =
                                         new LinkedHashMap<String, String>();
@@ -3391,18 +3391,18 @@ public class ServiceInfo extends EditableInfo {
             child.setUpdated(true);
             setUpdated(true);
         }
-        if (isConstraintPH() || child.isConstraintPH()) {
+        if (isConstraintPlaceholder() || child.isConstraintPlaceholder()) {
             if (Application.isLive(runMode)) {
-                if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedCol()) {
+                if (isConstraintPlaceholder() && ((ConstraintPHInfo) this).isReversedColocation()) {
                     ((ConstraintPHInfo) this).reverseOrder();
-                } else if (child.isConstraintPH() && ((ConstraintPHInfo) child).isReversedCol()) {
+                } else if (child.isConstraintPlaceholder() && ((ConstraintPHInfo) child).isReversedColocation()) {
                     ((ConstraintPHInfo) child).reverseOrder();
                 }
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
             final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
-            if (isConstraintPH()) {
+            if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
             } else {
@@ -3448,25 +3448,25 @@ public class ServiceInfo extends EditableInfo {
         }
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String rscId;
-        if (isConstraintPH()) {
+        if (isConstraintPlaceholder()) {
             rscId = getId();
         } else {
             rscId = getHeartbeatId(runMode);
         }
-        if (isConstraintPH() || parent.isConstraintPH()) {
+        if (isConstraintPlaceholder() || parent.isConstraintPlaceholder()) {
             final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs =
                                                             new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
             final ConstraintPHInfo cphi;
-            if (isConstraintPH()) {
+            if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
             } else {
                 cphi = (ConstraintPHInfo) parent;
             }
-            final CrmXml.RscSetConnectionData rdata = cphi.getRscSetConnectionDataCol();
+            final CrmXml.RscSetConnectionData rdata = cphi.getRscSetConnectionDataColocation();
             /** resource set */
             final String colId = rdata.getConstraintId();
             final String idToRemove;
-            if (isConstraintPH()) {
+            if (isConstraintPlaceholder()) {
                 idToRemove = parent.getService().getHeartbeatId();
             } else {
                 idToRemove = getService().getHeartbeatId();
@@ -3496,7 +3496,7 @@ public class ServiceInfo extends EditableInfo {
                 }
             }
             if (Application.isLive(runMode) && rscSetsColAttrs.isEmpty()) {
-                cphi.getRscSetConnectionDataCol().setConstraintId(null);
+                cphi.getRscSetConnectionDataColocation().setConstraintId(null);
             }
             final Map<String, String> attrs = new LinkedHashMap<String, String>();
             final CrmXml.ColocationData cd = clStatus.getColocationData(colId);
@@ -3540,18 +3540,18 @@ public class ServiceInfo extends EditableInfo {
             child.setUpdated(true);
             setUpdated(true);
         }
-        if (isConstraintPH() || child.isConstraintPH()) {
+        if (isConstraintPlaceholder() || child.isConstraintPlaceholder()) {
             if (Application.isLive(runMode)) {
-                if (isConstraintPH() && ((ConstraintPHInfo) this).isReversedOrd()) {
+                if (isConstraintPlaceholder() && ((ConstraintPHInfo) this).isReversedOrder()) {
                     ((ConstraintPHInfo) this).reverseColocation();
-                } else if (child.isConstraintPH() && ((ConstraintPHInfo) child).isReversedOrd()) {
+                } else if (child.isConstraintPlaceholder() && ((ConstraintPHInfo) child).isReversedOrder()) {
                     ((ConstraintPHInfo) child).reverseColocation();
                 }
             }
             final ConstraintPHInfo cphi;
             final ServiceInfo withService;
             final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
-            if (isConstraintPH()) {
+            if (isConstraintPlaceholder()) {
                 cphi = (ConstraintPHInfo) this;
                 withService = child;
             } else {
@@ -3654,11 +3654,11 @@ public class ServiceInfo extends EditableInfo {
         if (getBrowser().getCrmGraph().addResource(serviceInfo, this, pos, colocation, order, runMode)) {
             Tools.waitForSwing();
             /* edge added */
-            if (isConstraintPH() || serviceInfo.isConstraintPH()) {
+            if (isConstraintPlaceholder() || serviceInfo.isConstraintPlaceholder()) {
                 final ConstraintPHInfo cphi;
                 final ServiceInfo withService;
                 final Collection<ServiceInfo> withFrom = new TreeSet<ServiceInfo>();
-                if (isConstraintPH()) {
+                if (isConstraintPlaceholder()) {
                     cphi = (ConstraintPHInfo) this;
                     withService = serviceInfo;
                 } else {
@@ -4331,7 +4331,7 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Whether this class is a constraint placeholder. */
-    public boolean isConstraintPH() {
+    public boolean isConstraintPlaceholder() {
         return false;
     }
 

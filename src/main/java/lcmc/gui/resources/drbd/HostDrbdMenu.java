@@ -47,21 +47,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class HostDrbdMenu {
-
-    /** LVM menu. */
     private static final String LVM_MENU = "LVM";
-    /** Name of the create VG menu item. */
     private static final String VG_CREATE_MENU_ITEM = "Create VG";
-    /** Description create VG. */
-    private static final String VG_CREATE_MENU_DESCRIPTION =
-                                                    "Create a volume group.";
-    /** Name of the create menu item. */
+    private static final String VG_CREATE_MENU_DESCRIPTION = "Create a volume group.";
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
-    /** Description create LV. */
-    private static final String LV_CREATE_MENU_DESCRIPTION =
-                                                    "Create a logical volume.";
-    private Host host;
-    private HostDrbdInfo hostDrbdInfo;
+    private static final String LV_CREATE_MENU_DESCRIPTION = "Create a logical volume.";
     @Autowired
     private EditHostDialog editHostDialog;
 
@@ -73,10 +63,8 @@ public class HostDrbdMenu {
             new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
                            Tools.getString("HostBrowser.HostWizard"),
-                           new AccessMode(Application.AccessType.RO,
-                                          false),
-                           new AccessMode(Application.AccessType.RO,
-                                          false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -92,16 +80,13 @@ public class HostDrbdMenu {
             new MyMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
                            HostBrowser.HOST_ICON_LARGE,
                            Tools.getString("HostBrowser.ProxyHostWizard"),
-                           new AccessMode(Application.AccessType.RO,
-                                          false),
-                           new AccessMode(Application.AccessType.RO,
-                                          false)) {
+                           new AccessMode(Application.AccessType.RO, false),
+                           new AccessMode(Application.AccessType.RO, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
                 public void action() {
-                    final ProxyHostWizard dialog = new ProxyHostWizard(host,
-                                                                       null);
+                    final ProxyHostWizard dialog = new ProxyHostWizard(host, null);
                     dialog.showDialogs();
                 }
             };
@@ -133,9 +118,7 @@ public class HostDrbdMenu {
                 @Override
                 public void action() {
                     DRBD.load(host, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(
-                                                        host,
-                                                        !Host.UPDATE_LVM);
+                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                 }
             };
         items.add(loadItem);
@@ -148,10 +131,8 @@ public class HostDrbdMenu {
                            Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                            null,
                            hostDrbdInfo.getMenuToolTip("DRBD.startProxy", ""),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
+                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -166,9 +147,7 @@ public class HostDrbdMenu {
                     } else {
                         DRBD.startProxy(host, runMode);
                     }
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(
-                                                        host,
-                                                        !Host.UPDATE_LVM);
+                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                 }
             };
         items.add(proxyItem);
@@ -178,10 +157,8 @@ public class HostDrbdMenu {
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                            null,
                            hostDrbdInfo.getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
+                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -192,9 +169,7 @@ public class HostDrbdMenu {
                 @Override
                 public void action() {
                     DRBD.proxyUp(host, DRBD.ALL, null, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(
-                                                        host,
-                                                        !Host.UPDATE_LVM);
+                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                 }
             };
         items.add(allProxyUpItem);
@@ -204,10 +179,8 @@ public class HostDrbdMenu {
             new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                            null,
                            hostDrbdInfo.getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
+                           new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
+                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -218,19 +191,16 @@ public class HostDrbdMenu {
                 @Override
                 public void action() {
                     DRBD.proxyDown(host, DRBD.ALL, null, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(
-                                                        host,
-                                                        !Host.UPDATE_LVM);
+                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                 }
             };
         items.add(allProxyDownItem);
 
         /* load DRBD config / adjust all */
         final MyMenuItem adjustAllItem =
-            new MyMenuItem(
-                   Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
-                   null,
-                   Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
+            new MyMenuItem(Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
+                           null,
+                           Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
                            new AccessMode(Application.AccessType.OP, false),
                            new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
@@ -247,16 +217,13 @@ public class HostDrbdMenu {
                 @Override
                 public void action() {
                     DRBD.adjust(host, DRBD.ALL, null, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(
-                                                        host,
-                                                        !Host.UPDATE_LVM);
+                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                 }
             };
         items.add(adjustAllItem);
         final ClusterBrowser cb = hostDrbdInfo.getBrowser().getClusterBrowser();
         if (cb != null) {
-            final ButtonCallback adjustAllItemCallback =
-                                       cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback adjustAllItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.adjust(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -277,7 +244,7 @@ public class HostDrbdMenu {
                 @Override
                 public String enablePredicate() {
                     if (!host.isDrbdStatusOk()) {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                     return null;
                 }
@@ -289,8 +256,7 @@ public class HostDrbdMenu {
             };
         items.add(upAllItem);
         if (cb != null) {
-            final ButtonCallback upAllItemCallback =
-                                      cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback upAllItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.up(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -310,11 +276,9 @@ public class HostDrbdMenu {
 
                 @Override
                 public void action() {
-                    final Color newColor = JColorChooser.showDialog(
-                                            Tools.getGUIData().getMainFrame(),
-                                            "Choose " + host.getName()
-                                            + " color",
-                                            host.getPmColors()[0]);
+                    final Color newColor = JColorChooser.showDialog(Tools.getGUIData().getMainFrame(),
+                                                                    "Choose " + host.getName() + " color",
+                                                                    host.getPmColors()[0]);
                     if (newColor != null) {
                         host.setSavedHostColorInGraphs(newColor);
                     }
@@ -361,7 +325,7 @@ public class HostDrbdMenu {
                     if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                 }
 
@@ -372,8 +336,7 @@ public class HostDrbdMenu {
             };
         items.add(connectAllItem);
         if (cb != null) {
-            final ButtonCallback connectAllItemCallback =
-                                       cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback connectAllItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -396,7 +359,7 @@ public class HostDrbdMenu {
                     if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                 }
 
@@ -407,9 +370,7 @@ public class HostDrbdMenu {
             };
         items.add(disconnectAllItem);
         if (cb != null) {
-            final ButtonCallback
-                    disconnectAllItemCallback =
-                                      cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback disconnectAllItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.disconnect(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -432,7 +393,7 @@ public class HostDrbdMenu {
                     if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                 }
 
@@ -443,9 +404,7 @@ public class HostDrbdMenu {
             };
         items.add(attachAllItem);
         if (cb != null) {
-            final ButtonCallback
-                    attachAllItemCallback =
-                                       cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback attachAllItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.attach(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -468,7 +427,7 @@ public class HostDrbdMenu {
                     if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                 }
 
@@ -479,8 +438,7 @@ public class HostDrbdMenu {
             };
         items.add(detachAllItem);
         if (cb != null) {
-            final ButtonCallback
-                    detachAllItemCallback = cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback detachAllItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.detach(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -494,12 +452,8 @@ public class HostDrbdMenu {
             new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
                            null,
                            Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
-                           new AccessMode(
-                                   Application.AccessType.ADMIN,
-                                   false),
-                           new AccessMode(
-                                   Application.AccessType.OP,
-                                   false)) {
+                           new AccessMode(Application.AccessType.ADMIN, false),
+                           new AccessMode(Application.AccessType.OP, false)) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
@@ -507,7 +461,7 @@ public class HostDrbdMenu {
                     if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                 }
 
@@ -518,9 +472,7 @@ public class HostDrbdMenu {
             };
         items.add(setAllPrimaryItem);
         if (cb != null) {
-            final ButtonCallback
-                    setAllPrimaryItemCallback =
-                                       cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback setAllPrimaryItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.setPrimary(host, DRBD.ALL, null, Application.RunMode.TEST);
@@ -543,7 +495,7 @@ public class HostDrbdMenu {
                     if (host.isDrbdStatusOk()) {
                         return null;
                     } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_STRING;
+                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                     }
                 }
 
@@ -554,16 +506,13 @@ public class HostDrbdMenu {
             };
         items.add(setAllSecondaryItem);
         if (cb != null) {
-            final ButtonCallback
-                    setAllSecondaryItemCallback =
-                                       cb.new DRBDMenuItemCallback(host) {
+            final ButtonCallback setAllSecondaryItemCallback = cb.new DRBDMenuItemCallback(host) {
                 @Override
                 public void action(final Host dcHost) {
                     DRBD.setSecondary(host, DRBD.ALL, null, Application.RunMode.TEST);
                 }
             };
-            hostDrbdInfo.addMouseOverListener(setAllSecondaryItem,
-                                 setAllSecondaryItemCallback);
+            hostDrbdInfo.addMouseOverListener(setAllSecondaryItem, setAllSecondaryItemCallback);
         }
 
         /* remove host from gui */
@@ -596,8 +545,7 @@ public class HostDrbdMenu {
         final UpdatableItem hostAdvancedSubmenu = new MyMenu(
                                 Tools.getString("HostBrowser.AdvancedSubmenu"),
                                 new AccessMode(Application.AccessType.OP, false),
-                                new AccessMode(Application.AccessType.OP,
-                                               false)) {
+                                new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -615,12 +563,12 @@ public class HostDrbdMenu {
             }
         };
         items.add(hostAdvancedSubmenu);
-        items.add(getLVMMenu());
+        items.add(getLVMMenu(host));
         return items;
     }
 
     /** Returns lvm menu. */
-    private UpdatableItem getLVMMenu() {
+    private UpdatableItem getLVMMenu(final Host host) {
         return new MyMenu(LVM_MENU,
                           new AccessMode(Application.AccessType.OP, true),
                           new AccessMode(Application.AccessType.OP, true)) {
@@ -629,15 +577,14 @@ public class HostDrbdMenu {
             @Override
             public void updateAndWait() {
                 super.updateAndWait();
-                addLVMMenu(this);
+                addLVMMenu(this, host);
             }
         };
     }
 
-    /** Adds menus to manage LVMs. */
-    private void addLVMMenu(final MyMenu submenu) {
+    private void addLVMMenu(final MyMenu submenu, final Host host) {
         submenu.removeAll();
-        submenu.add(getVGCreateItem());
+        submenu.add(getVGCreateItem(host));
         for (final BlockDevice bd : host.getBlockDevices()) {
             final String vg;
             final BlockDevice drbdBD = bd.getDrbdBlockDevice();
@@ -647,19 +594,17 @@ public class HostDrbdMenu {
                 vg = drbdBD.getVolumeGroupOnPhysicalVolume();
             }
             if (vg != null) {
-                submenu.add(getLVMCreateItem(vg, bd));
+                submenu.add(getLVMCreateItem(vg, bd, host));
             }
         }
     }
 
-    /** Return "Create VG" menu item. */
-    private MyMenuItem getVGCreateItem() {
-        final MyMenuItem mi = new MyMenuItem(
-                            VG_CREATE_MENU_ITEM,
-                            null,
-                            VG_CREATE_MENU_DESCRIPTION,
-                            new AccessMode(Application.AccessType.OP, false),
-                            new AccessMode(Application.AccessType.OP, false)) {
+    private MyMenuItem getVGCreateItem(final Host host) {
+        final MyMenuItem mi = new MyMenuItem(VG_CREATE_MENU_ITEM,
+                                             null,
+                                             VG_CREATE_MENU_DESCRIPTION,
+                                             new AccessMode(Application.AccessType.OP, false),
+                                             new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -682,26 +627,25 @@ public class HostDrbdMenu {
 
     /** Return create LV menu item. */
     private MyMenuItem getLVMCreateItem(final String volumeGroup,
-                                        final BlockDevice blockDevice) {
+                                        final BlockDevice blockDevice,
+                                        final Host host) {
         final String name = LV_CREATE_MENU_ITEM + volumeGroup;
-        final MyMenuItem mi = new MyMenuItem(
-                             name,
-                             null,
-                             LV_CREATE_MENU_DESCRIPTION,
-                             new AccessMode(Application.AccessType.OP, false),
-                             new AccessMode(Application.AccessType.OP, false)) {
+        final MyMenuItem mi = new MyMenuItem(name,
+                                             null,
+                                             LV_CREATE_MENU_DESCRIPTION,
+                                             new AccessMode(Application.AccessType.OP, false),
+                                             new AccessMode(Application.AccessType.OP, false)) {
             private static final long serialVersionUID = 1L;
             @Override
             public boolean visiblePredicate() {
-                return volumeGroup != null && !volumeGroup.isEmpty()
+                return volumeGroup != null
+                       && !volumeGroup.isEmpty()
                        && host.getVolumeGroupNames().contains(volumeGroup);
             }
 
             @Override
             public void action() {
-                final LVCreate lvCreate = new LVCreate(host,
-                                                       volumeGroup,
-                                                       blockDevice);
+                final LVCreate lvCreate = new LVCreate(host, volumeGroup, blockDevice);
                 while (true) {
                     lvCreate.showDialog();
                     if (lvCreate.isPressedCancelButton()) {
@@ -723,5 +667,4 @@ public class HostDrbdMenu {
         mi.setToolTipText(LV_CREATE_MENU_DESCRIPTION);
         return mi;
     }
-
 }

@@ -658,9 +658,9 @@ public class ServicesInfo extends EditableInfo {
                     final ConstraintPHInfo cphi =
                                (ConstraintPHInfo) infoEntry.getValue();
                     final CrmXml.RscSetConnectionData rdataOrd =
-                                    cphi.getRscSetConnectionDataOrd();
+                                    cphi.getRscSetConnectionDataOrder();
                     final CrmXml.RscSetConnectionData rdataCol =
-                                    cphi.getRscSetConnectionDataCol();
+                                    cphi.getRscSetConnectionDataColocation();
                     if (cphi.getService().isNew()) {
                         preNewCphis.add(cphi);
                     }
@@ -919,7 +919,7 @@ public class ServicesInfo extends EditableInfo {
 
     /** Returns type of the info text. text/plain or text/html. */
     @Override
-    protected String getInfoType() {
+    protected String getInfoMimeType() {
         return Tools.MIME_TYPE_TEXT_HTML;
     }
 
