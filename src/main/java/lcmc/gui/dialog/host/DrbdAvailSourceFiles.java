@@ -31,7 +31,6 @@ import javax.swing.SpringLayout;
 
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.model.drbd.DrbdInstallation;
@@ -49,17 +48,12 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where available versions of drbd will be
  * determined.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 @Component
 final class DrbdAvailSourceFiles extends DialogHost {
     @Autowired
     private DrbdCommandInst drbdCommandInst = null;
-    /** Combo box with drbd tarballs. */
     private Widget drbdTarballCombo = null;
-    /** Whether the listeners where added. */
     private boolean listenersAdded = false;
 
     /**
@@ -73,74 +67,62 @@ final class DrbdAvailSourceFiles extends DialogHost {
         disableComponents(new java.awt.Component[]{drbdTarballCombo.getComponent()});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         getProgressBar().start(2000);
-        availTarballs();
+        findAvailTarballs();
     }
 
-    /** Finds abailable tarballs. */
-    protected void availTarballs() {
+    protected void findAvailTarballs() {
         getHost().execCommand(new ExecCommandConfig()
-                .commandString("DrbdAvailVersionsSource")
-                .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
-                .execCallback(new ExecCallback() {
-                    @Override
-                    public void done(final String answer) {
-                        if (answer == null || answer.isEmpty()) {
-                            doneError(null, 1);
-                            return;
-                        }
-                        final String[] versions = answer.split("\\r?\\n");
-                        if (versions.length == 0) {
-                            doneError(null, 1);
-                            return;
-                        }
-                        final List<Value> items = new ArrayList<Value>();
-                        for (final String versionString : versions) {
-                            if (versionString != null
-                                    && versionString.length() > 16) {
-                                final String version =
-                                        versionString.substring(
-                                                9,
-                                                versionString.length() - 7);
-                                items.add(
-                                        new StringValue(versionString, version));
-                            }
-                        }
-                        drbdTarballCombo.clear();
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!items.isEmpty()) {
-                                    drbdTarballCombo.reloadComboBox(
-                                            items.get(0),
-                                            items.toArray(new Value[items.size()]));
-                                }
-                                final Value selectedItem =
-                                        drbdTarballCombo.getValue();
-                                drbdTarballCombo.setEnabled(true);
-                                allDone(selectedItem);
-                            }
-                        });
+                                    .commandString("DrbdAvailVersionsSource")
+                                    .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
+                                    .execCallback(new ExecCallback() {
+                @Override
+                public void done(final String answer) {
+                    if (answer == null || answer.isEmpty()) {
+                        doneError(null, 1);
+                        return;
                     }
+                    final String[] versions = answer.split("\\r?\\n");
+                    if (versions.length == 0) {
+                        doneError(null, 1);
+                        return;
+                    }
+                    final List<Value> items = new ArrayList<Value>();
+                    for (final String versionString : versions) {
+                        if (versionString != null && versionString.length() > 16) {
+                            final String version = versionString.substring(9, versionString.length() - 7);
+                            items.add(new StringValue(versionString, version));
+                        }
+                    }
+                    drbdTarballCombo.clear();
+                    Tools.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!items.isEmpty()) {
+                                drbdTarballCombo.reloadComboBox(items.get(0), items.toArray(new Value[items.size()]));
+                            }
+                            final Value selectedItem = drbdTarballCombo.getValue();
+                            drbdTarballCombo.setEnabled(true);
+                            allDone(selectedItem);
+                        }
+                    });
+                }
 
-                    @Override
-                    public void doneError(final String answer,
-                                          final int errorCode) {
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                progressBarDoneError();
-                                printErrorAndRetry(Tools.getString(
-                                                "Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
-                                        answer,
-                                        errorCode);
-                            }
-                        });
-                    }
-                }));
+                @Override
+                public void doneError(final String answer, final int errorCode) {
+                    Tools.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBarDoneError();
+                            printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
+                                               answer,
+                                               errorCode);
+                        }
+                    });
+                }
+            }));
     }
 
     /**
@@ -149,12 +131,10 @@ final class DrbdAvailSourceFiles extends DialogHost {
      */
     protected void allDone(final Value versionInfo) {
         if (versionInfo != null) {
-            answerPaneSetText("http://oss.linbit.com/drbd/"
-                              + versionInfo.getValueForGui());
+            answerPaneSetText("http://oss.linbit.com/drbd/" + versionInfo.getValueForGui());
             final DrbdInstallation drbdInstallation = getDrbdInstallation();
             drbdInstallation.setDrbdVersionToInstall(versionInfo.toString());
-            drbdInstallation.setDrbdVersionUrlStringToInstall(
-                                            versionInfo.getValueForConfig());
+            drbdInstallation.setDrbdVersionUrlStringToInstall(versionInfo.getValueForConfig());
         }
         // TODO: do something different if we did not get any versions
         drbdTarballCombo.setEnabled(true);
@@ -171,31 +151,21 @@ final class DrbdAvailSourceFiles extends DialogHost {
         }
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         return drbdCommandInst;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.DrbdAvailSourceFiles.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.DrbdAvailSourceFiles.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Description");
     }
 
-    /** Returns the panel with combo boxes. */
     protected JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel(new SpringLayout());
 
@@ -207,8 +177,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
 
         //drbdTarballCombo.setEnabled(false);
@@ -220,17 +189,15 @@ final class DrbdAvailSourceFiles extends DialogHost {
         return pane;
     }
 
-    /** Adds listeners to all combo boxes. */
     private void addListeners() {
         /* tarball combo box */
         drbdTarballCombo.addListeners(new WidgetListener() {
             @Override
             public void check(final Value value) {
                 final Value item = drbdTarballCombo.getValue();
-                    allDone(item);
+                allDone(item);
             }
         });
-
     }
 
     /** Returns input pane with available drbd files. */
@@ -239,9 +206,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getChoiceBoxes());
         pane.add(getProgressBarPane());
-        pane.add(
-            getAnswerPane(
-               Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.Executing")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  // rows, cols
                                               0, 0,  // initX, initY
                                               0, 0); // xPad, yPad

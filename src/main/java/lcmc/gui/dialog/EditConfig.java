@@ -51,42 +51,26 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of an edit config dialog.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class EditConfig extends ConfigDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                                    LoggerFactory.getLogger(EditConfig.class);
-    /** File to edit. */
-    private final String file;
-    /** Cluster hosts. */
+    private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
+    private final String fileToEdit;
     private final Set<Host> hosts;
-    /** Map from hosts to checkboxes. */
-    private final Map<Host, JCheckBox> hostCbs = new HashMap<Host, JCheckBox>();
-    /** Backup checkbox. */
-    private final JCheckBox backupCB = new JCheckBox(
-                            Tools.getString("Dialog.EditConfig.Backup.Button"));
+    private final Map<Host, JCheckBox> hostCheckBoxes = new HashMap<Host, JCheckBox>();
+    private final JCheckBox backupCheckBoxes = new JCheckBox(Tools.getString("Dialog.EditConfig.Backup.Button"));
 
-    /** Config text area. */
-    private final JTextArea configArea = new JTextArea(
-                                Tools.getString("Dialog.EditConfig.Loading"));
+    private final JTextArea configArea = new JTextArea(Tools.getString("Dialog.EditConfig.Loading"));
 
-    /** Error panel for error messages. */
-    private final JLabel errorPanel = new JLabel();
+    private final JLabel errorMessagePanel = new JLabel();
     /** Whether config area is being filled so that save button,
         doesn't get enabled. */
     private volatile boolean configInProgress = true;
 
-    /**
-     * Create new editConfig object.
-     */
-    public EditConfig(final String file, final Set<Host> hosts) {
+    public EditConfig(final String fileToEdit, final Set<Host> hosts) {
         super();
-        this.file = file;
+        this.fileToEdit = fileToEdit;
         this.hosts = hosts;
-        addToOptions(backupCB);
+        addToOptions(backupCheckBoxes);
     }
 
     /** Returns the content of the edit config dialog. */
@@ -95,19 +79,17 @@ public final class EditConfig extends ConfigDialog {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         final JPanel hostsPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        errorPanel.setForeground(Color.RED);
-        backupCB.setBackground(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        hostsPanel.add(backupCB);
+        errorMessagePanel.setForeground(Color.RED);
+        backupCheckBoxes.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        hostsPanel.add(backupCheckBoxes);
         for (final Host host : hosts) {
             final JCheckBox hcb = new JCheckBox(host.getName());
-            hostCbs.put(host, hcb);
-            hcb.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            hostCheckBoxes.put(host, hcb);
+            hcb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
             hostsPanel.add(hcb);
         }
-        hostsPanel.add(errorPanel);
+        hostsPanel.add(errorMessagePanel);
         pane.add(hostsPanel);
 
         pane.add(configArea);
@@ -117,11 +99,9 @@ public final class EditConfig extends ConfigDialog {
     }
 
 
-    /** Inits the dialog and enables all the components. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        /* align buttons to the right */
         final FlowLayout layout = new FlowLayout();
         layout.setAlignment(FlowLayout.TRAILING);
 
@@ -132,16 +112,13 @@ public final class EditConfig extends ConfigDialog {
         enableComponents();
     }
 
-    /** Set config are with config and error text, if any. */
-    private void setConfigArea(final String text,
-                               final int errorCode,
-                               final boolean selected) {
+    private void setConfigArea(final String text, final int errorCode, final boolean selected) {
         if (selected) {
             final String config;
             if (errorCode == 0) {
                 config = text;
             } else {
-                errorPanel.setText("WARNING: " + text);
+                errorMessagePanel.setText("WARNING: " + text);
                 config = Tools.getString("Dialog.EditConfig.NewConfig");
             }
             configArea.setText(config);
@@ -154,7 +131,6 @@ public final class EditConfig extends ConfigDialog {
         configInProgress = false;
     }
 
-    /** This method is called immediatly after the dialog is shown. */
     @Override
     protected void initDialogAfterVisible() {
         final ExecCommandThread[] threads = new ExecCommandThread[hosts.size()];
@@ -167,22 +143,20 @@ public final class EditConfig extends ConfigDialog {
                 new ExecCallback() {
                     @Override
                     public void done(final String answer) {
-                        final String text = answer.replaceAll("\r", "")
-                                               .replaceFirst("\n$", "");
+                        final String text = answer.replaceAll("\r", "").replaceFirst("\n$", "");
                         results[index] = text;
                         errors[index] = 0;
                     }
 
                     @Override
-                    public void doneError(final String answer,
-                                          final int errorCode) {
+                    public void doneError(final String answer, final int errorCode) {
                         results[index] = answer;
                         errors[index] = errorCode;
                         LOG.sshError(host, "", answer, "", errorCode);
                     }
 
                 };
-            threads[i] = host.execCommand(new ExecCommandConfig().command(DistResource.SUDO + "cat " + file)
+            threads[i] = host.execCommand(new ExecCommandConfig().command(DistResource.SUDO + "cat " + fileToEdit)
                                                                  .execCallback(execCallback));
             i++;
         }
@@ -195,40 +169,32 @@ public final class EditConfig extends ConfigDialog {
         }
         i = 0;
         for (final Host host : hosts) {
-            final JCheckBox hcb = hostCbs.get(host);
+            final JCheckBox hcb = hostCheckBoxes.get(host);
             if (i == 0 || results[0].equals(results[i])) {
                 hcb.setSelected(true);
             } else {
-                errorPanel.setText(
-                          Tools.getString("Dialog.EditConfig.DifferentFiles"));
+                errorMessagePanel.setText(Tools.getString("Dialog.EditConfig.DifferentFiles"));
             }
             i++;
         }
         i = 0;
         for (final Host host : hosts) {
             final int index = i;
-            final JCheckBox hcb = hostCbs.get(host);
+            final JCheckBox hcb = hostCheckBoxes.get(host);
             hcb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            setConfigArea(
-                                     results[index],
-                                     errors[index],
-                                     e.getStateChange() == ItemEvent.SELECTED);
+                            setConfigArea(results[index], errors[index], e.getStateChange() == ItemEvent.SELECTED);
                             if (e.getStateChange() == ItemEvent.SELECTED) {
                                 for (final Host h : hosts) {
-                                    final JCheckBox thiscb = hostCbs.get(h);
+                                    final JCheckBox thiscb = hostCheckBoxes.get(h);
                                     if (h == host) {
-                                        thiscb.setBackground(
-                                            Tools.getDefaultColor(
-                                             "ConfigDialog.Background.Darker"));
+                                        thiscb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Darker"));
                                     } else {
-                                        thiscb.setBackground(
-                                            Tools.getDefaultColor(
-                                              "ConfigDialog.Background.Light"));
+                                        thiscb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
                                     }
                                 }
                             }
@@ -266,14 +232,11 @@ public final class EditConfig extends ConfigDialog {
                 update();
             }
         });
-
     }
 
-    /** Gets the title of the dialog as string. */
     @Override
     protected String getDialogTitle() {
-        return Tools.getString("Dialog.EditConfig.Title")
-               + ' ' + file;
+        return Tools.getString("Dialog.EditConfig.Title") + ' ' + fileToEdit;
     }
 
     /**
@@ -309,18 +272,16 @@ public final class EditConfig extends ConfigDialog {
         return new ImageIcon[]{null, null};
     }
 
-    /** Action when save button was pressed. */
     private void saveButtonWasPressed() {
-        final String iText = "saving " + file + "...";
+        final String iText = "saving " + fileToEdit + "...";
         Tools.startProgressIndicator(iText);
         for (final Host host : hosts) {
-            if (hostCbs.get(host).isSelected()) {
-
+            if (hostCheckBoxes.get(host).isSelected()) {
                 host.getSSH().createConfig(configArea.getText(),
-                                           file,
+                                           fileToEdit,
                                            "",   /* dir */
                                            null, /* mode */
-                                           backupCB.isSelected(), /* backup */
+                                           backupCheckBoxes.isSelected(), /* backup */
                                            null,   /* pre cmd */
                                            null);  /* post cmd */
             }

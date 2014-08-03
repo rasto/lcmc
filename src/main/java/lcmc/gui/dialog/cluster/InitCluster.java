@@ -65,72 +65,43 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * An implementation of a dialog where heartbeat is initialized on all hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
+ * An implementation of a dialog where cluster is initialized on all hosts.
  */
 @Component
-public class Init extends DialogCluster {
-    /** Logger. */
-    private static final Logger LOG = LoggerFactory.getLogger(Init.class);
-    /** Interval between checks. */
+public class InitCluster extends DialogCluster {
+    private static final Logger LOG = LoggerFactory.getLogger(InitCluster.class);
     private static final int CHECK_INTERVAL = 1000;
-    /** Switch to Heartbeat button text. */
-    private static final String HB_BUTTON_SWITCH =
-                        Tools.getString("Dialog.Cluster.Init.HbButtonSwitch");
-    /** Switch to Corosync/OpenAIS button text. */
-    private static final String CS_AIS_BUTTON_SWITCH =
-                       Tools.getString("Dialog.Cluster.Init.CsAisButtonSwitch");
-    /** Corosync init script. */
-    private static final String COROSYNC_INIT_SCRIPT =
-                                                 "use /etc/init.d/corosync";
-    /** Openais init script. */
+    private static final String HEARTBEAT_BUTTON_SWITCH_TEXT = Tools.getString("Dialog.Cluster.Init.HbButtonSwitch");
+    private static final String COROSYNC_AIS_BUTTON_SWITCH_TEXT =
+                                                          Tools.getString("Dialog.Cluster.Init.CsAisButtonSwitch");
+    private static final String COROSYNC_INIT_SCRIPT = "use /etc/init.d/corosync";
     private static final String OPENAIS_INIT_SCRIPT = "/etc/init.d/openais";
-    /** List with texts if drbd is loaded per host. */
-    private List<JLabel> drbdLoadedInfos;
-    /** List of load drbd buttons. */
+    private List<JLabel> drbdLoadedLabels;
     private List<MyButton> drbdLoadButtons;
 
     /** List with texts whether Pacemaker is started per host. */
-    private List<JLabel> pmStartedInfos;
-    /** List of start Pacemaker buttons. */
-    private List<MyButton> pmStartButtons;
-    /** List with texts whether hb is started per host. */
-    private List<JLabel> hbStartedInfos;
-    /** List of start hb buttons. */
-    private List<MyButton> hbStartButtons;
+    private List<JLabel> pacemakerStartedLabels;
+    private List<MyButton> startPacemakerButtons;
+    private List<JLabel> heartbeatStartedLabels;
+    private List<MyButton> startHeartbeatButtons;
 
-    /** Main panel, so that it can be revalidated, if something have changed.
-     */
     private JPanel mainPanel;
-    /** Whether the checking of the cluster should be stopped. */
     private volatile boolean checkClusterStopped;
-    /** Last value of drbd-is-loadeded check. */
     private Boolean[] lastDrbdLoaded;
-    /** Last value of pacemaker-is-started check. */
-    private Boolean[] lastPmStarted;
-    /** Last value of pacemaker-is-in-rc check. */
-    private Boolean[] lastPmRc;
-    /** Last value of pacemaker-is-installed check. */
-    private Boolean[] lastPmInstalled;
-    /** Last value of pacemaker-is-configured check. */
-    private Boolean[] lastPmConf;
-    /** Last value of hb-is-started check. */
-    private Boolean[] lastHbStarted;
-    /** Last value of heartbeat-is-in-rc check. */
-    private Boolean[] lastHbRc;
-    /** Last value of heartbeat-is-installed check. */
-    private Boolean[] lastHbInstalled;
-    /** Last value of heartbeat-is-configured check. */
-    private Boolean[] lastHbConf;
+    private Boolean[] lastPacemakerStarted;
+    private Boolean[] lastPacemakerInRc;
+    private Boolean[] lastPacemakerInstalled;
+    private Boolean[] lastPacemakerConfigured;
+    private Boolean[] lastHeartbeatStarted;
+    private Boolean[] lastHeartbeatInRc;
+    private Boolean[] lastHeartbeatInstalled;
+    private Boolean[] lastHeartbeatConfigured;
 
-    /** Cluster check thread. */
     private Thread checkClusterThread = null;
     /** Button that acts as a finish button. This is used by methods that
      * override this one and use different finish/next button.
      */
-    private String button = null;
+    private String otherFinishButton = null;
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
     private final Widget useOpenaisButton = WidgetFactory.createInstance(
@@ -141,84 +112,70 @@ public class Init extends DialogCluster {
                                    Widget.NO_REGEXP,
                                    0,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(Application.AccessType.ADMIN,
-                                                  !AccessMode.ADVANCED),
+                                   new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
     @Autowired
     private Finish finishDialog;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
-        setButton(finishButton());
+        setOtherFinishButton(finishButton());
         finishDialog.init(this, getCluster());
     }
 
-    /** Sets button. Which acts as a finish button. */
-    private void setButton(final String button) {
-        this.button = button;
+    private void setOtherFinishButton(final String otherFinishButton) {
+        this.otherFinishButton = otherFinishButton;
     }
 
-    /** Stops the checks and waits for them to stop. */
     private void stopCheckCluster() {
         checkClusterStopped = true;
     }
 
-    /**
-     * Returns previous dialog. It is used to get with the back button to
-     * the dialog before this one.
-     */
     @Override
     public final WizardDialog getPreviousDialog() {
         stopCheckCluster();
         return super.getPreviousDialog();
     }
 
-    /** After the dialog is finished. */
     @Override
     protected final void finishDialog() {
         stopCheckCluster();
     }
 
-    /** Is called before the dialog is canceled. It stops all the checks. */
     @Override
     public final void cancelDialog() {
         stopCheckCluster();
     }
 
-    /** Returns the next dialog. */
     @Override
     public final WizardDialog nextDialog() {
         stopCheckCluster();
         return finishDialog;
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected final String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Init.Title");
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected final String getDescription() {
         return Tools.getString("Dialog.Cluster.Init.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         lastDrbdLoaded = null;
-        lastPmStarted = null;
-        lastPmRc = null;
-        lastHbStarted = null;
-        lastHbRc = null;
+        lastPacemakerStarted = null;
+        lastPacemakerInRc = null;
+        lastHeartbeatStarted = null;
+        lastHeartbeatInRc = null;
         checkClusterStopped = false;
         checkClusterThread = new Thread(
             new Runnable() {
@@ -244,8 +201,7 @@ public class Init extends DialogCluster {
     private void checkCluster(final boolean periodic) {
         /* check if modules are loaded. */
         final Host[] hosts = getCluster().getHostsArray();
-        final ExecCommandThread[] infoThreads =
-                                        new ExecCommandThread[hosts.length];
+        final ExecCommandThread[] infoThreads = new ExecCommandThread[hosts.length];
         int i = 0;
         for (final Host h : hosts) {
             infoThreads[i] = h.execCommand(new ExecCommandConfig()
@@ -253,15 +209,12 @@ public class Init extends DialogCluster {
                                                .execCallback(new ExecCallback() {
                                                    @Override
                                                    public void done(final String answer) {
-                                                       //drbdLoaded[index] = true;
-                                                       for (final String line
-                                                                      : answer.split("\\r?\\n")) {
+                                                       for (final String line : answer.split("\\r?\\n")) {
                                                            h.parseInstallationInfo(line);
                                                        }
                                                    }
                                                    @Override
-                                                   public void doneError(final String answer,
-                                                                         final int errorCode) {
+                                                   public void doneError(final String answer, final int errorCode) {
                                                        LOG.appWarning("doneError: could not get install info");
                                                    }
                                                })
@@ -284,19 +237,19 @@ public class Init extends DialogCluster {
         if (!lastDrbdLoadedExists) {
             lastDrbdLoaded = new Boolean[hosts.length];
         }
-        final boolean lastPmStartedExists = (lastPmStarted != null);
+        final boolean lastPmStartedExists = (lastPacemakerStarted != null);
         if (!lastPmStartedExists) {
-            lastPmStarted = new Boolean[hosts.length];
-            lastPmRc = new Boolean[hosts.length];
-            lastPmConf = new Boolean[hosts.length];
-            lastPmInstalled = new Boolean[hosts.length];
+            lastPacemakerStarted = new Boolean[hosts.length];
+            lastPacemakerInRc = new Boolean[hosts.length];
+            lastPacemakerConfigured = new Boolean[hosts.length];
+            lastPacemakerInstalled = new Boolean[hosts.length];
         }
-        final boolean lastHbStartedExists = (lastHbStarted != null);
+        final boolean lastHbStartedExists = (lastHeartbeatStarted != null);
         if (!lastHbStartedExists) {
-            lastHbStarted = new Boolean[hosts.length];
-            lastHbRc = new Boolean[hosts.length];
-            lastHbConf = new Boolean[hosts.length];
-            lastHbInstalled = new Boolean[hosts.length];
+            lastHeartbeatStarted = new Boolean[hosts.length];
+            lastHeartbeatInRc = new Boolean[hosts.length];
+            lastHeartbeatConfigured = new Boolean[hosts.length];
+            lastHeartbeatInstalled = new Boolean[hosts.length];
         }
         boolean needOpenaisButton = false;
 
@@ -318,15 +271,14 @@ public class Init extends DialogCluster {
                 drbdLoadedChanged = true;
                 lastDrbdLoaded[i] = drbdLoaded;
             }
-            final JLabel drbdLoadedInfo = drbdLoadedInfos.get(i);
+            final JLabel drbdLoadedInfo = drbdLoadedLabels.get(i);
             boolean drbdFailed = false;
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            drbdLoadedInfo.setText(Tools.getString(
-                                           "Dialog.Cluster.Init.DrbdIsLoaded"));
+                            drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsLoaded"));
                             drbdLoadedInfo.setForeground(Color.BLACK);
                         }
                     });
@@ -338,8 +290,7 @@ public class Init extends DialogCluster {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            drbdLoadedInfo.setText(Tools.getString(
-                                        "Dialog.Cluster.Init.DrbdIsNotLoaded"));
+                            drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsNotLoaded"));
                             drbdLoadedInfo.setForeground(Color.RED);
                             drbdLoadButton.setVisible(true);
                         }
@@ -347,18 +298,15 @@ public class Init extends DialogCluster {
                 }
             }
 
-            final boolean csAisIsInstalled = h.getOpenaisVersion() != null
-                                             || h.getCorosyncVersion() != null;
-            final boolean csAisRunning     = h.isCorosyncRunning()
-                                             || h.isOpenaisRunning();
-            final boolean csAisIsRc        = h.isCorosyncInRc() || h.isOpenaisInRc();
-            final boolean csAisIsConf      = h.corosyncOrOpenaisConfigExists();
+            final boolean csAisIsInstalled = h.getOpenaisVersion() != null || h.getCorosyncVersion() != null;
+            final boolean csAisRunning = h.isCorosyncRunning() || h.isOpenaisRunning();
+            final boolean csAisIsRc = h.isCorosyncInRc() || h.isOpenaisInRc();
+            final boolean csAisIsConf = h.corosyncOrOpenaisConfigExists();
 
-            final boolean heartbeatIsInstalled =
-                                            h.getHeartbeatVersion() != null;
-            final boolean heartbeatIsRunning   = h.isHeartbeatRunning();
-            final boolean heartbeatIsRc      = h.isHeartbeatInRc();
-            final boolean heartbeatIsConf      = h.heartbeatConfigExists();
+            final boolean heartbeatIsInstalled = h.getHeartbeatVersion() != null;
+            final boolean heartbeatIsRunning = h.isHeartbeatRunning();
+            final boolean heartbeatIsRc = h.isHeartbeatInRc();
+            final boolean heartbeatIsConf = h.heartbeatConfigExists();
             if (!csAisRunning && h.hasCorosyncInitScript() && h.hasOpenaisInitScript()) {
                 needOpenaisButton = true;
             }
@@ -366,68 +314,67 @@ public class Init extends DialogCluster {
             boolean hbChanged = false;
             boolean csAisChanged = false;
             if (lastPmStartedExists) {
-                if (lastPmStarted[i] != csAisRunning) {
+                if (lastPacemakerStarted[i] != csAisRunning) {
                     oneChanged = true;
                     csAisChanged = true;
-                    lastPmStarted[i] = csAisRunning;
+                    lastPacemakerStarted[i] = csAisRunning;
                 }
-                if (lastPmRc[i] != csAisIsRc) {
+                if (lastPacemakerInRc[i] != csAisIsRc) {
                     oneChanged = true;
                     csAisChanged = true;
-                    lastPmRc[i] = csAisIsRc;
+                    lastPacemakerInRc[i] = csAisIsRc;
                 }
-                if (lastPmConf[i] != csAisIsConf) {
+                if (lastPacemakerConfigured[i] != csAisIsConf) {
                     oneChanged = true;
                     csAisChanged = true;
-                    lastPmConf[i] = csAisIsConf;
+                    lastPacemakerConfigured[i] = csAisIsConf;
                 }
-                if (lastPmInstalled[i] != csAisIsInstalled) {
+                if (lastPacemakerInstalled[i] != csAisIsInstalled) {
                     oneChanged = true;
                     csAisChanged = true;
-                    lastPmInstalled[i] = csAisIsInstalled;
+                    lastPacemakerInstalled[i] = csAisIsInstalled;
                 }
 
-                if (lastHbStarted[i] != heartbeatIsRunning) {
+                if (lastHeartbeatStarted[i] != heartbeatIsRunning) {
                     oneChanged = true;
                     hbChanged = true;
-                    lastHbStarted[i] = heartbeatIsRunning;
+                    lastHeartbeatStarted[i] = heartbeatIsRunning;
                 }
-                if (lastHbRc[i] != heartbeatIsRc) {
+                if (lastHeartbeatInRc[i] != heartbeatIsRc) {
                     oneChanged = true;
                     hbChanged = true;
-                    lastHbRc[i] = heartbeatIsRc;
+                    lastHeartbeatInRc[i] = heartbeatIsRc;
                 }
-                if (lastHbConf[i] != heartbeatIsConf) {
+                if (lastHeartbeatConfigured[i] != heartbeatIsConf) {
                     oneChanged = true;
                     hbChanged = true;
-                    lastHbConf[i] = heartbeatIsConf;
+                    lastHeartbeatConfigured[i] = heartbeatIsConf;
                 }
-                if (lastHbInstalled[i] != heartbeatIsInstalled) {
+                if (lastHeartbeatInstalled[i] != heartbeatIsInstalled) {
                     oneChanged = true;
                     hbChanged = true;
-                    lastHbInstalled[i] = heartbeatIsInstalled;
+                    lastHeartbeatInstalled[i] = heartbeatIsInstalled;
                 }
             } else {
                 oneChanged = true;
                 csAisChanged = true;
-                lastPmStarted[i] = csAisRunning;
-                lastPmRc[i] = csAisIsRc;
-                lastPmConf[i] = csAisIsConf;
-                lastPmInstalled[i] = csAisIsInstalled;
+                lastPacemakerStarted[i] = csAisRunning;
+                lastPacemakerInRc[i] = csAisIsRc;
+                lastPacemakerConfigured[i] = csAisIsConf;
+                lastPacemakerInstalled[i] = csAisIsInstalled;
 
                 hbChanged = true;
-                lastHbStarted[i] = heartbeatIsRunning;
-                lastHbRc[i] = heartbeatIsRc;
-                lastHbConf[i] = heartbeatIsConf;
-                lastHbInstalled[i] = heartbeatIsInstalled;
+                lastHeartbeatStarted[i] = heartbeatIsRunning;
+                lastHeartbeatInRc[i] = heartbeatIsRc;
+                lastHeartbeatConfigured[i] = heartbeatIsConf;
+                lastHeartbeatInstalled[i] = heartbeatIsInstalled;
             }
 
             /* Corosync/Openais */
-            final JLabel pmStartedInfo = pmStartedInfos.get(i);
-            final MyButton csAisStartButton = pmStartButtons.get(i);
+            final JLabel pmStartedInfo = pacemakerStartedLabels.get(i);
+            final MyButton csAisStartButton = startPacemakerButtons.get(i);
             String is = "Corosync";
-            if (!useCorosync(h)
-                && h.getOpenaisVersion() != null) {
+            if (!useCorosync(h) && h.getOpenaisVersion() != null) {
                 is = "OpenAIS";
             }
             final String initScript = is;
@@ -438,20 +385,17 @@ public class Init extends DialogCluster {
                         @Override
                         public void run() {
                             pmStartedInfo.setText(
-                                initScript + Tools.getString(
-                                        "Dialog.Cluster.Init.CsAisIsRunning"));
+                                initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsRunning"));
                             pmStartedInfo.setForeground(Color.BLACK);
                             if (csAisIsRc) {
                                 csAisStartButton.setVisible(false);
                                 pmStartedInfo.setText(
-                                    initScript + Tools.getString(
-                                             "Dialog.Cluster.Init.CsAisIsRc"));
+                                    initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsRc"));
                             } else if (heartbeatIsRunning || heartbeatIsRc) {
-                                csAisStartButton.setText(CS_AIS_BUTTON_SWITCH);
+                                csAisStartButton.setText(COROSYNC_AIS_BUTTON_SWITCH_TEXT);
                                 csAisStartButton.setVisible(true);
                             } else {
-                                csAisStartButton.setText(Tools.getString(
-                                         "Dialog.Cluster.Init.CsAisButtonRc"));
+                                csAisStartButton.setText(Tools.getString("Dialog.Cluster.Init.CsAisButtonRc"));
                                 csAisStartButton.setVisible(true);
                             }
                         }
@@ -464,31 +408,25 @@ public class Init extends DialogCluster {
                         @Override
                         public void run() {
                             if (heartbeatIsRunning || heartbeatIsRc) {
-                                csAisStartButton.setText(CS_AIS_BUTTON_SWITCH);
+                                csAisStartButton.setText(COROSYNC_AIS_BUTTON_SWITCH_TEXT);
                             } else {
-                                csAisStartButton.setText(Tools.getString(
-                                      "Dialog.Cluster.Init.StartCsAisButton"));
+                                csAisStartButton.setText(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
                             }
                             if (!csAisIsInstalled) {
-                                pmStartedInfo.setText(
-                                    initScript + Tools.getString(
-                                   "Dialog.Cluster.Init.CsAisIsNotInstalled"));
+                                pmStartedInfo.setText(initScript
+                                                      + Tools.getString("Dialog.Cluster.Init.CsAisIsNotInstalled"));
                                 csAisStartButton.setEnabled(false);
                             } else if (!csAisIsConf) {
-                                pmStartedInfo.setText(
-                                   initScript + Tools.getString(
-                                   "Dialog.Cluster.Init.CsAisIsNotConfigured"));
+                                pmStartedInfo.setText(initScript
+                                                      + Tools.getString("Dialog.Cluster.Init.CsAisIsNotConfigured"));
                                 csAisStartButton.setEnabled(false);
                             } else {
                                 pmStartedInfo.setText(
-                                   initScript + Tools.getString(
-                                        "Dialog.Cluster.Init.CsAisIsStopped"));
+                                   initScript + Tools.getString("Dialog.Cluster.Init.CsAisIsStopped"));
                                 if (heartbeatIsRunning) {
                                     csAisStartButton.setEnabled(false);
                                 } else {
-                                    Tools.getGUIData().setAccessible(
-                                                    csAisStartButton,
-                                                    Application.AccessType.OP);
+                                    Tools.getGUIData().setAccessible(csAisStartButton, Application.AccessType.OP);
                                 }
                             }
                             csAisStartButton.setVisible(true);
@@ -499,27 +437,24 @@ public class Init extends DialogCluster {
             }
 
             /* Heartbeat */
-            final JLabel hbStartedInfo = hbStartedInfos.get(i);
-            final MyButton hbStartButton = hbStartButtons.get(i);
+            final JLabel hbStartedInfo = heartbeatStartedLabels.get(i);
+            final MyButton hbStartButton = startHeartbeatButtons.get(i);
             boolean hbFailed = false;
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            hbStartedInfo.setText(Tools.getString(
-                                           "Dialog.Cluster.Init.HbIsRunning"));
+                            hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRunning"));
                             hbStartedInfo.setForeground(Color.BLACK);
                             if (heartbeatIsRc) {
                                 hbStartButton.setVisible(false);
-                                hbStartedInfo.setText(Tools.getString(
-                                                "Dialog.Cluster.Init.HbIsRc"));
+                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRc"));
                             } else if (csAisRunning || csAisIsRc) {
-                                hbStartButton.setText(HB_BUTTON_SWITCH);
+                                hbStartButton.setText(HEARTBEAT_BUTTON_SWITCH_TEXT);
                                 hbStartButton.setVisible(true);
                             } else {
-                                hbStartButton.setText(Tools.getString(
-                                            "Dialog.Cluster.Init.HbButtonRc"));
+                                hbStartButton.setText(Tools.getString("Dialog.Cluster.Init.HbButtonRc"));
                                 hbStartButton.setVisible(true);
                             }
                         }
@@ -532,28 +467,22 @@ public class Init extends DialogCluster {
                         @Override
                         public void run() {
                             if (csAisRunning || csAisIsRc) {
-                                hbStartButton.setText(HB_BUTTON_SWITCH);
+                                hbStartButton.setText(HEARTBEAT_BUTTON_SWITCH_TEXT);
                             } else {
-                                hbStartButton.setText(Tools.getString(
-                                         "Dialog.Cluster.Init.StartHbButton"));
+                                hbStartButton.setText(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
                             }
                             if (!heartbeatIsInstalled) {
-                                hbStartedInfo.setText(Tools.getString(
-                                       "Dialog.Cluster.Init.HbIsNotInstalled"));
+                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsNotInstalled"));
                                 hbStartButton.setEnabled(false);
                             } else if (!heartbeatIsConf) {
-                                hbStartedInfo.setText(Tools.getString(
-                                     "Dialog.Cluster.Init.HbIsNotConfigured"));
+                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsNotConfigured"));
                                 hbStartButton.setEnabled(false);
                             } else {
-                                hbStartedInfo.setText(Tools.getString(
-                                            "Dialog.Cluster.Init.HbIsStopped"));
+                                hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsStopped"));
                                 if (csAisRunning) {
                                     hbStartButton.setEnabled(false);
                                 } else {
-                                    Tools.getGUIData().setAccessible(
-                                                    hbStartButton,
-                                                    Application.AccessType.OP);
+                                    Tools.getGUIData().setAccessible(hbStartButton, Application.AccessType.OP);
                                 }
                             }
                             hbStartButton.setVisible(true);
@@ -591,7 +520,7 @@ public class Init extends DialogCluster {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        buttonClass(button).setEnabled(false);
+                        buttonClass(otherFinishButton).setEnabled(false);
                     }
                 });
             }
@@ -621,14 +550,14 @@ public class Init extends DialogCluster {
                 Thread.currentThread().interrupt();
             }
         }
-        drbdLoadedInfos = new ArrayList<JLabel>();
+        drbdLoadedLabels = new ArrayList<JLabel>();
         drbdLoadButtons = new ArrayList<MyButton>();
 
-        pmStartedInfos = new ArrayList<JLabel>();
-        pmStartButtons = new ArrayList<MyButton>();
+        pacemakerStartedLabels = new ArrayList<JLabel>();
+        startPacemakerButtons = new ArrayList<MyButton>();
 
-        hbStartedInfos = new ArrayList<JLabel>();
-        hbStartButtons = new ArrayList<MyButton>();
+        heartbeatStartedLabels = new ArrayList<JLabel>();
+        startHeartbeatButtons = new ArrayList<MyButton>();
 
         mainPanel = new JPanel(new GridLayout(1, 0));
 
@@ -644,17 +573,13 @@ public class Init extends DialogCluster {
             final JPanel pane = new JPanel(layout);
             pane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
-            final TitledBorder titledBorder =
-                            BorderFactory.createTitledBorder(host.getName());
+            final TitledBorder titledBorder = BorderFactory.createTitledBorder(host.getName());
             titledBorder.setTitleJustification(TitledBorder.LEFT);
             pane.setBorder(titledBorder);
 
-            drbdLoadedInfos.add(new JLabel(
-                        Tools.getString("Dialog.Cluster.Init.CheckingDrbd")));
-            final MyButton drbdb = new MyButton(
-                       Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
-            drbdb.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
+            drbdLoadedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingDrbd")));
+            final MyButton drbdb = new MyButton(Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
+            drbdb.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             drbdLoadButtons.add(drbdb);
             drbdLoadButtons.get(i).setVisible(false);
 
@@ -682,28 +607,22 @@ public class Init extends DialogCluster {
                     }
                 });
 
-            pane.add(drbdLoadedInfos.get(i));
+            pane.add(drbdLoadedLabels.get(i));
             pane.add(drbdLoadButtons.get(i));
 
             /* Heartbeat */
-            hbStartedInfos.add(new JLabel(
-                        Tools.getString("Dialog.Cluster.Init.CheckingHb")));
+            heartbeatStartedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingHb")));
             final MyButton btn;
-            if (host.isCorosyncRunning()
-                || host.isOpenaisRunning()
-                || host.isCorosyncInRc()
-                || host.isOpenaisInRc()) {
-                btn = new MyButton(HB_BUTTON_SWITCH);
+            if (host.isCorosyncRunning() || host.isOpenaisRunning() || host.isCorosyncInRc() || host.isOpenaisInRc()) {
+                btn = new MyButton(HEARTBEAT_BUTTON_SWITCH_TEXT);
             } else {
-                btn = new MyButton(
-                         Tools.getString("Dialog.Cluster.Init.StartHbButton"));
+                btn = new MyButton(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
             }
-            btn.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
-            hbStartButtons.add(btn);
-            hbStartButtons.get(i).setVisible(false);
+            btn.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+            startHeartbeatButtons.add(btn);
+            startHeartbeatButtons.get(i).setVisible(false);
 
-            hbStartButtons.get(i).addActionListener(
+            startHeartbeatButtons.get(i).addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(final ActionEvent e) {
@@ -715,24 +634,18 @@ public class Init extends DialogCluster {
                                     Tools.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
-                                            hbStartButtons.get(
-                                                      index).setVisible(false);
+                                            startHeartbeatButtons.get(index).setVisible(false);
                                         }
                                     });
-                                    if (Tools.getString(
-                                      "Dialog.Cluster.Init.HbButtonRc").equals(
-                                        e.getActionCommand())) {
+                                    if (Tools.getString("Dialog.Cluster.Init.HbButtonRc").equals(
+                                                                                            e.getActionCommand())) {
                                         Heartbeat.addHeartbeatToRc(host);
                                     } else if (useCorosync(host)
-                                               && HB_BUTTON_SWITCH.equals(
-                                                       e.getActionCommand())) {
-                                        Heartbeat.switchFromCorosyncToHeartbeat(
-                                                                          host);
+                                               && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
+                                        Heartbeat.switchFromCorosyncToHeartbeat(host);
                                     } else if (!useCorosync(host)
-                                               && HB_BUTTON_SWITCH.equals(
-                                                       e.getActionCommand())) {
-                                        Heartbeat.switchFromOpenaisToHeartbeat(
-                                                                          host);
+                                               && HEARTBEAT_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
+                                        Heartbeat.switchFromOpenaisToHeartbeat(host);
                                     } else {
                                         if (host.isHeartbeatInRc()) {
                                             Heartbeat.startHeartbeat(host);
@@ -748,73 +661,62 @@ public class Init extends DialogCluster {
                     }
                 });
 
-            pane.add(hbStartedInfos.get(i));
-            pane.add(hbStartButtons.get(i));
-
+            pane.add(heartbeatStartedLabels.get(i));
+            pane.add(startHeartbeatButtons.get(i));
 
             /* Pacemaker */
-            pmStartedInfos.add(new JLabel(
-                        Tools.getString("Dialog.Cluster.Init.CheckingPm")));
-            final MyButton pmsb = new MyButton(
-                      Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
-            pmsb.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
-            pmStartButtons.add(pmsb);
-            pmStartButtons.get(i).setVisible(false);
+            pacemakerStartedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingPm")));
+            final MyButton pmsb = new MyButton(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
+            pmsb.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+            startPacemakerButtons.add(pmsb);
+            startPacemakerButtons.get(i).setVisible(false);
 
-            pmStartButtons.get(i).addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(
-                            new Runnable() {
+            startPacemakerButtons.get(i).addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            disableComponents();
+                            Tools.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    disableComponents();
-                                    Tools.invokeLater(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            pmStartButtons.get(
-                                                      index).setVisible(false);
-                                        }
-                                    });
-                                    if (Tools.getString(
-                                   "Dialog.Cluster.Init.CsAisButtonRc").equals(
-                                        e.getActionCommand())) {
-                                        if (useCorosync(host)) {
-                                            Corosync.addCorosyncToRc(host);
-                                        } else {
-                                            Openais.addOpenaisToRc(host);
-                                        }
-                                    } else if (CS_AIS_BUTTON_SWITCH.equals(
-                                                    e.getActionCommand())) {
-                                        if (useCorosync(host)) {
-                                            Corosync.switchToCorosync(host);
-                                        } else {
-                                            Openais.switchToOpenais(host);
-                                        }
+                                    startPacemakerButtons.get(index).setVisible(false);
+                                }
+                            });
+                            if (Tools.getString("Dialog.Cluster.Init.CsAisButtonRc").equals(e.getActionCommand())) {
+                                if (useCorosync(host)) {
+                                    Corosync.addCorosyncToRc(host);
+                                } else {
+                                    Openais.addOpenaisToRc(host);
+                                }
+                            } else if (COROSYNC_AIS_BUTTON_SWITCH_TEXT.equals(e.getActionCommand())) {
+                                if (useCorosync(host)) {
+                                    Corosync.switchToCorosync(host);
+                                } else {
+                                    Openais.switchToOpenais(host);
+                                }
+                            } else {
+                                if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
+                                    if (useCorosync(host)) {
+                                        Corosync.startCorosync(host);
                                     } else {
-                                        if (host.isCorosyncInRc() || host.isOpenaisInRc()) {
-                                            if (useCorosync(host)) {
-                                                Corosync.startCorosync(host);
-                                            } else {
-                                                Openais.startOpenais(host);
-                                            }
-                                        } else {
-                                            if (useCorosync(host)) {
-                                                Corosync.startCorosyncRc(host);
-                                            } else {
-                                                Openais.startOpenaisRc(host);
-                                            }
-                                        }
+                                        Openais.startOpenais(host);
                                     }
-                                    checkCluster(false);
+                                } else {
+                                    if (useCorosync(host)) {
+                                        Corosync.startCorosyncRc(host);
+                                    } else {
+                                        Openais.startOpenaisRc(host);
+                                    }
                                 }
                             }
-                        );
-                        thread.start();
-                    }
-                });
+                            checkCluster(false);
+                        }
+                    });
+                    thread.start();
+                }
+            });
             if (host.isCorosyncRunning() && host.isOpenaisRunning()) {
                 /* started with openais init script. */
                 oneStartedAsOpenais = true;
@@ -823,8 +725,8 @@ public class Init extends DialogCluster {
                 noCorosync = true;
             }
 
-            pane.add(pmStartedInfos.get(i));
-            pane.add(pmStartButtons.get(i));
+            pane.add(pacemakerStartedLabels.get(i));
+            pane.add(startPacemakerButtons.get(i));
             i++;
             SpringUtilities.makeCompactGrid(pane, 3, 2,  //rows, cols
                                                   1, 1,  //initX, initY
@@ -847,7 +749,6 @@ public class Init extends DialogCluster {
         return p;
     }
 
-    /** Enable skip button. */
     @Override
     protected final boolean skipButtonEnabled() {
         return true;

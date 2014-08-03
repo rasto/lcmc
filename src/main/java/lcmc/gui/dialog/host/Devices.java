@@ -29,8 +29,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.ExecCallback;
@@ -42,10 +40,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where hardware information is collected.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 public class Devices extends DialogHost {
@@ -59,8 +53,7 @@ public class Devices extends DialogHost {
         final List<String> changed = new ArrayList<String>();
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
             progressBarDoneError();
-            final String error =
-                             Tools.getString("Dialog.Host.Devices.CheckError");
+            final String error = Tools.getString("Dialog.Host.Devices.CheckError");
             answerPaneSetTextError(error);
             incorrect.add(error);
         } else {
@@ -76,13 +69,11 @@ public class Devices extends DialogHost {
         }
     }
 
-    /** Inits the dialog and starts the info collecting thread. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected final void initDialogAfterVisible() {
         makeDefaultAndRequestFocus(buttonClass(nextButton()));
@@ -96,7 +87,6 @@ public class Devices extends DialogHost {
         t.start();
     }
 
-    /** Returns info for input pane. */
     protected final void getAllInfo() {
         final ExecCommandThread t = getHost().execCommand(
                          new ExecCommandConfig().commandString("GetHostAllInfo")
@@ -108,12 +98,10 @@ public class Devices extends DialogHost {
                              }
 
                              @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                            "Dialog.Host.Devices.CheckError"),
-                                         answer,
-                                         errorCode);
+                             public void doneError(final String answer, final int errorCode) {
+                                 printErrorAndRetry(Tools.getString("Dialog.Host.Devices.CheckError"),
+                                                    answer,
+                                                    errorCode);
                              }
                          })
                          .silentCommand()
@@ -121,38 +109,27 @@ public class Devices extends DialogHost {
         setCommandThread(t);
     }
 
-    /** Returns the next dialog object. */
     @Override
     public WizardDialog nextDialog() {
         distDetection.init(this, getHost(), getDrbdInstallation());
         return distDetection;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.Devices.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.Devices.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.Devices.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.Devices.Description");
     }
 
-    /** Returns pane where collected info is displayed. */
     @Override
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(
-                            Tools.getString("Dialog.Host.Devices.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.Devices.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  //rows, cols
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad

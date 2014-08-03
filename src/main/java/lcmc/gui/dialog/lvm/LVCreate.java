@@ -61,39 +61,24 @@ import lcmc.utilities.WidgetListener;
 /** Create LV dialog. */
 public final class LVCreate extends LV {
 
-    /** Description create LV. */
-    private static final String LV_CREATE_DESCRIPTION =
-                       "Create a logical volume in an existing volume group.";
-    /** LV create timeout. */
-    private static final int CREATE_TIMEOUT = 5000;
-    /** Block device info object. */
+    private static final String LV_CREATE_DESCRIPTION = "Create a logical volume in an existing volume group.";
+    private static final int LV_CREATE_TIMEOUT = 5000;
     private final Collection<Host> selectedHosts = new LinkedHashSet<Host>();
-    /** Create button. */
     private final MyButton createButton = new MyButton("Create");
-    /** Name of the logical volume. */
-    private Widget lvNameWi;
-    /** New size of the logical volume. */
-    private Widget sizeWi;
-    /** Maximum size of the logical volume. */
-    private Widget maxSizeWi;
-    /** Volume group. */
+    private Widget lvNameWidget;
+    private Widget lvSizeWidget;
+    private Widget maxSizeWidget;
     private final String volumeGroup;
-    /** Checkboxes with all hosts in the cluster. */
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    /** Selected block device. */
-    private final Collection<BlockDevice> selectedBlockDevices =
-                                             new LinkedHashSet<BlockDevice>();
-    /** Create new LVCreate object. */
-    public LVCreate(final Host host,
-                    final String volumeGroup,
-                    final BlockDevice selectedBlockDevice) {
+    private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<BlockDevice>();
+
+    public LVCreate(final Host host, final String volumeGroup, final BlockDevice selectedBlockDevice) {
         super(null);
         selectedHosts.add(host);
         this.volumeGroup = volumeGroup;
         selectedBlockDevices.add(selectedBlockDevice);
     }
 
-    /** Create new LVCreate object. */
     public LVCreate(final Iterable<BlockDevInfo> sbdis, final String volumeGroup) {
         super(null);
         this.volumeGroup = volumeGroup;
@@ -103,72 +88,60 @@ public final class LVCreate extends LV {
         }
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getDialogTitle() {
         return "Create LV";
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return LV_CREATE_DESCRIPTION;
     }
 
-    /** Close button. */
     @Override
     public String cancelButton() {
         return "Close";
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        makeDefaultAndRequestFocusLater(sizeWi.getComponent());
+        makeDefaultAndRequestFocusLater(lvSizeWidget.getComponent());
         makeDefaultButton(createButton);
     }
 
-    /** Enables and disabled buttons. */
     protected void checkButtons() {
         enableCreateButton(true);
     }
 
-    /** Enable create button. */
     private void enableCreateButton(boolean enable) {
         Tools.isSwingThread();
         if (enable) {
-            final String maxBlockSize = getMaxBlockSize(
-                                                 getSelectedHostCbs());
+            final String maxBlockSize = getMaxBlockSize(getSelectedHostCbs());
             final long maxSize = Long.parseLong(maxBlockSize);
-            maxSizeWi.setValue(VmsXml.convertKilobytes(maxBlockSize));
-            final long size = VmsXml.convertToKilobytes(
-                    sizeWi.getValue());
+            maxSizeWidget.setValue(VmsXml.convertKilobytes(maxBlockSize));
+            final long size = VmsXml.convertToKilobytes(lvSizeWidget.getValue());
             if (size > maxSize || size <= 0) {
                 enable = false;
-                sizeWi.wrongValue();
+                lvSizeWidget.wrongValue();
             } else {
-                sizeWi.setBackground(new StringValue(), new StringValue(), true);
+                lvSizeWidget.setBackground(new StringValue(), new StringValue(), true);
             }
             boolean lvNameCorrect = true;
-            if (lvNameWi.getStringValue() != null && lvNameWi.getStringValue().isEmpty()) {
+            if (lvNameWidget.getStringValue() != null && lvNameWidget.getStringValue().isEmpty()) {
                 lvNameCorrect = false;
             } else if (hostCheckBoxes != null) {
                 for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                     if (hostEntry.getValue().isSelected()) {
-                        final Set<String> lvs =
-                                hostEntry.getKey().getLogicalVolumesFromVolumeGroup(
-                                        volumeGroup);
+                        final Set<String> lvs = hostEntry.getKey().getLogicalVolumesFromVolumeGroup(volumeGroup);
                         if (lvs != null
-                            && lvs.contains(
-                                    lvNameWi.getStringValue())) {
+                            && lvs.contains(lvNameWidget.getStringValue())) {
                             lvNameCorrect = false;
                             break;
                         }
@@ -176,16 +149,15 @@ public final class LVCreate extends LV {
                 }
             }
             if (lvNameCorrect) {
-                lvNameWi.setBackground(new StringValue(), new StringValue(), true);
+                lvNameWidget.setBackground(new StringValue(), new StringValue(), true);
             } else {
                 enable = false;
-                lvNameWi.wrongValue();
+                lvNameWidget.wrongValue();
             }
         }
         createButton.setEnabled(enable);
     }
 
-    /** Returns the input pane. */
     @Override
     protected JComponent getInputPane() {
         createButton.setEnabled(false);
@@ -200,8 +172,7 @@ public final class LVCreate extends LV {
         /* find next free logical volume name */
         final Collection<String> logicalVolumes = new LinkedHashSet<String>();
         for (final Host h : selectedHosts) {
-            final Set<String> hvgs =
-                                h.getLogicalVolumesFromVolumeGroup(volumeGroup);
+            final Set<String> hvgs = h.getLogicalVolumesFromVolumeGroup(volumeGroup);
             if (hvgs != null) {
                 logicalVolumes.addAll(hvgs);
             }
@@ -215,42 +186,39 @@ public final class LVCreate extends LV {
             }
             i++;
         }
-        lvNameWi = WidgetFactory.createInstance(
+        lvNameWidget = WidgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
                                       new StringValue(defaultName),
                                       Widget.NO_ITEMS,
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.OP,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
-        inputPane.add(lvNameWi.getComponent());
+        inputPane.add(lvNameWidget.getComponent());
         inputPane.add(new JLabel());
-        lvNameWi.addListeners(new WidgetListener() {
-                                @Override
-                                public void check(final Value value) {
-                                    checkButtons();
-                                }
-                            });
+        lvNameWidget.addListeners(new WidgetListener() {
+            @Override
+            public void check(final Value value) {
+                checkButtons();
+            }
+        });
 
         final String maxBlockSize = getMaxBlockSize(selectedHosts);
         /* size */
-        final String newBlockSize = Long.toString(
-                                             Long.parseLong(maxBlockSize) / 2);
+        final String newBlockSize = Long.toString(Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new TextfieldWithUnit(VmsXml.convertKilobytes(newBlockSize),
+        lvSizeWidget = new TextfieldWithUnit(VmsXml.convertKilobytes(newBlockSize),
                                        getUnits(),
                                        Widget.NO_REGEXP,
                                        250,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.OP,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
-        inputPane.add(sizeWi.getComponent());
+        inputPane.add(lvSizeWidget.getComponent());
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -264,29 +232,23 @@ public final class LVCreate extends LV {
                             }
                         });
                         disableComponents();
-                        getProgressBar().start(CREATE_TIMEOUT
-                                               * hostCheckBoxes.size());
+                        getProgressBar().start(LV_CREATE_TIMEOUT * hostCheckBoxes.size());
                         boolean oneFailed = false;
                         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                             if (hostEntry.getValue().isSelected()) {
-                                final boolean ret = lvCreate(
-                                        hostEntry.getKey(),
-                                        lvNameWi.getStringValue(),
-                                        sizeWi.getStringValue());
+                                final boolean ret = lvCreate(hostEntry.getKey(),
+                                                             lvNameWidget.getStringValue(),
+                                                             lvSizeWidget.getStringValue());
                                 if (!ret) {
                                     oneFailed = true;
                                 }
                             }
                         }
                         for (final Host h : hostCheckBoxes.keySet()) {
-                            h.getBrowser().getClusterBrowser().updateHWInfo(
-                                                        h,
-                                                        Host.UPDATE_LVM);
+                            h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                         }
-                        final String maxBlockSize = getMaxBlockSize(
-                                                      getSelectedHostCbs());
-                        maxSizeWi.setValue(VmsXml.convertKilobytes(
-                                maxBlockSize));
+                        final String maxBlockSize = getMaxBlockSize(getSelectedHostCbs());
+                        maxSizeWidget.setValue(VmsXml.convertKilobytes(maxBlockSize));
                         enableComponents();
                         if (oneFailed) {
                             progressBarDoneError();
@@ -302,25 +264,24 @@ public final class LVCreate extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWi = new TextfieldWithUnit(
+        maxSizeWidget = new TextfieldWithUnit(
                                       VmsXml.convertKilobytes(maxBlockSize),
                                       getUnits(),
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.OP,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
-        maxSizeWi.setEnabled(false);
+        maxSizeWidget.setEnabled(false);
         inputPane.add(maxSizeLabel);
-        inputPane.add(maxSizeWi.getComponent());
+        inputPane.add(maxSizeWidget.getComponent());
         inputPane.add(new JLabel());
-        sizeWi.addListeners(new WidgetListener() {
-                                @Override
-                                public void check(final Value value) {
-                                    checkButtons();
-                                }
-                            });
+        lvSizeWidget.addListeners(new WidgetListener() {
+            @Override
+            public void check(final Value value) {
+                checkButtons();
+            }
+        });
 
         SpringUtilities.makeCompactGrid(inputPane, 4, 3,  /* rows, cols */
                                                    1, 1,  /* initX, initY */
@@ -364,15 +325,8 @@ public final class LVCreate extends LV {
         return pane;
     }
 
-    /** Create LV. */
-    private boolean lvCreate(final Host host,
-                             final String lvName,
-                             final String size) {
-        final boolean ret = LVM.lvCreate(host,
-                                         lvName,
-                                         volumeGroup,
-                                         size,
-                                         Application.RunMode.LIVE);
+    private boolean lvCreate(final Host host, final String lvName, final String size) {
+        final boolean ret = LVM.lvCreate(host, lvName, volumeGroup, size, Application.RunMode.LIVE);
         if (ret) {
             answerPaneAddText("Logical volume "
                               + lvName
@@ -380,20 +334,16 @@ public final class LVCreate extends LV {
                               + volumeGroup
                               + " on " + host.getName() + '.');
         } else {
-            answerPaneAddTextError("Creating of logical volume "
-                                   + lvName
-                                   + " failed.");
+            answerPaneAddTextError("Creating of logical volume " + lvName + " failed.");
         }
         return ret;
     }
 
-    /** Returns maximum block size available in the group. */
     private String getMaxBlockSize(final Iterable<Host> hosts) {
         long free = -1;
         if (hosts != null) {
             for (final Host h : hosts) {
-                final long hostFree =
-                                    h.getFreeInVolumeGroup(volumeGroup) / 1024;
+                final long hostFree = h.getFreeInVolumeGroup(volumeGroup) / 1024;
                 if (free == -1 || hostFree < free) {
                     free = hostFree;
                 }
@@ -425,4 +375,3 @@ public final class LVCreate extends LV {
         return hosts;
     }
 }
-

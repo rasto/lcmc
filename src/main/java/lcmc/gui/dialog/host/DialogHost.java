@@ -43,15 +43,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * DialogHost.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 @Component
 public abstract class DialogHost extends WizardDialog {
-    /** Host for which is this dialog. */
     private Host host;
-    /** Thread in which a command can be executed. */
     private ExecCommandThread commandThread = null;
 
     private DrbdInstallation drbdInstallation;
@@ -70,13 +65,13 @@ public abstract class DialogHost extends WizardDialog {
         return drbdInstallation;
     }
 
-    /** Sets the command thread, so that it can be canceled. */
     final void setCommandThread(final ExecCommandThread commandThread) {
         this.commandThread = commandThread;
         if (getProgressBar() != null) {
             getProgressBar().setCancelEnabled(commandThread != null);
         }
     }
+
     /**
      * Creates progress bar that can be used during connecting to the host
      * and returns pane, where the progress bar is displayed.
@@ -127,10 +122,7 @@ public abstract class DialogHost extends WizardDialog {
     protected final String getDialogTitle() {
         final StringBuilder s = new StringBuilder(50);
         s.append(getHostDialogTitle());
-        if (host != null
-            && !host.getName().isEmpty()
-            && !"unknown".equals(host.getName())) {
-
+        if (host != null && !host.getName().isEmpty() && !"unknown".equals(host.getName())) {
             s.append(" (");
             s.append(host.getName());
             s.append(')');
@@ -147,23 +139,19 @@ public abstract class DialogHost extends WizardDialog {
         };
     }
 
-    /** Return title for getDialogTitle() function. */
     protected abstract String getHostDialogTitle();
 
-    /** Get installation methods. */
-    protected final Widget getInstallationMethods(
-                                           final String prefix,
-                                           final boolean staging,
-                                           final String lastInstalledMethod,
-                                           final String autoOption,
-                                           final ComponentWithTest installButton) {
+    protected final Widget getInstallationMethods(final String prefix,
+                                                  final boolean staging,
+                                                  final String lastInstalledMethod,
+                                                  final String autoOption,
+                                                  final ComponentWithTest installButton) {
         final List<InstallMethods> methods = new ArrayList<InstallMethods>();
         int i = 1;
         Value defaultValue = null;
         while (true) {
             final String index = Integer.toString(i);
-            final String text =
-                    getHost().getDistString(prefix + ".install.text." + index);
+            final String text = getHost().getDistString(prefix + ".install.text." + index);
             if (text == null || text.isEmpty()) {
                 if (i > 9) {
                     break;
@@ -171,81 +159,70 @@ public abstract class DialogHost extends WizardDialog {
                 i++;
                 continue;
             }
-            final String stagingMethod =
-                 getHost().getDistString(prefix + ".install.staging." + index);
-            if (stagingMethod != null && "true".equals(stagingMethod)
-                && !staging) {
+            final String stagingMethod = getHost().getDistString(prefix + ".install.staging." + index);
+            if (stagingMethod != null && "true".equals(stagingMethod) && !staging) {
                 /* skip staging */
                 i++;
                 continue;
             }
-            String method =
-                  getHost().getDistString(prefix + ".install.method." + index);
+            String method = getHost().getDistString(prefix + ".install.method." + index);
             if (method == null) {
                 method = "";
             }
             final InstallMethods installMethod = new InstallMethods(
-                Tools.getString("Dialog.Host.CheckInstallation.InstallMethod")
-                + text, i, method);
+                                    Tools.getString("Dialog.Host.CheckInstallation.InstallMethod") + text, i, method);
             if (text.equals(lastInstalledMethod)) {
                 defaultValue = installMethod;
             }
             methods.add(installMethod);
             i++;
         }
-        final Widget instMethodWi = WidgetFactory.createInstance(
+        final Widget instMethodWidget = WidgetFactory.createInstance(
                        Widget.Type.COMBOBOX,
                        defaultValue,
                        methods.toArray(new InstallMethods[methods.size()]),
                        Widget.NO_REGEXP,
                        0,    /* width */
                        Widget.NO_ABBRV,
-                       new AccessMode(Application.AccessType.RO,
-                                      !AccessMode.ADVANCED),
+                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         if (Tools.getApplication().getAutoOptionHost(autoOption) != null) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
-                    instMethodWi.setSelectedIndex(
-                        Integer.parseInt(
-                         Tools.getApplication().getAutoOptionHost(autoOption)));
+                    instMethodWidget.setSelectedIndex(
+                            Integer.parseInt(Tools.getApplication().getAutoOptionHost(autoOption)));
                 }
             });
         }
-        instMethodWi.addListeners(new WidgetListener() {
+        instMethodWidget.addListeners(new WidgetListener() {
             @Override
             public void check(final Value value) {
-                final InstallMethods method =
-                                      (InstallMethods) instMethodWi.getValue();
-                final String toolTip =
-                                    getInstToolTip(prefix, method.getIndex());
+                final InstallMethods method = (InstallMethods) instMethodWidget.getValue();
+                final String toolTip = getInstToolTip(prefix, method.getIndex());
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        instMethodWi.setToolTipText(toolTip);
+                        instMethodWidget.setToolTipText(toolTip);
                         installButton.setToolTipText(toolTip);
                     }
                 });
             }
         });
-        return instMethodWi;
+        return instMethodWidget;
     }
 
     /**
      * Returns tool tip texts for installation method combo box and
      * install button.
      */
-    protected final String getInstToolTip(final String prefix,
-                                          final String index) {
+    protected final String getInstToolTip(final String prefix, final String index) {
         return Tools.html(
             getHost().getDistString(
-                prefix + ".install." + index)).replaceAll(";", ";<br>&gt; ")
-                                           .replaceAll("&&", "<br>&gt; &&");
+                prefix + ".install." + index)).replaceAll(";", ";<br>&gt; ").replaceAll("&&", "<br>&gt; &&");
     }
 
-    protected void enableNextButtons(final List<String> incorrect,
-                                     final List<String> changed) {
+    protected void enableNextButtons(final List<String> incorrect, final List<String> changed) {
         final Check check = new Check(incorrect, changed);
         Tools.invokeLater(new Runnable() {
             @Override
@@ -258,50 +235,39 @@ public abstract class DialogHost extends WizardDialog {
         });
     }
 
-    /** Buttons that are enabled/disabled during checks. */
     protected MyButton[] nextButtons() {
         return new MyButton[]{};
     }
 
     /** This class holds install method names, and their indeces. */
     public static final class InstallMethods implements Value {
-        /** Name of the method like "CD". */
         private final String name;
-        /** Index of the method. */
         private final int index;
-        /** Method string. */
         private final String method;
 
-        public InstallMethods(final String name,
-                              final int index,
-                              final String method) {
+        public InstallMethods(final String name, final int index, final String method) {
             this.name = name;
             this.index = index;
             this.method = method;
         }
 
-        /** Returns name of the install method. */
         @Override
         public String toString() {
             return name;
         }
 
-        /** Returns index of the install method. */
         public String getIndex() {
             return Integer.toString(index);
         }
 
-        /** Returns method. */
         String getMethod() {
             return method;
         }
 
-        /** Returns whether the installation method is "source". */
         boolean isSourceMethod() {
             return "source".equals(method);
         }
 
-        /** Returns whether the installation method is "linbit". */
         boolean isLinbitMethod() {
             return "linbit".equals(method);
         }

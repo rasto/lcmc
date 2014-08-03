@@ -51,14 +51,9 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a bug report dialog.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class BugReport extends ConfigDialog {
-    /** Logger. */
-    private static final Logger LOG =
-                                    LoggerFactory.getLogger(BugReport.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BugReport.class);
 
     private static final String CONFIG_CIB = "pcmk configs";
     private static final String CONFIG_DRBD = "DRBD configs";
@@ -67,30 +62,22 @@ public final class BugReport extends ConfigDialog {
     private static final String LOG_BUFFER_DELIM = "=== logs ===";
     public static final Cluster UNKNOWN_CLUSTER = null;
     public static final String NO_ERROR_TEXT = null;
+    public static final int MINIMUM_CLUSTERS_PANE_HEIGHT = 75;
 
-    /** Cluster. Can be null, if unknown. */
-    private final Cluster cluster;
-    /** Error text, exceptions. Can be null. */
+    private final Cluster selectedCluster;
     private final String errorText;
-    /** Text area for the bug report. */
-    private final JTextPane textArea = new JTextPane();
-    /** Map from. */
-    private final Map<String, JCheckBox> configCbMap =
-                                            new HashMap<String, JCheckBox>();
-    private final Map<Cluster, JCheckBox> clusterCbMap =
-                                            new HashMap<Cluster, JCheckBox>();
-    /** The whole log buffer. */
-    private final String logs;
+    private final JTextPane bugReportTextArea = new JTextPane();
+    private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<String, JCheckBox>();
+    private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
+    private final String logBuffer;
 
-    /** Prepares a new {@code BugReport} object. */
-    public BugReport(final Cluster cluster, final String errorText) {
+    public BugReport(final Cluster selectedCluster, final String errorText) {
         super();
-        this.cluster = cluster;
+        this.selectedCluster = selectedCluster;
         this.errorText = errorText;
-        logs = LoggerFactory.getLogBuffer();
+        logBuffer = LoggerFactory.getLogBuffer();
     }
 
-    /** Inits the dialog and enables all the components. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -98,34 +85,27 @@ public final class BugReport extends ConfigDialog {
         enableComponents();
     }
 
-    /** Enables/disables all the components. */
     private void enableAllComponents(final boolean enable) {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final Map.Entry<String, JCheckBox> configEntry : configCbMap.entrySet()) {
+                for (final Map.Entry<String, JCheckBox> configEntry : configCheckBoxMap.entrySet()) {
                     configEntry.getValue().setEnabled(enable);
                 }
             }
         });
     }
 
-    /** Gets the title of the dialog as string. */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.BugReport.Title");
     }
 
-    /**
-     * Returns description for dialog. This can be HTML defined in
-     * TextResource.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.BugReport.Description");
     }
 
-    /** Returns a map from pattern name to its pattern. */
     private List<String> getConfigChoices() {
         final List<String> choices = new ArrayList<String>();
         choices.add(CONFIG_CIB);
@@ -134,17 +114,14 @@ public final class BugReport extends ConfigDialog {
         return choices;
     }
 
-    /** Returns panel with config checkboxes. */
     private JComponent getConfigPane() {
         final List<String> config = getConfigChoices();
         final JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        pane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         for (final String name : config) {
             final JCheckBox cb = new JCheckBox(name, true);
-            cb.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-            configCbMap.put(name, cb);
+            cb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+            configCheckBoxMap.put(name, cb);
             cb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
@@ -156,17 +133,14 @@ public final class BugReport extends ConfigDialog {
         return pane;
     }
 
-    /** Returns panel with checkboxes. */
     private JComponent getClustersPane(final Iterable<Cluster> clusters) {
         final JPanel clusterPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         clusterPane.setBorder(Tools.getBorder("Clusters"));
-        clusterPane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-        for (final Cluster cl : clusters) {
-            final JCheckBox cb = new JCheckBox(cl.getName(), true);
-            cb.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-            clusterCbMap.put(cl, cb);
+        clusterPane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        for (final Cluster cluster : clusters) {
+            final JCheckBox cb = new JCheckBox(cluster.getName(), true);
+            cb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+            clusterCheckBoxMap.put(cluster, cb);
             cb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
@@ -175,25 +149,21 @@ public final class BugReport extends ConfigDialog {
             });
             clusterPane.add(cb);
         }
-        final JScrollPane sp =
-                    new JScrollPane(clusterPane,
-                                    JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                                    JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        sp.setMinimumSize(new Dimension(0, 75));
+        final JScrollPane sp = new JScrollPane(clusterPane,
+                                               JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+                                               JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        sp.setMinimumSize(new Dimension(0, MINIMUM_CLUSTERS_PANE_HEIGHT));
         return sp;
     }
 
-    /** Returns the content of the bug report dialog. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
-        pane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-        textArea.setEditable(true);
-        textArea.setText("loading...");
-        final Set<Cluster> clusters =
-                          Tools.getApplication().getClusters().getClusterSet();
+        pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        bugReportTextArea.setEditable(true);
+        bugReportTextArea.setText("loading...");
+        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
         final JComponent clPane = getClustersPane(clusters);
         if (clusters.size() > 1) {
             pane.add(clPane);
@@ -202,124 +172,138 @@ public final class BugReport extends ConfigDialog {
             pane.add(getConfigPane());
         }
 
-        final JScrollPane sp = new JScrollPane(textArea);
+        final JScrollPane sp = new JScrollPane(bugReportTextArea);
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         pane.add(sp);
-        pane.setMaximumSize(new Dimension(Short.MAX_VALUE,
-                                          pane.getPreferredSize().height));
+        pane.setMaximumSize(new Dimension(Short.MAX_VALUE, pane.getPreferredSize().height));
         return pane;
     }
 
     protected void refresh() {
         enableAllComponents(false);
-        final Set<Cluster> clusters =
-                          Tools.getApplication().getClusters().getClusterSet();
-        final String allOldText = textArea.getText();
+        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
+        final String allOldText = bugReportTextArea.getText();
         final int i = allOldText.indexOf(GENERATED_DELIM);
-        String oldText = "email: anonymous\nerror description:\n"
-                         + (errorText == null ? "" : errorText)
-                         + '\n';
+        String oldText = "email: anonymous\nerror description:\n" + (errorText == null ? "" : errorText) + '\n';
         if (i > 0) {
             oldText = allOldText.substring(0, i - 1);
         }
         final StringBuffer text = new StringBuffer();
         text.append(oldText).append('\n').append(GENERATED_DELIM);
-        for (final Cluster cl : clusters) {
-            if (clusterCbMap.get(cl).isSelected()) {
-                text.append("\n== ")
-                    .append(cl.getName())
-                    .append(", br: ")
-                    .append(cl.getBrowser() != null);
-                if (cl == cluster) {
-                    text.append(" *");
-                }
-                text.append(" ==\n");
-                for (final Host host : cl.getHosts()) {
-                    if (host == null) {
-                        text.append("host == null");
-                    } else {
-                        text.append(host.getName()).append(" c: ")
-                            .append(host.getCluster() != null)
-                            .append(" br: ")
-                            .append(host.getBrowser() != null);
-                        if (host.getBrowser() != null) {
-                            text.append(" cbr: ").append(
-                             host.getBrowser().getClusterBrowser() != null);
-                        }
-                    }
-                    text.append('\n');
-                }
-                /* cib */
-                text.append("= ").append(CONFIG_CIB).append(" =\n");
-                if (configCbMap.get(CONFIG_CIB).isSelected()) {
-                    String cib = null;
-                    final ClusterBrowser cb = cl.getBrowser();
-                    if (cb != null) {
-                        final ClusterStatus cs = cb.getClusterStatus();
-                        if (cs != null) {
-                            cib = cs.getCibXml();
-                        }
-                    }
-                    if (cib == null) {
-                        text.append("not available\n");
-                    } else {
-                        text.append(cib);
-                    }
-                }
-
-                /* DRBD */
-                text.append("\n\n= ").append(CONFIG_DRBD).append(" =\n");
-                if (configCbMap.get(CONFIG_DRBD).isSelected()) {
-                    final ClusterBrowser cb = cl.getBrowser();
-                    String cib = null;
-                    if (cb != null) {
-                        final DrbdXml drbdXml = cb.getDrbdXml();
-                        if (drbdXml != null) {
-                            cib = drbdXml.getOldConfig();
-                        }
-                    }
-                    if (cib == null) {
-                        text.append("not available\n");
-                    } else {
-                        text.append(cib);
-                    }
-                }
-                /* libvirt */
-                text.append("\n\n= ")
-                    .append(CONFIG_LIBVIRT)
-                    .append(" =\n");
-                if (configCbMap.get(CONFIG_LIBVIRT).isSelected()) {
-                    for (final Host host : cl.getHosts()) {
-                        text.append("\n\n== ")
-                            .append(host.getName())
-                            .append(" ==\n");
-                        final ClusterBrowser cb = cl.getBrowser();
-                        String cfg = null;
-                        if (cb != null) {
-                            final VmsXml vmsXml = cb.getVmsXml(host);
-                            if (vmsXml != null) {
-                                cfg = vmsXml.getConfig();
-                            }
-                        }
-                        if (cfg == null) {
-                            text.append("not available\n");
-                        } else {
-                            text.append(cfg);
-                        }
-                    }
-                }
+        for (final Cluster cluster : clusters) {
+            if (clusterCheckBoxMap.get(cluster).isSelected()) {
+                appendClusterText(text, cluster);
+                appendHostText(text, cluster);
+                appendCibText(text, cluster);
+                appendDrbdText(text, cluster);
+                appendLibvirtText(text, cluster);
             }
         }
-        /** logs */
-        text.append('\n').append(LOG_BUFFER_DELIM).append('\n').append(logs);
+        appendLogText(text);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                textArea.setText(text.toString());
-                textArea.setCaretPosition(0);
+                bugReportTextArea.setText(text.toString());
+                bugReportTextArea.setCaretPosition(0);
             }
         });
         enableAllComponents(true);
+    }
+
+    private void appendClusterText(StringBuffer text, Cluster cluster) {
+        text.append("\n== ")
+            .append(cluster.getName())
+            .append(", br: ")
+            .append(cluster.getBrowser() != null);
+        if (cluster == this.selectedCluster) {
+            text.append(" *");
+        }
+        text.append(" ==\n");
+    }
+
+    private void appendHostText(StringBuffer text, Cluster cluster) {
+        for (final Host host : cluster.getHosts()) {
+            if (host == null) {
+                text.append("host == null");
+            } else {
+                text.append(host.getName()).append(" c: ")
+                        .append(host.getCluster() != null)
+                        .append(" br: ")
+                        .append(host.getBrowser() != null);
+                if (host.getBrowser() != null) {
+                    text.append(" cbr: ").append(host.getBrowser().getClusterBrowser() != null);
+                }
+            }
+            text.append('\n');
+        }
+    }
+
+    private void appendCibText(StringBuffer text, Cluster cluster) {
+        text.append("= ").append(CONFIG_CIB).append(" =\n");
+        if (configCheckBoxMap.get(CONFIG_CIB).isSelected()) {
+            String cib = null;
+            final ClusterBrowser cb = cluster.getBrowser();
+            if (cb != null) {
+                final ClusterStatus cs = cb.getClusterStatus();
+                if (cs != null) {
+                    cib = cs.getCibXml();
+                }
+            }
+            if (cib == null) {
+                text.append("not available\n");
+            } else {
+                text.append(cib);
+            }
+        }
+    }
+
+    private void appendDrbdText(StringBuffer text, Cluster cluster) {
+        text.append("\n\n= ").append(CONFIG_DRBD).append(" =\n");
+        if (configCheckBoxMap.get(CONFIG_DRBD).isSelected()) {
+            final ClusterBrowser cb = cluster.getBrowser();
+            String cib = null;
+            if (cb != null) {
+                final DrbdXml drbdXml = cb.getDrbdXml();
+                if (drbdXml != null) {
+                    cib = drbdXml.getOldConfig();
+                }
+            }
+            if (cib == null) {
+                text.append("not available\n");
+            } else {
+                text.append(cib);
+            }
+        }
+    }
+
+    private void appendLibvirtText(StringBuffer text, Cluster cluster) {
+        text.append("\n\n= ")
+                .append(CONFIG_LIBVIRT)
+                .append(" =\n");
+        if (configCheckBoxMap.get(CONFIG_LIBVIRT).isSelected()) {
+            for (final Host host : cluster.getHosts()) {
+                text.append("\n\n== ")
+                        .append(host.getName())
+                        .append(" ==\n");
+                final ClusterBrowser cb = cluster.getBrowser();
+                String cfg = null;
+                if (cb != null) {
+                    final VmsXml vmsXml = cb.getVmsXml(host);
+                    if (vmsXml != null) {
+                        cfg = vmsXml.getConfig();
+                    }
+                }
+                if (cfg == null) {
+                    text.append("not available\n");
+                } else {
+                    text.append(cfg);
+                }
+            }
+        }
+    }
+
+    private void appendLogText(StringBuffer text) {
+        text.append('\n').append(LOG_BUFFER_DELIM).append('\n').append(logBuffer);
     }
 
     String sendReportButton() {
@@ -335,7 +319,7 @@ public final class BugReport extends ConfigDialog {
     protected ConfigDialog checkAnswer() {
         if (isPressedButton(sendReportButton())) {
             LOG.info("checkAnswer: send report");
-            Http.post("lcmc", textArea.getText());
+            Http.post("lcmc", bugReportTextArea.getText());
         }
         return null;
     }

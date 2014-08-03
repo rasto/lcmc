@@ -29,8 +29,6 @@ import javax.swing.JOptionPane;
 import lcmc.utilities.Tools;
 
 /**
- * @author rasto
- *
  * Creates confirm dialog with yes and no options.
  * isPressedYesButton() returns true if 'yes' option was pressed.
  * Use confirmDialog function in utilities/Tools class to use
@@ -38,20 +36,12 @@ import lcmc.utilities.Tools;
  *
  */
 public final class ConfirmDialog extends ConfigDialog {
-    /** user defined dialog description. */
     private final String description;
-    /** user defined dialog title. */
     private final String title;
-    /** user defined yes button text. */
     private final String yesButton;
-    /** user defined no button text. */
     private final String noButton;
 
-    /** Prepares a new {@code ConfirmDialog} object. */
-    public ConfirmDialog(final String title,
-                         final String description,
-                         final String yesButton,
-                         final String noButton) {
+    public ConfirmDialog(final String title, final String description, final String yesButton, final String noButton) {
         super();
         this.title       = title;
         this.description = description;

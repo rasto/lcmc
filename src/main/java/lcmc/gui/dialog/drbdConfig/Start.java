@@ -47,26 +47,15 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a dialog where user start to configure the DRBD.
  * information.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Start extends WizardDialog {
-    /** Width of the combo boxes. */
     private static final int COMBOBOX_WIDTH = 250;
-    /** DRBD resource pulldown menu. */
-    private Widget drbdResourceWi;
-    /** DRBD info object. */
+    private Widget drbdResourceWidget;
     private final GlobalInfo globalInfo;
-    /** The first block device info object. */
     private final BlockDevInfo blockDevInfo1;
-    /** The second block device info object. */
     private final BlockDevInfo blockDevInfo2;
-    /** DRBD resource info object. */
     private ResourceInfo resourceInfo;
 
-    /** Prepares a new {@code Start} object. */
     public Start(final WizardDialog previousDialog,
                  final GlobalInfo globalInfo,
                  final BlockDevInfo blockDevInfo1,
@@ -81,23 +70,19 @@ public final class Start extends WizardDialog {
     @Override
     public WizardDialog nextDialog() {
         boolean newResource = false;
-        final Value i = drbdResourceWi.getValue();
+        final Value i = drbdResourceWidget.getValue();
         if (i == null || i.isNothingSelected()) {
             final Iterable<BlockDevInfo> bdis =
-                    new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
-                                                              blockDevInfo2));
-            resourceInfo = globalInfo.getNewDrbdResource(
-                               VolumeInfo.getHostsFromBlockDevices(bdis));
+                                            new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1, blockDevInfo2));
+            resourceInfo = globalInfo.getNewDrbdResource(VolumeInfo.getHostsFromBlockDevices(bdis));
             globalInfo.addDrbdResource(resourceInfo);
             newResource = true;
         } else {
             resourceInfo = (ResourceInfo) i;
         }
         final VolumeInfo dvi = globalInfo.getNewDrbdVolume(
-                                resourceInfo,
-                                new ArrayList<BlockDevInfo>(Arrays.asList(
-                                                              blockDevInfo1,
-                                                              blockDevInfo2)));
+                                             resourceInfo,
+                                             new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1, blockDevInfo2)));
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -112,25 +97,16 @@ public final class Start extends WizardDialog {
         }
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.DrbdConfig.Start.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.Start.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.DrbdConfig.Start.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.Start.Description");
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -146,34 +122,30 @@ public final class Start extends WizardDialog {
         }
     }
 
-    /** Returns input pane where user can configure a drbd resource. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
 
         /* Drbd Resource */
-        final JLabel drbdResourceLabel = new JLabel(
-                    Tools.getString("Dialog.DrbdConfig.Start.DrbdResource"));
-        final String newDrbdResource =
-                    Tools.getString("Dialog.DrbdConfig.Start.NewDrbdResource");
+        final JLabel drbdResourceLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.Start.DrbdResource"));
+        final String newDrbdResource = Tools.getString("Dialog.DrbdConfig.Start.NewDrbdResource");
         final List<Value> choices = new ArrayList<Value>();
         choices.add(new StringValue(null, newDrbdResource));
         for (final ResourceInfo dri : globalInfo.getDrbdResources()) {
             choices.add(dri);
         }
-        drbdResourceWi = WidgetFactory.createInstance(
+        drbdResourceWidget = WidgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
                                     Widget.NO_DEFAULT,
                                     choices.toArray(new Value[choices.size()]),
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(Application.AccessType.RO,
-                                                   !AccessMode.ADVANCED),
+                                    new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(drbdResourceLabel);
-        inputPane.add(drbdResourceWi.getComponent());
+        inputPane.add(drbdResourceWidget.getComponent());
         SpringUtilities.makeCompactGrid(inputPane, 1, 2,  // rows, cols
                                                    1, 1,  // initX, initY
                                                    1, 1); // xPad, yPad

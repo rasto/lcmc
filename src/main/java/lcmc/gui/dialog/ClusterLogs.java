@@ -32,26 +32,19 @@ import lcmc.model.Host;
 
 /**
  * An implementation of an dialog with log files from many hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public class ClusterLogs extends Logs {
-    /** Cluster object. */
     private final Cluster cluster;
 
-    /** Prepares a new {@code ClusterLogs} object. */
     public ClusterLogs(final Cluster cluster) {
         super();
         this.cluster = cluster;
     }
 
-    /** Returns the cluster object. */
     protected final Cluster getCluster() {
         return cluster;
     }
 
-    /** Returns all hosts in the cluster. */
     @Override
     protected final Host[] getHosts() {
         return cluster.getHostsArray();
@@ -60,15 +53,14 @@ public class ClusterLogs extends Logs {
     /** Returns a map from pattern name to its pattern. */
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> pm = new LinkedHashMap<String, String>();
-        pm.put("lrmd", wordBoundary("lrmd"));
-        pm.put("crmd", wordBoundary("crmd"));
-        pm.put("pengine", wordBoundary("pengine"));
-        pm.put("ERROR", wordBoundary("ERROR"));
-        return pm;
+        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        patternMap.put("lrmd", wordBoundary("lrmd"));
+        patternMap.put("crmd", wordBoundary("crmd"));
+        patternMap.put("pengine", wordBoundary("pengine"));
+        patternMap.put("ERROR", wordBoundary("ERROR"));
+        return patternMap;
     }
 
-    /** Returns which pattern names are selected by default. */
     @Override
     protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();

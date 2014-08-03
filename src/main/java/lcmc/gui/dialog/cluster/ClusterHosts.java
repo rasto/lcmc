@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
-import lcmc.model.Cluster;
+
 import lcmc.model.Host;
 import lcmc.model.Hosts;
 import lcmc.gui.dialog.WizardDialog;
@@ -52,24 +52,15 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where user can choose which hosts belong to
  * the cluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class ClusterHosts extends DialogCluster {
-    /** Host checked icon. */
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
-            Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
-    /** Host not checked icon. */
+                                               Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
     private static final ImageIcon HOST_UNCHECKED_ICON = Tools.createImageIcon(
-            Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
-    ///** Whether the scrolling pane was already moved. */
-    //private volatile boolean alreadyMoved = false;
+                                               Tools.getDefault("Dialog.Cluster.ClusterHosts.HostUncheckedIcon"));
     /** Map from checkboxes to the host, which they choose. */
-    private final Map<JCheckBox, Host> checkBoxToHost =
-                                    new LinkedHashMap<JCheckBox, Host>();
+    private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<JCheckBox, Host>();
 
     @Autowired
     private CommStack commStackDialog;
@@ -90,7 +81,6 @@ final class ClusterHosts extends DialogCluster {
         Tools.getGUIData().refreshClustersPanel();
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         boolean allConnected = true;
@@ -119,10 +109,8 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         boolean enable = true;
-        final Collection<String> hostnames = new ArrayList<String>();
-        if (selected < 1
-            || (selected == 1
-                && !Tools.getApplication().isOneHostCluster())) {
+        final Collection<String> hostNames = new ArrayList<String>();
+        if (selected < 1 || (selected == 1 && !Tools.getApplication().isOneHostCluster())) {
             enable = false;
         } else {
             /* check if some of the hosts are the same. It will not work all
@@ -131,11 +119,11 @@ final class ClusterHosts extends DialogCluster {
                 if (checkBoxEntry.getKey().isSelected() && checkBoxEntry.getKey().isEnabled()) {
                     final Host host = checkBoxEntry.getValue();
                     final String hostname = host.getHostname();
-                    if (hostnames.contains(hostname)) {
+                    if (hostNames.contains(hostname)) {
                         enable = false;
                         break;
                     }
-                    hostnames.add(hostname);
+                    hostNames.add(hostname);
                 }
             }
         }
@@ -152,46 +140,39 @@ final class ClusterHosts extends DialogCluster {
         }
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.ClusterHosts.Title");
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Cluster.ClusterHosts.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
 
-        final Thread thread = new Thread(
-            new Runnable() {
-                @Override
-                public void run() {
-                    checkCheckBoxes();
-                }
-            });
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                checkCheckBoxes();
+            }
+        });
         thread.start();
     }
 
-    /** Inits dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
     }
 
-    /** Returns the panel with hosts that can be selected. */
     @Override
     protected JComponent getInputPane() {
         /* Hosts */
-        final ScrollableFlowPanel p1 =
-            new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
+        final ScrollableFlowPanel p1 = new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
         final Hosts hosts = Tools.getApplication().getHosts();
 
         final ItemListener chListener = new ItemListener() {
@@ -219,16 +200,13 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         final JScrollPane sp = new JScrollPane(p1,
-                               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                                               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                                               JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         for (final Host host : hosts.getHostsArray()) {
-            final JCheckBox button = new JCheckBox(host.getName(),
-                                                   HOST_UNCHECKED_ICON);
-            button.setBackground(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            final JCheckBox button = new JCheckBox(host.getName(), HOST_UNCHECKED_ICON);
+            button.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
             button.setSelectedIcon(HOST_CHECKED_ICON);
-            if (getCluster().getBrowser() != null
-                && getCluster() == host.getCluster()) {
+            if (getCluster().getBrowser() != null && getCluster() == host.getCluster()) {
                 /* once we have browser the cluster members cannot be removed.
                  * TODO: make it possible
                  */
@@ -249,54 +227,18 @@ final class ClusterHosts extends DialogCluster {
             button.addItemListener(chListener);
             p1.add(button);
         }
-        // TODO: it does not work all the time, it destroys the pane sometimes.
-        //if (lastButton != null) {
-        //    /* move the scrolling pane till the end. */
-        //    final JCheckBox lb = lastButton;
-        //    lb.addComponentListener(new ComponentListener() {
-        //        public final void componentHidden(final ComponentEvent e) {
-        //        }
-
-        //        public final void componentMoved(final ComponentEvent e) {
-        //            Tools.invokeLater(new Runnable() {
-        //                @Override
-        //                public void run() {
-        //                    if (alreadyMoved) {
-        //                        return;
-        //                    }
-        //                    alreadyMoved = true;
-        //                    sp.getViewport().setViewPosition(
-        //                                        lb.getBounds().getLocation());
-        //                }
-        //            });
-        //        }
-
-        //        public final void componentResized(final ComponentEvent e) {
-        //        }
-
-        //        public final void componentShown(final ComponentEvent e) {
-        //        }
-        //    });
-        //}
         p1.setBackground(Color.WHITE);
         return sp;
     }
 
     /** Workaround so that flow layout scrolls right. */
-    private class ScrollableFlowPanel extends JPanel
-                                             implements Scrollable {
-        /** Serial version UID. */
-        private static final long serialVersionUID = 1L;
-        /** New ScrollableFlowPanel object. */
+    private class ScrollableFlowPanel extends JPanel implements Scrollable {
         ScrollableFlowPanel(final LayoutManager layout) {
             super(layout);
         }
 
         @Override
-        public void setBounds(final int x,
-                              final int y,
-                              final int width,
-                              final int height) {
+        public void setBounds(final int x, final int y, final int width, final int height) {
             super.setBounds(x, y, getParent().getWidth(), height);
         }
 
@@ -311,9 +253,7 @@ final class ClusterHosts extends DialogCluster {
         }
 
         @Override
-        public int getScrollableUnitIncrement(final Rectangle visibleRect,
-                                              final int orientation,
-                                              final int direction) {
+        public int getScrollableUnitIncrement(final Rectangle visibleRect, final int orientation, final int direction) {
             final int hundredth = (orientation ==  SwingConstants.VERTICAL
                     ? getParent().getHeight() : getParent().getWidth()) / 100;
             return (hundredth == 0 ? 1 : hundredth);
@@ -323,8 +263,7 @@ final class ClusterHosts extends DialogCluster {
         public int getScrollableBlockIncrement(final Rectangle visibleRect,
                                                final int orientation,
                                                final int direction) {
-            return orientation == SwingConstants.VERTICAL
-                            ? getParent().getHeight() : getParent().getWidth();
+            return orientation == SwingConstants.VERTICAL ? getParent().getHeight() : getParent().getWidth();
         }
 
         @Override
@@ -337,7 +276,6 @@ final class ClusterHosts extends DialogCluster {
             return false;
         }
 
-        /** Returns preferred height. */
         private int getPreferredHeight() {
             int rv = 0;
             final int count = getComponentCount();

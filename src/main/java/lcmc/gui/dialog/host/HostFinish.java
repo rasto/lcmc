@@ -42,29 +42,17 @@ import org.springframework.stereotype.Component;
 /**
  * Host finish dialog with buttons to configure next host or configure the
  * clsuter.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class HostFinish extends DialogHost {
     /** Host icon for add another host button. */
-    private static final ImageIcon HOST_ICON = Tools.createImageIcon(
-                            Tools.getDefault("Dialog.Host.Finish.HostIcon"));
-    /** Cluster icon for define cluster button. */
-    private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
-                            Tools.getDefault("Dialog.Host.Finish.ClusterIcon"));
-    /** Dimensions of the buttons. */
+    private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Host.Finish.HostIcon"));
+    private static final ImageIcon CLUSTER_ICON =
+                                            Tools.createImageIcon(Tools.getDefault("Dialog.Host.Finish.ClusterIcon"));
     private static final Dimension BUTTON_DIMENSION = new Dimension(300, 100);
-    /** Add another host button. */
     private MyButton addAnotherHostButton;
-    /** Configure cluster button. */
-    private MyButton confClusterButton;
-    /** Save checkbox. */
-    private final JCheckBox saveCB = new JCheckBox(
-                                    Tools.getString("Dialog.Host.Finish.Save"),
-                                    true);
+    private MyButton configureClusterButton;
+    private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.Finish.Save"), true);
     @Autowired
     private NewHostDialog newHostDialog;
     @Autowired
@@ -74,37 +62,32 @@ final class HostFinish extends DialogHost {
     @Autowired
     private AddClusterDialog addClusterDialog;
 
-    /** Returns next dialog. */
     @Override
     public WizardDialog nextDialog() {
         return newHostDialog;
     }
 
-    /** Finishes the dialog, and saves the host. */
     @Override
     protected void finishDialog() {
-        if (saveCB.isSelected()) {
+        if (saveCheckBox.isSelected()) {
             final String saveFile = Tools.getApplication().getSaveFile();
             Tools.save(userConfig, saveFile, false);
         }
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
-                                               buttonClass(finishButton())});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton()), buttonClass(finishButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
         if (Tools.getApplication().danglingHostsCount() < 2) {
             makeDefaultAndRequestFocusLater(addAnotherHostButton);
         } else {
-            makeDefaultAndRequestFocusLater(confClusterButton);
+            makeDefaultAndRequestFocusLater(configureClusterButton);
         }
         Tools.getApplication().removeAutoHost();
         if (Tools.getApplication().getAutoHosts().isEmpty()) {
@@ -113,7 +96,7 @@ final class HostFinish extends DialogHost {
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        confClusterButton.pressButton();
+                        configureClusterButton.pressButton();
                     }
                 });
             }
@@ -128,35 +111,21 @@ final class HostFinish extends DialogHost {
         }
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.Finish.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.Finish.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.Finish.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.Finish.Description");
     }
 
-    /**
-     * Returns input pane with two big buttons: configure a cluster or add
-     * another host.
-     */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
         /* host wizard button */
-        addAnotherHostButton = new MyButton(
-                    Tools.getString("Dialog.Host.Finish.AddAnotherHostButton"),
-                    HOST_ICON);
+        addAnotherHostButton = new MyButton(Tools.getString("Dialog.Host.Finish.AddAnotherHostButton"), HOST_ICON);
         addAnotherHostButton.setPreferredSize(BUTTON_DIMENSION);
         final DialogHost thisClass = this;
         addAnotherHostButton.addActionListener(new ActionListener() {
@@ -185,11 +154,10 @@ final class HostFinish extends DialogHost {
             }
         });
         /* cluster wizard button */
-        confClusterButton = new MyButton(
-                Tools.getString("Dialog.Host.Finish.ConfigureClusterButton"),
-                CLUSTER_ICON);
-        confClusterButton.setPreferredSize(BUTTON_DIMENSION);
-        confClusterButton.addActionListener(new ActionListener() {
+        configureClusterButton = new MyButton(Tools.getString("Dialog.Host.Finish.ConfigureClusterButton"),
+                                              CLUSTER_ICON);
+        configureClusterButton.setPreferredSize(BUTTON_DIMENSION);
+        configureClusterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 final Thread t = new Thread(new Runnable() {
@@ -198,7 +166,7 @@ final class HostFinish extends DialogHost {
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                confClusterButton.setEnabled(false);
+                                configureClusterButton.setEnabled(false);
                                 buttonClass(finishButton()).pressButton();
                             }
                         });
@@ -210,12 +178,12 @@ final class HostFinish extends DialogHost {
         });
         pane.add(addAnotherHostButton);
         if (Tools.getApplication().danglingHostsCount() < 1) {
-            confClusterButton.setEnabled(false);
+            configureClusterButton.setEnabled(false);
         }
-        pane.add(confClusterButton);
+        pane.add(configureClusterButton);
         /* Save checkbox */
-        saveCB.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
-        pane.add(saveCB);
+        saveCheckBox.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
+        pane.add(saveCheckBox);
         return pane;
     }
 }

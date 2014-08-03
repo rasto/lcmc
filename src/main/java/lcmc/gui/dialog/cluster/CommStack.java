@@ -32,7 +32,6 @@ import javax.swing.SpringLayout;
 
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
@@ -52,17 +51,10 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
  * be Corosync or Heartbeat.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class CommStack extends DialogCluster {
-    /** Logger. */
-    private static final Logger LOG =
-                                    LoggerFactory.getLogger(CommStack.class);
-    /** Radio Combo box. */
+    private static final Logger LOG = LoggerFactory.getLogger(CommStack.class);
     private Widget chooseStackCombo;
 
     @Autowired
@@ -70,75 +62,64 @@ final class CommStack extends DialogCluster {
     @Autowired
     private CoroConfig coroConfigDialog;
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         DialogCluster configDialog;
-        if (Application.HEARTBEAT_NAME.equals(chooseStackCombo.getValue().getValueForConfig())) {
-            Tools.getApplication().setLastInstalledClusterStack(
-                                                    Application.HEARTBEAT_NAME);
-            hbConfigDialog.init(this, getCluster());
-            return hbConfigDialog;
+        final String chosenStack = chooseStackCombo.getValue().getValueForConfig();
+        if (Application.HEARTBEAT_NAME.equals(chosenStack)) {
+            configDialog = hbConfigDialog;
         } else {
-            Tools.getApplication().setLastInstalledClusterStack(
-                                                    Application.COROSYNC_NAME);
-            coroConfigDialog.init(this, getCluster());
-            return coroConfigDialog;
+            configDialog = coroConfigDialog;
         }
+        Tools.getApplication().setLastInstalledClusterStack(chosenStack);
+        configDialog.init(this, getCluster());
+        return configDialog;
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.CommStack.Title");
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Cluster.CommStack.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 
-    /** Inits dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         final Host[] hosts = getCluster().getHostsArray();
-        final ExecCommandThread[] infoThreads =
-                                        new ExecCommandThread[hosts.length];
+        final ExecCommandThread[] infoThreads = new ExecCommandThread[hosts.length];
         getProgressBar().start(10000);
         int i = 0;
         for (final Host host : hosts) {
             infoThreads[i] = host.execCommand(new ExecCommandConfig()
-                             .commandString("Cluster.Init.getInstallationInfo")
-                             .progressBar(getProgressBar())
-                             .execCallback(new ExecCallback() {
-                                 @Override
-                                 public void done(final String answer) {
-                                     //drbdLoaded[index] = true;
-                                     for (final String line
-                                                    : answer.split("\\r?\\n")) {
-                                         host.parseInstallationInfo(line);
-                                     }
-                                 }
-                                 @Override
-                                 public void doneError(final String answer,
-                                                       final int errorCode) {
-                                     skipButtonSetEnabled(false);
-                                     LOG.error("initDialogAfterVisible: "
-                                             + host.getName()
-                                             + ": could not get install info: "
-                                             + answer);
-                                 }
-                             })
-                             .silentCommand()
-                             .silentOutput());
+                                                  .commandString("Cluster.Init.getInstallationInfo")
+                                                  .progressBar(getProgressBar())
+                                                  .execCallback(new ExecCallback() {
+                                                      @Override
+                                                      public void done(final String answer) {
+                                                          for (final String line : answer.split("\\r?\\n")) {
+                                                              host.parseInstallationInfo(line);
+                                                          }
+                                                      }
+                                                      @Override
+                                                      public void doneError(final String answer, final int errorCode) {
+                                                          skipButtonSetEnabled(false);
+                                                          LOG.error("initDialogAfterVisible: "
+                                                                    + host.getName()
+                                                                    + ": could not get install info: "
+                                                                    + answer);
+                                                      }
+                                                  })
+                                                  .silentCommand()
+                                                  .silentOutput());
             i++;
         }
         for (final ExecCommandThread t : infoThreads) {
@@ -153,8 +134,7 @@ final class CommStack extends DialogCluster {
         boolean aisIsPossible = true;
         boolean hbIsPossible = true;
         for (final Host host : hosts) {
-            if (host.getCorosyncVersion() == null
-                && host.getOpenaisVersion() == null) {
+            if (host.getCorosyncVersion() == null && host.getOpenaisVersion() == null) {
                 aisIsPossible = false;
             }
             if (host.getHeartbeatVersion() == null) {
@@ -171,12 +151,10 @@ final class CommStack extends DialogCluster {
                 @Override
                 public void run() {
                     if (ais) {
-                        chooseStackCombo.setEnabled(Application.COROSYNC_NAME,
-                                                    true);
+                        chooseStackCombo.setEnabled(Application.COROSYNC_NAME, true);
                     }
                     if (hb) {
-                        chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME,
-                                                    true);
+                        chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME, true);
                     }
                 }
             });
@@ -198,7 +176,6 @@ final class CommStack extends DialogCluster {
     }
 
 
-    /** Returns the panel with radio boxes. */
     @Override
     protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -253,15 +230,12 @@ final class CommStack extends DialogCluster {
         chooseStackCombo = WidgetFactory.createInstance(
                                           Widget.Type.RADIOGROUP,
                                           new StringValue(defaultValue),
-                                          new Value[]{
-                                                 new StringValue(Application.HEARTBEAT_NAME),
-                                                 new StringValue(Application.COROSYNC_NAME)},
+                                          new Value[]{new StringValue(Application.HEARTBEAT_NAME),
+                                                      new StringValue(Application.COROSYNC_NAME)},
                                           Widget.NO_REGEXP,
                                           500,
                                           Widget.NO_ABBRV,
-                                          new AccessMode(
-                                                 Application.AccessType.ADMIN,
-                                                 false), /* only adv. mode */
+                                          new AccessMode(Application.AccessType.ADMIN, false), /* only adv. mode */
                                           Widget.NO_BUTTON);
         chooseStackCombo.setEnabled(Application.COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME, false);
@@ -279,7 +253,6 @@ final class CommStack extends DialogCluster {
         return panel;
     }
 
-    /** Enable skip button. */
     @Override
     protected boolean skipButtonEnabled() {
         return true;

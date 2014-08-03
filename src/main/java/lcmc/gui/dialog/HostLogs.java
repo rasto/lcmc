@@ -27,26 +27,19 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of an dialog, with log files.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public class HostLogs extends Logs {
-    /** Host from which we get the log/logs. */
     private final Host host;
 
-    /** Prepares a new {@code HostLogs} object. */
     public HostLogs(final Host host) {
         super();
         this.host = host;
     }
 
-    /** Returns the host. */
     protected final Host getHost() {
         return host;
     }
 
-    /** Returns this host. */
     @Override
     protected final Host[] getHosts() {
         return new Host[]{host};
@@ -58,7 +51,6 @@ public class HostLogs extends Logs {
      */
     @Override
     protected final String getDialogTitle() {
-        return Tools.getString("Dialog.HostLogs.Title") + " ("
-               + host.getName() + ')';
+        return Tools.getString("Dialog.HostLogs.Title") + " (" + host.getName() + ')';
     }
 }

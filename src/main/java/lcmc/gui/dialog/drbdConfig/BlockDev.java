@@ -45,28 +45,18 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a dialog where user can enter drbd block device
  * information.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 final class BlockDev extends DrbdConfig {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
-    /** This block device. */
     private final BlockDevInfo blockDevInfo;
 
-    /** Prepares a new {@code BlockDev} object. */
-    BlockDev(final WizardDialog previousDialog,
-             final VolumeInfo dli,
-             final BlockDevInfo blockDevInfo) {
+    BlockDev(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         super(previousDialog, dli);
         this.blockDevInfo = blockDevInfo;
         dli.getDrbdResourceInfo().getDrbdInfo().setSelectedNode(blockDevInfo);
         dli.getDrbdResourceInfo().getDrbdInfo().selectMyself();
     }
 
-    /** Applies the changes to the blockDevInfo object. */
     @Override
     protected void finishDialog() {
         Tools.waitForSwing();
@@ -74,11 +64,10 @@ final class BlockDev extends DrbdConfig {
 
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */
     private String getGI(final BlockDevInfo bdi) {
-        return DRBD.getGI(
-                       bdi.getHost(),
-                       bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
-                       bdi.getDrbdVolumeInfo().getName(),
-                       Application.RunMode.LIVE);
+        return DRBD.getGI(bdi.getHost(),
+                          bdi.getDrbdVolumeInfo().getDrbdResourceInfo().getName(),
+                          bdi.getDrbdVolumeInfo().getName(),
+                          Application.RunMode.LIVE);
     }
 
     /**
@@ -89,12 +78,10 @@ final class BlockDev extends DrbdConfig {
     @Override
     public WizardDialog nextDialog() {
         if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
-            final BlockDevInfo oBdi =
-                    getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
+            final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
             return new BlockDev(this, getDrbdVolumeInfo(), oBdi);
         } else {
-            final BlockDevInfo oBdi =
-                    getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
+            final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
             try {
                 final Application.RunMode runMode = Application.RunMode.LIVE;
 
@@ -123,16 +110,13 @@ final class BlockDev extends DrbdConfig {
                 oBdi.apply(runMode);
 
                 /* create config */
-                getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo()
-                                                    .createDrbdConfigLive();
+                getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo().createDrbdConfigLive();
                 final String gi1 = getGI(blockDevInfo);
                 final String gi2 = getGI(oBdi);
                 if (gi1 == null || gi2 == null) {
-                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(
-                                                                          true);
+                    getDrbdVolumeInfo().getDrbdResourceInfo().setHaveToCreateMD(true);
                 }
-                final ClusterBrowser browser =
-                        getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
+                final ClusterBrowser browser = getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
                 browser.reloadAllComboBoxes(null);
                 Tools.getGUIData().expandTerminalSplitPane(1);
                 Tools.getGUIData().getMainFrame().requestFocus();
@@ -145,30 +129,18 @@ final class BlockDev extends DrbdConfig {
         }
     }
 
-    /** Returns title of the dialog. */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.BlockDev.Title");
     }
 
-    /**
-     * Returns description of the dialog.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.BlockDev.Description");
     }
 
-    /** Inits the dialog. */
-    @Override
-    protected void initDialogBeforeVisible() {
-        super.initDialogBeforeVisible();
-    }
-
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-
         final String[] params = blockDevInfo.getParametersFromXML();
         Tools.invokeLater(new Runnable() {
             @Override
@@ -183,7 +155,6 @@ final class BlockDev extends DrbdConfig {
         }
     }
 
-    /** Returns the input pane with block device parameters. */
     @Override
     protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -194,13 +165,12 @@ final class BlockDev extends DrbdConfig {
         final String[] params = blockDevInfo.getParametersFromXML();
         blockDevInfo.selectMyself();
         blockDevInfo.waitForInfoPanel();
-        blockDevInfo.addWizardParams(
-                 optionsPanel,
-                 params,
-                 buttonClass(nextButton()),
-                 Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
-                 Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
-                 null);
+        blockDevInfo.addWizardParams(optionsPanel,
+                                     params,
+                                     buttonClass(nextButton()),
+                                     Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
+                                     Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
+                                     null);
 
         final JPanel p = new JPanel();
         p.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));

@@ -31,48 +31,30 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of an About dialog.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class About extends ConfigDialog {
-
-    /** Inits the dialog and enables all the components. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponents();
     }
 
-    /** Gets the title of the dialog as string. */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.About.Title") + Tools.getRelease();
     }
 
-    /**
-     * Returns description for dialog. This can be HTML defined in
-     * TextResource.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.About.Description");
     }
 
-    /** Returns the content of the about dialog. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        final JScrollPane sp =
-                      getAnswerPane(Tools.getString("Dialog.About.Licences"));
+        final JScrollPane sp = getAnswerPane(Tools.getString("Dialog.About.Licences"));
 
         pane.add(sp);
-        //Tools.invokeLater(new Runnable() {
-        //    @Override
-        //    public void run() {
-        //        sp.getVerticalScrollBar().setValue(0);
-        //    }
-        //});
         SpringUtilities.makeCompactGrid(pane, 1, 1,  //rows, cols
                                               1, 1,  //initX, initY
                                               1, 1); //xPad, yPad

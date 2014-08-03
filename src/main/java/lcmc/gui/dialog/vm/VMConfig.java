@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc.gui.dialog.vm;
 
 import lcmc.gui.dialog.WizardDialog;
@@ -29,23 +28,16 @@ import lcmc.gui.resources.vms.DomainInfo;
 /**
  * VMConfig super class from which all the vm wizards can be
  * extended.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public abstract class VMConfig extends WizardDialog {
-    /** VMS Virtual domain info object. */
-    private final DomainInfo vmsVirtualDomainInfo;
+    private final DomainInfo domainInfo;
 
-    /** Prepares a new {@code VMConfig} object. */
-    protected VMConfig(final WizardDialog previousDialog,
-                       final DomainInfo vmsVirtualDomainInfo) {
+    protected VMConfig(final WizardDialog previousDialog, final DomainInfo domainInfo) {
         setPreviousDialog(previousDialog);
-        this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
+        this.domainInfo = domainInfo;
     }
 
-    /** Returns vms virtual domain info object. */
     protected final DomainInfo getVMSVirtualDomainInfo() {
-        return vmsVirtualDomainInfo;
+        return domainInfo;
     }
 }

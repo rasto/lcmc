@@ -30,40 +30,35 @@ import lcmc.utilities.Unit;
 
 /** LVM dialogs. */
 class LV extends WizardDialog {
-    /** Return unit objects. */
     protected static Unit[] getUnits() {
         return new Unit[]{
             new Unit("K", "K", "KiByte", "KiBytes"),
-                   new Unit("M", "M", "MiByte", "MiBytes"),
-                   new Unit("G",  "G",  "GiByte",      "GiBytes"),
-                   new Unit("T",  "T",  "TiByte",      "TiBytes")
+                     new Unit("M", "M", "MiByte", "MiBytes"),
+                     new Unit("G",  "G",  "GiByte",      "GiBytes"),
+                     new Unit("T",  "T",  "TiByte",      "TiBytes")
         };
     }
-    /** Prepares a new {@code LV} object. */
+
     protected LV(final WizardDialog previousDialog) {
         setPreviousDialog(previousDialog);
     }
 
-    /** Returns the next dialog. */
     @Override
     public final WizardDialog nextDialog() {
         return null;
     }
 
-    /** Returns the input pane. */
     @Override
     protected JComponent getInputPane() {
         return null;
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getDialogTitle() {
         return null;
     }
 
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return null;
@@ -77,5 +72,4 @@ class LV extends WizardDialog {
         }
         return false;
     }
-
 }

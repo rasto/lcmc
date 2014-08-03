@@ -65,23 +65,13 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 
 /**
  * An implementation of an dialog with log files from many hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 class Logs extends ConfigDialog {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
-    /** Text area for the log. */
     private final JTextPane logTextArea = new JTextPane();
-    /** Map from pattern name to its checkbox. */
-    private final Map<String, JCheckBox> checkBoxMap =
-                                            new HashMap<String, JCheckBox>();
-    /** Refresh lock. */
+    private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Lock mRefreshLock = new ReentrantLock();
-    /** Additional components. */
-    private final Collection<JComponent> additionalComponents =
-                                                   new ArrayList<JComponent>();
+    private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
 
     /**
      * Command that gets the log. The command must be specified in the
@@ -91,14 +81,13 @@ class Logs extends ConfigDialog {
         return "Logs.hbLog";
     }
 
-    /** Grep pattern for the log. */
     protected final String grepPattern() {
         final StringBuilder pattern = new StringBuilder(40);
         pattern.append('\'');
         final Map<String, String> patternMap = getPatternMap();
         boolean first = true;
         for (final Map.Entry<String, String> patternEntry : patternMap.entrySet()) {
-            if (checkBoxMap.get(patternEntry.getKey()).isSelected()) {
+            if (patternToCheckBoxMap.get(patternEntry.getKey()).isSelected()) {
                 if (!first) {
                     pattern.append(".*");
                 }
@@ -110,7 +99,6 @@ class Logs extends ConfigDialog {
         return pattern.toString();
     }
 
-    /** Inits the dialog. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -118,7 +106,6 @@ class Logs extends ConfigDialog {
         refreshLogsThread();
     }
 
-    /** Refresh logs in a thread. */
     protected void refreshLogsThread() {
         final Thread thread = new Thread(
             new Runnable() {
@@ -137,17 +124,15 @@ class Logs extends ConfigDialog {
         thread.start();
     }
 
-    /** Returns all hosts in cluster or a host. */
     protected Host[] getHosts() {
         return new Host[]{};
     }
 
-    /** Enables/disables all the components. */
     protected void enableAllComponents(final boolean enable) {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                for (final Map.Entry<String, JCheckBox> checkBoxEntry : checkBoxMap.entrySet()) {
+                for (final Map.Entry<String, JCheckBox> checkBoxEntry : patternToCheckBoxMap.entrySet()) {
                     checkBoxEntry.getValue().setEnabled(enable);
                 }
                 for (final JComponent ac : additionalComponents) {
@@ -157,7 +142,6 @@ class Logs extends ConfigDialog {
         });
     }
 
-    /** Options for the log command. */
     protected Map<String, String> getOptionsHash() {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@GREPPATTERN@", grepPattern());
@@ -181,31 +165,24 @@ class Logs extends ConfigDialog {
         final String stacktrace = Tools.getStackTrace();
         for (final Host host : hosts) {
             final int index = i;
-            final String command = host.getDistCommand(logFileCommand(),
-                                                       replaceHash);
+            final String command = host.getDistCommand(logFileCommand(), replaceHash);
             threads[index] = host.execCommand(new ExecCommandConfig()
-                         .command(command)
-                         .execCallback(new ExecCallback() {
-                             @Override
-                             public void done(final String answer) {
-                                 texts[index] = answer;
-                             }
-                             @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 texts[index] = host.getName()
-                                                + ": "
-                                                + answer + '\n';
-                                 LOG.sshError(host,
-                                              command,
-                                         answer,
-                                              stacktrace,
-                                         errorCode);
-                             }
-                         })
-                         .sshCommandTimeout(30000)
-                         .silentCommand()
-                         .silentOutput());
+                                                   .command(command)
+                                                   .execCallback(new ExecCallback() {
+                                                       @Override
+                                                       public void done(final String answer) {
+                                                           texts[index] = answer;
+                                                       }
+                                                       @Override
+                                                       public void doneError(final String answer,
+                                                                             final int errorCode) {
+                                                           texts[index] = host.getName() + ": " + answer + '\n';
+                                                           LOG.sshError(host, command, answer, stacktrace, errorCode);
+                                                       }
+                                                   })
+                                                   .sshCommandTimeout(30000)
+                                                   .silentCommand()
+                                                   .silentOutput());
             i++;
         }
         i = 0;
@@ -220,11 +197,8 @@ class Logs extends ConfigDialog {
             i++;
         }
         final String[] output = ans.toString().split("\r\n");
-        final String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-        final Pattern p = Pattern.compile(
-                '(' + Tools.join("|", months)
-                                    + ") +(\\d+) +(\\d+):(\\d+):(\\d+).*");
+        final String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+        final Pattern p = Pattern.compile('(' + Tools.join("|", months) + ") +(\\d+) +(\\d+):(\\d+):(\\d+).*");
         final Map<String, Integer> monthsHash = new HashMap<String, Integer>();
         i = 0;
         for (final String m : months) {
@@ -241,17 +215,17 @@ class Logs extends ConfigDialog {
                                 final int month1 = monthsHash.get(m1.group(1));
                                 final int month2 = monthsHash.get(m2.group(1));
 
-                                final int day1   = Integer.valueOf(m1.group(2));
-                                final int day2   = Integer.valueOf(m2.group(2));
+                                final int day1 = Integer.valueOf(m1.group(2));
+                                final int day2 = Integer.valueOf(m2.group(2));
 
-                                final int hour1  = Integer.valueOf(m1.group(3));
-                                final int hour2  = Integer.valueOf(m2.group(3));
+                                final int hour1 = Integer.valueOf(m1.group(3));
+                                final int hour2 = Integer.valueOf(m2.group(3));
 
-                                final int min1   = Integer.valueOf(m1.group(4));
-                                final int min2   = Integer.valueOf(m2.group(4));
+                                final int min1 = Integer.valueOf(m1.group(4));
+                                final int min2 = Integer.valueOf(m2.group(4));
 
-                                final int sec1   = Integer.valueOf(m1.group(5));
-                                final int sec2   = Integer.valueOf(m2.group(5));
+                                final int sec1 = Integer.valueOf(m1.group(5));
+                                final int sec2 = Integer.valueOf(m2.group(5));
 
                                 if (month1 != month2) {
                                     return month1 < month2 ? -1 : 1;
@@ -277,7 +251,6 @@ class Logs extends ConfigDialog {
         final Document doc = logTextArea.getStyledDocument();
         final SimpleAttributeSet color1 = new SimpleAttributeSet();
         final SimpleAttributeSet color2 = new SimpleAttributeSet();
-        //promptColorStyleConstants.setForeground(c, host.getColor());
         StyleConstants.setForeground(color1, Color.BLACK);
         StyleConstants.setForeground(color2, Color.BLUE);
         SimpleAttributeSet color = null;
@@ -315,22 +288,16 @@ class Logs extends ConfigDialog {
         enableAllComponents(true);
     }
 
-    /** Gets the title of the dialog as string. */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.ClusterLogs.Title");
     }
 
-    /**
-     * Returns description for dialog. This can be HTML defined in
-     * TextResource.
-     */
     @Override
     protected String getDescription() {
         return "";
     }
 
-    /** Returns string with word boundary for grep command. */
     protected final String wordBoundary(final String w) {
         return "\\\\<" + w + "\\\\>";
     }
@@ -348,15 +315,12 @@ class Logs extends ConfigDialog {
     /** Returns panel with checkboxes. */
     private JPanel getGrepChoicesPane() {
         final JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEADING));
-        pane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         final Map<String, String> patternMap = getPatternMap();
         for (final String name : patternMap.keySet()) {
-            final JCheckBox cb = new JCheckBox(name,
-                                               getSelectedSet().contains(name));
-            cb.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
-            checkBoxMap.put(name, cb);
+            final JCheckBox cb = new JCheckBox(name, getSelectedSet().contains(name));
+            cb.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+            patternToCheckBoxMap.put(name, cb);
             cb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
@@ -372,10 +336,8 @@ class Logs extends ConfigDialog {
         return pane;
     }
 
-    /** Return refresh button. */
     protected MyButton getRefreshBtn() {
-        final MyButton refreshBtn =
-                    new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
+        final MyButton refreshBtn = new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
         refreshBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -385,30 +347,25 @@ class Logs extends ConfigDialog {
         return refreshBtn;
     }
 
-    /** Return components for extra functionality. */
     protected JComponent[] getAdditionalComponents() {
         return new JComponent[]{getRefreshBtn()};
     }
 
-    /** Returns panel for logs. */
     @Override
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
-        pane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Dark"));
+        pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         logTextArea.setEditable(false);
         logTextArea.setText("loading...");
         pane.add(getGrepChoicesPane());
         final JScrollPane sp = new JScrollPane(logTextArea);
         sp.setPreferredSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
         pane.add(sp);
-        pane.setMaximumSize(new Dimension(Short.MAX_VALUE,
-                                          pane.getPreferredSize().height));
+        pane.setMaximumSize(new Dimension(Short.MAX_VALUE, pane.getPreferredSize().height));
         return pane;
     }
 
-    /** Returns an icon. */
     @Override
     protected final ImageIcon icon() {
         return Info.LOGFILE_ICON;

@@ -37,12 +37,8 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class Display extends VMConfig {
-    /** Configuration options of the new domain. */
     private static final String[] PARAMS = {GraphicsData.TYPE,
                                             GraphicsData.PORT,
                                             GraphicsData.LISTEN,
@@ -50,20 +46,14 @@ final class Display extends VMConfig {
                                             GraphicsData.KEYMAP,
                                             GraphicsData.DISPLAY,
                                             GraphicsData.XAUTH};
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    /** VMS graphics info object. */
-    private GraphicsInfo vmsgi = null;
-    /** Next dialog object. */
+    private GraphicsInfo graphicsInfo = null;
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code Display} object. */
-    Display(final WizardDialog previousDialog,
-            final DomainInfo vmsVirtualDomainInfo) {
+    Display(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
@@ -72,19 +62,11 @@ final class Display extends VMConfig {
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Display.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.Display.Description");
@@ -92,38 +74,33 @@ final class Display extends VMConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        if (vmsgi == null) {
-            vmsgi = getVMSVirtualDomainInfo().addGraphicsPanel();
-            vmsgi.waitForInfoPanel();
+        if (graphicsInfo == null) {
+            graphicsInfo = getVMSVirtualDomainInfo().addGraphicsPanel();
+            graphicsInfo.waitForInfoPanel();
         } else {
-            vmsgi.selectMyself();
+            graphicsInfo.selectMyself();
         }
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsgi.checkResourceFields(
-                                               null,
-                                               vmsgi.getRealParametersFromXML())
-                                            .isCorrect();
+                final boolean enable = graphicsInfo.checkResourceFields(null, graphicsInfo.getRealParametersFromXML())
+                                                   .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         if (inputPane != null) {
@@ -135,25 +112,22 @@ final class Display extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        vmsgi.savePreferredValues();
-        vmsgi.getResource().setValue(GraphicsData.TYPE,
-                                     GraphicsInfo.TYPE_VNC);
-        vmsgi.getResource().setValue(GraphicsData.PORT,
-                                     GraphicsInfo.PORT_AUTO);
+        graphicsInfo.savePreferredValues();
+        graphicsInfo.getResource().setValue(GraphicsData.TYPE, GraphicsInfo.TYPE_VNC);
+        graphicsInfo.getResource().setValue(GraphicsData.PORT, GraphicsInfo.PORT_AUTO);
 
-        vmsgi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                      null);
+        graphicsInfo.addWizardParams(optionsPanel,
+                                     PARAMS,
+                                     buttonClass(nextButton()),
+                                     Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                     Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                     null);
 
         panel.add(optionsPanel);
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 }

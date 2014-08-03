@@ -34,7 +34,6 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -47,28 +46,17 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 public class NewHostDialog extends DialogHost {
-    /** Normal widths of the fields. */
     private static final int FIELD_WIDTH = 120;
-    /** Widths of the fields if hops are used. */
     private static final int BIG_FIELD_WIDTH = 400;
-    /** Default ssh user. */
-    private static final String SSH_ROOT_USER = Tools.getDefault("SSH.User");
-    /** Default ssh port. */
-    private static final String SSH_PORT = Tools.getDefault("SSH.Port");
+    private static final String DEFAULT_SSH_ROOT_USER = Tools.getDefault("SSH.User");
+    private static final String DEFAULT_SSH_PORT = Tools.getDefault("SSH.Port");
     /** hostField can be ip or hostname with or without domainname. */
     private Widget hostField;
-    /** User name field. */
     private Widget usernameField;
-    /** SSH Port field. */
     private Widget sshPortField;
-    /** Whether sudo should be used. */
     private Widget useSudoField;
     /** Whether the fields are big (if more hops are being used). */
     private boolean bigFields = false;
@@ -90,25 +78,19 @@ public class NewHostDialog extends DialogHost {
         Tools.getApplication().setLastEnteredSSHPort(sshPort);
         final String useSudoString = useSudoField.getStringValue().trim();
         getHost().setUseSudo("true".equals(useSudoString));
-        Tools.getApplication().setLastEnteredUseSudo(
-                                                "true".equals(useSudoString));
+        Tools.getApplication().setLastEnteredUseSudo("true".equals(useSudoString));
         if (!Tools.getApplication().existsHost(getHost())) {
             Tools.getApplication().addHostToHosts(getHost());
-             Tools.getGUIData().setTerminalPanel(getHost().getTerminalPanel());
+            Tools.getGUIData().setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 
-    /** Sets nextDialog to Configuration. */
     @Override
     public WizardDialog nextDialog() {
         configurationDialog.init(this, getHost(), getDrbdInstallation());
         return configurationDialog;
     }
 
-    /**
-     * Checks host and username field and if both are not empty enables
-     * next and finish buttons.
-     */
     @Override
     protected final void checkFields(final Widget field) {
         final String hs = hostField.getStringValue().trim();
@@ -200,31 +182,21 @@ public class NewHostDialog extends DialogHost {
         enableNextButtons(incorrect, changed);
     }
 
-    /**
-     * Returns the title of the dialog, defined as
-     * Dialog.Host.NewHost.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.NewHost.Title");
     }
 
-    /**
-     * Returns the description of the dialog, defined as
-     * Dialog.Host.NewHost.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.NewHost.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
     }
 
-    /** Inits the dialog. */
     @Override
     protected final void initDialogAfterVisible() {
         enableComponents();
@@ -240,8 +212,7 @@ public class NewHostDialog extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostField.setValue(
-                                new StringValue(Tools.getApplication().getAutoHosts().get(0)));
+                    hostField.setValue(new StringValue(Tools.getApplication().getAutoHosts().get(0)));
                 }
             });
             Tools.sleep(3000);
@@ -257,13 +228,11 @@ public class NewHostDialog extends DialogHost {
     protected final JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setBackground(Tools.getDefaultColor(
-                                            "ConfigDialog.Background.Light"));
+        inputPane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
         inputPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Host */
-        final JLabel hostLabel = new JLabel(
-                        Tools.getString("Dialog.Host.NewHost.EnterHost"));
+        final JLabel hostLabel = new JLabel(Tools.getString("Dialog.Host.NewHost.EnterHost"));
         inputPane.add(hostLabel);
         final String hostname = getHost().getHostname();
         final String hn;
@@ -280,8 +249,7 @@ public class NewHostDialog extends DialogHost {
                                        regexp,
                                        FIELD_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
             /* so that hostname is not disabled after going back in the wizard*/
@@ -300,15 +268,14 @@ public class NewHostDialog extends DialogHost {
                                 true);
 
         /* SSH Port */
-        final JLabel sshPortLabel = new JLabel(
-                        Tools.getString("Dialog.Host.NewHost.SSHPort"));
+        final JLabel sshPortLabel = new JLabel(Tools.getString("Dialog.Host.NewHost.SSHPort"));
 
         inputPane.add(sshPortLabel);
         String sshPort = getHost().getSSHPort();
         if (sshPort == null) {
             sshPort = Tools.getApplication().getLastEnteredSSHPort();
             if (sshPort == null) {
-                sshPort = SSH_PORT;
+                sshPort = DEFAULT_SSH_PORT;
             }
         }
         sshPortField = WidgetFactory.createInstance(
@@ -318,8 +285,7 @@ public class NewHostDialog extends DialogHost {
                                       "^\\d+$",
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField.getComponent());
@@ -330,21 +296,20 @@ public class NewHostDialog extends DialogHost {
 
 
         /* Username */
-        final JLabel usernameLabel = new JLabel(
-                        Tools.getString("Dialog.Host.NewHost.EnterUsername"));
+        final JLabel usernameLabel = new JLabel(Tools.getString("Dialog.Host.NewHost.EnterUsername"));
 
         inputPane.add(usernameLabel);
         String userName = getHost().getUsername();
         if (userName == null) {
             userName = Tools.getApplication().getLastEnteredUser();
             if (userName == null) {
-                userName = SSH_ROOT_USER;
+                userName = DEFAULT_SSH_ROOT_USER;
             }
         }
         final List<Value> users = new ArrayList<Value>();
         final String user = System.getProperty("user.name");
-        if (!SSH_ROOT_USER.equals(user)) {
-            users.add(new StringValue(SSH_ROOT_USER));
+        if (!DEFAULT_SSH_ROOT_USER.equals(user)) {
+            users.add(new StringValue(DEFAULT_SSH_ROOT_USER));
         }
         users.add(new StringValue(user));
         usernameField = WidgetFactory.createInstance(
@@ -354,8 +319,7 @@ public class NewHostDialog extends DialogHost {
                                    regexp,
                                    FIELD_WIDTH,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(Application.AccessType.RO,
-                                                  !AccessMode.ADVANCED),
+                                   new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                    Widget.NO_BUTTON);
         usernameField.setEditable(true);
         addCheckField(usernameField);
@@ -365,8 +329,7 @@ public class NewHostDialog extends DialogHost {
                                     new StringValue(getHost().getUsername()),
                                     true);
         /* use sudo */
-        final JLabel useSudoLabel = new JLabel(
-                        Tools.getString("Dialog.Host.NewHost.UseSudo"));
+        final JLabel useSudoLabel = new JLabel(Tools.getString("Dialog.Host.NewHost.UseSudo"));
 
         inputPane.add(useSudoLabel);
         Boolean useSudo = getHost().isUseSudo();
@@ -380,20 +343,15 @@ public class NewHostDialog extends DialogHost {
         useSudoField = WidgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
                                       useSudoValue,
-                                      new Value[]{new StringValue("true"),
-                                                  new StringValue("false")},
+                                      new Value[]{new StringValue("true"), new StringValue("false")},
                                       Widget.NO_REGEXP,
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
-        //addCheckField(useSudoField);
         useSudoLabel.setLabelFor(useSudoField.getComponent());
         inputPane.add(useSudoField.getComponent());
-        useSudoField.setBackground(useSudoValue,
-                                   useSudoValue,
-                                   true);
+        useSudoField.setBackground(useSudoValue, useSudoValue, true);
 
         SpringUtilities.makeCompactGrid(inputPane, 2, 4,  // rows, cols
                                                    1, 1,  // initX, initY

@@ -50,87 +50,57 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where
  * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class CheckInstallation extends DialogHost {
-    /** Logger. */
-    private static final Logger LOG =
-                            LoggerFactory.getLogger(CheckInstallation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CheckInstallation.class);
 
-    /** Checking icon. */
-    private static final ImageIcon CHECKING_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("Dialog.Host.CheckInstallation.CheckingIcon"));
-    /** Not installed icon. */
+    private static final ImageIcon CHECKING_ICON = Tools.createImageIcon(
+                                                      Tools.getDefault("Dialog.Host.CheckInstallation.CheckingIcon"));
     private static final ImageIcon NOT_INSTALLED_ICON =
-        Tools.createImageIcon(
-            Tools.getDefault("Dialog.Host.CheckInstallation.NotInstalledIcon"));
-    /** Already installed icon. */
-    private static final ImageIcon INSTALLED_ICON =
-        Tools.createImageIcon(
-              Tools.getDefault("Dialog.Host.CheckInstallation.InstalledIcon"));
-    /** Upgrade available icon. */
-    private static final ImageIcon UPGR_AVAIL_ICON =
-        Tools.createImageIcon(
-              Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
+                            Tools.createImageIcon(Tools.getDefault("Dialog.Host.CheckInstallation.NotInstalledIcon"));
+    private static final ImageIcon ALREADY_INSTALLED_ICON =
+                               Tools.createImageIcon(Tools.getDefault("Dialog.Host.CheckInstallation.InstalledIcon"));
+    private static final ImageIcon UPGRADE_AVAILABLE_ICON =
+                               Tools.createImageIcon(Tools.getDefault("Dialog.Host.CheckInstallation.UpgrAvailIcon"));
 
-    private static final String PM_PREFIX = "PmInst";
-    private static final String HBPM_PREFIX = "HbPmInst";
+    private static final String PACEMAKER_PREFIX = "PmInst";
+    private static final String HEARTBEAT_PACEMAKER_PREFIX = "HbPmInst";
     private static final String DRBD_PREFIX = "DrbdInst";
 
-    /** Auto options for testing. */
-    private static final String PM_AUTO_OPTION = "pminst";
-    private static final String HBPM_AUTO_OPTION = "hbinst";
-    private static final String DRBD_AUTO_OPTION = "drbdinst";
+    private static final String PACEMAKER_AUTOTEST_OPTION = "pminst";
+    private static final String HEARTBEAT_PACEMAKER_AUTOTEST_OPTION = "hbinst";
+    private static final String DRBD_AUTOTEST_OPTION = "drbdinst";
 
     private DialogHost nextDialogObject = null;
 
-    /** Checking drbd label. */
-    private final JLabel drbdLabel = new JLabel(
-          ": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingDrbd"));
-    /** Checking corosync/openais/pacemaker label. */
-    private final JLabel pmLabel = new JLabel(
-          ": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingPm"));
-    /** Checking heartbeat/pacemaker label. */
-    private final JLabel hbPmLabel = new JLabel(
-          ": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingHbPm"));
+    private final JLabel checkingDrbdLabel =
+                                  new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingDrbd"));
+    private final JLabel checkingPacemakerLabel =
+                                  new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingPm"));
+    private final JLabel checkingHeartbeatPacemakerLabel =
+                                  new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingHbPm"));
 
-    /** Install/Upgrade drbd button. */
-    private final MyButton drbdButton = new MyButton(
-            Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallButton"));
-    /** Install corosync/openais/pacemaker button. */
-    private final MyButton pmButton = new MyButton(
-            Tools.getString("Dialog.Host.CheckInstallation.PmInstallButton"));
-    /** Install heartbeat/pacemaker button. */
-    private final MyButton hbPmButton = new MyButton(
-            Tools.getString("Dialog.Host.CheckInstallation.HbPmInstallButton"));
-    /** Corosync/Openais/Pacemaker installation method. */
-    private Widget pmInstMethodWi;
-    /** Heartbeat/pacemaker installation method. */
-    private Widget hbPmInstMethodWi;
-    /** DRBD installation method. */
-    private Widget drbdInstMethodWi;
+    private final MyButton installDrbdButton =
+                                  new MyButton(Tools.getString("Dialog.Host.CheckInstallation.DrbdInstallButton"));
+    private final MyButton installPacemakerButton =
+                                  new MyButton(Tools.getString("Dialog.Host.CheckInstallation.PmInstallButton"));
+    private final MyButton installHeartbeatPacemakerButton =
+                                  new MyButton(Tools.getString("Dialog.Host.CheckInstallation.HbPmInstallButton"));
 
-    /** Drbd icon: checking ... */
-    private final JLabel drbdIcon = new JLabel(CHECKING_ICON);
-    /** Corosync/openais/pacemaker icon: checking ... */
-    private final JLabel pmIcon = new JLabel(CHECKING_ICON);
-    /** Heartbeat/pacemaker icon: checking ... */
-    private final JLabel hbPmIcon = new JLabel(CHECKING_ICON);
-    /** Whether drbd installation was ok. */
-    private boolean drbdOk = false;
-    /** Whether corosync/openais/pacemaker installation was ok. */
-    private boolean pmOk = false;
-    /** Whether heartbeat/pacemaker installation was ok. */
-    private boolean hbPmOk = false;
-    /** Label of heartbeat that can be with or without pacemaker. */
-    private final JLabel hbPmJLabel = new JLabel("Pcmk/Heartbeat");
-    /** Label of pacemaker that can be with corosync or openais. */
-    private final JLabel pmJLabel = new JLabel("Pcmk/Corosync");
+    private Widget pacemakerInstMethodWidget;
+    private Widget heartbeatPacemakerInstMethodWidget;
+    private Widget drbdInstMethodWidget;
+
+    private final JLabel checkingDrbdIcon = new JLabel(CHECKING_ICON);
+    private final JLabel checkingPacemakerIcon = new JLabel(CHECKING_ICON);
+    private final JLabel heartbeatPacemakerIcon = new JLabel(CHECKING_ICON);
+    private boolean drbdInstallationOk = false;
+    private boolean pacemakerInstallationOk = false;
+    private boolean heartbeatPacemakerInstallationOk = false;
+    private final JLabel heartbeatPacemakerLabel = new JLabel("Pcmk/Heartbeat");
+
+    private final JLabel pacemakerLabel = new JLabel("Pcmk/Corosync");
     @Autowired
     private HostFinish hostFinishDialog;
     @Autowired
@@ -146,18 +116,16 @@ final class CheckInstallation extends DialogHost {
     @Autowired
     private PacemakerInst pacemakerInstDialog;
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
-        drbdOk = false;
-        pmOk = false;
-        hbPmOk = false;
+        drbdInstallationOk = false;
+        pacemakerInstallationOk = false;
+        heartbeatPacemakerInstallationOk = false;
 
         hostFinishDialog.init(this, getHost(), getDrbdInstallation());
         nextDialogObject = hostFinishDialog;
@@ -166,28 +134,27 @@ final class CheckInstallation extends DialogHost {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                drbdButton.setBackgroundColor(
-                                 Tools.getDefaultColor("ConfigDialog.Button"));
-                drbdButton.setEnabled(false);
-                drbdInstMethodWi.setEnabled(false);
-                pmButton.setEnabled(false);
-                pmInstMethodWi.setEnabled(false);
-                hbPmButton.setEnabled(false);
-                hbPmInstMethodWi.setEnabled(false);
+                installDrbdButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+                installDrbdButton.setEnabled(false);
+                drbdInstMethodWidget.setEnabled(false);
+                installPacemakerButton.setEnabled(false);
+                pacemakerInstMethodWidget.setEnabled(false);
+                installHeartbeatPacemakerButton.setEnabled(false);
+                heartbeatPacemakerInstMethodWidget.setEnabled(false);
             }
         });
-        drbdButton.addActionListener(
+        installDrbdButton.addActionListener(
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    if (drbdOk) {
+                    if (drbdInstallationOk) {
                         getDrbdInstallation().setDrbdWillBeUpgraded(true);
                     }
-                    final InstallMethods im = (InstallMethods) drbdInstMethodWi.getValue();
+                    final InstallMethods im = (InstallMethods) drbdInstMethodWidget.getValue();
                     getDrbdInstallation().setDrbdInstallMethodIndex(im.getIndex());
                     final String button = e.getActionCommand();
-                    if (!drbdOk || button.equals(Tools.getString(
-                                                      "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
+                    if (!drbdInstallationOk || button.equals(Tools.getString(
+                                                    "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"))) {
                         if (im.isLinbitMethod()) {
                             nextDialogObject = drbdLinbitAvailPackagesDialog;
                         } else if (im.isSourceMethod()) {
@@ -218,15 +185,14 @@ final class CheckInstallation extends DialogHost {
             }
         );
 
-        hbPmButton.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
-        hbPmButton.addActionListener(
+        installHeartbeatPacemakerButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+        installHeartbeatPacemakerButton.addActionListener(
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = heartbeatInstDialog;
                     nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                    final InstallMethods im = (InstallMethods) hbPmInstMethodWi.getValue();
+                    final InstallMethods im = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
                     getHost().setHeartbeatPacemakerInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -238,15 +204,14 @@ final class CheckInstallation extends DialogHost {
             }
         );
 
-        pmButton.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
-        pmButton.addActionListener(
+        installPacemakerButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
+        installPacemakerButton.addActionListener(
             new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     nextDialogObject = pacemakerInstDialog;
                     nextDialogObject.init(thisClass, getHost(), getDrbdInstallation());
-                    final InstallMethods im = (InstallMethods) pmInstMethodWi.getValue();
+                    final InstallMethods im = (InstallMethods) pacemakerInstMethodWidget.getValue();
                     getHost().setPacemakerInstallMethodIndex(im.getIndex());
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -259,20 +224,20 @@ final class CheckInstallation extends DialogHost {
         );
 
         getHost().execCommand(new ExecCommandConfig().commandString("DrbdCheck.version")
-                         .progressBar(getProgressBar())
-                         .execCallback(new ExecCallback() {
-                             @Override
-                             public void done(final String answer) {
-                                 checkDrbd(answer);
-                             }
-                             @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 checkDrbd(""); // not installed
-                             }
-                         })
-                         .silentCommand()
-                         .silentOutput());
+                                                     .progressBar(getProgressBar())
+                                                     .execCallback(new ExecCallback() {
+                                                         @Override
+                                                         public void done(final String answer) {
+                                                             checkDrbd(answer);
+                                                         }
+                                                         @Override
+                                                         public void doneError(final String answer,
+                                                                               final int errorCode) {
+                                                             checkDrbd(""); // not installed
+                                                         }
+                                                     })
+                                                     .silentCommand()
+                                                     .silentOutput());
     }
 
     /**
@@ -283,39 +248,36 @@ final class CheckInstallation extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    drbdLabel.setText(": " + Tools.getString(
-                            "Dialog.Host.CheckInstallation.DrbdNotInstalled"));
-                    drbdIcon.setIcon(NOT_INSTALLED_ICON);
+                    checkingDrbdLabel.setText(": " + Tools.getString("Dialog.Host.CheckInstallation.DrbdNotInstalled"));
+                    checkingDrbdIcon.setIcon(NOT_INSTALLED_ICON);
                     final String toolTip = getInstToolTip(DRBD_PREFIX, "1");
-                    drbdInstMethodWi.setToolTipText(toolTip);
-                    drbdButton.setToolTipText(toolTip);
-                    drbdButton.setEnabled(true);
-                    drbdInstMethodWi.setEnabled(true);
+                    drbdInstMethodWidget.setToolTipText(toolTip);
+                    installDrbdButton.setToolTipText(toolTip);
+                    installDrbdButton.setEnabled(true);
+                    drbdInstMethodWidget.setEnabled(true);
                 }
             });
         } else {
-            drbdOk = true;
+            drbdInstallationOk = true;
             Tools.invokeLater(new Runnable() {
                 @Override
                 @SuppressWarnings("DeadBranch")
                 public void run() {
-                    drbdLabel.setText(": " + ans.trim());
+                    checkingDrbdLabel.setText(": " + ans.trim());
                     if (getDrbdInstallation().isDrbdUpgradeAvailable(ans.trim())) {
-                        drbdIcon.setIcon(UPGR_AVAIL_ICON);
-                        drbdButton.setText(Tools.getString(
-                          "Dialog.Host.CheckInstallation.DrbdUpgradeButton"));
-                        drbdButton.setEnabled(true);
-                        drbdInstMethodWi.setEnabled(true);
+                        checkingDrbdIcon.setIcon(UPGRADE_AVAILABLE_ICON);
+                        installDrbdButton.setText(Tools.getString("Dialog.Host.CheckInstallation.DrbdUpgradeButton"));
+                        installDrbdButton.setEnabled(true);
+                        drbdInstMethodWidget.setEnabled(true);
                     } else {
-                        drbdButton.setText(Tools.getString(
-                     "Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"
-                        ));
+                        installDrbdButton.setText(
+                                          Tools.getString("Dialog.Host.CheckInstallation.DrbdCheckForUpgradeButton"));
                         if (false) {
                             // TODO: disabled
-                            drbdButton.setEnabled(true);
-                            drbdInstMethodWi.setEnabled(true);
+                            installDrbdButton.setEnabled(true);
+                            drbdInstMethodWidget.setEnabled(true);
                         }
-                        drbdIcon.setIcon(INSTALLED_ICON);
+                        checkingDrbdIcon.setIcon(ALREADY_INSTALLED_ICON);
                     }
                 }
             });
@@ -329,8 +291,7 @@ final class CheckInstallation extends DialogHost {
                                                          }
 
                                                          @Override
-                                                         public void doneError(final String answer,
-                                                                               final int errorCode) {
+                                                         public void doneError(final String answer, final int errorCode) {
                                                              done("");
                                                          }
                                                      })
@@ -338,10 +299,6 @@ final class CheckInstallation extends DialogHost {
                                                      .silentOutput());
     }
 
-    /**
-     * Checks whether heartbeat/pacemaker is installed and starts
-     * openais/pacemaker check.
-     */
     void checkAisHbPm(final String ans) {
         getHost().setPacemakerVersion(null);
         getHost().setOpenaisVersion(null);
@@ -356,27 +313,22 @@ final class CheckInstallation extends DialogHost {
         final String corosyncVersion = getHost().getCorosyncVersion();
         String hbVersion = getHost().getHeartbeatVersion();
         if (hbVersion == null
-            && (getHost().getPacemakerVersion() == null
-                || (corosyncVersion == null && aisVersion == null))) {
-            final InstallMethods hbim =
-                                  (InstallMethods) hbPmInstMethodWi.getValue();
+            && (getHost().getPacemakerVersion() == null || (corosyncVersion == null && aisVersion == null))) {
+            final InstallMethods hbim = (InstallMethods) heartbeatPacemakerInstMethodWidget.getValue();
             if (hbim != null) {
-                hbPmButton.setEnabled(true);
-                hbPmInstMethodWi.setEnabled(true);
-                final String toolTip =
-                                  getInstToolTip(HBPM_PREFIX, hbim.getIndex());
-                hbPmInstMethodWi.setToolTipText(toolTip);
-                hbPmButton.setToolTipText(toolTip);
+                installHeartbeatPacemakerButton.setEnabled(true);
+                heartbeatPacemakerInstMethodWidget.setEnabled(true);
+                final String toolTip = getInstToolTip(HEARTBEAT_PACEMAKER_PREFIX, hbim.getIndex());
+                heartbeatPacemakerInstMethodWidget.setToolTipText(toolTip);
+                installHeartbeatPacemakerButton.setToolTipText(toolTip);
             }
-            final InstallMethods pmim =
-                                    (InstallMethods) pmInstMethodWi.getValue();
+            final InstallMethods pmim = (InstallMethods) pacemakerInstMethodWidget.getValue();
             if (pmim != null) {
-                pmButton.setEnabled(true);
-                pmInstMethodWi.setEnabled(true);
-                final String aisToolTip =
-                                  getInstToolTip(PM_PREFIX, pmim.getIndex());
-                pmInstMethodWi.setToolTipText(aisToolTip);
-                pmButton.setToolTipText(aisToolTip);
+                installPacemakerButton.setEnabled(true);
+                pacemakerInstMethodWidget.setEnabled(true);
+                final String aisToolTip = getInstToolTip(PACEMAKER_PREFIX, pmim.getIndex());
+                pacemakerInstMethodWidget.setToolTipText(aisToolTip);
+                installPacemakerButton.setToolTipText(aisToolTip);
             }
         }
         if (hbVersion == null) {
@@ -384,13 +336,13 @@ final class CheckInstallation extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hbPmIcon.setIcon(NOT_INSTALLED_ICON);
-                    hbPmLabel.setText(": " + Tools.getString(
-                             "Dialog.Host.CheckInstallation.HbPmNotInstalled"));
+                    heartbeatPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
+                    checkingHeartbeatPacemakerLabel.setText(
+                                            ": " + Tools.getString("Dialog.Host.CheckInstallation.HbPmNotInstalled"));
                 }
             });
         } else {
-            hbPmOk = true;
+            heartbeatPacemakerInstallationOk = true;
             final String text;
             if ("2.1.3".equals(hbVersion)
                 && "sles10".equals(getHost().getDistributionVersion())) {
@@ -405,61 +357,54 @@ final class CheckInstallation extends DialogHost {
                 @Override
                 public void run() {
                     if (getHost().getPacemakerVersion() == null
-                        || getHost().getHeartbeatVersion().equals(
-                                            getHost().getPacemakerVersion())) {
-                        hbPmJLabel.setText("Heartbeat");
-                        hbPmLabel.setText(": " + text);
+                        || getHost().getHeartbeatVersion().equals(getHost().getPacemakerVersion())) {
+                        heartbeatPacemakerLabel.setText("Heartbeat");
+                        checkingHeartbeatPacemakerLabel.setText(": " + text);
                     } else {
-                        hbPmLabel.setText(": "
-                                          + getHost().getPacemakerVersion()
-                                          + '/' + text);
+                        checkingHeartbeatPacemakerLabel.setText(": " + getHost().getPacemakerVersion() + '/' + text);
                     }
-                    hbPmIcon.setIcon(INSTALLED_ICON);
+                    heartbeatPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
                 }
             });
         }
-        if (getHost().getPacemakerVersion() == null
-            || (aisVersion == null && corosyncVersion == null)) {
+        if (getHost().getPacemakerVersion() == null || (aisVersion == null && corosyncVersion == null)) {
             /* corosync */
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    pmIcon.setIcon(NOT_INSTALLED_ICON);
-                    pmLabel.setText(": " + Tools.getString(
-                            "Dialog.Host.CheckInstallation.PmNotInstalled"));
-                    pmJLabel.setText("Pcmk/Corosync");
+                    checkingPacemakerIcon.setIcon(NOT_INSTALLED_ICON);
+                    checkingPacemakerLabel.setText(
+                                            ": " + Tools.getString("Dialog.Host.CheckInstallation.PmNotInstalled"));
+                    pacemakerLabel.setText("Pcmk/Corosync");
                 }
             });
         } else {
-            pmOk = true;
+            pacemakerInstallationOk = true;
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    pmIcon.setIcon(INSTALLED_ICON);
+                    checkingPacemakerIcon.setIcon(ALREADY_INSTALLED_ICON);
                     String coroAisVersion = "no";
                     if (corosyncVersion != null) {
-                        pmJLabel.setText("Pcmk/Corosync");
+                        pacemakerLabel.setText("Pcmk/Corosync");
                         coroAisVersion = corosyncVersion;
                     } else if (aisVersion != null) {
-                        pmJLabel.setText("Pcmk/AIS");
+                        pacemakerLabel.setText("Pcmk/AIS");
                         coroAisVersion = aisVersion;
                     }
-                    pmJLabel.repaint();
-                    pmLabel.setText(": "
-                                       + getHost().getPacemakerVersion() + '/'
-                                       + coroAisVersion);
+                    pacemakerLabel.repaint();
+                    checkingPacemakerLabel.setText(": " + getHost().getPacemakerVersion() + '/' + coroAisVersion);
                 }
             });
         }
 
         final List<String> incorrect = new ArrayList<String>();
-        if (drbdOk && (hbPmOk || pmOk)) {
+        if (drbdInstallationOk && (heartbeatPacemakerInstallationOk || pacemakerInstallationOk)) {
             progressBarDone();
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    answerPaneSetText(Tools.getString(
-                                       "Dialog.Host.CheckInstallation.AllOk"));
+                    answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk"));
                 }
             });
             if (Tools.getApplication().getAutoOptionHost("drbdinst") != null
@@ -475,9 +420,13 @@ final class CheckInstallation extends DialogHost {
             }
         } else {
             progressBarDoneError();
-            LOG.debug2("checkAisHbPm: drbd: " + drbdOk + ", ais/pm: " + pmOk + ", hb/pm: " + hbPmOk);
-            final String error = Tools.getString(
-                                  "Dialog.Host.CheckInstallation.SomeFailed");
+            LOG.debug2("checkAisHbPm: drbd: "
+                       + drbdInstallationOk
+                       + ", ais/pm: "
+                       + pacemakerInstallationOk
+                       + ", hb/pm: "
+                       + heartbeatPacemakerInstallationOk);
+            final String error = Tools.getString("Dialog.Host.CheckInstallation.SomeFailed");
             printErrorAndRetry(error);
             incorrect.add(error);
         }
@@ -485,40 +434,28 @@ final class CheckInstallation extends DialogHost {
         enableComponents();
         enableNextButtons(incorrect, changed);
         makeDefaultAndRequestFocus(buttonClass(nextButton()));
-        if (!drbdOk
-            && Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+        if (!drbdInstallationOk && Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
-            drbdButton.pressButton();
-        } else if (!hbPmOk
-            && Tools.getApplication().getAutoOptionHost("hbinst") != null) {
+            installDrbdButton.pressButton();
+        } else if (!heartbeatPacemakerInstallationOk && Tools.getApplication().getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
-            hbPmButton.pressButton();
-        } else if (!pmOk
-            && Tools.getApplication().getAutoOptionHost("pminst") != null) {
+            installHeartbeatPacemakerButton.pressButton();
+        } else if (!pacemakerInstallationOk && Tools.getApplication().getAutoOptionHost("pminst") != null) {
             Tools.sleep(1000);
-            pmButton.pressButton();
+            installPacemakerButton.pressButton();
         }
     }
 
-    /** Returns the next dialog object. It is set dynamicaly. */
     @Override
     public WizardDialog nextDialog() {
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.CheckInstallation.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.CheckInstallation.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.CheckInstallation.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.CheckInstallation.Description");
@@ -530,51 +467,47 @@ final class CheckInstallation extends DialogHost {
      */
     private JPanel getInstallationPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pmInstMethodWi = getInstallationMethods(
-                            PM_PREFIX,
-                            Tools.getApplication().isStagingPacemaker(),
-                            Tools.getApplication().getLastHbPmInstalledMethod(),
-                            PM_AUTO_OPTION,
-                            pmButton);
+        pacemakerInstMethodWidget = getInstallationMethods(PACEMAKER_PREFIX,
+                                                           Tools.getApplication().isStagingPacemaker(),
+                                                           Tools.getApplication().getLastHbPmInstalledMethod(),
+                                                           PACEMAKER_AUTOTEST_OPTION,
+                                                           installPacemakerButton);
 
-        hbPmInstMethodWi = getInstallationMethods(
-                            HBPM_PREFIX,
-                            Tools.getApplication().isStagingPacemaker(),
-                            Tools.getApplication().getLastHbPmInstalledMethod(),
-                            HBPM_AUTO_OPTION,
-                            hbPmButton);
-        drbdInstMethodWi = getInstallationMethods(
-                            DRBD_PREFIX,
-                            Tools.getApplication().isStagingDrbd(),
-                            Tools.getApplication().getLastDrbdInstalledMethod(),
-                            DRBD_AUTO_OPTION,
-                            drbdButton);
-        final String lastInstalled =
-                          Tools.getApplication().getLastInstalledClusterStack();
+        heartbeatPacemakerInstMethodWidget = getInstallationMethods(HEARTBEAT_PACEMAKER_PREFIX,
+                                                                    Tools.getApplication().isStagingPacemaker(),
+                                                                    Tools.getApplication().getLastHbPmInstalledMethod(),
+                                                                    HEARTBEAT_PACEMAKER_AUTOTEST_OPTION,
+                                                                    installHeartbeatPacemakerButton);
+        drbdInstMethodWidget = getInstallationMethods(DRBD_PREFIX,
+                                                      Tools.getApplication().isStagingDrbd(),
+                                                      Tools.getApplication().getLastDrbdInstalledMethod(),
+                                                      DRBD_AUTOTEST_OPTION,
+                                                      installDrbdButton);
+        final String lastInstalled = Tools.getApplication().getLastInstalledClusterStack();
         if (lastInstalled != null) {
             if (Application.HEARTBEAT_NAME.equals(lastInstalled)) {
-                pmJLabel.setForeground(Color.LIGHT_GRAY);
-                pmLabel.setForeground(Color.LIGHT_GRAY);
+                pacemakerLabel.setForeground(Color.LIGHT_GRAY);
+                checkingPacemakerLabel.setForeground(Color.LIGHT_GRAY);
             } else if (Application.COROSYNC_NAME.equals(lastInstalled)) {
-                hbPmJLabel.setForeground(Color.LIGHT_GRAY);
-                hbPmLabel.setForeground(Color.LIGHT_GRAY);
+                heartbeatPacemakerLabel.setForeground(Color.LIGHT_GRAY);
+                checkingHeartbeatPacemakerLabel.setForeground(Color.LIGHT_GRAY);
             }
         }
-        pane.add(hbPmJLabel);
-        pane.add(hbPmLabel);
-        pane.add(hbPmIcon);
-        pane.add(hbPmInstMethodWi.getComponent());
-        pane.add(hbPmButton);
-        pane.add(pmJLabel);
-        pane.add(pmLabel);
-        pane.add(pmIcon);
-        pane.add(pmInstMethodWi.getComponent());
-        pane.add(pmButton);
+        pane.add(heartbeatPacemakerLabel);
+        pane.add(checkingHeartbeatPacemakerLabel);
+        pane.add(heartbeatPacemakerIcon);
+        pane.add(heartbeatPacemakerInstMethodWidget.getComponent());
+        pane.add(installHeartbeatPacemakerButton);
+        pane.add(pacemakerLabel);
+        pane.add(checkingPacemakerLabel);
+        pane.add(checkingPacemakerIcon);
+        pane.add(pacemakerInstMethodWidget.getComponent());
+        pane.add(installPacemakerButton);
         pane.add(new JLabel("Drbd"));
-        pane.add(drbdLabel);
-        pane.add(drbdIcon);
-        pane.add(drbdInstMethodWi.getComponent());
-        pane.add(drbdButton);
+        pane.add(checkingDrbdLabel);
+        pane.add(checkingDrbdIcon);
+        pane.add(drbdInstMethodWidget.getComponent());
+        pane.add(installDrbdButton);
 
         SpringUtilities.makeCompactGrid(pane, 3, 5,  //rows, cols
                                               1, 1,  //initX, initY
@@ -582,14 +515,12 @@ final class CheckInstallation extends DialogHost {
         return pane;
     }
 
-    /** Returns input pane with installation pane and answer pane. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getInstallationPane());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(Tools.getString(
-                                    "Dialog.Host.CheckInstallation.Checking")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.CheckInstallation.Checking")));
         SpringUtilities.makeCompactGrid(pane, 3, 1,  //rows, cols
                                               0, 0,  //initX, initY
                                               0, 0); //xPad, yPad
@@ -597,7 +528,6 @@ final class CheckInstallation extends DialogHost {
         return pane;
     }
 
-    /** Enable skip button. */
     @Override
     protected boolean skipButtonEnabled() {
         return true;

@@ -26,22 +26,14 @@ package lcmc.gui.dialog.cluster;
 import lcmc.model.Cluster;
 import lcmc.gui.dialog.WizardDialog;
 
-/**
- * DialogCluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
- */
 public abstract class DialogCluster extends WizardDialog {
-    /** Cluster object. */
     private Cluster cluster;
 
-    public void init(final WizardDialog previousDialog, final Cluster cluster) {
+    public void init(final WizardDialog previousDialog, final Cluster cluster0) {
         setPreviousDialog(previousDialog);
-        this.cluster = cluster;
+        this.cluster = cluster0;
     }
 
-    /** Returns cluster object. */
     protected final Cluster getCluster() {
         return cluster;
     }

@@ -40,23 +40,15 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 public class SSH extends DialogHost {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
     @Autowired
     private Devices devicesDialog;
 
-    /** Connects to all hosts. */
     private String connectHost() {
-        final SSHGui sshGui = new SSHGui(getDialogPanel(),
-                                         getHost(),
-                                         getProgressBar());
+        final SSHGui sshGui = new SSHGui(getDialogPanel(), getHost(), getProgressBar());
 
         getHost().connect(sshGui, getProgressBar(),
                      new ConnectionCallback() {
@@ -67,34 +59,26 @@ public class SSH extends DialogHost {
                              LOG.debug1("done: callback done flag: " + flag);
                              getHost().setConnected();
                              progressBarDone();
-                             answerPaneSetText(
-                                Tools.getString("Dialog.Host.SSH.Connected"));
-                             //enableComponents();
+                             answerPaneSetText(Tools.getString("Dialog.Host.SSH.Connected"));
                              Tools.invokeLater(new Runnable() {
                                  @Override
                                  public void run() {
                                     buttonClass(nextButton()).pressButton();
                                  }
                              });
-                             final List<String> incorrect =
-                                                      new ArrayList<String>();
-                             final List<String> changed =
-                                                      new ArrayList<String>();
+                             final List<String> incorrect = new ArrayList<String>();
+                             final List<String> changed = new ArrayList<String>();
                              enableNextButtons(incorrect, changed);
                          }
 
                          @Override
                          public void doneError(final String errorText) {
                              getHost().setConnected();
-                             final String error = Tools.getString(
-                                                "Dialog.Host.SSH.NotConnected")
-                                                + '\n' + errorText;
+                             final String error = Tools.getString("Dialog.Host.SSH.NotConnected") + '\n' + errorText;
                              printErrorAndRetry(error);
-                             final List<String> incorrect =
-                                                      new ArrayList<String>();
+                             final List<String> incorrect = new ArrayList<String>();
                              incorrect.add(error);
-                             final List<String> changed =
-                                                      new ArrayList<String>();
+                             final List<String> changed = new ArrayList<String>();
                              enableNextButtons(incorrect, changed);
                          }
                       });
@@ -103,20 +87,17 @@ public class SSH extends DialogHost {
         return null;
     }
 
-    /** Returns the next dialog. Devices */
     @Override
     public WizardDialog nextDialog() {
         devicesDialog.init(getPreviousDialog(), getHost(), getDrbdInstallation());
         return devicesDialog;
     }
 
-    /** Inits the dialog and start connecting to the hosts. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected final void initDialogAfterVisible() {
         final Thread thread = new Thread(
@@ -129,29 +110,19 @@ public class SSH extends DialogHost {
         thread.start();
     }
 
-    /**
-     * Returns the title of the dialog, defined as
- Dialog.Host.Ssh.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.SSH.Title");
     }
 
-    /**
-     * Returns the description of the dialog, defined as
- Dialog.Host.Ssh.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.SSH.Description");
     }
 
-    /** Returns a pane where ssh connection will be attempted. */
     @Override
     protected final JComponent getInputPane() {
         final JPanel pane = new JPanel();
-        //final JPanel pane = new JPanel(new SpringLayout());
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         pane.add(getProgressBarPane(
                     new CancelCallback() {
@@ -164,9 +135,6 @@ public class SSH extends DialogHost {
                 ));
         pane.add(getAnswerPane(Tools.getString("Dialog.Host.SSH.Connecting")));
 
-//        SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
-//                                              1, 1,  // initX, initY
-//                                              1, 1); // xPad, yPad
         return pane;
     }
 }

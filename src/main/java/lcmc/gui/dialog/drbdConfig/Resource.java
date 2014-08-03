@@ -55,70 +55,51 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * An implementation of a dialog where user can enter drbd resource
  * information.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Resource extends DrbdConfig {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Resource.class);
-    /** Wfc timeout option string. */
     private static final String WFC_TIMEOUT_PARAM = "wfc-timeout";
-    /** Degr wfc timeout option string. */
     private static final String DEGR_WFC_TIMEOUT_PARAM = "degr-wfc-timeout";
 
-    /** Allow two primaries string. */
-    private static final String ALLOW_TWO_PRIMARIES =
-                                                  "allow-two-primaries";
-    /** cram-hmac-alg option string. */
-    private static final String CRAM_HMAC_ALG = "cram-hmac-alg";
-    /** shared-secret option string. */
-    private static final String SHARED_SECRET = "shared-secret";
-    /** on-io-error option string. */
-    private static final String ON_IO_ERROR = "on-io-error";
-    /** memlimit proxy option string. */
-    private static final String PROXY_MEMLIMIT = "memlimit";
-    private static final String PROXY_PLUGIN_ZLIB = "plugin-zlib";
-    private static final String PROXY_PLUGIN_LZMA = "plugin-lzma";
-    /** Common configuration options. */
+    private static final String ALLOW_TWO_PRIMARIES_PARAM = "allow-two-primaries";
+    private static final String CRAM_HMAC_ALG_PARAM = "cram-hmac-alg";
+    private static final String SHARED_SECRET_PARAM = "shared-secret";
+    private static final String ON_IO_ERROR_PARAM = "on-io-error";
+    private static final String PROXY_MEMLIMIT_PARAM = "memlimit";
+    private static final String PROXY_PLUGIN_ZLIB_PARAM = "plugin-zlib";
+    private static final String PROXY_PLUGIN_LZMA_PARAM = "plugin-lzma";
+
     private static final String[] COMMON_PARAMS = {DrbdXml.PROTOCOL_PARAM,
                                                    DrbdXml.PING_TIMEOUT_PARAM,
-                                                   CRAM_HMAC_ALG,
-                                                   SHARED_SECRET,
+                                                   CRAM_HMAC_ALG_PARAM,
+                                                   SHARED_SECRET_PARAM,
                                                    WFC_TIMEOUT_PARAM,
                                                    DEGR_WFC_TIMEOUT_PARAM,
-                                                   ON_IO_ERROR,
-                                                   PROXY_MEMLIMIT,
-                                                   PROXY_PLUGIN_ZLIB,
-                                                   PROXY_PLUGIN_LZMA};
-    /** Configuration options of the drbd resource. */
+                                                   ON_IO_ERROR_PARAM,
+                                                   PROXY_MEMLIMIT_PARAM,
+                                                   PROXY_PLUGIN_ZLIB_PARAM,
+                                                   PROXY_PLUGIN_LZMA_PARAM};
     private static final String[] PARAMS = {"name",
                                             DrbdXml.PROTOCOL_PARAM,
                                             DrbdXml.PING_TIMEOUT_PARAM,
-                                            ALLOW_TWO_PRIMARIES,
-                                            CRAM_HMAC_ALG,
-                                            SHARED_SECRET,
+                                            ALLOW_TWO_PRIMARIES_PARAM,
+                                            CRAM_HMAC_ALG_PARAM,
+                                            SHARED_SECRET_PARAM,
                                             WFC_TIMEOUT_PARAM,
                                             DEGR_WFC_TIMEOUT_PARAM,
-                                            ON_IO_ERROR,
-                                            PROXY_MEMLIMIT,
-                                            PROXY_PLUGIN_ZLIB,
-                                            PROXY_PLUGIN_LZMA};
-    /** Length of the secret string. */
+                                            ON_IO_ERROR_PARAM,
+                                            PROXY_MEMLIMIT_PARAM,
+                                            PROXY_PLUGIN_ZLIB_PARAM,
+                                            PROXY_PLUGIN_LZMA_PARAM};
     private static final int SECRET_STRING_LENGTH = 32;
-    /** Whether to add proxy host. */
     private boolean proxyHostNextDialog = false;
     @Autowired
     private HostFactory hostFactory;
 
-    /** Prepares a new {@code Resource} object. */
-    public Resource(final WizardDialog previousDialog,
-                    final VolumeInfo dvi) {
+    public Resource(final WizardDialog previousDialog, final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 
-    /** Returns a string with SECRET_STRING_LENGTH random characters. */
     private String getRandomSecret() {
         return Tools.getRandomSecret(SECRET_STRING_LENGTH);
     }
@@ -138,8 +119,7 @@ public final class Resource extends DrbdConfig {
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
         if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
-                if (!protocolInNetSection
-                    && DrbdXml.PROTOCOL_PARAM.equals(commonP)) {
+                if (!protocolInNetSection && DrbdXml.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
                 final Widget wi = globalInfo.getWidget(commonP, null);
@@ -155,19 +135,11 @@ public final class Resource extends DrbdConfig {
         return new Volume(this, getDrbdVolumeInfo());
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.DrbdConfig.Resource.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.Resource.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.DrbdConfig.Resource.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.Resource.Description");
@@ -179,14 +151,12 @@ public final class Resource extends DrbdConfig {
         dri.waitForInfoPanel();
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
@@ -208,7 +178,6 @@ public final class Resource extends DrbdConfig {
         }
     }
 
-    /** Returns input pane where user can configure a drbd resource. */
     @Override
     protected JComponent getInputPane() {
         final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
@@ -219,40 +188,32 @@ public final class Resource extends DrbdConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         /* common options */
-        final Map<String, Value> commonPreferredValue =
-                                                new HashMap<String, Value>();
+        final Map<String, Value> commonPreferredValue = new HashMap<String, Value>();
         commonPreferredValue.put(DrbdXml.PROTOCOL_PARAM, DrbdXml.PROTOCOL_C);
         commonPreferredValue.put(DEGR_WFC_TIMEOUT_PARAM, new StringValue("0"));
-        commonPreferredValue.put(CRAM_HMAC_ALG, new StringValue("sha1"));
-        commonPreferredValue.put(SHARED_SECRET, new StringValue(getRandomSecret()));
-        commonPreferredValue.put(ON_IO_ERROR, new StringValue("detach"));
-        commonPreferredValue.put(PROXY_MEMLIMIT,
-                                 new StringValue("100",
-                                                 DrbdXml.getUnitMiBytes("")));
-        commonPreferredValue.put(PROXY_PLUGIN_ZLIB, new StringValue("level 9"));
+        commonPreferredValue.put(CRAM_HMAC_ALG_PARAM, new StringValue("sha1"));
+        commonPreferredValue.put(SHARED_SECRET_PARAM, new StringValue(getRandomSecret()));
+        commonPreferredValue.put(ON_IO_ERROR_PARAM, new StringValue("detach"));
+        commonPreferredValue.put(PROXY_MEMLIMIT_PARAM, new StringValue("100", DrbdXml.getUnitMiBytes("")));
+        commonPreferredValue.put(PROXY_PLUGIN_ZLIB_PARAM, new StringValue("level 9"));
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
         if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
-                if (!protocolInNetSection
-                    && DrbdXml.PROTOCOL_PARAM.equals(commonP)) {
+                if (!protocolInNetSection && DrbdXml.PROTOCOL_PARAM.equals(commonP)) {
                     continue;
                 }
-                final Widget wi = globalInfo.getWidget(commonP, null);
-                if (wi == null) {
+                final Widget widget = globalInfo.getWidget(commonP, null);
+                if (widget == null) {
                     LOG.appError("widget for param: " + commonP + " was not created");
                     return new JPanel();
                 }
                 /* for the first resource set common options. */
-                final Value commonValue =
-                                      globalInfo.getResource().getValue(commonP);
+                final Value commonValue = globalInfo.getResource().getValue(commonP);
                 if (commonPreferredValue.containsKey(commonP)) {
-                    final Value defaultValue =
-                               globalInfo.getParamDefault(commonP);
+                    final Value defaultValue = globalInfo.getParamDefault(commonP);
                     if (Tools.areEqual(defaultValue, commonValue)) {
-                        wi.setValue(commonPreferredValue.get(commonP));
-                        dri.getResource().setValue(
-                                            commonP,
-                                            commonPreferredValue.get(commonP));
+                        widget.setValue(commonPreferredValue.get(commonP));
+                        dri.getResource().setValue(commonP, commonPreferredValue.get(commonP));
                     } else {
                         dri.getResource().setValue(commonP, commonValue);
                     }
@@ -261,17 +222,13 @@ public final class Resource extends DrbdConfig {
         } else {
             /* resource options, if not defined in common section. */
             for (final String commonP : COMMON_PARAMS) {
-                final Value commonValue =
-                                      globalInfo.getResource().getValue(commonP);
+                final Value commonValue = globalInfo.getResource().getValue(commonP);
                 if (commonValue == null || commonValue.isNothingSelected()
                     && commonPreferredValue.containsKey(commonP)) {
-                    dri.getResource().setValue(
-                                            commonP,
-                                            commonPreferredValue.get(commonP));
+                    dri.getResource().setValue(commonP, commonPreferredValue.get(commonP));
                 }
             }
         }
-
 
         /* address combo boxes */
         dri.addHostAddresses(optionsPanel,
@@ -279,15 +236,12 @@ public final class Resource extends DrbdConfig {
                              ClusterBrowser.SERVICE_FIELD_WIDTH << 1,
                              true,
                              buttonClass(nextButton()));
-        dri.addWizardParams(
-                  optionsPanel,
-                  PARAMS,
-                  buttonClass(nextButton()),
-                  Tools.getDefaultSize(
-                                "Dialog.DrbdConfig.Resource.LabelWidth"),
-                  Tools.getDefaultSize(
-                        "Dialog.DrbdConfig.Resource.FieldWidth") << 1,
-                  null);
+        dri.addWizardParams(optionsPanel,
+                            PARAMS,
+                            buttonClass(nextButton()),
+                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
+                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth") << 1,
+                            null);
 
         inputPane.add(optionsPanel);
         final JPanel buttonPanel = new JPanel();
@@ -299,17 +253,12 @@ public final class Resource extends DrbdConfig {
         return sp;
     }
 
-    /**
-     * Return "Add Proxy Host" button.
-     */
     private JPanel getProxyHostsPanel() {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.setBorder(Tools.getBorder(
-                    Tools.getString("Dialog.DrbdConfig.Resource.ProxyHosts")));
+        panel.setBorder(Tools.getBorder(Tools.getString("Dialog.DrbdConfig.Resource.ProxyHosts")));
 
-        final MyButton btn = new MyButton(
-                        Tools.getString("Dialog.DrbdConfig.Resource.AddHost"));
+        final MyButton btn = new MyButton(Tools.getString("Dialog.DrbdConfig.Resource.AddHost"));
         btn.setBackgroundColor(AppDefaults.LIGHT_ORANGE);
         btn.addActionListener(new ActionListener() {
             @Override

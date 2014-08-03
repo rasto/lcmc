@@ -39,33 +39,25 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where connection to every host will be checked
  * and established if there isn't one.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class Connect extends DialogCluster {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 
     @Autowired
     private CommStack commStackDialog;
 
-    /** Returns the next dialog which is ClusterDrbdConf. */
     @Override
     public WizardDialog nextDialog() {
         commStackDialog.init(getPreviousDialog(), getCluster());
         return commStackDialog;
     }
 
-    /** Returns cluster dialog title. */
     @Override
     protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Connect.Title");
     }
 
-    /** Returns description. */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Connect.Description");
@@ -89,8 +81,7 @@ final class Connect extends DialogCluster {
             }
             text.append(host.getName()).append(' ').append(status).append('\n');
         }
-        LOG.debug("checkHosts: pending: " + pending + ", one failed: "
-                  + oneFailed);
+        LOG.debug("checkHosts: pending: " + pending + ", one failed: " + oneFailed);
         if (pending) {
              answerPaneSetText(text.toString());
         } else if (oneFailed) {
@@ -112,7 +103,6 @@ final class Connect extends DialogCluster {
         }
     }
 
-    /** Connects all cluster hosts. */
     protected void connectHosts() {
         getCluster().connect(getDialogPanel(), true, 1);
         for (final Host host : getCluster().getHosts()) {
@@ -121,14 +111,12 @@ final class Connect extends DialogCluster {
         checkHosts();
     }
 
-    /** Inits the dialog and connects the hosts. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         final Thread t = new Thread(new Runnable() {
@@ -140,7 +128,6 @@ final class Connect extends DialogCluster {
         t.start();
     }
 
-    /** Returns the connect hosts dialog content. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
@@ -157,7 +144,6 @@ final class Connect extends DialogCluster {
         return pane;
     }
 
-    /** Enable skip button. */
     @Override
     protected boolean skipButtonEnabled() {
         return true;

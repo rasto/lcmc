@@ -39,14 +39,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where heartbeat is installed.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class HeartbeatInst extends DialogHost {
-    /** Next dialog object. */
     @Autowired
     private CheckInstallation checkInstallationDialog;
 
@@ -67,23 +62,19 @@ final class HeartbeatInst extends DialogHost {
         }
     }
 
-    /** Inits the dialog and starts the installation procedure. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         installHeartbeat();
     }
 
-    /** Installs the heartbeat. */
     private void installHeartbeat() {
-        String arch = getHost().getDistString("HbPmInst.install."
-                                              + getHost().getArch());
+        String arch = getHost().getDistString("HbPmInst.install." + getHost().getArch());
         if (arch == null) {
             arch = getHost().getArch();
         }
@@ -96,8 +87,7 @@ final class HeartbeatInst extends DialogHost {
         }
         Tools.getApplication().setLastHbPmInstalledMethod(
             getHost().getDistString("HbPmInst.install.text." + installMethod));
-        Tools.getApplication().setLastInstalledClusterStack(
-                                                Application.HEARTBEAT_NAME);
+        Tools.getApplication().setLastInstalledClusterStack(Application.HEARTBEAT_NAME);
 
         getHost().execCommandInBash(new ExecCommandConfig()
                 .commandString(installCommand)
@@ -109,55 +99,41 @@ final class HeartbeatInst extends DialogHost {
                     }
 
                     @Override
-                    public void doneError(final String answer,
-                                          final int errorCode) {
-                        printErrorAndRetry(Tools.getString(
-                                        "Dialog.Host.HeartbeatInst.InstError"),
-                                answer,
-                                errorCode);
+                    public void doneError(final String answer, final int errorCode) {
+                        printErrorAndRetry(Tools.getString("Dialog.Host.HeartbeatInst.InstError"),
+                                           answer,
+                                           errorCode);
                     }
                 })
                 .convertCmdCallback(new ConvertCmdCallback() {
                     @Override
                     public String convert(final String command) {
-                        return command.replaceAll("@ARCH@",
-                                archString);
+                        return command.replaceAll("@ARCH@", archString);
                     }
                 })
                 .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         return checkInstallationDialog;
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.HeartbeatInst.Description in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.HeartbeatInst.Title");
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.HeartbeatInst.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.HeartbeatInst.Description");
     }
 
-    /** Returns the input pane with info about the installation progress. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(
-                     Tools.getString("Dialog.Host.HeartbeatInst.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.HeartbeatInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               0, 0,  // initX, initY
                                               0, 0); // xPad, yPad

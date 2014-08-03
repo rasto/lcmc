@@ -36,18 +36,13 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a dialog where user can enter drbd volume
  * information.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Volume extends DrbdConfig {
 
     /** Configuration options of the drbd volume. */
     private static final String[] PARAMS = {"number", "device"};
-    /** Prepares a new {@code Volume} object. */
-    public Volume(final WizardDialog previousDialog,
-                  final VolumeInfo dvi) {
+
+    public Volume(final WizardDialog previousDialog, final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 
@@ -55,24 +50,14 @@ public final class Volume extends DrbdConfig {
     @Override
     public WizardDialog nextDialog() {
         Tools.waitForSwing();
-        return new BlockDev(this,
-                            getDrbdVolumeInfo(),
-                            getDrbdVolumeInfo().getFirstBlockDevInfo());
+        return new BlockDev(this, getDrbdVolumeInfo(), getDrbdVolumeInfo().getFirstBlockDevInfo());
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.DrbdConfig.Volume.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.DrbdConfig.Volume.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.DrbdConfig.Volume.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.DrbdConfig.Volume.Description");
@@ -89,12 +74,9 @@ public final class Volume extends DrbdConfig {
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        final boolean correct = getDrbdVolumeInfo().checkResourceFields(
-                                                         null,
-                                                         PARAMS).isCorrect();
+        final boolean correct = getDrbdVolumeInfo().checkResourceFields(null, PARAMS).isCorrect();
         if (correct) {
             enableComponents();
         } else {
@@ -117,13 +99,12 @@ public final class Volume extends DrbdConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        getDrbdVolumeInfo().addWizardParams(
-                  optionsPanel,
-                  PARAMS,
-                  buttonClass(nextButton()),
-                  Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
-                  Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
-                  null);
+        getDrbdVolumeInfo().addWizardParams(optionsPanel,
+                                            PARAMS,
+                                            buttonClass(nextButton()),
+                                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
+                                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
+                                            null);
 
         inputPane.add(optionsPanel);
         final JScrollPane sp = new JScrollPane(inputPane);

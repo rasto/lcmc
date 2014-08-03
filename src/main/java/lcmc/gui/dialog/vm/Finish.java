@@ -40,52 +40,35 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class Finish extends VMConfig {
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
 
-    /** Prepares a new {@code Finish} object. */
-    Finish(final WizardDialog previousDialog,
-           final DomainInfo vmsVirtualDomainInfo) {
+    Finish(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         return null;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Finish.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.Finish.Description");
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(finishButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
@@ -97,7 +80,6 @@ final class Finish extends VMConfig {
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         final DomainInfo vdi = getVMSVirtualDomainInfo();
@@ -108,8 +90,7 @@ final class Finish extends VMConfig {
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         final MyButton createConfigBtn = new MyButton("Create Config");
-        createConfigBtn.setBackgroundColor(
-                                 Tools.getDefaultColor("ConfigDialog.Button"));
+        createConfigBtn.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         createConfigBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -138,16 +119,15 @@ final class Finish extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         vdi.waitForInfoPanel();
-        optionsPanel.add(vdi.getDefinedOnHostsPanel(Widget.WIZARD_PREFIX,
-                                                    createConfigBtn));
+        optionsPanel.add(vdi.getDefinedOnHostsPanel(Widget.WIZARD_PREFIX, createConfigBtn));
 
         optionsPanel.add(createConfigBtn);
         panel.add(optionsPanel);
 
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 }

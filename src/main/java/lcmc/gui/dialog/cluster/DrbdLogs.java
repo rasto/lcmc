@@ -32,18 +32,14 @@ import lcmc.gui.dialog.ClusterLogs;
 
 /**
  * An implementation of an dialog with log files from many hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class DrbdLogs extends ClusterLogs {
     /** Name of the drbd device. */
-    private final String deviceName;
+    private final String drbdDeviceName;
 
-    /** Prepares a new {@code DrbdLogs} object. */
     public DrbdLogs(final Cluster cluster, final String device) {
         super(cluster);
-        deviceName = device.substring(device.lastIndexOf('/') + 1);
+        drbdDeviceName = device.substring(device.lastIndexOf('/') + 1);
     }
 
     /**
@@ -59,15 +55,15 @@ public final class DrbdLogs extends ClusterLogs {
     @Override
     protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
-        selected.add(deviceName);
+        selected.add(drbdDeviceName);
         return selected;
     }
 
     /** Returns a map from pattern name to its pattern. */
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> pm = new LinkedHashMap<String, String>();
-        pm.put(deviceName, wordBoundary(deviceName));
-        return pm;
+        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        patternMap.put(drbdDeviceName, wordBoundary(drbdDeviceName));
+        return patternMap;
     }
 }

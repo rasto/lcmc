@@ -29,17 +29,10 @@ import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class SSHProxy extends SSH {
-    /** drbd volume info. */
     private final VolumeInfo volumeInfo;
-    /** The dialog we came from. */
     private final WizardDialog origDialog;
-    /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     public SSHProxy(final WizardDialog previousDialog,
@@ -52,7 +45,6 @@ public final class SSHProxy extends SSH {
         this.origDialog = origDialog;
     }
 
-    /** Returns the next dialog. Devices */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
@@ -62,7 +54,6 @@ public final class SSHProxy extends SSH {
         }
     }
 
-    /** Finish dialog. */
     @Override
     protected void finishDialog() {
         super.finishDialog();
@@ -79,15 +70,11 @@ public final class SSHProxy extends SSH {
         }
     }
 
-    /** Buttons that are enabled/disabled during checks. */
     @Override
     protected MyButton[] nextButtons() {
         return new MyButton[]{buttonClass(finishButton())};
     }
 
-    /**
-     * Return dialog that comes after "cancel" button was pressed.
-     */
     @Override
     protected WizardDialog dialogAfterCancel() {
         return origDialog;

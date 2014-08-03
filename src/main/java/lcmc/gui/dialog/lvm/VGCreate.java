@@ -58,60 +58,48 @@ import lcmc.utilities.Tools;
 
 /** Create VG dialog. */
 public final class VGCreate extends LV {
-    /** Description create VG. */
-    private static final String VG_CREATE_DESCRIPTION =
-                                                    "Create a volume group.";
-    /** VG create timeout. */
+    private static final String VG_CREATE_DESCRIPTION = "Create a volume group.";
     private static final int CREATE_TIMEOUT = 5000;
     private final Host host;
-    /** Selected block device, can be null. */
-    private final Collection<BlockDevInfo> selectedBlockDevInfos =
-                                                 new ArrayList<BlockDevInfo>();
+    private final Collection<BlockDevInfo> selectedBlockDevInfos = new ArrayList<BlockDevInfo>();
     private final MyButton createButton = new MyButton("Create VG");
     private Widget vgNameWi;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
 
-    /** Create new VGCreate object. */
     public VGCreate(final Host host) {
         super(null);
         this.host = host;
     }
 
-    /** Create new VGCreate object. */
     public VGCreate(final Host host, final BlockDevInfo sbdi) {
         super(null);
         this.host = host;
         selectedBlockDevInfos.add(sbdi);
     }
 
-    /** Create new VGCreate object. */
     public VGCreate(final Host host, final Collection<BlockDevInfo> sbdis) {
         super(null);
         this.host = host;
         selectedBlockDevInfos.addAll(sbdis);
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getDialogTitle() {
         return "Create VG";
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return VG_CREATE_DESCRIPTION;
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
@@ -119,11 +107,10 @@ public final class VGCreate extends LV {
         makeDefaultButton(createButton);
     }
 
-    /** Enables and disabled buttons. */
     protected void checkButtons() {
         boolean enable = true;
         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
-            if (hostEntry.getValue().isSelected() && !hostHasPVS(hostEntry.getKey())) {
+            if (hostEntry.getValue().isSelected() && !hostHasPVSWithoutVGs(hostEntry.getKey())) {
                 enable = false;
                 break;
             }
@@ -131,7 +118,6 @@ public final class VGCreate extends LV {
         enableCreateButton(enable);
     }
 
-    /** Enable create button. */
     private void enableCreateButton(boolean enable) {
         if (enable) {
             boolean vgNameCorrect = true;
@@ -140,10 +126,8 @@ public final class VGCreate extends LV {
             } else if (hostCheckBoxes != null) {
                 for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                     if (hostEntry.getValue().isSelected()) {
-                        final Set<String> vgs =
-                                hostEntry.getKey().getVolumeGroupNames();
-                        if (vgs != null && vgs.contains(
-                                        vgNameWi.getStringValue())) {
+                        final Set<String> vgs = hostEntry.getKey().getVolumeGroupNames();
+                        if (vgs != null && vgs.contains(vgNameWi.getStringValue())) {
                             vgNameCorrect = false;
                             break;
                         }
@@ -160,26 +144,19 @@ public final class VGCreate extends LV {
         createButton.setEnabled(enable);
     }
 
-    /** Returns array of volume group checkboxes. */
-    private Map<String, JCheckBox> getPVCheckBoxes(
-                                               final Collection<String> selectedPVs) {
-        final Map<String, JCheckBox> components =
-                                        new LinkedHashMap<String, JCheckBox>();
+    private Map<String, JCheckBox> getPVCheckBoxes(final Collection<String> selectedPVs) {
+        final Map<String, JCheckBox> components = new LinkedHashMap<String, JCheckBox>();
         for (final BlockDevice pv : host.getPhysicalVolumes()) {
             final String pvName = pv.getName();
-            final JCheckBox button =
-                           new JCheckBox(pvName, selectedPVs.contains(pvName));
-            button.setBackground(
-                       Tools.getDefaultColor("ConfigDialog.Background.Light"));
+            final JCheckBox button = new JCheckBox(pvName, selectedPVs.contains(pvName));
+            button.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
             components.put(pvName, button);
         }
         return components;
     }
 
-    /** Returns true if the specified host has specified PVs without VGs. */
-    private boolean hostHasPVS(final Host host) {
-        final Map<String, BlockDevice> oPVS =
-                                            new HashMap<String, BlockDevice>();
+    private boolean hostHasPVSWithoutVGs(final Host host) {
+        final Map<String, BlockDevice> oPVS = new HashMap<String, BlockDevice>();
         for (final BlockDevice bd : host.getPhysicalVolumes()) {
             oPVS.put(bd.getName(), bd);
         }
@@ -193,15 +170,13 @@ public final class VGCreate extends LV {
             if (opv == null) {
                 return false;
             }
-            if (!opv.isPhysicalVolume()
-                || opv.isVolumeGroupOnPhysicalVolume()) {
+            if (!opv.isPhysicalVolume() || opv.isVolumeGroupOnPhysicalVolume()) {
                 return false;
             }
         }
         return selected > 0;
     }
 
-    /** Returns the input pane. */
     @Override
     protected JComponent getInputPane() {
         createButton.setEnabled(false);
@@ -216,8 +191,7 @@ public final class VGCreate extends LV {
         int i = 0;
         while (true) {
             defaultName = "vg" + String.format("%02d", i);
-            if (volumeGroups == null
-                || !volumeGroups.contains(defaultName)) {
+            if (volumeGroups == null || !volumeGroups.contains(defaultName)) {
                 break;
             }
             i++;
@@ -229,8 +203,7 @@ public final class VGCreate extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.OP,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("VG Name"));
         inputPane.add(vgNameWi.getComponent());
@@ -248,8 +221,7 @@ public final class VGCreate extends LV {
         final Collection<Host> selectedHosts = new HashSet<Host>();
         for (final BlockDevInfo sbdi : selectedBlockDevInfos) {
             if (sbdi.getBlockDevice().isDrbd()) {
-                selectedPVs.add(sbdi.getBlockDevice()
-                                              .getDrbdBlockDevice().getName());
+                selectedPVs.add(sbdi.getBlockDevice().getDrbdBlockDevice().getName());
             } else {
                 selectedPVs.add(sbdi.getName());
             }
@@ -258,29 +230,26 @@ public final class VGCreate extends LV {
         pvCheckBoxes = getPVCheckBoxes(selectedPVs);
         pvsPane.add(new JLabel("Select physical volumes: "));
         for (final Map.Entry<String, JCheckBox> pvEntry : pvCheckBoxes.entrySet()) {
-            pvEntry.getValue().addItemListener(
-                    new ItemChangeListener(true));
+            pvEntry.getValue().addItemListener(new ItemChangeListener(true));
             pvsPane.add(pvEntry.getValue());
         }
         final JScrollPane pvSP = new JScrollPane(pvsPane);
         pvSP.setPreferredSize(new Dimension(0, 45));
         pane.add(pvSP);
 
-        final JPanel hostsPane = new JPanel(
-                                        new FlowLayout(FlowLayout.LEADING));
+        final JPanel hostsPane = new JPanel(new FlowLayout(FlowLayout.LEADING));
         final Cluster cluster = host.getCluster();
         hostCheckBoxes = Tools.getHostCheckBoxes(cluster);
         hostsPane.add(new JLabel("Select Hosts: "));
         for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
-            hostEntry.getValue().addItemListener(
-                    new ItemChangeListener(true));
+            hostEntry.getValue().addItemListener(new ItemChangeListener(true));
             if (host == hostEntry.getKey()) {
                 hostEntry.getValue().setEnabled(false);
                 hostEntry.getValue().setSelected(true);
             } else if (isOneDrbd(selectedBlockDevInfos)) {
                 hostEntry.getValue().setEnabled(false);
                 hostEntry.getValue().setSelected(false);
-            } else if (hostHasPVS(hostEntry.getKey())) {
+            } else if (hostHasPVSWithoutVGs(hostEntry.getKey())) {
                 hostEntry.getValue().setEnabled(true);
                 hostEntry.getValue().setSelected(selectedHosts.contains(hostEntry.getKey()));
             } else {
@@ -301,15 +270,9 @@ public final class VGCreate extends LV {
         return pane;
     }
 
-    /** Create VG. */
-    private boolean vgCreate(final Host host,
-                             final String vgName,
-                             final Collection<String> pvNames) {
+    private boolean vgCreate(final Host host, final String vgName, final Collection<String> pvNames) {
         for (final String pv : pvNames) {
-            final BlockDevInfo bdi =
-                host.getBrowser().getDrbdGraph().findBlockDevInfo(
-                                                             host.getName(),
-                                                             pv);
+            final BlockDevInfo bdi = host.getBrowser().getDrbdGraph().findBlockDevInfo(host.getName(), pv);
             if (bdi != null) {
                 bdi.getBlockDevice().setVolumeGroupOnPhysicalVolume(vgName);
                 bdi.getBrowser().getDrbdGraph().startAnimation(bdi);
@@ -317,14 +280,9 @@ public final class VGCreate extends LV {
         }
         final boolean ret = LVM.vgCreate(host, vgName, pvNames, Application.RunMode.LIVE);
         if (ret) {
-            answerPaneAddText("Volume group "
-                              + vgName
-                              + " was successfully created "
-                              + " on " + host.getName() + '.');
+            answerPaneAddText("Volume group " + vgName + " was successfully created " + " on " + host.getName() + '.');
         } else {
-            answerPaneAddTextError("Creating of volume group "
-                                   + vgName
-                                   + " failed.");
+            answerPaneAddTextError("Creating of volume group " + vgName + " failed.");
         }
         return ret;
     }
@@ -333,15 +291,14 @@ public final class VGCreate extends LV {
     private class ItemChangeListener implements ItemListener {
         /** Whether to check buttons on both select and deselect. */
         private final boolean onDeselect;
-        /** Create ItemChangeListener object. */
+
         ItemChangeListener(final boolean onDeselect) {
             super();
             this.onDeselect = onDeselect;
         }
         @Override
         public void itemStateChanged(final ItemEvent e) {
-            if (e.getStateChange() == ItemEvent.SELECTED
-                || onDeselect) {
+            if (e.getStateChange() == ItemEvent.SELECTED || onDeselect) {
                 checkButtons();
             }
         }
@@ -367,8 +324,7 @@ public final class VGCreate extends LV {
             });
                     
             disableComponents();
-            getProgressBar().start(CREATE_TIMEOUT
-                                   * hostCheckBoxes.size());
+            getProgressBar().start(CREATE_TIMEOUT * hostCheckBoxes.size());
             boolean oneFailed = false;
             for (final Map.Entry<Host, JCheckBox> hostEntry : hostCheckBoxes.entrySet()) {
                 if (hostEntry.getValue().isSelected()) {
@@ -378,8 +334,7 @@ public final class VGCreate extends LV {
                             pvNames.add(pvEntry.getKey());
                         }
                     }
-                    final boolean ret =
-                        vgCreate(hostEntry.getKey(), vgNameWi.getStringValue(), pvNames);
+                    final boolean ret = vgCreate(hostEntry.getKey(), vgNameWi.getStringValue(), pvNames);
                     if (!ret) {
                         oneFailed = true;
                     }
@@ -388,9 +343,7 @@ public final class VGCreate extends LV {
             enableComponents();
             if (oneFailed) {
                 for (final Host h : hostCheckBoxes.keySet()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(
-                                                            h,
-                                                            Host.UPDATE_LVM);
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                 }
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -403,9 +356,7 @@ public final class VGCreate extends LV {
                 progressBarDone();
                 disposeDialog();
                 for (final Host h : hostCheckBoxes.keySet()) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(
-                                                            h,
-                                                            Host.UPDATE_LVM);
+                    h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                 }
             }
         }

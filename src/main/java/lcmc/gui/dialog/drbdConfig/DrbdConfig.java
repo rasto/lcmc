@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc.gui.dialog.drbdConfig;
 
 import lcmc.gui.dialog.WizardDialog;
@@ -29,22 +28,15 @@ import lcmc.gui.resources.drbd.VolumeInfo;
 /**
  * DrbdConfig super class from which all the drbd config wizards can be
  * extended. It just adds VolumeInfo field.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public abstract class DrbdConfig extends WizardDialog {
-    /** Drbd resource info object. */
     private final VolumeInfo volumeInfo;
 
-    /** Prepares a new {@code DrbdConfig} object. */
-    protected DrbdConfig(final WizardDialog previousDialog,
-                      final VolumeInfo volumeInfo) {
+    protected DrbdConfig(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {
         setPreviousDialog(previousDialog);
         this.volumeInfo = volumeInfo;
     }
 
-    /** Returns drbd resource info object. */
     protected final VolumeInfo getDrbdVolumeInfo() {
         return volumeInfo;
     }

@@ -39,10 +39,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where openais with pacemaker is installed.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class PacemakerInst extends DialogHost {
@@ -66,23 +62,19 @@ final class PacemakerInst extends DialogHost {
         }
     }
 
-    /** Inits the dialog and starts the installation procedure. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         installPm();
     }
 
-    /** Installs the heartbeat. */
     private void installPm() {
-        String arch = getHost().getDistString("PmInst.install."
-                                              + getHost().getArch());
+        String arch = getHost().getDistString("PmInst.install." + getHost().getArch());
         if (arch == null) {
             arch = getHost().getArch();
         }
@@ -91,9 +83,7 @@ final class PacemakerInst extends DialogHost {
         final String installMethod = getHost().getPacemakerInstallMethodIndex();
         if (installMethod != null) {
             installCommand = "PmInst.install." + installMethod;
-            final String filesStr =
-                      getHost().getDistString(
-                            "PmInst.install.files." + installMethod);
+            final String filesStr = getHost().getDistString("PmInst.install.files." + installMethod);
             if (filesStr != null) {
                 final String[] parts = filesStr.split(":");
                 /* install files if specified */
@@ -104,22 +94,15 @@ final class PacemakerInst extends DialogHost {
                     final String perm = parts[i + 2];
                     final String file = Tools.getFile(fileName);
                     if (file != null) {
-                        getHost().getSSH().scp(file,
-                                               to,
-                                               perm,
-                                               true,
-                                               null,
-                                               null,
-                                               null);
+                        getHost().getSSH().scp(file, to, perm, true, null, null, null);
                     }
                     i += 3;
                 }
             }
         }
         Tools.getApplication().setLastHbPmInstalledMethod(
-           getHost().getDistString("PmInst.install.text." + installMethod));
-        Tools.getApplication().setLastInstalledClusterStack(
-                                                Application.COROSYNC_NAME);
+                                                getHost().getDistString("PmInst.install.text." + installMethod));
+        Tools.getApplication().setLastInstalledClusterStack(Application.COROSYNC_NAME);
 
         getHost().execCommandInBash(new ExecCommandConfig()
                          .commandString(installCommand)
@@ -130,56 +113,41 @@ final class PacemakerInst extends DialogHost {
                                  checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 printErrorAndRetry(
-                                        Tools.getString(
-                                         "Dialog.Host.PacemakerInst.InstError"),
-                                         answer,
-                                         errorCode);
+                             public void doneError(final String answer, final int errorCode) {
+                                 printErrorAndRetry(Tools.getString("Dialog.Host.PacemakerInst.InstError"),
+                                                    answer,
+                                                    errorCode);
                              }
                          })
                          .convertCmdCallback(new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
-                                 return command.replaceAll("@ARCH@",
-                                                           archString);
+                                 return command.replaceAll("@ARCH@", archString);
                              }
                          })
                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         return checkInstallationDialog;
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.PacemakerInst.Description in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.PacemakerInst.Title");
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.PacemakerInst.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.PacemakerInst.Description");
     }
 
-    /** Returns the input pane with info about the installation progress. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(
-                      Tools.getString("Dialog.Host.PacemakerInst.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.PacemakerInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               0, 0,  // initX, initY
                                               0, 0); // xPad, yPad

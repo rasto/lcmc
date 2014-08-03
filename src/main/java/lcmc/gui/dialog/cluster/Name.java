@@ -42,16 +42,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 public final class Name extends DialogCluster {
-    /** Width of the name field. */
     private static final int NAME_FIELD_WIDTH = 120;
-    /** Name field. */
     private Widget nameField;
 
     @Autowired
@@ -59,13 +53,11 @@ public final class Name extends DialogCluster {
     @Autowired
     private ClusterTabFactory clusterTabFactory;
 
-    /** Called before the dialog is finished. It saves the value. */
     @Override
     protected void finishDialog() {
         getCluster().setName(nameField.getStringValue().trim());
     }
 
-    /** Returns the next dialog after this dialog. */
     @Override
     public WizardDialog nextDialog() {
         clusterHostsDialog.init(this, getCluster());
@@ -80,8 +72,7 @@ public final class Name extends DialogCluster {
         if (name.isEmpty()) {
             v = false;
         } else {
-            for (final Cluster c
-                    : Tools.getApplication().getClusters().getClusterSet()) {
+            for (final Cluster c : Tools.getApplication().getClusters().getClusterSet()) {
                 if (c != getCluster() && name.equals(c.getName())) {
                     v = false;
                     break;
@@ -103,19 +94,16 @@ public final class Name extends DialogCluster {
         Tools.getGUIData().renameSelectedClusterTab(name);
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Name.Title");
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Name.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -127,16 +115,12 @@ public final class Name extends DialogCluster {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    //Tools.getGUIData().addClusterTab(getCluster());
-                    //clusterTab.initWithCluster(getCluster());
-                    //clustersPanel.addClusterTab(clusterTab);
                     clusterTabFactory.createClusterTab(getCluster());
                 }
             });
         }
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         Tools.invokeLater(new Runnable() {
@@ -159,14 +143,12 @@ public final class Name extends DialogCluster {
         }
     }
 
-    /** Returns panel where user can enter a cluster name. */
     @Override
     protected JComponent getInputPane() {
         /* Name */
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel pane = new JPanel(new SpringLayout());
-        final JLabel nameLabel = new JLabel(
-                            Tools.getString("Dialog.Cluster.Name.EnterName"));
+        final JLabel nameLabel = new JLabel(Tools.getString("Dialog.Cluster.Name.EnterName"));
         pane.add(nameLabel);
         String name = getCluster().getName();
         if (name == null) {
@@ -181,8 +163,7 @@ public final class Name extends DialogCluster {
                                        regexp,
                                        NAME_FIELD_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
         addCheckField(nameField);
         nameLabel.setLabelFor(nameField.getComponent());

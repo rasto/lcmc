@@ -20,7 +20,6 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-
 package lcmc.gui.dialog.drbd;
 
 import java.util.HashSet;
@@ -32,26 +31,18 @@ import lcmc.gui.dialog.HostLogs;
 
 /**
  * An implementation of an dialog with log files.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class DrbdsLog extends HostLogs {
 
-    /** Prepares a new {@code DrbdsLog} object. */
     public DrbdsLog(final Host host) {
         super(host);
     }
 
-    /**
-     * Returns a command name from the DistResource that gets the drbd log file.
-     */
     @Override
     protected String logFileCommand() {
         return "DrbdLog.log";
     }
 
-    /** Returns which pattern names are selected by default. */
     @Override
     protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
@@ -59,11 +50,10 @@ public final class DrbdsLog extends HostLogs {
         return selected;
     }
 
-    /** Returns a map from pattern name to its pattern. */
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> pm = new LinkedHashMap<String, String>();
-        pm.put("drbd", wordBoundary("drbd"));
-        return pm;
+        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        patternMap.put("drbd", wordBoundary("drbd"));
+        return patternMap;
     }
 }

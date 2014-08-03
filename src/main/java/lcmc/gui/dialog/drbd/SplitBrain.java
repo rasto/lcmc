@@ -48,34 +48,22 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class SplitBrain extends DrbdConfig {
-    /** Logger. */
-    private static final Logger LOG =
-                                   LoggerFactory.getLogger(SplitBrain.class);
-    /** Width of the combo box. */
+    private static final Logger LOG = LoggerFactory.getLogger(SplitBrain.class);
     private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
-    private Widget hostWi;
-    /** Resolve split brain button. */
-    private final MyButton resolveButton = new MyButton(
-                    Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
+    private Widget hostWithBetterDataWidget;
+    private final MyButton resolveButton = new MyButton(Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
 
-    /** Prepares a new {@code SplitBrain} object. */
-    public SplitBrain(final WizardDialog previousDialog,
-               final VolumeInfo dvi) {
+    public SplitBrain(final WizardDialog previousDialog, final VolumeInfo dvi) {
         super(previousDialog, dvi);
     }
 
-    /** Resolves the split brain. */
     protected void resolve() {
         final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();
         final Host h2 = getDrbdVolumeInfo().getSecondBlockDevInfo().getHost();
-        final String h = hostWi.getStringValue();
+        final String h = hostWithBetterDataWidget.getStringValue();
 
         final Runnable runnable = new Runnable() {
             @Override
@@ -95,16 +83,9 @@ public final class SplitBrain extends DrbdConfig {
                 buttonClass(finishButton()).setEnabled(false);
                 resolveButton.setEnabled(false);
                 final Application.RunMode runMode = Application.RunMode.LIVE;
-                final String resName =
-                          getDrbdVolumeInfo().getDrbdResourceInfo().getName();
-                DRBD.setSecondary(hostSec,
-                                  resName,
-                                  getDrbdVolumeInfo().getName(),
-                                  runMode);
-                DRBD.disconnect(hostSec,
-                                resName,
-                                getDrbdVolumeInfo().getName(),
-                                runMode);
+                final String resName = getDrbdVolumeInfo().getDrbdResourceInfo().getName();
+                DRBD.setSecondary(hostSec, resName, getDrbdVolumeInfo().getName(), runMode);
+                DRBD.disconnect(hostSec, resName, getDrbdVolumeInfo().getName(), runMode);
                 DRBD.discardData(hostSec, resName, null, runMode);
                 getDrbdVolumeInfo().connect(hostPri, runMode);
                 buttonClass(finishButton()).setEnabled(true);
@@ -115,68 +96,50 @@ public final class SplitBrain extends DrbdConfig {
         thread.start();
     }
 
-    /** Returns next dialog which is null. */
     @Override
     public WizardDialog nextDialog() {
         return null;
     }
 
-    /**
-     * Returns the title for the dialog. It is defined in TextResources as
-     * Dialog.Drbd.SplitBrain.Title.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.Drbd.SplitBrain.Title");
     }
 
-    /**
-     * Returns the description for the dialog. It is defined in TextResources
-     * as Dialog.Drbd.SplitBrain.Description.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Drbd.SplitBrain.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        resolveButton.setBackgroundColor(
-                               Tools.getDefaultColor("ConfigDialog.Button"));
+        resolveButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
     }
 
-    /**
-     * Returns an input pane, where user can select the host with more recent
-     * data.
-     */
     @Override
     protected JComponent getInputPane() {
         final JPanel inputPane = new JPanel(new SpringLayout());
         /* host */
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
-        final JLabel hostLabel = new JLabel(
-                        Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
+        final JLabel hostLabel = new JLabel(Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
         final Host[] hostsArray = hosts.toArray(new Host[hosts.size()]);
-        hostWi = WidgetFactory.createInstance(
+        hostWithBetterDataWidget = WidgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
                                     hostsArray[0],
                                     hostsArray,
                                     Widget.NO_REGEXP,
                                     COMBOBOX_WIDTH,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(Application.AccessType.RO,
-                                                   !AccessMode.ADVANCED),
+                                    new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                     Widget.NO_BUTTON);
         inputPane.add(hostLabel);
-        inputPane.add(hostWi.getComponent());
+        inputPane.add(hostWithBetterDataWidget.getComponent());
         resolveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

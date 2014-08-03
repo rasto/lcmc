@@ -46,67 +46,53 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 /**
  * This class implements LVM snapshot dialog.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class LVSnapshot extends LV {
-    /** LV Snapshot timeout. */
     private static final int SNAPSHOT_TIMEOUT = 5000;
-    /** Description LV snapshot. */
-    private static final String SNAPSHOT_DESCRIPTION =
-                                    "Create a snapshot of the logical volume.";
-    /** Block device info object. */
+    private static final String SNAPSHOT_DESCRIPTION = "Create a snapshot of the logical volume.";
     private final BlockDevInfo blockDevInfo;
     private final MyButton snapshotButton = new MyButton("Create Snapshot");
     private Widget lvNameWi;
     private Widget sizeWi;
     private Widget maxSizeWi;
-    /** Create new LVSnapshot object. */
+
     public LVSnapshot(final BlockDevInfo blockDevInfo) {
         super(null);
         this.blockDevInfo = blockDevInfo;
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getDialogTitle() {
         return "LV Snapshot ";
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return SNAPSHOT_DESCRIPTION;
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         makeDefaultAndRequestFocusLater(sizeWi.getComponent());
     }
 
-    /** Enables and disabled buttons. */
     protected void checkButtons() {
         Tools.invokeLater(new EnableSnapshotRunnable(true));
     }
 
     private void setComboBoxes() {
-        final String maxBlockSize = getMaxBlockSize();
-        sizeWi.setValue(VmsXml.convertKilobytes(Long.toString(
-                Long.parseLong(maxBlockSize) / 2)));
+        final String maxBlockSize = getMaxBlockSizeAvailableInGroup();
+        sizeWi.setValue(VmsXml.convertKilobytes(Long.toString(Long.parseLong(maxBlockSize) / 2)));
         maxSizeWi.setValue(VmsXml.convertKilobytes(maxBlockSize));
     }
 
-    /** Returns the input pane. */
     @Override
     protected JComponent getInputPane() {
         snapshotButton.setEnabled(false);
@@ -114,21 +100,17 @@ public final class LVSnapshot extends LV {
         final JPanel inputPane = new JPanel(new SpringLayout());
         inputPane.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
 
-        final String volumeGroup =
-                            blockDevInfo.getBlockDevice().getVolumeGroup();
+        final String volumeGroup = blockDevInfo.getBlockDevice().getVolumeGroup();
         inputPane.add(new JLabel("Group"));
         inputPane.add(new JLabel(volumeGroup));
         inputPane.add(new JLabel());
         /* find next free logical volume name */
         String defaultName;
-        final Set<String> volumeGroups =
-               blockDevInfo.getHost().getLogicalVolumesFromVolumeGroup(
-                                                              volumeGroup);
+        final Set<String> volumeGroups = blockDevInfo.getHost().getLogicalVolumesFromVolumeGroup(volumeGroup);
         int i = 0;
         while (true) {
             defaultName = "lvol" + i;
-            if (volumeGroups == null
-                || !volumeGroups.contains(defaultName)) {
+            if (volumeGroups == null || !volumeGroups.contains(defaultName)) {
                 break;
             }
             i++;
@@ -140,8 +122,7 @@ public final class LVSnapshot extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.OP,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
         inputPane.add(lvNameWi.getComponent());
@@ -153,10 +134,9 @@ public final class LVSnapshot extends LV {
                                   }
                               });
 
-        final String maxBlockSize = getMaxBlockSize();
+        final String maxBlockSize = getMaxBlockSizeAvailableInGroup();
         /* size */
-        final String newBlockSize = Long.toString(
-                                      Long.parseLong(maxBlockSize) / 2);
+        final String newBlockSize = Long.toString(Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
         sizeWi = new TextfieldWithUnit(
@@ -165,8 +145,7 @@ public final class LVSnapshot extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(Application.AccessType.OP,
-                                      !AccessMode.ADVANCED),
+                       new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWi.getComponent());
@@ -179,13 +158,9 @@ public final class LVSnapshot extends LV {
                         Tools.invokeAndWait(new EnableSnapshotRunnable(false));
                         disableComponents();
                         getProgressBar().start(SNAPSHOT_TIMEOUT);
-                        final boolean ret = lvSnapshot(
-                                                    lvNameWi.getStringValue(),
-                                                    sizeWi.getStringValue());
+                        final boolean ret = lvSnapshot(lvNameWi.getStringValue(), sizeWi.getStringValue());
                         final Host host = blockDevInfo.getHost();
-                        host.getBrowser().getClusterBrowser().updateHWInfo(
-                                                             host,
-                                                             Host.UPDATE_LVM);
+                        host.getBrowser().getClusterBrowser().updateHWInfo(host, Host.UPDATE_LVM);
                         setComboBoxes();
                         if (ret) {
                             progressBarDone();
@@ -210,8 +185,7 @@ public final class LVSnapshot extends LV {
                         Widget.NO_REGEXP,
                         250,
                         Widget.NO_ABBRV,
-                        new AccessMode(Application.AccessType.OP,
-                                       !AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
                         Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);
@@ -238,32 +212,20 @@ public final class LVSnapshot extends LV {
         return pane;
     }
 
-    /** LV Snapshot. */
     private boolean lvSnapshot(final String lvName, final String size) {
-        final String volumeGroup =
-                            blockDevInfo.getBlockDevice().getVolumeGroup();
-        final boolean ret = blockDevInfo.lvSnapshot(lvName,
-                                                    size,
-                                                    Application.RunMode.LIVE);
+        final String volumeGroup = blockDevInfo.getBlockDevice().getVolumeGroup();
+        final boolean ret = blockDevInfo.lvSnapshot(lvName, size, Application.RunMode.LIVE);
         if (ret) {
-            answerPaneSetText("Logical volume "
-                              + lvName
-                              + " was successfully created on "
-                              + volumeGroup + '.');
+            answerPaneSetText("Logical volume " + lvName + " was successfully created on " + volumeGroup + '.');
         } else {
-            answerPaneSetTextError("Creating of logical volume "
-                                   + lvName
-                                   + " failed.");
+            answerPaneSetTextError("Creating of logical volume " + lvName + " failed.");
         }
         return ret;
     }
 
-    /** Returns maximum block size available in the group. */
-    private String getMaxBlockSize() {
-        final String volumeGroup =
-                            blockDevInfo.getBlockDevice().getVolumeGroup();
-        final long free =
-           blockDevInfo.getHost().getFreeInVolumeGroup(volumeGroup) / 1024;
+    private String getMaxBlockSizeAvailableInGroup() {
+        final String volumeGroup = blockDevInfo.getBlockDevice().getVolumeGroup();
+        final long free = blockDevInfo.getHost().getFreeInVolumeGroup(volumeGroup) / 1024;
         return Long.toString(free);
     }
 
@@ -278,21 +240,16 @@ public final class LVSnapshot extends LV {
         public void run() {
             boolean e = enable;
             if (enable) {
-                final long size = VmsXml.convertToKilobytes(
-                        sizeWi.getValue());
-                final long maxSize = VmsXml.convertToKilobytes(
-                        maxSizeWi.getValue());
+                final long size = VmsXml.convertToKilobytes(sizeWi.getValue());
+                final long maxSize = VmsXml.convertToKilobytes(maxSizeWi.getValue());
                 if (size > maxSize) {
                     e = false;
                 } else if (size <= 0) {
                     e = false;
                 } else {
-                    final Set<String> lvs =
-                        blockDevInfo.getHost()
-                                    .getLogicalVolumesFromVolumeGroup(
-                           blockDevInfo.getBlockDevice().getVolumeGroup());
-                    if (lvs != null
-                        && lvs.contains(lvNameWi.getStringValue())) {
+                    final Set<String> lvs = blockDevInfo.getHost().getLogicalVolumesFromVolumeGroup(
+                                                                      blockDevInfo.getBlockDevice().getVolumeGroup());
+                    if (lvs != null && lvs.contains(lvNameWi.getStringValue())) {
                         e = false;
                     }
                 }

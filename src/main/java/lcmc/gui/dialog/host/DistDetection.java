@@ -25,8 +25,6 @@ package lcmc.gui.dialog.host;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
@@ -35,32 +33,23 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog that shows which distribution was detected.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class DistDetection extends DialogHost {
     @Autowired
     private CheckInstallation checkInstallation;
-    /** Inits dialog and starts the distribution detection. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
-        final String support =
-                      Tools.getDistString("Support",
-                                          getHost().getDistributionName(),
-                                          getHost().getDistributionVersionString(),
-                                          getHost().getArch());
-        final String answerText = "\nversion: " + getHost().getDetectedInfo()
-                        + " (support file: "
-                        + support + ')';
+        final String support = Tools.getDistString("Support",
+                                                   getHost().getDistributionName(),
+                                                   getHost().getDistributionVersionString(),
+                                                   getHost().getArch());
+        final String answerText = "\nversion: " + getHost().getDetectedInfo() + " (support file: " + support + ')';
         answerPaneSetText(answerText);
     }
 
-    /** Inits dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
@@ -70,37 +59,26 @@ final class DistDetection extends DialogHost {
         }
     }
 
-    /** Returns the next dialog which is CheckInstallation. */
     @Override
     public WizardDialog nextDialog() {
         checkInstallation.init(this, getHost(), getDrbdInstallation());
         return checkInstallation;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.DistDetection.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DistDetection.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.DistDetection.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.DistDetection.Description");
     }
 
-    /** Returns the input pane with check boxes and other info. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
-        pane.add(getAnswerPane(Tools.getString(
-                                      "Dialog.Host.DistDetection.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.DistDetection.Executing")));
         SpringUtilities.makeCompactGrid(pane, 1, 1,  // rows, cols
                                               1, 1,  // initX, initY
                                               1, 1); // xPad, yPad

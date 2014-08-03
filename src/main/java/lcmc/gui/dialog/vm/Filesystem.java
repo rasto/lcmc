@@ -36,9 +36,6 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class Filesystem extends VMConfig {
     /** Configuration options of the new domain. */
@@ -46,20 +43,14 @@ final class Filesystem extends VMConfig {
                                             FilesystemData.SOURCE_DIR,
                                             FilesystemData.SOURCE_NAME,
                                             FilesystemData.TARGET_DIR};
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    /** VMS filesystem info object. */
-    private FilesystemInfo vmsfi = null;
-    /** Next dialog object. */
+    private FilesystemInfo filesystemInfo = null;
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code Filesystem} object. */
-    Filesystem(final WizardDialog previousDialog,
-               final DomainInfo vmsVirtualDomainInfo) {
+    Filesystem(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
@@ -68,19 +59,11 @@ final class Filesystem extends VMConfig {
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Filesystem.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.Filesystem.Description");
@@ -88,38 +71,33 @@ final class Filesystem extends VMConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        if (vmsfi == null) {
-            vmsfi = getVMSVirtualDomainInfo().addFilesystemPanel();
-            vmsfi.waitForInfoPanel();
+        if (filesystemInfo == null) {
+            filesystemInfo = getVMSVirtualDomainInfo().addFilesystemPanel();
+            filesystemInfo.waitForInfoPanel();
         } else {
-            vmsfi.selectMyself();
+            filesystemInfo.selectMyself();
         }
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsfi.checkResourceFields(
-                                              null,
-                                              vmsfi.getRealParametersFromXML())
-                                            .isCorrect();
+                final boolean enable = filesystemInfo.checkResourceFields(null, filesystemInfo.getRealParametersFromXML())
+                                                     .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         if (inputPane != null) {
@@ -131,21 +109,19 @@ final class Filesystem extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        vmsfi.savePreferredValues();
-        vmsfi.getResource().setValue(FilesystemData.TYPE,
-                                     FilesystemInfo.MOUNT_TYPE);
-        vmsfi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                      null);
+        filesystemInfo.savePreferredValues();
+        filesystemInfo.getResource().setValue(FilesystemData.TYPE, FilesystemInfo.MOUNT_TYPE);
+        filesystemInfo.addWizardParams(optionsPanel,
+                                       PARAMS,
+                                       buttonClass(nextButton()),
+                                       Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                       Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                       null);
         panel.add(optionsPanel);
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 }

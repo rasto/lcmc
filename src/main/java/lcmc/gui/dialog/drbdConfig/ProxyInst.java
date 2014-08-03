@@ -40,20 +40,12 @@ import lcmc.utilities.ssh.Ssh;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 final class ProxyInst extends DialogHost {
-    /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
-    /** Drbd volume info. */
     private final VolumeInfo volumeInfo;
-    /** The dialog we came from. */
     private final WizardDialog origDialog;
 
-    /** Prepares a new {@code ProxyInst} object. */
     ProxyInst(final WizardDialog previousDialog,
               final Host host,
               final VolumeInfo volumeInfo,
@@ -64,10 +56,6 @@ final class ProxyInst extends DialogHost {
         this.origDialog = origDialog;
     }
 
-    /**
-     * Checks the answer of the installation and enables/disables the
-     * components accordingly.
-     */
     void checkAnswer(final String ans, final String installMethod) {
         nextDialogObject = new ProxyCheckInstallation(
                                         getPreviousDialog().getPreviousDialog(),
@@ -86,23 +74,19 @@ final class ProxyInst extends DialogHost {
         }
     }
 
-    /** Inits the dialog and starts the installation procedure. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         installProxy();
     }
 
-    /** Installs the proxy. */
     private void installProxy() {
-        String arch = getHost().getDistString("ProxyInst.install."
-                                              + getHost().getArch());
+        String arch = getHost().getDistString("ProxyInst.install." + getHost().getArch());
         if (arch == null) {
             arch = getHost().getArch();
         }
@@ -123,26 +107,21 @@ final class ProxyInst extends DialogHost {
                                 checkAnswer(answer, installMethod);
                              }
                              @Override
-                             public void doneError(final String answer,
-                                                   final int errorCode) {
-                                 printErrorAndRetry(Tools.getString(
-                                         "Dialog.Host.ProxyInst.InstError"),
-                                         answer,
-                                         errorCode
-                                 );
+                             public void doneError(final String answer, final int errorCode) {
+                                 printErrorAndRetry(Tools.getString("Dialog.Host.ProxyInst.InstError"),
+                                                    answer,
+                                                    errorCode);
                              }
                          })
                          .convertCmdCallback(new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
-                                 return command.replaceAll("@ARCH@",
-                                                           archString);
+                                 return command.replaceAll("@ARCH@", archString);
                              }
                          })
                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
@@ -152,7 +131,6 @@ final class ProxyInst extends DialogHost {
         }
     }
 
-    /** Finish dialog. */
     @Override
     protected void finishDialog() {
         super.finishDialog();
@@ -169,31 +147,20 @@ final class ProxyInst extends DialogHost {
         }
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.ProxyInst.Description in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.ProxyInst.Title");
     }
-
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.ProxyInst.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.ProxyInst.Description");
     }
 
-    /** Returns the input pane with info about the installation progress. */
     @Override
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(
-                     Tools.getString("Dialog.Host.ProxyInst.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.ProxyInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               0, 0,  // initX, initY
                                               0, 0); // xPad, yPad
@@ -201,9 +168,6 @@ final class ProxyInst extends DialogHost {
         return pane;
     }
 
-    /**
-     * Return dialog that comes after "cancel" button was pressed.
-     */
     @Override
     protected WizardDialog dialogAfterCancel() {
         return origDialog;

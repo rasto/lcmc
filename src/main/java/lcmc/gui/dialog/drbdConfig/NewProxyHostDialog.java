@@ -31,16 +31,10 @@ import lcmc.utilities.Tools;
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
- *
- * @author Rasto Levrinc
- *
  */
 public final class NewProxyHostDialog extends NewHostDialog {
-    /** Drbd volume info. */
     private final VolumeInfo volumeInfo;
-    /** The dialog we came from. */
     private final WizardDialog origDialog;
-    /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
     public NewProxyHostDialog(final WizardDialog previousDialog,
@@ -62,7 +56,6 @@ public final class NewProxyHostDialog extends NewHostDialog {
         }
     }
 
-    /** Finish dialog. */
     @Override
     protected void finishDialog() {
         super.finishDialog();
@@ -79,33 +72,21 @@ public final class NewProxyHostDialog extends NewHostDialog {
         }
     }
 
-    /**
-     * Returns the title of the dialog, defined as
-     * Dialog.Host.NewProxyHost.Title in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.NewProxyHost.Title");
     }
 
-    /**
-     * Returns the description of the dialog, defined as
-     * Dialog.Host.NewProxyHost.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.NewProxyHost.Description");
     }
 
-    /** Buttons that are enabled/disabled during check. */
     @Override
     protected MyButton[] nextButtons() {
         return new MyButton[]{buttonClass(finishButton())};
     }
 
-    /**
-     * Return dialog that comes after "cancel" button was pressed.
-     */
     @Override
     protected WizardDialog dialogAfterCancel() {
         return origDialog;

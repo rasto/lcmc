@@ -39,12 +39,8 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class Storage extends VMConfig {
-    /** Configuration options of the new domain. */
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
@@ -62,20 +58,14 @@ final class Storage extends VMConfig {
                                             DiskData.DRIVER_NAME,
                                             DiskData.DRIVER_TYPE,
                                             DiskData.DRIVER_CACHE};
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    /** VMS disk info object. */
-    private DiskInfo vmsdi = null;
-    /** Next dialog object. */
+    private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code Storage} object. */
-    Storage(final WizardDialog previousDialog,
-            final DomainInfo vmsVirtualDomainInfo) {
+    Storage(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
@@ -84,19 +74,11 @@ final class Storage extends VMConfig {
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Storage.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.Storage.Description");
@@ -104,38 +86,33 @@ final class Storage extends VMConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        if (vmsdi == null) {
-            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
-            vmsdi.waitForInfoPanel();
+        if (diskInfo == null) {
+            diskInfo = getVMSVirtualDomainInfo().addDiskPanel();
+            diskInfo.waitForInfoPanel();
         } else {
-            vmsdi.selectMyself();
+            diskInfo.selectMyself();
         }
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsdi.checkResourceFields(
-                                              null,
-                                              vmsdi.getRealParametersFromXML())
-                                            .isCorrect();
+                final boolean enable = diskInfo.checkResourceFields(null, diskInfo.getRealParametersFromXML())
+                                               .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         if (inputPane != null) {
@@ -147,44 +124,33 @@ final class Storage extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        vmsdi.savePreferredValues();
-        vmsdi.getResource().setValue(DiskData.TYPE,
-                                     DiskInfo.FILE_TYPE);
-        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE,
-                                     DiskInfo.BUS_TYPE_IDE);
-        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE,
-                                     new StringValue("hda"));
-        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE,
-                                     new StringValue("raw"));
-        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE,
-                                     new StringValue("default"));
-        if ("xen".equals(getVMSVirtualDomainInfo().getWidget(
-                        VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
-            vmsdi.getResource().setValue(DiskData.DRIVER_NAME,
-                                         new StringValue("file"));
+        diskInfo.savePreferredValues();
+        diskInfo.getResource().setValue(DiskData.TYPE, DiskInfo.FILE_TYPE);
+        diskInfo.getResource().setValue(DiskData.TARGET_BUS_TYPE, DiskInfo.BUS_TYPE_IDE);
+        diskInfo.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hda"));
+        diskInfo.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
+        diskInfo.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
+        if ("xen".equals(getVMSVirtualDomainInfo().getWidget(VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue())) {
+            diskInfo.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("file"));
         } else {
-            vmsdi.getResource().setValue(DiskData.DRIVER_NAME,
-                                         new StringValue("qemu"));
+            diskInfo.getResource().setValue(DiskData.DRIVER_NAME, new StringValue("qemu"));
         }
-        vmsdi.getResource().setValue(
-                     DiskData.SOURCE_FILE,
-                     new StringValue("/var/lib/libvirt/images/"
-                                     +
-                                     getVMSVirtualDomainInfo().getComboBoxValue(
-                                                         VmsXml.VM_PARAM_NAME)
-                                     + ".img"));
-        vmsdi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                      null);
+        diskInfo.getResource().setValue(
+                                    DiskData.SOURCE_FILE,
+                                    new StringValue("/var/lib/libvirt/images/"
+                                                    + getVMSVirtualDomainInfo().getComboBoxValue(VmsXml.VM_PARAM_NAME)
+                                                    + ".img"));
+        diskInfo.addWizardParams(optionsPanel,
+                                 PARAMS,
+                                 buttonClass(nextButton()),
+                                 Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                 Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                 null);
         panel.add(optionsPanel);
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 }

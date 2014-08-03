@@ -32,37 +32,28 @@ import lcmc.gui.dialog.ClusterLogs;
 
 /**
  * An implementation of an dialog with log files from many hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class ServiceLogs extends ClusterLogs {
     /** Service type. e.g. Filesystem. */
     private final String serviceType;
-    /** Service heartbeat id. */
-    private final String serviceHbId;
+    private final String serviceCrmId;
 
-    /** Prepares a new {@code ServiceLogs} object. */
-    public ServiceLogs(final Cluster cluster,
-                       final String serviceType,
-                       final String serviceHbId) {
+    public ServiceLogs(final Cluster cluster, final String serviceType, final String serviceCrmId) {
         super(cluster);
         this.serviceType = serviceType;
-        this.serviceHbId = serviceHbId;
+        this.serviceCrmId = serviceCrmId;
     }
 
-    /** Returns a map from pattern name to its pattern. */
     @Override
     protected Map<String, String> getPatternMap() {
-        final Map<String, String> pm = new LinkedHashMap<String, String>();
-        pm.put("lrmd", wordBoundary("lrmd"));
-        pm.put(serviceType, wordBoundary(serviceType));
-        pm.put(serviceHbId, wordBoundary(serviceHbId));
-        pm.put("ERROR", wordBoundary("ERROR"));
-        return pm;
+        final Map<String, String> patternMap = new LinkedHashMap<String, String>();
+        patternMap.put("lrmd", wordBoundary("lrmd"));
+        patternMap.put(serviceType, wordBoundary(serviceType));
+        patternMap.put(serviceCrmId, wordBoundary(serviceCrmId));
+        patternMap.put("ERROR", wordBoundary("ERROR"));
+        return patternMap;
     }
 
-    /** Returns which pattern names are selected by default. */
     @Override
     protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();

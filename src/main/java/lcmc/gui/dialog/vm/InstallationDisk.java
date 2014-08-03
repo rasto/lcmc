@@ -39,12 +39,8 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class InstallationDisk extends VMConfig {
-    /** Configuration options of the new domain. */
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
                                             DiskData.SOURCE_FILE,
@@ -62,24 +58,18 @@ final class InstallationDisk extends VMConfig {
                                             DiskData.DRIVER_TYPE,
                                             DiskData.DRIVER_CACHE,
                                             DiskData.READONLY};
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    /** VMS disk info object. */
-    private DiskInfo vmsdi = null;
-    /** Next dialog object. */
+    private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code InstallationDisk} object. */
-    InstallationDisk(final WizardDialog previousDialog,
-                     final DomainInfo vmsVirtualDomainInfo) {
+    InstallationDisk(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (skipButtonIsSelected()) {
-            vmsdi.removeMyself(Application.RunMode.TEST);
+            diskInfo.removeMyself(Application.RunMode.TEST);
         }
         if (nextDialogObject == null) {
             nextDialogObject = new Storage(this, getVMSVirtualDomainInfo());
@@ -87,19 +77,11 @@ final class InstallationDisk extends VMConfig {
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.InstallationDisk.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.InstallationDisk.Description");
@@ -107,27 +89,24 @@ final class InstallationDisk extends VMConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        if (vmsdi == null) {
-            vmsdi = getVMSVirtualDomainInfo().addDiskPanel();
-            vmsdi.waitForInfoPanel();
+        if (diskInfo == null) {
+            diskInfo = getVMSVirtualDomainInfo().addDiskPanel();
+            diskInfo.waitForInfoPanel();
         } else {
-            vmsdi.selectMyself();
+            diskInfo.selectMyself();
         }
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        final boolean enable = vmsdi.checkResourceFields(null, PARAMS)
-                                    .isCorrect();
+        final boolean enable = diskInfo.checkResourceFields(null, PARAMS).isCorrect();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -136,7 +115,6 @@ final class InstallationDisk extends VMConfig {
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         if (inputPane != null) {
@@ -148,34 +126,30 @@ final class InstallationDisk extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        vmsdi.savePreferredValues();
-        vmsdi.getResource().setValue(DiskData.TYPE, DiskInfo.FILE_TYPE);
-        vmsdi.getResource().setValue(DiskData.TARGET_BUS_TYPE,
-                                     DiskInfo.BUS_TYPE_CDROM);
-        vmsdi.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hdc"));
-        vmsdi.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
-        vmsdi.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
-        vmsdi.getResource().setValue(DiskData.READONLY, new StringValue("True"));
-        vmsdi.getResource().setValue(DiskData.SOURCE_FILE,
-                                     new StringValue(DiskInfo.LIBVIRT_IMAGE_LOCATION));
-        vmsdi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                      null);
-        vmsdi.setApplyButtons(null, vmsdi.getParametersFromXML());
+        diskInfo.savePreferredValues();
+        diskInfo.getResource().setValue(DiskData.TYPE, DiskInfo.FILE_TYPE);
+        diskInfo.getResource().setValue(DiskData.TARGET_BUS_TYPE, DiskInfo.BUS_TYPE_CDROM);
+        diskInfo.getResource().setValue(DiskData.TARGET_DEVICE, new StringValue("hdc"));
+        diskInfo.getResource().setValue(DiskData.DRIVER_TYPE, new StringValue("raw"));
+        diskInfo.getResource().setValue(DiskData.DRIVER_CACHE, new StringValue("default"));
+        diskInfo.getResource().setValue(DiskData.READONLY, new StringValue("True"));
+        diskInfo.getResource().setValue(DiskData.SOURCE_FILE, new StringValue(DiskInfo.LIBVIRT_IMAGE_LOCATION));
+        diskInfo.addWizardParams(optionsPanel,
+                                 PARAMS,
+                                 buttonClass(nextButton()),
+                                 Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                 Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                 null);
+        diskInfo.setApplyButtons(null, diskInfo.getParametersFromXML());
         panel.add(optionsPanel);
 
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 
-    /** Enable skip button. */
     @Override
     protected boolean skipButtonEnabled() {
         return true;

@@ -26,7 +26,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -44,17 +43,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd is installed.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class DrbdCommandInst extends DialogHost {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(DrbdCommandInst.class);
-    /** Next dialog object. */
+    private static final Logger LOG = LoggerFactory.getLogger(DrbdCommandInst.class);
     @Autowired
     private CheckInstallation checkInstallation;
 
@@ -63,23 +55,20 @@ final class DrbdCommandInst extends DialogHost {
      * components accordingly.
      */
     void checkAnswer(final String ans) {
-        final ClusterBrowser clusterBrowser =
-                                   getHost().getBrowser().getClusterBrowser();
+        final ClusterBrowser clusterBrowser = getHost().getBrowser().getClusterBrowser();
         if (clusterBrowser != null) {
             clusterBrowser.getHostDrbdParameters().clear();
-            final GlobalInfo globalInfo =
-                                  clusterBrowser.getDrbdGraph().getDrbdInfo();
+            final GlobalInfo globalInfo = clusterBrowser.getDrbdGraph().getDrbdInfo();
             globalInfo.clearPanelLists();
             globalInfo.updateDrbdInfo();
             globalInfo.resetInfoPanel();
             globalInfo.getInfoPanel();
         }
         checkInstallation.init(getPreviousDialog().getPreviousDialog().getPreviousDialog(),
-                getHost(),
-                getDrbdInstallation());
+                               getHost(),
+                               getDrbdInstallation());
         progressBarDone();
-        answerPaneSetText(
-                    Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
+        answerPaneSetText(Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
         if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
@@ -88,24 +77,20 @@ final class DrbdCommandInst extends DialogHost {
         }
     }
 
-    /** Inits the dialog and starts the installation procedure. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         getProgressBar().start(50000);
         installDrbd();
     }
 
-    /** Installs the drbd. */
     private void installDrbd() {
-        String arch = getHost().getDistString("DrbdInst.install."
-                                              + getHost().getArch());
+        String arch = getHost().getDistString("DrbdInst.install." + getHost().getArch());
         if (arch == null) {
             arch = getHost().getArch();
         }
@@ -119,7 +104,7 @@ final class DrbdCommandInst extends DialogHost {
         final String drbdVersion = drbdInstallation.getDrbdVersionToInstall();
         final String drbdVersionUrlString = drbdInstallation.getDrbdVersionUrlStringToInstall();
         Tools.getApplication().setLastDrbdInstalledMethod(
-            getHost().getDistString("DrbdInst.install.text." + installMethod));
+                                                getHost().getDistString("DrbdInst.install.text." + installMethod));
         LOG.debug1("installDrbd: cmd: " + installCommand
                    + " arch: " + archString
                    + " version: " + drbdVersionUrlString
@@ -153,25 +138,16 @@ final class DrbdCommandInst extends DialogHost {
                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         return checkInstallation;
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.DrbdCommandInst.Description in TextResources.
-     */
     @Override
     protected String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DrbdCommandInst.Title");
     }
 
-    /**
-     * Returns the description of the dialog defined as
-     * Dialog.Host.DrbdCommandInst.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Host.DrbdCommandInst.Description");
@@ -184,8 +160,7 @@ final class DrbdCommandInst extends DialogHost {
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
-        pane.add(getAnswerPane(
-                    Tools.getString("Dialog.Host.DrbdCommandInst.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.DrbdCommandInst.Executing")));
         SpringUtilities.makeCompactGrid(pane, 2, 1,  // rows, cols
                                               0, 0,  // initX, initY
                                               0, 0); // xPad, yPad

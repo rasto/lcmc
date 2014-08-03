@@ -229,10 +229,6 @@ final class CreateFS extends DrbdConfig {
         }
     }
 
-    /**
-     * Returns input pane, where file system can be created on the selected
-     * host.
-     */
     @Override
     protected JComponent getInputPane() {
         makeFileSystemButton.setEnabled(false);
@@ -339,13 +335,11 @@ final class CreateFS extends DrbdConfig {
         return pane;
     }
 
-    /** Returns whether skip sync is available. */
     private boolean skipSyncAvailable() {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         try {
-            return bdi1.getHost().drbdVersionHigherOrEqual("8.3.2")
-                   && bdi2.getHost().drbdVersionHigherOrEqual("8.3.2");
+            return bdi1.getHost().drbdVersionHigherOrEqual("8.3.2") && bdi2.getHost().drbdVersionHigherOrEqual("8.3.2");
         } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("skipSyncAvailable: " + e.getMessage(), e);
             return false;

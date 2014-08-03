@@ -39,32 +39,22 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 final class Network extends VMConfig {
-    /** Configuration options of the new domain. */
     private static final String[] PARAMS = {InterfaceData.TYPE,
                                             InterfaceData.MAC_ADDRESS,
                                             InterfaceData.SOURCE_NETWORK,
                                             InterfaceData.SOURCE_BRIDGE,
                                             InterfaceData.SCRIPT_PATH,
                                             InterfaceData.MODEL_TYPE};
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    /** VMS interface info object. */
-    private InterfaceInfo vmsii = null;
-    /** Next dialog object. */
+    private InterfaceInfo interfaceInfo = null;
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code Network} object. */
-    Network(final WizardDialog previousDialog,
-            final DomainInfo vmsVirtualDomainInfo) {
+    Network(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
@@ -78,19 +68,11 @@ final class Network extends VMConfig {
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Network.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.Network.Description");
@@ -98,38 +80,33 @@ final class Network extends VMConfig {
 
     @Override
     protected void initDialogBeforeCreated() {
-        if (vmsii == null) {
-            vmsii = getVMSVirtualDomainInfo().addInterfacePanel();
-            vmsii.waitForInfoPanel();
+        if (interfaceInfo == null) {
+            interfaceInfo = getVMSVirtualDomainInfo().addInterfacePanel();
+            interfaceInfo.waitForInfoPanel();
         } else {
-            vmsii.selectMyself();
+            interfaceInfo.selectMyself();
         }
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final boolean enable = vmsii.checkResourceFields(
-                                              null,
-                                              vmsii.getRealParametersFromXML())
-                                            .isCorrect();
+                final boolean enable = interfaceInfo.checkResourceFields(null, interfaceInfo.getRealParametersFromXML())
+                                                    .isCorrect();
                 buttonClass(nextButton()).setEnabled(enable);
             }
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         if (inputPane != null) {
@@ -141,27 +118,24 @@ final class Network extends VMConfig {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        vmsii.savePreferredValues();
-        vmsii.getResource().setValue(InterfaceData.TYPE,
-                                     InterfaceInfo.TYPE_NETWORK);
-        vmsii.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
-        vmsii.getResource().setValue(InterfaceData.MODEL_TYPE, new StringValue());
-        vmsii.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                      null);
-        vmsii.getWidget(InterfaceData.MODEL_TYPE,
-                        Widget.WIZARD_PREFIX).setValue(new StringValue());
+        interfaceInfo.savePreferredValues();
+        interfaceInfo.getResource().setValue(InterfaceData.TYPE, InterfaceInfo.TYPE_NETWORK);
+        interfaceInfo.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));
+        interfaceInfo.getResource().setValue(InterfaceData.MODEL_TYPE, new StringValue());
+        interfaceInfo.addWizardParams(optionsPanel,
+                                      PARAMS,
+                                      buttonClass(nextButton()),
+                                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                      null);
+        interfaceInfo.getWidget(InterfaceData.MODEL_TYPE, Widget.WIZARD_PREFIX).setValue(new StringValue());
 
         panel.add(optionsPanel);
 
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 }

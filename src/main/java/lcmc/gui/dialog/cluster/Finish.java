@@ -28,7 +28,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.gui.EmptyBrowser;
-import lcmc.model.Cluster;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
@@ -38,47 +37,35 @@ import org.springframework.stereotype.Component;
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish
  * button.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 final class Finish extends DialogCluster {
-    /** Save checkbox. */
-    private final JCheckBox saveCB = new JCheckBox(
-                                  Tools.getString("Dialog.Cluster.Finish.Save"),
-                                  true);
+    private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
     @Autowired
     private EmptyBrowser emptyBrowser;
     @Autowired
     private UserConfig userConfig;
 
-    /** Returns next dialog. Null in this case. */
     @Override
     public WizardDialog nextDialog() {
         return null;
     }
 
-    /** Finishes the dialog, and saves the cluster. */
     @Override
     protected void finishDialog() {
         emptyBrowser.addClusterBox(getCluster());
-        if (saveCB.isSelected()) {
+        if (saveCheckBox.isSelected()) {
             final String saveFile = Tools.getApplication().getSaveFile();
             Tools.save(userConfig, saveFile, false);
         }
     }
 
-    /** Inits dialog and enables the finish button. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
-        enableComponentsLater(new JComponent[]{buttonClass(nextButton()),
-                                               buttonClass(finishButton())});
+        enableComponentsLater(new JComponent[]{buttonClass(nextButton()), buttonClass(finishButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
@@ -89,25 +76,21 @@ final class Finish extends DialogCluster {
         }
     }
 
-    /** Returns the title of the dialog. */
     @Override
     protected String getClusterDialogTitle() {
         return Tools.getString("Dialog.Cluster.Finish.Title");
     }
 
-    /** Returns the description of the dialog. */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.Cluster.Finish.Description");
     }
 
-    /** Returns the input panel. */
     @Override
     protected JPanel getInputPane() {
         final JPanel pane = new JPanel();
-        /* Save checkbox */
-        pane.add(saveCB);
-        saveCB.setBackground(Color.WHITE);
+        pane.add(saveCheckBox);
+        saveCheckBox.setBackground(Color.WHITE);
         return pane;
     }
 }

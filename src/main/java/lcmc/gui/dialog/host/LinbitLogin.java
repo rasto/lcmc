@@ -29,9 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import lcmc.model.Host;
 import lcmc.model.StringValue;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -43,34 +41,23 @@ import org.springframework.stereotype.Component;
 /**.
  * An implementation of a dialog where user can enter the name and password
  * for the linbit website.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 public class LinbitLogin extends DialogHost {
-    /** Width of the check boxes. */
     private static final int CHECKBOX_WIDTH = 120;
-    /** Field with user name. */
     private Widget downloadUserField;
-    /** Field with password. */
     private Widget downloadPasswordField;
-    /** Checkbox to save the info. */
     private JCheckBox saveCheckBox;
     @Autowired
     private DrbdLinbitInst drbdLinbitInst;
 
-    /** Finishes the dialog and sets the information. */
     @Override
     protected final void finishDialog() {
-        Tools.getApplication().setDownloadLogin(
-                                downloadUserField.getStringValue().trim(),
-                                downloadPasswordField.getStringValue().trim(),
-                                saveCheckBox.isSelected());
+        Tools.getApplication().setDownloadLogin(downloadUserField.getStringValue().trim(),
+                                                downloadPasswordField.getStringValue().trim(),
+                                                saveCheckBox.isSelected());
     }
 
-    /** Returns the next dialog. */
     @Override
     public WizardDialog nextDialog() {
         drbdLinbitInst.init(this, getHost(), getDrbdInstallation());
@@ -85,54 +72,41 @@ public class LinbitLogin extends DialogHost {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                boolean v =
-                    (!downloadUserField.getStringValue().trim().isEmpty());
+                boolean v = (!downloadUserField.getStringValue().trim().isEmpty());
                 v = v && (!downloadPasswordField.getStringValue().trim().isEmpty());
                 buttonClass(nextButton()).setEnabled(v);
             }
         });
     }
 
-    /** Check all fields if they are correct. */
     @Override
     protected final void checkFields(final Widget field) {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                boolean v =
-                    (!downloadUserField.getStringValue().trim().isEmpty());
+                boolean v = (!downloadUserField.getStringValue().trim().isEmpty());
                 v = v && (!downloadPasswordField.getStringValue().trim().isEmpty());
                 buttonClass(nextButton()).setEnabled(v);
             }
         });
     }
 
-    /**
-     * Returns the title of the dialog, defined as
-     * Dialog.Host.LinbitLogin.Title in TextResources.
-     */
     @Override
     protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.LinbitLogin.Title");
     }
 
-    /**
-     * Returns the description of the dialog, defined as
-     * Dialog.Host.LinbitLogin.Description in TextResources.
-     */
     @Override
     protected final String getDescription() {
         return Tools.getString("Dialog.Host.LinbitLogin.Description");
     }
 
-    /** Inits the dialog. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
@@ -149,20 +123,14 @@ public class LinbitLogin extends DialogHost {
         }
     }
 
-    /**
-     * Returns the input pane, where user can enter the user name, password and
-     * can select a check box to save the info for later.
-     */
     @Override
     protected final JComponent getInputPane() {
         final JPanel p = new JPanel(new BorderLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
-        inputPane.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        inputPane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         /* user */
-        final JLabel userLabel = new JLabel(
-                      Tools.getString("Dialog.Host.LinbitLogin.EnterUser"));
+        final JLabel userLabel = new JLabel(Tools.getString("Dialog.Host.LinbitLogin.EnterUser"));
         inputPane.add(userLabel);
         downloadUserField = WidgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
@@ -171,8 +139,7 @@ public class LinbitLogin extends DialogHost {
                                        "^[,\\w.-]+$",
                                        CHECKBOX_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
         addCheckField(downloadUserField);
@@ -180,8 +147,7 @@ public class LinbitLogin extends DialogHost {
         inputPane.add(downloadUserField.getComponent());
 
         /* password */
-        final JLabel passwordLabel = new JLabel(
-                  Tools.getString("Dialog.Host.LinbitLogin.EnterPassword"));
+        final JLabel passwordLabel = new JLabel(Tools.getString("Dialog.Host.LinbitLogin.EnterPassword"));
 
         inputPane.add(passwordLabel);
         downloadPasswordField = WidgetFactory.createInstance(
@@ -191,8 +157,7 @@ public class LinbitLogin extends DialogHost {
                                   Widget.NO_REGEXP,
                                   CHECKBOX_WIDTH,
                                   Widget.NO_ABBRV,
-                                  new AccessMode(Application.AccessType.RO,
-                                                 !AccessMode.ADVANCED),
+                                  new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                   Widget.NO_BUTTON);
 
         addCheckField(downloadPasswordField);
@@ -201,16 +166,13 @@ public class LinbitLogin extends DialogHost {
 
         /* save */
         final JLabel saveLabel = new JLabel("");
-        saveLabel.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        saveLabel.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         inputPane.add(saveLabel);
-        saveCheckBox = new JCheckBox(
-                            Tools.getString("Dialog.Host.LinbitLogin.Save"),
-                            Tools.getApplication().getLoginSave());
+        saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.LinbitLogin.Save"),
+                                     Tools.getApplication().getLoginSave());
         saveLabel.setLabelFor(saveCheckBox);
-        saveCheckBox.setBackground(
-                        Tools.getDefaultColor("ConfigDialog.Background.Light"));
+        saveCheckBox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
         inputPane.add(saveCheckBox);
 
         SpringUtilities.makeCompactGrid(inputPane, 3, 2,  // rows, cols

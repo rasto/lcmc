@@ -37,13 +37,8 @@ import lcmc.utilities.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Domain extends VMConfig {
-    /** Configuration options of the new domain. */
     private static final String[] PARAMS = {VmsXml.VM_PARAM_DOMAIN_TYPE,
                                             VmsXml.VM_PARAM_NAME,
                                             VmsXml.VM_PARAM_VIRSH_OPTIONS,
@@ -57,59 +52,42 @@ public final class Domain extends VMConfig {
                                             VmsXml.VM_PARAM_INIT,
                                             VmsXml.VM_PARAM_TYPE_ARCH,
                                             VmsXml.VM_PARAM_TYPE_MACHINE};
-    /** Input pane cache for back button. */
     private JComponent inputPane = null;
-    private Widget domainNameWi;
-    /** Next dialog object. */
+    private Widget domainNameWidget;
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code Domain} object. */
-    public Domain(final WizardDialog previousDialog,
-                  final DomainInfo vmsVirtualDomainInfo) {
+    public Domain(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
         super(previousDialog, vmsVirtualDomainInfo);
     }
 
-    /** Next dialog. */
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
             if (getVMSVirtualDomainInfo().needFilesystem()) {
-                nextDialogObject =
-                        new Filesystem(this, getVMSVirtualDomainInfo());
+                nextDialogObject = new Filesystem(this, getVMSVirtualDomainInfo());
             } else {
-                nextDialogObject =
-                        new InstallationDisk(this, getVMSVirtualDomainInfo());
+                nextDialogObject = new InstallationDisk(this, getVMSVirtualDomainInfo());
             }
         }
         return nextDialogObject;
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.vm.Domain.Title in TextResources.
-     */
     @Override
     protected String getDialogTitle() {
         return Tools.getString("Dialog.vm.Domain.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.vm.Domain.Description in TextResources.
-     */
     @Override
     protected String getDescription() {
         return Tools.getString("Dialog.vm.Domain.Description");
     }
 
-    /** Inits dialog. */
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog. */
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
@@ -130,12 +108,11 @@ public final class Domain extends VMConfig {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                domainNameWi.requestFocus();
+                domainNameWidget.requestFocus();
             }
         });
     }
 
-    /** Returns input pane where user can configure a vm. */
     @Override
     protected JComponent getInputPane() {
         final DomainInfo vdi = getVMSVirtualDomainInfo();
@@ -150,24 +127,21 @@ public final class Domain extends VMConfig {
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
         optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
-        vdi.getResource().setValue(VmsXml.VM_PARAM_BOOT,
-                                   DomainInfo.BOOT_CDROM);
+        vdi.getResource().setValue(VmsXml.VM_PARAM_BOOT, DomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();
-        vdi.addWizardParams(
-                      optionsPanel,
-                      PARAMS,
-                      buttonClass(nextButton()),
-                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
-                      null);
-        domainNameWi = vdi.getWidget(VmsXml.VM_PARAM_NAME,
-                                     Widget.WIZARD_PREFIX);
+        vdi.addWizardParams(optionsPanel,
+                            PARAMS,
+                            buttonClass(nextButton()),
+                            Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                            Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                            null);
+        domainNameWidget = vdi.getWidget(VmsXml.VM_PARAM_NAME, Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);
 
-        final JScrollPane sp = new JScrollPane(panel);
-        sp.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
-        sp.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
-        inputPane = sp;
-        return sp;
+        final JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setMaximumSize(new Dimension(Short.MAX_VALUE, 200));
+        scrollPane.setPreferredSize(new Dimension(Short.MAX_VALUE, 200));
+        inputPane = scrollPane;
+        return scrollPane;
     }
 }

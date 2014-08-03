@@ -29,20 +29,12 @@ import lcmc.utilities.MyButton;
 
 /**
  * An implementation of a dialog where hardware information is collected.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 final class DevicesProxy extends Devices {
-    /** Drbd volume info. */
     private final VolumeInfo volumeInfo;
-    /** The dialog we came from. */
     private final WizardDialog origDialog;
-    /** Next dialog object. */
     private WizardDialog nextDialogObject = null;
 
-    /** Prepares a new {@code Devices} object. */
     DevicesProxy(final WizardDialog previousDialog,
                  final Host host,
                  final VolumeInfo volumeInfo,
@@ -62,7 +54,6 @@ final class DevicesProxy extends Devices {
         }
     }
 
-    /** Finish dialog. */
     @Override
     protected void finishDialog() {
         super.finishDialog();
@@ -79,16 +70,11 @@ final class DevicesProxy extends Devices {
         }
     }
 
-
-    /** Buttons that are enabled/disabled during checks. */
     @Override
     protected MyButton[] nextButtons() {
         return new MyButton[]{buttonClass(finishButton())};
     }
 
-    /**
-     * Return dialog that comes after "cancel" button was pressed.
-     */
     @Override
     protected WizardDialog dialogAfterCancel() {
         return origDialog;

@@ -39,14 +39,10 @@ import lcmc.utilities.Unit;
 
 /**
  * An implementation of an dialog with log files.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public final class CmdLog extends HostLogs {
     private static final Value DEFAULT_TIME = new StringValue("5m");
 
-    /** Time units. */
     protected static Unit[] getUnits() {
         return new Unit[]{
                    new Unit("s", "s", "second", "seconds"),
@@ -55,30 +51,26 @@ public final class CmdLog extends HostLogs {
                    new Unit("d", "d", "day",    "days")
        };
     }
-    /** Command to retrieve the logs. */
-    private String command = "CmdLog.Processed";
+    private String getLogsCommand = "CmdLog.Processed";
     /** Time in minutes of the logs. */
-    private TextfieldWithUnit timeTF;
+    private TextfieldWithUnit logTimeInMinutes;
 
-    /** Prepares a new {@code CmdLog} object. */
     public CmdLog(final Host host) {
         super(host);
     }
 
     @Override
     protected String logFileCommand() {
-        return command;
+        return getLogsCommand;
     }
 
-    /** Return buttons for extra functionality. */
     @Override
     protected JComponent[] getAdditionalComponents() {
-        final MyButton processed =
-                         new MyButton(Tools.getString("CmdLog.Processed.Btn"));
+        final MyButton processed = new MyButton(Tools.getString("CmdLog.Processed.Btn"));
         processed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                command = "CmdLog.Processed";
+                getLogsCommand = "CmdLog.Processed";
                 refreshLogsThread();
             }
         });
@@ -87,43 +79,38 @@ public final class CmdLog extends HostLogs {
         raw.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                command = "CmdLog.Raw";
+                getLogsCommand = "CmdLog.Raw";
                 refreshLogsThread();
             }
         });
 
-        final MyButton clear =
-                             new MyButton(Tools.getString("CmdLog.Clear.Btn"));
+        final MyButton clear = new MyButton(Tools.getString("CmdLog.Clear.Btn"));
         clear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                command = "CmdLog.Clear";
+                getLogsCommand = "CmdLog.Clear";
                 refreshLogsThread();
             }
         });
-        timeTF =
-             new TextfieldWithUnit(DEFAULT_TIME,
-                                   getUnits(),
-                                   Widget.NO_REGEXP,
-                                   150,
-                                   Widget.NO_ABBRV,
-                                   new AccessMode(Application.AccessType.ADMIN,
-                                                  !AccessMode.ADVANCED),
-                                   Widget.NO_BUTTON);
+        logTimeInMinutes = new TextfieldWithUnit(DEFAULT_TIME,
+                                                 getUnits(),
+                                                 Widget.NO_REGEXP,
+                                                 150,
+                                                 Widget.NO_ABBRV,
+                                                 new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                                                 Widget.NO_BUTTON);
         return new JComponent[]{processed,
                                 raw,
                                 clear,
-                                new JLabel(
-                                        Tools.getString("CmdLog.Last.Label")),
-                                timeTF,
+                                new JLabel(Tools.getString("CmdLog.Last.Label")),
+                                logTimeInMinutes,
                                 getRefreshBtn()};
     }
 
-    /** Options for the log command. */
     @Override
     protected Map<String, String> getOptionsHash() {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put("@OPTIONS@", "--log-time=" + timeTF.getStringValue());
+        replaceHash.put("@OPTIONS@", "--log-time=" + logTimeInMinutes.getStringValue());
         return replaceHash;
     }
 

@@ -36,10 +36,8 @@ import javax.swing.SpringLayout;
 
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -53,48 +51,33 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where user can choose a distribution of the
  * host.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 public class DrbdLinbitAvailPackages extends DialogHost {
-    /** Logger. */
-    private static final Logger LOG =
-                      LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
-    /** No match string. */
+    private static final Logger LOG = LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
     private static final String NO_MATCH_STRING = "No Match";
-    /** Newline. */
     private static final String NEWLINE = "\\r?\\n";
-    /** Height of the choice boxes. */
     private static final int CHOICE_BOX_HEIGHT = 30;
-    /** Combo box with distributions. */
-    private Widget drbdDistCombo = null;
-    /** Combo box with available kernel versions for this distribution. */
-    private Widget drbdKernelDirCombo = null;
-    /** Combo box with available architectures versions for this distribution.
-     */
-    private Widget drbdArchCombo = null;
-    /** List of items in the dist combo. */
+    private Widget drbdDistributionWidget = null;
+    private Widget drbdKernelDirWidget = null;
+    private Widget drbdArchWidget = null;
+
     private List<String> drbdDistItems = null;
-    /** List of items in the kernel versions combo. */
     private List<String> drbdKernelDirItems = null;
-    /** List of items in the arch combo. */
     private List<String> drbdArchItems = null;
+
     @Autowired
     private CheckInstallation checkInstallationDialog;
     @Autowired
     private DrbdAvailFiles drbdAvailFilesDialog;
 
-    /** Checks the available drbd verisions. */
-    protected final void availVersions() {
+    protected final void availDrbdVersions() {
         /* get drbd available versions,
          * they are independent from distribution and kernel version and
          * are first directory part in the download area.*/
-        drbdDistCombo.setEnabled(false);
-        drbdKernelDirCombo.setEnabled(false);
-        drbdArchCombo.setEnabled(false);
+        drbdDistributionWidget.setEnabled(false);
+        drbdKernelDirWidget.setEnabled(false);
+        drbdArchWidget.setEnabled(false);
         getProgressBar().start(20000);
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
                 .commandString("DrbdAvailVersions")
@@ -111,12 +94,10 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                     }
 
                     @Override
-                    public void doneError(final String answer,
-                                          final int errorCode) {
-                        printErrorAndRetry(Tools.getString(
-                                        "Dialog.Host.DrbdLinbitAvailPackages.NoVersions"),
-                                answer,
-                                errorCode);
+                    public void doneError(final String answer, final int errorCode) {
+                        printErrorAndRetry(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoVersions"),
+                                           answer,
+                                           errorCode);
                     }
                 }));
         setCommandThread(t);
@@ -127,8 +108,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                drbdKernelDirCombo.setEnabled(false);
-                drbdArchCombo.setEnabled(false);
+                drbdKernelDirWidget.setEnabled(false);
+                drbdArchWidget.setEnabled(false);
             }
         });
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
@@ -143,23 +124,20 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                drbdDistCombo.reloadComboBox(
-                                        new StringValue(
-                                                getHost().getDistributionVersion()),
+                                drbdDistributionWidget.reloadComboBox(
+                                        new StringValue(getHost().getDistributionVersion()),
                                         StringValue.getValues(items));
-                                drbdDistCombo.setEnabled(true);
+                                drbdDistributionWidget.setEnabled(true);
                             }
                         });
                         availKernels();
                     }
 
                     @Override
-                    public void doneError(final String answer,
-                                          final int errorCode) {
-                        printErrorAndRetry(Tools.getString(
-                                        "Dialog.Host.DrbdLinbitAvailPackages.NoDistributions"),
-                                answer,
-                                errorCode);
+                    public void doneError(final String answer, final int errorCode) {
+                        printErrorAndRetry(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoDistributions"),
+                                           answer,
+                                           errorCode);
                     }
                 })
                 .convertCmdCallback(new ConvertCmdCallback() {
@@ -171,16 +149,13 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         setCommandThread(t);
     }
 
-    /** Checks what are the available kernels for this distribution. */
     protected final void availKernels() {
         final String distVersion = getHost().getDistributionVersion();
         if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    drbdKernelDirCombo.reloadComboBox(
-                                                null,
-                                                new Value[]{new StringValue(NO_MATCH_STRING)});
+                    drbdKernelDirWidget.reloadComboBox(null, new Value[]{new StringValue(NO_MATCH_STRING)});
                 }
             });
             availArchs();
@@ -198,19 +173,17 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 Tools.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
-                                        drbdKernelDirCombo.reloadComboBox(
-                                            new StringValue(
-                                               getHost().getKernelVersion()),
-                                            StringValue.getValues(items));
-                                        drbdKernelDirCombo.setEnabled(true);
+                                        drbdKernelDirWidget.reloadComboBox(
+                                                new StringValue(getHost().getKernelVersion()),
+                                                StringValue.getValues(items));
+                                        drbdKernelDirWidget.setEnabled(true);
                                     }
                                 });
                                 availArchs();
                             }
 
                             @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
+                            public void doneError(final String answer, final int errorCode) {
                                 LOG.debug("doneError:");
                                 printErrorAndRetry(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoKernels"),
                                                    answer,
@@ -220,7 +193,6 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         setCommandThread(t);
     }
 
-    /** Checks what are the available architectures for this distribution. */
     protected final void availArchs() {
         final String kernelVersion = getHost().getKernelVersion();
         final String arch = getHost().getArch();
@@ -232,9 +204,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             Tools.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    drbdArchCombo.reloadComboBox(null,
-                                                 new Value[]{new StringValue(NO_MATCH_STRING)});
-                    drbdArchCombo.setEnabled(false);
+                    drbdArchWidget.reloadComboBox(null, new Value[]{new StringValue(NO_MATCH_STRING)});
+                    drbdArchWidget.setEnabled(false);
                 }
             });
             allDone(null);
@@ -252,10 +223,8 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                drbdArchCombo.reloadComboBox(
-                                        new StringValue(arch),
-                                        StringValue.getValues(items));
-                                drbdArchCombo.setEnabled(true);
+                                drbdArchWidget.reloadComboBox(new StringValue(arch), StringValue.getValues(items));
+                                drbdArchWidget.setEnabled(true);
                             }
                         });
                         if (drbdArchItems == null) {
@@ -266,19 +235,15 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                     }
 
                     @Override
-                    public void doneError(final String answer,
-                                          final int errorCode) {
-                        printErrorAndRetry(Tools.getString(
-                                        "Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
-                                answer,
-                                errorCode);
+                    public void doneError(final String answer, final int errorCode) {
+                        printErrorAndRetry(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
+                                           answer,
+                                           errorCode);
                     }
                 }));
-
         setCommandThread(t);
     }
 
-    /** Checks what are the avail drbd versions for this distribution. */
     protected final void availVersionsForDist() {
         final ExecCommandThread t = getHost().execCommand(new ExecCommandConfig()
                 .commandString("DrbdAvailVersionsForDist")
@@ -289,15 +254,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                             }
 
                             @Override
-                            public void doneError(final String answer,
-                                                  final int errorCode) {
-                                printErrorAndRetry(
-                                    Tools.getString(
-                                 "Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
-                                        answer,
-                                        errorCode);
+                            public void doneError(final String answer, final int errorCode) {
+                                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NoArchs"),
+                                                   answer,
+                                                   errorCode);
                             }
-                          }));
+                         }));
 
         setCommandThread(t);
     }
@@ -316,18 +278,11 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             final String kernel = getHost().getKernelVersion();
             final String arch = getHost().getArch();
             if (drbdDistItems == null || !drbdDistItems.contains(dist)) {
-                errorText.append(
-                  Tools.getString(
-                     "Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Dist"));
-            } else if (drbdKernelDirItems == null
-                       || !drbdKernelDirItems.contains(kernel)) {
-                errorText.append(
-                  Tools.getString(
-                   "Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Kernel"));
+                errorText.append(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Dist"));
+            } else if (drbdKernelDirItems == null || !drbdKernelDirItems.contains(kernel)) {
+                errorText.append(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Kernel"));
             } else if (drbdArchItems == null || !drbdArchItems.contains(arch)) {
-                errorText.append(
-                  Tools.getString(
-                    "Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Arch"));
+                errorText.append(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.NotAvailable.Arch"));
             }
             errorText.append("\n\n");
             errorText.append(dist);
@@ -339,10 +294,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         } else {
             final String[] versions = ans.split(NEWLINE);
             getDrbdInstallation().setAvailableDrbdVersions(versions);
-            answerPaneSetText(
-                    Tools.getString(
-                        "Dialog.Host.DrbdLinbitAvailPackages.AvailVersions")
-                    + ' ' + Tools.join(", ", versions));
+            answerPaneSetText(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.AvailVersions")
+                                              + " "
+                                              + Tools.join(", ", versions));
             if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
                 Tools.sleep(1000);
                 pressNextButton();
@@ -351,20 +305,17 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         addListeners();
     }
 
-    /** Inits dialog and starts the distribution detection. */
     @Override
     protected final void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
     }
 
-    /** Inits the dialog after it becomes visible. */
     @Override
     protected void initDialogAfterVisible() {
-        availVersions();
+        availDrbdVersions();
     }
 
-    /** Returns the next dialog which is CheckInstallation. */
     @Override
     public WizardDialog nextDialog() {
         if (getDrbdInstallation().isDrbdUpgraded()) {
@@ -376,26 +327,16 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         }
     }
 
-    /**
-     * Returns the title of the dialog. It is defined as
-     * Dialog.Host.DrbdLinbitAvailPackages.Title in TextResources.
-     */
     @Override
     protected final String getHostDialogTitle() {
         return Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.Title");
     }
 
-    /**
-     * Returns the description of the dialog. It is defined as
-     * Dialog.Host.DrbdLinbitAvailPackages.Description in TextResources.
-     */
     @Override
     protected final String getDescription() {
-        return Tools.getString(
-                            "Dialog.Host.DrbdLinbitAvailPackages.Description");
+        return Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.Description");
     }
 
-    /** Returns the pane with all combo boxes. */
     protected final JPanel getChoiceBoxes() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.LINE_AXIS));
@@ -403,92 +344,84 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         pane.setMaximumSize(new Dimension(maxX, CHOICE_BOX_HEIGHT));
 
         /* combo boxes */
-        drbdDistCombo = WidgetFactory.createInstance(
+        drbdDistributionWidget = WidgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
                                        Widget.NO_ITEMS,
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
-        drbdDistCombo.setEnabled(false);
-        pane.add(drbdDistCombo.getComponent());
-        drbdKernelDirCombo = WidgetFactory.createInstance(
+        drbdDistributionWidget.setEnabled(false);
+        pane.add(drbdDistributionWidget.getComponent());
+        drbdKernelDirWidget = WidgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
                                        Widget.NO_ITEMS,
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
-        drbdKernelDirCombo.setEnabled(false);
-        pane.add(drbdKernelDirCombo.getComponent());
-        drbdArchCombo = WidgetFactory.createInstance(
+        drbdKernelDirWidget.setEnabled(false);
+        pane.add(drbdKernelDirWidget.getComponent());
+        drbdArchWidget = WidgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
                                        Widget.NO_ITEMS,
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO,
-                                                      !AccessMode.ADVANCED),
+                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                        Widget.NO_BUTTON);
 
-        drbdArchCombo.setEnabled(false);
-        pane.add(drbdArchCombo.getComponent());
+        drbdArchWidget.setEnabled(false);
+        pane.add(drbdArchWidget.getComponent());
         pane.add(Box.createHorizontalGlue());
         pane.add(Box.createRigidArea(new Dimension(10, 0)));
         return pane;
     }
 
-    /** Adds listeners to the check boxes. */
     private void addListeners() {
         /* listeners, that disallow to select anything. */
         /* distribution combo box */
-        drbdDistCombo.addListeners(
-            new WidgetListener() {
-                @Override
-                public void check(final Value value) {
-                    String v = getHost().getDistributionVersion();
-                    if (drbdDistItems == null || !drbdDistItems.contains(v)) {
-                        v = NO_MATCH_STRING;
+        drbdDistributionWidget.addListeners(new WidgetListener() {
+                    @Override
+                    public void check(final Value value) {
+                        String v = getHost().getDistributionVersion();
+                        if (drbdDistItems == null || !drbdDistItems.contains(v)) {
+                            v = NO_MATCH_STRING;
+                        }
+                        drbdDistributionWidget.setValue(new StringValue(v));
                     }
-                    drbdDistCombo.setValue(new StringValue(v));
-                }
-            });
+                });
 
 
         /* kernel version combo box */
-        drbdKernelDirCombo.addListeners(
-            new WidgetListener() {
-                @Override
-                public void check(final Value value) {
-                    String v = getHost().getKernelVersion();
-                    if (drbdKernelDirItems == null
-                        || !drbdKernelDirItems.contains(v)) {
-                        v = NO_MATCH_STRING;
+        drbdKernelDirWidget.addListeners(
+                new WidgetListener() {
+                    @Override
+                    public void check(final Value value) {
+                        String v = getHost().getKernelVersion();
+                        if (drbdKernelDirItems == null || !drbdKernelDirItems.contains(v)) {
+                            v = NO_MATCH_STRING;
+                        }
+                        drbdKernelDirWidget.setValue(new StringValue(v));
                     }
-                    drbdKernelDirCombo.setValue(new StringValue(v));
-                }
-            });
+                });
 
         /* arch combo box */
-        drbdArchCombo.addListeners(
-            new WidgetListener() {
-                @Override
-                public void check(final Value value) {
-                    enableComponentsLater(
-                                new JComponent[]{buttonClass(nextButton())});
-                    getHost().setArch(drbdArchCombo.getStringValue());
-                    availVersionsForDist();
-                }
-            });
+        drbdArchWidget.addListeners(new WidgetListener() {
+                    @Override
+                    public void check(final Value value) {
+                        enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
+                        getHost().setArch(drbdArchWidget.getStringValue());
+                        availVersionsForDist();
+                    }
+                });
     }
 
     /** Returns the input pane with check boxes and other info. */
@@ -497,15 +430,12 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel labelP = new JPanel(new FlowLayout(FlowLayout.LEADING));
         labelP.setPreferredSize(new Dimension(0, 0));
-        labelP.add(new JLabel(
-            Tools.getString(
-                "Dialog.Host.DrbdLinbitAvailPackages.AvailablePackages")));
+        labelP.add(new JLabel(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.AvailablePackages")));
         pane.add(labelP);
         pane.add(getChoiceBoxes());
         final JPanel progrPane = getProgressBarPane();
         pane.add(progrPane);
-        pane.add(getAnswerPane(Tools.getString(
-                            "Dialog.Host.DrbdLinbitAvailPackages.Executing")));
+        pane.add(getAnswerPane(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.Executing")));
         SpringUtilities.makeCompactGrid(pane, 4, 1,  // rows, cols
                                               0, 0,  // initX, initY
                                               0, 0); // xPad, yPad
