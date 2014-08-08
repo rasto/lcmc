@@ -291,9 +291,9 @@ public final class DistResource extends ListResourceBundle {
 
         {"CRM.erase",
          SUDO
-         + "/usr/sbin/cibadmin --obj_type configuration -R -X '<constraints/>'"
+         + "/usr/sbin/cibadmin -o configuration -R -X '<constraints/>'"
          + " && " + SUDO
-         + "/usr/sbin/cibadmin --obj_type configuration -R -X '<resources/>'"},
+         + "/usr/sbin/cibadmin -o configuration -R -X '<resources/>'"},
 
         {"CRM.configureCommit",
          "EDITOR=\"echo '@CONFIG@'|cat>\" " + SUDO + "crm configure edit"},

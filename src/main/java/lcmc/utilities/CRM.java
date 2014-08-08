@@ -70,7 +70,7 @@ public final class CRM {
     /** Returns cibadmin command. */
     public static String getCibCommand(final String command, final String objType, final String xml) {
         final StringBuilder cmd = new StringBuilder(300);
-        cmd.append(DistResource.SUDO + "/usr/sbin/cibadmin --obj_type ");
+        cmd.append(DistResource.SUDO + "/usr/sbin/cibadmin -o ");
         cmd.append(objType);
         cmd.append(' ');
         cmd.append(command);
