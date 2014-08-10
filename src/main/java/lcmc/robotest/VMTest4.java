@@ -24,64 +24,48 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import lcmc.gui.widget.GenericWidget.MTextField;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.getAppPosition;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.isColor;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class VMTest4 {
+    @Autowired
+    private RoboTest roboTest;
+
     /** Cluster wizard locked until focus is lost. */
-    static void start(final String vmTest, final int count) {
-        slowFactor = 0.1f;
-        aborted = false;
+    void start(final String vmTest, final int count) {
+        roboTest.setSlowFactor(0.1f);
+        roboTest.setAborted(false);
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info(vmTest + " I: " + i);
+                roboTest.info(vmTest + " I: " + i);
             }
-            moveTo("Add New Virtual Machine"); /* new VM */
-            leftClick();
-            sleep(1000);
-            moveTo("Domain name", MTextField.class);
-            final Point2D p = getAppPosition();
-            if (!isColor((int) p.getX(),
-                         (int) p.getY(),
-                         new Color(255, 100, 100),
-                         true)) {
-                info(vmTest + " 1: error");
+            roboTest.moveTo("Add New Virtual Machine"); /* new VM */
+            roboTest.leftClick();
+            roboTest.sleep(1000);
+            roboTest.moveTo("Domain name", MTextField.class);
+            final Point2D p = roboTest.getAppPosition();
+            if (!roboTest.isColor((int) p.getX(), (int) p.getY(), new Color(255, 100, 100), true)) {
+                roboTest.info(vmTest + " 1: error");
                 break;
             }
             boolean ok = false;
             for (int error = 0; error < 5; error++) {
-                press(KeyEvent.VK_X);
-                if (!isColor((int) p.getX(),
-                             (int) p.getY(),
-                             new Color(255, 100, 100),
-                             false)) {
+                roboTest.press(KeyEvent.VK_X);
+                if (!roboTest.isColor((int) p.getX(), (int) p.getY(), new Color(255, 100, 100), false)) {
                     ok = true;
                     break;
                 }
             }
             if (!ok) {
-                info(vmTest + " 2: failed");
+                roboTest.info(vmTest + " 2: failed");
                 break;
             }
-            moveTo("Cancel"); /* cancel */
-            leftClick();
+            roboTest.moveTo("Cancel"); /* cancel */
+            roboTest.leftClick();
         }
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private VMTest4() {
-        /* Cannot be instantiated. */
     }
 }

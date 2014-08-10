@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import javax.inject.Provider;
 import javax.swing.JPanel;
 import junitparams.JUnitParamsRunner;
 import static junitparams.JUnitParamsRunner.$;
@@ -17,6 +18,7 @@ import lcmc.gui.TerminalPanel;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdHost;
+import lcmc.model.drbd.DrbdXml;
 import lcmc.testutils.TestUtils;
 import lcmc.utilities.ssh.Ssh;
 import org.junit.Assert;
@@ -954,7 +956,12 @@ public final class ToolsTest {
     @Parameters(method="parametersForTestVersionBeforePacemaker")
     public void testVersionBeforePacemaker(final String pcmkVersion, final String hbVersion) {
         final GlobalInfo globalInfo = new GlobalInfo();
-        final Host host = new Host(guiData, ssh, drbdHostStub, terminalPanelStub);
+        final Host host = new Host(guiData, ssh, drbdHostStub, terminalPanelStub, new Provider<DrbdXml>() {
+            @Override
+            public DrbdXml get() {
+                return null;
+            }
+        });
 
         host.setPacemakerVersion(pcmkVersion);
         host.setHeartbeatVersion(hbVersion);
@@ -975,7 +982,12 @@ public final class ToolsTest {
     @Test
     @Parameters(method="parametersForTestVersionAfterPacemaker")
     public void testVersionAfterPacemaker(final String pcmkVersion, final String hbVersion) {
-        final Host host = new Host(guiData, ssh, drbdHostStub, terminalPanelStub);
+        final Host host = new Host(guiData, ssh, drbdHostStub, terminalPanelStub, new Provider<DrbdXml>() {
+            @Override
+            public DrbdXml get() {
+                return null;
+            }
+        });
 
         host.setPacemakerVersion(pcmkVersion);
         host.setHeartbeatVersion(hbVersion);

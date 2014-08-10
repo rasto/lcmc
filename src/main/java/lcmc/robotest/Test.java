@@ -1,7 +1,7 @@
 /*
  * This file is part of LCMC written by Rasto Levrinc.
  *
- * Copyright (C) 2013, Rastislav Levrinc.
+ * Copyright (C) 2014, Rastislav Levrinc.
  *
  * The LCMC is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -20,19 +20,20 @@
 
 package lcmc.robotest;
 
-import lcmc.model.Cluster;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+public class Test {
+    private final RoboTest.Type type;
+    private final char index;
 
-/**
- * This class is used to test the GUI.
- */
-@Component
-final class VMTest5 {
-    @Autowired
-    private VMTest1 vmTest1;
+    public Test(final RoboTest.Type type, final char index) {
+        this.type = type;
+        this.index = index;
+    }
 
-    void start(final Cluster cluster, final String vmTest, final int count) {
-        vmTest1.startVMTest(cluster, vmTest, "lxc", count);
+    public RoboTest.Type getType() {
+        return type;
+    }
+
+    public char getIndex() {
+        return index;
     }
 }

@@ -21,53 +21,44 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.addConstraint;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.chooseDummy;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.moveToMenu;
-import static lcmc.robotest.RoboTest.removeEverything;
-import static lcmc.robotest.RoboTest.removePlaceHolder;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopEverything;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTest4 {
-    static void start() {
-        slowFactor = 0.6f;
-        aborted = false;
+    @Autowired
+    private RoboTest roboTest;
 
-        disableStonith();
-        checkTest("test4", 1);
+    void start() {
+        roboTest.setSlowFactor(0.6f);
+        roboTest.setAborted(false);
+
+        roboTest.disableStonith();
+        roboTest.checkTest("test4", 1);
         /* create 6 dummies */
         final int dummy1X = 235;
         final int dummy1Y = 207;
-        chooseDummy(dummy1X, dummy1Y, false, true);
+        roboTest.chooseDummy(dummy1X, dummy1Y, false, true);
         final int dummy2X = 545;
         final int dummy2Y = 207;
-        chooseDummy(dummy2X, dummy2Y, false, true);
+        roboTest.chooseDummy(dummy2X, dummy2Y, false, true);
         final int dummy3X = 235;
         final int dummy3Y = 346;
-        chooseDummy(dummy3X, dummy3Y, false, true);
+        roboTest.chooseDummy(dummy3X, dummy3Y, false, true);
         final int dummy4X = 545;
         final int dummy4Y = 346;
-        chooseDummy(dummy4X, dummy4Y, false, true);
+        roboTest.chooseDummy(dummy4X, dummy4Y, false, true);
         final int dummy5X = 235;
         final int dummy5Y = 505;
-        chooseDummy(dummy5X, dummy5Y, false, true);
+        roboTest.chooseDummy(dummy5X, dummy5Y, false, true);
         final int dummy6X = 545;
         final int dummy6Y = 505;
-        chooseDummy(dummy6X, dummy6Y, false, true);
-        checkTest("test4", 2);
+        roboTest.chooseDummy(dummy6X, dummy6Y, false, true);
+        roboTest.checkTest("test4", 2);
 
         /* 2 placeholders */
         final int count = 1;
@@ -76,59 +67,54 @@ final class PcmkTest4 {
         final int ph2X = 445;
         final int ph2Y = 425;
         for (int i = 0; i < count; i++) {
-            moveTo(ph1X, ph1Y);
-            rightClick();
-            moveTo("Placeholder (AND)");
-            leftClick();
+            roboTest.moveTo(ph1X, ph1Y);
+            roboTest.rightClick();
+            roboTest.moveTo("Placeholder (AND)");
+            roboTest.leftClick();
 
-            moveTo(ph2X, ph2Y);
-            rightClick();
-            moveTo("Placeholder (AND)");
-            leftClick();
-            checkTest("test4", 2);
+            roboTest.moveTo(ph2X, ph2Y);
+            roboTest.rightClick();
+            roboTest.moveTo("Placeholder (AND)");
+            roboTest.leftClick();
+            roboTest.checkTest("test4", 2);
 
             /* constraints */
             /* menu dummy 5 with ph2 */
-            moveToMenu("Dummy (5)");
-            addConstraint(7);
+            roboTest.moveToMenu("Dummy (5)");
+            roboTest.addConstraint(7);
             /* menu dummy 6 with ph2 */
-            moveToMenu("Dummy (6)");
-            addConstraint(7);
+            roboTest.moveToMenu("Dummy (6)");
+            roboTest.addConstraint(7);
 
             /* with dummy 3 */
-            moveTo(ph2X, ph2Y);
-            addConstraint(3);
+            roboTest.moveTo(ph2X, ph2Y);
+            roboTest.addConstraint(3);
             /* with dummy 4 */
-            moveTo(ph2X, ph2Y);
-            addConstraint(3);
+            roboTest.moveTo(ph2X, ph2Y);
+            roboTest.addConstraint(3);
 
             /* with ph1 */
-            moveTo(dummy3X, dummy3Y);
-            addConstraint(4);
+            roboTest.moveTo(dummy3X, dummy3Y);
+            roboTest.addConstraint(4);
             /* with ph1 */
-            moveTo(dummy4X, dummy4Y);
-            addConstraint(4);
+            roboTest.moveTo(dummy4X, dummy4Y);
+            roboTest.addConstraint(4);
 
-            moveTo(ph1X, ph1Y);
-            addConstraint(1); /* with dummy 1 */
-            moveTo(ph1X, ph1Y);
-            addConstraint(1); /* with dummy 2 */
-            checkTest("test4", 2);
+            roboTest.moveTo(ph1X, ph1Y);
+            roboTest.addConstraint(1); /* with dummy 1 */
+            roboTest.moveTo(ph1X, ph1Y);
+            roboTest.addConstraint(1); /* with dummy 2 */
+            roboTest.checkTest("test4", 2);
 
         }
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
 
-        checkTest("test4", 3);
-        stopEverything();
-        checkTest("test4", 4);
-        removeEverything();
-        removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
-        removePlaceHolder(ph2X, ph2Y, !CONFIRM_REMOVE);
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest4() {
-        /* Cannot be instantiated. */
+        roboTest.checkTest("test4", 3);
+        roboTest.stopEverything();
+        roboTest.checkTest("test4", 4);
+        roboTest.removeEverything();
+        roboTest.removePlaceHolder(ph1X, ph1Y, !CONFIRM_REMOVE);
+        roboTest.removePlaceHolder(ph2X, ph2Y, !CONFIRM_REMOVE);
     }
 }

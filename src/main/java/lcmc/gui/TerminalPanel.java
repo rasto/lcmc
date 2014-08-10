@@ -51,6 +51,7 @@ import javax.swing.text.StyleConstants;
 
 import lcmc.model.Host;
 import lcmc.robotest.RoboTest;
+import lcmc.robotest.Test;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -106,12 +107,13 @@ public class TerminalPanel extends JScrollPane {
     private static final String DEBUG_INC = "debuginc";
     /** Command to decrement debug level. */
     private static final String DEBUG_DEC = "debugdec";
-    /** Starts tests. */
-    private static final Map<String, RoboTest.Test> TESTS = new HashMap<String, RoboTest.Test>();
     /** Register mouse movement. */
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
     private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<String, Integer>();
+    @Autowired
+    private RoboTest roboTest;
+    private static final Map<String, Test> TEST_CHEATS = new HashMap<String, Test>();
     static {
         for (final RoboTest.Type type : new RoboTest.Type[]{RoboTest.Type.PCMK,
                                                             RoboTest.Type.DRBD,
@@ -119,8 +121,7 @@ public class TerminalPanel extends JScrollPane {
                                                             RoboTest.Type.GUI}) {
             for (final char index : new Character[]{
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}) {
-                TESTS.put(type.getTestName() + index,
-                          new RoboTest.Test(type, index));
+                TEST_CHEATS.put(type.getTestName() + index, new Test(type, index));
             }
         }
     }
@@ -144,7 +145,7 @@ public class TerminalPanel extends JScrollPane {
         CHEATS_MAP.put(MOVETEST_LAZY_LONG, 0);
         CHEATS_MAP.put(DEBUG_INC, 0);
         CHEATS_MAP.put(DEBUG_DEC, 0);
-        for (final String test : TESTS.keySet()) {
+        for (final String test : TEST_CHEATS.keySet()) {
             CHEATS_MAP.put(test, 0);
         }
         CHEATS_MAP.put(REGISTER_MOVEMENT, 0);
@@ -548,37 +549,37 @@ public class TerminalPanel extends JScrollPane {
             });
             t.start();
         } else if (CLICKTEST_SHORT.equals(cheat)) {
-            RoboTest.startClicker(1, false);
+            roboTest.startClicker(1, false);
         } else if (CLICKTEST_LONG.equals(cheat)) {
-            RoboTest.startClicker(8 * 60, false);
+            roboTest.startClicker(8 * 60, false);
         } else if (CLICKTEST_LAZY_SHORT.equals(cheat)) {
-            RoboTest.startClicker(1, true);
+            roboTest.startClicker(1, true);
         } else if (CLICKTEST_LAZY_LONG.equals(cheat)) {
-            RoboTest.startClicker(8 * 60, true); /* 8 hours */
+            roboTest.startClicker(8 * 60, true); /* 8 hours */
         } else if (RIGHT_CLICKTEST_SHORT.equals(cheat)) {
-            RoboTest.startRightClicker(1, false);
+            roboTest.startRightClicker(1, false);
         } else if (RIGHT_CLICKTEST_LONG.equals(cheat)) {
-            RoboTest.startRightClicker(8 * 60, false);
+            roboTest.startRightClicker(8 * 60, false);
         } else if (RIGHT_CLICKTEST_LAZY_SHORT.equals(cheat)) {
-            RoboTest.startRightClicker(1, true);
+            roboTest.startRightClicker(1, true);
         } else if (RIGHT_CLICKTEST_LAZY_LONG.equals(cheat)) {
-            RoboTest.startRightClicker(8 * 60, true); /* 8 hours */
+            roboTest.startRightClicker(8 * 60, true); /* 8 hours */
         } else if (MOVETEST_SHORT.equals(cheat)) {
-            RoboTest.startMover(1, false);
+            roboTest.startMover(1, false);
         } else if (MOVETEST_LONG.equals(cheat)) {
-            RoboTest.startMover(8 * 60, false);
+            roboTest.startMover(8 * 60, false);
         } else if (MOVETEST_LAZY_SHORT.equals(cheat)) {
-            RoboTest.startMover(1, true);
+            roboTest.startMover(1, true);
         } else if (MOVETEST_LAZY_LONG.equals(cheat)) {
-            RoboTest.startMover(8 * 60, true);
+            roboTest.startMover(8 * 60, true);
         } else if (DEBUG_INC.equals(cheat)) {
             LoggerFactory.incrementDebugLevel();
         } else if (DEBUG_DEC.equals(cheat)) {
             LoggerFactory.decrementDebugLevel();
-        } else if (TESTS.containsKey(cheat)) {
-            RoboTest.startTest(TESTS.get(cheat), host.getCluster());
+        } else if (TEST_CHEATS.containsKey(cheat)) {
+            roboTest.startTest(TEST_CHEATS.get(cheat), host.getCluster());
         } else if (REGISTER_MOVEMENT.equals(cheat)) {
-            RoboTest.registerMovement();
+            roboTest.registerMovement();
         }
         nextCommand();
     }

@@ -43,8 +43,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Provider;
 import javax.swing.JComponent;
 
+import lcmc.AppContext;
 import lcmc.Exceptions;
 import lcmc.LCMC;
 import lcmc.configs.DistResource;
@@ -231,15 +233,19 @@ public class Host implements Comparable<Host>, Value {
     private GUIData guiData;
     private Ssh ssh;
 
+    private Provider<DrbdXml> drbdXmlProvider;
+
     public Host(final GUIData guiData,
                 final Ssh ssh,
                 final DrbdHost drbdHost,
-                final TerminalPanel terminalPanel) {
+                final TerminalPanel terminalPanel,
+                final Provider<DrbdXml> drbdXmlProvider) {
         this.guiData = guiData;
         this.ssh = ssh;
 
         this.drbdHost = drbdHost;
         this.terminalPanel = terminalPanel;
+        this.drbdXmlProvider = drbdXmlProvider;
 
 
         if (Tools.getApplication().getHosts().size() == 1) {
@@ -1437,7 +1443,8 @@ public class Host implements Comparable<Host>, Value {
                                      }
                                  }
                                  if (drbdUpdate != null) {
-                                     final DrbdXml dxml = new DrbdXml(guiData, cluster.getHostsArray(), cb.getHostDrbdParameters());
+                                     final DrbdXml dxml = drbdXmlProvider.get();
+                                     dxml.init(cluster.getHostsArray(), cb.getHostDrbdParameters());
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXml(dxml);
                                      Tools.invokeLater(new Runnable() {
@@ -2321,6 +2328,7 @@ public class Host implements Comparable<Host>, Value {
         command.append(" 2>&1");
         int i = 0;
         SshOutput out;
+        final RoboTest roboTest = AppContext.getBean(RoboTest.class);
         do {
             out = getSSH().execCommandAndWait(new ExecCommandConfig().command(command.toString())
                                                                      .sshCommandTimeout(60000));
@@ -2328,16 +2336,16 @@ public class Host implements Comparable<Host>, Value {
                 break;
             }
             i++;
-            RoboTest.sleepNoFactor(i * 2000);
+            roboTest.sleepNoFactor(i * 2000);
         } while (i < 5);
         String nameS = ' ' + name;
         if (name == null) {
             nameS = "";
         }
         if (i > 0) {
-            RoboTest.info(getName() + ' ' + test + ' ' + index + nameS + " tries: " + (i + 1));
+            roboTest.info(getName() + ' ' + test + ' ' + index + nameS + " tries: " + (i + 1));
         }
-        RoboTest.info(getName() + ' ' + test + ' ' + index + nameS + ' ' + out.getOutput());
+        roboTest.info(getName() + ' ' + test + ' ' + index + nameS + ' ' + out.getOutput());
         return out.getExitCode() == 0;
     }
 

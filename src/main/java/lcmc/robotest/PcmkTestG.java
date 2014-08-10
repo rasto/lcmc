@@ -22,96 +22,80 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.resetTerminalAreas;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.robot;
-import static lcmc.robotest.RoboTest.setTimeouts;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopResource;
-import static lcmc.robotest.RoboTest.typeDummy;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTestG {
-    static void start(final int count) {
-        slowFactor = 0.5f;
-        aborted = false;
-        disableStonith();
-        checkTest("testG", 1);
+    @Autowired
+    private RoboTest roboTest;
+
+    void start(final int count) {
+        roboTest.setSlowFactor(0.5f);
+        roboTest.setAborted(false);
+        roboTest.disableStonith();
+        roboTest.checkTest("testG", 1);
         /* group with dummy resources */
         final int gx = 235;
         final int gy = 207;
-        moveTo(gx, gy);
-        sleep(1000);
-        rightClick(); /* popup */
-        sleep(1000);
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
-        leftClick();
-        sleep(3000);
+        roboTest.moveTo(gx, gy);
+        roboTest.sleep(1000);
+        roboTest.rightClick(); /* popup */
+        roboTest.sleep(1000);
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
+        roboTest.leftClick();
+        roboTest.sleep(3000);
         /* create dummy */
-        moveTo(gx + 46, gy + 11);
-        rightClick(); /* group popup */
-        sleep(2000);
+        roboTest.moveTo(gx + 46, gy + 11);
+        roboTest.rightClick(); /* group popup */
+        roboTest.sleep(2000);
 
         for (int i = 0; i < count; i++) {
             /* another group resource */
-            moveTo(gx + 10, gy - 25);
-            rightClick(); /* popup */
-            sleep(10000);
-            moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-            sleep(1000);
-            moveTo("OCF Resource Agents");
-            sleep(1000);
-            typeDummy();
-            sleep(i * 300);
-            setTimeouts(true);
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            sleep(6000);
-            leftClick();
-            sleep(1000);
+            roboTest.moveTo(gx + 10, gy - 25);
+            roboTest.rightClick(); /* popup */
+            roboTest.sleep(10000);
+            roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+            roboTest.sleep(1000);
+            roboTest.moveTo("OCF Resource Agents");
+            roboTest.sleep(1000);
+            roboTest.typeDummy();
+            roboTest.sleep(i * 300);
+            roboTest.setTimeouts(true);
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.sleep(6000);
+            roboTest.leftClick();
+            roboTest.sleep(1000);
         }
-        checkTest("testG", 2);
-        sleep(4000);
-        stopResource(gx, gy);
-        sleep(6000);
-        checkTest("testG", 3);
+        roboTest.checkTest("testG", 2);
+        roboTest.sleep(4000);
+        roboTest.stopResource(gx, gy);
+        roboTest.sleep(6000);
+        roboTest.checkTest("testG", 3);
 
         /* copy/paste */
-        moveTo(gx + 10 , gy + 10);
-        leftClick();
-        robot.keyPress(KeyEvent.VK_CONTROL);
-        press(KeyEvent.VK_C);
-        press(KeyEvent.VK_V);
-        robot.keyRelease(KeyEvent.VK_CONTROL);
-        moveTo(gx + 10 , gy + 90);
-        leftClick();
-        moveTo(Tools.getString("Browser.ApplyGroup"));
-        sleep(4000);
-        leftClick();
-        checkTest("testG", 4);
+        roboTest.moveTo(gx + 10 , gy + 10);
+        roboTest.leftClick();
+        roboTest.getRobot().keyPress(KeyEvent.VK_CONTROL);
+        roboTest.press(KeyEvent.VK_C);
+        roboTest.press(KeyEvent.VK_V);
+        roboTest.getRobot().keyRelease(KeyEvent.VK_CONTROL);
+        roboTest.moveTo(gx + 10 , gy + 90);
+        roboTest.leftClick();
+        roboTest.moveTo(Tools.getString("Browser.ApplyGroup"));
+        roboTest.sleep(4000);
+        roboTest.leftClick();
+        roboTest.checkTest("testG", 4);
 
         if (count < 10) {
-            removeResource(gx, gy, CONFIRM_REMOVE);
-            removeResource(gx, gy + 90, CONFIRM_REMOVE);
-            resetTerminalAreas();
+            roboTest.removeResource(gx, gy, CONFIRM_REMOVE);
+            roboTest.removeResource(gx, gy + 90, CONFIRM_REMOVE);
+            roboTest.resetTerminalAreas();
         }
         System.gc();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestG() {
-        /* Cannot be instantiated. */
     }
 }

@@ -23,116 +23,104 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkNumberOfVertices;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.removeEverything;
-import static lcmc.robotest.RoboTest.resetTerminalAreas;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopEverything;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
  *
  * @author Rasto Levrinc
  */
+@Component
 final class PcmkTest3 {
-    static void start(final int count) {
-        slowFactor = 0.3f;
-        aborted = false;
-        disableStonith();
+    @Autowired
+    private RoboTest roboTest;
+
+    void start(final int count) {
+        roboTest.setSlowFactor(0.3f);
+        roboTest.setAborted(false);
+        roboTest.disableStonith();
         final String testName = "test3";
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
-                info(testName + " I: " + i);
+                roboTest.info(testName + " I: " + i);
             }
-            checkTest(testName, 1);
+            roboTest.checkTest(testName, 1);
             /* filesystem/drbd */
-            moveTo(577, 205);
-            rightClick(); /* popup */
-            moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-            moveTo("Filesystem + Linbit:DRBD");
-            leftClick(); /* choose fs */
+            roboTest.moveTo(577, 205);
+            roboTest.rightClick(); /* popup */
+            roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+            roboTest.moveTo("Filesystem + Linbit:DRBD");
+            roboTest.leftClick(); /* choose fs */
 
-            moveTo("block device", MComboBox.class); /* choose drbd */
-            leftClick();
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_ENTER);
+            roboTest.moveTo("block device", MComboBox.class); /* choose drbd */
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo("mount point", MComboBox.class);
-            leftClick();
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_ENTER);
+            roboTest.moveTo("mount point", MComboBox.class);
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo("filesystem type", MComboBox.class);
-            leftClick();
-            press(KeyEvent.VK_E);
-            press(KeyEvent.VK_E);
-            press(KeyEvent.VK_ENTER);
+            roboTest.moveTo("filesystem type", MComboBox.class);
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_E);
+            roboTest.press(KeyEvent.VK_E);
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
-            checkTest(testName, 2);
-            checkNumberOfVertices(testName, 4);
-            stopEverything();
-            checkTest(testName, 3);
-            removeEverything();
-            resetTerminalAreas();
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
+            roboTest.checkTest(testName, 2);
+            roboTest.checkNumberOfVertices(testName, 4);
+            roboTest.stopEverything();
+            roboTest.checkTest(testName, 3);
+            roboTest.removeEverything();
+            roboTest.resetTerminalAreas();
 
             /* filesystem/drbd - with name */
-            moveTo(577, 205);
-            rightClick(); /* popup */
-            moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-            moveTo("Filesystem + Linbit:DRBD");
-            leftClick(); /* choose fs */
+            roboTest.moveTo(577, 205);
+            roboTest.rightClick(); /* popup */
+            roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+            roboTest.moveTo("Filesystem + Linbit:DRBD");
+            roboTest.leftClick(); /* choose fs */
 
-            checkTest(testName, 4);
-            moveTo("Name", MTextField.class);
-            leftClick();
-            press(KeyEvent.VK_X);
-            press(KeyEvent.VK_Y);
+            roboTest.checkTest(testName, 4);
+            roboTest.moveTo("Name", MTextField.class);
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_X);
+            roboTest.press(KeyEvent.VK_Y);
 
-            moveTo("block device", MComboBox.class); /* choose drbd */
-            leftClick();
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_ENTER);
+            roboTest.moveTo("block device", MComboBox.class); /* choose drbd */
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo("mount point", MComboBox.class);
-            leftClick();
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_ENTER);
+            roboTest.moveTo("mount point", MComboBox.class);
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo("filesystem type", MComboBox.class);
-            leftClick();
-            press(KeyEvent.VK_E);
-            press(KeyEvent.VK_E);
-            press(KeyEvent.VK_ENTER);
+            roboTest.moveTo("filesystem type", MComboBox.class);
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_E);
+            roboTest.press(KeyEvent.VK_E);
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
-            checkTest(testName, 5);
-            checkNumberOfVertices(testName, 4);
-            stopEverything();
-            checkTest(testName, 6);
-            removeEverything();
-            resetTerminalAreas();
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
+            roboTest.checkTest(testName, 5);
+            roboTest.checkNumberOfVertices(testName, 4);
+            roboTest.stopEverything();
+            roboTest.checkTest(testName, 6);
+            roboTest.removeEverything();
+            roboTest.resetTerminalAreas();
         }
         System.gc();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest3() {
-        /* Cannot be instantiated. */
     }
 }

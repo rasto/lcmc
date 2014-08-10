@@ -26,6 +26,7 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.TerminalPanel;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.drbd.DrbdHost;
+import lcmc.model.drbd.DrbdXml;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.Ssh;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +44,13 @@ public class HostFactory {
     private GUIData guiData;
     @Autowired
     private Provider<Ssh> sshProvider;
+    @Autowired
+    private Provider<DrbdXml> drbdXmlProvider;
 
     public Host createInstance() {
         final TerminalPanel terminalPanel = terminalPanelProvider.get();
         final HostBrowser hostBrowser = hostBrowserProvider.get();
-        final Host host = new Host(guiData, sshProvider.get(), new DrbdHost(), terminalPanel);
+        final Host host = new Host(guiData, sshProvider.get(), new DrbdHost(), terminalPanel, drbdXmlProvider);
         host.setBrowser(hostBrowser);
         return host;
     }

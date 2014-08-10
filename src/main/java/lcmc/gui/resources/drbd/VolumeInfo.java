@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -144,6 +145,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private GUIData guiData;
     @Autowired
     private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
+    @Autowired
+    private Provider<DrbdXml> drbdXmlProvider;
 
     void init(final String name,
               final String device,
@@ -501,9 +504,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             getBrowser().getGlobalInfo().selectMyself();
             clusterBrowser.resetFilesystems();
 
-            final DrbdXml dxml = new DrbdXml(guiData,
-                                             hosts0.toArray(new Host[hosts0.size()]),
-                                             clusterBrowser.getHostDrbdParameters());
+            final DrbdXml dxml = drbdXmlProvider.get();
+            dxml.init(hosts0.toArray(new Host[hosts0.size()]), clusterBrowser.getHostDrbdParameters());
             for (final Host host : hosts0) {
                 final String conf = dxml.getConfig(host);
                 if (conf != null) {

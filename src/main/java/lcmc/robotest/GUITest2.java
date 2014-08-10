@@ -21,47 +21,39 @@
 package lcmc.robotest;
 
 import java.awt.Color;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.isColor;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class GUITest2 {
+    @Autowired
+    private RoboTest roboTest;
+
     /** Cluster wizard locked until focus is lost. */
-    static void start(final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
+    void start(final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("gui-test2 " + i);
+                roboTest.info("gui-test2 " + i);
             }
 
-            moveTo(Tools.getString("ClusterTab.AddNewCluster"));
-            sleep(500);
-            leftClick();
-            sleep(2000);
-            if (!isColor(326, 512, new Color(184, 207, 229), true)) {
-                info("gui-test2: error");
+            roboTest.moveTo(Tools.getString("ClusterTab.AddNewCluster"));
+            roboTest.sleep(500);
+            roboTest.leftClick();
+            roboTest.sleep(2000);
+            if (!roboTest.isColor(326, 512, new Color(184, 207, 229), true)) {
+                roboTest.info("gui-test2: error");
                 break;
             }
-            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-            sleep(500);
-            leftClick();
-            sleep(1000);
+            roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+            roboTest.sleep(500);
+            roboTest.leftClick();
+            roboTest.sleep(1000);
         }
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private GUITest2() {
-        /* Cannot be instantiated. */
     }
 }

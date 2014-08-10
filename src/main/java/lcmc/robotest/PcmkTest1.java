@@ -27,58 +27,26 @@ import lcmc.model.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.addColocation;
-import static lcmc.robotest.RoboTest.addConstraint;
-import static lcmc.robotest.RoboTest.addConstraintColocationOnly;
-import static lcmc.robotest.RoboTest.addConstraintOrderOnly;
-import static lcmc.robotest.RoboTest.addOrder;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.enableStonith;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.leftPress;
-import static lcmc.robotest.RoboTest.leftRelease;
-import static lcmc.robotest.RoboTest.manageResource;
-import static lcmc.robotest.RoboTest.migrateResource;
-import static lcmc.robotest.RoboTest.moveScrollBar;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.moveToMenu;
-import static lcmc.robotest.RoboTest.moveToSlowly;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.removeColocation;
-import static lcmc.robotest.RoboTest.removeConstraint;
-import static lcmc.robotest.RoboTest.removeGroup;
-import static lcmc.robotest.RoboTest.removeOrder;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.resetStartStopResource;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.robot;
-import static lcmc.robotest.RoboTest.setLocation;
-import static lcmc.robotest.RoboTest.setTimeouts;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.startResource;
-import static lcmc.robotest.RoboTest.stopGroup;
-import static lcmc.robotest.RoboTest.stopResource;
-import static lcmc.robotest.RoboTest.typeDummy;
-import static lcmc.robotest.RoboTest.unmanageResource;
-import static lcmc.robotest.RoboTest.unmigrateResource;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
  *
  * @author Rasto Levrinc
  */
+@Component
 final class PcmkTest1 {
-    /** Logger. */
+    @Autowired
+    private RoboTest roboTest;
     private static final Logger LOG = LoggerFactory.getLogger(PcmkTest1.class);
 
-    static void start(final Cluster cluster) {
-        RoboTest.slowFactor = 0.4f;
-        RoboTest.aborted = false;
+    void start(final Cluster cluster) {
+        roboTest.setSlowFactor(0.4f);
+        roboTest.setAborted(false);
         /* create IPaddr2 with 192.168.100.100 ip */
         String testName = "test1";
         final String pmV = cluster.getHostsArray()[0].getPacemakerVersion();
@@ -90,591 +58,581 @@ final class PcmkTest1 {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
 
-        disableStonith();
-        checkTest(testName, 1);
-        enableStonith();
-        checkTest(testName, 1.1);
-        disableStonith();
-        checkTest(testName, 1);
+        roboTest.disableStonith();
+        roboTest.checkTest(testName, 1);
+        roboTest.enableStonith();
+        roboTest.checkTest(testName, 1.1);
+        roboTest.disableStonith();
+        roboTest.checkTest(testName, 1);
         final int ipX = 235;
         final int ipY = 207;
-        moveTo(ipX, ipY + 200);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        moveTo("Filesystem + Linbit:DRBD");
-        moveTo("OCF Resource Agents");
-        press(KeyEvent.VK_D);
-        press(KeyEvent.VK_R);
-        press(KeyEvent.VK_B);
-        press(KeyEvent.VK_D);
-        press(KeyEvent.VK_ENTER);
-        moveTo(Tools.getString("ConfirmDialog.Yes"));
-        leftClick();
-        removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
+        roboTest.moveTo(ipX, ipY + 200);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+        roboTest.moveTo("Filesystem + Linbit:DRBD");
+        roboTest.moveTo("OCF Resource Agents");
+        roboTest.press(KeyEvent.VK_D);
+        roboTest.press(KeyEvent.VK_R);
+        roboTest.press(KeyEvent.VK_B);
+        roboTest.press(KeyEvent.VK_D);
+        roboTest.press(KeyEvent.VK_ENTER);
+        roboTest.moveTo(Tools.getString("ConfirmDialog.Yes"));
+        roboTest.leftClick();
+        roboTest.removeResource(ipX, ipY + 200, !CONFIRM_REMOVE);
 
-        moveTo(ipX, ipY + 200);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        moveTo("Filesystem + Linbit:DRBD");
-        moveTo("IPaddr2");
-        leftClick();
+        roboTest.moveTo(ipX, ipY + 200);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+        roboTest.moveTo("Filesystem + Linbit:DRBD");
+        roboTest.moveTo("IPaddr2");
+        roboTest.leftClick();
 
-        moveTo(ipX, ipY);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        moveTo("Filesystem + Linbit:DRBD");
-        moveTo("IPaddr2");
-        leftClick();
+        roboTest.moveTo(ipX, ipY);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+        roboTest.moveTo("Filesystem + Linbit:DRBD");
+        roboTest.moveTo("IPaddr2");
+        roboTest.leftClick();
 
-        final float savedSlowFactor = RoboTest.slowFactor;
-        RoboTest.slowFactor = 0.00001f;
+        final float savedSlowFactor = roboTest.getSlowFactor();
+        roboTest.setSlowFactor(0.00001f);
         for (final Integer pos1 : new Integer[]{850, 900, 1000}) {
             for (final Integer pos2 : new Integer[]{850, 900, 1000}) {
                 if (pos1 == pos2) {
                     continue;
                 }
                 for (int i = 0; i < 70; i++) {
-                    moveTo(pos1, RoboTest.CLONE_RADIO_Y);
-                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    roboTest.moveTo(pos1, RoboTest.CLONE_RADIO_Y);
+                    roboTest.getRobot().mousePress(InputEvent.BUTTON1_MASK);
                     Tools.sleep(20);
-                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
-                    moveTo(pos2, RoboTest.CLONE_RADIO_Y);
-                    robot.mousePress(InputEvent.BUTTON1_MASK);
+                    roboTest.getRobot().mouseRelease(InputEvent.BUTTON1_MASK);
+                    roboTest.moveTo(pos2, RoboTest.CLONE_RADIO_Y);
+                    roboTest.getRobot().mousePress(InputEvent.BUTTON1_MASK);
                     Tools.sleep(20);
-                    robot.mouseRelease(InputEvent.BUTTON1_MASK);
+                    roboTest.getRobot().mouseRelease(InputEvent.BUTTON1_MASK);
                 }
             }
         }
-        slowFactor = savedSlowFactor;
-        removeResource(ipX, ipY + 200, !RoboTest.CONFIRM_REMOVE);
-        removeResource(ipX, ipY, !RoboTest.CONFIRM_REMOVE);
+        roboTest.setSlowFactor(savedSlowFactor);
+        roboTest.removeResource(ipX, ipY + 200, !RoboTest.CONFIRM_REMOVE);
+        roboTest.removeResource(ipX, ipY, !RoboTest.CONFIRM_REMOVE);
         /* again */
-        moveTo(ipX, ipY);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        moveTo("Filesystem + Linbit:DRBD");
-        moveTo("IPaddr2");
-        leftClick();
+        roboTest.moveTo(ipX, ipY);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+        roboTest.moveTo("Filesystem + Linbit:DRBD");
+        roboTest.moveTo("IPaddr2");
+        roboTest.leftClick();
 
-        moveTo("IPv4 ", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER);
-        press(KeyEvent.VK_1);
-        press(KeyEvent.VK_0);
-        press(KeyEvent.VK_0);
-        setTimeouts(false);
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick(); /* apply */
+        roboTest.moveTo("IPv4 ", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER);
+        roboTest.press(KeyEvent.VK_1);
+        roboTest.press(KeyEvent.VK_0);
+        roboTest.press(KeyEvent.VK_0);
+        roboTest.setTimeouts(false);
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick(); /* apply */
         /* CIDR netmask 24 */
 
-        moveTo("CIDR netmask", MTextField.class); /* CIDR */
-        leftClick();
-        press(KeyEvent.VK_2);
-        press(KeyEvent.VK_4);
+        roboTest.moveTo("CIDR netmask", MTextField.class); /* CIDR */
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_2);
+        roboTest.press(KeyEvent.VK_4);
 
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick(); /* apply */
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick(); /* apply */
 
-        checkTest(testName, 2); /* 2 */
+        roboTest.checkTest(testName, 2); /* 2 */
 
         /* pingd */
-        moveScrollBar(true);
-        moveTo("pingd", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_DOWN); /* no ping */
-        press(KeyEvent.VK_DOWN); /* no ping */
-        press(KeyEvent.VK_ENTER); /* no ping */
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
-        checkTest(testName, 2.1); /* 2.1 */
+        roboTest.moveScrollBar(true);
+        roboTest.moveTo("pingd", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN); /* no ping */
+        roboTest.press(KeyEvent.VK_DOWN); /* no ping */
+        roboTest.press(KeyEvent.VK_ENTER); /* no ping */
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 2.1); /* 2.1 */
 
-        moveTo("pingd", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_UP); /* no ping */
-        press(KeyEvent.VK_UP); /* no ping */
-        press(KeyEvent.VK_ENTER); /* no ping */
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
+        roboTest.moveTo("pingd", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_UP); /* no ping */
+        roboTest.press(KeyEvent.VK_UP); /* no ping */
+        roboTest.press(KeyEvent.VK_ENTER); /* no ping */
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
 
-        moveScrollBar(false);
+        roboTest.moveScrollBar(false);
 
         /* group with dummy resources */
         final int gx = 230;
         final int gy = 305;
-        moveTo(gx, gy);
-        rightClick(); /* popup */
-        moveTo(gx + 46, gy + 11);
-        leftClick(); /* choose group */
+        roboTest.moveTo(gx, gy);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(gx + 46, gy + 11);
+        roboTest.leftClick(); /* choose group */
         /* remove it */
-        removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
+        roboTest.removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
 
-        moveTo(gx, gy);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
-        leftClick();
+        roboTest.moveTo(gx, gy);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
+        roboTest.leftClick();
 
-        rightClick(); /* group popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-        moveTo("OCF Resource Agents");
-        typeDummy();
+        roboTest.rightClick(); /* group popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+        roboTest.moveTo("OCF Resource Agents");
+        roboTest.typeDummy();
 
         /* remove it */
-        removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
+        roboTest.removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
 
         /* group with dummy resources, once again */
-        moveTo(gx, gy);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
-        leftClick();
-        rightClick(); /* group popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-        moveTo("OCF Resource Agents");
-        typeDummy();
+        roboTest.moveTo(gx, gy);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
+        roboTest.leftClick();
+        roboTest.rightClick(); /* group popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+        roboTest.moveTo("OCF Resource Agents");
+        roboTest.typeDummy();
 
-        moveToMenu("Dummy (1)");
-        rightClick();
+        roboTest.moveToMenu("Dummy (1)");
+        roboTest.rightClick();
 
-        moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
-        leftClick(); /* menu remove service */
-        removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
+        roboTest.leftClick(); /* menu remove service */
+        roboTest.removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
 
         /* group with dummy resources, once again */
-        moveTo(gx, gy);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
-        leftClick();
-        rightClick(); /* group popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-        moveTo("OCF Resource Agents");
-        typeDummy();
+        roboTest.moveTo(gx, gy);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
+        roboTest.leftClick();
+        roboTest.rightClick(); /* group popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+        roboTest.moveTo("OCF Resource Agents");
+        roboTest.typeDummy();
 
-        removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
+        roboTest.removeResource(gx, gy, !RoboTest.CONFIRM_REMOVE);
 
         /* once again */
-        moveTo(gx, gy);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
-        leftClick();
+        roboTest.moveTo(gx, gy);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
+        roboTest.leftClick();
 
-        checkTest(testName, 2); /* 2 */
+        roboTest.checkTest(testName, 2); /* 2 */
 
-        rightClick(); /* group popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-        moveTo("OCF Resource Agents");
-        typeDummy();
+        roboTest.rightClick(); /* group popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+        roboTest.moveTo("OCF Resource Agents");
+        roboTest.typeDummy();
 
-        setTimeouts(true);
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
+        roboTest.setTimeouts(true);
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
         for (int i = 0; i < 2; i++) {
             /* another group resource */
-            moveTo(gx + 10, gy - 25);
-            rightClick(); /* popup */
-            moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-            moveTo("OCF Resource Agents");
-            typeDummy();
-            setTimeouts(true);
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
+            roboTest.moveTo(gx + 10, gy - 25);
+            roboTest.rightClick(); /* popup */
+            roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+            roboTest.moveTo("OCF Resource Agents");
+            roboTest.typeDummy();
+            roboTest.setTimeouts(true);
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
         }
-        checkTest(testName, 3); /* 3 */
+        roboTest.checkTest(testName, 3); /* 3 */
 
         /* constraints */
-        moveTo(gx + 10, gy - 25);
-        addConstraint(1);
-        checkTest(testName, 3.1); /* 3.1 */
+        roboTest.moveTo(gx + 10, gy - 25);
+        roboTest.addConstraint(1);
+        roboTest.checkTest(testName, 3.1); /* 3.1 */
 
         try {
             if (pmV != null && Tools.compareVersions(pmV, "1.0.8") > 0) {
                 /* move up, move down */
                 for (int i = 0; i < 2; i++) {
-                    moveToMenu("Dummy (3)");
-                    rightClick();
-                    moveTo(Tools.getString("ClusterBrowser.Hb.ResGrpMoveUp"));
-                    leftClick(); /* move res 3 up */
-                    checkTest(testName, 3.11); /* 3.11 */
-                    moveToMenu("Dummy (3)");
-                    rightClick();
-                    moveTo(Tools.getString("ClusterBrowser.Hb.ResGrpMoveDown"));
-                    leftClick();
-                    checkTest(testName, 3.12); /* 3.12 */
+                    roboTest.moveToMenu("Dummy (3)");
+                    roboTest.rightClick();
+                    roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.ResGrpMoveUp"));
+                    roboTest.leftClick(); /* move res 3 up */
+                    roboTest.checkTest(testName, 3.11); /* 3.11 */
+                    roboTest.moveToMenu("Dummy (3)");
+                    roboTest.rightClick();
+                    roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.ResGrpMoveDown"));
+                    roboTest.leftClick();
+                    roboTest.checkTest(testName, 3.12); /* 3.12 */
                 }
             }
         } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
 
-        moveToMenu("Dummy (3)");
-        leftClick();
+        roboTest.moveToMenu("Dummy (3)");
+        roboTest.leftClick();
 
-        moveScrollBar(true);
+        roboTest.moveScrollBar(true);
 
         for (int i = 0; i < 2; i++) {
-            moveTo(Tools.getString("ClusterBrowser.SameAs"),
-                   2,
-                   MComboBox.class);
-            leftClick();
-            press(KeyEvent.VK_DOWN); /* choose another dummy */
-            press(KeyEvent.VK_DOWN);
-            press(KeyEvent.VK_ENTER);
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
-            checkTest(testName, 3.2); /* 3.2 */
+            roboTest.moveTo(Tools.getString("ClusterBrowser.SameAs"), 2, MComboBox.class);
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_DOWN); /* choose another dummy */
+            roboTest.press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_ENTER);
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
+            roboTest.checkTest(testName, 3.2); /* 3.2 */
 
-            moveTo(Tools.getString("ClusterBrowser.SameAs"),
-                   2,
-                   MComboBox.class);
-            leftClick();
+            roboTest.moveTo(Tools.getString("ClusterBrowser.SameAs"), 2, MComboBox.class);
+            roboTest.leftClick();
 
-            press(KeyEvent.VK_PAGE_UP); /* choose "nothing selected */
-            press(KeyEvent.VK_ENTER);
+            roboTest.press(KeyEvent.VK_PAGE_UP); /* choose "nothing selected */
+            roboTest.press(KeyEvent.VK_ENTER);
 
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
-            checkTest(testName, 4); /* 4 */
-            sleep(500);
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
+            roboTest.checkTest(testName, 4); /* 4 */
+            roboTest.sleep(500);
         }
-        moveScrollBar(false);
+        roboTest.moveScrollBar(false);
 
         /* locations */
-        moveTo(ipX + 20, ipY);
-        leftClick(); /* choose ip */
-        setLocation(new Integer[]{KeyEvent.VK_I});
-        checkTest(testName, 4.1); /* 4.1 */
+        roboTest.moveTo(ipX + 20, ipY);
+        roboTest.leftClick(); /* choose ip */
+        roboTest.setLocation(new Integer[]{KeyEvent.VK_I});
+        roboTest.checkTest(testName, 4.1); /* 4.1 */
 
-        setLocation(new Integer[]{KeyEvent.VK_END,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_MINUS,
-                                  KeyEvent.VK_I});
-        checkTest(testName, 4.2); /* 4.2 */
+        roboTest.setLocation(new Integer[]{KeyEvent.VK_END,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_MINUS,
+                                           KeyEvent.VK_I});
+        roboTest.checkTest(testName, 4.2); /* 4.2 */
 
-        setLocation(new Integer[]{KeyEvent.VK_END,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_PLUS});
-        checkTest(testName, 4.3); /* 4.3 */
+        roboTest.setLocation(new Integer[]{KeyEvent.VK_END,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_PLUS});
+        roboTest.checkTest(testName, 4.3); /* 4.3 */
 
-        setLocation(new Integer[]{KeyEvent.VK_END,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE,
-                                  KeyEvent.VK_BACK_SPACE});
-        checkTest(testName, 4.4); /* 4.4 */
+        roboTest.setLocation(new Integer[]{KeyEvent.VK_END,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE,
+                                           KeyEvent.VK_BACK_SPACE});
+        roboTest.checkTest(testName, 4.4); /* 4.4 */
         final int popX = 340;
         final int popY = 257;
-        removeConstraint(popX, popY);
-        checkTest(testName, 5); /* 5 */
-        moveTo(gx + 10, gy - 25);
-        addConstraint(1);
-        checkTest(testName, 5.1); /* 4.4 */
+        roboTest.removeConstraint(popX, popY);
+        roboTest.checkTest(testName, 5); /* 5 */
+        roboTest.moveTo(gx + 10, gy - 25);
+        roboTest.addConstraint(1);
+        roboTest.checkTest(testName, 5.1); /* 4.4 */
 
-        removeConstraint(popX, popY);
-        checkTest(testName, 5.2); /* 5 */
+        roboTest.removeConstraint(popX, popY);
+        roboTest.checkTest(testName, 5.2); /* 5 */
 
-        moveTo(gx + 10, gy - 25);
-        addConstraint(1);
-        checkTest(testName, 6); /* 6 */
+        roboTest.moveTo(gx + 10, gy - 25);
+        roboTest.addConstraint(1);
+        roboTest.checkTest(testName, 6); /* 6 */
 
-        removeOrder(popX, popY);
-        checkTest(testName, 7);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 7);
 
-        addOrder(popX, popY);
-        checkTest(testName, 8);
+        roboTest.addOrder(popX, popY);
+        roboTest.checkTest(testName, 8);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 9);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 9);
 
-        addColocation(popX, popY);
-        checkTest(testName, 10);
+        roboTest.addColocation(popX, popY);
+        roboTest.checkTest(testName, 10);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 10.1);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 10.1);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 10.2);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 10.2);
 
-        addConstraintOrderOnly(gx, gy - 25, 2);
-        checkTest(testName, 10.3);
+        roboTest.addConstraintOrderOnly(gx, gy - 25, 2);
+        roboTest.checkTest(testName, 10.3);
 
-        addColocation(popX, popY);
-        checkTest(testName, 10.4);
+        roboTest.addColocation(popX, popY);
+        roboTest.checkTest(testName, 10.4);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 10.5);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 10.5);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 10.6);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 10.6);
 
-        addConstraintColocationOnly(gx, gy - 25, 2);
-        checkTest(testName, 10.7);
+        roboTest.addConstraintColocationOnly(gx, gy - 25, 2);
+        roboTest.checkTest(testName, 10.7);
 
-        addOrder(popX, popY);
-        checkTest(testName, 10.8);
+        roboTest.addOrder(popX, popY);
+        roboTest.checkTest(testName, 10.8);
 
-        removeConstraint(popX, popY);
-        checkTest(testName, 10.9);
+        roboTest.removeConstraint(popX, popY);
+        roboTest.checkTest(testName, 10.9);
 
-        moveTo(ipX, ipY);
-        addConstraint(1);
-        checkTest(testName, 10.91);
+        roboTest.moveTo(ipX, ipY);
+        roboTest.addConstraint(1);
+        roboTest.checkTest(testName, 10.91);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 10.92);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 10.92);
 
-        addOrder(popX, popY);
-        checkTest(testName, 10.93);
+        roboTest.addOrder(popX, popY);
+        roboTest.checkTest(testName, 10.93);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 10.94);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 10.94);
 
-        addColocation(popX, popY);
-        checkTest(testName, 10.95);
+        roboTest.addColocation(popX, popY);
+        roboTest.checkTest(testName, 10.95);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 10.96);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 10.96);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 10.97);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 10.97);
 
-        addConstraintColocationOnly(ipX, ipY, 1);
-        checkTest(testName, 10.98);
+        roboTest.addConstraintColocationOnly(ipX, ipY, 1);
+        roboTest.checkTest(testName, 10.98);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 10.99);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 10.99);
 
-        addConstraintOrderOnly(ipX, ipY, 1);
-        checkTest(testName, 11);
+        roboTest.addConstraintOrderOnly(ipX, ipY, 1);
+        roboTest.checkTest(testName, 11);
 
-        addColocation(popX, popY);
-        checkTest(testName, 11.1);
+        roboTest.addColocation(popX, popY);
+        roboTest.checkTest(testName, 11.1);
 
-        removeConstraint(popX, popY);
-        checkTest(testName, 11.2);
+        roboTest.removeConstraint(popX, popY);
+        roboTest.checkTest(testName, 11.2);
 
-        moveTo(ipX, ipY);
-        addConstraint(3);
-        checkTest(testName, 11.3);
-        stopResource(ipX, ipY);
-        checkTest(testName, 11.4);
-        resetStartStopResource(ipX, ipY);
-        checkTest(testName, 11.5);
+        roboTest.moveTo(ipX, ipY);
+        roboTest.addConstraint(3);
+        roboTest.checkTest(testName, 11.3);
+        roboTest.stopResource(ipX, ipY);
+        roboTest.checkTest(testName, 11.4);
+        roboTest.resetStartStopResource(ipX, ipY);
+        roboTest.checkTest(testName, 11.5);
 
-        moveTo(ipX + 20, ipY + 10);
-        leftClick(); /* choose ip */
-        moveTo(Tools.getString("Browser.ActionsMenu"));
-        rightClick();
-        moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
-        leftClick();
-        checkTest(testName, 11.501);
+        roboTest.moveTo(ipX + 20, ipY + 10);
+        roboTest.leftClick(); /* choose ip */
+        roboTest.moveTo(Tools.getString("Browser.ActionsMenu"));
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 11.501);
 
-        moveTo(ipX + 20, ipY + 10);
-        leftClick(); /* choose ip */
-        moveTo(Tools.getString("Browser.ActionsMenu"));
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.StartResource").substring(1));
+        roboTest.moveTo(ipX + 20, ipY + 10);
+        roboTest.leftClick(); /* choose ip */
+        roboTest.moveTo(Tools.getString("Browser.ActionsMenu"));
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.StartResource").substring(1));
         /* actions menu start */
-        leftClick();
-        checkTest(testName, 11.502);
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 11.502);
 
-        resetStartStopResource(ipX, ipY);
-        checkTest(testName, 11.5);
+        roboTest.resetStartStopResource(ipX, ipY);
+        roboTest.checkTest(testName, 11.5);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 11.51);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 11.51);
 
-        addColocation(popX, popY);
-        checkTest(testName, 11.52);
+        roboTest.addColocation(popX, popY);
+        roboTest.checkTest(testName, 11.52);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 11.53);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 11.53);
 
-        addOrder(popX, popY);
-        checkTest(testName, 11.54);
+        roboTest.addOrder(popX, popY);
+        roboTest.checkTest(testName, 11.54);
 
-        removeColocation(popX, popY);
-        checkTest(testName, 11.55);
+        roboTest.removeColocation(popX, popY);
+        roboTest.checkTest(testName, 11.55);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 11.56);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 11.56);
 
-        addConstraintOrderOnly(ipX, ipY, 3);
-        checkTest(testName, 11.57);
+        roboTest.addConstraintOrderOnly(ipX, ipY, 3);
+        roboTest.checkTest(testName, 11.57);
 
-        removeOrder(popX, popY);
-        checkTest(testName, 11.58);
+        roboTest.removeOrder(popX, popY);
+        roboTest.checkTest(testName, 11.58);
 
-        addConstraintColocationOnly(ipX, ipY, 3);
-        checkTest(testName, 11.59);
+        roboTest.addConstraintColocationOnly(ipX, ipY, 3);
+        roboTest.checkTest(testName, 11.59);
 
-        addOrder(popX, popY);
-        checkTest(testName, 11.6);
+        roboTest.addOrder(popX, popY);
+        roboTest.checkTest(testName, 11.6);
 
-        removeConstraint(popX, popY);
-        checkTest(testName, 11.7);
+        roboTest.removeConstraint(popX, popY);
+        roboTest.checkTest(testName, 11.7);
 
-        moveTo(gx + 10, gy - 25);
-        addConstraint(1);
-        checkTest(testName, 11.8);
+        roboTest.moveTo(gx + 10, gy - 25);
+        roboTest.addConstraint(1);
+        roboTest.checkTest(testName, 11.8);
         /** Add m/s Stateful resource */
         final int statefulX = 500;
         final int statefulY = 207;
-        moveTo(statefulX, statefulY);
-        rightClick();
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        moveTo("Filesystem + Linbit:DRBD");
-        moveTo("OCF Resource Agents");
+        roboTest.moveTo(statefulX, statefulY);
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+        roboTest.moveTo("Filesystem + Linbit:DRBD");
+        roboTest.moveTo("OCF Resource Agents");
 
-        press(KeyEvent.VK_S);
-        press(KeyEvent.VK_T);
-        press(KeyEvent.VK_A);
-        press(KeyEvent.VK_T);
-        press(KeyEvent.VK_E);
-        press(KeyEvent.VK_F);
-        press(KeyEvent.VK_ENTER); /* choose Stateful */
+        roboTest.press(KeyEvent.VK_S);
+        roboTest.press(KeyEvent.VK_T);
+        roboTest.press(KeyEvent.VK_A);
+        roboTest.press(KeyEvent.VK_T);
+        roboTest.press(KeyEvent.VK_E);
+        roboTest.press(KeyEvent.VK_F);
+        roboTest.press(KeyEvent.VK_ENTER); /* choose Stateful */
 
         Tools.sleep(400);
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
-        checkTest(testName, 11.9);
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 11.9);
         /* set clone max to 1 */
-        moveTo("Clone Max", MComboBox.class);
-        leftClick();
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_1);
-        setTimeouts(false);
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
-        checkTest(testName, 12);
-        stopResource(statefulX, statefulY);
-        checkTest(testName, 13);
+        roboTest.moveTo("Clone Max", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_1);
+        roboTest.setTimeouts(false);
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 12);
+        roboTest.stopResource(statefulX, statefulY);
+        roboTest.checkTest(testName, 13);
 
-        startResource(statefulX, statefulY);
-        checkTest(testName, 14);
-        unmanageResource(statefulX, statefulY);
-        checkTest(testName, 15);
-        manageResource(statefulX, statefulY);
-        checkTest(testName, 16);
+        roboTest.startResource(statefulX, statefulY);
+        roboTest.checkTest(testName, 14);
+        roboTest.unmanageResource(statefulX, statefulY);
+        roboTest.checkTest(testName, 15);
+        roboTest.manageResource(statefulX, statefulY);
+        roboTest.checkTest(testName, 16);
 
         /* IP addr cont. */
-        stopResource(ipX, ipY);
-        checkTest(testName, 17);
-        startResource(ipX, ipY);
-        checkTest(testName, 18);
-        unmanageResource(ipX, ipY);
-        checkTest(testName, 19);
-        manageResource(ipX, ipY);
-        checkTest(testName, 20);
-        migrateResource(ipX, ipY);
-        checkTest(testName, 21);
-        unmigrateResource(ipX, ipY);
-        checkTest(testName, 22);
+        roboTest.stopResource(ipX, ipY);
+        roboTest.checkTest(testName, 17);
+        roboTest.startResource(ipX, ipY);
+        roboTest.checkTest(testName, 18);
+        roboTest.unmanageResource(ipX, ipY);
+        roboTest.checkTest(testName, 19);
+        roboTest.manageResource(ipX, ipY);
+        roboTest.checkTest(testName, 20);
+        roboTest.migrateResource(ipX, ipY);
+        roboTest.checkTest(testName, 21);
+        roboTest.unmigrateResource(ipX, ipY);
+        roboTest.checkTest(testName, 22);
 
         /* Group cont. */
-        stopResource(gx, gy - 25);
-        checkTest(testName, 23);
-        startResource(gx, gy - 25);
-        checkTest(testName, 24);
-        unmanageResource(gx, gy - 25);
-        checkTest(testName, 25);
-        manageResource(gx, gy - 25);
-        checkTest(testName, 26);
-        migrateResource(gx, gy - 25);
-        moveTo(gx, gy);
-        leftClick();
-        checkTest(testName, 27);
-        moveTo(Tools.getString("Browser.ActionsMenu"));
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.UnmigrateResource"));
-        leftClick(); /* stop */
-        checkTest(testName, 28);
+        roboTest.stopResource(gx, gy - 25);
+        roboTest.checkTest(testName, 23);
+        roboTest.startResource(gx, gy - 25);
+        roboTest.checkTest(testName, 24);
+        roboTest.unmanageResource(gx, gy - 25);
+        roboTest.checkTest(testName, 25);
+        roboTest.manageResource(gx, gy - 25);
+        roboTest.checkTest(testName, 26);
+        roboTest.migrateResource(gx, gy - 25);
+        roboTest.moveTo(gx, gy);
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 27);
+        roboTest.moveTo(Tools.getString("Browser.ActionsMenu"));
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.UnmigrateResource"));
+        roboTest.leftClick(); /* stop */
+        roboTest.checkTest(testName, 28);
 
-        moveTo(700, 450); /* rectangle */
-        leftPress();
-        moveTo(220, 65);
-        leftRelease();
+        roboTest.moveTo(700, 450); /* rectangle */
+        roboTest.leftPress();
+        roboTest.moveTo(220, 65);
+        roboTest.leftRelease();
 
-        moveTo(ipX, ipY);
-        rightClick();
-        moveTo(ipX + 30, ipY); /* ptest */
-        moveToSlowly(ipX + 30, ipY + 350);
-        moveTo(ipX, ipY);
+        roboTest.moveTo(ipX, ipY);
+        roboTest.rightClick();
+        roboTest.moveTo(ipX + 30, ipY); /* ptest */
+        roboTest.moveToSlowly(ipX + 30, ipY + 350);
+        roboTest.moveTo(ipX, ipY);
 
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER); /* standby selected hosts */
-        checkTest(testName, 28.1);
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER); /* standby selected hosts */
+        roboTest.checkTest(testName, 28.1);
 
-        moveTo(700, 450);
-        leftPress();
-        moveTo(220, 65);
-        leftRelease();
-        moveTo(ipX, ipY);
-        rightClick();
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER); /* online selected hosts */
-        checkTest(testName, 28.2);
+        roboTest.moveTo(700, 450);
+        roboTest.leftPress();
+        roboTest.moveTo(220, 65);
+        roboTest.leftRelease();
+        roboTest.moveTo(ipX, ipY);
+        roboTest.rightClick();
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER); /* online selected hosts */
+        roboTest.checkTest(testName, 28.2);
 
-        moveTo(700, 450);
-        leftPress();
-        moveTo(220, 65);
-        leftRelease();
-        moveTo(ipX, ipY);
-        rightClick();
-        moveTo(Tools.getString("PcmkMultiSelectionInfo.StopSelectedResources"));
-        leftClick();
-        checkTest(testName, 28.3);
+        roboTest.moveTo(700, 450);
+        roboTest.leftPress();
+        roboTest.moveTo(220, 65);
+        roboTest.leftRelease();
+        roboTest.moveTo(ipX, ipY);
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("PcmkMultiSelectionInfo.StopSelectedResources"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 28.3);
 
-        moveTo(700, 450);
-        leftPress();
-        moveTo(220, 65);
-        leftRelease();
-        moveTo(ipX, ipY);
-        rightClick();
-        moveTo(
-            Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
-        leftClick();
-        checkTest(testName, 28.4);
-        moveTo(700, 520); /* reset selection */
-        leftClick();
+        roboTest.moveTo(700, 450);
+        roboTest.leftPress();
+        roboTest.moveTo(220, 65);
+        roboTest.leftRelease();
+        roboTest.moveTo(ipX, ipY);
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 28.4);
+        roboTest.moveTo(700, 520); /* reset selection */
+        roboTest.leftClick();
 
-        stopResource(ipX, ipY);
-        moveTo(gx, gy);
-        leftClick();
-        moveTo(Tools.getString("Browser.ActionsMenu"));
-        stopGroup();
-        moveTo(statefulX, statefulY);
-        stopGroup();
-        checkTest(testName, 29);
+        roboTest.stopResource(ipX, ipY);
+        roboTest.moveTo(gx, gy);
+        roboTest.leftClick();
+        roboTest.moveTo(Tools.getString("Browser.ActionsMenu"));
+        roboTest.stopGroup();
+        roboTest.moveTo(statefulX, statefulY);
+        roboTest.stopGroup();
+        roboTest.checkTest(testName, 29);
 
-        removeResource(ipX, ipY, RoboTest.CONFIRM_REMOVE);
-        removeGroup(gx, gy - 20);
-        removeGroup(statefulX, statefulY);
-        checkTest(testName, 1);
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest1() {
-        /* Cannot be instantiated. */
+        roboTest.removeResource(ipX, ipY, RoboTest.CONFIRM_REMOVE);
+        roboTest.removeGroup(gx, gy - 20);
+        roboTest.removeGroup(statefulX, statefulY);
+        roboTest.checkTest(testName, 1);
     }
 }

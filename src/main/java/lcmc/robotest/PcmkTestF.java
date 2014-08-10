@@ -24,86 +24,68 @@ import java.awt.event.KeyEvent;
 import lcmc.model.Cluster;
 import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.moveToMenu;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.resetTerminalAreas;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.setTimeouts;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopResource;
-import static lcmc.robotest.RoboTest.typeDummy;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTestF {
+    @Autowired
+    private RoboTest roboTest;
+
     /** Cloned group. */
-    static void start(final Cluster cluster, final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
-        disableStonith();
+    void start(final Cluster cluster, final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
+        roboTest.disableStonith();
         final String testName = "testF";
-        final String distro = cluster.getHostsArray()[0].getDistributionName();
-        checkTest(testName, 1);
+        roboTest.checkTest(testName, 1);
         /* group with dummy resources */
         final int gx = 235;
         final int gy = 207;
-        moveTo(gx, gy);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
-        leftClick(); /* choose group */
-        moveTo("Clone");
-        leftClick(); /* clone */
+        roboTest.moveTo(gx, gy);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroup"));
+        roboTest.leftClick(); /* choose group */
+        roboTest.moveTo("Clone");
+        roboTest.leftClick(); /* clone */
 
         final int type = 1;
-        //int type = 2;
         for (int i = count; i > 0; i--) {
-            info("I: " + i);
+            roboTest.info("I: " + i);
             /* create dummy */
-            moveToMenu("Group (1)");
-            rightClick(); /* group popup */
-            moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
-            moveTo("OCF Resource Agents");
-            typeDummy();
-            setTimeouts(true);
+            roboTest.moveToMenu("Group (1)");
+            roboTest.rightClick(); /* group popup */
+            roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddGroupService"));
+            roboTest.moveTo("OCF Resource Agents");
+            roboTest.typeDummy();
+            roboTest.setTimeouts(true);
             if (type == 1) {
-                moveTo(Tools.getString("Browser.ApplyResource"));
-                leftClick();
+                roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+                roboTest.leftClick();
             }
         }
         if (type != 1) {
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
         }
-        checkTest(testName, 2);
+        roboTest.checkTest(testName, 2);
         /* set resource stickiness */
-        moveTo("Resource Stickiness", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_2);
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
-        checkTest(testName, 3);
+        roboTest.moveTo("Resource Stickiness", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_2);
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
+        roboTest.checkTest(testName, 3);
 
-        stopResource(gx, gy);
-        checkTest(testName, 4);
-        removeResource(gx, gy, CONFIRM_REMOVE);
-        resetTerminalAreas();
+        roboTest.stopResource(gx, gy);
+        roboTest.checkTest(testName, 4);
+        roboTest.removeResource(gx, gy, CONFIRM_REMOVE);
+        roboTest.resetTerminalAreas();
         System.gc();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestF() {
-        /* Cannot be instantiated. */
     }
 }

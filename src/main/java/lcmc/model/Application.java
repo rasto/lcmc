@@ -30,7 +30,8 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import lcmc.robotest.RoboTest;
+
+import lcmc.robotest.Test;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -191,7 +192,7 @@ public class Application {
     /** Whether to log commands on the servers. */
     private boolean cmdLog = false;
     /** Auto test, null no auto test. */
-    private RoboTest.Test autoTest = null;
+    private Test autoTest = null;
     /** Check swing threads. Print stack traces. */
     private boolean checkSwing = false;
 
@@ -723,12 +724,12 @@ public class Application {
     }
 
     /** Set auto test. */
-    public void setAutoTest(final RoboTest.Test autoTest) {
+    public void setAutoTest(final Test autoTest) {
         this.autoTest = autoTest;
     }
 
     /** Get auto test. */
-    public RoboTest.Test getAutoTest() {
+    public Test getAutoTest() {
         return autoTest;
     }
 

@@ -205,6 +205,8 @@ public class ClusterBrowser extends Browser {
     private Provider<HbConnectionInfo> connectionInfoProvider;
     @Autowired
     private Provider<AvailableServiceInfo> availableServiceInfoProvider;
+    @Autowired
+    private Provider<DrbdXml> drbdXmlProvider;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -243,6 +245,7 @@ public class ClusterBrowser extends Browser {
     @Autowired
     private DrbdGraph drbdGraph;
     private ClusterStatus clusterStatus;
+    @Autowired
     private CrmXml crmXml;
     private DrbdXml drbdXml;
     private final ReadWriteLock mVmsLock = new ReentrantReadWriteLock();
@@ -633,10 +636,11 @@ public class ClusterBrowser extends Browser {
                 }
 
                 LOG.debug1("updateHeartbeatDrbdThread: first host: " + firstHost);
-                crmXml = new CrmXml(guiData, firstHost, getServicesInfo());
+                crmXml.init(firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXml);
                 initOperations();
-                drbdXml = new DrbdXml(guiData, cluster.getHostsArray(), hostDrbdParameters);
+                drbdXml = drbdXmlProvider.get();
+                drbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
                 /* available services */
                 final String clusterName = getCluster().getName();
                 guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
@@ -908,7 +912,8 @@ public class ClusterBrowser extends Browser {
                                host.drbdStatusLock();
                                drbdConfig = host.getOutput("drbd", outputBuffer);
                                if (drbdConfig != null) {
-                                   final DrbdXml newDrbdXml = new DrbdXml(guiData, cluster.getHostsArray(), hostDrbdParameters);
+                                   final DrbdXml newDrbdXml = drbdXmlProvider.get();
+                                   newDrbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
                                    newDrbdXml.update(drbdConfig);
                                    drbdXml = newDrbdXml;
                                    drbdUpdate = true;

@@ -21,187 +21,166 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.addColocation;
-import static lcmc.robotest.RoboTest.addConstraint;
-import static lcmc.robotest.RoboTest.addConstraintColocationOnly;
-import static lcmc.robotest.RoboTest.addConstraintOrderOnly;
-import static lcmc.robotest.RoboTest.addOrder;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.chooseDummy;
-import static lcmc.robotest.RoboTest.confirmRemove;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.maybe;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.removeColocation;
-import static lcmc.robotest.RoboTest.removeConstraint;
-import static lcmc.robotest.RoboTest.removeEverything;
-import static lcmc.robotest.RoboTest.removeOrder;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopEverything;
-import static lcmc.robotest.RoboTest.stopResource;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
  *
  * @author Rasto Levrinc
  */
+@Component
 final class PcmkTest2 {
-    static void start() {
-        slowFactor = 0.6f;
-        aborted = false;
+    @Autowired
+    private RoboTest roboTest;
 
-        disableStonith();
-        checkTest("test2", 1);
+    void start() {
+        roboTest.setSlowFactor(0.6f);
+        roboTest.setAborted(false);
+
+        roboTest.disableStonith();
+        roboTest.checkTest("test2", 1);
         /* create 4 dummies */
         final int dummy1X = 235;
         final int dummy1Y = 207;
-        chooseDummy(dummy1X, dummy1Y, false, true);
+        roboTest.chooseDummy(dummy1X, dummy1Y, false, true);
         final int dummy2X = 545;
         final int dummy2Y = 207;
-        chooseDummy(dummy2X, dummy2Y, false, true);
+        roboTest.chooseDummy(dummy2X, dummy2Y, false, true);
         final int dummy3X = 235;
         final int dummy3Y = 342;
-        chooseDummy(dummy3X, dummy3Y, false, true);
+        roboTest.chooseDummy(dummy3X, dummy3Y, false, true);
         final int dummy4X = 545;
         final int dummy4Y = 342;
-        chooseDummy(dummy4X, dummy4Y, false, true);
-        checkTest("test2", 2);
+        roboTest.chooseDummy(dummy4X, dummy4Y, false, true);
+        roboTest.checkTest("test2", 2);
 
         /* placeholder */
         final int phX = 445;
         final int phY = 342;
-        moveTo(phX, phY);
-        rightClick();
-        moveTo("Placeholder (AND)");
-        leftClick();
-        checkTest("test2", 3);
+        roboTest.moveTo(phX, phY);
+        roboTest.rightClick();
+        roboTest.moveTo("Placeholder (AND)");
+        roboTest.leftClick();
+        roboTest.checkTest("test2", 3);
         /* constraints */
-        moveTo(phX, phY);
-        addConstraint(1); /* with dummy 1 */
-        moveTo(Tools.getString("Browser.ApplyResource"));
-        leftClick();
-        checkTest("test2", 4);
+        roboTest.moveTo(phX, phY);
+        roboTest.addConstraint(1); /* with dummy 1 */
+        roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+        roboTest.leftClick();
+        roboTest.checkTest("test2", 4);
 
         final int dum1PopX = dummy1X + 130;
         final int dum1PopY = dummy1Y + 50;
         for (int i = 0; i < 1; i++) {
-            removeOrder(dum1PopX, dum1PopY);
+            roboTest.removeOrder(dum1PopX, dum1PopY);
 
-            checkTest("test2", 5);
+            roboTest.checkTest("test2", 5);
 
-            addOrder(dum1PopX, dum1PopY);
-            checkTest("test2", 6);
+            roboTest.addOrder(dum1PopX, dum1PopY);
+            roboTest.checkTest("test2", 6);
 
-            removeColocation(dum1PopX, dum1PopY);
-            checkTest("test2", 7);
+            roboTest.removeColocation(dum1PopX, dum1PopY);
+            roboTest.checkTest("test2", 7);
 
-            addColocation(dum1PopX, dum1PopY);
-            checkTest("test2", 8);
+            roboTest.addColocation(dum1PopX, dum1PopY);
+            roboTest.checkTest("test2", 8);
         }
 
-        moveTo(dummy3X, dummy3Y);
-        addConstraint(5); /* with ph */
-        checkTest("test2", 9);
+        roboTest.moveTo(dummy3X, dummy3Y);
+        roboTest.addConstraint(5); /* with ph */
+        roboTest.checkTest("test2", 9);
 
         final int dum3PopX = dummy3X + 165;
         final int dum3PopY = dummy3Y;
         for (int i = 0; i < 2; i++) {
-            removeColocation(dum3PopX, dum3PopY);
+            roboTest.removeColocation(dum3PopX, dum3PopY);
 
-            checkTest("test2", 9.1);
+            roboTest.checkTest("test2", 9.1);
 
-            addColocation(dum3PopX, dum3PopY);
-            checkTest("test2", 9.2);
+            roboTest.addColocation(dum3PopX, dum3PopY);
+            roboTest.checkTest("test2", 9.2);
 
-            removeOrder(dum3PopX, dum3PopY);
-            checkTest("test2", 9.3);
+            roboTest.removeOrder(dum3PopX, dum3PopY);
+            roboTest.checkTest("test2", 9.3);
 
-            addOrder(dum3PopX, dum3PopY);
-            checkTest("test2", 9.4);
+            roboTest.addOrder(dum3PopX, dum3PopY);
+            roboTest.checkTest("test2", 9.4);
         }
 
-        moveTo(phX, phY);
-        addConstraint(1); /* with dummy 2 */
-        checkTest("test2", 10);
-        moveTo(dummy4X, dummy4Y);
-        addConstraint(5); /* with ph */
-        checkTest("test2", 11);
+        roboTest.moveTo(phX, phY);
+        roboTest.addConstraint(1); /* with dummy 2 */
+        roboTest.checkTest("test2", 10);
+        roboTest.moveTo(dummy4X, dummy4Y);
+        roboTest.addConstraint(5); /* with ph */
+        roboTest.checkTest("test2", 11);
 
         /* ph -> dummy2 */
         final int dum2PopX = dummy2X - 10;
         final int dum2PopY = dummy2Y + 70;
-        removeConstraint(dum2PopX, dum2PopY);
-        checkTest("test2", 11.1);
-        addConstraintOrderOnly(phX, phY, 2); /* with dummy 2 */
-        checkTest("test2", 11.2);
-        removeOrder(dum2PopX, dum2PopY);
-        checkTest("test2", 11.3);
-        addConstraintColocationOnly(phX, phY, 2); /* with dummy 2 */
-        checkTest("test2", 11.4);
-        addOrder(dum2PopX, dum2PopY);
-        checkTest("test2", 11.5);
+        roboTest.removeConstraint(dum2PopX, dum2PopY);
+        roboTest.checkTest("test2", 11.1);
+        roboTest.addConstraintOrderOnly(phX, phY, 2); /* with dummy 2 */
+        roboTest.checkTest("test2", 11.2);
+        roboTest.removeOrder(dum2PopX, dum2PopY);
+        roboTest.checkTest("test2", 11.3);
+        roboTest.addConstraintColocationOnly(phX, phY, 2); /* with dummy 2 */
+        roboTest.checkTest("test2", 11.4);
+        roboTest.addOrder(dum2PopX, dum2PopY);
+        roboTest.checkTest("test2", 11.5);
 
         /* dummy4 -> ph */
         final int dum4PopX = dummy4X - 40;
         final int dum4PopY = dummy4Y;
-        removeConstraint(dum4PopX, dum4PopY);
-        checkTest("test2", 11.6);
-        moveTo(dummy4X + 20, dummy4Y + 5);
-        rightClick(); /* workaround for the next popup not working. */
-        rightClick(); /* workaround for the next popup not working. */
-        addConstraintColocationOnly(dummy4X, dummy4Y, 5); /* with ph */
-        checkTest("test2", 11.7);
-        removeColocation(dum4PopX, dum4PopY);
-        checkTest("test2", 11.8);
-        moveTo(dummy4X + 20, dummy4Y + 5);
-        rightClick(); /* workaround for the next popup not working. */
-        addConstraintOrderOnly(dummy4X, dummy4Y, 5); /* ph 2 */
-        checkTest("test2", 11.9);
-        addColocation(dum4PopX, dum4PopY);
-        checkTest("test2", 11.91);
+        roboTest.removeConstraint(dum4PopX, dum4PopY);
+        roboTest.checkTest("test2", 11.6);
+        roboTest.moveTo(dummy4X + 20, dummy4Y + 5);
+        roboTest.rightClick(); /* workaround for the next popup not working. */
+        roboTest.rightClick(); /* workaround for the next popup not working. */
+        roboTest.addConstraintColocationOnly(dummy4X, dummy4Y, 5); /* with ph */
+        roboTest.checkTest("test2", 11.7);
+        roboTest.removeColocation(dum4PopX, dum4PopY);
+        roboTest.checkTest("test2", 11.8);
+        roboTest.moveTo(dummy4X + 20, dummy4Y + 5);
+        roboTest.rightClick(); /* workaround for the next popup not working. */
+        roboTest.addConstraintOrderOnly(dummy4X, dummy4Y, 5); /* ph 2 */
+        roboTest.checkTest("test2", 11.9);
+        roboTest.addColocation(dum4PopX, dum4PopY);
+        roboTest.checkTest("test2", 11.91);
         /* remove one dummy */
-        stopResource(dummy1X, dummy1Y);
-        checkTest("test2", 11.92);
-        removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
-        checkTest("test2", 12);
-        stopResource(dummy2X, dummy2Y);
-        stopResource(dummy3X, dummy3Y);
-        stopResource(dummy4X, dummy4Y);
-        stopEverything();
-        checkTest("test2", 12.5);
-        if (maybe()) {
+        roboTest.stopResource(dummy1X, dummy1Y);
+        roboTest.checkTest("test2", 11.92);
+        roboTest.removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
+        roboTest.checkTest("test2", 12);
+        roboTest.stopResource(dummy2X, dummy2Y);
+        roboTest.stopResource(dummy3X, dummy3Y);
+        roboTest.stopResource(dummy4X, dummy4Y);
+        roboTest.stopEverything();
+        roboTest.checkTest("test2", 12.5);
+        if (roboTest.maybe()) {
             /* remove placeholder */
-            moveTo(phX , phY);
-            rightClick();
-            moveTo(Tools.getString("ConstraintPHInfo.Remove"));
-            leftClick();
-            confirmRemove();
+            roboTest.moveTo(phX , phY);
+            roboTest.rightClick();
+            roboTest.moveTo(Tools.getString("ConstraintPHInfo.Remove"));
+            roboTest.leftClick();
+            roboTest.confirmRemove();
 
             /* remove rest of the dummies */
-            removeResource(dummy2X, dummy2Y, CONFIRM_REMOVE);
-            checkTest("test2", 14);
-            removeResource(dummy3X, dummy3Y, CONFIRM_REMOVE);
-            checkTest("test2", 15);
-            removeResource(dummy4X, dummy4Y, CONFIRM_REMOVE);
+            roboTest.removeResource(dummy2X, dummy2Y, CONFIRM_REMOVE);
+            roboTest.checkTest("test2", 14);
+            roboTest.removeResource(dummy3X, dummy3Y, CONFIRM_REMOVE);
+            roboTest.checkTest("test2", 15);
+            roboTest.removeResource(dummy4X, dummy4Y, CONFIRM_REMOVE);
         } else {
-            removeEverything();
+            roboTest.removeEverything();
             /* remove placeholder */
-            moveTo(phX , phY);
-            rightClick();
-            moveTo(Tools.getString("ConstraintPHInfo.Remove"));
-            leftClick();
-            confirmRemove();
+            roboTest.moveTo(phX , phY);
+            roboTest.rightClick();
+            roboTest.moveTo(Tools.getString("ConstraintPHInfo.Remove"));
+            roboTest.leftClick();
+            roboTest.confirmRemove();
         }
-        checkTest("test2", 16);
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest2() {
-        /* Cannot be instantiated. */
+        roboTest.checkTest("test2", 16);
     }
 }

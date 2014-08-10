@@ -22,6 +22,7 @@ package lcmc;
 
 import lcmc.model.*;
 import lcmc.robotest.RoboTest;
+import lcmc.robotest.Test;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -98,6 +99,8 @@ public class ArgumentParser {
     private static final String CHECK_SWING_OP = "check-swing";
     @Autowired
     private UserConfig userConfig;
+    @Autowired
+    private RoboTest roboTest;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -256,7 +259,7 @@ public class ArgumentParser {
             if (cmd.hasOption(RESTORE_MOUSE_OP)) {
                 /* restore mouse if it is stuck in pressed state, during
                 * robot tests. */
-                RoboTest.restoreMouse();
+                roboTest.restoreMouse();
             }
             final String vncPortOffsetString = cmd.getOptionValue(VNC_PORT_OFFSET_OP);
             if (vncPortOffsetString != null && lcmc.utilities.Tools.isNumber(vncPortOffsetString)) {
@@ -351,22 +354,22 @@ public class ArgumentParser {
             } else if (PCMKTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new RoboTest.Test(RoboTest.Type.PCMK, index.charAt(0)));
+                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.PCMK, index.charAt(0)));
                 }
             } else if (DRBDTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new RoboTest.Test(RoboTest.Type.DRBD, index.charAt(0)));
+                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.DRBD, index.charAt(0)));
                 }
             } else if (VMTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new RoboTest.Test(RoboTest.Type.VM, index.charAt(0)));
+                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.VM, index.charAt(0)));
                 }
             } else if (GUITEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new RoboTest.Test(RoboTest.Type.GUI, index.charAt(0)));
+                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.GUI, index.charAt(0)));
                 }
             }
         }

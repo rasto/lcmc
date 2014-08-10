@@ -21,41 +21,33 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.HOST_Y;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTestE {
+    @Autowired
+    private RoboTest roboTest;
+
     /** Host wizard deadlock. */
-    static void start(final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
+    void start(final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("testE I: " + i);
+                roboTest.info("testE I: " + i);
             }
-            moveTo(300 , HOST_Y); /* host */
-            rightClick();
-            moveTo(Tools.getString("HostBrowser.HostWizard"));
-            leftClick();
-            sleep(30000);
-            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-            leftClick();
+            roboTest.moveTo(300 , HOST_Y); /* host */
+            roboTest.rightClick();
+            roboTest.moveTo(Tools.getString("HostBrowser.HostWizard"));
+            roboTest.leftClick();
+            roboTest.sleep(30000);
+            roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+            roboTest.leftClick();
         }
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestE() {
-        /* Cannot be instantiated. */
     }
 }

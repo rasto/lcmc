@@ -47,6 +47,7 @@ import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.resources.crm.ServicesInfo;
 import lcmc.robotest.RoboTest;
+import lcmc.robotest.Test;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -57,6 +58,9 @@ import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -67,6 +71,8 @@ import org.w3c.dom.NodeList;
  * of services in the hashes and provides methods to get this
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class CrmXml extends XML {
     private static final Logger LOG = LoggerFactory.getLogger(CrmXml.class);
     private static final MultiKeyMap<String, String> RA_NON_ADVANCED_PARAM = new MultiKeyMap<String, String>();
@@ -328,7 +334,8 @@ public final class CrmXml extends XML {
     }
 
     private static final Application.AccessType DEFAULT_ACCESS_TYPE = Application.AccessType.ADMIN;
-    private final GUIData guiData;
+    @Autowired
+    private GUIData guiData;
 
     public static Unit getUnitMilliSec() {
         return new Unit("ms", "ms", "Millisecond", "Milliseconds");
@@ -354,7 +361,7 @@ public final class CrmXml extends XML {
         return new Unit[]{getUnitMilliSec(), getUnitMicroSec(), getUnitSecond(), getUnitMinute(), getUnitHour()};
     }
 
-    private final Host host;
+    private Host host;
     private final List<String> globalParams = new ArrayList<String>();
     private final Collection<String> globalNotAdvancedParams = new ArrayList<String>();
     private final Map<String, Application.AccessType> paramGlobalAccessTypes =
@@ -395,7 +402,7 @@ public final class CrmXml extends XML {
     private final Map<String, Value[]> paramOrderPossibleChoices = new HashMap<String, Value[]>();
     private final Map<String, Value[]> paramOrderPossibleChoicesMasterSlave = new HashMap<String, Value[]>();
     private final ResourceAgent groupResourceAgent = new ResourceAgent(Application.PACEMAKER_GROUP_NAME, "", "group");
-    private final ResourceAgent cloneResourceAgent;
+    private ResourceAgent cloneResourceAgent;
     private final ResourceAgent drbddiskResourceAgent = new ResourceAgent("drbddisk",
                                                                           ResourceAgent.HEARTBEAT_PROVIDER,
                                                                           ResourceAgent.HEARTBEAT_CLASS_NAME);
@@ -410,10 +417,10 @@ public final class CrmXml extends XML {
     private Map<String, String> metaAttrParams = null;
     private Map<String, String> resourceDefaultsMetaAttrs = null;
 
-    public CrmXml(final GUIData guiData, final Host host, final ServicesInfo allServicesInfo) {
-        super();
-        this.guiData = guiData;
+    @Autowired
+    private RoboTest roboTest;
 
+    public void init(final Host host, final ServicesInfo allServicesInfo) {
         this.host = host;
         final Value[] booleanValues = PCMK_BOOLEAN_VALUES;
         final Value hbBooleanTrue = booleanValues[0];
@@ -728,9 +735,9 @@ public final class CrmXml extends XML {
                 }
                 guiData.stopProgressIndicator(hn, text);
                 LOG.debug("CRMXML: RAs loaded");
-                final RoboTest.Test autoTest = Tools.getApplication().getAutoTest();
+                final Test autoTest = Tools.getApplication().getAutoTest();
                 if (autoTest != null) {
-                    RoboTest.startTest(autoTest, allServicesInfo.getBrowser().getCluster());
+                    roboTest.startTest(autoTest, allServicesInfo.getBrowser().getCluster());
                 }
             }
         });

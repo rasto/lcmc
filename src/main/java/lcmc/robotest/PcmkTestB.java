@@ -22,66 +22,52 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.chooseDummy;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.resetTerminalAreas;
-import static lcmc.robotest.RoboTest.robot;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopResource;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTestB {
-    static void start(final int count) {
-        slowFactor = 0.5f;
-        aborted = false;
-        disableStonith();
+    @Autowired
+    private RoboTest roboTest;
+
+    void start(final int count) {
+        roboTest.setSlowFactor(0.5f);
+        roboTest.setAborted(false);
+        roboTest.disableStonith();
         final String testName = "testB";
         final int dummy1X = 235;
         final int dummy1Y = 207;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
-                info(testName + " I: " + i);
+                roboTest.info(testName + " I: " + i);
             }
-            checkTest(testName, 1);
+            roboTest.checkTest(testName, 1);
             /* create dummy */
-            chooseDummy(dummy1X, dummy1Y, true, true);
-            checkTest(testName, 2);
-            stopResource(dummy1X, dummy1Y);
-            checkTest(testName, 3);
+            roboTest.chooseDummy(dummy1X, dummy1Y, true, true);
+            roboTest.checkTest(testName, 2);
+            roboTest.stopResource(dummy1X, dummy1Y);
+            roboTest.checkTest(testName, 3);
             /* copy/paste */
-            moveTo(dummy1X + 10 , dummy1Y + 10);
-            leftClick();
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            press(KeyEvent.VK_C);
-            press(KeyEvent.VK_V);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            moveTo(dummy1X + 10 , dummy1Y + 90);
-            leftClick();
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
-            checkTest("testB", 4);
+            roboTest.moveTo(dummy1X + 10 , dummy1Y + 10);
+            roboTest.leftClick();
+            roboTest.getRobot().keyPress(KeyEvent.VK_CONTROL);
+            roboTest.press(KeyEvent.VK_C);
+            roboTest.press(KeyEvent.VK_V);
+            roboTest.getRobot().keyRelease(KeyEvent.VK_CONTROL);
+            roboTest.moveTo(dummy1X + 10 , dummy1Y + 90);
+            roboTest.leftClick();
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
+            roboTest.checkTest("testB", 4);
 
-            removeResource(dummy1X, dummy1Y + 90, CONFIRM_REMOVE);
-            removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
-            resetTerminalAreas();
+            roboTest.removeResource(dummy1X, dummy1Y + 90, CONFIRM_REMOVE);
+            roboTest.removeResource(dummy1X, dummy1Y, CONFIRM_REMOVE);
+            roboTest.resetTerminalAreas();
         }
         System.gc();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestB() {
-        /* Cannot be instantiated. */
     }
 }

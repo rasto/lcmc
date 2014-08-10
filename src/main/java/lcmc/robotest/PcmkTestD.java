@@ -22,38 +22,35 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CLONE_RADIO_Y;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.chooseDummy;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.slowFactor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTestD {
+    @Autowired
+    private RoboTest roboTest;
+
     /** Pacemaker Leak tests. */
-    static void start(final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
+    void start(final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
         final int dummy1X = 540;
         final int dummy1Y = 202;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
-                info("testD 1 I: " + i);
+                roboTest.info("testD 1 I: " + i);
             }
-            chooseDummy(dummy1X, dummy1Y, false, false);
-            removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
+            roboTest.chooseDummy(dummy1X, dummy1Y, false, false);
+            roboTest.removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
         }
-        chooseDummy(dummy1X, dummy1Y, false, false);
+        roboTest.chooseDummy(dummy1X, dummy1Y, false, false);
         int pos = 0;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
-                info("testD 2 I: " + i);
+                roboTest.info("testD 2 I: " + i);
             }
             final double rand = Math.random();
             if (rand < 0.33) {
@@ -61,29 +58,24 @@ final class PcmkTestD {
                     continue;
                 }
                 pos = 1;
-                moveTo(796, CLONE_RADIO_Y);
-                leftClick();
+                roboTest.moveTo(796, CLONE_RADIO_Y);
+                roboTest.leftClick();
             } else if (rand < 0.66) {
                 if (pos == 2) {
                     continue;
                 }
                 pos = 2;
-                moveTo(894, CLONE_RADIO_Y);
-                leftClick();
+                roboTest.moveTo(894, CLONE_RADIO_Y);
+                roboTest.leftClick();
             } else {
                 if (pos == 3) {
                     continue;
                 }
                 pos = 3;
-                moveTo(994, CLONE_RADIO_Y);
-                leftClick();
+                roboTest.moveTo(994, CLONE_RADIO_Y);
+                roboTest.leftClick();
             }
         }
-        removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestD() {
-        /* Cannot be instantiated. */
+        roboTest.removeResource(dummy1X, dummy1Y, !CONFIRM_REMOVE);
     }
 }

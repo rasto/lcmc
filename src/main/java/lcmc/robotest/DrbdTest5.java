@@ -21,137 +21,117 @@
 package lcmc.robotest;
 
 import lcmc.model.Cluster;
-import static lcmc.robotest.DrbdTest1.createLV;
-import static lcmc.robotest.DrbdTest1.createLVMulti;
-import static lcmc.robotest.DrbdTest1.createPV;
-import static lcmc.robotest.DrbdTest1.createVG;
-import static lcmc.robotest.DrbdTest1.createVGMulti;
-import static lcmc.robotest.DrbdTest1.lvRemove;
-import static lcmc.robotest.DrbdTest1.lvRemoveMulti;
-import static lcmc.robotest.DrbdTest1.pvRemove;
-import static lcmc.robotest.DrbdTest1.resizeLV;
-import static lcmc.robotest.DrbdTest1.vgRemove;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.controlLeftClick;
-import static lcmc.robotest.RoboTest.getY;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.moveToGraph;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.sleepNoFactor;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class DrbdTest5 {
-    /** Logger. */
+    @Autowired
+    private RoboTest roboTest;
+    @Autowired
+    private DrbdTest1 drbdTest1;
+
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest5.class);
 
-    static void start(final Cluster cluster, final int blockDevY) {
+    void start(final Cluster cluster, final int blockDevY) {
         /* Two bds. */
-        slowFactor = 0.6f;
-        aborted = false;
+        roboTest.setSlowFactor(0.6f);
+        roboTest.setAborted(false);
         /* multi */
         LOG.info("start: create pvs");
-        moveTo(334, blockDevY);
-        leftClick();
+        roboTest.moveTo(334, blockDevY);
+        roboTest.leftClick();
 
-        moveTo(534, getY());
-        controlLeftClick();
+        roboTest.moveTo(534, roboTest.getY());
+        roboTest.controlLeftClick();
 
-        moveTo(334, blockDevY + 40);
-        controlLeftClick();
+        roboTest.moveTo(334, blockDevY + 40);
+        roboTest.controlLeftClick();
 
-        moveTo(534, blockDevY + 40);
-        controlLeftClick();
+        roboTest.moveTo(534, blockDevY + 40);
+        roboTest.controlLeftClick();
 
-        createPV(334, blockDevY);
+        drbdTest1.createPV(334, blockDevY);
         LOG.info("start: create vgs");
-        createVGMulti(blockDevY);
-        sleepNoFactor(5000);
+        drbdTest1.createVGMulti(blockDevY);
+        roboTest.sleepNoFactor(5000);
         LOG.info("start: create lvs");
-        moveToGraph("VG vg00");
-        sleepNoFactor(5000);
-        createLVMulti();
+        roboTest.moveToGraph("VG vg00");
+        roboTest.sleepNoFactor(5000);
+        drbdTest1.createLVMulti();
         LOG.info("start: remove lvs");
-        moveTo(334, blockDevY);
-        leftClick();
-        moveTo(534, blockDevY);
-        controlLeftClick();
-        lvRemoveMulti();
+        roboTest.moveTo(334, blockDevY);
+        roboTest.leftClick();
+        roboTest.moveTo(534, blockDevY);
+        roboTest.controlLeftClick();
+        drbdTest1.lvRemoveMulti();
         LOG.info("start: remove vgs");
-        sleepNoFactor(5000);
-        moveToGraph("VG vg00");
-        leftClick();
-        moveTo(534, getY());
-        controlLeftClick();
-        rightClick();
-        sleep(1000);
-        moveTo("Remove selected VGs");
-        leftClick();
-        sleep(1000);
-        moveTo("Remove VG"); /* button */
-        leftClick();
+        roboTest.sleepNoFactor(5000);
+        roboTest.moveToGraph("VG vg00");
+        roboTest.leftClick();
+        roboTest.moveTo(534, roboTest.getY());
+        roboTest.controlLeftClick();
+        roboTest.rightClick();
+        roboTest.sleep(1000);
+        roboTest.moveTo("Remove selected VGs");
+        roboTest.leftClick();
+        roboTest.sleep(1000);
+        roboTest.moveTo("Remove VG"); /* button */
+        roboTest.leftClick();
         LOG.info("start: remove pvs");
-        moveTo(334, blockDevY);
-        leftClick();
-        moveTo(534, blockDevY);
-        controlLeftClick();
-        moveTo(334, blockDevY + 40);
-        controlLeftClick();
-        moveTo(534, blockDevY + 40);
-        controlLeftClick();
-        rightClick();
-        sleep(3000);
-        moveTo("Remove selected PVs");
-        sleep(2000);
-        leftClick();
+        roboTest.moveTo(334, blockDevY);
+        roboTest.leftClick();
+        roboTest.moveTo(534, blockDevY);
+        roboTest.controlLeftClick();
+        roboTest.moveTo(334, blockDevY + 40);
+        roboTest.controlLeftClick();
+        roboTest.moveTo(534, blockDevY + 40);
+        roboTest.controlLeftClick();
+        roboTest.rightClick();
+        roboTest.sleep(3000);
+        roboTest.moveTo("Remove selected PVs");
+        roboTest.sleep(2000);
+        roboTest.leftClick();
 
-        moveTo(430, 90);
-        leftClick(); // reset selection
+        roboTest.moveTo(430, 90);
+        roboTest.leftClick(); // reset selection
 
         /* single */
         for (int i = 0; i < 2; i++) {
             LOG.info("start: create pv 1 " + i);
-            createPV(334, blockDevY);
+            drbdTest1.createPV(334, blockDevY);
             LOG.info("start: create pv 2 " + i);
-            createPV(534, blockDevY);
+            drbdTest1.createPV(534, blockDevY);
             LOG.info("start: create vg " + i);
-            createVG(cluster, blockDevY);
-            sleepNoFactor(10000);
+            drbdTest1.createVG(cluster, blockDevY);
+            roboTest.sleepNoFactor(10000);
             LOG.info("start: create lv" + i);
-            moveToGraph("VG vg0" + i);
-            createLV(cluster);
+            roboTest.moveToGraph("VG vg0" + i);
+            drbdTest1.createLV(cluster);
             LOG.info("start: resize lv" + i);
-            moveToGraph("vg0" + i + "/lvol0");
-            resizeLV(cluster);
+            roboTest.moveToGraph("vg0" + i + "/lvol0");
+            drbdTest1.resizeLV(cluster);
         }
         int offset = 0;
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
-                moveToGraph("vg0" + i + "/lvol0");
+                roboTest.moveToGraph("vg0" + i + "/lvol0");
                 LOG.info("start: remove lv " + i + ' ' + j);
-                lvRemove();
-                sleepNoFactor(10000);
+                drbdTest1.lvRemove();
+                roboTest.sleepNoFactor(10000);
             }
             LOG.info("start: remove vg " + i);
-            moveToGraph("VG vg0" + i);
-            vgRemove(cluster);
-            sleepNoFactor(10000);
-            pvRemove(334, blockDevY + offset);
-            pvRemove(534, blockDevY + offset);
+            roboTest.moveToGraph("VG vg0" + i);
+            drbdTest1.vgRemove(cluster);
+            roboTest.sleepNoFactor(10000);
+            drbdTest1.pvRemove(334, blockDevY + offset);
+            drbdTest1.pvRemove(534, blockDevY + offset);
             offset += 40;
         }
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest5() {
-        /* Cannot be instantiated. */
     }
 }

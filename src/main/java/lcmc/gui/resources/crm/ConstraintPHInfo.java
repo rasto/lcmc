@@ -73,6 +73,8 @@ public class ConstraintPHInfo extends ServiceInfo {
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
     /** Whether the all resources are required to be started. */
     private Preference preference;
+    @Autowired
+    private ConstraintPHMenu constraintPHMenu;
 
 
     void init(final Browser browser,
@@ -318,7 +320,6 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     @Override
     public List<UpdatableItem> createPopup() {
-        final ConstraintPHMenu constraintPHMenu = new ConstraintPHMenu();
         return constraintPHMenu.getPulldownMenu(this);
     }
 

@@ -52,6 +52,10 @@ import lcmc.utilities.ssh.SshOutput;
 import org.apache.commons.collections15.keyvalue.MultiKey;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -62,6 +66,8 @@ import org.w3c.dom.NodeList;
  * information.
  * The xml is obtained with drbdsetp xml command and drbdadm dump-xml.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DrbdXml extends XML {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXml.class);
     public static final String[] EMPTY_STRING = new String[0];
@@ -133,8 +139,6 @@ public class DrbdXml extends XML {
         HARDCODED_DEFAULTS.put("on-no-data-accessible", new StringValue("io-error"));
         HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
     }
-
-    private final GUIData guiData;
 
     public static Unit getUnitBytes(final String unitPart) {
         return new Unit("", "", "Byte" + unitPart, "Bytes" + unitPart);
@@ -322,10 +326,10 @@ public class DrbdXml extends XML {
     private final Map<String, Boolean> hostDrbdLoadedMap = new HashMap<String, Boolean>();
     private boolean unknownSections = false;
     private String oldConfig = null;
+    @Autowired
+    private GUIData guiData;
 
-    public DrbdXml(final GUIData guiData, final Host[] hosts, final Map<Host, String> drbdParameters) {
-        super();
-        this.guiData = guiData;
+    public void init(final Host[] hosts, final Map<Host, String> drbdParameters) {
         addSpecialParameter("resource", "name", true);
         for (final Host host : hosts) {
             final String output;

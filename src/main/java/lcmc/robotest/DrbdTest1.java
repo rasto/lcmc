@@ -23,29 +23,21 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import lcmc.model.Cluster;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.PROXY;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkDRBDTest;
-import static lcmc.robotest.RoboTest.confirmRemove;
-import static lcmc.robotest.RoboTest.dialogColorTest;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class DrbdTest1 {
-    static void start(final Cluster cluster, final int blockDevY) {
-        slowFactor = 0.2f;
-        aborted = false;
+    @Autowired
+    private RoboTest roboTest;
+
+    void start(final Cluster cluster, final int blockDevY) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
 
         addDrbdResource(cluster, blockDevY);
         chooseDrbdResource(cluster);
@@ -54,213 +46,206 @@ final class DrbdTest1 {
         addBlockDevice();
         addMetaData();
         addFileSystem();
-        moveTo(Tools.getString("Dialog.Dialog.Finish"));
-        leftClick();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Finish"));
+        roboTest.leftClick();
         final String drbdTest = "drbd-test1";
-        checkDRBDTest(drbdTest, 1.1);
+        roboTest.checkDRBDTest(drbdTest, 1.1);
         for (int i = 0; i < 2; i++) {
-            info("i: " + i);
+            roboTest.info("i: " + i);
             removeDrbdVolume(false);
         }
         removeDrbdVolume(true);
-        checkDRBDTest(drbdTest, 2);
+        roboTest.checkDRBDTest(drbdTest, 2);
     }
 
-    static void addDrbdResource(final Cluster cluster, final int blockDevY) {
-        moveTo(334, blockDevY); /* add drbd resource */
-        rightClick();
-        moveTo(Tools.getString("HostBrowser.Drbd.AddDrbdResource"));
-        moveTo(cluster.getHostsArray()[1].getName());
-        sleep(2000);
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER);
-        dialogColorTest("addDrbdResource");
-        moveTo(500, 300);
-        rightClick();
+    void addDrbdResource(final Cluster cluster, final int blockDevY) {
+        roboTest.moveTo(334, blockDevY); /* add drbd resource */
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("HostBrowser.Drbd.AddDrbdResource"));
+        roboTest.moveTo(cluster.getHostsArray()[1].getName());
+        roboTest.sleep(2000);
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER);
+        roboTest.dialogColorTest("addDrbdResource");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void drbdNext() {
-        press(KeyEvent.VK_ENTER);
+    void drbdNext() {
+        roboTest.press(KeyEvent.VK_ENTER);
     }
 
-    static void newDrbdResource() {
+    void newDrbdResource() {
         drbdNext();
-        dialogColorTest("newDrbdResource");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.dialogColorTest("newDrbdResource");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void chooseDrbdResourceInterface(final String hostName, final boolean proxy) {
-        moveTo("on " + hostName, MComboBox.class); /* interface */
-        leftClick();
+    void chooseDrbdResourceInterface(final String hostName, final boolean proxy) {
+        roboTest.moveTo("on " + hostName, MComboBox.class); /* interface */
+        roboTest.leftClick();
         if (proxy) {
-            press(KeyEvent.VK_P); /* select first interface to proxy*/
-            press(KeyEvent.VK_DOWN);
+            roboTest.press(KeyEvent.VK_P); /* select first interface to proxy*/
+            roboTest.press(KeyEvent.VK_DOWN);
         } else {
-            press(KeyEvent.VK_E); /* select first interface */
+            roboTest.press(KeyEvent.VK_E); /* select first interface */
         }
-        press(KeyEvent.VK_ENTER);
-        dialogColorTest("chooseDrbdResourceInterface");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.press(KeyEvent.VK_ENTER);
+        roboTest.dialogColorTest("chooseDrbdResourceInterface");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void chooseDrbdResource(final Cluster cluster) {
-        chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName(),
-                                    !PROXY);
-        chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(),
-                                    !PROXY);
+    void chooseDrbdResource(final Cluster cluster) {
+        chooseDrbdResourceInterface(cluster.getHostsArray()[0].getName(), !RoboTest.PROXY);
+        chooseDrbdResourceInterface(cluster.getHostsArray()[1].getName(), !RoboTest.PROXY);
 
         drbdNext();
-        dialogColorTest("chooseDrbdResource");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.dialogColorTest("chooseDrbdResource");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void addDrbdVolume() {
+    void addDrbdVolume() {
         drbdNext();
-        dialogColorTest("addDrbdVolume");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.dialogColorTest("addDrbdVolume");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void addBlockDevice() {
+    void addBlockDevice() {
         drbdNext();
-        dialogColorTest("addBlockDevice");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.dialogColorTest("addBlockDevice");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void addMetaData() {
+    void addMetaData() {
         drbdNext();
-        dialogColorTest("addMetaData");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.dialogColorTest("addMetaData");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void addFileSystem() {
+    void addFileSystem() {
         /* do nothing. */
-        dialogColorTest("addFileSystem");
-        moveTo(500, 300);
-        rightClick();
+        roboTest.dialogColorTest("addFileSystem");
+        roboTest.moveTo(500, 300);
+        roboTest.rightClick();
     }
 
-    static void removeDrbdVolume(final boolean really) {
-        if (aborted) {
+    void removeDrbdVolume(final boolean really) {
+        if (roboTest.isAborted()) {
             return;
         }
-        moveTo(480, 152); /* rsc popup */
-        rightClick(); /* remove */
-        moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
-        leftClick();
-        dialogColorTest("removeDrbdVolume");
+        roboTest.moveTo(480, 152); /* rsc popup */
+        roboTest.rightClick(); /* remove */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
+        roboTest.leftClick();
+        roboTest.dialogColorTest("removeDrbdVolume");
         if (really) {
-            confirmRemove();
+            roboTest.confirmRemove();
         } else {
-            press(KeyEvent.VK_ENTER); /* cancel */
+            roboTest.press(KeyEvent.VK_ENTER); /* cancel */
         }
     }
 
-    static void createPV(final int blockDevX, final int blockDevY) {
-        moveTo(blockDevX, blockDevY);
-        rightClick();
-        moveTo("Create PV");
-        leftClick();
+    void createPV(final int blockDevX, final int blockDevY) {
+        roboTest.moveTo(blockDevX, blockDevY);
+        roboTest.rightClick();
+        roboTest.moveTo("Create PV");
+        roboTest.leftClick();
     }
 
-    static void pvRemove(final int blockDevX, final int blockDevY) {
-        moveTo(blockDevX, blockDevY);
-        rightClick();
-        moveTo("Remove PV");
-        leftClick();
+    void pvRemove(final int blockDevX, final int blockDevY) {
+        roboTest.moveTo(blockDevX, blockDevY);
+        roboTest.rightClick();
+        roboTest.moveTo("Remove PV");
+        roboTest.leftClick();
     }
 
-    static void createVG(final Cluster cluster, final int blockDevY) {
-        moveTo(334, blockDevY);
-        rightClick();
-        moveTo("Create VG");
-        leftClick();
-        moveTo(cluster.getHostsArray()[1].getName());
-        leftClick();
-        moveTo("Create VG"); /* button */
-        leftClick();
+    void createVG(final Cluster cluster, final int blockDevY) {
+        roboTest.moveTo(334, blockDevY);
+        roboTest.rightClick();
+        roboTest.moveTo("Create VG");
+        roboTest.leftClick();
+        roboTest.moveTo(cluster.getHostsArray()[1].getName());
+        roboTest.leftClick();
+        roboTest.moveTo("Create VG"); /* button */
+        roboTest.leftClick();
     }
 
-    static void createVGMulti(final int blockDevY) {
-        moveTo(334, blockDevY);
-        rightClick();
-        moveTo("Create VG");
-        leftClick();
-        moveTo("Create VG"); /* button */
-        leftClick();
+    void createVGMulti(final int blockDevY) {
+        roboTest.moveTo(334, blockDevY);
+        roboTest.rightClick();
+        roboTest.moveTo("Create VG");
+        roboTest.leftClick();
+        roboTest.moveTo("Create VG"); /* button */
+        roboTest.leftClick();
     }
 
-    static void createLV(final Cluster cluster) {
-        rightClick();
-        moveTo("Create LV in VG");
-        leftClick();
-        moveTo(cluster.getHostsArray()[1].getName());
-        leftClick();
-        moveTo("Create"); /* button */
-        leftClick();
-        moveTo("Close");
-        leftClick();
+    void createLV(final Cluster cluster) {
+        roboTest.rightClick();
+        roboTest.moveTo("Create LV in VG");
+        roboTest.leftClick();
+        roboTest.moveTo(cluster.getHostsArray()[1].getName());
+        roboTest.leftClick();
+        roboTest.moveTo("Create"); /* button */
+        roboTest.leftClick();
+        roboTest.moveTo("Close");
+        roboTest.leftClick();
     }
 
-    static void createLVMulti() {
-        rightClick();
-        moveTo("Create LV in VG");
-        leftClick();
-        moveTo("Create"); /* button */
-        leftClick();
-        moveTo("Close");
-        leftClick();
+    void createLVMulti() {
+        roboTest.rightClick();
+        roboTest.moveTo("Create LV in VG");
+        roboTest.leftClick();
+        roboTest.moveTo("Create"); /* button */
+        roboTest.leftClick();
+        roboTest.moveTo("Close");
+        roboTest.leftClick();
     }
 
-    static void resizeLV(final Cluster cluster) {
-        rightClick();
-        moveTo("Resize LV");
-        leftClick();
-        press(KeyEvent.VK_2);
-        press(KeyEvent.VK_5);
-        press(KeyEvent.VK_2);
-        moveTo(cluster.getHostsArray()[1].getName());
-        leftClick();
+    void resizeLV(final Cluster cluster) {
+        roboTest.rightClick();
+        roboTest.moveTo("Resize LV");
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_2);
+        roboTest.press(KeyEvent.VK_5);
+        roboTest.press(KeyEvent.VK_2);
+        roboTest.moveTo(cluster.getHostsArray()[1].getName());
+        roboTest.leftClick();
 
-        moveTo("Resize");
-        leftClick();
-        moveTo("Close");
-        leftClick();
+        roboTest.moveTo("Resize");
+        roboTest.leftClick();
+        roboTest.moveTo("Close");
+        roboTest.leftClick();
     }
 
-    static void vgRemove(final Cluster cluster) {
-        rightClick();
-        moveTo("Remove VG");
-        leftClick();
-        moveTo(cluster.getHostsArray()[1].getName());
-        leftClick();
-        moveTo("Remove VG"); /* button */
-        leftClick();
+    void vgRemove(final Cluster cluster) {
+        roboTest.rightClick();
+        roboTest.moveTo("Remove VG");
+        roboTest.leftClick();
+        roboTest.moveTo(cluster.getHostsArray()[1].getName());
+        roboTest.leftClick();
+        roboTest.moveTo("Remove VG"); /* button */
+        roboTest.leftClick();
     }
 
-    static void lvRemove() {
-        rightClick();
-        moveTo("Remove LV");
-        leftClick();
-        moveTo("Remove"); /* button */
-        leftClick();
+    void lvRemove() {
+        roboTest.rightClick();
+        roboTest.moveTo("Remove LV");
+        roboTest.leftClick();
+        roboTest.moveTo("Remove"); /* button */
+        roboTest.leftClick();
     }
 
-    static void lvRemoveMulti() {
-        rightClick();
-        moveTo("Remove selected LV");
-        leftClick();
-        moveTo("Remove"); /* button */
-        leftClick();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest1() {
-        /* Cannot be instantiated. */
+    void lvRemoveMulti() {
+        roboTest.rightClick();
+        roboTest.moveTo("Remove selected LV");
+        roboTest.leftClick();
+        roboTest.moveTo("Remove"); /* button */
+        roboTest.leftClick();
     }
 }

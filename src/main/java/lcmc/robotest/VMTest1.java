@@ -29,41 +29,31 @@ import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkVMTest;
-import static lcmc.robotest.RoboTest.confirmRemove;
-import static lcmc.robotest.RoboTest.dialogColorTest;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.moveToMenu;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
 @Component
 final class VMTest1 {
     @Autowired
-    private static GUIData guiData;
+    private RoboTest roboTest;
+    @Autowired
+    private GUIData guiData;
 
-    static void start(final Cluster cluster, final String vmTest, final int count) {
+    void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "kvm", count);
     }
 
     /** VM Test 1. */
-    static void startVMTest(final Cluster cluster, final String vmTest, final String type, final int count) {
-        slowFactor = 0.1f;
-        aborted = false;
+    void startVMTest(final Cluster cluster, final String vmTest, final String type, final int count) {
+        roboTest.setSlowFactor(0.1f);
+        roboTest.setAborted(false);
         String name = "dmc";
         for (int j = 0; j < count; j++) {
-            checkVMTest(vmTest, 1, name);
+            roboTest.checkVMTest(vmTest, 1, name);
             name += "i";
         }
         name = "dmc";
@@ -71,303 +61,298 @@ final class VMTest1 {
 
         final int count2 = 1;
         for (int j = 0; j < count; j++) {
-            moveToMenu("VMs (KVM");
-            rightClick();
-            moveTo("Add New Virtual Machine");
-            leftClick();
-            dialogColorTest("new domain");
-            moveTo("Domain name", MTextField.class); /* domain name */
-            leftClick();
-            press(KeyEvent.VK_D);
-            press(KeyEvent.VK_M);
-            press(KeyEvent.VK_C);
+            roboTest.moveToMenu("VMs (KVM");
+            roboTest.rightClick();
+            roboTest.moveTo("Add New Virtual Machine");
+            roboTest.leftClick();
+            roboTest.dialogColorTest("new domain");
+            roboTest.moveTo("Domain name", MTextField.class); /* domain name */
+            roboTest.leftClick();
+            roboTest.press(KeyEvent.VK_D);
+            roboTest.press(KeyEvent.VK_M);
+            roboTest.press(KeyEvent.VK_C);
             for (int k = 0; k < j; k++) {
-                press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
+                roboTest.press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
             }
             /* type */
-            moveTo("Domain Type", MComboBox.class);
-            leftClick();
+            roboTest.moveTo("Domain Type", MComboBox.class);
+            roboTest.leftClick();
             if ("lxc".equals(type)) {
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_ENTER);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_ENTER);
             }
 
             /* next */
-            moveTo("Next");
-            leftClick();
+            roboTest.moveTo("Next");
+            roboTest.leftClick();
 
             if ("lxc".equals(type)) {
                 /* filesystem */
-                dialogColorTest("filesystem");
-                moveTo("Source Dir", MComboBox.class);
-                leftClick();
-                press(KeyEvent.VK_END);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_ENTER);
-                press(KeyEvent.VK_SLASH);
-                press(KeyEvent.VK_D);
-                press(KeyEvent.VK_M);
-                press(KeyEvent.VK_C);
+                roboTest.dialogColorTest("filesystem");
+                roboTest.moveTo("Source Dir", MComboBox.class);
+                roboTest.leftClick();
+                roboTest.press(KeyEvent.VK_END);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_ENTER);
+                roboTest.press(KeyEvent.VK_SLASH);
+                roboTest.press(KeyEvent.VK_D);
+                roboTest.press(KeyEvent.VK_M);
+                roboTest.press(KeyEvent.VK_C);
                 for (int k = 0; k < j; k++) {
-                    press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
+                    roboTest.press(KeyEvent.VK_I); /* dmci, dmcii, etc. */
                 }
-                press(KeyEvent.VK_SLASH);
-                press(KeyEvent.VK_R);
-                press(KeyEvent.VK_O);
-                press(KeyEvent.VK_O);
-                press(KeyEvent.VK_T);
-                press(KeyEvent.VK_F);
-                press(KeyEvent.VK_S);
-                moveTo("Next");
-                leftClick();
+                roboTest.press(KeyEvent.VK_SLASH);
+                roboTest.press(KeyEvent.VK_R);
+                roboTest.press(KeyEvent.VK_O);
+                roboTest.press(KeyEvent.VK_O);
+                roboTest.press(KeyEvent.VK_T);
+                roboTest.press(KeyEvent.VK_F);
+                roboTest.press(KeyEvent.VK_S);
+                roboTest.moveTo("Next");
+                roboTest.leftClick();
             } else {
                 /* source file */
-                dialogColorTest("source file");
+                roboTest.dialogColorTest("source file");
 
-                moveTo("File", MComboBox.class);
-                leftClick();
-                press(KeyEvent.VK_END);
-                press(KeyEvent.VK_T);
-                press(KeyEvent.VK_E);
-                press(KeyEvent.VK_S);
-                press(KeyEvent.VK_T);
+                roboTest.moveTo("File", MComboBox.class);
+                roboTest.leftClick();
+                roboTest.press(KeyEvent.VK_END);
+                roboTest.press(KeyEvent.VK_T);
+                roboTest.press(KeyEvent.VK_E);
+                roboTest.press(KeyEvent.VK_S);
+                roboTest.press(KeyEvent.VK_T);
                 for (int i = 0; i < count2; i++) {
-                    moveTo("Disk/block device");
-                    leftClick();
-                    moveTo("Image file");
-                    leftClick();
+                    roboTest.moveTo("Disk/block device");
+                    roboTest.leftClick();
+                    roboTest.moveTo("Image file");
+                    roboTest.leftClick();
                 }
 
-                moveTo("Next");
-                leftClick();
-                dialogColorTest("disk image");
-                moveTo("Next");
-                leftClick();
+                roboTest.moveTo("Next");
+                roboTest.leftClick();
+                roboTest.dialogColorTest("disk image");
+                roboTest.moveTo("Next");
+                roboTest.leftClick();
             }
-            dialogColorTest("network");
+            roboTest.dialogColorTest("network");
             for (int i = 0; i < count2; i++) {
-                moveTo("bridge");
-                leftClick();
-                moveTo("network");
-                leftClick();
+                roboTest.moveTo("bridge");
+                roboTest.leftClick();
+                roboTest.moveTo("network");
+                roboTest.leftClick();
             }
-            moveTo("Next");
-            leftClick();
+            roboTest.moveTo("Next");
+            roboTest.leftClick();
             if (!"lxc".equals(type)) {
-                dialogColorTest("display");
+                roboTest.dialogColorTest("display");
                 for (int i = 0; i < count2; i++) {
-                    moveTo("sdl"); /* sdl */
-                    leftClick();
-                    moveTo("vnc"); /* vnc */
-                    leftClick();
+                    roboTest.moveTo("sdl"); /* sdl */
+                    roboTest.leftClick();
+                    roboTest.moveTo("vnc"); /* vnc */
+                    roboTest.leftClick();
                 }
-                moveTo("Next");
-                leftClick();
+                roboTest.moveTo("Next");
+                roboTest.leftClick();
             }
-            dialogColorTest("create config");
+            roboTest.dialogColorTest("create config");
 
-            moveTo("Create Config");
-            leftClick();
-            checkVMTest(vmTest, 2, name);
+            roboTest.moveTo("Create Config");
+            roboTest.leftClick();
+            roboTest.checkVMTest(vmTest, 2, name);
 
             final String firstHost = cluster.getHostsArray()[0].getName();
             final String secondHost = cluster.getHostsArray()[1].getName();
             if (cluster.getHosts().size() > 1) {
                 /* two hosts */
-                moveTo(firstHost, JCheckBox.class); /* deselect first */
-                leftClick();
-                moveTo("Create Config");
-                leftClick();
-                checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
-                checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
+                roboTest.moveTo(firstHost, JCheckBox.class); /* deselect first */
+                roboTest.leftClick();
+                roboTest.moveTo("Create Config");
+                roboTest.leftClick();
+                roboTest.checkVMTest(cluster.getHostsArray()[0], vmTest, 1, name);
+                roboTest.checkVMTest(cluster.getHostsArray()[1], vmTest, 2, name);
 
-                moveTo(firstHost, JCheckBox.class); /* select first */
-                leftClick();
-                moveTo(secondHost, JCheckBox.class); /* deselect second */
-                leftClick();
-                moveTo("Create Config");
-                leftClick();
-                checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
-                checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
+                roboTest.moveTo(firstHost, JCheckBox.class); /* select first */
+                roboTest.leftClick();
+                roboTest.moveTo(secondHost, JCheckBox.class); /* deselect second */
+                roboTest.leftClick();
+                roboTest.moveTo("Create Config");
+                roboTest.leftClick();
+                roboTest.checkVMTest(cluster.getHostsArray()[0], vmTest, 2, name);
+                roboTest.checkVMTest(cluster.getHostsArray()[1], vmTest, 1, name);
 
-                moveTo(secondHost, JCheckBox.class); /* select second */
-                leftClick();
-                moveTo("Create Config");
-                leftClick();
-                checkVMTest(vmTest, 2, name);
+                roboTest.moveTo(secondHost, JCheckBox.class); /* select second */
+                roboTest.leftClick();
+                roboTest.moveTo("Create Config");
+                roboTest.leftClick();
+                roboTest.checkVMTest(vmTest, 2, name);
             }
 
-            moveTo("Finish"); /* finish */
-            leftClick();
+            roboTest.moveTo("Finish"); /* finish */
+            roboTest.leftClick();
 
-            moveTo("Number of CPUs", MTextField.class);
-            leftClick();
+            roboTest.moveTo("Number of CPUs", MTextField.class);
+            roboTest.leftClick();
             Tools.sleep(500);
-            press(KeyEvent.VK_BACK_SPACE);
-            press(KeyEvent.VK_2);
-            moveTo("Apply");
-            leftClick();
-            checkVMTest(vmTest, 3, name);
+            roboTest.press(KeyEvent.VK_BACK_SPACE);
+            roboTest.press(KeyEvent.VK_2);
+            roboTest.moveTo("Apply");
+            roboTest.leftClick();
+            roboTest.checkVMTest(vmTest, 3, name);
 
             if (j  == 0) {
                 for (int i = 0; i < count2; i++) {
                     /* remove net interface */
-                    moveToMenu("VMs (");
-                    leftClick();
-                    press(KeyEvent.VK_RIGHT);
+                    roboTest.moveToMenu("VMs (");
+                    roboTest.leftClick();
+                    roboTest.press(KeyEvent.VK_RIGHT);
 
-                    moveToMenu("dmc");
-                    leftClick();
-                    moveToMenu("default (:");
-                    rightClick();
-                    moveTo("Remove");
-                    leftClick();
-                    confirmRemove();
-                    checkVMTest(vmTest, 3.001, name);
+                    roboTest.moveToMenu("dmc");
+                    roboTest.leftClick();
+                    roboTest.moveToMenu("default (:");
+                    roboTest.rightClick();
+                    roboTest.moveTo("Remove");
+                    roboTest.leftClick();
+                    roboTest.confirmRemove();
+                    roboTest.checkVMTest(vmTest, 3.001, name);
 
                     /* add net interface */
-                    moveToMenu("dmc");
-                    rightClick();
-                    moveTo("Add Hardware");
-                    moveTo("New Disk");
-                    moveTo("New Network Interface");
-                    leftClick();
+                    roboTest.moveToMenu("dmc");
+                    roboTest.rightClick();
+                    roboTest.moveTo("Add Hardware");
+                    roboTest.moveTo("New Disk");
+                    roboTest.moveTo("New Network Interface");
+                    roboTest.leftClick();
                     Tools.sleep(500);
-                    moveTo("network");
-                    leftClick();
-                    moveTo("Apply");
-                    leftClick();
-                    checkVMTest(vmTest, 3, name);
+                    roboTest.moveTo("network");
+                    roboTest.leftClick();
+                    roboTest.moveTo("Apply");
+                    roboTest.leftClick();
+                    roboTest.checkVMTest(vmTest, 3, name);
                 }
             }
-            checkVMTest(vmTest, 3, name);
+            roboTest.checkVMTest(vmTest, 3, name);
 
             if (j  == 0 && !"lxc".equals(type)) {
                 /* add disk */
-                moveToMenu("VMs (");
-                leftClick();
-                press(KeyEvent.VK_RIGHT);
+                roboTest.moveToMenu("VMs (");
+                roboTest.leftClick();
+                roboTest.press(KeyEvent.VK_RIGHT);
 
-                moveToMenu("dmc");
-                rightClick();
-                moveTo("Add Hardware");
-                moveTo("New Disk");
-                leftClick();
+                roboTest.moveToMenu("dmc");
+                roboTest.rightClick();
+                roboTest.moveTo("Add Hardware");
+                roboTest.moveTo("New Disk");
+                roboTest.leftClick();
                 Tools.sleep(500);
-                moveTo("Disk/block device");
-                leftClick();
-                moveTo("Device", MComboBox.class);
-                leftClick();
-                press(KeyEvent.VK_SLASH);
-                press(KeyEvent.VK_D);
-                press(KeyEvent.VK_E);
-                press(KeyEvent.VK_V);
+                roboTest.moveTo("Disk/block device");
+                roboTest.leftClick();
+                roboTest.moveTo("Device", MComboBox.class);
+                roboTest.leftClick();
+                roboTest.press(KeyEvent.VK_SLASH);
+                roboTest.press(KeyEvent.VK_D);
+                roboTest.press(KeyEvent.VK_E);
+                roboTest.press(KeyEvent.VK_V);
 
-                press(KeyEvent.VK_SLASH);
-                press(KeyEvent.VK_S);
-                press(KeyEvent.VK_D);
-                press(KeyEvent.VK_A);
-                press(KeyEvent.VK_1);
-                press(KeyEvent.VK_ENTER);
-                moveTo("Apply");
-                leftClick();
-                checkVMTest(vmTest, 3.01, name);
+                roboTest.press(KeyEvent.VK_SLASH);
+                roboTest.press(KeyEvent.VK_S);
+                roboTest.press(KeyEvent.VK_D);
+                roboTest.press(KeyEvent.VK_A);
+                roboTest.press(KeyEvent.VK_1);
+                roboTest.press(KeyEvent.VK_ENTER);
+                roboTest.moveTo("Apply");
+                roboTest.leftClick();
+                roboTest.checkVMTest(vmTest, 3.01, name);
                 /* remove disk */
-                moveToMenu("hdb (IDE");
-                rightClick();
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_ENTER); /* remove */
-                confirmRemove();
-                checkVMTest(vmTest, 3, name);
+                roboTest.moveToMenu("hdb (IDE");
+                roboTest.rightClick();
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_ENTER); /* remove */
+                roboTest.confirmRemove();
+                roboTest.checkVMTest(vmTest, 3, name);
 
                 /* add disk /virtio */
-                moveToMenu("dmc");
-                rightClick();
-                moveTo("Add Hardware");
-                moveTo("New Disk");
-                leftClick();
+                roboTest.moveToMenu("dmc");
+                roboTest.rightClick();
+                roboTest.moveTo("Add Hardware");
+                roboTest.moveTo("New Disk");
+                roboTest.leftClick();
                 Tools.sleep(500);
-                moveTo("Disk/block device");
-                leftClick();
-                moveTo("Device", MComboBox.class);
-                leftClick();
-                press(KeyEvent.VK_SLASH);
-                press(KeyEvent.VK_D);
-                press(KeyEvent.VK_E);
-                press(KeyEvent.VK_V);
+                roboTest.moveTo("Disk/block device");
+                roboTest.leftClick();
+                roboTest.moveTo("Device", MComboBox.class);
+                roboTest.leftClick();
+                roboTest.press(KeyEvent.VK_SLASH);
+                roboTest.press(KeyEvent.VK_D);
+                roboTest.press(KeyEvent.VK_E);
+                roboTest.press(KeyEvent.VK_V);
 
-                press(KeyEvent.VK_SLASH);
-                press(KeyEvent.VK_S);
-                press(KeyEvent.VK_D);
-                press(KeyEvent.VK_A);
-                press(KeyEvent.VK_2);
-                press(KeyEvent.VK_ENTER);
-                moveTo("Disk Type", MComboBox.class);
-                leftClick();
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_ENTER); /* virtio */
-                moveTo("Apply");
-                leftClick();
-                checkVMTest(vmTest, 3.02, name);
+                roboTest.press(KeyEvent.VK_SLASH);
+                roboTest.press(KeyEvent.VK_S);
+                roboTest.press(KeyEvent.VK_D);
+                roboTest.press(KeyEvent.VK_A);
+                roboTest.press(KeyEvent.VK_2);
+                roboTest.press(KeyEvent.VK_ENTER);
+                roboTest.moveTo("Disk Type", MComboBox.class);
+                roboTest.leftClick();
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_ENTER); /* virtio */
+                roboTest.moveTo("Apply");
+                roboTest.leftClick();
+                roboTest.checkVMTest(vmTest, 3.02, name);
 
                 /* remove disk */
-                moveToMenu("vda (Virtio");
-                rightClick();
-                press(KeyEvent.VK_DOWN);
-                press(KeyEvent.VK_ENTER); /* remove */
-                confirmRemove();
-                checkVMTest(vmTest, 3, name);
+                roboTest.moveToMenu("vda (Virtio");
+                roboTest.rightClick();
+                roboTest.press(KeyEvent.VK_DOWN);
+                roboTest.press(KeyEvent.VK_ENTER); /* remove */
+                roboTest.confirmRemove();
+                roboTest.checkVMTest(vmTest, 3, name);
             }
 
             if (!"lxc".equals(type)) {
                 /* disk readonly */
-                moveToMenu("hda (IDE"); /* popup */
-                leftClick();
-                moveTo("Readonly", JCheckBox.class);
-                leftClick();
-                moveTo("Apply"); /* apply */
-                leftClick();
-                checkVMTest(vmTest, 3.1, name);
+                roboTest.moveToMenu("hda (IDE"); /* popup */
+                roboTest.leftClick();
+                roboTest.moveTo("Readonly", JCheckBox.class);
+                roboTest.leftClick();
+                roboTest.moveTo("Apply"); /* apply */
+                roboTest.leftClick();
+                roboTest.checkVMTest(vmTest, 3.1, name);
                 guiData.expandTerminalSplitPane(1);
-                moveTo("Readonly", JCheckBox.class);
-                leftClick();
+                roboTest.moveTo("Readonly", JCheckBox.class);
+                roboTest.leftClick();
 
-                moveTo("VM Host Overview"); /* host overview */
-                leftClick();
+                roboTest.moveTo("VM Host Overview"); /* host overview */
+                roboTest.leftClick();
 
-                moveTo("Apply"); /* host apply */
-                leftClick();
-                checkVMTest(vmTest, 3.2, name);
+                roboTest.moveTo("Apply"); /* host apply */
+                roboTest.leftClick();
+                roboTest.checkVMTest(vmTest, 3.2, name);
             }
 
             names.add(name);
             for (final String n : names) {
-                checkVMTest(vmTest, 3, n);
+                roboTest.checkVMTest(vmTest, 3, n);
             }
             name += "i";
         }
 
         for (int j = 0; j < count; j++) {
-            moveToMenu("dmc");
-            rightClick();
-            moveTo("Remove Domain");
-            leftClick();
-            dialogColorTest("remove VM");
-            confirmRemove();
-            leftClick();
+            roboTest.moveToMenu("dmc");
+            roboTest.rightClick();
+            roboTest.moveTo("Remove Domain");
+            roboTest.leftClick();
+            roboTest.dialogColorTest("remove VM");
+            roboTest.confirmRemove();
+            roboTest.leftClick();
             Tools.sleep(500);
         }
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private VMTest1() {
-        /* Cannot be instantiated. */
     }
 }

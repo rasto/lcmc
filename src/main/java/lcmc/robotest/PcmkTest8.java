@@ -20,53 +20,40 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.chooseDummy;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftPress;
-import static lcmc.robotest.RoboTest.leftRelease;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.removeEverything;
-import static lcmc.robotest.RoboTest.resetTerminalAreas;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopEverything;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTest8 {
-    static void start(final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
-        disableStonith();
-        checkTest("test8", 1);
+    @Autowired
+    private RoboTest roboTest;
+
+    void start(final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
+        roboTest.disableStonith();
+        roboTest.checkTest("test8", 1);
         final int dummy1X = 540;
         final int dummy1Y = 202;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
-                info("test8 i: " + i);
+                roboTest.info("test8 i: " + i);
             }
             //checkTest("test7", 1);
-            chooseDummy(dummy1X, dummy1Y, false, true);
-            moveTo(550, 202);
-            leftPress(); /* move the reosurce */
-            moveTo(300, 202);
-            leftRelease();
+            roboTest.chooseDummy(dummy1X, dummy1Y, false, true);
+            roboTest.moveTo(550, 202);
+            roboTest.leftPress(); /* move the reosurce */
+            roboTest.moveTo(300, 202);
+            roboTest.leftRelease();
         }
-        checkTest("test8-" + count, 2);
-        stopEverything();
-        checkTest("test8-" + count, 3);
-        removeEverything();
-        checkTest("test8", 4);
-        resetTerminalAreas();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest8() {
-        /* Cannot be instantiated. */
+        roboTest.checkTest("test8-" + count, 2);
+        roboTest.stopEverything();
+        roboTest.checkTest("test8-" + count, 3);
+        roboTest.removeEverything();
+        roboTest.checkTest("test8", 4);
+        roboTest.resetTerminalAreas();
     }
 }

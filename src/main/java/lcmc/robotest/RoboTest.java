@@ -72,11 +72,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public final class RoboTest {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
-    /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                                        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     /** Don't move the mosue pointer smothly. */
     private static final boolean MOVE_MOUSE_FAST = true;
     /** Confirm remove variable. */
@@ -86,22 +84,91 @@ public final class RoboTest {
     /** Host y position. */
     static final int HOST_Y = 100;
     /** Previous position of the mouse. */
-    private static volatile Point2D prevP = null;
+    private volatile Point2D prevP = null;
     /** Whether the test was aborted. */
-    static volatile boolean aborted = false;
+    private boolean aborted = false;
     /** Slow down the animation. */
-    static float slowFactor = 1f;
-    /** Robot. */
-    static Robot robot;
+    private float slowFactor = 1f;
+    private Robot robot;
     /** Cluster. */
-    private static Cluster cluster;
+    private Cluster cluster;
 
     static final boolean PROXY = true;
     @Autowired
-    private static GUIData guiData;
+    private GUIData guiData;
+    @Autowired
+    private PcmkTest1 pcmkTest1;
+    @Autowired
+    private PcmkTest2 pcmkTest2;
+    @Autowired
+    private PcmkTest3 pcmkTest3;
+    @Autowired
+    private PcmkTest4 pcmkTest4;
+    @Autowired
+    private PcmkTest5 pcmkTest5;
+    @Autowired
+    private PcmkTest6 pcmkTest6;
+    @Autowired
+    private PcmkTest7 pcmkTest7;
+    @Autowired
+    private PcmkTest8 pcmkTest8;
+    @Autowired
+    private PcmkTestA pcmkTestA;
+    @Autowired
+    private PcmkTestB pcmkTestB;
+    @Autowired
+    private PcmkTestC pcmkTestC;
+    @Autowired
+    private PcmkTestD pcmkTestD;
+    @Autowired
+    private PcmkTestE pcmkTestE;
+    @Autowired
+    private PcmkTestF pcmkTestF;
+    @Autowired
+    private PcmkTestG pcmkTestG;
+    @Autowired
+    private PcmkTestH pcmkTestH;
+    @Autowired
+    private DrbdTest1 drbdTest1;
+    @Autowired
+    private DrbdTest2 drbdTest2;
+    @Autowired
+    private DrbdTest3 drbdTest3;
+    @Autowired
+    private DrbdTest4 drbdTest4;
+    @Autowired
+    private DrbdTest5 drbdTest5;
+    @Autowired
+    private DrbdTest8 drbdTest8;
+    @Autowired
+    private GUITest1 guiTest1;
+    @Autowired
+    private GUITest2 guiTest2;
+    @Autowired
+    private VMTest1 vmTest1;
+    @Autowired
+    private VMTest4 vmTest4;
+    @Autowired
+    private VMTest5 vmTest5;
+
+    public void setAborted(boolean aborted) {
+        this.aborted = aborted;
+    }
+
+    public boolean isAborted() {
+        return aborted;
+    }
+
+    public void setSlowFactor(float slowFactor) {
+        this.slowFactor = slowFactor;
+    }
+
+    public float getSlowFactor() {
+        return slowFactor;
+    }
 
     /** Abort if mouse moved. */
-    private static boolean abortWithMouseMovement() {
+    private boolean abortWithMouseMovement() {
         if (MouseInfo.getPointerInfo() == null) {
             return false;
         }
@@ -139,7 +206,7 @@ public final class RoboTest {
      * Restore mouse when the program was interrupted, while a mouse button
      * was pressed.
      */
-    public static void restoreMouse() {
+    public void restoreMouse() {
         try {
             robot = new Robot(SCREEN_DEVICE);
         } catch (final AWTException e) {
@@ -154,7 +221,7 @@ public final class RoboTest {
     }
 
     /** Starts automatic left clicker in 10 seconds. */
-    public static void startClicker(final int duration, final boolean lazy) {
+    public void startClicker(final int duration, final boolean lazy) {
         startClicker0(duration, lazy, InputEvent.BUTTON1_MASK,
                                       10,   /* after click */
                                       10,   /* after release */
@@ -163,7 +230,7 @@ public final class RoboTest {
     }
 
     /** Starts automatic right clicker in 10 seconds. */
-    public static void startRightClicker(final int duration, final boolean lazy) {
+    public void startRightClicker(final int duration, final boolean lazy) {
         startClicker0(duration, lazy, InputEvent.BUTTON3_MASK,
                                       10,   /* after click */
                                       500,   /* after release */
@@ -172,7 +239,7 @@ public final class RoboTest {
     }
 
     /** Starts automatic clicker in 10 seconds. */
-    private static void startClicker0(final int duration, final boolean lazy, final int buttonMask, final int timeAfterClick, final int timeAfterRelase, final int timeAfterClickLazy, final int timeAfterRelaseLazy) {
+    private void startClicker0(final int duration, final boolean lazy, final int buttonMask, final int timeAfterClick, final int timeAfterRelase, final int timeAfterClickLazy, final int timeAfterRelaseLazy) {
         info("start click test in 10 seconds");
         prevP = null;
         final Thread thread = new Thread(new Runnable() {
@@ -222,7 +289,7 @@ public final class RoboTest {
     }
 
     /** Starts automatic mouse mover in 10 seconds. */
-    public static void startMover(final int duration, final boolean withClicks) {
+    public void startMover(final int duration, final boolean withClicks) {
         aborted = false;
         slowFactor = 0.3f;
         info("start mouse move test in 10 seconds");
@@ -283,7 +350,7 @@ public final class RoboTest {
     }
 
     /** workaround for dual monitors that are flipped. */
-    private static int getOffset() {
+    private int getOffset() {
         final Point2D p = MouseInfo.getPointerInfo().getLocation();
         final GraphicsDevice[] devices =
             GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -303,7 +370,7 @@ public final class RoboTest {
     }
 
     /** Automatic tests. */
-    public static void startTest(final Test autoTest, final Cluster c) {
+    public void startTest(final Test autoTest, final Cluster c) {
         final Type type = autoTest.getType();
         final char index = autoTest.getIndex();
         LCMC.MAIN_FRAME.setSize(
@@ -346,7 +413,7 @@ public final class RoboTest {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        GUITest1.start(count);
+                        guiTest1.start(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -354,7 +421,7 @@ public final class RoboTest {
                         /* cluster wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        GUITest2.start(count);
+                        guiTest2.start(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -369,71 +436,67 @@ public final class RoboTest {
                         while (true) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTest1.start(cluster);
+                            pcmkTest1.start(cluster);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest2.start();
+                            pcmkTest2.start();
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest3.start(4);
+                            pcmkTest3.start(4);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest4.start();
+                            pcmkTest4.start();
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest5.start(5);
+                            pcmkTest5.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest6.start(5);
+                            pcmkTest6.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest7.start(5);
+                            pcmkTest7.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTest8.start(10);
+                            pcmkTest8.start(10);
                             if (aborted) {
                                 break;
                             }
-                            //PcmkTest9.start();
+                            pcmkTestA.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestA.start(5);
+                            pcmkTestB.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestB.start(5);
+                            pcmkTestC.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestC.start(5);
+                            pcmkTestD.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestD.start(5);
+                            pcmkTestE.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestE.start(5);
+                            pcmkTestF.start(cluster, 2);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestF.start(cluster, 2);
+                            pcmkTestG.start(5);
                             if (aborted) {
                                 break;
                             }
-                            PcmkTestG.start(5);
-                            if (aborted) {
-                                break;
-                            }
-                            PcmkTestH.start(5);
+                            pcmkTestH.start(5);
                             if (aborted) {
                                 break;
                             }
@@ -449,7 +512,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTest1.start(cluster);
+                            pcmkTest1.start(cluster);
                             final int secs = (int) (System.currentTimeMillis()
                                                     - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -463,7 +526,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTest2.start();
+                            pcmkTest2.start();
                             final int secs = (int) (System.currentTimeMillis()
                                                     - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -476,7 +539,7 @@ public final class RoboTest {
                         final int i = 1;
                         final long startTime = System.currentTimeMillis();
                         info("test" + index + " no " + i);
-                        PcmkTest3.start(200);
+                        pcmkTest3.start(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + " no " + i + ", secs: " + secs);
@@ -486,7 +549,7 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTest4.start();
+                            pcmkTest4.start();
                             final int secs = (int) (System.currentTimeMillis()
                                                     - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -499,7 +562,7 @@ public final class RoboTest {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTest5.start(10);
+                            pcmkTest5.start(10);
                             final int secs = (int) (System.currentTimeMillis()
                                                     - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -512,7 +575,7 @@ public final class RoboTest {
                             /* pacemaker */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTest6.start(10);
+                            pcmkTest6.start(10);
                             final int secs = (int) (System.currentTimeMillis()
                                                     - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -523,7 +586,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTest7.start(100);
+                        pcmkTest7.start(100);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -531,7 +594,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTest8.start(30);
+                        pcmkTest8.start(30);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -539,7 +602,7 @@ public final class RoboTest {
                         /* pacemaker leak test group */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestA.start(200);
+                        pcmkTestA.start(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -547,7 +610,7 @@ public final class RoboTest {
                         /* pacemaker leak test clone */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestB.start(200);
+                        pcmkTestB.start(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -555,7 +618,7 @@ public final class RoboTest {
                         /* pacemaker master/slave test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestC.start(200);
+                        pcmkTestC.start(200);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -563,7 +626,7 @@ public final class RoboTest {
                         /* pacemaker leak test */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestD.start(count);
+                        pcmkTestD.start(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -571,7 +634,7 @@ public final class RoboTest {
                         /* host wizard deadlock */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestE.start(count);
+                        pcmkTestE.start(count);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -581,7 +644,7 @@ public final class RoboTest {
                             /* cloned group */
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            PcmkTestF.start(cluster, 2);
+                            pcmkTestF.start(cluster, 2);
                             final int secs = (int) (System.currentTimeMillis()
                                                     - startTime) / 1000;
                             info("test" + index + " no " + i + ", secs: "
@@ -592,7 +655,7 @@ public final class RoboTest {
                         /* big group */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestG.start(15);
+                        pcmkTestG.start(15);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -600,7 +663,7 @@ public final class RoboTest {
                         /* ipmi */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        PcmkTestH.start(15);
+                        pcmkTestH.start(15);
                         final int secs = (int) (System.currentTimeMillis()
                                                 - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
@@ -616,33 +679,30 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest1.start(cluster, blockDevY);
+                            drbdTest1.start(cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            DrbdTest2.start(cluster, blockDevY);
+                            drbdTest2.start(cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            DrbdTest3.start(cluster, blockDevY);
+                            drbdTest3.start(cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                DrbdTest4.start(cluster, blockDevY);
+                                drbdTest4.start(cluster, blockDevY);
                                 if (aborted) {
                                     break;
                                 }
                             }
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getApplication().setBigDRBDConf(
-                                    !Tools.getApplication().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(!Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '1') {
@@ -652,16 +712,13 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest1.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            drbdTest1.start(cluster, blockDevY);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getApplication().setBigDRBDConf(
-                                    !Tools.getApplication().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(!Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '2') {
@@ -671,11 +728,9 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest2.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            drbdTest2.start(cluster, blockDevY);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                         }
@@ -686,11 +741,9 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest3.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            drbdTest3.start(cluster, blockDevY);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
@@ -705,16 +758,13 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest4.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            drbdTest4.start(cluster, blockDevY);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getApplication().setBigDRBDConf(
-                                    !Tools.getApplication().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(!Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     } else if (index == '5') {
@@ -723,14 +773,12 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest5.start(cluster, blockDevY);
+                            drbdTest5.start(cluster, blockDevY);
                             if (aborted) {
                                 break;
                             }
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                         }
@@ -741,16 +789,13 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            DrbdTest8.start(cluster, blockDevY);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            drbdTest8.start(cluster, blockDevY);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                             if (cluster.getHostsArray()[0].hasVolumes()) {
-                                Tools.getApplication().setBigDRBDConf(
-                                    !Tools.getApplication().getBigDRBDConf());
+                                Tools.getApplication().setBigDRBDConf(!Tools.getApplication().getBigDRBDConf());
                             }
                         }
                     }
@@ -763,11 +808,9 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            VMTest1.start(cluster, "vm-test" + index, 2);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            vmTest1.start(cluster, "vm-test" + index, 2);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                         }
@@ -778,11 +821,9 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            VMTest1.start(cluster, "vm-test" + testIndex, 10);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            vmTest1.start(cluster, "vm-test" + testIndex, 10);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                         }
@@ -793,11 +834,9 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            VMTest1.start(cluster, "vm-test" + testIndex, 30);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            vmTest1.start(cluster, "vm-test" + testIndex, 30);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                         }
@@ -805,9 +844,8 @@ public final class RoboTest {
                         /* VMs dialog disabled textfields check. */
                         final long startTime = System.currentTimeMillis();
                         info("test" + index);
-                        VMTest4.start("vm-test" + index, 100);
-                        final int secs = (int) (System.currentTimeMillis()
-                                                - startTime) / 1000;
+                        vmTest4.start("vm-test" + index, 100);
+                        final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
                         info("test" + index + ", secs: " + secs);
                         resetTerminalAreas();
                     } else if (index == '5') {
@@ -816,11 +854,9 @@ public final class RoboTest {
                         while (!aborted) {
                             final long startTime = System.currentTimeMillis();
                             info("test" + index + " no " + i);
-                            VMTest5.start(cluster, "vm-test" + index, 2);
-                            final int secs = (int) (System.currentTimeMillis()
-                                                    - startTime) / 1000;
-                            info("test" + index + " no " + i + ", secs: "
-                                 + secs);
+                            vmTest5.start(cluster, "vm-test" + index, 2);
+                            final int secs = (int) (System.currentTimeMillis() - startTime) / 1000;
+                            info("test" + index + " no " + i + ", secs: " + secs);
                             resetTerminalAreas();
                             i++;
                         }
@@ -833,7 +869,7 @@ public final class RoboTest {
     }
 
     /** Check test. */
-    static void checkTest(final String test, final double no) {
+    void checkTest(final String test, final double no) {
         for (final Host host : getClusterHosts()) {
             if (abortWithMouseMovement()) {
                 return;
@@ -845,7 +881,7 @@ public final class RoboTest {
     }
 
     /** Check DRBD test on the first two hosts. */
-    static void checkDRBDTest(final String test, final double no) {
+    void checkDRBDTest(final String test, final double no) {
         int h = 1;
         for (final Host host : getClusterHosts()) {
             if (abortWithMouseMovement()) {
@@ -862,7 +898,7 @@ public final class RoboTest {
     }
 
     /** Check VM test on one host. */
-    static void checkVMTest(final Host host, final String test, final double no, final String name) {
+    void checkVMTest(final Host host, final String test, final double no, final String name) {
         if (abortWithMouseMovement()) {
             return;
         }
@@ -872,7 +908,7 @@ public final class RoboTest {
     }
 
     /** Check VM test. */
-    static void checkVMTest(final String test, final double no, final String name) {
+    void checkVMTest(final String test, final double no, final String name) {
         for (final Host host : getClusterHosts()) {
             if (abortWithMouseMovement()) {
                 return;
@@ -883,7 +919,7 @@ public final class RoboTest {
         }
     }
     /** Stop everything. */
-    static void stopEverything() {
+    void stopEverything() {
         moveTo(Tools.getString("Browser.AdvancedMode"));
         leftClick();
         moveTo(700, 520);
@@ -896,7 +932,7 @@ public final class RoboTest {
     }
 
     /** Remove everything. */
-    static void removeEverything() {
+    void removeEverything() {
         moveTo(Tools.getString("Browser.AdvancedMode"));
         leftClick();
         moveTo(700, 520);
@@ -911,7 +947,7 @@ public final class RoboTest {
     }
 
     /** Enable stonith if it is enabled. */
-    static void enableStonith() {
+    void enableStonith() {
         moveTo(265, 202);
         leftClick(); /* global options */
         final String stonith = cluster.getBrowser()
@@ -925,7 +961,7 @@ public final class RoboTest {
     }
 
     /** Disable stonith if it is enabled. */
-    static void disableStonith() {
+    void disableStonith() {
 
         moveTo(265, 202);
         leftClick(); /* global options */
@@ -955,7 +991,7 @@ public final class RoboTest {
     }
 
     /** Sets location. */
-    static void setLocation(final Integer[] events) {
+    void setLocation(final Integer[] events) {
         moveScrollBar(true);
 
         moveTo("on ", MComboBox.class);
@@ -978,7 +1014,7 @@ public final class RoboTest {
     }
 
     /** Choose dummy resource. */
-    static void typeDummy() {
+    void typeDummy() {
         press(KeyEvent.VK_D);
         press(KeyEvent.VK_U);
         press(KeyEvent.VK_M);
@@ -988,7 +1024,7 @@ public final class RoboTest {
     }
 
     /** Sets start timeout. */
-    static void setTimeouts(final boolean migrateTimeouts) {
+    void setTimeouts(final boolean migrateTimeouts) {
         moveScrollBar(true);
         moveTo("Start / Timeout", MTextField.class);
         leftClick();
@@ -1035,12 +1071,12 @@ public final class RoboTest {
         moveScrollBar(false);
     }
 
-    public static void sleepNoFactor(final double x) {
+    public void sleepNoFactor(final double x) {
         sleep(x / slowFactor);
     }
 
     /** Sleep for x milliseconds * slowFactor + some random time. */
-    static void sleep(final double x) {
+    void sleep(final double x) {
         if (abortWithMouseMovement()) {
             return;
         }
@@ -1063,12 +1099,12 @@ public final class RoboTest {
     }
 
     /** Returns maybe true. */
-    static boolean maybe() {
+    boolean maybe() {
         return Math.random() < 0.5;
     }
 
     /** Create dummy resource. */
-    static void chooseDummy(final int x, final int y, final boolean clone, final boolean apply) {
+    void chooseDummy(final int x, final int y, final boolean clone, final boolean apply) {
         moveTo(x, y);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
@@ -1087,7 +1123,7 @@ public final class RoboTest {
     }
 
     /** Removes service. */
-    static void removeResource(final int x, final int y, final boolean confirm) {
+    void removeResource(final int x, final int y, final boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
@@ -1098,7 +1134,7 @@ public final class RoboTest {
     }
 
     /** Removes group. */
-    static void removeGroup(final int x, final int y) {
+    void removeGroup(final int x, final int y) {
         moveTo(x + 20, y);
         rightClick();
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveService"));
@@ -1107,7 +1143,7 @@ public final class RoboTest {
     }
 
     /** Removes placeholder. */
-    static void removePlaceHolder(final int x, final int y, final boolean confirm) {
+    void removePlaceHolder(final int x, final int y, final boolean confirm) {
         moveTo(x + 20, y);
         rightClick();
         moveTo(Tools.getString("ConstraintPHInfo.Remove"));
@@ -1118,7 +1154,7 @@ public final class RoboTest {
     }
 
     /** Confirms remove dialog. */
-    static void confirmRemove() {
+    void confirmRemove() {
         dialogColorTest("confirm remove");
         press(KeyEvent.VK_TAB);
         press(KeyEvent.VK_TAB);
@@ -1126,7 +1162,7 @@ public final class RoboTest {
     }
 
     /** Stops resource. */
-    static void stopResource(final int x, final int y) {
+    void stopResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
@@ -1134,14 +1170,14 @@ public final class RoboTest {
     }
 
     /** Stops group. */
-    static void stopGroup() {
+    void stopGroup() {
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.StopResource"));
         leftClick(); /* stop */
     }
 
     /** Removes target role. */
-    static void resetStartStopResource(final int x, final int y) {
+    void resetStartStopResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         leftClick(); /* select */
 
@@ -1156,7 +1192,7 @@ public final class RoboTest {
     }
 
     /** Starts resource. */
-    static void startResource(final int x, final int y) {
+    void startResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
         moveTo('^' + Tools.getString("ClusterBrowser.Hb.StartResource") + '$');
@@ -1164,7 +1200,7 @@ public final class RoboTest {
     }
 
     /** Migrate resource. */
-    static void migrateResource(final int x, final int y) {
+    void migrateResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.MigrateFromResource"));
@@ -1172,7 +1208,7 @@ public final class RoboTest {
     }
 
     /** Unmigrate resource. */
-    static void unmigrateResource(final int x, final int y) {
+    void unmigrateResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.UnmigrateResource"));
@@ -1180,7 +1216,7 @@ public final class RoboTest {
     }
 
     /** Unmanage resource. */
-    static void unmanageResource(final int x, final int y) {
+    void unmanageResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.UnmanageResource"));
@@ -1188,7 +1224,7 @@ public final class RoboTest {
     }
 
     /** Manage resource. */
-    static void manageResource(final int x, final int y) {
+    void manageResource(final int x, final int y) {
         moveTo(x + 50, y + 5);
         rightClick(); /* popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.ManageResource"));
@@ -1196,7 +1232,7 @@ public final class RoboTest {
     }
 
     /** Adds constraint from vertex. */
-    static void addConstraint(final int number) {
+    void addConstraint(final int number) {
         rightClick();
         moveTo(Tools.getString("ClusterBrowser.Hb.AddStartBefore"));
         leftClick();
@@ -1207,7 +1243,7 @@ public final class RoboTest {
     }
 
     /** Adds constraint (order only) from vertex. */
-    static void addConstraintOrderOnly(final int x, final int y, final int number) {
+    void addConstraintOrderOnly(final int x, final int y, final int number) {
         moveTo(x + 20, y + 5);
         rightClick();
         moveTo(Tools.getString("ClusterBrowser.Hb.AddStartBefore"));
@@ -1224,7 +1260,7 @@ public final class RoboTest {
     }
 
     /** Adds constraint (colocation only) from vertex. */
-    static void addConstraintColocationOnly(final int x, final int y, final int number) {
+    void addConstraintColocationOnly(final int x, final int y, final int number) {
         moveTo(x + 20, y + 5);
         rightClick();
         moveTo(Tools.getString("ClusterBrowser.Hb.AddStartBefore"));
@@ -1241,7 +1277,7 @@ public final class RoboTest {
     }
 
     /** Removes constraint. */
-    static void removeConstraint(final int popX, final int popY) {
+    void removeConstraint(final int popX, final int popY) {
         moveTo(popX, popY);
         rightClick(); /* constraint popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.RemoveEdge"));
@@ -1249,7 +1285,7 @@ public final class RoboTest {
     }
 
     /** Removes order. */
-    static void removeOrder(final int popX, final int popY) {
+    void removeOrder(final int popX, final int popY) {
         moveTo(popX, popY);
         rightClick(); /* constraint popup */
         final String s = Tools.getString("ClusterBrowser.Hb.RemoveOrder");
@@ -1258,7 +1294,7 @@ public final class RoboTest {
     }
 
     /** Adds order. */
-    static void addOrder(final int popX, final int popY) {
+    void addOrder(final int popX, final int popY) {
         moveTo(popX, popY);
         rightClick(); /* constraint popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.AddOrder"));
@@ -1266,7 +1302,7 @@ public final class RoboTest {
     }
 
     /** Removes colocation. */
-    static void removeColocation(final int popX, final int popY) {
+    void removeColocation(final int popX, final int popY) {
         moveTo(popX, popY);
         rightClick(); /* constraint popup */
         moveTo(
@@ -1275,7 +1311,7 @@ public final class RoboTest {
     }
 
     /** Adds colocation. */
-    static void addColocation(final int popX, final int popY) {
+    void addColocation(final int popX, final int popY) {
         moveTo(popX, popY);
         rightClick(); /* constraint popup */
         moveTo(Tools.getString("ClusterBrowser.Hb.AddColocation").substring(1));
@@ -1283,7 +1319,7 @@ public final class RoboTest {
     }
 
     /** Press button. */
-    static void press(final int ke) {
+    void press(final int ke) {
         if (aborted) {
             return;
         }
@@ -1293,14 +1329,14 @@ public final class RoboTest {
     }
 
     /** Control left click. */
-    static void controlLeftClick()  {
+    void controlLeftClick()  {
         robot.keyPress(KeyEvent.VK_CONTROL);
         leftClick();
         robot.keyRelease(KeyEvent.VK_CONTROL);
     }
 
     /** Left click. */
-    static void leftClick()  {
+    void leftClick()  {
         if (aborted) {
             return;
         }
@@ -1311,7 +1347,7 @@ public final class RoboTest {
     }
 
     /** Left press. */
-    static void leftPress()  {
+    void leftPress()  {
         if (aborted) {
             return;
         }
@@ -1320,7 +1356,7 @@ public final class RoboTest {
     }
 
     /** Left release. */
-    static void leftRelease()  {
+    void leftRelease()  {
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
         if (aborted) {
             return;
@@ -1329,7 +1365,7 @@ public final class RoboTest {
     }
 
     /** Right click. */
-    static void rightClick()  {
+    void rightClick()  {
         if (aborted) {
             return;
         }
@@ -1341,7 +1377,7 @@ public final class RoboTest {
     }
 
     /** Returns true if there is the specified color on this position. */
-    static boolean isColor(final int fromX, final int fromY, final Color color, final boolean expected)  {
+    boolean isColor(final int fromX, final int fromY, final Color color, final boolean expected)  {
         if (aborted) {
             return true;
         }
@@ -1382,14 +1418,14 @@ public final class RoboTest {
         return !expected;
     }
 
-    static void moveToSlowly(final int toX, final int toY) {
+    void moveToSlowly(final int toX, final int toY) {
         slowFactor *= 50;
         moveTo(toX, toY);
         slowFactor /= 50;
     }
 
     /** Move to position. */
-    static void moveTo(final int toX, final int toY) {
+    void moveTo(final int toX, final int toY) {
         if (aborted) {
             return;
         }
@@ -1404,32 +1440,32 @@ public final class RoboTest {
         moveToAbs(endX, endY);
     }
 
-    static int getY() {
+    int getY() {
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final Point2D endP =
             guiData.getMainFrameContentPane().getLocationOnScreen();
         return (int) origP.getY() - (int) endP.getY();
     }
 
-    static int getX() {
+    int getX() {
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final Point2D endP =
             guiData.getMainFrameContentPane().getLocationOnScreen();
         return (int) origP.getX() - (int) endP.getX();
     }
 
-    static void moveTo(final String text) {
+    void moveTo(final String text) {
         if (aborted) {
             return;
         }
         moveTo(text, null);
     }
 
-    static void moveScrollBar(final boolean down) {
+    void moveScrollBar(final boolean down) {
         moveScrollBar(down, 300);
     }
 
-    static void moveScrollBar(final boolean down, final int delta) {
+    void moveScrollBar(final boolean down, final int delta) {
         if (aborted) {
             return;
         }
@@ -1481,7 +1517,7 @@ public final class RoboTest {
         leftRelease();
     }
 
-    private static java.awt.Component getFocusedWindow() {
+    private java.awt.Component getFocusedWindow() {
         for (final Window w : Window.getWindows()) {
             java.awt.Component c = w.getFocusOwner();
             if (c != null) {
@@ -1495,7 +1531,7 @@ public final class RoboTest {
         return null;
     }
 
-    static void moveTo(final Class<?> clazz, final int number) {
+    void moveTo(final Class<?> clazz, final int number) {
         if (aborted) {
             return;
         }
@@ -1525,7 +1561,7 @@ public final class RoboTest {
         moveToAbs(endX, endY);
     }
 
-    static void moveToMenu(final String text) {
+    void moveToMenu(final String text) {
         if (aborted) {
             return;
         }
@@ -1550,7 +1586,7 @@ public final class RoboTest {
         LOG.info("moveToMenu: cannot find " + text + " the tree");
     }
 
-    static void moveToGraph(final String text) {
+    void moveToGraph(final String text) {
         if (aborted) {
             return;
         }
@@ -1571,11 +1607,11 @@ public final class RoboTest {
         LOG.info("moveToGraph: cannot find " + text + " in the graph");
     }
 
-    static void moveTo(final String text, final Class<?> clazz) {
+    void moveTo(final String text, final Class<?> clazz) {
         moveTo(text, 1, clazz);
     }
 
-    static void moveTo(final String text, final int number, final Class<?> clazz) {
+    void moveTo(final String text, final int number, final Class<?> clazz) {
         if (aborted) {
             return;
         }
@@ -1628,7 +1664,7 @@ public final class RoboTest {
         moveToAbs(endX, endY);
     }
 
-    static void moveToAbs(final int endX, final int endY) {
+    void moveToAbs(final int endX, final int endY) {
         if (aborted) {
             return;
         }
@@ -1675,7 +1711,7 @@ public final class RoboTest {
     }
 
     /** Register movement. */
-    public static void registerMovement() {
+    public void registerMovement() {
         Robot rbt = null;
         try {
             rbt = new Robot(SCREEN_DEVICE);
@@ -1715,7 +1751,7 @@ public final class RoboTest {
         thread.start();
     }
 
-    static boolean dialogColorTest(final String text) {
+    boolean dialogColorTest(final String text) {
         if (aborted) {
             return false;
         }
@@ -1746,7 +1782,7 @@ public final class RoboTest {
         }
     }
 
-    static void resetTerminalAreas() {
+    void resetTerminalAreas() {
         for (final Host h : getClusterHosts()) {
             if (!aborted) {
                 h.getTerminalPanel().resetTerminalArea();
@@ -1754,7 +1790,7 @@ public final class RoboTest {
         }
     }
 
-    public static void info(final String text) {
+    public void info(final String text) {
         if (cluster != null) {
             for (final Host h : getClusterHosts()) {
                 h.getTerminalPanel().addCommandOutput(text + '\n');
@@ -1763,7 +1799,7 @@ public final class RoboTest {
         LOG.info(text);
     }
 
-    public static java.awt.Component findInside(final java.awt.Component component, final Class<?> clazz, final int position) {
+    public java.awt.Component findInside(final java.awt.Component component, final Class<?> clazz, final int position) {
         final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
         findInside(component, clazz, res);
         if (res.size() > position) {
@@ -1772,7 +1808,7 @@ public final class RoboTest {
         return null;
     }
 
-    public static void findInside(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
+    public void findInside(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
         int i = 0;
         while (results.isEmpty() && i < 10) {
             if (i > 0) {
@@ -1783,7 +1819,7 @@ public final class RoboTest {
         }
     }
 
-    private static void findInside0(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
+    private void findInside0(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
         if (component.getClass().equals(clazz)
             && component.isShowing()) {
             results.add(component);
@@ -1797,7 +1833,7 @@ public final class RoboTest {
 
     /** Find component that is next to the specified component and is of the
      * specified class. */
-    public static java.awt.Component findNext(final java.awt.Component component, final Class<?> clazz) {
+    public java.awt.Component findNext(final java.awt.Component component, final Class<?> clazz) {
         boolean next = false;
         for (final java.awt.Component c : component.getParent().getComponents()) {
             if (next) {
@@ -1817,7 +1853,7 @@ public final class RoboTest {
         return null;
     }
 
-    static Container findComponent(final String text, final Container component, final Integer[] number) {
+    Container findComponent(final String text, final Container component, final Integer[] number) {
         final String quotedText;
         if (text.contains("*") || text.contains("$") || text.contains("^")) {
             quotedText = text;
@@ -1865,17 +1901,17 @@ public final class RoboTest {
         return null;
     }
 
-    public static Container findComponent(final String text) {
+    public Container findComponent(final String text) {
         return findComponent(text, 1);
     }
 
-    public static Container findComponent(final String text, final int number) {
+    public Container findComponent(final String text, final int number) {
         return findComponent(text,
                              (Container) getFocusedWindow(),
                              new Integer[]{number});
     }
 
-    static Point2D getAppPosition() {
+    Point2D getAppPosition() {
         final Point2D loc =
             guiData.getMainFrameContentPane().getLocationOnScreen();
         final Point2D pos = MouseInfo.getPointerInfo().getLocation();
@@ -1884,7 +1920,7 @@ public final class RoboTest {
         return newPos;
     }
 
-    static void waitForMe() {
+    void waitForMe() {
         info("waiting...");
         final Point2D iPos = MouseInfo.getPointerInfo().getLocation();
         while (true) {
@@ -1899,7 +1935,7 @@ public final class RoboTest {
         info("continue...");
     }
 
-    static void checkNumberOfVertices(final String name, final int should) {
+    void checkNumberOfVertices(final String name, final int should) {
         if (aborted) {
             return;
         }
@@ -1916,7 +1952,7 @@ public final class RoboTest {
     }
 
     /** Return vertical position of the blockdevices. */
-    static int getBlockDevY() {
+    int getBlockDevY() {
         info("move to position, start in 3 seconds");
         sleepNoFactor(3000);
         final Point2D pos = getAppPosition();
@@ -1927,34 +1963,14 @@ public final class RoboTest {
         }
         return y;
     }
+
+    Robot getRobot() {
+        return robot;
+    }
     
-    private static List<Host> getClusterHosts() {
+    private List<Host> getClusterHosts() {
         return new ArrayList<Host>(cluster.getHosts());
     }
-    
-    /** Private constructor, cannot be instantiated. */
-    private RoboTest() {
-        /* Cannot be instantiated. */
-    }
-
-    public static class Test {
-        private final RoboTest.Type type;
-        private final char index;
-
-        public Test(final RoboTest.Type type, final char index) {
-            this.type = type;
-            this.index = index;
-        }
-
-        public RoboTest.Type getType() {
-            return type;
-        }
-
-        public char getIndex() {
-            return index;
-        }
-    }
-
 
     public enum Type {
         PCMK("pcmk"), DRBD("drbd"), VM("vm"), GUI("gui");

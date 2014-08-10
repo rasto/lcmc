@@ -20,63 +20,45 @@
 
 package lcmc.robotest;
 
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.addConstraint;
-import static lcmc.robotest.RoboTest.chooseDummy;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.removeConstraint;
-import static lcmc.robotest.RoboTest.removeEverything;
-import static lcmc.robotest.RoboTest.resetTerminalAreas;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.slowFactor;
-import static lcmc.robotest.RoboTest.stopEverything;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTest6 {
-    static void start(final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
+    @Autowired
+    private RoboTest roboTest;
+
+    void start(final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
 
         final int ph1X = 315;
         final int ph1Y = 346;
         
-        
-        //disableStonith();
-        /* create 2 dummies */
-        //checkTest("test5", 1);
-
         /* placeholders */
-        moveTo(ph1X, ph1Y);
-        rightClick();
-        moveTo("Placeholder (AND)");
-        leftClick();
+        roboTest.moveTo(ph1X, ph1Y);
+        roboTest.rightClick();
+        roboTest.moveTo("Placeholder (AND)");
+        roboTest.leftClick();
 
         final int dummy1X = 235;
         final int dummy1Y = 207;
-        chooseDummy(dummy1X, dummy1Y, false, true);
+        roboTest.chooseDummy(dummy1X, dummy1Y, false, true);
         final int dum1PopX = dummy1X + 70;
         final int dum1PopY = dummy1Y + 60;
         for (int i = 0; i < count; i++) {
             if (i % 5 == 0) {
-                info("test6 i: " + i);
+                roboTest.info("test6 i: " + i);
             }
-            moveTo(ph1X, ph1Y);
-            addConstraint(1);
-            removeConstraint(dum1PopX, dum1PopY);
+            roboTest.moveTo(ph1X, ph1Y);
+            roboTest.addConstraint(1);
+            roboTest.removeConstraint(dum1PopX, dum1PopY);
         }
-        stopEverything();
-        removeEverything();
-        resetTerminalAreas();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTest6() {
-        /* Cannot be instantiated. */
+        roboTest.stopEverything();
+        roboTest.removeEverything();
+        roboTest.resetTerminalAreas();
     }
 }

@@ -22,62 +22,52 @@ package lcmc.robotest;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.isColor;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.sleepNoFactor;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class GUITest1 {
+    @Autowired
+    private RoboTest roboTest;
+
     /** Host wizard locked until focus is lost. */
-    static void start(final int count) {
-        slowFactor = 0.2f;
-        aborted = false;
+    void start(final int count) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
         for (int i = count; i > 0; i--) {
             if (i % 10 == 0) {
-                info("gui-test1 I: " + i);
+                roboTest.info("gui-test1 I: " + i);
             }
-            moveTo(Tools.getString("ClusterTab.AddNewHost"));
-            sleep(500);
-            leftClick();
-            sleep(1000);
-            if (!isColor(360, 472, new Color(255, 100, 100), true)) {
-                info("gui-test1 1: error");
+            roboTest.moveTo(Tools.getString("ClusterTab.AddNewHost"));
+            roboTest.sleep(500);
+            roboTest.leftClick();
+            roboTest.sleep(1000);
+            if (!roboTest.isColor(360, 472, new Color(255, 100, 100), true)) {
+                roboTest.info("gui-test1 1: error");
                 break;
             }
             boolean ok = false;
             for (int error = 0; error < 5; error++) {
-                sleep(100);
-                press(KeyEvent.VK_X);
-                if (!isColor(360, 472, new Color(255, 100, 100), false)) {
-                    sleepNoFactor(1000);
+                roboTest.sleep(100);
+                roboTest.press(KeyEvent.VK_X);
+                if (!roboTest.isColor(360, 472, new Color(255, 100, 100), false)) {
+                    roboTest.sleepNoFactor(1000);
                     ok = true;
                     break;
                 }
             }
             if (!ok) {
-                info("gui-test1 2: failed");
+                roboTest.info("gui-test1 2: failed");
                 break;
             }
-            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-            sleep(500);
-            leftClick();
-            sleep(1000);
+            roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+            roboTest.sleep(500);
+            roboTest.leftClick();
+            roboTest.sleep(1000);
         }
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private GUITest1() {
-        /* Cannot be instantiated. */
     }
 }

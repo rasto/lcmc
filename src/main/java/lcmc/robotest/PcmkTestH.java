@@ -23,84 +23,71 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkTest;
-import static lcmc.robotest.RoboTest.disableStonith;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.removeResource;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.robot;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class PcmkTestH {
+    @Autowired
+    private RoboTest roboTest;
     /** Create ipmi resource. */
-    private static void chooseIpmi(final int x, final int y, final boolean apply) {
-        moveTo(x, y);
-        rightClick(); /* popup */
-        moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
-        moveTo("Filesystem + Linbit:DRBD");
-        moveTo("Stonith Devices");
-        press(KeyEvent.VK_I);
-        press(KeyEvent.VK_P);
-        press(KeyEvent.VK_M);
-        press(KeyEvent.VK_I);
-        press(KeyEvent.VK_ENTER);
-        moveTo("Target Role", MComboBox.class);
-        leftClick(); /* pull down */
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER);
+    private void chooseIpmi(final int x, final int y, final boolean apply) {
+        roboTest.moveTo(x, y);
+        roboTest.rightClick(); /* popup */
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Hb.AddService"));
+        roboTest.moveTo("Filesystem + Linbit:DRBD");
+        roboTest.moveTo("Stonith Devices");
+        roboTest.press(KeyEvent.VK_I);
+        roboTest.press(KeyEvent.VK_P);
+        roboTest.press(KeyEvent.VK_M);
+        roboTest.press(KeyEvent.VK_I);
+        roboTest.press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Target Role", MComboBox.class);
+        roboTest.leftClick(); /* pull down */
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER);
         if (apply) {
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
         }
     }
 
-    static void start(final int count) {
-        slowFactor = 0.5f;
-        aborted = false;
-        disableStonith();
+    void start(final int count) {
+        roboTest.setSlowFactor(0.5f);
+        roboTest.setAborted(false);
+        roboTest.disableStonith();
         final int ipmiX = 235;
         final int ipmiY = 207;
         for (int i = count; i > 0; i--) {
             if (i % 5 == 0) {
-                info("testH I: " + i);
+                roboTest.info("testH I: " + i);
             }
-            checkTest("testH", 1);
+            roboTest.checkTest("testH", 1);
             /* create ipmi res */
             chooseIpmi(ipmiX, ipmiY, true);
-            checkTest("testH", 3);
+            roboTest.checkTest("testH", 3);
             /* copy/paste */
-            moveTo(ipmiX + 10 , ipmiY + 10);
-            leftClick();
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            press(KeyEvent.VK_C);
-            press(KeyEvent.VK_V);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            moveTo(ipmiX + 10 , ipmiY + 90);
-            leftClick();
-            moveTo(Tools.getString("Browser.ApplyResource"));
-            leftClick();
-            checkTest("testH", 4);
+            roboTest.moveTo(ipmiX + 10 , ipmiY + 10);
+            roboTest.leftClick();
+            roboTest.getRobot().keyPress(KeyEvent.VK_CONTROL);
+            roboTest.press(KeyEvent.VK_C);
+            roboTest.press(KeyEvent.VK_V);
+            roboTest.getRobot().keyRelease(KeyEvent.VK_CONTROL);
+            roboTest.moveTo(ipmiX + 10 , ipmiY + 90);
+            roboTest.leftClick();
+            roboTest.moveTo(Tools.getString("Browser.ApplyResource"));
+            roboTest.leftClick();
+            roboTest.checkTest("testH", 4);
 
-            removeResource(ipmiX, ipmiY, CONFIRM_REMOVE);
-            removeResource(ipmiX, ipmiY + 90, CONFIRM_REMOVE);
+            roboTest.removeResource(ipmiX, ipmiY, CONFIRM_REMOVE);
+            roboTest.removeResource(ipmiX, ipmiY + 90, CONFIRM_REMOVE);
         }
         System.gc();
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private PcmkTestH() {
-        /* Cannot be instantiated. */
     }
 }

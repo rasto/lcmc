@@ -26,26 +26,6 @@ import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
-import static lcmc.robotest.DrbdTest1.addBlockDevice;
-import static lcmc.robotest.DrbdTest1.addDrbdResource;
-import static lcmc.robotest.DrbdTest1.addDrbdVolume;
-import static lcmc.robotest.DrbdTest1.addFileSystem;
-import static lcmc.robotest.DrbdTest1.addMetaData;
-import static lcmc.robotest.DrbdTest1.chooseDrbdResource;
-import static lcmc.robotest.DrbdTest1.newDrbdResource;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkDRBDTest;
-import static lcmc.robotest.RoboTest.confirmRemove;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.leftPress;
-import static lcmc.robotest.RoboTest.leftRelease;
-import static lcmc.robotest.RoboTest.moveScrollBar;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.moveToSlowly;
-import static lcmc.robotest.RoboTest.press;
-import static lcmc.robotest.RoboTest.rightClick;
-import static lcmc.robotest.RoboTest.sleep;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -54,225 +34,221 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
 @Component
 final class DrbdTest3 {
+    @Autowired
+    private RoboTest roboTest;
+    @Autowired
+    private DrbdTest1 drbdTest1;
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest3.class);
     @Autowired
-    private static GUIData guiData;
+    private GUIData guiData;
 
-    static void start(final Cluster cluster, final int blockDevY) {
+    void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
-        slowFactor = 0.2f;
-        aborted = false;
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
         int offset = 0;
         final String drbdTest = "drbd-test3";
         for (int i = 0; i < 2; i++) {
-            addDrbdResource(cluster, blockDevY + offset);
+            drbdTest1.addDrbdResource(cluster, blockDevY + offset);
             if (i == 1 && cluster.getHostsArray()[0].hasVolumes()) {
-                newDrbdResource();
+                drbdTest1.newDrbdResource();
             }
-            chooseDrbdResource(cluster);
+            drbdTest1.chooseDrbdResource(cluster);
 
-            addDrbdVolume();
-            addBlockDevice();
-            addBlockDevice();
-            sleep(20000);
+            drbdTest1.addDrbdVolume();
+            drbdTest1.addBlockDevice();
+            drbdTest1.addBlockDevice();
+            roboTest.sleep(20000);
 
             if (offset == 0) {
-                checkDRBDTest(drbdTest, 1.1);
+                roboTest.checkDRBDTest(drbdTest, 1.1);
             } else {
-                checkDRBDTest(drbdTest, 1.2);
+                roboTest.checkDRBDTest(drbdTest, 1.2);
             }
-            sleep(10000);
-            addMetaData();
-            addFileSystem();
-            sleep(10000);
-            moveTo(Tools.getString("Dialog.Dialog.Finish"));
-            leftClick();
-            sleep(10000);
+            roboTest.sleep(10000);
+            drbdTest1.addMetaData();
+            drbdTest1.addFileSystem();
+            roboTest.sleep(10000);
+            roboTest.moveTo(Tools.getString("Dialog.Dialog.Finish"));
+            roboTest.leftClick();
+            roboTest.sleep(10000);
 
             offset += 40;
         }
-        checkDRBDTest(drbdTest, 2);
+        roboTest.checkDRBDTest(drbdTest, 2);
 
-        moveTo(730, 475); /* rectangle */
-        leftPress();
-        moveTo(225, 65);
-        leftRelease();
+        roboTest.moveTo(730, 475); /* rectangle */
+        roboTest.leftPress();
+        roboTest.moveTo(225, 65);
+        roboTest.leftRelease();
 
-        moveTo(334, blockDevY);
-        rightClick();
-        moveToSlowly(400, blockDevY + 160);
+        roboTest.moveTo(334, blockDevY);
+        roboTest.rightClick();
+        roboTest.moveToSlowly(400, blockDevY + 160);
 
-        moveTo("Detach Selected");
-        leftClick();
-        checkDRBDTest(drbdTest, 2.01);
+        roboTest.moveTo("Detach Selected");
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 2.01);
 
-        moveTo(400, blockDevY);
-        rightClick();
-        moveTo("Attach Selected");
-        leftClick();
-        checkDRBDTest(drbdTest, 2.02);
+        roboTest.moveTo(400, blockDevY);
+        roboTest.rightClick();
+        roboTest.moveTo("Attach Selected");
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 2.02);
 
-        moveTo(480, 152); /* select r0 */
-        leftClick();
+        roboTest.moveTo(480, 152); /* select r0 */
+        roboTest.leftClick();
 
-        moveTo("Protocol", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_UP); /* protocol b */
-        press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Protocol", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_UP); /* protocol b */
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveTo("Fence peer", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_DOWN); /* select dopd */
-        press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Fence peer", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_DOWN); /* select dopd */
+        roboTest.press(KeyEvent.VK_ENTER);
         guiData.expandTerminalSplitPane(1);
 
-        moveTo("Wfc timeout", MTextField.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_9);
+        roboTest.moveTo("Wfc timeout", MTextField.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_9);
 
-        moveTo("Max buffers", MTextField.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_5);
-        moveTo("Max buffers", MComboBox.class); /* Unit */
-        leftClick();
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Max buffers", MTextField.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_5);
+        roboTest.moveTo("Max buffers", MComboBox.class); /* Unit */
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveScrollBar(true);
+        roboTest.moveScrollBar(true);
         try {
             if (cluster.getHostsArray()[0].drbdVersionSmaller("8.4.0")) {
-                moveTo("After", MComboBox.class);
+                roboTest.moveTo("After", MComboBox.class);
             } else {
-                moveTo("after", MComboBox.class);
+                roboTest.moveTo("after", MComboBox.class);
             }
         } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
-        leftClick();
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_ENTER);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveScrollBar(false);
+        roboTest.moveScrollBar(false);
 
-        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        leftClick(); /* apply/disables tooltip */
-        leftClick();
-        checkDRBDTest(drbdTest, 2.1); /* 2.1 */
-        
-        
+        roboTest.moveTo(Tools.getString("Browser.ApplyDRBDResource"));
+        roboTest.leftClick(); /* apply/disables tooltip */
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 2.1); /* 2.1 */
+
         /* common */
-        moveTo(500, 342); /* select background */
-        leftClick();
-        leftClick();
+        roboTest.moveTo(500, 342); /* select background */
+        roboTest.leftClick();
+        roboTest.leftClick();
 
-        moveTo("Wfc timeout", MTextField.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_3);
+        roboTest.moveTo("Wfc timeout", MTextField.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_3);
 
-        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        leftClick(); /* apply/disables tooltip */
-        leftClick();
-        checkDRBDTest(drbdTest, 2.11); /* 2.11 */
+        roboTest.moveTo(Tools.getString("Browser.ApplyDRBDResource"));
+        roboTest.leftClick(); /* apply/disables tooltip */
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 2.11); /* 2.11 */
         Tools.sleep(10000);
-        moveTo("Wfc timeout", MTextField.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_0);
+        roboTest.moveTo("Wfc timeout", MTextField.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_0);
 
-        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        leftClick(); /* apply/disables tooltip */
-        leftClick();
+        roboTest.moveTo(Tools.getString("Browser.ApplyDRBDResource"));
+        roboTest.leftClick(); /* apply/disables tooltip */
+        roboTest.leftClick();
 
         /* resource */
-        moveTo(480, 152); /* select r0 */
-        leftClick();
-        leftClick();
+        roboTest.moveTo(480, 152); /* select r0 */
+        roboTest.leftClick();
+        roboTest.leftClick();
 
-        moveTo("Protocol", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_DOWN); /* protocol c */
-        press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Protocol", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN); /* protocol c */
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveTo("Fence peer", MComboBox.class);
-        leftClick();
-        press(KeyEvent.VK_DOWN);
-        press(KeyEvent.VK_UP); /* deselect dopd */
-        press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Fence peer", MComboBox.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_DOWN);
+        roboTest.press(KeyEvent.VK_UP); /* deselect dopd */
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveTo("Wfc timeout", MTextField.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_5);
+        roboTest.moveTo("Wfc timeout", MTextField.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_5);
 
-        moveTo("Max buffers", MTextField.class);
-        leftClick();
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_2);
-        press(KeyEvent.VK_0);
-        press(KeyEvent.VK_4);
-        press(KeyEvent.VK_8);
-        moveTo("Max buffers", MComboBox.class); /* Unit */
-        leftClick();
-        press(KeyEvent.VK_UP);
-        press(KeyEvent.VK_ENTER);
+        roboTest.moveTo("Max buffers", MTextField.class);
+        roboTest.leftClick();
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_2);
+        roboTest.press(KeyEvent.VK_0);
+        roboTest.press(KeyEvent.VK_4);
+        roboTest.press(KeyEvent.VK_8);
+        roboTest.moveTo("Max buffers", MComboBox.class); /* Unit */
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_UP);
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveScrollBar(true);
+        roboTest.moveScrollBar(true);
         try {
             if (cluster.getHostsArray()[0].drbdVersionSmaller("8.4.0")) {
-                moveTo("After", MComboBox.class);
+                roboTest.moveTo("After", MComboBox.class);
             } else {
-                moveTo("after", MComboBox.class);
+                roboTest.moveTo("after", MComboBox.class);
             }
         } catch (final Exceptions.IllegalVersionException e) {
             LOG.appWarning("start: " + e.getMessage(), e);
         }
-        leftClick();
-        press(KeyEvent.VK_UP);
-        press(KeyEvent.VK_ENTER);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_UP);
+        roboTest.press(KeyEvent.VK_ENTER);
 
-        moveScrollBar(false);
+        roboTest.moveScrollBar(false);
 
-        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        leftClick(); /* apply/disables tooltip */
-        leftClick();
-        checkDRBDTest(drbdTest, 2.2); /* 2.2 */
+        roboTest.moveTo(Tools.getString("Browser.ApplyDRBDResource"));
+        roboTest.leftClick(); /* apply/disables tooltip */
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 2.2); /* 2.2 */
 
-        moveTo("Wfc timeout", MTextField.class);
-        leftClick();
-        press(KeyEvent.VK_BACK_SPACE);
-        press(KeyEvent.VK_0);
+        roboTest.moveTo("Wfc timeout", MTextField.class);
+        roboTest.leftClick();
+        roboTest.press(KeyEvent.VK_BACK_SPACE);
+        roboTest.press(KeyEvent.VK_0);
 
-        moveTo(Tools.getString("Browser.ApplyDRBDResource"));
-        leftClick();
-        checkDRBDTest(drbdTest, 2.3); /* 2.3 */
+        roboTest.moveTo(Tools.getString("Browser.ApplyDRBDResource"));
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 2.3); /* 2.3 */
 
-        moveTo(480, 152); /* rsc popup */
-        rightClick();
-        moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
-        leftClick();
-        confirmRemove();
-        checkDRBDTest(drbdTest, 3);
-        moveTo(480, 152); /* rsc popup */
-        rightClick();
-        moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
-        leftClick();
-        confirmRemove();
-        checkDRBDTest(drbdTest, 4);
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest3() {
-        /* Cannot be instantiated. */
+        roboTest.moveTo(480, 152); /* rsc popup */
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
+        roboTest.leftClick();
+        roboTest.confirmRemove();
+        roboTest.checkDRBDTest(drbdTest, 3);
+        roboTest.moveTo(480, 152); /* rsc popup */
+        roboTest.rightClick();
+        roboTest.moveTo(Tools.getString("ClusterBrowser.Drbd.RemoveEdge"));
+        roboTest.leftClick();
+        roboTest.confirmRemove();
+        roboTest.checkDRBDTest(drbdTest, 4);
     }
 }

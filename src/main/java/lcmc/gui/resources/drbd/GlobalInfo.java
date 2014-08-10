@@ -115,6 +115,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     private Provider<ProxyHostInfo> proxyHostInfoProvider;
     @Autowired
     private Provider<ResourceInfo> resourceInfoProvider;
+    @Autowired
+    private Provider<DrbdXml> drbdXmlProvider;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
@@ -840,9 +842,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
 
     public void updateDrbdInfo() {
         getBrowser().updateCommonBlockDevices();
-        final DrbdXml newDrbdXml = new DrbdXml(guiData,
-                                               getCluster().getHostsArray(),
-                                               getBrowser().getHostDrbdParameters());
+        final DrbdXml newDrbdXml = drbdXmlProvider.get();
+        newDrbdXml.init(getCluster().getHostsArray(), getBrowser().getHostDrbdParameters());
         for (final Host host : getCluster().getHosts()) {
             final String configString = newDrbdXml.getConfig(host);
             if (configString != null) {

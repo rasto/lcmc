@@ -21,123 +21,110 @@
 package lcmc.robotest;
 
 import lcmc.model.Cluster;
-import static lcmc.robotest.DrbdTest1.addBlockDevice;
-import static lcmc.robotest.DrbdTest1.addDrbdResource;
-import static lcmc.robotest.DrbdTest1.addDrbdVolume;
-import static lcmc.robotest.DrbdTest1.addFileSystem;
-import static lcmc.robotest.DrbdTest1.addMetaData;
-import static lcmc.robotest.DrbdTest1.chooseDrbdResource;
-import static lcmc.robotest.DrbdTest1.removeDrbdVolume;
-import static lcmc.robotest.RoboTest.aborted;
-import static lcmc.robotest.RoboTest.checkDRBDTest;
-import static lcmc.robotest.RoboTest.confirmRemove;
-import static lcmc.robotest.RoboTest.info;
-import static lcmc.robotest.RoboTest.leftClick;
-import static lcmc.robotest.RoboTest.moveTo;
-import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
+@Component
 final class DrbdTest2 {
-    static void start(final Cluster cluster, final int blockDevY) {
-        slowFactor = 0.2f;
-        aborted = false;
+    @Autowired
+    private RoboTest roboTest;
+    @Autowired
+    private DrbdTest1 drbdTest1;
+
+    void start(final Cluster cluster, final int blockDevY) {
+        roboTest.setSlowFactor(0.2f);
+        roboTest.setAborted(false);
         final String drbdTest = "drbd-test1";
         for (int i = 0; i < 2; i++) {
-            info(drbdTest + "/1");
-            addDrbdResource(cluster, blockDevY);
+            roboTest.info(drbdTest + "/1");
+            drbdTest1.addDrbdResource(cluster, blockDevY);
 
-            moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-            leftClick();
+            roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+            roboTest.leftClick();
         }
 
-        info(drbdTest + "/2");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
+        roboTest.info(drbdTest + "/2");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
 
-        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        leftClick();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+        roboTest.leftClick();
 
-        info(drbdTest + "/3");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
-        addDrbdVolume();
+        roboTest.info(drbdTest + "/3");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
+        drbdTest1.addDrbdVolume();
 
-        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        leftClick();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+        roboTest.leftClick();
 
-        info(drbdTest + "/4");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
-        addDrbdVolume();
-        addBlockDevice();
+        roboTest.info(drbdTest + "/4");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
+        drbdTest1.addDrbdVolume();
+        drbdTest1.addBlockDevice();
 
-        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        leftClick();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+        roboTest.leftClick();
 
-        info(drbdTest + "/5");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
-        addDrbdVolume();
-        addBlockDevice();
-        addBlockDevice();
-        checkDRBDTest(drbdTest, 1);
+        roboTest.info(drbdTest + "/5");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
+        drbdTest1.addDrbdVolume();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addBlockDevice();
+        roboTest.checkDRBDTest(drbdTest, 1);
 
-        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        leftClick();
-        confirmRemove();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+        roboTest.leftClick();
+        roboTest.confirmRemove();
 
-        info(drbdTest + "/6");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
-        addDrbdVolume();
-        addBlockDevice();
-        addBlockDevice();
-        addMetaData();
+        roboTest.info(drbdTest + "/6");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
+        drbdTest1.addDrbdVolume();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addMetaData();
 
-        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        leftClick();
-        confirmRemove();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+        roboTest.leftClick();
+        roboTest.confirmRemove();
 
-        info(drbdTest + "/7");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
-        addDrbdVolume();
-        addBlockDevice();
-        addBlockDevice();
-        addMetaData();
-        addFileSystem();
-        checkDRBDTest(drbdTest, 1.1);
+        roboTest.info(drbdTest + "/7");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
+        drbdTest1.addDrbdVolume();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addMetaData();
+        drbdTest1.addFileSystem();
+        roboTest.checkDRBDTest(drbdTest, 1.1);
 
-        moveTo(Tools.getString("Dialog.Dialog.Cancel"));
-        leftClick();
-        confirmRemove();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Cancel"));
+        roboTest.leftClick();
+        roboTest.confirmRemove();
 
-        info(drbdTest + "/8");
-        addDrbdResource(cluster, blockDevY);
-        chooseDrbdResource(cluster);
-        addDrbdVolume();
-        addBlockDevice();
-        addBlockDevice();
-        addMetaData();
-        addFileSystem();
-        moveTo(Tools.getString("Dialog.Dialog.Finish"));
-        leftClick();
-        checkDRBDTest(drbdTest, 1.1);
+        roboTest.info(drbdTest + "/8");
+        drbdTest1.addDrbdResource(cluster, blockDevY);
+        drbdTest1.chooseDrbdResource(cluster);
+        drbdTest1.addDrbdVolume();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addBlockDevice();
+        drbdTest1.addMetaData();
+        drbdTest1.addFileSystem();
+        roboTest.moveTo(Tools.getString("Dialog.Dialog.Finish"));
+        roboTest.leftClick();
+        roboTest.checkDRBDTest(drbdTest, 1.1);
 
         for (int i = 0; i < 3; i++) {
-            removeDrbdVolume(false);
+            drbdTest1.removeDrbdVolume(false);
         }
-        removeDrbdVolume(true);
-        checkDRBDTest(drbdTest, 2);
-    }
-
-    /** Private constructor, cannot be instantiated. */
-    private DrbdTest2() {
-        /* Cannot be instantiated. */
+        drbdTest1.removeDrbdVolume(true);
+        roboTest.checkDRBDTest(drbdTest, 2);
     }
 }
