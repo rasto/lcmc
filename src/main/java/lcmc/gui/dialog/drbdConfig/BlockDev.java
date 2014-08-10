@@ -22,14 +22,19 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import java.awt.Component;
 import java.net.UnknownHostException;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.AppContext;
 import lcmc.Exceptions;
+import lcmc.LCMC;
+import lcmc.gui.GUIData;
+import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.Application;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -41,20 +46,33 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter drbd block device
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class BlockDev extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
-    private final BlockDevInfo blockDevInfo;
+    private BlockDevInfo blockDevInfo;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private CreateMD createMDDialog;
+    private GlobalInfo globalInfo;
 
-    BlockDev(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
-        super(previousDialog, dli);
+    void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
+        init(previousDialog, dli);
         this.blockDevInfo = blockDevInfo;
-        dli.getDrbdResourceInfo().getDrbdInfo().setSelectedNode(blockDevInfo);
-        dli.getDrbdResourceInfo().getDrbdInfo().selectMyself();
+        globalInfo = blockDevInfo.getBrowser().getClusterBrowser().getGlobalInfo();
+        globalInfo.setSelectedNode(blockDevInfo);
+        globalInfo.selectMyself();
     }
 
     @Override
@@ -79,7 +97,9 @@ final class BlockDev extends DrbdConfig {
     public WizardDialog nextDialog() {
         if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
-            return new BlockDev(this, getDrbdVolumeInfo(), oBdi);
+            final BlockDev nextBlockDev = AppContext.getBean(BlockDev.class);
+            nextBlockDev.init(this, getDrbdVolumeInfo(), oBdi);
+            return nextBlockDev;
         } else {
             final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
             try {
@@ -87,7 +107,7 @@ final class BlockDev extends DrbdConfig {
 
                 /* apply */
                 final VolumeInfo dvi = getDrbdVolumeInfo();
-                dvi.getDrbdInfo().apply(runMode);
+                globalInfo.apply(runMode);
                 final ResourceInfo dri = dvi.getDrbdResourceInfo();
                 Tools.invokeAndWait(new Runnable() {
                     @Override
@@ -110,7 +130,7 @@ final class BlockDev extends DrbdConfig {
                 oBdi.apply(runMode);
 
                 /* create config */
-                getDrbdVolumeInfo().getDrbdResourceInfo().getDrbdInfo().createDrbdConfigLive();
+                globalInfo.createDrbdConfigLive();
                 final String gi1 = getGI(blockDevInfo);
                 final String gi2 = getGI(oBdi);
                 if (gi1 == null || gi2 == null) {
@@ -118,14 +138,15 @@ final class BlockDev extends DrbdConfig {
                 }
                 final ClusterBrowser browser = getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
                 browser.reloadAllComboBoxes(null);
-                Tools.getGUIData().expandTerminalSplitPane(1);
-                Tools.getGUIData().getMainFrame().requestFocus();
+                guiData.expandTerminalSplitPane(1);
+                LCMC.MAIN_FRAME.requestFocus();
             } catch (final Exceptions.DrbdConfigException dce) {
                 LOG.appError("nextDialog: config failed", dce);
             } catch (final UnknownHostException e) {
                 LOG.appError("nextDialog: config failed", e);
             }
-            return new CreateMD(this, getDrbdVolumeInfo());
+            createMDDialog.init(this, getDrbdVolumeInfo());
+            return createMDDialog;
         }
     }
 
@@ -160,7 +181,7 @@ final class BlockDev extends DrbdConfig {
         final JPanel inputPane = new JPanel(new SpringLayout());
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         final String[] params = blockDevInfo.getParametersFromXML();
         blockDevInfo.selectMyself();

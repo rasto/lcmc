@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
@@ -61,6 +63,9 @@ public class TestUtils {
     public static final String TEST_USERNAME = System.getenv("LCMC_TEST_USERNAME");
 
     private static volatile boolean clusterLoaded = false;
+
+    private final GUIData guiData = new GUIData();
+
     static {
         if (System.getProperty("test.password") == null) {
             PASSWORD = "rastislav";
@@ -162,7 +167,7 @@ public class TestUtils {
 
     public synchronized void initMain() {
         lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
-        Tools.getGUIData().setTerminalPanel(null);
+        guiData.setTerminalPanel(null);
         Tools.waitForSwing();
     }
     
@@ -210,7 +215,7 @@ public class TestUtils {
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = Tools.getApplication().getSaveFile();
-            Tools.save(new UserConfig(), saveFile, false);
+            Tools.save(guiData, new UserConfig(), saveFile, false);
         }
         for (final Host host : HOSTS) {
             host.disconnect();
@@ -237,15 +242,15 @@ public class TestUtils {
             }
         });
         
-        //Tools.getGUIData().getEmptyBrowser().addClusterBox(cluster);
+        //guiData.getEmptyBrowser().addClusterBox(cluster);
         final String saveFile = Tools.getApplication().getSaveFile();
-        Tools.save(new UserConfig(), saveFile, false);
-        Tools.getGUIData().refreshClustersPanel();
+        Tools.save(guiData, new UserConfig(), saveFile, false);
+        guiData.refreshClustersPanel();
         
-        Tools.getGUIData().expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(1);
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();
-        Tools.getGUIData().checkAddClusterButtons();
+        guiData.checkAddClusterButtons();
         for (final Host host : HOSTS) {
             host.waitForServerStatusLatch();
         }

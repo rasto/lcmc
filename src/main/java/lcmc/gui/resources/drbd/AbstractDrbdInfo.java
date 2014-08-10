@@ -36,11 +36,17 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class AbstractDrbdInfo extends EditableInfo {
     /** Name of the drbd after parameter. */
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
@@ -56,11 +62,6 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     /** Returns cluster object to resource belongs. */
     public final Cluster getCluster() {
         return getBrowser().getCluster();
-    }
-
-    /** Returns the GlobalInfo object (for all drbds). */
-    public final GlobalInfo getDrbdInfo() {
-        return getBrowser().getDrbdGraph().getDrbdInfo();
     }
 
     /** Returns the regexp of the parameter. */

@@ -27,7 +27,10 @@ import ch.ethz.ssh2.SCPClient;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import lcmc.LCMC;
 import lcmc.configs.DistResource;
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
@@ -36,7 +39,13 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Ssh {
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
@@ -62,6 +71,8 @@ public final class Ssh {
     private final Lock mConnectionLock = new ReentrantLock();
     private final Lock mConnectionThreadLock = new ReentrantLock();
     private LocalPortForwarder localPortForwarder = null;
+    @Autowired
+    private GUIData guiData;
 
     boolean reconnect() {
         Tools.isNotSwingThread();
@@ -87,7 +98,7 @@ public final class Ssh {
             LOG.debug1("reconnect: connecting: " + host.getName());
             this.connectionCallback = NO_CONNECTION_CALLBACK;
             this.progressBar = NO_PROGRESS_BAR;
-            this.sshGui = new SSHGui(Tools.getGUIData().getMainFrame(), host, null);
+            this.sshGui = new SSHGui(LCMC.MAIN_FRAME, host, null);
             authenticateAndConnect();
         }
         return true;
@@ -304,7 +315,7 @@ public final class Ssh {
                          .connectionThread(connectionThread)
                          .sshGui(sshGui)
                          .execCallback(execCallback)
-                         .execute().block();
+                         .execute(guiData).block();
         return new SshOutput(answer[0], exitCode[0]);
     }
 
@@ -325,7 +336,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .execute();
+                                .execute(guiData);
     }
 
     public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
@@ -340,7 +351,7 @@ public final class Ssh {
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
-                                .capture();
+                                .capture(guiData);
     }
 
     /** Installs gui-helper on the remote host. */
@@ -502,7 +513,7 @@ public final class Ssh {
              new Runnable() {
                  @Override
                  public void run() {
-                     Tools.progressIndicatorFailed(host.getName(), line, 3000);
+                     guiData.progressIndicatorFailed(host.getName(), line, 3000);
                  }
              });
              t.start();

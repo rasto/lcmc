@@ -57,6 +57,7 @@ import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.Exceptions;
+import lcmc.gui.*;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -73,10 +74,6 @@ import lcmc.model.vm.VmsXml.SoundData;
 import lcmc.model.vm.VmsXml.VideoData;
 import lcmc.model.Value;
 import lcmc.model.resources.Resource;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.NetInfo;
@@ -93,12 +90,18 @@ import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VIRSH;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
  * but not in the cluster view.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DomainInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(DomainInfo.class);
     /** Timeout of starting, shutting down, etc. actions in seconds. */
@@ -578,7 +581,7 @@ public class DomainInfo extends EditableInfo {
     private final Lock mParallelToInfoLock = new ReentrantLock();
     private final Map<String, ParallelInfo> parallelToInfo = new HashMap<String, ParallelInfo>();
     /** Preferred emulator. It's distro dependent. */
-    private final String preferredEmulator;
+    private String preferredEmulator;
     private volatile Map<String, ParallelInfo> parallelKeyToInfo = new HashMap<String, ParallelInfo>();
 
     private final Lock mVideoToInfoLock = new ReentrantLock();
@@ -589,11 +592,13 @@ public class DomainInfo extends EditableInfo {
     private volatile Map<String, VideoInfo> videoKeyToInfo = new HashMap<String, VideoInfo>();
     /** Previous type. */
     private volatile Value prevType = null;
-    private final Value[] autostartPossibleValues;
+    private Value[] autostartPossibleValues;
     /** This is a map from host to the check box. */
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
+    @Autowired
+    private GUIData guiData;
 
-    public DomainInfo(final String name, final Browser browser) {
+    public void init(final String name, final Browser browser) {
         super.init(name, browser);
         final Host firstHost = getBrowser().getClusterHosts()[0];
         preferredEmulator = firstHost.getDistString("KVM.emulator");
@@ -2759,7 +2764,7 @@ public class DomainInfo extends EditableInfo {
         final Map<Node, VmsXml> domainNodesToSave = new HashMap<Node, VmsXml>();
         final String clusterName = getBrowser().getCluster().getName();
         getBrowser().vmStatusLock();
-        Tools.startProgressIndicator(clusterName, "VM view update");
+        guiData.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
             Tools.invokeLater(new Runnable() {
@@ -2860,7 +2865,7 @@ public class DomainInfo extends EditableInfo {
         }
         getBrowser().periodicalVmsUpdate(getBrowser().getClusterHosts());
         updateParameters();
-        Tools.stopProgressIndicator(clusterName, "VM view update");
+        guiData.stopProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusUnlock();
         Tools.invokeLater(new Runnable() {
             @Override

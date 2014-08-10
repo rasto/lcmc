@@ -33,14 +33,21 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
+
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GlobalMenu {
     @Autowired
-    private EditClusterDialog editClusterDialog;
+    private Provider<EditClusterDialog> editClusterDialogProvider;
     @Autowired
     private HostFactory hostFactory;
+    @Autowired
+    private Provider<ProxyHostWizard> proxyHostWizardProvider;
 
     public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -72,6 +79,7 @@ public class GlobalMenu {
 
             @Override
             public void action() {
+                final EditClusterDialog editClusterDialog = editClusterDialogProvider.get();
                 editClusterDialog.showDialogs(globalInfo.getBrowser().getCluster());
             }
         };
@@ -119,7 +127,8 @@ public class GlobalMenu {
         final Host proxyHost = hostFactory.createInstance();
         proxyHost.init();
         proxyHost.setCluster(globalInfo.getCluster());
-        final ProxyHostWizard w = new ProxyHostWizard(proxyHost, null);
-        w.showDialogs();
+        final ProxyHostWizard proxyHostWizard = proxyHostWizardProvider.get();
+        proxyHostWizard.init(proxyHost, null);
+        proxyHostWizard.showDialogs();
     }
 }

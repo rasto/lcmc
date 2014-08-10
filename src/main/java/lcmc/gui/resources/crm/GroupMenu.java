@@ -24,9 +24,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.ResourceAgent;
@@ -38,17 +41,25 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GroupMenu extends ServiceMenu {
 
-    private final GroupInfo groupInfo;
-    
-    public GroupMenu(GroupInfo groupInfo) {
-        super(groupInfo);
-        this.groupInfo = groupInfo;
-    }
+    @Autowired
+    private GUIData drbdGui;
+    @Autowired @Qualifier("serviceMenu")
+    private Provider<ServiceMenu> serviceMenuProvider;
 
     @Override
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
+        final GroupInfo groupInfo = (GroupInfo) serviceInfo;
+
         /* add group service */
         final UpdatableItem addGroupServiceMenuItem = new MyMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService"),
@@ -58,7 +69,7 @@ public class GroupMenu extends ServiceMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().crmStatusFailed()) {
+                if (groupInfo.getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 } else {
                     return null;
@@ -104,9 +115,7 @@ public class GroupMenu extends ServiceMenu {
                                         }
                                     }
                                 });
-                                if (ra.isLinbitDrbd()
-                                    && !getBrowser()
-                                                .linbitDrbdConfirmDialog()) {
+                                if (ra.isLinbitDrbd() && !groupInfo.getBrowser().linbitDrbdConfirmDialog()) {
                                     return;
                                 }
                                 groupInfo.addGroupServicePanel(ra, true);
@@ -115,15 +124,15 @@ public class GroupMenu extends ServiceMenu {
                         };
                         dlm.addElement(mmi);
                     }
-                    final boolean ret = Tools.getScrollingMenu(
-                                ClusterBrowser.CRM_CLASS_MENU.get(cl),
-                                null, /* options */
-                                classItem,
-                                dlm,
-                                new MyList<MyMenuItem>(dlm, getBackground()),
-                                groupInfo,
-                                popups,
-                                null);
+                    final boolean ret = drbdGui.getScrollingMenu(
+                            ClusterBrowser.CRM_CLASS_MENU.get(cl),
+                            null, /* options */
+                            classItem,
+                            dlm,
+                            new MyList<MyMenuItem>(dlm, getBackground()),
+                            groupInfo,
+                            popups,
+                            null);
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
@@ -134,7 +143,7 @@ public class GroupMenu extends ServiceMenu {
         };
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         items.add(addGroupServiceMenuItem);
-        for (final UpdatableItem item : super.getPulldownMenu()) {
+        for (final UpdatableItem item : super.getPulldownMenu(groupInfo)) {
             items.add(item);
         }
 
@@ -172,7 +181,8 @@ public class GroupMenu extends ServiceMenu {
     /** Adds existing service menu item for every member of a group. */
     @Override
     protected void addExistingGroupServiceMenuItems(
-                        final ServiceInfo asi,
+                        final ServiceInfo serviceInfo,
+                        final ServiceInfo existingService,
                         final MyListModel<MyMenuItem> dlm,
                         final Map<MyMenuItem, ButtonCallback> callbackHash,
                         final MyList<MyMenuItem> list,
@@ -180,18 +190,18 @@ public class GroupMenu extends ServiceMenu {
                         final JCheckBox orderWi,
                         final List<JDialog> popups,
                         final Application.RunMode runMode) {
-        for (final ServiceInfo child : groupInfo.getGroupServices()) {
-            final ServiceMenu subServiceMenu = new ServiceMenu(asi);
-            subServiceMenu.addExistingServiceMenuItem(
-                                           "         " + child,
-                                           child,
-                                           dlm,
-                                           callbackHash,
-                                           list,
-                                           colocationWi,
-                                           orderWi,
-                                           popups,
-                                           runMode);
+        for (final ServiceInfo child : ((GroupInfo) existingService).getGroupServices()) {
+            final ServiceMenu subServiceMenu = serviceMenuProvider.get();
+            subServiceMenu.addExistingServiceMenuItem(serviceInfo,
+                                                      "         " + child,
+                                                      child,
+                                                      dlm,
+                                                      callbackHash,
+                                                      list,
+                                                      colocationWi,
+                                                      orderWi,
+                                                      popups,
+                                                      runMode);
         }
     }
 }

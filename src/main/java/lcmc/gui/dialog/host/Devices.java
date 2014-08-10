@@ -36,12 +36,16 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where hardware information is collected.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Devices extends DialogHost {
     @Autowired
     private DistDetection distDetection;

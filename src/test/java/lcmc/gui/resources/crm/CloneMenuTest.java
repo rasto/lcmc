@@ -67,12 +67,12 @@ public class CloneMenuTest {
         when(cloneInfoStub.getContainedService()).thenReturn(containedServiceInfoStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        cloneMenu = new CloneMenu(cloneInfoStub);
+        cloneMenu = new CloneMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = cloneMenu.getPulldownMenu();
+        final List<UpdatableItem> items = cloneMenu.getPulldownMenu(cloneInfoStub);
 
         assertEquals(17, items.size());
     }

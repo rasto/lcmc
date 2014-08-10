@@ -37,6 +37,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.model.UserConfig;
 import lcmc.utilities.Logger;
@@ -64,10 +65,12 @@ public final class ClustersPanel extends JPanel {
     private ClusterTab previouslySelectedTab = null;
     @Autowired
     private UserConfig userConfig;
+    @Autowired
+    private GUIData guiData;
 
     /** Shows the tabbed pane. */
     public void init() {
-        Tools.getGUIData().setClustersPanel(this);
+        guiData.setClustersPanel(this);
         clusterTabFactory.createClusterTab(null);
         tabbedPane = new JTabbedPane();
 
@@ -214,10 +217,10 @@ public final class ClustersPanel extends JPanel {
 
     private void loadDefaultConfigFile() {
         final String saveFile = Tools.getApplication().getSaveFile();
-        String xml = Tools.loadFile(saveFile, false);
+        String xml = Tools.loadFile(guiData, saveFile, false);
         if (xml == null) {
             final String saveFileOld = Tools.getApplication().getSaveFileOld();
-            xml = Tools.loadFile(saveFileOld, false);
+            xml = Tools.loadFile(guiData, saveFileOld, false);
         }
         if (xml != null) {
             userConfig.loadXML(xml);

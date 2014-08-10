@@ -20,27 +20,37 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
+import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.MyButton;
+import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class SSHProxy extends SSH {
-    private final VolumeInfo volumeInfo;
-    private final WizardDialog origDialog;
+    private VolumeInfo volumeInfo;
+    private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
+    @Autowired
+    private DevicesProxy devicesProxyDialog;
 
-    public SSHProxy(final WizardDialog previousDialog,
-                    final Host host,
-                    final VolumeInfo volumeInfo,
-                    final WizardDialog origDialog,
-                    final DrbdInstallation drbdInstallation) {
-        init(previousDialog, host, drbdInstallation);
+    public void init(final WizardDialog previousDialog,
+                     final Host host,
+                     final VolumeInfo volumeInfo,
+                     final WizardDialog origDialog,
+                     final DrbdInstallation drbdInstallation) {
+        super.init(previousDialog, host, drbdInstallation);
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
     }
@@ -48,7 +58,8 @@ public final class SSHProxy extends SSH {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            return new DevicesProxy(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
+            devicesProxyDialog.init(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
+            return devicesProxyDialog;
         } else {
             return nextDialogObject;
         }
@@ -65,7 +76,7 @@ public final class SSHProxy extends SSH {
             getHost().getCluster().addProxyHost(getHost());
             if (volumeInfo != null) {
                 volumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
-                volumeInfo.getDrbdInfo().addProxyHostNode(getHost());
+                volumeInfo.getBrowser().getGlobalInfo().addProxyHostNode(getHost());
             }
         }
     }

@@ -30,6 +30,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -47,20 +49,26 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class CreateMD extends DrbdConfig {
     private static final int COMBOBOX_WIDTH = 250;
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
     private final MyButton makeMetaDataButton = new MyButton();
-
-    CreateMD(final WizardDialog previousDialog, final VolumeInfo dvi) {
-        super(previousDialog, dvi);
-    }
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private CreateFS createFSDialog;
 
     private void createMetadataAndCheckResult(final boolean destroyData) {
         Tools.invokeLater(new Runnable() {
@@ -170,7 +178,7 @@ final class CreateMD extends DrbdConfig {
         final BlockDevInfo bdi1 = getDrbdVolumeInfo().getFirstBlockDevInfo();
         final BlockDevInfo bdi2 = getDrbdVolumeInfo().getSecondBlockDevInfo();
         final String clusterName = bdi1.getHost().getCluster().getName();
-        Tools.startProgressIndicator(clusterName, "scanning block devices...");
+        guiData.startProgressIndicator(clusterName, "scanning block devices...");
         final Application.RunMode runMode = Application.RunMode.LIVE;
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isProxy(bdi1.getHost())) {
             DRBD.proxyUp(bdi1.getHost(), getDrbdVolumeInfo().getDrbdResourceInfo().getName(), null, runMode);
@@ -192,8 +200,9 @@ final class CreateMD extends DrbdConfig {
         browser.updateHWInfo(bdi2.getHost(), !Host.UPDATE_LVM);
         bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getDrbdBlockDevice(device));
         bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getDrbdBlockDevice(device));
-        Tools.stopProgressIndicator(clusterName, "scanning block devices...");
-        return new CreateFS(this, getDrbdVolumeInfo());
+        guiData.stopProgressIndicator(clusterName, "scanning block devices...");
+        createFSDialog.init(this, getDrbdVolumeInfo());
+        return createFSDialog;
     }
 
     @Override

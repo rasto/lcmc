@@ -27,25 +27,18 @@ import lcmc.model.Host;
 import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.ResourceInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
  * treated in special way.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class DrbddiskInfo extends ServiceInfo {
-
-    DrbddiskInfo(final String name, final ResourceAgent ra, final Browser browser) {
-        super(name, ra, browser);
-    }
-
-    DrbddiskInfo(final String name,
-                 final ResourceAgent ra,
-                 final String hbId,
-                 final Map<String, String> resourceNode,
-                 final Browser browser) {
-        super(name, ra, hbId, resourceNode, browser);
-    }
-
     /** Returns string representation of the drbddisk service. */
     @Override
     public String toString() {

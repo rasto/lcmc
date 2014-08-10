@@ -72,12 +72,12 @@ public class MultiSelectionMenuITest {
         when(hostDrbdInfoStub.getHost()).thenReturn(hostStub);
         when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
 
-        multiSelectionMenu = new MultiSelectionMenu(multiSelectionInfoStub, selectedInfos);
+        multiSelectionMenu = new MultiSelectionMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = multiSelectionMenu.getPulldownMenu();
+        final List<UpdatableItem> items = multiSelectionMenu.getPulldownMenu(multiSelectionInfoStub, selectedInfos);
 
         assertEquals(26, items.size());
     }

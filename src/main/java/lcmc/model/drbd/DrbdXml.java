@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.*;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.drbd.BlockDevInfo;
@@ -132,6 +133,8 @@ public class DrbdXml extends XML {
         HARDCODED_DEFAULTS.put("on-no-data-accessible", new StringValue("io-error"));
         HARDCODED_DEFAULTS.put("on-congestion", new StringValue("block"));
     }
+
+    private final GUIData guiData;
 
     public static Unit getUnitBytes(final String unitPart) {
         return new Unit("", "", "Byte" + unitPart, "Bytes" + unitPart);
@@ -320,8 +323,9 @@ public class DrbdXml extends XML {
     private boolean unknownSections = false;
     private String oldConfig = null;
 
-    public DrbdXml(final Host[] hosts, final Map<Host, String> drbdParameters) {
+    public DrbdXml(final GUIData guiData, final Host[] hosts, final Map<Host, String> drbdParameters) {
         super();
+        this.guiData = guiData;
         addSpecialParameter("resource", "name", true);
         for (final Host host : hosts) {
             final String output;
@@ -1084,7 +1088,7 @@ public class DrbdXml extends XML {
                     LOG.appWarning("parseConfigResourceNode: unknown section: " + secName);
                     if (!unknownSections) {
                         /* unknown section, so it's not removed. */
-                        Tools.progressIndicatorFailed("DRBD: unknown section: " + secName);
+                        guiData.progressIndicatorFailed("DRBD: unknown section: " + secName);
                         unknownSections = true;
                     }
                 }

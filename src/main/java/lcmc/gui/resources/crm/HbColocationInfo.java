@@ -40,10 +40,16 @@ import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Object that holds a colocation constraint information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class HbColocationInfo extends EditableInfo
                              implements HbConstraintInterface {
     /** Resource 1 in colocation constraint. */
@@ -51,13 +57,12 @@ final class HbColocationInfo extends EditableInfo
     /** Resource 2 in colocation constraint. */
     private ServiceInfo serviceInfoWithRsc;
     /** Connection that keeps this constraint. */
-    private final HbConnectionInfo connectionInfo;
+    private HbConnectionInfo connectionInfo;
 
-    /** Prepares a new {@code HbColocationInfo} object. */
-    HbColocationInfo(final HbConnectionInfo connectionInfo,
-                     final ServiceInfo serviceInfoRsc,
-                     final ServiceInfo serviceInfoWithRsc,
-                     final Browser browser) {
+    void init(final HbConnectionInfo connectionInfo,
+              final ServiceInfo serviceInfoRsc,
+              final ServiceInfo serviceInfoWithRsc,
+              final Browser browser) {
         super.init("Colocation", browser);
         setResource(new Service("Colocation"));
         this.connectionInfo = connectionInfo;

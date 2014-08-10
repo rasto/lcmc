@@ -29,12 +29,16 @@ import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog that shows which distribution was detected.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class DistDetection extends DialogHost {
     @Autowired
     private CheckInstallation checkInstallation;

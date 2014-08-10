@@ -41,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import lcmc.configs.DistResource;
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
@@ -48,14 +49,20 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an edit config dialog.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class EditConfig extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
-    private final String fileToEdit;
-    private final Set<Host> hosts;
+    private String fileToEdit;
+    private Set<Host> hosts;
     private final Map<Host, JCheckBox> hostCheckBoxes = new HashMap<Host, JCheckBox>();
     private final JCheckBox backupCheckBoxes = new JCheckBox(Tools.getString("Dialog.EditConfig.Backup.Button"));
 
@@ -65,9 +72,10 @@ public final class EditConfig extends ConfigDialog {
     /** Whether config area is being filled so that save button,
         doesn't get enabled. */
     private volatile boolean configInProgress = true;
+    @Autowired
+    private GUIData guiData;
 
-    public EditConfig(final String fileToEdit, final Set<Host> hosts) {
-        super();
+    public void init(final String fileToEdit, final Set<Host> hosts) {
         this.fileToEdit = fileToEdit;
         this.hosts = hosts;
         addToOptions(backupCheckBoxes);
@@ -274,7 +282,7 @@ public final class EditConfig extends ConfigDialog {
 
     private void saveButtonWasPressed() {
         final String iText = "saving " + fileToEdit + "...";
-        Tools.startProgressIndicator(iText);
+        guiData.startProgressIndicator(iText);
         for (final Host host : hosts) {
             if (hostCheckBoxes.get(host).isSelected()) {
                 host.getSSH().createConfig(configArea.getText(),
@@ -286,7 +294,7 @@ public final class EditConfig extends ConfigDialog {
                                            null);  /* post cmd */
             }
         }
-        Tools.stopProgressIndicator(iText);
+        guiData.stopProgressIndicator(iText);
     }
 
     /** This method is called after user has pushed the button. */

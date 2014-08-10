@@ -22,6 +22,7 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
@@ -48,15 +49,20 @@ import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
  *
  * @author Rasto Levrinc
  */
+@Component
 final class DrbdTest3 {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest3.class);
+    @Autowired
+    private static GUIData guiData;
 
     static void start(final Cluster cluster, final int blockDevY) {
         /* Two drbds. */
@@ -125,7 +131,7 @@ final class DrbdTest3 {
         press(KeyEvent.VK_DOWN);
         press(KeyEvent.VK_DOWN); /* select dopd */
         press(KeyEvent.VK_ENTER);
-        Tools.getGUIData().expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(1);
 
         moveTo("Wfc timeout", MTextField.class);
         leftClick();

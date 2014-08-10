@@ -27,6 +27,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
@@ -38,12 +40,15 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Name extends DialogCluster {
     private static final int NAME_FIELD_WIDTH = 120;
     private Widget nameField;
@@ -52,6 +57,8 @@ public final class Name extends DialogCluster {
     private ClusterHosts clusterHostsDialog;
     @Autowired
     private ClusterTabFactory clusterTabFactory;
+    @Autowired
+    private GUIData guiData;
 
     @Override
     protected void finishDialog() {
@@ -91,7 +98,7 @@ public final class Name extends DialogCluster {
                 }
             }
         });
-        Tools.getGUIData().renameSelectedClusterTab(name);
+        guiData.renameSelectedClusterTab(name);
     }
 
     @Override

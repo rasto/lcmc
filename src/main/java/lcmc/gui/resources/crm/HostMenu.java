@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JColorChooser;
 import lcmc.EditHostDialog;
+import lcmc.LCMC;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -41,14 +43,19 @@ import lcmc.utilities.Openais;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostMenu {
     private static final String NOT_IN_CLUSTER = "not in cluster";
 
     @Autowired
     private EditHostDialog editHostDialog;
+    @Autowired
+    private GUIData guiData;
 
     public List<UpdatableItem> getPulldownMenu(final HostInfo hostInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -67,7 +74,7 @@ public class HostMenu {
                 }
             };
         items.add(hostWizardItem);
-        Tools.getGUIData().registerAddHostButton(hostWizardItem);
+        guiData.registerAddHostButton(hostWizardItem);
         /* cluster manager standby on/off */
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenuItem standbyItem =
@@ -503,7 +510,7 @@ public class HostMenu {
                 @Override
                 public void action() {
                     final Color newColor = JColorChooser.showDialog(
-                                            Tools.getGUIData().getMainFrame(),
+                                            LCMC.MAIN_FRAME,
                                             "Choose " + hostInfo.getHost().getName() + " color",
                                             hostInfo.getHost().getPmColors()[0]);
                     if (newColor != null) {
@@ -581,10 +588,10 @@ public class HostMenu {
                     hostInfo.getHost().disconnect();
                     final ClusterBrowser b = hostInfo.getBrowser().getClusterBrowser();
                     if (b != null) {
-                        Tools.getGUIData().unregisterAllHostsUpdate(b.getClusterViewPanel());
+                        guiData.unregisterAllHostsUpdate(b.getClusterViewPanel());
                     }
                     Tools.getApplication().removeHostFromHosts(hostInfo.getHost());
-                    Tools.getGUIData().allHostsUpdate();
+                    guiData.allHostsUpdate();
                 }
             };
         items.add(removeHostItem);

@@ -22,6 +22,7 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -35,15 +36,19 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where heartbeat is installed.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class HeartbeatInst extends DialogHost {
-    @Autowired
     private CheckInstallation checkInstallationDialog;
+    @Autowired
+    private Provider<CheckInstallation> checkInstallationFactory;
 
     /**
      * Checks the answer of the installation and enables/disables the
@@ -51,6 +56,7 @@ final class HeartbeatInst extends DialogHost {
      */
     void checkAnswer(final String ans, final String installMethod) {
         // TODO: check if it really failes
+        checkInstallationDialog = checkInstallationFactory.get();
         checkInstallationDialog.init(getPreviousDialog().getPreviousDialog(), getHost(), getDrbdInstallation());
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.HeartbeatInst.InstOk"));

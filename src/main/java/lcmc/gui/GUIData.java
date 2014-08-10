@@ -21,8 +21,8 @@
  */
 package lcmc.gui;
 
-import java.awt.Component;
-import java.awt.Container;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,41 +31,45 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import javax.swing.JApplet;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-import javax.swing.JSplitPane;
-import javax.swing.RootPaneContainer;
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
+
+import lcmc.LCMC;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServicesInfo;
-import lcmc.utilities.AllHostsUpdatable;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.utilities.*;
 import lcmc.view.ClusterTab;
 import lcmc.view.ClustersPanel;
+import lcmc.view.MainPanel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * Holds global GUI data, so that they can be retrieved easily throughout
  * the application and some functions that use this data.
  */
-public final class GUIData  {
+@Component
+public class GUIData  {
     private static final Logger LOG = LoggerFactory.getLogger(GUIData.class);
-    private Container mainFrame;
-    private JPanel mainPanel;
+
+    private static final int DIALOG_PANEL_WIDTH = 400;
+    private static final int DIALOG_PANEL_HEIGHT = 300;
+    private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
+    public static final String MIME_TYPE_TEXT_HTML = "text/html";
+    public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
+    @Autowired
+    private MainPanel mainPanel;
     private JSplitPane terminalSplitPane;
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
+    @Autowired
     private ProgressIndicatorPanel mainGlassPane;
-    private MainMenu mainMenu;
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
     private final Lock mAddClusterButtonListReadLock = mAddClusterButtonListLock.readLock();
     private final Lock mAddClusterButtonListWriteLock = mAddClusterButtonListLock.writeLock();
@@ -85,47 +89,22 @@ public final class GUIData  {
     private final Collection<AllHostsUpdatable> allHostsUpdateList = new ArrayList<AllHostsUpdatable>();
     /** Selected components for copy/paste. */
     private List<Info> selectedComponents = null;
+    @Autowired
+    private MainMenu mainMenu;
 
-    public void setMainFrame(final Container mainFrame) {
-        this.mainFrame = mainFrame;
-    }
-
-    public void setMainPanel(final JPanel mainPanel) {
-        this.mainPanel = mainPanel;
-    }
-
-    public Container getMainFrame() {
-        return mainFrame;
-    }
+    private static volatile int prevScrollingMenuIndex = -1;
 
     public Container getMainFrameContentPane() {
-        return ((RootPaneContainer) mainFrame).getContentPane();
+        return ((RootPaneContainer) LCMC.MAIN_FRAME).getContentPane();
     }
 
     public JRootPane getMainFrameRootPane() {
-        if (mainFrame instanceof JFrame) {
-            return ((RootPaneContainer) mainFrame).getRootPane();
-        } else if (mainFrame instanceof JApplet) {
-            return ((RootPaneContainer) mainFrame).getRootPane();
+        if (LCMC.MAIN_FRAME instanceof JFrame) {
+            return ((RootPaneContainer) LCMC.MAIN_FRAME).getRootPane();
+        } else if (LCMC.MAIN_FRAME instanceof JApplet) {
+            return ((RootPaneContainer) LCMC.MAIN_FRAME).getRootPane();
         }
         return null;
-    }
-
-    public void setMainMenu(final MainMenu mainMenu) {
-        this.mainMenu = mainMenu;
-    }
-
-    public MainMenu getMainMenu() {
-        return mainMenu;
-    }
-
-    /** Returns main glass pane (with progress indicator). */
-    public ProgressIndicatorPanel getMainGlassPane() {
-        return mainGlassPane;
-    }
-
-    public void setMainGlassPane(final ProgressIndicatorPanel mainGlassPane) {
-        this.mainGlassPane = mainGlassPane;
     }
 
     /** Sets split pane that contains terminal as bottom component. */
@@ -133,11 +112,11 @@ public final class GUIData  {
         this.terminalSplitPane = terminalSplitPane;
     }
 
-    public void setTerminalPanel(final Component terminalPanel) {
+    public void setTerminalPanel(final java.awt.Component terminalPanel) {
         if (terminalPanel == null) {
             return;
         }
-        final Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
+        final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
             Tools.invokeAndWaitIfNeeded(new Runnable() {
                 @Override
@@ -333,9 +312,9 @@ public final class GUIData  {
      * - enable/disable look and feel menu etc
      */
     void godModeChanged(final boolean godMode) {
-        Tools.startProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        Tools.stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
-        getMainMenu().resetOperatingModes(godMode);
+        startProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        stopProgressIndicator("OH MY GOD!!! Hi Rasto!");
+        mainMenu.resetOperatingModes(godMode);
         updateGlobalItems();
     }
 
@@ -450,6 +429,341 @@ public final class GUIData  {
      * Return whether it is run as an applet.
      */
     public boolean isApplet() {
-        return mainFrame instanceof JApplet;
+        return LCMC.MAIN_FRAME instanceof JApplet;
+    }
+
+    public void startProgressIndicator(final String text) {
+        mainGlassPane.start(text, null);
+    }
+
+    public void startProgressIndicator(final String name, final String text) {
+        startProgressIndicator(name + ": " + text);
+    }
+
+    public void stopProgressIndicator(final String text) {
+        mainGlassPane.stop(text);
+    }
+
+    public void stopProgressIndicator(final String name, final String text) {
+        stopProgressIndicator(name + ": " + text);
+    }
+
+    public void progressIndicatorFailed(final String text) {
+        mainGlassPane.failure(text);
+    }
+
+    public void progressIndicatorFailed(final String name, final String text) {
+        progressIndicatorFailed(name + ": " + text);
+    }
+
+    /** Progress indicator with failure message that shows for n seconds. */
+    public void progressIndicatorFailed(final String text, final int n) {
+        mainGlassPane.failure(text, n);
+    }
+
+    /**
+     * Progress indicator with failure message for host or cluster command,
+     * that shows for n seconds.
+     */
+    public void progressIndicatorFailed(final String name, final String text, final int n) {
+        progressIndicatorFailed(name + ": " + text, n);
+    }
+
+
+    /** Returns a popup in a scrolling pane. */
+    public boolean getScrollingMenu(final String name,
+                                    final JPanel optionsPanel,
+                                    final MyMenu menu,
+                                    final MyListModel<MyMenuItem> dlm,
+                                    final MyList<MyMenuItem> list,
+                                    final Info infoObject,
+                                    final Collection<JDialog> popups,
+                                    final Map<MyMenuItem, ButtonCallback> callbackHash) {
+        final int maxSize = dlm.getSize();
+        if (maxSize <= 0) {
+            return false;
+        }
+        prevScrollingMenuIndex = -1;
+        list.setFixedCellHeight(25);
+        if (maxSize > 10) {
+            list.setVisibleRowCount(10);
+        } else {
+            list.setVisibleRowCount(maxSize);
+        }
+        final JScrollPane sp = new JScrollPane(list);
+        sp.setViewportBorder(null);
+        sp.setBorder(null);
+        final JTextField typeToSearchField = dlm.getFilterField();
+        final JDialog popup;
+        if (LCMC.MAIN_FRAME instanceof JApplet) {
+            popup = new JDialog(new JFrame(), name, false);
+        } else {
+            popup = new JDialog((Frame) LCMC.MAIN_FRAME, name, false);
+        }
+        popup.setUndecorated(true);
+        popup.setAlwaysOnTop(true);
+        final JPanel popupPanel = new JPanel();
+        popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));
+        if (maxSize > 10) {
+            popupPanel.add(typeToSearchField);
+        }
+        popupPanel.add(sp);
+        if (optionsPanel != null) {
+            popupPanel.add(optionsPanel);
+        }
+        popup.setContentPane(popupPanel);
+        popups.add(popup);
+
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseExited(final MouseEvent e) {
+                prevScrollingMenuIndex = -1;
+                if (callbackHash != null) {
+                    for (final MyMenuItem item : callbackHash.keySet()) {
+                        callbackHash.get(item).mouseOut(item);
+                        list.clearSelection();
+                    }
+                }
+            }
+            @Override
+            public void mouseEntered(final MouseEvent e) {
+                /* request focus here causes the applet making all
+                textfields to be not editable. */
+                list.requestFocus();
+            }
+
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                prevScrollingMenuIndex = -1;
+                if (callbackHash != null) {
+                    for (final MyMenuItem item : callbackHash.keySet()) {
+                        callbackHash.get(item).mouseOut(item);
+                    }
+                }
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final int index = list.locationToIndex(e.getPoint());
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                list.setSelectedIndex(index);
+                                //TODO: some submenus stay visible, during
+                                //ptest, but this breaks group popup menu
+                                //setMenuVisible(menu, false);
+                                menu.setSelected(false);
+                            }
+                        });
+                        final MyMenuItem item = dlm.getElementAt(index);
+                        item.action();
+                    }
+                });
+                thread.start();
+            }
+        });
+
+        list.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(final MouseEvent e) {
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        int pIndex = list.locationToIndex(e.getPoint());
+                        final Rectangle r = list.getCellBounds(pIndex, pIndex);
+                        if (r == null) {
+                            return;
+                        }
+                        if (!r.contains(e.getPoint())) {
+                            pIndex = -1;
+                        }
+                        final int index = pIndex;
+                        final int lastIndex = prevScrollingMenuIndex;
+                        if (index == lastIndex) {
+                            return;
+                        }
+                        prevScrollingMenuIndex = index;
+                        Tools.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                list.setSelectedIndex(index);
+                            }
+                        });
+                        if (callbackHash != null) {
+                            if (lastIndex >= 0) {
+                                final MyMenuItem lastItem =
+                                        dlm.getElementAt(lastIndex);
+                                final ButtonCallback bc =
+                                        callbackHash.get(lastItem);
+                                if (bc != null) {
+                                    bc.mouseOut(lastItem);
+                                }
+                            }
+                            if (index >= 0) {
+                                final MyMenuItem item = dlm.getElementAt(index);
+                                final ButtonCallback bc =
+                                        callbackHash.get(item);
+                                if (bc != null) {
+                                    bc.mouseOver(item);
+                                }
+                            }
+                        }
+                    }
+                });
+                thread.start();
+            }
+        });
+        list.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(final KeyEvent e) {
+                final int ch = e.getKeyCode();
+                if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
+                    Tools.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            typeToSearchField.requestFocus();
+                        }
+                    });
+                } else if (ch == KeyEvent.VK_ESCAPE) {
+                    Tools.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            for (final JDialog otherP : popups) {
+                                otherP.dispose();
+                            }
+                        }
+                    });
+                    infoObject.hidePopup();
+                } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
+                    final MyMenuItem item = list.getSelectedValue();
+                    if (item != null) {
+                        final Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                item.action();
+                            }
+                        });
+                        thread.start();
+                    }
+                }
+            }
+            @Override
+            public void keyReleased(final KeyEvent e) {
+            }
+            @Override
+            public void keyTyped(final KeyEvent e) {
+            }
+        });
+        popup.addWindowFocusListener(new WindowFocusListener() {
+            @Override
+            public void windowGainedFocus(final WindowEvent e) {
+            }
+            @Override
+            public void windowLostFocus(final WindowEvent e) {
+                popup.dispose();
+            }
+        });
+
+        typeToSearchField.addKeyListener(new KeyListener() {
+            @Override
+            public void keyPressed(final KeyEvent e) {
+                final int ch = e.getKeyCode();
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (ch == KeyEvent.VK_DOWN) {
+                            Tools.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    list.requestFocus();
+                                    /* don't need to press down arrow twice */
+                                    list.setSelectedIndex(0);
+                                }
+                            });
+                        } else if (ch == KeyEvent.VK_ESCAPE) {
+                            Tools.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    for (final JDialog otherP : popups) {
+                                        otherP.dispose();
+                                    }
+                                }
+                            });
+                            infoObject.hidePopup();
+                        } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
+                            final MyMenuItem item = list.getModel().getElementAt(0);
+                            if (item != null) {
+                                item.action();
+                            }
+                        }
+                    }
+                });
+                thread.start();
+            }
+            @Override
+            public void keyReleased(final KeyEvent e) {
+            }
+            @Override
+            public void keyTyped(final KeyEvent e) {
+            }
+        });
+
+        /* menu is not new. */
+        for (final MenuListener ml : menu.getMenuListeners()) {
+            menu.removeMenuListener(ml);
+        }
+        menu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuCanceled(final MenuEvent e) {
+            }
+
+            @Override
+            public void menuDeselected(final MenuEvent e) {
+                final Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+                SwingUtilities.convertPointFromScreen(mouseLocation, sp);
+                final boolean inside = sp.getBounds().contains(mouseLocation);
+
+                for (final JDialog otherP : popups) {
+                    if (popup != otherP || !inside) {
+                        /* don't dispose the popup if it was clicked.  */
+                        otherP.dispose();
+                    }
+                }
+            }
+
+            @Override
+            public void menuSelected(final MenuEvent e) {
+                final Point l = menu.getLocationOnScreen();
+                for (final JDialog otherP : popups) {
+                    otherP.dispose();
+                }
+                popup.setLocation((int) (l.getX() + menu.getBounds().getWidth()), (int) l.getY() - 1);
+                popup.pack();
+                popup.setVisible(true);
+                typeToSearchField.requestFocus();
+                typeToSearchField.selectAll();
+                /* Setting location again. Moving it one pixel fixes
+                the "gray window" problem. */
+                popup.setLocation((int) (l.getX() + menu.getBounds().getWidth()), (int) l.getY());
+            }
+        });
+        return true;
+    }
+
+    /** Dialog that informs a user about something with ok button. */
+    public void infoDialog(final String title, final String info1, final String info2) {
+        final JEditorPane infoPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN, info1 + '\n' + info2);
+        infoPane.setEditable(false);
+        infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
+        infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
+        infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
+        Tools.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                JOptionPane.showMessageDialog(LCMC.MAIN_FRAME,
+                        new JScrollPane(infoPane),
+                        title,
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 }

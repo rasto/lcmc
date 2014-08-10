@@ -2,6 +2,8 @@ package lcmc.utilities;
 
 import java.util.Map;
 import javax.swing.JCheckBox;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.UserConfig;
 import lcmc.testutils.TestUtils;
@@ -18,6 +20,8 @@ public final class ToolsITest {
     private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
 
     private final TestUtils testSuite = new TestUtils();
+
+    private final GUIData guiData = new GUIData();
     @Before
     public void setUp() {
         testSuite.initStdout();
@@ -85,10 +89,10 @@ public final class ToolsITest {
     @Category(GuiTest.class)
     public void testLoadFile() {
         testSuite.initMain();
-        assertNull(Tools.loadFile("JUNIT_TEST_FILE_CLICK_OK", false));
+        assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
-        Tools.save(new UserConfig(), testFile, false);
-        final String file = Tools.loadFile(testFile, false);
+        Tools.save(guiData, new UserConfig(), testFile, false);
+        final String file = Tools.loadFile(guiData, testFile, false);
         assertNotNull(file);
         testSuite.clearStdout();
         assertFalse("".equals(file));
@@ -99,24 +103,24 @@ public final class ToolsITest {
     public void testStartProgressIndicator() {
         testSuite.initMain();
         for (int i = 0; i < 10; i++) {
-            Tools.startProgressIndicator(null);
-            Tools.startProgressIndicator("test");
-            Tools.startProgressIndicator("test2");
-            Tools.startProgressIndicator("test3");
-            Tools.startProgressIndicator(null, "test4");
-            Tools.startProgressIndicator("name", "test4");
-            Tools.startProgressIndicator("name2", "test4");
-            Tools.startProgressIndicator("name2", null);
-            Tools.startProgressIndicator(null, null);
-            Tools.stopProgressIndicator(null, null);
-            Tools.stopProgressIndicator("name2", null);
-            Tools.stopProgressIndicator("name2", "test4");
-            Tools.stopProgressIndicator("name", "test4");
-            Tools.stopProgressIndicator(null, "test4");
-            Tools.stopProgressIndicator("test3");
-            Tools.stopProgressIndicator("test2");
-            Tools.stopProgressIndicator("test");
-            Tools.stopProgressIndicator(null);
+            guiData.startProgressIndicator(null);
+            guiData.startProgressIndicator("test");
+            guiData.startProgressIndicator("test2");
+            guiData.startProgressIndicator("test3");
+            guiData.startProgressIndicator(null, "test4");
+            guiData.startProgressIndicator("name", "test4");
+            guiData.startProgressIndicator("name2", "test4");
+            guiData.startProgressIndicator("name2", null);
+            guiData.startProgressIndicator(null, null);
+            guiData.stopProgressIndicator(null, null);
+            guiData.stopProgressIndicator("name2", null);
+            guiData.stopProgressIndicator("name2", "test4");
+            guiData.stopProgressIndicator("name", "test4");
+            guiData.stopProgressIndicator(null, "test4");
+            guiData.stopProgressIndicator("test3");
+            guiData.stopProgressIndicator("test2");
+            guiData.stopProgressIndicator("test");
+            guiData.stopProgressIndicator(null);
         }
     }
 
@@ -124,13 +128,13 @@ public final class ToolsITest {
     @Category(GuiTest.class)
     public void testProgressIndicatorFailed() {
         testSuite.initMain();
-        Tools.progressIndicatorFailed(null, "fail3");
-        Tools.progressIndicatorFailed("name", "fail2");
-        Tools.progressIndicatorFailed("name", null);
-        Tools.progressIndicatorFailed("fail1");
-        Tools.progressIndicatorFailed(null);
+        guiData.progressIndicatorFailed(null, "fail3");
+        guiData.progressIndicatorFailed("name", "fail2");
+        guiData.progressIndicatorFailed("name", null);
+        guiData.progressIndicatorFailed("fail1");
+        guiData.progressIndicatorFailed(null);
 
-        Tools.progressIndicatorFailed("fail two seconds", 2);
+        guiData.progressIndicatorFailed("fail two seconds", 2);
         testSuite.clearStdout();
     }
 

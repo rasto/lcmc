@@ -64,6 +64,8 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Value;
@@ -264,7 +266,7 @@ public class Info implements Comparable<Info>, Value {
 
     /** Returns type of the info text. text/plain or text/html. */
     protected String getInfoMimeType() {
-        return Tools.MIME_TYPE_TEXT_PLAIN;
+        return GUIData.MIME_TYPE_TEXT_PLAIN;
     }
 
     protected JComponent getBackButton() {

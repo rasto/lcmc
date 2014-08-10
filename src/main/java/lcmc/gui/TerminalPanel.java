@@ -56,6 +56,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -168,6 +169,8 @@ public class TerminalPanel extends JScrollPane {
     /** Terminal output colors. */
     private final Map<String, Color> terminalColor = new HashMap<String, Color>();
     private Color defaultOutputColor;
+    @Autowired
+    private GUIData guiData;
 
     public void initWithHost(final Host host0) {
         host = host0;
@@ -393,21 +396,21 @@ public class TerminalPanel extends JScrollPane {
             return;
         }
         if (command != null && !command.isEmpty()) {
-            Tools.startProgressIndicator(hostName, "Executing command");
+            guiData.startProgressIndicator(hostName, "Executing command");
         }
         host.execCommand(new ExecCommandConfig().command(command)
                                                 .execCallback(new ExecCallback() {
                                                     @Override
                                                     public void done(final String answer) {
                                                         if (command != null && !command.isEmpty()) {
-                                                            Tools.stopProgressIndicator(hostName, "Executing command");
+                                                            guiData.stopProgressIndicator(hostName, "Executing command");
                                                         }
                                                     }
 
                                                     @Override
                                                     public void doneError(final String answer, final int errorCode) {
                                                         if (command != null && !command.isEmpty()) {
-                                                            Tools.stopProgressIndicator(hostName, "Executing command");
+                                                            guiData.stopProgressIndicator(hostName, "Executing command");
                                                         }
                                                     }
                                                 }));
@@ -516,10 +519,10 @@ public class TerminalPanel extends JScrollPane {
         }
         if (!editEnabled && GOD_ON.equals(cheat)) {
             editEnabled = true;
-            Tools.getGUIData().godModeChanged(editEnabled);
+            guiData.godModeChanged(editEnabled);
         } else if (editEnabled && GOD_OFF.equals(cheat)) {
             editEnabled = false;
-            Tools.getGUIData().godModeChanged(editEnabled);
+            guiData.godModeChanged(editEnabled);
         } else if (CHEAT_LIST.equals(cheat)) {
             final StringBuilder list = new StringBuilder();
             for (final String ch : CHEATS_MAP.keySet()) {

@@ -44,11 +44,17 @@ import lcmc.gui.widget.Check;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class PcmkRscSetsInfo extends HbConnectionInfo {
     /** Placeholders. */
     private final Collection<ConstraintPHInfo> constraintPHInfos =
@@ -56,14 +62,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     /** constraints lock. */
     private final Lock mConstraintPHLock = new ReentrantLock();
 
-    /** Prepares a new {@code PcmkRscSetsInfo} object. */
-    PcmkRscSetsInfo(final Browser browser) {
-        super(browser);
-    }
-
-    /** Prepares a new {@code PcmkRscSetsInfo} object. */
-    PcmkRscSetsInfo(final Browser browser, final ConstraintPHInfo cphi) {
-        this(browser);
+    void init(final Browser browser, final ConstraintPHInfo cphi) {
+        super.init(browser);
         mConstraintPHLock.lock();
         try {
             constraintPHInfos.add(cphi);

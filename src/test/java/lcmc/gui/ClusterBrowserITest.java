@@ -21,6 +21,9 @@ public final class ClusterBrowserITest {
 
     private final TestUtils testSuite = new TestUtils();
 
+    private final GUIData guiData = new GUIData();
+
+
     @Before
     public void setUp() {
         testSuite.initTestCluster();
@@ -98,8 +101,8 @@ public final class ClusterBrowserITest {
         for (String file : files) {
             //System.out.println(i + " file: " + file);
             i++;
-            Tools.startProgressIndicator(i + ": " + file);
-            String xml = Tools.loadFile(file, true);
+            guiData.startProgressIndicator(i + ": " + file);
+            String xml = Tools.loadFile(guiData, file, true);
             xml = xml.replaceAll("<nodes/>", nodes.toString())
                      .replaceAll("<nodes>.*?</nodes>", nodes.toString())
                      .replaceAll("<status>.*?</status>", status.toString())
@@ -132,7 +135,7 @@ public final class ClusterBrowserITest {
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
             }
-            Tools.stopProgressIndicator(i + ": " + file);
+            guiData.stopProgressIndicator(i + ": " + file);
             for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 Tools.waitForSwing();

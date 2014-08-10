@@ -52,6 +52,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.CastAddress;
@@ -75,6 +76,9 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -85,6 +89,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class HbConfig extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(HbConfig.class);
     private static final String KEEPALIVE_OPTION = "keepalive";
@@ -190,6 +195,8 @@ final class HbConfig extends DialogCluster {
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
+    @Autowired
+    private GUIData guiData;
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
@@ -705,7 +712,7 @@ final class HbConfig extends DialogCluster {
                     if (castAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        Tools.getGUIData().setAccessible(makeConfigButton, Application.AccessType.ADMIN);
+                        guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
                     }
                     if (!Tools.getApplication().getAutoClusters().isEmpty() && !castAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -1093,7 +1100,7 @@ final class HbConfig extends DialogCluster {
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        Tools.getGUIData().setAccessible(configCheckbox, Application.AccessType.ADMIN);
+        guiData.setAccessible(configCheckbox, Application.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -1229,7 +1236,7 @@ final class HbConfig extends DialogCluster {
                         }
                     }
                 }
-                Tools.getGUIData().setAccessible(makeConfigButton, Application.AccessType.ADMIN);
+                guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
             }
         };
     }

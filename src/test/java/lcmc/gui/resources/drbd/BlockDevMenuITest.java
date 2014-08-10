@@ -1,6 +1,8 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.resources.BlockDevice;
 import lcmc.gui.ClusterBrowser;
@@ -17,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Category(GuiTest.class)
 @RunWith(MockitoJUnitRunner.class)
@@ -41,7 +44,11 @@ public class BlockDevMenuITest {
     @Mock
     private HostBrowser hostBrowserNoClusterStub;
 
-    private BlockDevMenu blockDevMenu;
+    private BlockDevMenu blockDevMenu = new BlockDevMenu();
+    private BlockDevMenu blockDevMenuNoCluster = new BlockDevMenu();
+
+    @Autowired
+    private GUIData guiData;
 
     @Before
     public void setUp() {
@@ -53,24 +60,21 @@ public class BlockDevMenuITest {
         when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserStub);
         when(blockDevInfoNoClusterStub.getHost()).thenReturn(hostStub);
         when(blockDevInfoNoClusterStub.getBlockDevice()).thenReturn(blockDeviceStub);
-
-        blockDevMenu = new BlockDevMenu(blockDevInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = blockDevMenu.getPulldownMenu();
+        final List<UpdatableItem> items = blockDevMenu.getPulldownMenu(blockDevInfoStub);
 
         assertEquals(20, items.size());
     }
 
     @Test
     public void menuWithOrWithoutClusterShoulBeTheSameSize() {
-        final List<UpdatableItem> itemsWithCluster = blockDevMenu.getPulldownMenu();
+        final List<UpdatableItem> itemsWithCluster = blockDevMenu.getPulldownMenu(blockDevInfoStub);
         when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
-        final BlockDevMenu blockDevMenuNoCluster = new BlockDevMenu(blockDevInfoNoClusterStub);
 
-        final List<UpdatableItem> itemsNoCluster = blockDevMenuNoCluster.getPulldownMenu();
+        final List<UpdatableItem> itemsNoCluster = blockDevMenuNoCluster.getPulldownMenu(blockDevInfoNoClusterStub);
 
         assertTrue(itemsNoCluster.size() == itemsWithCluster.size());
     }

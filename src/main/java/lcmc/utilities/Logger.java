@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+
+import lcmc.LCMC;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
@@ -147,7 +149,7 @@ public final class Logger {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(
-                            Tools.getGUIData().getMainFrame(),
+                            LCMC.MAIN_FRAME,
                             new JScrollPane(new JTextArea(msg, 20, 60)),
                             Tools.getString("Error.Title"),
                             JOptionPane.ERROR_MESSAGE);
@@ -293,8 +295,7 @@ public final class Logger {
             return;
         }
 
-        Tools.getGUIData().getMainMenu().setOperatingMode(
-                                                        Application.OP_MODE_RO);
+        //Tools.getGUIData().getMainMenu().setOperatingMode(Application.OP_MODE_RO);
 
         final Thread t = new Thread(new Runnable() {
             @Override

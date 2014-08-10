@@ -61,6 +61,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     private AddHostDialog addHostDialog;
     @Autowired
     private HostFactory hostFactory;
+    @Autowired
+    private GUIData guiData;
 
     public void init() {
         emptyBrowser.init();
@@ -104,12 +106,12 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                 thread.start();
             }
         });
-        Tools.getGUIData().registerAddHostButton(addHostButton);
+        guiData.registerAddHostButton(addHostButton);
         buttonPanel.add(addHostButton);
         createEmptyView();
         add(logoPanel, BorderLayout.PAGE_END);
-        Tools.getGUIData().registerAllHostsUpdate(this);
-        Tools.getGUIData().allHostsUpdate();
+        guiData.registerAllHostsUpdate(this);
+        guiData.allHostsUpdate();
 
         /* add new cluster button */
         final MyButton addClusterButton = new MyButton(Tools.getString("ClusterTab.AddNewCluster"), CLUSTER_ICON);
@@ -129,8 +131,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                 thread.start();
             }
         });
-        Tools.getGUIData().registerAddClusterButton(addClusterButton);
-        Tools.getGUIData().checkAddClusterButtons();
+        guiData.registerAddClusterButton(addClusterButton);
+        guiData.checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
         if (!Tools.getApplication().getAutoHosts().isEmpty()) {
             Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {

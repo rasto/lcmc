@@ -49,15 +49,11 @@ import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
+import lcmc.model.*;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdProxy;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.drbd.DrbdXml.HostProxy;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
 import lcmc.model.resources.DrbdResource;
 import lcmc.model.resources.NetInterface;
 import lcmc.gui.Browser;
@@ -79,11 +75,17 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ResourceInfo extends AbstractDrbdInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceInfo.class);
     static final String DRBD_RES_PARAM_NAME = "name";
@@ -133,13 +135,15 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Resync-after combobox. */
     private Widget resyncAfterParamWi = null;
     private ServiceInfo isUsedByCRM;
-    private final Set<Host> hosts;
+    private Set<Host> hosts;
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
+    private GlobalInfo globalInfo;
 
-    public ResourceInfo(final String name, final Set<Host> hosts, final Browser browser) {
+    public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
         this.hosts = hosts;
         setResource(new DrbdResource(name));
+        globalInfo = ((ClusterBrowser) browser).getGlobalInfo();
     }
 
     public void addDrbdVolume(final VolumeInfo drbdVolume) {
@@ -298,7 +302,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
 
     @Override
     public Value getParamDefault(final String param) {
-        final Value common = getDrbdInfo().getParamSaved(param);
+        final Value common = globalInfo.getParamSaved(param);
         if (common != null) {
             return common;
         }
@@ -404,8 +408,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
             getBrowser().getDrbdResourceNameHash().put(name, this);
             getBrowser().putDrbdResHash();
             getBrowser().getDrbdGraph().repaint();
-            getDrbdInfo().setAllApplyButtons();
-            getDrbdInfo().reloadDRBDResourceComboBoxes();
+            globalInfo.setAllApplyButtons();
+            globalInfo.reloadDRBDResourceComboBoxes();
             getResource().setNew(false);
         }
     }
@@ -463,7 +467,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 getBrowser().setDRBDtestData(null);
                 final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
                 try {
-                    getDrbdInfo().createConfigDryRun(testOutput);
+                    globalInfo.createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
@@ -526,7 +530,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getDrbdInfo().createDrbdConfigLive();
+                            globalInfo.createDrbdConfigLive();
                             for (final Host h : getHosts()) {
                                 DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                             }
@@ -1650,7 +1654,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             }
             portLabel = Tools.getString("ResourceInfo.NetInterfacePortToProxy");
 
-            getDrbdInfo().enableProxySection(wizard); /* never disable */
+            globalInfo.enableProxySection(wizard); /* never disable */
         } else {
             portLabel = Tools.getString("ResourceInfo.NetInterfacePort");
         }
@@ -1821,7 +1825,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         if (Application.isLive(runMode)) {
             removeNode();
         }
-        getDrbdInfo().reloadDRBDResourceComboBoxes();
+        globalInfo.reloadDRBDResourceComboBoxes();
     }
 
     /** Returns DRBD volumes. */
@@ -1834,7 +1838,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     public void reloadComboBoxes() {
         super.reloadComboBoxes();
         String param = DRBD_RES_PARAM_AFTER;
-        if (!getDrbdInfo().atLeastVersion("8.4")) {
+        if (!globalInfo.atLeastVersion("8.4")) {
             param = DRBD_RES_PARAM_AFTER_8_3;
         }
         final List<Value> l = new ArrayList<Value>();

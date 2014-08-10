@@ -32,18 +32,19 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CloneMenu extends ServiceMenu {
-    private final CloneInfo cloneInfo;
+    private CloneInfo cloneInfo;
     
-    public CloneMenu(final CloneInfo cloneInfo) {
-        super(cloneInfo);
-        this.cloneInfo = cloneInfo;
-    }
-
     @Override
-    public List<UpdatableItem> getPulldownMenu() {
-        final List<UpdatableItem> items = super.getPulldownMenu();
+    public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
+        this.cloneInfo = (CloneInfo) serviceInfo;
+        final List<UpdatableItem> items = super.getPulldownMenu(cloneInfo);
         final ServiceInfo cs = cloneInfo.getContainedService();
         if (cs == null) {
             return items;
@@ -73,13 +74,13 @@ public class CloneMenu extends ServiceMenu {
     }
 
     @Override
-    protected void addMigrateMenuItems(final List<UpdatableItem> items) {
-        super.addMigrateMenuItems(items);
+    protected void addMigrateMenuItems(final ServiceInfo serviceInfo, final List<UpdatableItem> items) {
+        super.addMigrateMenuItems(cloneInfo, items);
         if (!cloneInfo.getService().isMaster()) {
             return;
         }
         final Application.RunMode runMode = Application.RunMode.LIVE;
-        for (final Host host : getBrowser().getClusterHosts()) {
+        for (final Host host : cloneInfo.getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateFromMenuItem =
                new MyMenuItem(Tools.getString("ClusterBrowser.Hb.MigrateFromResource") + ' ' + hostName + " (stop)",
@@ -117,7 +118,7 @@ public class CloneMenu extends ServiceMenu {
                                 break;
                             }
                         }
-                        if (!getBrowser().crmStatusFailed()
+                        if (!cloneInfo.getBrowser().crmStatusFailed()
                             && cloneInfo.getService().isAvailable()
                             && runningOnNode
                             && host.isCrmStatusOk()) {
@@ -132,13 +133,13 @@ public class CloneMenu extends ServiceMenu {
                         cloneInfo.hidePopup();
                         if (cloneInfo.getService().isMaster()) {
                             /* without role=master */
-                            cloneInfo.superMigrateFromResource(getBrowser().getDCHost(), hostName, runMode);
+                            cloneInfo.superMigrateFromResource(cloneInfo.getBrowser().getDCHost(), hostName, runMode);
                         } else {
-                            cloneInfo.migrateFromResource(getBrowser().getDCHost(), hostName, runMode);
+                            cloneInfo.migrateFromResource(cloneInfo.getBrowser().getDCHost(), hostName, runMode);
                         }
                     }
                 };
-            final ButtonCallback migrateItemCallback = getBrowser().new ClMenuItemCallback(null) {
+            final ButtonCallback migrateItemCallback = cloneInfo.getBrowser().new ClMenuItemCallback(null) {
                 @Override
                 public void action(final Host dcHost) {
                     if (cloneInfo.getService().isMaster()) {
@@ -156,7 +157,7 @@ public class CloneMenu extends ServiceMenu {
 
     /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
     @Override
-    protected void addMoreMigrateMenuItems(final MyMenu submenu) {
+    protected void addMoreMigrateMenuItems(final ServiceInfo serviceInfo, final MyMenu submenu) {
         /* no migrate / unmigrate menu advanced items for clones. */
     }
 }

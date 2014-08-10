@@ -39,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
@@ -62,12 +63,15 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where cluster is initialized on all hosts.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class InitCluster extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(InitCluster.class);
     private static final int CHECK_INTERVAL = 1000;
@@ -116,6 +120,8 @@ public class InitCluster extends DialogCluster {
                                    Widget.NO_BUTTON);
     @Autowired
     private Finish finishDialog;
+    @Autowired
+    private GUIData guiData;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
@@ -426,7 +432,7 @@ public class InitCluster extends DialogCluster {
                                 if (heartbeatIsRunning) {
                                     csAisStartButton.setEnabled(false);
                                 } else {
-                                    Tools.getGUIData().setAccessible(csAisStartButton, Application.AccessType.OP);
+                                    guiData.setAccessible(csAisStartButton, Application.AccessType.OP);
                                 }
                             }
                             csAisStartButton.setVisible(true);
@@ -482,7 +488,7 @@ public class InitCluster extends DialogCluster {
                                 if (csAisRunning) {
                                     hbStartButton.setEnabled(false);
                                 } else {
-                                    Tools.getGUIData().setAccessible(hbStartButton, Application.AccessType.OP);
+                                    guiData.setAccessible(hbStartButton, Application.AccessType.OP);
                                 }
                             }
                             hbStartButton.setVisible(true);

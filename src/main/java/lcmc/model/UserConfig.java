@@ -48,6 +48,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
+import lcmc.view.ClustersPanel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -78,6 +79,8 @@ public final class UserConfig extends XML {
     private ClusterTabFactory clusterTabFactory;
     @Autowired
     private HostFactory hostFactory;
+    @Autowired
+    private ClustersPanel clustersPanel;
 
     /** Saves data about clusters and hosts to the supplied output stream. */
     public String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
@@ -182,7 +185,7 @@ public final class UserConfig extends XML {
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.getGUIData().getClustersPanel().removeTabWithCluster(cluster);
+                            clustersPanel.removeTabWithCluster(cluster);
                         }
                     });
                     continue;

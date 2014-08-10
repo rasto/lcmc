@@ -48,15 +48,23 @@ import lcmc.gui.widget.Check;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds clone service info object.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
+    @Autowired
+    private CloneMenu cloneMenu;
 
-    CloneInfo(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {
-        super(name, ra, browser);
+    void init(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {
+        super.init(name, ra, browser);
         getService().setMaster(master);
     }
 
@@ -551,8 +559,7 @@ public class CloneInfo extends ServiceInfo {
     /** Returns items for the clone popup. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final CloneMenu cloneMenu = new CloneMenu(this);
-        return cloneMenu.getPulldownMenu();
+        return cloneMenu.getPulldownMenu(this);
     }
 
     /** Returns whether info panel is already created. */

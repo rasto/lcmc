@@ -56,6 +56,7 @@ import javax.swing.filechooser.FileFilter;
 import lcmc.AddClusterDialog;
 import lcmc.AddHostDialog;
 import lcmc.Exceptions;
+import lcmc.LCMC;
 import lcmc.model.*;
 import lcmc.gui.dialog.About;
 import lcmc.gui.dialog.BugReport;
@@ -84,8 +85,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Advanced mode button. */
     private JCheckBox advancedModeCB;
     /** Upgrade check text field. */
-    private final JEditorPane upgradeTextField = new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
-    private final JEditorPane infoTextField = new JEditorPane(Tools.MIME_TYPE_TEXT_HTML, "");
+    private final JEditorPane upgradeTextField = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML, "");
+    private final JEditorPane infoTextField = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML, "");
     /** Upgrade check text. */
     private String upgradeCheck = "";
     private String infoText = null;
@@ -98,6 +99,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     private AddHostDialog addHostDialog;
     @Autowired
     private HostFactory hostFactory;
+    @Autowired
+    private GUIData guiData;
 
     public void init() {
         if (Tools.getApplication().isUpgradeCheckEnabled()) {
@@ -116,7 +119,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_N,
                                                newHostActionListener(),
                                                HOST_ICON);
-        Tools.getGUIData().registerAddHostButton(hostItem);
+        guiData.registerAddHostButton(hostItem);
 
         final JMenuItem cmi = addMenuItem(Tools.getString("MainMenu.Cluster"),
                                           menuNew,
@@ -125,8 +128,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                                           newClusterActionListener(),
                                           ClusterBrowser.CLUSTER_ICON_SMALL);
 
-        Tools.getGUIData().registerAddClusterButton(cmi);
-        Tools.getGUIData().checkAddClusterButtons();
+        guiData.registerAddClusterButton(cmi);
+        guiData.checkAddClusterButtons();
 
 
         submenu.add(menuNew);
@@ -137,7 +140,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_L,
                                                loadActionListener(),
                                                null);
-        Tools.getGUIData().addToEnabledInAccessType(loadItem, new AccessMode(Application.AccessType.GOD, false));
+        guiData.addToEnabledInAccessType(loadItem, new AccessMode(Application.AccessType.GOD, false));
 
         final JMenuItem item = addMenuItem(Tools.getString("MainMenu.RemoveEverything"),
                                            submenu,
@@ -145,7 +148,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                            0,
                                            removeEverythingActionListener(),
                                            null);
-        Tools.getGUIData().addToVisibleInAccessType(item, new AccessMode(Application.AccessType.GOD, false));
+        guiData.addToVisibleInAccessType(item, new AccessMode(Application.AccessType.GOD, false));
 
         addMenuItem(Tools.getString("MainMenu.Save"),
                     submenu,
@@ -162,7 +165,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     null);
 
         submenu.addSeparator();
-        if (!Tools.getGUIData().isApplet()) {
+        if (!guiData.isApplet()) {
             addMenuItem(Tools.getString("MainMenu.Exit"),
                         submenu,
                         KeyEvent.VK_X,
@@ -174,7 +177,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
         /* settings */
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
-        Tools.getGUIData().addToVisibleInAccessType(submenu, new AccessMode(Application.AccessType.GOD, false));
+        guiData.addToVisibleInAccessType(submenu, new AccessMode(Application.AccessType.GOD, false));
         final JMenu menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
         for (final UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
@@ -323,7 +326,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      }
                  };
                  fc.setFileFilter(filter);
-                 final int ret = fc.showOpenDialog(Tools.getGUIData().getMainFrame());
+                 final int ret = fc.showOpenDialog(LCMC.MAIN_FRAME);
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      Tools.getApplication().setSaveFile(name);
@@ -335,12 +338,12 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     private void loadConfigData(final String filename) {
         LOG.debug("loadConfigData: start");
-        final String xml = Tools.loadFile(filename, true);
+        final String xml = Tools.loadFile(guiData, filename, true);
         if (xml == null) {
             return;
         }
         userConfig.startClusters(null);
-        Tools.getGUIData().allHostsUpdate();
+        guiData.allHostsUpdate();
     }
 
     private ActionListener removeEverythingActionListener() {
@@ -352,7 +355,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     new Runnable() {
                         @Override
                         public void run() {
-                            Tools.removeEverything();
+                            Tools.removeEverything(guiData);
                         }
                     }
                  );
@@ -373,7 +376,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread thread = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         Tools.save(userConfig, Tools.getApplication().getSaveFile(), true);
+                         Tools.save(guiData, userConfig, Tools.getApplication().getSaveFile(), true);
                      }
                  });
                  thread.start();
@@ -414,11 +417,11 @@ public final class MainMenu extends JPanel implements ActionListener {
                      }
                  };
                  fc.setFileFilter(filter);
-                 final int ret = fc.showSaveDialog(Tools.getGUIData().getMainFrame());
+                 final int ret = fc.showSaveDialog(LCMC.MAIN_FRAME);
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      Tools.getApplication().setSaveFile(name);
-                     Tools.save(userConfig, Tools.getApplication().getSaveFile(), true);
+                     Tools.save(guiData, userConfig, Tools.getApplication().getSaveFile(), true);
                  }
 
              }
@@ -456,7 +459,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
                 try {
                     UIManager.setLookAndFeel(lookAndFeel);
-                    final JComponent componentToSwitch = Tools.getGUIData().getMainFrameRootPane();
+                    final JComponent componentToSwitch = guiData.getMainFrameRootPane();
                     SwingUtilities.updateComponentTreeUI(componentToSwitch);
                     componentToSwitch.invalidate();
                     componentToSwitch.validate();
@@ -482,7 +485,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.getGUIData().copy();
+                        guiData.copy();
                     }
                 });
                 t.start();
@@ -498,7 +501,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.getGUIData().paste();
+                        guiData.paste();
                     }
                 });
                 t.start();

@@ -46,6 +46,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
+import lcmc.LCMC;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -586,8 +587,7 @@ public abstract class HardwareInfo extends EditableInfo {
         fc.setApproveButtonToolTipText(
                                Tools.getString("DiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showDialog(Tools.getGUIData().getMainFrame(),
-                                      Tools.getString("DiskInfo.Approve"));
+        final int ret = fc.showDialog(LCMC.MAIN_FRAME, Tools.getString("DiskInfo.Approve"));
         linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION
             && fc.getSelectedFile() != null) {

@@ -24,15 +24,21 @@ package lcmc.gui.dialog.vm;
 
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.utilities.Tools;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * VMConfig super class from which all the vm wizards can be
  * extended.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class VMConfig extends WizardDialog {
-    private final DomainInfo domainInfo;
+    private DomainInfo domainInfo;
 
-    protected VMConfig(final WizardDialog previousDialog, final DomainInfo domainInfo) {
+    public void init(final WizardDialog previousDialog, final DomainInfo domainInfo) {
         setPreviousDialog(previousDialog);
         this.domainInfo = domainInfo;
     }

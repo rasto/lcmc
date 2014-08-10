@@ -36,10 +36,16 @@ import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class VirtualDomainInfo extends ServiceInfo {
     /** Pattern that captures a name from xml file name. */
     static final Pattern LIBVIRT_CONF_PATTERN =
@@ -57,22 +63,6 @@ public class VirtualDomainInfo extends ServiceInfo {
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
     /** VirtualDomain in the VMs menu. */
     private DomainInfo domainInfo = null;
-
-    /** Creates the VirtualDomainInfo object. */
-    public VirtualDomainInfo(final String name,
-                      final ResourceAgent ra,
-                      final Browser browser) {
-        super(name, ra, browser);
-    }
-
-    /** Creates the VirtualDomainInfo object. */
-    public VirtualDomainInfo(final String name,
-                      final ResourceAgent ra,
-                      final String hbId,
-                      final Map<String, String> resourceNode,
-                      final Browser browser) {
-        super(name, ra, hbId, resourceNode, browser);
-    }
 
     /** Returns object with vm data. */
     VmsXml getVMSXML(final Host host) {
@@ -142,8 +132,8 @@ public class VirtualDomainInfo extends ServiceInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final VirtualDomainMenu virtualDomainMenu = new VirtualDomainMenu(this);
-        return virtualDomainMenu.getPulldownMenu();
+        final VirtualDomainMenu virtualDomainMenu = new VirtualDomainMenu();
+        return virtualDomainMenu.getPulldownMenu(this);
     }
 
     /** Returns a name of the service with virtual domain name. */

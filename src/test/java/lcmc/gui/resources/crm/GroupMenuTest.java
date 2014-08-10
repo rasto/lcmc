@@ -61,12 +61,12 @@ public class GroupMenuTest {
         when(groupInfoStub.getService()).thenReturn(serviceStub);
         final Host[] hosts = new Host[]{hostStub};
         when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        groupMenu = new GroupMenu(groupInfoStub);
+        groupMenu = new GroupMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = groupMenu.getPulldownMenu();
+        final List<UpdatableItem> items = groupMenu.getPulldownMenu(groupInfoStub);
 
         assertEquals(16, items.size());
     }

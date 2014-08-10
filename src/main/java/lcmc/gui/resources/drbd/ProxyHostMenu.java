@@ -23,6 +23,7 @@ package lcmc.gui.resources.drbd;
 import java.util.ArrayList;
 import java.util.List;
 import lcmc.ProxyHostWizard;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -33,19 +34,26 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ProxyHostMenu {
     /** Not connectable. */
     private static final String NOT_CONNECTABLE_STRING =
                                Tools.getString("ProxyHostInfo.NotConnectable");
     
-    private final ProxyHostInfo proxyHostInfo;
-    
-    public ProxyHostMenu(final ProxyHostInfo proxyHostInfo) {
-        this.proxyHostInfo = proxyHostInfo;
-    }
+    private ProxyHostInfo proxyHostInfo;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private ProxyHostWizard proxyHostWizard;
 
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final ProxyHostInfo proxyHostInfo) {
+        this.proxyHostInfo = proxyHostInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* connect */
@@ -100,13 +108,12 @@ public class ProxyHostMenu {
 
                 @Override
                 public void action() {
-                    final ProxyHostWizard dialog =
-                            new ProxyHostWizard(getHost(), null);
-                    dialog.showDialogs();
+                    proxyHostWizard.init(getHost(), null);
+                    proxyHostWizard.showDialogs();
                 }
             };
         items.add(hostWizardItem);
-        Tools.getGUIData().registerAddHostButton(hostWizardItem);
+        guiData.registerAddHostButton(hostWizardItem);
         final Application.RunMode runMode = Application.RunMode.LIVE;
 
         /* proxy start/stop */
@@ -244,7 +251,7 @@ public class ProxyHostMenu {
                 public void action() {
                     getHost().disconnect();
                     Tools.getApplication().removeHostFromHosts(getHost());
-                    Tools.getGUIData().allHostsUpdate();
+                    guiData.allHostsUpdate();
                 }
             };
         items.add(removeHostItem);

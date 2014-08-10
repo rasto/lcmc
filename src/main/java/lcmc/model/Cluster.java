@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.resources.BlockDevice;
 import lcmc.model.resources.Network;
 import lcmc.gui.ClusterBrowser;
@@ -39,6 +40,9 @@ import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,6 +50,7 @@ import org.springframework.stereotype.Component;
  * methods.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Cluster implements Comparable<Cluster> {
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     private String name = null;
@@ -62,6 +67,8 @@ public class Cluster implements Comparable<Cluster> {
     private boolean clusterTabClosable = true;
 
     private ClusterBrowser clusterBrowser;
+    @Autowired
+    private GUIData guiData;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
@@ -360,7 +367,7 @@ public class Cluster implements Comparable<Cluster> {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Tools.getGUIData().getClustersPanel().removeTabWithCluster(thisCluster);
+                guiData.getClustersPanel().removeTabWithCluster(thisCluster);
             }
         });
     }

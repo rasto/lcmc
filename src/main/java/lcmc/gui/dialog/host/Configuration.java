@@ -33,10 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -45,6 +43,9 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -56,6 +57,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Configuration extends DialogHost {
     /** Logger. */
     private static final Logger LOG =
@@ -75,8 +77,8 @@ public class Configuration extends DialogHost {
     /** Whether the hostname was ok. */
     private volatile boolean hostnameOk = false;
     @Autowired
-    private Devices devicesDialog;
-    @Autowired
+    private Devices devices;
+    @Autowired @Qualifier("SSH")
     private SSH sshDialog;
 
     /** Finishes the dialog and stores the values. */
@@ -99,8 +101,8 @@ public class Configuration extends DialogHost {
     public WizardDialog nextDialog() {
         if (hostnameOk) {
             if (getHost().isConnected()) {
-                devicesDialog.init(this, getHost(), getDrbdInstallation());
-                return devicesDialog;
+                devices.init(this, getHost(), getDrbdInstallation());
+                return devices;
             } else {
                 sshDialog.init(this, getHost(), getDrbdInstallation());
                 return sshDialog;

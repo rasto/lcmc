@@ -50,10 +50,16 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a host.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ProxyHostInfo extends Info {
     /** Logger. */
     private static final Logger LOG =
@@ -62,9 +68,9 @@ public class ProxyHostInfo extends Info {
     private static final String NAME_PREFIX =
                                     Tools.getString("ProxyHostInfo.NameInfo");
     /** Host data. */
-    private final Host host;
-    /** Prepares a new {@code ProxyHostInfo} object. */
-    public ProxyHostInfo(final Host host, final Browser browser) {
+    private Host host;
+
+    public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
         this.host = host;
     }
@@ -199,8 +205,8 @@ public class ProxyHostInfo extends Info {
     /** Creates the popup for the host. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final ProxyHostMenu proxyHostMenu = new ProxyHostMenu(this);
-        return proxyHostMenu.getPulldownMenu();
+        final ProxyHostMenu proxyHostMenu = new ProxyHostMenu();
+        return proxyHostMenu.getPulldownMenu(this);
     }
 
     /** Returns grahical view if there is any. */
@@ -210,7 +216,8 @@ public class ProxyHostInfo extends Info {
         if (dg == null) {
             return null;
         }
-        dg.getDrbdInfo().setSelectedNode(null);
-        return dg.getDrbdInfo().getGraphicalView();
+        final GlobalInfo globalInfo = getBrowser().getClusterBrowser().getGlobalInfo();
+        globalInfo.setSelectedNode(null);
+        return globalInfo.getGraphicalView();
     }
 }

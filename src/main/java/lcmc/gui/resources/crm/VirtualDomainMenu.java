@@ -30,22 +30,24 @@ import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class VirtualDomainMenu extends ServiceMenu {
     
-    private final VirtualDomainInfo virtualDomainInfo;
+    private VirtualDomainInfo virtualDomainInfo;
 
-    private final DomainInfo domainInfo;
-
-    public VirtualDomainMenu(VirtualDomainInfo virtualDomainInfo) {
-        super(virtualDomainInfo);
-        this.virtualDomainInfo = virtualDomainInfo;
-        domainInfo = virtualDomainInfo.getDomainInfo();
-    }
+    private DomainInfo domainInfo;
 
     @Override
-    public List<UpdatableItem> getPulldownMenu() {
-        final List<UpdatableItem> items = super.getPulldownMenu();
+    public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
+        virtualDomainInfo = (VirtualDomainInfo) serviceInfo;
+        domainInfo = virtualDomainInfo.getDomainInfo();
+        final List<UpdatableItem> items = super.getPulldownMenu(virtualDomainInfo);
         addVncViewersToTheMenu(items);
         return items;
     }

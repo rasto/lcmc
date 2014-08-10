@@ -23,24 +23,13 @@ package lcmc.utilities;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.Insets;
-import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -54,7 +43,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -74,28 +62,18 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
-import javax.swing.JApplet;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -108,13 +86,11 @@ import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Clusters;
 import lcmc.model.Host;
-import lcmc.model.HostOptions;
 import lcmc.model.UserConfig;
 import lcmc.model.Value;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.dialog.ConfirmDialog;
-import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 
 /**
@@ -130,20 +106,12 @@ public final class Tools {
 
     /** Config data object. */
     private static Application application;
-    private static GUIData guiData;
-    private static final int DIALOG_PANEL_WIDTH = 400;
-    private static final int DIALOG_PANEL_HEIGHT = 300;
-    private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
-    private static volatile int prevScrollingMenuIndex = -1;
-    public static final String MIME_TYPE_TEXT_HTML = "text/html";
-    public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
     public static final boolean CHECK_SWING_THREAD = true;
 
     public static void init() {
         setDefaults();
         application = new Application();
-        guiData = new GUIData();
     }
 
     /**
@@ -222,24 +190,6 @@ public final class Tools {
         return strace.toString();
     }
 
-    /** Dialog that informs a user about something with ok button. */
-    public static void infoDialog(final String title, final String info1, final String info2) {
-        final JEditorPane infoPane = new JEditorPane(MIME_TYPE_TEXT_PLAIN, info1 + '\n' + info2);
-        infoPane.setEditable(false);
-        infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
-        infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
-        infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        Tools.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                JOptionPane.showMessageDialog(guiData.getMainFrame(),
-                                              new JScrollPane(infoPane),
-                                              title,
-                                              JOptionPane.ERROR_MESSAGE);
-            }
-        });
-    }
-
     /**
      * Checks string if it is an ip.
      */
@@ -293,7 +243,7 @@ public final class Tools {
      * Loads the save file and returns its content as string. Return null, if
      * nothing was loaded.
      */
-    public static String loadFile(final String filename, final boolean showError) {
+    public static String loadFile(GUIData guiData, final String filename, final boolean showError) {
         final BufferedReader in;
         final StringBuilder content = new StringBuilder("");
         try {
@@ -304,7 +254,7 @@ public final class Tools {
             }
         } catch (final IOException ex) {
             if (showError) {
-                infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
+                guiData.infoDialog("Load Error", "The file " + filename + " failed to load", ex.getMessage());
             }
             return null;
         }
@@ -335,11 +285,11 @@ public final class Tools {
     }
 
     /** Removes all the hosts and clusters from all the panels and data. */
-    public static void removeEverything() {
-        Tools.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+    public static void removeEverything(final GUIData guiData) {
+        guiData.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
         Tools.getApplication().disconnectAllHosts();
-        getGUIData().getClustersPanel().removeAllTabs();
-        Tools.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+        guiData.getClustersPanel().removeAllTabs();
+        guiData.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
     }
 
     /**
@@ -349,11 +299,11 @@ public final class Tools {
      *          filename where are the data stored.
      * @param saveAll whether to save clusters specified from the command line
      */
-    public static void save(final UserConfig userConfig, final String filename, final boolean saveAll) {
+    public static void save(final GUIData guiData, final UserConfig userConfig, final String filename, final boolean saveAll) {
         LOG.debug1("save: start");
         final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
                                                                        Matcher.quoteReplacement(filename));
-        startProgressIndicator(text);
+        guiData.startProgressIndicator(text);
         try {
             final FileOutputStream fileOut = new FileOutputStream(filename);
             userConfig.saveXML(fileOut, saveAll);
@@ -376,7 +326,7 @@ public final class Tools {
                     }
                 }
             }
-            stopProgressIndicator(text);
+            guiData.stopProgressIndicator(text);
         }
     }
 
@@ -386,10 +336,6 @@ public final class Tools {
 
     public static Application getApplication() {
         return application;
-    }
-
-    public static GUIData getGUIData() {
-        return guiData;
     }
 
     /**
@@ -787,43 +733,6 @@ public final class Tools {
         return value;
     }
 
-    public static void startProgressIndicator(final String text) {
-        getGUIData().getMainGlassPane().start(text, null);
-    }
-
-    public static void startProgressIndicator(final String name, final String text) {
-        startProgressIndicator(name + ": " + text);
-    }
-
-    public static void stopProgressIndicator(final String text) {
-        getGUIData().getMainGlassPane().stop(text);
-    }
-
-    public static void stopProgressIndicator(final String name, final String text) {
-        stopProgressIndicator(name + ": " + text);
-    }
-
-    public static void progressIndicatorFailed(final String text) {
-        getGUIData().getMainGlassPane().failure(text);
-    }
-
-    public static void progressIndicatorFailed(final String name, final String text) {
-        progressIndicatorFailed(name + ": " + text);
-    }
-
-    /** Progress indicator with failure message that shows for n seconds. */
-    public static void progressIndicatorFailed(final String text, final int n) {
-        getGUIData().getMainGlassPane().failure(text, n);
-    }
-
-    /**
-     * Progress indicator with failure message for host or cluster command,
-     * that shows for n seconds.
-     */
-    public static void progressIndicatorFailed(final String name, final String text, final int n) {
-        progressIndicatorFailed(name + ": " + text, n);
-    }
-
     /** Sets fixed size for component. */
     public static void setSize(final Component c, final int width, final int height) {
         final Dimension d = new Dimension(width, height);
@@ -958,286 +867,6 @@ public final class Tools {
         final TitledBorder titledBorder = new TitledBorder(BorderFactory.createLineBorder(Color.BLACK, 1), text);
         titledBorder.setTitleJustification(TitledBorder.LEFT);
         return titledBorder;
-    }
-
-    /** Returns a popup in a scrolling pane. */
-    public static boolean getScrollingMenu(final String name,
-                                           final JPanel optionsPanel,
-                                           final MyMenu menu,
-                                           final MyListModel<MyMenuItem> dlm,
-                                           final MyList<MyMenuItem> list,
-                                           final Info infoObject,
-                                           final Collection<JDialog> popups,
-                                           final Map<MyMenuItem, ButtonCallback> callbackHash) {
-        final int maxSize = dlm.getSize();
-        if (maxSize <= 0) {
-            return false;
-        }
-        prevScrollingMenuIndex = -1;
-        list.setFixedCellHeight(25);
-        if (maxSize > 10) {
-            list.setVisibleRowCount(10);
-        } else {
-            list.setVisibleRowCount(maxSize);
-        }
-        final JScrollPane sp = new JScrollPane(list);
-        sp.setViewportBorder(null);
-        sp.setBorder(null);
-        final JTextField typeToSearchField = dlm.getFilterField();
-        final Container mainFrame = Tools.getGUIData().getMainFrame();
-        final JDialog popup;
-        if (mainFrame instanceof JApplet) {
-            popup = new JDialog(new JFrame(), name, false);
-        } else {
-            popup = new JDialog((Frame) mainFrame, name, false);
-        }
-        popup.setUndecorated(true);
-        popup.setAlwaysOnTop(true);
-        final JPanel popupPanel = new JPanel();
-        popupPanel.setLayout(new BoxLayout(popupPanel, BoxLayout.PAGE_AXIS));
-        if (maxSize > 10) {
-            popupPanel.add(typeToSearchField);
-        }
-        popupPanel.add(sp);
-        if (optionsPanel != null) {
-            popupPanel.add(optionsPanel);
-        }
-        popup.setContentPane(popupPanel);
-        popups.add(popup);
-
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                prevScrollingMenuIndex = -1;
-                if (callbackHash != null) {
-                    for (final MyMenuItem item : callbackHash.keySet()) {
-                        callbackHash.get(item).mouseOut(item);
-                        list.clearSelection();
-                    }
-                }
-            }
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                /* request focus here causes the applet making all
-                textfields to be not editable. */
-                list.requestFocus();
-            }
-
-            @Override
-            public void mousePressed(final MouseEvent e) {
-                prevScrollingMenuIndex = -1;
-                if (callbackHash != null) {
-                    for (final MyMenuItem item : callbackHash.keySet()) {
-                        callbackHash.get(item).mouseOut(item);
-                    }
-                }
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final int index = list.locationToIndex(e.getPoint());
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.setSelectedIndex(index);
-                                //TODO: some submenus stay visible, during
-                                //ptest, but this breaks group popup menu
-                                //setMenuVisible(menu, false);
-                                menu.setSelected(false);
-                            }
-                        });
-                        final MyMenuItem item = dlm.getElementAt(index);
-                        item.action();
-                    }
-                });
-                thread.start();
-            }
-        });
-
-        list.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(final MouseEvent e) {
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int pIndex = list.locationToIndex(e.getPoint());
-                        final Rectangle r = list.getCellBounds(pIndex, pIndex);
-                        if (r == null) {
-                            return;
-                        }
-                        if (!r.contains(e.getPoint())) {
-                            pIndex = -1;
-                        }
-                        final int index = pIndex;
-                        final int lastIndex = prevScrollingMenuIndex;
-                        if (index == lastIndex) {
-                            return;
-                        }
-                        prevScrollingMenuIndex = index;
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.setSelectedIndex(index);
-                            }
-                        });
-                        if (callbackHash != null) {
-                            if (lastIndex >= 0) {
-                                final MyMenuItem lastItem =
-                                    dlm.getElementAt(lastIndex);
-                                final ButtonCallback bc =
-                                    callbackHash.get(lastItem);
-                                if (bc != null) {
-                                    bc.mouseOut(lastItem);
-                                }
-                            }
-                            if (index >= 0) {
-                                final MyMenuItem item = dlm.getElementAt(index);
-                                final ButtonCallback bc =
-                                    callbackHash.get(item);
-                                if (bc != null) {
-                                    bc.mouseOver(item);
-                                }
-                            }
-                        }
-                    }
-                });
-                thread.start();
-            }
-        });
-        list.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(final KeyEvent e) {
-                final int ch = e.getKeyCode();
-                if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            typeToSearchField.requestFocus();
-                        }
-                    });
-                } else if (ch == KeyEvent.VK_ESCAPE) {
-                    Tools.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (final JDialog otherP : popups) {
-                                otherP.dispose();
-                            }
-                        }
-                    });
-                    infoObject.hidePopup();
-                } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
-                    final MyMenuItem item = list.getSelectedValue();
-                    if (item != null) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                item.action();
-                            }
-                        });
-                        thread.start();
-                    }
-                }
-            }
-            @Override
-            public void keyReleased(final KeyEvent e) {
-            }
-            @Override
-            public void keyTyped(final KeyEvent e) {
-            }
-        });
-        popup.addWindowFocusListener(new WindowFocusListener() {
-            @Override
-            public void windowGainedFocus(final WindowEvent e) {
-            }
-            @Override
-            public void windowLostFocus(final WindowEvent e) {
-                popup.dispose();
-            }
-        });
-
-        typeToSearchField.addKeyListener(new KeyListener() {
-            @Override
-            public void keyPressed(final KeyEvent e) {
-                final int ch = e.getKeyCode();
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (ch == KeyEvent.VK_DOWN) {
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    list.requestFocus();
-                                    /* don't need to press down arrow twice */
-                                    list.setSelectedIndex(0);
-                                }
-                            });
-                        } else if (ch == KeyEvent.VK_ESCAPE) {
-                            Tools.invokeLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    for (final JDialog otherP : popups) {
-                                        otherP.dispose();
-                                    }
-                                }
-                            });
-                            infoObject.hidePopup();
-                        } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
-                            final MyMenuItem item = list.getModel().getElementAt(0);
-                            if (item != null) {
-                                item.action();
-                            }
-                        }
-                    }
-                });
-                thread.start();
-            }
-            @Override
-            public void keyReleased(final KeyEvent e) {
-            }
-            @Override
-            public void keyTyped(final KeyEvent e) {
-            }
-        });
-
-        /* menu is not new. */
-        for (final MenuListener ml : menu.getMenuListeners()) {
-            menu.removeMenuListener(ml);
-        }
-        menu.addMenuListener(new MenuListener() {
-            @Override
-            public void menuCanceled(final MenuEvent e) {
-            }
-
-            @Override
-            public void menuDeselected(final MenuEvent e) {
-                final Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
-                SwingUtilities.convertPointFromScreen(mouseLocation, sp);
-                final boolean inside = sp.getBounds().contains(mouseLocation);
-
-                for (final JDialog otherP : popups) {
-                    if (popup != otherP || !inside) {
-                        /* don't dispose the popup if it was clicked.  */
-                        otherP.dispose();
-                    }
-                }
-            }
-
-            @Override
-            public void menuSelected(final MenuEvent e) {
-                final Point l = menu.getLocationOnScreen();
-                for (final JDialog otherP : popups) {
-                    otherP.dispose();
-                }
-                popup.setLocation((int) (l.getX() + menu.getBounds().getWidth()), (int) l.getY() - 1);
-                popup.pack();
-                popup.setVisible(true);
-                typeToSearchField.requestFocus();
-                typeToSearchField.selectAll();
-                /* Setting location again. Moving it one pixel fixes
-                the "gray window" problem. */
-                popup.setLocation((int) (l.getX() + menu.getBounds().getWidth()), (int) l.getY());
-            }
-        });
-        return true;
     }
 
     /** Returns whether the computer, where this program is run, is Linux. */

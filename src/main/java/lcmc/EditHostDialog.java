@@ -22,37 +22,43 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that configure a host.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class EditHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditHostDialog.class);
     private Host host;
-    @Autowired
+    @Autowired @Qualifier("SSH")
     private SSH sshDialog;
+    @Autowired
+    private GUIData guiData;
 
     public void showDialogs(final Host host) {
         DialogHost dialog = sshDialog;
         dialog.init(null, host, new DrbdInstallation());
-        final boolean expanded = Tools.getGUIData().isTerminalPanelExpanded();
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        final boolean expanded = guiData.isTerminalPanelExpanded();
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 if (!expanded) {
-                    Tools.getGUIData().expandTerminalSplitPane(1);
+                    guiData.expandTerminalSplitPane(1);
                 }
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
@@ -65,7 +71,7 @@ public final class EditHostDialog {
             dialog = newdialog;
         }
         if (!expanded) {
-            Tools.getGUIData().expandTerminalSplitPane(1);
+            guiData.expandTerminalSplitPane(1);
         }
     }
 }

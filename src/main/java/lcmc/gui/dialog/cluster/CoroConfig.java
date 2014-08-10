@@ -49,6 +49,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.crm.AisCastAddress;
 import lcmc.model.Application;
@@ -73,6 +74,8 @@ import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -80,6 +83,7 @@ import org.springframework.stereotype.Component;
  * hosts.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class CoroConfig extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(CoroConfig.class);
     private static final Value MCAST_TYPE = new StringValue("mcast");
@@ -120,6 +124,8 @@ final class CoroConfig extends DialogCluster {
 
     @Autowired
     private InitCluster initClusterDialog;
+    @Autowired
+    private GUIData guiData;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
@@ -601,7 +607,7 @@ final class CoroConfig extends DialogCluster {
                     if (aisCastAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        Tools.getGUIData().setAccessible(makeConfigButton, Application.AccessType.ADMIN);
+                        guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
                     }
                     if (!Tools.getApplication().getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -956,7 +962,7 @@ final class CoroConfig extends DialogCluster {
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
-        Tools.getGUIData().setAccessible(configCheckbox, Application.AccessType.ADMIN);
+        guiData.setAccessible(configCheckbox, Application.AccessType.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {

@@ -39,12 +39,15 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandThread;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * DialogHost.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class DialogHost extends WizardDialog {
     private Host host;
     private ExecCommandThread commandThread = null;

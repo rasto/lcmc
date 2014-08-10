@@ -21,7 +21,6 @@
 package lcmc.gui.resources.crm;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +32,8 @@ import javax.swing.JComponent;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.crm.ClusterStatus;
 import lcmc.model.Host;
@@ -49,27 +50,31 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class provides menus for service and host multi selection.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class PcmkMultiSelectionInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
                         LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     /** All selected objects. */
-    private final List<Info> selectedInfos;
+    private List<Info> selectedInfos;
 
-    /** Prepares a new {@code PcmkMultiSelectionInfo} object. */
-    public PcmkMultiSelectionInfo(final List<Info> selectedInfos,
-                                  final Browser browser) {
+    public void init(final List<Info> selectedInfos, final Browser browser) {
         super.init("selection", browser);
         this.selectedInfos = selectedInfos;
     }
 
     @Override
     protected String getInfoMimeType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
+        return GUIData.MIME_TYPE_TEXT_HTML;
     }
 
     @Override
@@ -301,7 +306,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Actions */
         final JMenuBar mb = new JMenuBar();

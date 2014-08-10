@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -53,6 +54,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import lcmc.AddHostDialog;
+import lcmc.AppContext;
+import lcmc.gui.GUIData;
 import lcmc.model.*;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.GenericWidget.MTextField;
@@ -63,6 +66,8 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -100,9 +105,11 @@ public final class AllHostsInfo extends Info {
     @Autowired
     private UserConfig userConfig;
     @Autowired
-    private AddHostDialog addHostDialog;
+    private Provider<AddHostDialog> addHostDialogProvider;
     @Autowired
     private HostFactory hostFactory;
+    @Autowired
+    private GUIData guiData;
 
     public void init(final Browser browser) {
         super.init(Tools.getString("ClusterBrowser.AllHosts"), browser);
@@ -147,7 +154,7 @@ public final class AllHostsInfo extends Info {
                 Tools.stopClusters(selectedRunningClusters);
                 Tools.removeClusters(selectedClusters);
                 final String saveFile = Tools.getApplication().getSaveFile();
-                Tools.save(userConfig, saveFile, false);
+                Tools.save(guiData, userConfig, saveFile, false);
                 mainPanel.repaint();
                 Tools.invokeLater(new Runnable() {
                     @Override
@@ -493,7 +500,7 @@ public final class AllHostsInfo extends Info {
                             host.setHostname(hostName);
                             cluster.addHost(host);
                             Tools.getApplication().addHostToHosts(host);
-                            Tools.getGUIData().allHostsUpdate();
+                            guiData.allHostsUpdate();
                         }
                         Tools.getApplication().addClusterToClusters(cluster);
                         final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
@@ -743,11 +750,12 @@ public final class AllHostsInfo extends Info {
                 public void action() {
                     final Host host = hostFactory.createInstance();
                     host.init();
+                    final AddHostDialog addHostDialog = addHostDialogProvider.get();
                     addHostDialog.showDialogs(host);
                 }
             };
         items.add(newHostWizardItem);
-        Tools.getGUIData().registerAddHostButton(newHostWizardItem);
+        guiData.registerAddHostButton(newHostWizardItem);
         return items;
     }
 }

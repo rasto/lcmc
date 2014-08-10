@@ -24,9 +24,11 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.inject.Provider;
 import javax.swing.JDialog;
 import lcmc.EditClusterDialog;
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.CrmXml;
@@ -47,9 +49,12 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ServicesMenu {
 
     private static final Logger LOG =
@@ -57,6 +62,12 @@ public class ServicesMenu {
 
     @Autowired
     private EditClusterDialog editClusterDialog;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
+    @Autowired
+    private Provider<PcmkRscSetsInfo> rscSetsInfoProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ServicesInfo servicesInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -300,7 +311,7 @@ public class ServicesMenu {
                         mmi.setPos(pos);
                         dlm.addElement(mmi);
                     }
-                    final boolean ret = Tools.getScrollingMenu(
+                    final boolean ret = guiData.getScrollingMenu(
                                         ClusterBrowser.getClassMenuName(cl),
                                         null, /* options */
                                         classItem,
@@ -345,16 +356,14 @@ public class ServicesMenu {
                 public void action() {
                     servicesInfo.hidePopup();
                     final CrmGraph hg = servicesInfo.getBrowser().getCrmGraph();
-                    final ConstraintPHInfo cphi =
-                         new ConstraintPHInfo(servicesInfo.getBrowser(),
-                                              null,
-                                              ConstraintPHInfo.Preference.AND);
-                    cphi.getService().setNew(true);
-                    servicesInfo.getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi, getPos(), runMode);
-                    final PcmkRscSetsInfo prsi =
-                                      new PcmkRscSetsInfo(servicesInfo.getBrowser(), cphi);
-                    cphi.setPcmkRscSetsInfo(prsi);
+                    final ConstraintPHInfo constraintPHInfo = constraintPHInfoProvider.get();
+                    constraintPHInfo.init(servicesInfo.getBrowser(), null, ConstraintPHInfo.Preference.AND);
+                    constraintPHInfo.getService().setNew(true);
+                    servicesInfo.getBrowser().addNameToServiceInfoHash(constraintPHInfo);
+                    hg.addConstraintPlaceholder(constraintPHInfo, getPos(), runMode);
+                    final PcmkRscSetsInfo rscSetsInfo = rscSetsInfoProvider.get();
+                    rscSetsInfo.init(servicesInfo.getBrowser(), constraintPHInfo);
+                    constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -403,16 +412,14 @@ public class ServicesMenu {
                 public void action() {
                     servicesInfo.hidePopup();
                     final CrmGraph hg = servicesInfo.getBrowser().getCrmGraph();
-                    final ConstraintPHInfo cphi =
-                         new ConstraintPHInfo(servicesInfo.getBrowser(),
-                                              null,
-                                              ConstraintPHInfo.Preference.OR);
-                    cphi.getService().setNew(true);
-                    servicesInfo.getBrowser().addNameToServiceInfoHash(cphi);
-                    hg.addConstraintPlaceholder(cphi, getPos(), runMode);
-                    final PcmkRscSetsInfo prsi =
-                                      new PcmkRscSetsInfo(servicesInfo.getBrowser(), cphi);
-                    cphi.setPcmkRscSetsInfo(prsi);
+                    final ConstraintPHInfo constraintPHInfo = constraintPHInfoProvider.get();
+                    constraintPHInfo.init(servicesInfo.getBrowser(), null, ConstraintPHInfo.Preference.OR);
+                    constraintPHInfo.getService().setNew(true);
+                    servicesInfo.getBrowser().addNameToServiceInfoHash(constraintPHInfo);
+                    hg.addConstraintPlaceholder(constraintPHInfo, getPos(), runMode);
+                    final PcmkRscSetsInfo rscSetsInfo = rscSetsInfoProvider.get();
+                    rscSetsInfo.init(servicesInfo.getBrowser(), constraintPHInfo);
+                    constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
                     Tools.invokeLater(new Runnable() {
                         @Override
                         public void run() {

@@ -25,6 +25,8 @@ package lcmc;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import lcmc.gui.GUIData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.drbdConfig.Resource;
 import lcmc.gui.dialog.drbdConfig.Start;
@@ -35,20 +37,30 @@ import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that add and configure new host.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class AddDrbdConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdConfigDialog.class);
     private boolean wizardCanceled = false;
-    private final GlobalInfo globalInfo;
-    private final BlockDevInfo blockDevInfo1;
-    private final BlockDevInfo blockDevInfo2;
+    private GlobalInfo globalInfo;
+    private BlockDevInfo blockDevInfo1;
+    private BlockDevInfo blockDevInfo2;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Start startDialog;
+    @Autowired
+    private Resource resourceDialog;
 
-    public AddDrbdConfigDialog(final GlobalInfo globalInfo,
-                               final BlockDevInfo blockDevInfo1,
-                               final BlockDevInfo blockDevInfo2) {
+    public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         this.globalInfo = globalInfo;
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;
@@ -57,7 +69,8 @@ public final class AddDrbdConfigDialog {
     public void showDialogs() {
         WizardDialog dialog;
         if (!globalInfo.getDrbdResources().isEmpty() && globalInfo.atLeastVersion("8.4")) {
-            dialog = new Start(null, globalInfo, blockDevInfo1, blockDevInfo2);
+            startDialog.init(null, blockDevInfo1, blockDevInfo2);
+            dialog = startDialog;
         } else {
             final List<BlockDevInfo> blockDevices = new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1,
                                                                                               blockDevInfo2));
@@ -72,16 +85,17 @@ public final class AddDrbdConfigDialog {
                     globalInfo.addDrbdVolume(dvi);
                 }
             });
-            dialog = new Resource(null, dvi);
+            resourceDialog.init(null, dvi);
+            dialog = resourceDialog;
         }
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 wizardCanceled = true;
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;

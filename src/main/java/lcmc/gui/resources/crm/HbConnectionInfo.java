@@ -22,7 +22,6 @@
 package lcmc.gui.resources.crm;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,6 +34,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -57,11 +57,17 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HbConnectionInfo extends EditableInfo {
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
@@ -86,9 +92,12 @@ public class HbConnectionInfo extends EditableInfo {
     /** List of order ids. */
     private final Map<String, HbOrderInfo> orderIds =
                                       new LinkedHashMap<String, HbOrderInfo>();
+    @Autowired
+    private Provider<HbColocationInfo> colocationInfoProvider;
+    @Autowired
+    private Provider<HbOrderInfo> orderInfoProvider;
 
-    /** Prepares a new {@code HbConnectionInfo} object. */
-    public HbConnectionInfo(final Browser browser) {
+    public void init(final Browser browser) {
         super.init("HbConnectionInfo", browser);
     }
 
@@ -398,7 +407,7 @@ public class HbConnectionInfo extends EditableInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         mainPanel.add(buttonPanel);
 
@@ -558,18 +567,16 @@ public class HbConnectionInfo extends EditableInfo {
             hoi.setParameters();
             return;
         }
-        final HbOrderInfo oi = new HbOrderInfo(this,
-                                               serviceInfoParent,
-                                               serviceInfoChild,
-                                               getBrowser());
-        oi.setApplyButton(getApplyButton());
-        oi.setRevertButton(getRevertButton());
-        orderIds.put(ordId, oi);
-        oi.getService().setHeartbeatId(ordId);
-        oi.setParameters();
+        final HbOrderInfo orderInfo = orderInfoProvider.get();
+        orderInfo.init(this, serviceInfoParent, serviceInfoChild, getBrowser());
+        orderInfo.setApplyButton(getApplyButton());
+        orderInfo.setRevertButton(getRevertButton());
+        orderIds.put(ordId, orderInfo);
+        orderInfo.getService().setHeartbeatId(ordId);
+        orderInfo.setParameters();
         mConstraintsWriteLock.lock();
         try {
-            constraints.add(oi);
+            constraints.add(orderInfo);
         } finally {
             mConstraintsWriteLock.unlock();
         }
@@ -594,18 +601,16 @@ public class HbConnectionInfo extends EditableInfo {
             hci.setParameters();
             return;
         }
-        final HbColocationInfo ci = new HbColocationInfo(this,
-                                                         serviceInfoRsc,
-                                                         serviceInfoWithRsc,
-                                                         getBrowser());
-        ci.setApplyButton(getApplyButton());
-        ci.setRevertButton(getRevertButton());
-        colocationIds.put(colId, ci);
-        ci.getService().setHeartbeatId(colId);
-        ci.setParameters();
+        final HbColocationInfo colocationInfo = colocationInfoProvider.get();
+        colocationInfo.init(this, serviceInfoRsc, serviceInfoWithRsc, getBrowser());
+        colocationInfo.setApplyButton(getApplyButton());
+        colocationInfo.setRevertButton(getRevertButton());
+        colocationIds.put(colId, colocationInfo);
+        colocationInfo.getService().setHeartbeatId(colId);
+        colocationInfo.setParameters();
         mConstraintsWriteLock.lock();
         try {
-            constraints.add(ci);
+            constraints.add(colocationInfo);
         } finally {
             mConstraintsWriteLock.unlock();
         }

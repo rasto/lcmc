@@ -36,22 +36,25 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
+
+import lcmc.gui.resources.drbd.*;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.Subtext;
 import lcmc.model.resources.BlockDevice;
 import lcmc.gui.resources.Info;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.gui.resources.drbd.HostDrbdInfo;
-import lcmc.gui.resources.drbd.MultiSelectionInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class creates graph and provides methods to add new block device
  * vertices and drbd volume edges, remove or modify them.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DrbdGraph extends ResourceGraph {
     /** Horizontal step in pixels by which the block devices are drawn in the graph. */
     private static final int BD_STEP_Y = 60;
@@ -90,27 +93,18 @@ public class DrbdGraph extends ResourceGraph {
     /** Map from drbd volume info object to the graph edge. */
     private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap = new LinkedHashMap<VolumeInfo, Edge>();
 
-    private GlobalInfo globalInfo;
-    private Info multiSelectionInfo = null;
+    @Autowired
+    private MultiSelectionInfo multiSelectionInfo = null;
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
-
-    public DrbdGraph(final ClusterBrowser clusterBrowser) {
-        super(clusterBrowser);
-    }
+    @Autowired
+    private GUIData guiData;
 
     @Override
-    protected void initGraph() {
+    protected void initGraph(final ClusterBrowser clusterBrowser) {
+        super.initGraph(clusterBrowser);
         super.initGraph(new DirectedSparseGraph<Vertex, Edge>());
-    }
-
-    public void setDrbdInfo(final GlobalInfo globalInfo) {
-        this.globalInfo = globalInfo;
-    }
-
-    public GlobalInfo getDrbdInfo() {
-        return globalInfo;
     }
 
     private boolean isVertexBlockDevice(final Vertex v) {
@@ -582,9 +576,8 @@ public class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected void handlePopupBackground(final Point2D pos) {
-        final GlobalInfo info = getDrbdInfo();
-        final JPopupMenu p = info.getPopup();
-        info.updateMenus(pos);
+        final JPopupMenu p = getClusterBrowser().getGlobalInfo().getPopup();
+        getClusterBrowser().getGlobalInfo().updateMenus(pos);
         showPopup(p, pos);
     }
 
@@ -605,7 +598,7 @@ public class DrbdGraph extends ResourceGraph {
         if (hi == null) {
             return;
         }
-        Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
+        guiData.setTerminalPanel(hi.getHost().getTerminalPanel());
     }
 
     /** Is called when one block device vertex was pressed. */
@@ -617,8 +610,8 @@ public class DrbdGraph extends ResourceGraph {
             if (bdi == null) {
                 return;
             }
-            globalInfo.setSelectedNode(bdi);
-            globalInfo.selectMyself();
+            getClusterBrowser().getGlobalInfo().setSelectedNode(bdi);
+            getClusterBrowser().getGlobalInfo().selectMyself();
             getClusterBrowser().setRightComponentInView(bdi);
         } else {
             pickHost(v);
@@ -713,8 +706,8 @@ public class DrbdGraph extends ResourceGraph {
      */
     @Override
     protected void backgroundClicked() {
-        globalInfo.setSelectedNode(null);
-        globalInfo.selectMyself();
+        getClusterBrowser().getGlobalInfo().setSelectedNode(null);
+        getClusterBrowser().getGlobalInfo().selectMyself();
     }
 
     /**
@@ -1023,7 +1016,7 @@ public class DrbdGraph extends ResourceGraph {
                 selectedInfos.add(i);
             }
         }
-        multiSelectionInfo = new MultiSelectionInfo(selectedInfos, getClusterBrowser());
+        multiSelectionInfo.init(selectedInfos, getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
 

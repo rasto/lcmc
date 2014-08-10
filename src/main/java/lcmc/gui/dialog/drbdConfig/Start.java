@@ -43,27 +43,36 @@ import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Start extends WizardDialog {
     private static final int COMBOBOX_WIDTH = 250;
     private Widget drbdResourceWidget;
-    private final GlobalInfo globalInfo;
-    private final BlockDevInfo blockDevInfo1;
-    private final BlockDevInfo blockDevInfo2;
+    private BlockDevInfo blockDevInfo1;
+    private BlockDevInfo blockDevInfo2;
     private ResourceInfo resourceInfo;
+    @Autowired
+    private Resource resourceDialog;
+    @Autowired
+    private Volume volumeDialog;
+    private GlobalInfo globalInfo;
 
-    public Start(final WizardDialog previousDialog,
-                 final GlobalInfo globalInfo,
-                 final BlockDevInfo blockDevInfo1,
-                 final BlockDevInfo blockDevInfo2) {
+    public void init(final WizardDialog previousDialog,
+                     final BlockDevInfo blockDevInfo1,
+                     final BlockDevInfo blockDevInfo2) {
         setPreviousDialog(previousDialog);
-        this.globalInfo = globalInfo;
         this.blockDevInfo1 = blockDevInfo1;
         this.blockDevInfo2 = blockDevInfo2;
+        globalInfo = blockDevInfo1.getBrowser().getClusterBrowser().getGlobalInfo();
     }
 
     /** Applies the changes and returns next dialog (BlockDev). */
@@ -91,9 +100,11 @@ public final class Start extends WizardDialog {
             }
         });
         if (newResource) {
-            return new Resource(this, dvi);
+            resourceDialog.init(this, dvi);
+            return resourceDialog;
         } else {
-            return new Volume(this, dvi);
+            volumeDialog.init(this, dvi);
+            return volumeDialog;
         }
     }
 

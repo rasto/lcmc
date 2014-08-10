@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
@@ -45,7 +47,13 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class BlockDevMenu {
     /** Logger. */
     private static final Logger LOG =
@@ -91,13 +99,13 @@ public class BlockDevMenu {
     /** Description LV snapshot. */
     private static final String LV_SNAPSHOT_MENU_DESCRIPTION =
                                     "Create a snapshot of the logical volume.";
-    
-    private final BlockDevInfo blockDevInfo;
-    public BlockDevMenu(BlockDevInfo blockDevInfo) {
-        this.blockDevInfo = blockDevInfo;
-    }
 
-    public List<UpdatableItem> getPulldownMenu() {
+    private BlockDevInfo blockDevInfo;
+    @Autowired
+    private GUIData guiData;
+
+    public List<UpdatableItem> getPulldownMenu(final BlockDevInfo blockDevInfo) {
+        this.blockDevInfo = blockDevInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final UpdatableItem repMenuItem = new MyMenu(
@@ -819,18 +827,13 @@ public class BlockDevMenu {
 
             @Override
             public void action() {
-                final GlobalInfo globalInfo =
-                              getClusterBrowser().getDrbdGraph().getDrbdInfo();
                 cleanup();
                 blockDevInfo.resetInfoPanel();
                 blockDevInfo.setInfoPanel(null);
                 oBdi.cleanup();
                 oBdi.resetInfoPanel();
                 oBdi.setInfoPanel(null);
-                globalInfo.addDrbdVolume(blockDevInfo,
-                                         oBdi,
-                                         true,
-                                         runMode);
+                getClusterBrowser().getGlobalInfo().addDrbdVolume(blockDevInfo, oBdi, true, runMode);
             }
         };
     }
@@ -862,9 +865,9 @@ public class BlockDevMenu {
             public void action() {
                 final boolean ret = blockDevInfo.pvCreate(Application.RunMode.LIVE);
                 if (!ret) {
-                    Tools.progressIndicatorFailed(
-                                Tools.getString("BlockDevInfo.PVCreate.Failed",
-                                                blockDevInfo.getName()));
+                    guiData.progressIndicatorFailed(
+                            Tools.getString("BlockDevInfo.PVCreate.Failed",
+                                    blockDevInfo.getName()));
                 }
                 getClusterBrowser().updateHWInfo(getHost(), Host.UPDATE_LVM);
             }
@@ -898,7 +901,7 @@ public class BlockDevMenu {
             public void action() {
                 final boolean ret = blockDevInfo.pvRemove(Application.RunMode.LIVE);
                 if (!ret) {
-                    Tools.progressIndicatorFailed(
+                    guiData.progressIndicatorFailed(
                                 Tools.getString("BlockDevInfo.PVRemove.Failed",
                                                 blockDevInfo.getName()));
                 }

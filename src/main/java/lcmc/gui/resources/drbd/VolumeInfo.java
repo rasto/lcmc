@@ -22,7 +22,6 @@
 package lcmc.gui.resources.drbd;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
@@ -72,10 +72,16 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data of a DRBD volume.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private static final Logger LOG = LoggerFactory.getLogger(VolumeInfo.class);
     static final String DRBD_VOL_PARAM_DEV = "device";
@@ -126,20 +132,24 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 }});
     private static final String BY_RES_DEV_DIR = "/dev/drbd/by-res/";
 
-    private final ResourceInfo resourceInfo;
-    private final List<BlockDevInfo> blockDevInfos;
+    private ResourceInfo resourceInfo;
+    private List<BlockDevInfo> blockDevInfos;
     /** Device name. TODO: */
     private String device;
     /** Last created filesystem. */
     private String createdFs = null;
     private JComponent infoPanel = null;
-    private final Set<Host> hosts;
+    private Set<Host> hosts;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
 
-    VolumeInfo(final String name,
-               final String device,
-               final ResourceInfo resourceInfo,
-               final List<BlockDevInfo> blockDevInfos,
-               final Browser browser) {
+    void init(final String name,
+              final String device,
+              final ResourceInfo resourceInfo,
+              final List<BlockDevInfo> blockDevInfos,
+              final Browser browser) {
         super.init(name, browser);
         assert (resourceInfo != null);
         assert (blockDevInfos.size() >= 2);
@@ -220,7 +230,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 final Map<Host, String> testOutput =
                     new LinkedHashMap<Host, String>();
                 try {
-                    getDrbdInfo().createConfigDryRun(testOutput);
+                    getBrowser().getGlobalInfo().createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
                     getBrowser().setDRBDtestData(dtd);
@@ -245,7 +255,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         mainPanel.add(buttonPanel);
 
@@ -279,7 +289,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                         });
                         getBrowser().drbdStatusLock();
                         try {
-                            getDrbdInfo().createDrbdConfigLive();
+                            getBrowser().getGlobalInfo().createDrbdConfigLive();
                             for (final Host h : getHosts()) {
                                 DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
                             }
@@ -486,13 +496,14 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         clusterBrowser.updateCommonBlockDevices();
 
         try {
-            getDrbdInfo().createDrbdConfig(runMode);
-            getDrbdInfo().setSelectedNode(null);
-            getDrbdInfo().selectMyself();
+            getBrowser().getGlobalInfo().createDrbdConfig(runMode);
+            getBrowser().getGlobalInfo().setSelectedNode(null);
+            getBrowser().getGlobalInfo().selectMyself();
             clusterBrowser.resetFilesystems();
 
-            final DrbdXml dxml = new DrbdXml(hosts0.toArray(new Host[hosts0.size()]),
-                clusterBrowser.getHostDrbdParameters());
+            final DrbdXml dxml = new DrbdXml(guiData,
+                                             hosts0.toArray(new Host[hosts0.size()]),
+                                             clusterBrowser.getHostDrbdParameters());
             for (final Host host : hosts0) {
                 final String conf = dxml.getConfig(host);
                 if (conf != null) {
@@ -550,7 +561,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     /** Return DRBD device in /dev/drbd/by-res...form. */
     public String getDeviceByRes() {
-        if (getDrbdInfo().atLeastVersion("8.4")) {
+        if (getBrowser().getGlobalInfo().atLeastVersion("8.4")) {
             return BY_RES_DEV_DIR + getDrbdResourceInfo().getName() + '/' + getName();
         } else {
             return BY_RES_DEV_DIR + getDrbdResourceInfo().getName();
@@ -773,8 +784,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     /** Starts resolve split brain dialog. */
     void resolveSplitBrain() {
-        final AddDrbdSplitBrainDialog adrd = new AddDrbdSplitBrainDialog(this);
-        adrd.showDialogs();
+        addDrbdSplitBrainDialog.init(this);
+        addDrbdSplitBrainDialog.showDialogs();
     }
 
     /** Connect block device from the specified host. */
@@ -837,7 +848,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                               final boolean fromDrbdInfo,
                               final boolean fromDrbdResourceInfo) {
         final DrbdXml dxml = getBrowser().getDrbdXml();
-        final GlobalInfo di = getDrbdInfo();
+        final GlobalInfo di = getBrowser().getGlobalInfo();
         if (di != null && !fromDrbdInfo && !fromDrbdResourceInfo) {
             di.setApplyButtons(null, di.getParametersFromXML());
         }
@@ -876,7 +887,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             getBrowser().getDrbdDeviceHash().put(drbdDevStr, this);
             getBrowser().putDrbdDevHash();
             getBrowser().getDrbdGraph().repaint();
-            getDrbdInfo().setAllApplyButtons();
+            getBrowser().getGlobalInfo().setAllApplyButtons();
             getResource().setNew(false);
         }
     }
@@ -976,7 +987,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     @Override
     protected String isEnabled(final String param) {
-        if (DRBD_VOL_PARAM_NUMBER.equals(param) && !getDrbdInfo().atLeastVersion("8.4")) {
+        if (DRBD_VOL_PARAM_NUMBER.equals(param) && !getBrowser().getGlobalInfo().atLeastVersion("8.4")) {
             return "available in DRBD 8.4";
         }
         if (getDrbdVolume().isCommited()) {
@@ -1069,10 +1080,6 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     @Override
     public boolean isUsedByCRM() {
         return getDrbdResourceInfo().isUsedByCRM();
-    }
-
-    public GlobalInfo getDrbdInfo() {
-        return getDrbdResourceInfo().getDrbdInfo();
     }
 
     @Override

@@ -24,7 +24,6 @@ package lcmc.gui.resources.drbd;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,6 +43,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.Exceptions;
+import lcmc.gui.*;
 import lcmc.model.Application;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
@@ -52,10 +52,6 @@ import lcmc.model.StringValue;
 import lcmc.model.Subtext;
 import lcmc.model.Value;
 import lcmc.model.resources.BlockDevice;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.DrbdGraph;
-import lcmc.gui.HostBrowser;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Check;
@@ -68,10 +64,16 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a block device.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class BlockDevInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
@@ -121,6 +123,15 @@ public class BlockDevInfo extends EditableInfo {
     private static final String PROXY_DOWN = "Proxy Down";
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private BlockDevMenu blockDevMenu;
+
+    public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
+        super.init(name, browser);
+        setResource(blockDevice);
+    }
 
     /**
      * Return whether the block device is unimportant (for the GUI), e.g.
@@ -148,19 +159,6 @@ public class BlockDevInfo extends EditableInfo {
                                             new HashMap<String, Boolean>();
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
-
-    /**
-     * Prepares a new {@code BlockDevInfo} object.
-     *
-     * @param name
-     *      name that will be shown in the tree
-     * @param blockDevice
-     *      block device
-     */
-    public BlockDevInfo(final String name, final BlockDevice blockDevice, final Browser browser) {
-        super.init(name, browser);
-        setResource(blockDevice);
-    }
 
     /**
      * Returns object of the other block device that is connected via drbd
@@ -891,16 +889,16 @@ public class BlockDevInfo extends EditableInfo {
     @Override
     public JPanel getGraphicalView() {
         if (getBlockDevice().isDrbd()) {
-            getBrowser().getDrbdGraph().getDrbdInfo().setSelectedNode(this);
+            getBrowser().getClusterBrowser().getGlobalInfo().setSelectedNode(this);
         }
-        return getBrowser().getDrbdGraph().getDrbdInfo().getGraphicalView();
+        return getBrowser().getClusterBrowser().getGlobalInfo().getGraphicalView();
     }
 
     /** Set the terminal panel. */
     @Override
     protected void setTerminalPanel() {
         if (getHost() != null) {
-            Tools.getGUIData().setTerminalPanel(getHost().getTerminalPanel());
+            guiData.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 
@@ -950,7 +948,7 @@ public class BlockDevInfo extends EditableInfo {
                 ((BlockDevInfo) v).getBlockDevice();
                 getBlockDevice().setMetaDisk(metaDisk);
             }
-            getBrowser().getDrbdGraph().getDrbdInfo().setAllApplyButtons();
+            getBrowser().getClusterBrowser().getGlobalInfo().setAllApplyButtons();
         }
     }
 
@@ -1009,8 +1007,7 @@ public class BlockDevInfo extends EditableInfo {
                 final Map<Host, String> testOutput =
                     new LinkedHashMap<Host, String>();
                 try {
-                    getBrowser().getDrbdGraph().getDrbdInfo()
-                                  .createConfigDryRun(testOutput);
+                    getBrowser().getClusterBrowser().getGlobalInfo().createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
                     thisClass.setDRBDtestData(dtd);
@@ -1035,7 +1032,7 @@ public class BlockDevInfo extends EditableInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Actions */
         buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
@@ -1064,8 +1061,7 @@ public class BlockDevInfo extends EditableInfo {
                             });
                             getBrowser().getClusterBrowser().drbdStatusLock();
                             try {
-                                getBrowser().getDrbdGraph().getDrbdInfo()
-                                    .createDrbdConfigLive();
+                                getBrowser().getClusterBrowser().getGlobalInfo().createDrbdConfigLive();
                                 for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
                                     DRBD.adjustApply(h,
@@ -1108,7 +1104,7 @@ public class BlockDevInfo extends EditableInfo {
         /* info */
         final JPanel riaPanel = new JPanel();
         riaPanel.setBackground(HostBrowser.PANEL_BACKGROUND);
-        riaPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        riaPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         riaPanel.add(super.getInfoPanel());
         mainPanel.add(riaPanel);
 
@@ -1181,8 +1177,7 @@ public class BlockDevInfo extends EditableInfo {
     /** Creates popup for the block device. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final BlockDevMenu blockDevMenu = new BlockDevMenu(this);
-        return blockDevMenu.getPulldownMenu();
+        return blockDevMenu.getPulldownMenu(this);
     }
 
     /** Returns how much of the block device is used. */

@@ -22,29 +22,40 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.gui.dialog.vm.Domain;
 import lcmc.gui.dialog.vm.VMConfig;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that add and configure new virtual domain.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class AddVMConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddVMConfigDialog.class);
-    private final DomainInfo vmsVirtualDomainInfo;
+    private DomainInfo vmsVirtualDomainInfo;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Domain domainDialog;
 
-    public AddVMConfigDialog(final DomainInfo vmsVirtualDomainInfo) {
+    public void init(final DomainInfo vmsVirtualDomainInfo) {
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 
     public void showDialogs() {
         vmsVirtualDomainInfo.setDialogStarted(true);
-        VMConfig dialog = new Domain(null, vmsVirtualDomainInfo);
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        VMConfig dialog = domainDialog;
+        dialog.init(null, vmsVirtualDomainInfo);
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final VMConfig newdialog = (VMConfig) dialog.showDialog();
@@ -65,7 +76,7 @@ public final class AddVMConfigDialog {
         }
         vmsVirtualDomainInfo.setDialogStarted(false);
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
-        Tools.getGUIData().expandTerminalSplitPane(1);
-        Tools.getGUIData().getMainFrame().requestFocus();
+        guiData.expandTerminalSplitPane(1);
+        LCMC.MAIN_FRAME.requestFocus();
     }
 }

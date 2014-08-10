@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.vm;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -31,13 +30,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.model.vm.VmsXml.GraphicsData;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.resources.vms.GraphicsInfo;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class Display extends VMConfig {
     private static final String[] PARAMS = {GraphicsData.TYPE,
                                             GraphicsData.PORT,
@@ -49,15 +53,14 @@ final class Display extends VMConfig {
     private JComponent inputPane = null;
     private GraphicsInfo graphicsInfo = null;
     private WizardDialog nextDialogObject = null;
-
-    Display(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
-        super(previousDialog, vmsVirtualDomainInfo);
-    }
+    @Autowired
+    private VMFinish vmFinishDialog;
 
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            nextDialogObject = new Finish(this, getVMSVirtualDomainInfo());
+            vmFinishDialog.init(this, getVMSVirtualDomainInfo());
+            nextDialogObject = vmFinishDialog;
         }
         return nextDialogObject;
     }
@@ -111,7 +114,7 @@ final class Display extends VMConfig {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
         graphicsInfo.savePreferredValues();
         graphicsInfo.getResource().setValue(GraphicsData.TYPE, GraphicsInfo.TYPE_VNC);
         graphicsInfo.getResource().setValue(GraphicsData.PORT, GraphicsInfo.PORT_AUTO);

@@ -202,12 +202,9 @@ public class HostDrbdInfo extends Info {
 
     @Override
     public JPanel getGraphicalView() {
-        final DrbdGraph dg = getBrowser().getDrbdGraph();
-        if (dg == null) {
-            return null;
-        }
-        dg.getDrbdInfo().setSelectedNode(null);
-        return dg.getDrbdInfo().getGraphicalView();
+        final GlobalInfo globalInfo = getBrowser().getClusterBrowser().getGlobalInfo();
+        globalInfo.setSelectedNode(null);
+        return globalInfo.getGraphicalView();
     }
 
     /** Returns how much of this is used. */

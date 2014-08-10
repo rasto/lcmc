@@ -35,4 +35,8 @@ public final class AppContext {
 	public static <T> T getBean(Class<T> beanClass) {
 		return context.getBean(beanClass);
 	}
+
+    public static <T> T getBean(final String name, Class<T> beanClass) {
+        return context.getBean(name, beanClass);
+    }
 }

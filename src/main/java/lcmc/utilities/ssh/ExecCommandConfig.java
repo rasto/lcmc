@@ -20,6 +20,7 @@
 
 package lcmc.utilities.ssh;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
@@ -121,16 +122,16 @@ public class ExecCommandConfig {
         return this;
     }
 
-    public ExecCommandThread execute() {
+    public ExecCommandThread execute(final GUIData guiData) {
         if (isOutputVisible()) {
-            Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
+            guiData.setTerminalPanel(host.getTerminalPanel());
         }
-        final ExecCommandThread execCommandThread = new ExecCommandThread(this);
+        final ExecCommandThread execCommandThread = new ExecCommandThread(guiData, this);
         execCommandThread.start();
         return execCommandThread;
     }
 
-    public SshOutput capture() {
+    public SshOutput capture(final GUIData guiData) {
         final StringBuilder output = new StringBuilder("");
         final Integer[] exitCodeHolder = new Integer[]{0};
         if (execCallback == null) {
@@ -151,7 +152,7 @@ public class ExecCommandConfig {
                 }
             };
         }
-        final ExecCommandThread execCommandThread = execute();
+        final ExecCommandThread execCommandThread = execute(guiData);
         execCommandThread.block();
         return new SshOutput(output.toString(), exitCodeHolder[0]);
     }

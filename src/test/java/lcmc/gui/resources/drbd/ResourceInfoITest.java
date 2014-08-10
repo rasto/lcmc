@@ -26,8 +26,11 @@ public final class ResourceInfoITest {
     @Test
     public void testNotEqualNames() {
         final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo("name1", null, clusterBrowser);
-        final ResourceInfo r2 = new ResourceInfo("name2", null, clusterBrowser);
+        final ResourceInfo r1 = new ResourceInfo();
+        r1.init("name1", null, clusterBrowser);
+        final ResourceInfo r2 = new ResourceInfo();
+        r2.init("name2", null, clusterBrowser);
+
         assertFalse("not equal names", r1.equals(r2));
     }
 
@@ -35,15 +38,20 @@ public final class ResourceInfoITest {
     public void testEqualNames() {
 
         final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo("name", null, clusterBrowser);
-        final ResourceInfo r2 = new ResourceInfo("name", null, clusterBrowser);
+        final ResourceInfo r1 = new ResourceInfo();
+        r1.init("name", null, clusterBrowser);
+        final ResourceInfo r2 = new ResourceInfo();
+        r2.init("name", null, clusterBrowser);
+
         assertTrue("equal names", r1.equals(r2));
     }
 
     @Test
     public void testNameNull() {
         final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
-        final ResourceInfo r1 = new ResourceInfo("name", null, clusterBrowser);
+        final ResourceInfo r1 = new ResourceInfo();
+        r1.init("name", null, clusterBrowser);
+
         assertFalse("equal name null", r1.getName() == null);
     }
 
@@ -52,10 +60,11 @@ public final class ResourceInfoITest {
         final ClusterBrowser clusterBrowser = testSuite.getHosts().get(0).getBrowser().getClusterBrowser();
 
         final HostFactory hostFactory = new HostFactory();
-        final ResourceInfo r1 = new ResourceInfo("name",
-                                                 new LinkedHashSet<Host>(Arrays.asList(hostFactory.createInstance())),
-                                                 clusterBrowser);
-        final ResourceInfo r2 = new ResourceInfo("name", null, clusterBrowser);
+        final ResourceInfo r1 = new ResourceInfo();
+        r1.init("name", new LinkedHashSet<Host>(Arrays.asList(hostFactory.createInstance())), clusterBrowser);
+        final ResourceInfo r2 = new ResourceInfo();
+        r2.init("name", null, clusterBrowser);
+
         assertTrue("equal names", r1.equals(r2));
     }
 }

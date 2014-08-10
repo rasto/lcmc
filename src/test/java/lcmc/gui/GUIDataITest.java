@@ -8,11 +8,16 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Category(IntegrationTest.class)
+@Component
 public final class GUIDataITest {
 
     private final TestUtils testSuite = new TestUtils();
+    @Autowired
+    private GUIData guiData;
 
     @Before
     public void setUp() {
@@ -25,13 +30,13 @@ public final class GUIDataITest {
         float count = 200;
         float errors = 0;
         for (int i = 0; i < count; i++) {
-            Tools.getGUIData().expandTerminalSplitPane(1);
+            guiData.expandTerminalSplitPane(1);
             for (final Host host : testSuite.getHosts()) {
-                Tools.getGUIData().setTerminalPanel(host.getTerminalPanel());
-                Tools.getGUIData().expandTerminalSplitPane(0);
+                guiData.setTerminalPanel(host.getTerminalPanel());
+                guiData.expandTerminalSplitPane(0);
             }
             Tools.waitForSwing();
-            if (Tools.getGUIData().getTerminalPanelPos() < 100) {
+            if (guiData.getTerminalPanelPos() < 100) {
                 errors++;
             }
         }

@@ -34,6 +34,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
@@ -53,7 +54,6 @@ import lcmc.gui.resources.NetInfo;
 import lcmc.gui.resources.crm.HostInfo;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.HostDrbdInfo;
-import lcmc.gui.resources.drbd.ProxyHostInfo;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
@@ -98,7 +98,6 @@ public class HostBrowser extends Browser {
     /** Host info object of the host in drbd view of this browser. */
     @Autowired
     private HostDrbdInfo hostDrbdInfo;
-    private ProxyHostInfo proxyHostInfo = null;
     /** Map of block devices and their info objects. */
     private final Map<BlockDevice, BlockDevInfo> blockDevInfos = new LinkedHashMap<BlockDevice, BlockDevInfo>();
     private final ReadWriteLock mBlockDevInfosLock = new ReentrantReadWriteLock();
@@ -110,6 +109,10 @@ public class HostBrowser extends Browser {
     private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
     private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Provider<BlockDevInfo> blockDevInfoFactory;
 
     public void init(final Host host) {
         this.host = host;
@@ -134,14 +137,6 @@ public class HostBrowser extends Browser {
 
     public HostDrbdInfo getHostDrbdInfo() {
         return hostDrbdInfo;
-    }
-
-    public ProxyHostInfo getProxyHostInfo() {
-        return proxyHostInfo;
-    }
-
-    public void setProxyHostInfo(final ProxyHostInfo proxyHostInfo) {
-        this.proxyHostInfo = proxyHostInfo;
     }
 
     public void initHostResources() {
@@ -214,15 +209,16 @@ public class HostBrowser extends Browser {
             }
             blockDevInfos.clear();
             for (final BlockDevice bd : bds) {
-                final BlockDevInfo bdi;
+                final BlockDevInfo blockDevInfo;
                 if (oldBlockDevices.containsKey(bd)) {
-                    bdi = oldBlockDevices.get(bd);
-                    bdi.updateInfo();
+                    blockDevInfo = oldBlockDevices.get(bd);
+                    blockDevInfo.updateInfo();
                 } else {
                     changed = true;
-                    bdi = new BlockDevInfo(bd.getName(), bd, thisClass);
+                    blockDevInfo = blockDevInfoFactory.get();
+                    blockDevInfo.init(bd.getName(), bd, thisClass);
                 }
-                blockDevInfos.put(bd, bdi);
+                blockDevInfos.put(bd, blockDevInfo);
             }
         } finally {
             mBlockDevInfosWriteLock.unlock();
@@ -366,9 +362,9 @@ public class HostBrowser extends Browser {
             public void action() {
                 final String hostName = host.getName();
                 final String command = "MakeKernelPanic";
-                Tools.startProgressIndicator(hostName, host.getDistString(command));
+                guiData.startProgressIndicator(hostName, host.getDistString(command));
                 host.execCommand(new ExecCommandConfig().commandString(command));
-                Tools.stopProgressIndicator(hostName, host.getDistString(command));
+                guiData.stopProgressIndicator(hostName, host.getDistString(command));
             }
         };
         submenu.add(panicMenuItem);
@@ -393,9 +389,9 @@ public class HostBrowser extends Browser {
             public void action() {
                 final String hostName = host.getName();
                 final String command = "MakeKernelReboot";
-                Tools.startProgressIndicator(hostName, host.getDistString(command));
+                guiData.startProgressIndicator(hostName, host.getDistString(command));
                 host.execCommand(new ExecCommandConfig().commandString(command));
-                Tools.stopProgressIndicator(hostName, host.getDistString(command));
+                guiData.stopProgressIndicator(hostName, host.getDistString(command));
             }
         };
         submenu.add(rebootMenuItem);

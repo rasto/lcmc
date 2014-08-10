@@ -38,10 +38,16 @@ import lcmc.gui.widget.Widget;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is for resource defaults or rsc_defaults.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class RscDefaultsInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
@@ -50,8 +56,7 @@ public final class RscDefaultsInfo extends EditableInfo {
      * Prepares a new {@code RscDefaultsInfo} object and creates
      * new rsc defaults object.
      */
-    public RscDefaultsInfo(final String name,
-                           final Browser browser) {
+    public void init(final String name, final Browser browser) {
         super.init(name, browser);
         setResource(new Resource(name));
     }

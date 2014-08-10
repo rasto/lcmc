@@ -34,6 +34,8 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,6 +43,7 @@ import org.springframework.stereotype.Component;
  * and established if there isn't one.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class Connect extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 

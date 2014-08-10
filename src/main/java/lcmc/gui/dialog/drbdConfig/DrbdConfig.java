@@ -30,9 +30,9 @@ import lcmc.gui.resources.drbd.VolumeInfo;
  * extended. It just adds VolumeInfo field.
  */
 public abstract class DrbdConfig extends WizardDialog {
-    private final VolumeInfo volumeInfo;
+    private VolumeInfo volumeInfo;
 
-    protected DrbdConfig(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {
+    public void init(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {
         setPreviousDialog(previousDialog);
         this.volumeInfo = volumeInfo;
     }

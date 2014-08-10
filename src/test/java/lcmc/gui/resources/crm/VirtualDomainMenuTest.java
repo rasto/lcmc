@@ -55,7 +55,7 @@ public class VirtualDomainMenuTest {
     @Mock
     private Host hostStub;
 
-    private VirtualDomainMenu sut;
+    private VirtualDomainMenu virtualDomainMenu = new VirtualDomainMenu();
 
     @Before
     public void setUp() {
@@ -65,7 +65,6 @@ public class VirtualDomainMenuTest {
         when(applicationStub.isTightvnc()).thenReturn(true);
         when(applicationStub.isRealvnc()).thenReturn(true);
         when(applicationStub.isUltravnc()).thenReturn(true);
-        sut = new VirtualDomainMenu(virtualDomainInfoStub);
         when(virtualDomainInfoStub.getService()).thenReturn(serviceStub);
         when(virtualDomainInfoStub.getResource()).thenReturn(resourceStub);
         final Host[] clusterHosts = {hostStub};
@@ -74,7 +73,7 @@ public class VirtualDomainMenuTest {
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = sut.getPulldownMenu();
+        final List<UpdatableItem> items = virtualDomainMenu.getPulldownMenu(virtualDomainInfoStub);
 
         assertEquals(18, items.size());
     }

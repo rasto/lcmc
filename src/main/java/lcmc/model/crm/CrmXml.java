@@ -41,6 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
+import lcmc.gui.GUIData;
 import lcmc.model.*;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
@@ -55,6 +56,7 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -326,6 +328,7 @@ public final class CrmXml extends XML {
     }
 
     private static final Application.AccessType DEFAULT_ACCESS_TYPE = Application.AccessType.ADMIN;
+    private final GUIData guiData;
 
     public static Unit getUnitMilliSec() {
         return new Unit("ms", "ms", "Millisecond", "Milliseconds");
@@ -407,8 +410,10 @@ public final class CrmXml extends XML {
     private Map<String, String> metaAttrParams = null;
     private Map<String, String> resourceDefaultsMetaAttrs = null;
 
-    public CrmXml(final Host host, final ServicesInfo allServicesInfo) {
+    public CrmXml(final GUIData guiData, final Host host, final ServicesInfo allServicesInfo) {
         super();
+        this.guiData = guiData;
+
         this.host = host;
         final Value[] booleanValues = PCMK_BOOLEAN_VALUES;
         final Value hbBooleanTrue = booleanValues[0];
@@ -715,13 +720,13 @@ public final class CrmXml extends XML {
                 initOCFMetaDataAll();
                 final String hn = host.getName();
                 final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
-                Tools.startProgressIndicator(hn, text);
+                guiData.startProgressIndicator(hn, text);
                 allServicesInfo.setAllResources(allServicesInfo.getBrowser().getClusterStatus(), Application.RunMode.LIVE);
                 final Info li = allServicesInfo.getBrowser().getClusterViewPanel().getLastSelectedInfo();
                 if (li instanceof ServiceInfo) {
                     allServicesInfo.getBrowser().getClusterViewPanel().reloadRightComponent();
                 }
-                Tools.stopProgressIndicator(hn, text);
+                guiData.stopProgressIndicator(hn, text);
                 LOG.debug("CRMXML: RAs loaded");
                 final RoboTest.Test autoTest = Tools.getApplication().getAutoTest();
                 if (autoTest != null) {

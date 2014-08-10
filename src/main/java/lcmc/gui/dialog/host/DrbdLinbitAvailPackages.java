@@ -27,6 +27,7 @@ import java.awt.FlowLayout;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Provider;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -34,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.AppContext;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.StringValue;
@@ -46,6 +48,8 @@ import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -53,6 +57,7 @@ import org.springframework.stereotype.Component;
  * host.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class DrbdLinbitAvailPackages extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
     private static final String NO_MATCH_STRING = "No Match";
@@ -67,9 +72,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private List<String> drbdArchItems = null;
 
     @Autowired
-    private CheckInstallation checkInstallationDialog;
-    @Autowired
     private DrbdAvailFiles drbdAvailFilesDialog;
+    @Autowired
+    private Provider<CheckInstallation> checkInstallationFactory;
 
     protected final void availDrbdVersions() {
         /* get drbd available versions,
@@ -319,8 +324,9 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     @Override
     public WizardDialog nextDialog() {
         if (getDrbdInstallation().isDrbdUpgraded()) {
-            checkInstallationDialog.init(this, getHost(), getDrbdInstallation());
-            return checkInstallationDialog;
+            final CheckInstallation checkInstallation = checkInstallationFactory.get();
+            checkInstallation.init(this, getHost(), getDrbdInstallation());
+            return checkInstallation;
         } else {
             drbdAvailFilesDialog.init(this, getHost(), getDrbdInstallation());
             return drbdAvailFilesDialog;

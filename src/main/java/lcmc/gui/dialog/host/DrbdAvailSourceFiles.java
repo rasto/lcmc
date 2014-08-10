@@ -43,6 +43,8 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,6 +52,7 @@ import org.springframework.stereotype.Component;
  * determined.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class DrbdAvailSourceFiles extends DialogHost {
     @Autowired
     private DrbdCommandInst drbdCommandInst = null;

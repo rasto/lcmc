@@ -61,6 +61,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import lcmc.LCMC;
+import lcmc.gui.GUIData;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
@@ -110,7 +113,7 @@ public abstract class ConfigDialog {
     }
 
     protected final JScrollPane getAnswerPane(final String initialText) {
-        answerPane = new JEditorPane(Tools.MIME_TYPE_TEXT_PLAIN, initialText);
+        answerPane = new JEditorPane(GUIData.MIME_TYPE_TEXT_PLAIN, initialText);
         answerPane.setBackground(Tools.getDefaultColor("ConfigDialog.AnswerPane"));
         answerPane.setForeground(Color.WHITE);
         answerPane.setEditable(false);
@@ -181,7 +184,7 @@ public abstract class ConfigDialog {
     protected final JPanel body() {
         final JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
-        final JEditorPane descPane = new JEditorPane(Tools.MIME_TYPE_TEXT_HTML,
+        final JEditorPane descPane = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML,
                                                      "<span style='font:bold italic;font-family:Dialog; font-size:"
                                                      + Tools.getApplication().scaled(14)
                                                      + ";'>"
@@ -436,7 +439,7 @@ public abstract class ConfigDialog {
                     optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
 
                     optionPane.setBackground(Tools.getDefaultColor( "ConfigDialog.Background.Dark"));
-                    final Container mainFrame = Tools.getGUIData().getMainFrame();
+                    final Container mainFrame = LCMC.MAIN_FRAME;
                     if (mainFrame instanceof JApplet) {
                         final JFrame noframe = new JFrame();
                         dialogPanel = new JDialog(noframe);
@@ -485,14 +488,14 @@ public abstract class ConfigDialog {
                 dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setLocationRelativeTo(Tools.getGUIData().getMainFrame());
+                dialogPanel.setLocationRelativeTo(LCMC.MAIN_FRAME);
                 dialogPanel.setVisible(true);
             }
         });
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                dialogPanel.setLocationRelativeTo(Tools.getGUIData().getMainFrameContentPane());
+                dialogPanel.setLocationRelativeTo(LCMC.MAIN_FRAME);
                 /* although the location was set before, it is set again as a
                  * workaround for gray dialogs with nothing in it, that appear
                  * in some comination of Java and compiz. */

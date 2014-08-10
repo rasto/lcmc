@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -32,25 +31,30 @@ import javax.swing.JScrollPane;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter drbd volume
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Volume extends DrbdConfig {
 
     /** Configuration options of the drbd volume. */
     private static final String[] PARAMS = {"number", "device"};
-
-    public Volume(final WizardDialog previousDialog, final VolumeInfo dvi) {
-        super(previousDialog, dvi);
-    }
+    @Autowired
+    private BlockDev blockDevDialog;
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override
     public WizardDialog nextDialog() {
         Tools.waitForSwing();
-        return new BlockDev(this, getDrbdVolumeInfo(), getDrbdVolumeInfo().getFirstBlockDevInfo());
+        blockDevDialog.init(this, getDrbdVolumeInfo(), getDrbdVolumeInfo().getFirstBlockDevInfo());
+        return blockDevDialog;
     }
 
     @Override
@@ -97,7 +101,7 @@ public final class Volume extends DrbdConfig {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
 
         getDrbdVolumeInfo().addWizardParams(optionsPanel,
                                             PARAMS,

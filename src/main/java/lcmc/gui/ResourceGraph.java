@@ -83,7 +83,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
+
+import lcmc.LCMC;
 import lcmc.model.Application;
+import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.model.Subtext;
 import lcmc.gui.resources.Info;
@@ -93,11 +96,17 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.TransformerUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class creates graph and provides methods for scaling etc.,
  * that are used in all graphs.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class ResourceGraph {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceGraph.class);
     /** Empty shape for arrows. (to not show an arrow). */
@@ -116,7 +125,6 @@ public abstract class ResourceGraph {
         }
         HOLLOW_INSTANCE.lineTo(1.0f, 0.0f);
     }
-    private final ClusterBrowser clusterBrowser;
     private final Renderer.Vertex<Vertex, Edge> pluggableRenderer = new MyPluggableRenderer<Vertex, Edge>();
     private final Map<Vertex, Info> vertexToInfoMap = new LinkedHashMap<Vertex, Info>();
     private final Map<Info, Vertex> infoToVertexMap = new LinkedHashMap<Info, Vertex>();
@@ -159,10 +167,9 @@ public abstract class ResourceGraph {
     private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
     private double scaledSoFar = 1.0;
 
-    ResourceGraph(final ClusterBrowser clusterBrowser) {
-        this.clusterBrowser = clusterBrowser;
-        initGraph();
-    }
+    private ClusterBrowser clusterBrowser;
+    @Autowired
+    private GUIData guiData;
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
@@ -325,11 +332,10 @@ public abstract class ResourceGraph {
         return running;
     }
 
-    protected final ClusterBrowser getClusterBrowser() {
-        return clusterBrowser;
-    }
+    protected void initGraph(final ClusterBrowser clusterBrowser) {
+        this.clusterBrowser = clusterBrowser;
 
-    protected abstract void initGraph();
+    }
 
     protected final void initGraph(final Graph<Vertex, Edge> graph) {
         this.graph = graph;
@@ -861,7 +867,7 @@ public abstract class ResourceGraph {
         if (ctl != null) {
             return ctl;
         }
-        final Font font = Tools.getGUIData().getMainFrame().getFont();
+        final Font font = LCMC.MAIN_FRAME.getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
         final TextLayout tl = new TextLayout(text,
                                              new Font(font.getName(),
@@ -1093,14 +1099,14 @@ public abstract class ResourceGraph {
 
     /** Get selected components for copy/paste. */
     public List<Info> getSelectedComponents() {
-        final String cn = getClusterBrowser().getCluster().getName();
-        Tools.startProgressIndicator(cn, "copy");
+        final String cn = clusterBrowser.getCluster().getName();
+        guiData.startProgressIndicator(cn, "copy");
         final List<Info> selected = new ArrayList<Info>();
         for (final Vertex v : getPickedVertices()) {
             final Info i = getInfo(v);
             selected.add(i);
         }
-        Tools.stopProgressIndicator(cn, "copy");
+        guiData.stopProgressIndicator(cn, "copy");
         return selected;
     }
 
@@ -1734,5 +1740,9 @@ public abstract class ResourceGraph {
                 return INSTANCE;
             }
         }
+    }
+
+    protected ClusterBrowser getClusterBrowser() {
+        return clusterBrowser;
     }
 }

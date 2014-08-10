@@ -34,12 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import javax.inject.Provider;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.AddVMConfigDialog;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
@@ -55,10 +57,16 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class shows a list of virtual machines.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class VMListInfo extends CategoryInfo {
     /** Default widths for columns. */
     private static final Map<Integer, Integer> DEFAULT_WIDTHS =
@@ -73,6 +81,10 @@ public final class VMListInfo extends CategoryInfo {
     /** Colors for some rows. */
     private volatile Map<String, Color> domainToColor =
                                                   new HashMap<String, Color>();
+    @Autowired
+    private Provider<AddVMConfigDialog> addVMConfigDialogProvider;
+    @Autowired
+    private Provider<DomainInfo> domainInfoProvider;
 
     /** Returns browser object of this info. */
     @Override
@@ -255,24 +267,25 @@ public final class VMListInfo extends CategoryInfo {
 
     /** Adds new virtual domain. */
     public void addDomainPanel() {
-        final DomainInfo vmsdi =
-                                new DomainInfo(null, getBrowser());
-        vmsdi.getResource().setNew(true);
+        final DomainInfo domainInfo = domainInfoProvider.get();
+        domainInfo.init(null, getBrowser());
+        domainInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
-                                           new DefaultMutableTreeNode(vmsdi);
+                                           new DefaultMutableTreeNode(domainInfo);
         getBrowser().setNode(resource);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getNode().add(resource);
                 getBrowser().reloadAndWait(getNode(), true);
-                vmsdi.getInfoPanel();
-                vmsdi.selectMyself();
+                domainInfo.getInfoPanel();
+                domainInfo.selectMyself();
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final AddVMConfigDialog avmcd = new AddVMConfigDialog(vmsdi);
-                        avmcd.showDialogs();
+                        final AddVMConfigDialog addVMConfigDialog = addVMConfigDialogProvider.get();
+                        addVMConfigDialog.init(domainInfo);
+                        addVMConfigDialog.showDialogs();
                     }
                 });
                 t.start();

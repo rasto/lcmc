@@ -42,11 +42,14 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.Hosts;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,6 +57,7 @@ import org.springframework.stereotype.Component;
  * the cluster.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class ClusterHosts extends DialogCluster {
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
                                                Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
@@ -66,6 +70,8 @@ final class ClusterHosts extends DialogCluster {
     private CommStack commStackDialog;
     @Autowired
     private Connect connectDialog;
+    @Autowired
+    private GUIData guiData;
 
     /** It is executed after the dialog is applied. */
     @Override
@@ -78,7 +84,7 @@ final class ClusterHosts extends DialogCluster {
                 getCluster().addHost(host);
             }
         }
-        Tools.getGUIData().refreshClustersPanel();
+        guiData.refreshClustersPanel();
     }
 
     @Override

@@ -27,28 +27,18 @@ import lcmc.model.Host;
 import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.ResourceInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is
  * treated in special way.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class LinbitDrbdInfo extends ServiceInfo {
-    /** Creates new LinbitDrbdInfo object. */
-    LinbitDrbdInfo(final String name,
-                   final ResourceAgent ra,
-                   final Browser browser) {
-        super(name, ra, browser);
-    }
-
-    /** Creates new linbit::drbd info object. */
-    LinbitDrbdInfo(final String name,
-                   final ResourceAgent ra,
-                   final String hbId,
-                   final Map<String, String> resourceNode,
-                   final Browser browser) {
-        super(name, ra, hbId, resourceNode, browser);
-    }
-
     /** Returns string representation of the linbit::drbd service. */
     @Override
     public String toString() {

@@ -22,10 +22,12 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.AppContext;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -39,15 +41,19 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd is installed.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class DrbdCommandInst extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdCommandInst.class);
     @Autowired
+    private Provider<CheckInstallation> checkInstallationProvider;
     private CheckInstallation checkInstallation;
 
     /**
@@ -58,12 +64,13 @@ final class DrbdCommandInst extends DialogHost {
         final ClusterBrowser clusterBrowser = getHost().getBrowser().getClusterBrowser();
         if (clusterBrowser != null) {
             clusterBrowser.getHostDrbdParameters().clear();
-            final GlobalInfo globalInfo = clusterBrowser.getDrbdGraph().getDrbdInfo();
+            final GlobalInfo globalInfo = clusterBrowser.getGlobalInfo();
             globalInfo.clearPanelLists();
             globalInfo.updateDrbdInfo();
             globalInfo.resetInfoPanel();
             globalInfo.getInfoPanel();
         }
+        checkInstallation = checkInstallationProvider.get();
         checkInstallation.init(getPreviousDialog().getPreviousDialog().getPreviousDialog(),
                                getHost(),
                                getDrbdInstallation());

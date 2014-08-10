@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -43,6 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.crm.CrmXml;
 import lcmc.model.crm.ClusterStatus;
@@ -67,6 +70,9 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -74,6 +80,7 @@ import org.springframework.stereotype.Component;
  * config.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ServicesInfo extends EditableInfo {
     /** Logger. */
     private static final Logger LOG =
@@ -86,6 +93,28 @@ public class ServicesInfo extends EditableInfo {
 
     @Autowired
     private ServicesMenu servicesMenu;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Provider<FilesystemInfo> filesystemInfoProvider;
+    @Autowired
+    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    @Autowired
+    private Provider<DrbddiskInfo> drbddiskInfoProvider;
+    @Autowired
+    private Provider<IPaddrInfo> ipaddrInfoProvider;
+    @Autowired
+    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
+    @Autowired @Qualifier("serviceInfo")
+    private Provider<ServiceInfo> serviceInfoProvider;
+    @Autowired
+    private Provider<GroupInfo> groupInfoProvider;
+    @Autowired
+    private Provider<CloneInfo> cloneInfoProvider;
+    @Autowired
+    private Provider<ConstraintPHInfo> constraintPHInfoProvider;
+    @Autowired
+    private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
 
     @Override
     public void init(final String name, final Browser browser) {
@@ -493,42 +522,19 @@ public class ServicesInfo extends EditableInfo {
                         serviceName = newRA.getServiceName();
                     }
                     if (newRA != null && newRA.isFilesystem()) {
-                        newSi = new FilesystemInfo(serviceName,
-                                                   newRA,
-                                                   hbId,
-                                                   resourceNode,
-                                                   getBrowser());
+                        newSi = filesystemInfoProvider.get();
                     } else if (newRA != null && newRA.isLinbitDrbd()) {
-                        newSi = new LinbitDrbdInfo(serviceName,
-                                                   newRA,
-                                                   hbId,
-                                                   resourceNode,
-                                                   getBrowser());
+                        newSi = linbitDrbdInfoProvider.get();
                     } else if (newRA != null && newRA.isDrbddisk()) {
-                        newSi = new DrbddiskInfo(serviceName,
-                                                 newRA,
-                                                 hbId,
-                                                 resourceNode,
-                                                 getBrowser());
+                        newSi = drbddiskInfoProvider.get();
                     } else if (newRA != null && newRA.isIPaddr()) {
-                        newSi = new IPaddrInfo(serviceName,
-                                               newRA,
-                                               hbId,
-                                               resourceNode,
-                                               getBrowser());
+                        newSi = ipaddrInfoProvider.get();
                     } else if (newRA != null && newRA.isVirtualDomain()) {
-                        newSi = new VirtualDomainInfo(serviceName,
-                                                      newRA,
-                                                      hbId,
-                                                      resourceNode,
-                                                      getBrowser());
+                        newSi = virtualDomainInfoProvider.get();
                     } else {
-                        newSi = new ServiceInfo(serviceName,
-                                                newRA,
-                                                hbId,
-                                                resourceNode,
-                                                getBrowser());
+                        newSi = serviceInfoProvider.get();
                     }
+                    newSi.init(serviceName, newRA, hbId, resourceNode, getBrowser());
                     newSi.getService().setHeartbeatId(hbId);
                     getBrowser().addToHeartbeatIdList(newSi);
                     if (newGi != null) {
@@ -677,7 +683,7 @@ public class ServicesInfo extends EditableInfo {
                                     new ArrayList<ConstraintPHInfo>();
             for (final CrmXml.RscSetConnectionData rdata
                                                 : rscSetConnections) {
-                ConstraintPHInfo cphi = null;
+                ConstraintPHInfo constraintPHInfo = null;
 
                 for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry
                                               : rdataToCphi.entrySet()) {
@@ -686,73 +692,72 @@ public class ServicesInfo extends EditableInfo {
                     }
                     if (rdata.equals(phEntry.getKey())
                         || rdata.equalsAlthoughReversed(phEntry.getKey())) {
-                        cphi = phEntry.getValue();
-                        cphi.setRscSetConnectionData(rdata);
+                        constraintPHInfo = phEntry.getValue();
+                        constraintPHInfo.setRscSetConnectionData(rdata);
                         break;
                     }
                 }
-                PcmkRscSetsInfo prsi = null;
-                if (cphi == null) {
+                PcmkRscSetsInfo rscSetsInfo = null;
+                if (constraintPHInfo == null) {
                     for (final Map.Entry<CrmXml.RscSetConnectionData, ConstraintPHInfo> phEntry
                                               : rdataToCphi.entrySet()) {
                         if (phEntry.getKey() == rdata) {
-                            cphi = phEntry.getValue();
+                            constraintPHInfo = phEntry.getValue();
                             break;
                         }
                         if (phEntry.getValue().sameConstraintId(
                                 rdata)) {
                             /* use the same rsc set info object */
-                            prsi = phEntry.getValue().getPcmkRscSetsInfo();
+                            rscSetsInfo = phEntry.getValue().getPcmkRscSetsInfo();
                         }
                         if (phEntry.getValue().getService().isNew()
                             || (rdata.canUseSamePlaceholder(phEntry.getKey())
                                 && phEntry.getValue().sameConstraintId(
                                 rdata))) {
-                            cphi = phEntry.getValue();
-                            cphi.setRscSetConnectionData(rdata);
-                            prsi = cphi.getPcmkRscSetsInfo();
-                            if (prsi != null) {
+                            constraintPHInfo = phEntry.getValue();
+                            constraintPHInfo.setRscSetConnectionData(rdata);
+                            rscSetsInfo = constraintPHInfo.getPcmkRscSetsInfo();
+                            if (rscSetsInfo != null) {
                                 if (rdata.isColocation()) {
-                                    prsi.addColocation(
+                                    rscSetsInfo.addColocation(
                                                rdata.getConstraintId(),
-                                               cphi);
+                                            constraintPHInfo);
                                 } else {
-                                    prsi.addOrder(
+                                    rscSetsInfo.addOrder(
                                                rdata.getConstraintId(),
-                                               cphi);
+                                            constraintPHInfo);
                                 }
                             }
                             break;
                         }
                     }
                 }
-                if (cphi == null && !preNewCphis.isEmpty()) {
+                if (constraintPHInfo == null && !preNewCphis.isEmpty()) {
                     /* placeholder */
-                    cphi = preNewCphis.remove(0);
-                    rdataToCphi.put(rdata, cphi);
-                    cphi.setRscSetConnectionData(rdata);
+                    constraintPHInfo = preNewCphis.remove(0);
+                    rdataToCphi.put(rdata, constraintPHInfo);
+                    constraintPHInfo.setRscSetConnectionData(rdata);
                 }
-                if (cphi == null) {
-                    cphi = new ConstraintPHInfo(
-                                            getBrowser(),
-                                            rdata,
-                                            ConstraintPHInfo.Preference.AND);
-                    if (prsi == null) {
-                        prsi = new PcmkRscSetsInfo(getBrowser());
+                if (constraintPHInfo == null) {
+                    constraintPHInfo = constraintPHInfoProvider.get();
+                    constraintPHInfo.init(getBrowser(), rdata, ConstraintPHInfo.Preference.AND);
+                    if (rscSetsInfo == null) {
+                        rscSetsInfo = pcmkRscSetsInfoProvider.get();
+                        rscSetsInfo.init(getBrowser());
                     }
                     if (rdata.isColocation()) {
-                        prsi.addColocation(rdata.getConstraintId(),
-                                           cphi);
+                        rscSetsInfo.addColocation(rdata.getConstraintId(),
+                                constraintPHInfo);
                     } else {
-                        prsi.addOrder(rdata.getConstraintId(), cphi);
+                        rscSetsInfo.addOrder(rdata.getConstraintId(), constraintPHInfo);
                     }
-                    cphi.setPcmkRscSetsInfo(prsi);
-                    getBrowser().addNameToServiceInfoHash(cphi);
-                    newCphis.add(cphi); /* have to add it later,
+                    constraintPHInfo.setPcmkRscSetsInfo(rscSetsInfo);
+                    getBrowser().addNameToServiceInfoHash(constraintPHInfo);
+                    newCphis.add(constraintPHInfo); /* have to add it later,
                                            so that ids are correct. */
-                    rdataToCphi.put(rdata, cphi);
+                    rdataToCphi.put(rdata, constraintPHInfo);
                 }
-                serviceIsPresent.add(cphi);
+                serviceIsPresent.add(constraintPHInfo);
 
                 final CrmXml.RscSet rscSet1 = rdata.getRscSet1();
                 final CrmXml.RscSet rscSet2 = rdata.getRscSet2();
@@ -764,7 +769,7 @@ public class ServicesInfo extends EditableInfo {
                                getBrowser().getServiceInfoFromCRMId(
                                                                 rscId);
                             hg.addColocation(rdata.getConstraintId(),
-                                             cphi,
+                                    constraintPHInfo,
                                              si);
                         }
                     }
@@ -775,7 +780,7 @@ public class ServicesInfo extends EditableInfo {
                                                                 rscId);
                             hg.addColocation(rdata.getConstraintId(),
                                              si,
-                                             cphi);
+                                    constraintPHInfo);
                         }
                     }
                 } else {
@@ -787,7 +792,7 @@ public class ServicesInfo extends EditableInfo {
                                                                 rscId);
                             hg.addOrder(rdata.getConstraintId(),
                                         si,
-                                        cphi);
+                                    constraintPHInfo);
                         }
                     }
                     if (rscSet2 != null) {
@@ -796,14 +801,14 @@ public class ServicesInfo extends EditableInfo {
                                getBrowser().getServiceInfoFromCRMId(
                                                                 rscId);
                             hg.addOrder(rdata.getConstraintId(),
-                                        cphi,
+                                    constraintPHInfo,
                                         si);
                         }
                     }
                 }
                 if (Application.isLive(runMode)) {
-                    cphi.setUpdated(false);
-                    cphi.getService().setNew(false);
+                    constraintPHInfo.setUpdated(false);
+                    constraintPHInfo.getService().setNew(false);
                 }
             }
 
@@ -920,7 +925,7 @@ public class ServicesInfo extends EditableInfo {
     /** Returns type of the info text. text/plain or text/html. */
     @Override
     protected String getInfoMimeType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
+        return GUIData.MIME_TYPE_TEXT_HTML;
     }
 
     /**
@@ -1136,17 +1141,24 @@ public class ServicesInfo extends EditableInfo {
         final ServiceInfo newServiceInfo;
         final String name = newRA.getServiceName();
         if (newRA.isFilesystem()) {
-            newServiceInfo = new FilesystemInfo(name, newRA, getBrowser());
+            newServiceInfo = filesystemInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isLinbitDrbd()) {
-            newServiceInfo = new LinbitDrbdInfo(name, newRA, getBrowser());
+            newServiceInfo = linbitDrbdInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isDrbddisk()) {
-            newServiceInfo = new DrbddiskInfo(name, newRA, getBrowser());
+            newServiceInfo = drbddiskInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isIPaddr()) {
-            newServiceInfo = new IPaddrInfo(name, newRA, getBrowser());
+            newServiceInfo = ipaddrInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isVirtualDomain()) {
-            newServiceInfo = new VirtualDomainInfo(name, newRA, getBrowser());
+            newServiceInfo = virtualDomainInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isGroup()) {
-            newServiceInfo = new GroupInfo(newRA, getBrowser());
+            final GroupInfo newGroupInfo = groupInfoProvider.get();
+            newGroupInfo.init(newRA, getBrowser());
+            newServiceInfo = newGroupInfo;
         } else if (newRA.isClone()) {
             final boolean master =
                          getBrowser().getClusterStatus().isMaster(heartbeatId);
@@ -1156,12 +1168,12 @@ public class ServicesInfo extends EditableInfo {
             } else {
                 cloneName = Application.PM_CLONE_SET_NAME;
             }
-            newServiceInfo = new CloneInfo(newRA,
-                                           cloneName,
-                                           master,
-                                           getBrowser());
+            final CloneInfo newCloneInfo = cloneInfoProvider.get();
+            newCloneInfo.init(newRA, cloneName, master, getBrowser());
+            newServiceInfo = newCloneInfo;
         } else {
-            newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
+            newServiceInfo = serviceInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         }
         if (heartbeatId != null) {
             newServiceInfo.getService().setHeartbeatId(heartbeatId);
@@ -1352,7 +1364,7 @@ public class ServicesInfo extends EditableInfo {
             return;
         }
         final String cn = getBrowser().getCluster().getName();
-        Tools.startProgressIndicator(cn, "paste");
+        guiData.startProgressIndicator(cn, "paste");
         final ClusterBrowser otherBrowser =
                                 (ClusterBrowser) oldInfos.get(0).getBrowser();
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(true);
@@ -1449,7 +1461,7 @@ public class ServicesInfo extends EditableInfo {
                 }
             }
         }
-        Tools.stopProgressIndicator(cn, "paste");
+        guiData.stopProgressIndicator(cn, "paste");
         otherBrowser.getClusterViewPanel().setDisabledDuringLoad(false);
         getBrowser().getClusterViewPanel().setDisabledDuringLoad(false);
     }

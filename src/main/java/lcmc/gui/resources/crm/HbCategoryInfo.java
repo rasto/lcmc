@@ -24,13 +24,20 @@ package lcmc.gui.resources.crm;
 import javax.swing.JPanel;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.GUIData;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 /**
  * This class is used for all kind of categories in the heartbeat
  * hierarchy. Its point is to show heartbeat graph all the time, ane
  * heartbeat category is clicked.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HbCategoryInfo extends CategoryInfo {
 
     /** Returns browser object of this info. */
@@ -43,7 +50,7 @@ public class HbCategoryInfo extends CategoryInfo {
     /** Returns type of the info text. text/plain or text/html. */
     @Override
     protected String getInfoMimeType() {
-        return Tools.MIME_TYPE_TEXT_HTML;
+        return GUIData.MIME_TYPE_TEXT_HTML;
     }
 
     /** Returns heartbeat graph. */

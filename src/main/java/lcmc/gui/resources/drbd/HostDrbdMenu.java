@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JColorChooser;
 import lcmc.EditHostDialog;
+import lcmc.LCMC;
 import lcmc.ProxyHostWizard;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -43,9 +45,12 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostDrbdMenu {
     private static final String LVM_MENU = "LVM";
     private static final String VG_CREATE_MENU_ITEM = "Create VG";
@@ -54,6 +59,10 @@ public class HostDrbdMenu {
     private static final String LV_CREATE_MENU_DESCRIPTION = "Create a logical volume.";
     @Autowired
     private EditHostDialog editHostDialog;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private ProxyHostWizard proxyHostWizard;
 
     public List<UpdatableItem> getPulldownMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -73,7 +82,7 @@ public class HostDrbdMenu {
                 }
             };
         items.add(hostWizardItem);
-        Tools.getGUIData().registerAddHostButton(hostWizardItem);
+        guiData.registerAddHostButton(hostWizardItem);
 
         /* proxy host wizard */
         final MyMenuItem proxyHostWizardItem =
@@ -86,12 +95,12 @@ public class HostDrbdMenu {
 
                 @Override
                 public void action() {
-                    final ProxyHostWizard dialog = new ProxyHostWizard(host, null);
-                    dialog.showDialogs();
+                    proxyHostWizard.init(host, null);
+                    proxyHostWizard.showDialogs();
                 }
             };
         items.add(proxyHostWizardItem);
-        Tools.getGUIData().registerAddHostButton(proxyHostWizardItem);
+        guiData.registerAddHostButton(proxyHostWizardItem);
         final Application.RunMode runMode = Application.RunMode.LIVE;
         /* load drbd */
         final UpdatableItem loadItem =
@@ -276,9 +285,9 @@ public class HostDrbdMenu {
 
                 @Override
                 public void action() {
-                    final Color newColor = JColorChooser.showDialog(Tools.getGUIData().getMainFrame(),
-                                                                    "Choose " + host.getName() + " color",
-                                                                    host.getPmColors()[0]);
+                    final Color newColor = JColorChooser.showDialog(LCMC.MAIN_FRAME,
+                            "Choose " + host.getName() + " color",
+                            host.getPmColors()[0]);
                     if (newColor != null) {
                         host.setSavedHostColorInGraphs(newColor);
                     }
@@ -536,7 +545,7 @@ public class HostDrbdMenu {
                 public void action() {
                     host.disconnect();
                     Tools.getApplication().removeHostFromHosts(host);
-                    Tools.getGUIData().allHostsUpdate();
+                    guiData.allHostsUpdate();
                 }
             };
         items.add(removeHostItem);

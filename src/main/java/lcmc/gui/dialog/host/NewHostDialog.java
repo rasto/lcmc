@@ -29,6 +29,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -40,6 +42,9 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
@@ -48,6 +53,7 @@ import org.springframework.stereotype.Component;
  * the host and user name.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class NewHostDialog extends DialogHost {
     private static final int FIELD_WIDTH = 120;
     private static final int BIG_FIELD_WIDTH = 400;
@@ -63,7 +69,9 @@ public class NewHostDialog extends DialogHost {
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
     @Autowired
-    private Configuration configurationDialog;
+    private Configuration configuration;
+    @Autowired
+    private GUIData guiData;
 
     /** Finishes the dialog, stores the values and adds the host tab. */
     @Override
@@ -81,14 +89,14 @@ public class NewHostDialog extends DialogHost {
         Tools.getApplication().setLastEnteredUseSudo("true".equals(useSudoString));
         if (!Tools.getApplication().existsHost(getHost())) {
             Tools.getApplication().addHostToHosts(getHost());
-            Tools.getGUIData().setTerminalPanel(getHost().getTerminalPanel());
+            guiData.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
 
     @Override
     public WizardDialog nextDialog() {
-        configurationDialog.init(this, getHost(), getDrbdInstallation());
-        return configurationDialog;
+        configuration.init(this, getHost(), getDrbdInstallation());
+        return configuration;
     }
 
     @Override

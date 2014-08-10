@@ -56,6 +56,8 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * An infinite progress panel displays a rotating figure and
@@ -87,6 +89,7 @@ import lcmc.utilities.Tools;
  * {@code setForeground()}.
  */
 
+@Component
 public final class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     private static final int RAMP_DELAY_STOP  = 1000;
@@ -128,6 +131,10 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private int oldHeight = getHeight();
     /** Beginning position of the bar. */
     private double barPos = -1;
+    @Autowired
+    private MainMenu mainMenu;
+    @Autowired
+    private GUIData guiData;
 
     public ProgressIndicatorPanel() {
         this(0.40f, 300);
@@ -203,7 +210,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
             return;
         }
         mTextsLock.unlock();
-        Tools.getGUIData().getMainMenu().turnOff();
+        mainMenu.turnOff();
         cancelButton.setEnabled(true);
         addMouseListener(this);
         addKeyListener(this);
@@ -248,7 +255,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
         animator.setRampUp(false);
         removeMouseListener(this);
         removeKeyListener(this);
-        Tools.getGUIData().getMainMenu().turnOn();
+        mainMenu.turnOn();
         mAnimatorLock.unlock();
     }
 
@@ -268,7 +275,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
             g2.setColor(new Color(VEIL_COLOR.getRed(), VEIL_COLOR.getGreen(), VEIL_COLOR.getBlue(), newAlphaLevel));
             final int barHeight = 40;
             final int startAtHeight = getHeight() / 2 - barHeight / 2;
-            g2.fillRect(0, 20, width, Tools.getGUIData().getTerminalPanelPos() - 20);
+            g2.fillRect(0, 20, width, guiData.getTerminalPanelPos() - 20);
             if (barPos < 0) {
                 barPos = width / 2;
             }

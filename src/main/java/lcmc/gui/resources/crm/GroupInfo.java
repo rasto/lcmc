@@ -35,6 +35,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.model.Application;
@@ -53,11 +54,18 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
  * like normal service, but it can contain other services.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GroupInfo extends ServiceInfo {
     private static final Logger LOG = LoggerFactory.getLogger(GroupInfo.class);
     private final List<ServiceInfo> groupServices = new ArrayList<ServiceInfo>();
@@ -65,9 +73,23 @@ public class GroupInfo extends ServiceInfo {
     private final ReadWriteLock mGroupServiceLock = new ReentrantReadWriteLock();
     private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
+    @Autowired
+    private GroupMenu groupMenu;
+    @Autowired @Qualifier("serviceInfo")
+    private Provider<ServiceInfo> serviceInfoProvider;
+    @Autowired
+    private Provider<FilesystemInfo> filesystemInfoProvider;
+    @Autowired
+    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    @Autowired
+    private Provider<DrbddiskInfo> drbddiskInfoProvider;
+    @Autowired
+    private Provider<IPaddrInfo> ipaddrInfoProvider;
+    @Autowired
+    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
 
-    GroupInfo(final ResourceAgent ra, final Browser browser) {
-        super(Application.PACEMAKER_GROUP_NAME, ra, browser);
+    void init(final ResourceAgent ra, final Browser browser) {
+        super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);
     }
 
     /** Applies the the whole group if for example an order has changed. */
@@ -401,21 +423,22 @@ public class GroupInfo extends ServiceInfo {
 
         final String name = newRA.getServiceName();
         if (newRA.isFilesystem()) {
-            newServiceInfo = new FilesystemInfo(name, newRA, getBrowser());
+            newServiceInfo = filesystemInfoProvider.get();
         } else if (newRA.isLinbitDrbd()) {
-            newServiceInfo = new LinbitDrbdInfo(name, newRA, getBrowser());
+            newServiceInfo = linbitDrbdInfoProvider.get();
         } else if (newRA.isDrbddisk()) {
-            newServiceInfo = new DrbddiskInfo(name, newRA, getBrowser());
+            newServiceInfo = drbddiskInfoProvider.get();
         } else if (newRA.isIPaddr()) {
-            newServiceInfo = new IPaddrInfo(name, newRA, getBrowser());
+            newServiceInfo = ipaddrInfoProvider.get();
         } else if (newRA.isVirtualDomain()) {
-            newServiceInfo = new VirtualDomainInfo(name, newRA, getBrowser());
+            newServiceInfo = virtualDomainInfoProvider.get();
         } else if (newRA.isGroup()) {
             LOG.appError("addGroupServicePanel: no groups in group allowed");
             return null;
         } else {
-            newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
+            newServiceInfo = serviceInfoProvider.get();
         }
+        newServiceInfo.init(name, newRA, getBrowser());
         addGroupServicePanel(newServiceInfo, reloadNode);
         return newServiceInfo;
     }
@@ -512,8 +535,7 @@ public class GroupInfo extends ServiceInfo {
 
     @Override
     public List<UpdatableItem> createPopup() {
-        final GroupMenu groupMenu = new GroupMenu(this);
-        return groupMenu.getPulldownMenu();
+        return groupMenu.getPulldownMenu(this);
     }
 
     /** Removes this group from the cib. */

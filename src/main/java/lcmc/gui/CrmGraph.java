@@ -46,13 +46,12 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.Subtext;
+
+import lcmc.model.*;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ConstraintPHInfo;
 import lcmc.gui.resources.crm.GroupInfo;
@@ -62,11 +61,17 @@ import lcmc.gui.resources.crm.PcmkMultiSelectionInfo;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
  * remove or modify them.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CrmGraph extends ResourceGraph {
     /** X position of a new block device. */
     private static final int BD_X_POS = 15;
@@ -135,14 +140,15 @@ public class CrmGraph extends ResourceGraph {
     private final Map<Info, Vertex> constraintPHToVertexMap = new HashMap<Info, Vertex>();
 
     private int hostDefaultXPos = 10;
-    private Info multiSelectionInfo = null;
-
-    CrmGraph(final ClusterBrowser clusterBrowser) {
-        super(clusterBrowser);
-    }
+    private PcmkMultiSelectionInfo multiSelectionInfo = null;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
 
     @Override
-    protected void initGraph() {
+    protected void initGraph(final ClusterBrowser clusterBrowser) {
+        super.initGraph(clusterBrowser);
         super.initGraph(new DirectedSparseGraph<Vertex, Edge>());
     }
 
@@ -781,7 +787,7 @@ public class CrmGraph extends ResourceGraph {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             if (hi != null) {
-                Tools.getGUIData().setTerminalPanel(hi.getHost().getTerminalPanel());
+                guiData.setTerminalPanel(hi.getHost().getTerminalPanel());
                 getClusterBrowser().setRightComponentInView(hi);
             }
         } else if (vertexToConstraintPHMap.containsKey(v)) {
@@ -904,7 +910,7 @@ public class CrmGraph extends ResourceGraph {
         } else if (si.isFailed(runMode)) {
             return Tools.getDefaultColor("CRMGraph.FillPaintFailed");
         } else if (!si.isRunning(runMode)) {
-            return ClusterBrowser.SERVICE_STOPPED_FILL_PAINT;
+            return getClusterBrowser().SERVICE_STOPPED_FILL_PAINT;
         } else if (getClusterBrowser().crmStatusFailed()) {
             return Tools.getDefaultColor("CRMGraph.FillPaintUnknown");
         } else if (vipl.contains(v) || Application.isTest(runMode)) {
@@ -1889,7 +1895,8 @@ public class CrmGraph extends ResourceGraph {
                 selectedInfos.add(i);
             }
         }
-        multiSelectionInfo = new PcmkMultiSelectionInfo(selectedInfos, getClusterBrowser());
+        multiSelectionInfo = pcmkMultiSelectionInfoProvider.get();
+        multiSelectionInfo.init(selectedInfos, getClusterBrowser());
         getClusterBrowser().setRightComponentInView(multiSelectionInfo);
     }
 }

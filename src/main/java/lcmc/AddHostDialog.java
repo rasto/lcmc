@@ -22,6 +22,7 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
@@ -30,23 +31,29 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that add and configure new host.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class AddHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddHostDialog.class);
     private Host host;
-    @Autowired
+    @Autowired @Qualifier("newHostDialog")
     private NewHostDialog newHostDialog;
+    @Autowired
+    private GUIData guiData;
 
     public void showDialogs(final Host host) {
-        Tools.getGUIData().enableAddHostButtons(false);
+        guiData.enableAddHostButtons(false);
         DialogHost dialog = newHostDialog;
         dialog.init(null, host, new DrbdInstallation());
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
@@ -55,26 +62,26 @@ public final class AddHostDialog {
                 host.disconnect();
                 Tools.getApplication().removeHostFromHosts(host);
                 dialog.cancelDialog();
-                Tools.getGUIData().enableAddHostButtons(true);
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.enableAddHostButtons(true);
+                guiData.expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
                 }
             } else if (dialog.isPressedFinishButton()) {
                 LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
-                Tools.getGUIData().allHostsUpdate();
+                guiData.allHostsUpdate();
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.getGUIData().checkAddClusterButtons();
+                        guiData.checkAddClusterButtons();
                     }
                 });
                 break;
             }
             dialog = newdialog;
         }
-        Tools.getGUIData().expandTerminalSplitPane(1);
-        Tools.getGUIData().enableAddHostButtons(true);
+        guiData.expandTerminalSplitPane(1);
+        guiData.enableAddHostButtons(true);
     }
 }

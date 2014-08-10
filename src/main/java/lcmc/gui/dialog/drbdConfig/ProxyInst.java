@@ -20,10 +20,13 @@
 
 package lcmc.gui.dialog.drbdConfig;
 
+import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.AppContext;
+import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
@@ -37,16 +40,24 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd proxy is installed.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class ProxyInst extends DialogHost {
     private WizardDialog nextDialogObject = null;
-    private final VolumeInfo volumeInfo;
-    private final WizardDialog origDialog;
+    private VolumeInfo volumeInfo;
+    private WizardDialog origDialog;
+    @Autowired
+    private Provider<ProxyCheckInstallation> proxyCheckInstallationProvider;
 
-    ProxyInst(final WizardDialog previousDialog,
+    void init(final WizardDialog previousDialog,
               final Host host,
               final VolumeInfo volumeInfo,
               final WizardDialog origDialog,
@@ -57,12 +68,13 @@ final class ProxyInst extends DialogHost {
     }
 
     void checkAnswer(final String ans, final String installMethod) {
-        nextDialogObject = new ProxyCheckInstallation(
-                                        getPreviousDialog().getPreviousDialog(),
-                                        getHost(),
-                                        volumeInfo,
-                                        origDialog,
-                                        getDrbdInstallation());
+        final ProxyCheckInstallation proxyCheckInstallationDialog = proxyCheckInstallationProvider.get();
+        proxyCheckInstallationDialog.init(getPreviousDialog().getPreviousDialog(),
+                                          getHost(),
+                                          volumeInfo,
+                                          origDialog,
+                                          getDrbdInstallation());
+        nextDialogObject = proxyCheckInstallationDialog;
         DRBD.startProxy(getHost(), Application.RunMode.LIVE);
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.ProxyInst.InstOk"));
@@ -125,7 +137,9 @@ final class ProxyInst extends DialogHost {
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            return new ProxyCheckInstallation(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
+            final ProxyCheckInstallation proxyCheckInstallationDialog = proxyCheckInstallationProvider.get();
+            proxyCheckInstallationDialog.init(this, getHost(), volumeInfo, origDialog, getDrbdInstallation());
+            return proxyCheckInstallationDialog;
         } else {
             return nextDialogObject;
         }
@@ -142,7 +156,7 @@ final class ProxyInst extends DialogHost {
             getHost().getCluster().addProxyHost(getHost());
             if (volumeInfo != null) {
                 volumeInfo.getDrbdResourceInfo().resetDrbdResourcePanel();
-                volumeInfo.getDrbdInfo().addProxyHostNode(getHost());
+                volumeInfo.getBrowser().getGlobalInfo().addProxyHostNode(getHost());
             }
         }
     }

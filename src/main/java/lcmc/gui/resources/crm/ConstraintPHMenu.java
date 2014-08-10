@@ -22,6 +22,8 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lcmc.gui.dialog.host.Configuration;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -30,21 +32,23 @@ import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ConstraintPHMenu extends ServiceMenu {
 
-    private final ConstraintPHInfo constraintPHInfo;
+    private ConstraintPHInfo constraintPHInfo;
     
-    public ConstraintPHMenu(final ConstraintPHInfo constraintPHInfo) {
-        super(constraintPHInfo);
-        this.constraintPHInfo = constraintPHInfo;
-    }
-
     @Override
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
+        this.constraintPHInfo = (ConstraintPHInfo) serviceInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final Application.RunMode runMode = Application.RunMode.LIVE;
-        addDependencyMenuItems(items, true, runMode);
+        addDependencyMenuItems(constraintPHInfo, items, true, runMode);
         /* remove the placeholder and all constraints associated with it. */
         final MyMenuItem removeMenuItem = new MyMenuItem(
                     Tools.getString("ConstraintPHInfo.Remove"),
@@ -56,7 +60,7 @@ public class ConstraintPHMenu extends ServiceMenu {
 
             @Override
             public String enablePredicate() {
-                if (getBrowser().crmStatusFailed()) {
+                if (constraintPHInfo.getBrowser().crmStatusFailed()) {
                     return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
                 } else if (constraintPHInfo.getService().isRemoved()) {
                     return ConstraintPHInfo.IS_BEING_REMOVED_STRING;
@@ -68,14 +72,14 @@ public class ConstraintPHMenu extends ServiceMenu {
             public void action() {
                 constraintPHInfo.hidePopup();
                 constraintPHInfo.removeMyself(Application.RunMode.LIVE);
-                getBrowser().getCrmGraph().repaint();
+                constraintPHInfo.getBrowser().getCrmGraph().repaint();
             }
         };
         final ButtonCallback removeItemCallback =
-                                    getBrowser().new ClMenuItemCallback(null) {
+                                    constraintPHInfo.getBrowser().new ClMenuItemCallback(null) {
             @Override
             public boolean isEnabled() {
-                return super.isEnabled() && !getService().isNew();
+                return super.isEnabled() && !constraintPHInfo.getService().isNew();
             }
             @Override
             public void action(final Host dcHost) {
@@ -86,5 +90,4 @@ public class ConstraintPHMenu extends ServiceMenu {
         items.add(removeMenuItem);
         return items;
     }
-
 }

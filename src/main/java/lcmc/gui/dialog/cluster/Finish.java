@@ -28,10 +28,13 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.gui.EmptyBrowser;
+import lcmc.gui.GUIData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,12 +42,15 @@ import org.springframework.stereotype.Component;
  * button.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class Finish extends DialogCluster {
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
     @Autowired
     private EmptyBrowser emptyBrowser;
     @Autowired
     private UserConfig userConfig;
+    @Autowired
+    private GUIData guiData;
 
     @Override
     public WizardDialog nextDialog() {
@@ -56,7 +62,7 @@ final class Finish extends DialogCluster {
         emptyBrowser.addClusterBox(getCluster());
         if (saveCheckBox.isSelected()) {
             final String saveFile = Tools.getApplication().getSaveFile();
-            Tools.save(userConfig, saveFile, false);
+            Tools.save(guiData, userConfig, saveFile, false);
         }
     }
 

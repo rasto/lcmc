@@ -24,19 +24,23 @@ import java.awt.BorderLayout;
 import javax.swing.Box;
 import lcmc.model.Cluster;
 import lcmc.utilities.AllHostsUpdatable;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a custer view with tree of services.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private Cluster cluster;
 
     @Autowired
     private ClusterBrowser clusterBrowser;
+    @Autowired
+    private GUIData guiData;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
@@ -49,7 +53,7 @@ public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatab
         add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);
 
         allHostsUpdate();
-        Tools.getGUIData().registerAllHostsUpdate(this);
+        guiData.registerAllHostsUpdate(this);
     }
 
     /** This is called when there was added a new host. */

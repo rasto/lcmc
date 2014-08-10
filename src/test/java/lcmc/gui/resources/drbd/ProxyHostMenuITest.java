@@ -21,6 +21,8 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
@@ -33,6 +35,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -44,8 +47,6 @@ public class ProxyHostMenuITest {
         Tools.init();
     }
 
-    private ProxyHostMenu proxyHostMenu;
-
     @Mock
     private ProxyHostInfo proxyHostInfoStub;
     @Mock
@@ -56,18 +57,22 @@ public class ProxyHostMenuITest {
     private DrbdInstallation drbdInstallationStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
+    @Mock
+    private GUIData guiData;
+    @InjectMocks
+    private ProxyHostMenu proxyHostMenu;
+
 
     @Before
     public void setUp() {
         when(proxyHostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(proxyHostInfoStub.getHost()).thenReturn(hostStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
-        proxyHostMenu = new ProxyHostMenu(proxyHostInfoStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = proxyHostMenu.getPulldownMenu();
+        final List<UpdatableItem> items = proxyHostMenu.getPulldownMenu(proxyHostInfoStub);
 
         assertEquals(7, items.size());
     }

@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.configs.DistResource;
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ExecCallback;
@@ -48,6 +49,7 @@ public final class ExecCommandThread extends Thread {
     private final NewOutputCallback newOutputCallback;
     private final boolean outputVisible;
     private final boolean commandVisible;
+    private final GUIData guiData;
 
     private volatile boolean cancelIt = false;
     private final Lock mSessionLock = new ReentrantLock();
@@ -59,7 +61,9 @@ public final class ExecCommandThread extends Thread {
     private static final int DEFAULT_EXIT_CODE = 100;
     private static final String ENCODING = "UTF-8";
 
-    ExecCommandThread(final ExecCommandConfig execCommandConfig) {
+    ExecCommandThread(final GUIData guiData, final ExecCommandConfig execCommandConfig) {
+        this.guiData = guiData;
+                
         this.host = execCommandConfig.getHost();
         this.connectionThread = execCommandConfig.getConnectionThread();
         this.sshGui = execCommandConfig.getSshGui();
@@ -168,7 +172,7 @@ public final class ExecCommandThread extends Thread {
             final int exitCode) {
         if (execCallback != null) {
             if (commandVisible || outputVisible) {
-                Tools.getGUIData().expandTerminalSplitPane(0);
+                guiData.expandTerminalSplitPane(0);
             }
             execCallback.doneError(ans.toString(), exitCode);
         }
@@ -318,8 +322,8 @@ public final class ExecCommandThread extends Thread {
                 if ((conditions & ChannelCondition.TIMEOUT) != 0) {
                     /* A timeout occured. */
                     LOG.appWarning("execOneCommand: SSH timeout: " + oneCommand);
-                    Tools.progressIndicatorFailed(host.getName(),
-                                                  "SSH timeout: " + oneCommand.replaceAll(DistResource.SUDO, ""));
+                    guiData.progressIndicatorFailed(host.getName(),
+                            "SSH timeout: " + oneCommand.replaceAll(DistResource.SUDO, ""));
                     throw new IOException("Timeout while waiting for data from peer.");
                 }
                 /* Here we do not need to check separately for CLOSED,

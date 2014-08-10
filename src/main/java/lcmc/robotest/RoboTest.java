@@ -24,7 +24,6 @@ package lcmc.robotest;
 
 import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -47,7 +46,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 
+import lcmc.LCMC;
 import lcmc.configs.AppDefaults;
+import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
@@ -59,6 +60,8 @@ import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
@@ -67,6 +70,7 @@ import lcmc.utilities.Tools;
  * @version $Id$
  *
  */
+@Component
 public final class RoboTest {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
@@ -93,6 +97,8 @@ public final class RoboTest {
     private static Cluster cluster;
 
     static final boolean PROXY = true;
+    @Autowired
+    private static GUIData guiData;
 
     /** Abort if mouse moved. */
     private static boolean abortWithMouseMovement() {
@@ -300,9 +306,9 @@ public final class RoboTest {
     public static void startTest(final Test autoTest, final Cluster c) {
         final Type type = autoTest.getType();
         final char index = autoTest.getIndex();
-        Tools.getGUIData().getMainFrame().setSize(
-            Tools.getDefaultInt("DrbdMC.width"),
-                                  Tools.getDefaultInt("DrbdMC.height") + 50);
+        LCMC.MAIN_FRAME.setSize(
+                Tools.getDefaultInt("DrbdMC.width"),
+                Tools.getDefaultInt("DrbdMC.height") + 50);
         cluster = c;
         aborted = false;
         info("start test " + index + " in 3 seconds");
@@ -316,7 +322,7 @@ public final class RoboTest {
                 }
             }
             final Host firstHost = cluster.getHostsArray()[0];
-            Tools.getGUIData().setTerminalPanel(firstHost.getTerminalPanel());
+            guiData.setTerminalPanel(firstHost.getTerminalPanel());
         }
         final Thread thread = new Thread(new Runnable() {
             @Override
@@ -602,7 +608,7 @@ public final class RoboTest {
                 } else if (type == Type.DRBD) {
                     moveToMenu(Tools.getString("Dialog.vm.Storage.Title"));
                     leftClick();
-                    Tools.getGUIData().expandTerminalSplitPane(1);
+                    guiData.expandTerminalSplitPane(1);
                     if (index == '0') {
                         /* all DRBD tests */
                         int i = 1;
@@ -1341,7 +1347,7 @@ public final class RoboTest {
         }
         final int xOffset = getOffset();
         final Point2D appP =
-            Tools.getGUIData().getMainFrameContentPane()
+            guiData.getMainFrameContentPane()
                 .getLocationOnScreen();
         final int appX = (int) appP.getX() + fromX;
         final int appY = (int) appP.getY() + fromY;
@@ -1392,7 +1398,7 @@ public final class RoboTest {
         final int origX = (int) origP.getX();
         final int origY = (int) origP.getY();
         final Point2D endP =
-            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+            guiData.getMainFrameContentPane().getLocationOnScreen();
         final int endX = (int) endP.getX() + toX;
         final int endY = (int) endP.getY() + toY;
         moveToAbs(endX, endY);
@@ -1401,14 +1407,14 @@ public final class RoboTest {
     static int getY() {
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final Point2D endP =
-            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+            guiData.getMainFrameContentPane().getLocationOnScreen();
         return (int) origP.getY() - (int) endP.getY();
     }
 
     static int getX() {
         final Point2D origP = MouseInfo.getPointerInfo().getLocation();
         final Point2D endP =
-            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+            guiData.getMainFrameContentPane().getLocationOnScreen();
         return (int) origP.getX() - (int) endP.getX();
     }
 
@@ -1428,26 +1434,26 @@ public final class RoboTest {
             return;
         }
 
-        Component scrollbar = null;
+        java.awt.Component scrollbar = null;
         int scrollbarX = 0;
         int scrollbarY = 0;
         int i = 0;
         do {
-            final List<Component> res = new ArrayList<Component>();
+            final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
             try {
-                findInside(Tools.getGUIData().getMainFrame(),
+                findInside(LCMC.MAIN_FRAME,
                            Class.forName("javax.swing.JScrollPane$ScrollBar"),
                            res);
             } catch (final ClassNotFoundException e) {
                 Tools.printStackTrace("can't find the scrollbar");
                 return;
             }
-            final Component app = Tools.getGUIData().getMainFrameContentPane();
+            final java.awt.Component app = guiData.getMainFrameContentPane();
             final int mX =
                 (int) app.getLocationOnScreen().getX() + app.getWidth() / 2;
             final int mY =
                 (int) app.getLocationOnScreen().getY() + app.getHeight() / 2;
-            for (final Component c : res) {
+            for (final java.awt.Component c : res) {
                 final Point2D p = c.getLocationOnScreen();
                 final int pX = (int) p.getX();
                 final int pY = (int) p.getY();
@@ -1475,9 +1481,9 @@ public final class RoboTest {
         leftRelease();
     }
 
-    private static Component getFocusedWindow() {
+    private static java.awt.Component getFocusedWindow() {
         for (final Window w : Window.getWindows()) {
-            Component c = w.getFocusOwner();
+            java.awt.Component c = w.getFocusOwner();
             if (c != null) {
                 while (c.getParent() != null
                        && !(c instanceof JDialog || c instanceof JFrame)) {
@@ -1493,7 +1499,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        Component c = null;
+        java.awt.Component c = null;
         int i = 0;
         while (c == null && i < 60 && !aborted) {
             c = findInside(getFocusedWindow(), clazz, number);
@@ -1523,7 +1529,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        final JTree tree = (JTree) findInside(Tools.getGUIData().getMainFrame(),
+        final JTree tree = (JTree) findInside(LCMC.MAIN_FRAME,
                                               JTree.class,
                                               0);
         if (tree == null) {
@@ -1573,7 +1579,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        Component c = null;
+        java.awt.Component c = null;
         int i = 0;
         while (c == null && i < 30 && !aborted) {
             c = findComponent(text, number);
@@ -1592,7 +1598,7 @@ public final class RoboTest {
             Tools.printStackTrace("can't find: " + text);
             return;
         }
-        final Component n;
+        final java.awt.Component n;
         if (clazz == null) {
             n = c;
         } else {
@@ -1714,7 +1720,7 @@ public final class RoboTest {
             return false;
         }
         sleepNoFactor(100);
-        Component dialog = getFocusedWindow();
+        java.awt.Component dialog = getFocusedWindow();
         for (int i = 0; i < 30; i++) {
             if (dialog instanceof JDialog || aborted) {
                 break;
@@ -1757,8 +1763,8 @@ public final class RoboTest {
         LOG.info(text);
     }
 
-    public static Component findInside(final Component component, final Class<?> clazz, final int position) {
-        final List<Component> res = new ArrayList<Component>();
+    public static java.awt.Component findInside(final java.awt.Component component, final Class<?> clazz, final int position) {
+        final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
         findInside(component, clazz, res);
         if (res.size() > position) {
             return res.get(position);
@@ -1766,7 +1772,7 @@ public final class RoboTest {
         return null;
     }
 
-    public static void findInside(final Component component, final Class<?> clazz, final List<Component> results) {
+    public static void findInside(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
         int i = 0;
         while (results.isEmpty() && i < 10) {
             if (i > 0) {
@@ -1777,13 +1783,13 @@ public final class RoboTest {
         }
     }
 
-    private static void findInside0(final Component component, final Class<?> clazz, final List<Component> results) {
+    private static void findInside0(final java.awt.Component component, final Class<?> clazz, final List<java.awt.Component> results) {
         if (component.getClass().equals(clazz)
             && component.isShowing()) {
             results.add(component);
         }
         if (component instanceof Container) {
-            for (final Component c : ((Container) component).getComponents()) {
+            for (final java.awt.Component c : ((Container) component).getComponents()) {
                 findInside0(c, clazz, results);
             }
         }
@@ -1791,11 +1797,11 @@ public final class RoboTest {
 
     /** Find component that is next to the specified component and is of the
      * specified class. */
-    public static Component findNext(final Component component, final Class<?> clazz) {
+    public static java.awt.Component findNext(final java.awt.Component component, final Class<?> clazz) {
         boolean next = false;
-        for (final Component c : component.getParent().getComponents()) {
+        for (final java.awt.Component c : component.getParent().getComponents()) {
             if (next) {
-                final Component f = findInside(c, clazz, 0);
+                final java.awt.Component f = findInside(c, clazz, 0);
                 if (f != null) {
                     return f;
                 }
@@ -1847,7 +1853,7 @@ public final class RoboTest {
             LOG.info("findComponent: cannot find " + text);
             return null;
         }
-        for (final Component c : component.getComponents()) {
+        for (final java.awt.Component c : component.getComponents()) {
             if (c instanceof Container) {
                 final Container ret =
                     findComponent(text, (Container) c, number);
@@ -1871,7 +1877,7 @@ public final class RoboTest {
 
     static Point2D getAppPosition() {
         final Point2D loc =
-            Tools.getGUIData().getMainFrameContentPane().getLocationOnScreen();
+            guiData.getMainFrameContentPane().getLocationOnScreen();
         final Point2D pos = MouseInfo.getPointerInfo().getLocation();
         final Point2D newPos = new Point2D.Double(pos.getX() - loc.getX(),
             pos.getY() - loc.getY());

@@ -37,18 +37,23 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,
  * to show it to the user.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class AvailableServiceInfo extends HbCategoryInfo {
     private static final ImageIcon AVAIL_SERVICES_ICON =
                                     Tools.createImageIcon(Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
-    private final ResourceAgent resourceAgent;
+    private ResourceAgent resourceAgent;
 
-    public AvailableServiceInfo(final ResourceAgent resourceAgent, final Browser browser) {
+    public void init(final ResourceAgent resourceAgent, final Browser browser) {
         super.init(resourceAgent.getServiceName(), browser);
         this.resourceAgent = resourceAgent;
     }

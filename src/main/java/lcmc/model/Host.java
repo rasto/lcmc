@@ -46,18 +46,14 @@ import java.util.regex.Pattern;
 import javax.swing.JComponent;
 
 import lcmc.Exceptions;
+import lcmc.LCMC;
 import lcmc.configs.DistResource;
+import lcmc.gui.*;
 import lcmc.model.drbd.DrbdHost;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.resources.BlockDevice;
 import lcmc.model.resources.NetInterface;
 import lcmc.model.vm.VmsXml;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.ProgressBar;
-import lcmc.gui.ResourceGraph;
-import lcmc.gui.SSHGui;
-import lcmc.gui.TerminalPanel;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.robotest.RoboTest;
 import lcmc.utilities.*;
@@ -65,6 +61,7 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.ssh.SshOutput;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -195,7 +192,6 @@ public class Host implements Comparable<Host>, Value {
     private String corosyncVersion = null;
     private String heartbeatVersion = null;
     private boolean crmStatusOk = false;
-    private final Ssh ssh = new Ssh();
     private String sshPort = null;
     private Boolean useSudo = null;
     private String sudoPassword = "";
@@ -232,7 +228,16 @@ public class Host implements Comparable<Host>, Value {
 
     private TerminalPanel terminalPanel;
 
-    public Host(final DrbdHost drbdHost, final TerminalPanel terminalPanel) {
+    private GUIData guiData;
+    private Ssh ssh;
+
+    public Host(final GUIData guiData,
+                final Ssh ssh,
+                final DrbdHost drbdHost,
+                final TerminalPanel terminalPanel) {
+        this.guiData = guiData;
+        this.ssh = ssh;
+
         this.drbdHost = drbdHost;
         this.terminalPanel = terminalPanel;
 
@@ -807,21 +812,21 @@ public class Host implements Comparable<Host>, Value {
 
     public SshOutput captureCommandProgressIndicator(final String text, final ExecCommandConfig execCommandConfig) {
         final String hostName = getName();
-        Tools.startProgressIndicator(hostName, text);
+        guiData.startProgressIndicator(hostName, text);
         try {
             return ssh.captureCommand(execCommandConfig);
         } finally {
-            Tools.stopProgressIndicator(hostName, text);
+            guiData.stopProgressIndicator(hostName, text);
         }
     }
 
     public void execCommandProgressIndicator(final String text, final ExecCommandConfig execCommandConfig) {
         final String hostName = getName();
-        Tools.startProgressIndicator(hostName, text);
+        guiData.startProgressIndicator(hostName, text);
         try {
             ssh.execCommand(execCommandConfig);
         } finally {
-            Tools.stopProgressIndicator(hostName, text);
+            guiData.stopProgressIndicator(hostName, text);
         }
     }
 
@@ -1110,7 +1115,7 @@ public class Host implements Comparable<Host>, Value {
      */
     public void connect(SSHGui sshGui, final ConnectionCallback callback) {
         if (sshGui == null) {
-            sshGui = new SSHGui(Tools.getGUIData().getMainFrame(), this, null);
+            sshGui = new SSHGui(LCMC.MAIN_FRAME, this, null);
         }
         ssh.connect(sshGui, callback, this);
     }
@@ -1186,11 +1191,11 @@ public class Host implements Comparable<Host>, Value {
         if (!isConnected()) {
             final String hostName = getName();
             if (progressIndicator) {
-                Tools.startProgressIndicator(hostName,
-                                             Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
+                guiData.startProgressIndicator(hostName,
+                                               Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
             }
             if (sshGui == null) {
-                sshGui = new SSHGui(Tools.getGUIData().getMainFrame(), this, null);
+                sshGui = new SSHGui(LCMC.MAIN_FRAME, this, null);
             }
 
             connect(sshGui,
@@ -1206,7 +1211,7 @@ public class Host implements Comparable<Host>, Value {
                                     getSSH().installGuiHelper();
                             getAllInfo();
                             if (progressIndicator) {
-                                Tools.stopProgressIndicator(
+                                guiData.stopProgressIndicator(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
                             }
@@ -1217,13 +1222,13 @@ public class Host implements Comparable<Host>, Value {
                             setLoadingError();
                             setConnected();
                             if (progressIndicator) {
-                                Tools.stopProgressIndicator(
+                                guiData.stopProgressIndicator(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
-                                Tools.progressIndicatorFailed(
+                                guiData.progressIndicatorFailed(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
-                                Tools.stopProgressIndicator(
+                                guiData.stopProgressIndicator(
                                   hostName,
                                   Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
                             }
@@ -1432,13 +1437,13 @@ public class Host implements Comparable<Host>, Value {
                                      }
                                  }
                                  if (drbdUpdate != null) {
-                                     final DrbdXml dxml = new DrbdXml(cluster.getHostsArray(), cb.getHostDrbdParameters());
+                                     final DrbdXml dxml = new DrbdXml(guiData, cluster.getHostsArray(), cb.getHostDrbdParameters());
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXml(dxml);
                                      Tools.invokeLater(new Runnable() {
                                          @Override
                                          public void run() {
-                                             cb.getDrbdGraph().getDrbdInfo().setParameters();
+                                             hostBrowser.getClusterBrowser().getGlobalInfo().setParameters();
                                              cb.updateDrbdResources();
                                          }
                                      });

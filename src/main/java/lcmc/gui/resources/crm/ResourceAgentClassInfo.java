@@ -37,11 +37,17 @@ import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds the information about resource agent class and its
  * services.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ResourceAgentClassInfo extends HbCategoryInfo {
     /** Back to overview icon. */
     private static final ImageIcon BACK_ICON = Tools.createImageIcon(

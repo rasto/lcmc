@@ -42,6 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -96,6 +97,9 @@ import org.apache.commons.collections15.keyvalue.MultiKey;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
@@ -105,6 +109,7 @@ import org.springframework.stereotype.Component;
  * Every resource has its Info object, that accessible through the tree view.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ClusterBrowser extends Browser {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterBrowser.class);
     public static final ImageIcon REMOVE_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.RemoveIcon"));
@@ -194,6 +199,13 @@ public class ClusterBrowser extends Browser {
         CRM_OPERATIONS_WITH_IGNORED_DEFAULT.add(CRM_VALIDATE_ALL_OPERATOR);
     }
 
+    @Autowired
+    private Provider<DomainInfo> domainInfoProvider;
+    @Autowired @Qualifier("hbConnectionInfo")
+    private Provider<HbConnectionInfo> connectionInfoProvider;
+    @Autowired
+    private Provider<AvailableServiceInfo> availableServiceInfoProvider;
+
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
         if (name == null) {
@@ -226,7 +238,9 @@ public class ClusterBrowser extends Browser {
     private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo = new HashMap<String, ServiceInfo>();
+    @Autowired
     private CrmGraph crmGraph;
+    @Autowired
     private DrbdGraph drbdGraph;
     private ClusterStatus clusterStatus;
     private CrmXml crmXml;
@@ -256,19 +270,28 @@ public class ClusterBrowser extends Browser {
     @Autowired
     private ServicesInfo servicesInfo;
     private RscDefaultsInfo rscDefaultsInfo = null;
+    @Autowired
+    private Provider<RscDefaultsInfo> rscDefaultsInfoProvider;
     private final Lock mCrmStatusLock = new ReentrantLock();
     private final Map<String, List<String>> crmOperationParams = new LinkedHashMap<String, List<String>>();
     /** Not advanced operations. */
     private final MultiKeyMap<String, Integer> notAdvancedOperations = MultiKeyMap.decorate(
                                                                      new LinkedMap<MultiKey<String>, Integer>());
     private final Map<Host, String> hostDrbdParameters = new HashMap<Host, String>();
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private GlobalInfo globalInfo;
+
+    @Autowired
+    private VMListInfo vmListInfo;
 
     public void init(final Cluster cluster) {
         this.cluster = cluster;
-        crmGraph = new CrmGraph(this);
-        drbdGraph = new DrbdGraph(this);
+        crmGraph.initGraph(this);
+        drbdGraph.initGraph(this);
+        globalInfo.init(Tools.getString("ClusterBrowser.Drbd"), this);
         setMenuTreeTop();
-
     }
 
     private void initOperations() {
@@ -420,7 +443,6 @@ public class ClusterBrowser extends Browser {
 
     void addVmsNode() {
         if (vmsNode == null) {
-            final VMListInfo vmListInfo = new VMListInfo();
             vmListInfo.init(Tools.getString("ClusterBrowser.VMs"), this);
             vmsNode = new DefaultMutableTreeNode(vmListInfo);
             setNode(vmsNode);
@@ -447,7 +469,7 @@ public class ClusterBrowser extends Browser {
         topLevelAdd(networksNode);
 
         /* drbd */
-        drbdNode = new DefaultMutableTreeNode(new GlobalInfo(Tools.getString("ClusterBrowser.Drbd"), this));
+        drbdNode = new DefaultMutableTreeNode(globalInfo);
         setNode(drbdNode);
         topLevelAdd(drbdNode);
 
@@ -472,7 +494,8 @@ public class ClusterBrowser extends Browser {
         setNode(commonBlockDevicesNode);
 
         /* resource defaults */
-        rscDefaultsInfo = new RscDefaultsInfo("rsc_defaults", this);
+        rscDefaultsInfo = rscDefaultsInfoProvider.get();
+        rscDefaultsInfo.init("rsc_defaults", this);
         /* services */
         servicesInfo.init(Tools.getString("ClusterBrowser.Services"), this);
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
@@ -488,7 +511,7 @@ public class ClusterBrowser extends Browser {
         final Set<Host> clusterHosts = getCluster().getHosts();
         for (final Host pHost : getCluster().getProxyHosts()) {
             if (!clusterHosts.contains(pHost)) {
-                getDrbdGraph().getDrbdInfo().addProxyHostNode(pHost);
+                globalInfo.addProxyHostNode(pHost);
             }
         }
     }
@@ -545,7 +568,7 @@ public class ClusterBrowser extends Browser {
                 final Host[] hosts = cluster.getHostsArray();
                 for (final Host host : hosts) {
                     host.waitForServerStatusLatch();
-                    Tools.stopProgressIndicator(
+                    guiData.stopProgressIndicator(
                         host.getName(),
                         Tools.getString("ClusterBrowser.UpdatingServerInfo"));
                 }
@@ -610,18 +633,18 @@ public class ClusterBrowser extends Browser {
                 }
 
                 LOG.debug1("updateHeartbeatDrbdThread: first host: " + firstHost);
-                crmXml = new CrmXml(firstHost, getServicesInfo());
+                crmXml = new CrmXml(guiData, firstHost, getServicesInfo());
                 clusterStatus = new ClusterStatus(firstHost, crmXml);
                 initOperations();
-                drbdXml = new DrbdXml(cluster.getHostsArray(), hostDrbdParameters);
+                drbdXml = new DrbdXml(guiData, cluster.getHostsArray(), hostDrbdParameters);
                 /* available services */
                 final String clusterName = getCluster().getName();
-                Tools.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
+                guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
 
                 updateAvailableServices();
-                Tools.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
-                Tools.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
-                Tools.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
+                guiData.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateResources"));
+                guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
+                guiData.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.DrbdUpdate"));
                 cluster.getBrowser().startConnectionStatusOnAllHosts();
                 cluster.getBrowser().startServerStatus();
                 cluster.getBrowser().startDrbdStatusOnAllHosts();
@@ -667,7 +690,7 @@ public class ClusterBrowser extends Browser {
         final CategoryInfo[] infosToUpdate = new CategoryInfo[]{clusterHostsInfo};
         while (true) {
             if (host.getWaitForServerStatusLatch()) {
-                Tools.startProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingServerInfo"));
+                guiData.startProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingServerInfo"));
             }
 
             host.setIsLoading();
@@ -794,7 +817,7 @@ public class ClusterBrowser extends Browser {
         host.setDrbdStatusOk(false);
         final String hostName = host.getName();
         /* now what we do if the status finished for the first time. */
-        Tools.startProgressIndicator( hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
+        guiData.startProgressIndicator( hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -809,7 +832,7 @@ public class ClusterBrowser extends Browser {
                         drbdGraph.scale();
                     }
                 });
-                Tools.stopProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
+                guiData.stopProgressIndicator(hostName, Tools.getString("ClusterBrowser.UpdatingDrbdStatus"));
             }
         });
         thread.start();
@@ -885,7 +908,7 @@ public class ClusterBrowser extends Browser {
                                host.drbdStatusLock();
                                drbdConfig = host.getOutput("drbd", outputBuffer);
                                if (drbdConfig != null) {
-                                   final DrbdXml newDrbdXml = new DrbdXml(cluster.getHostsArray(), hostDrbdParameters);
+                                   final DrbdXml newDrbdXml = new DrbdXml(guiData, cluster.getHostsArray(), hostDrbdParameters);
                                    newDrbdXml.update(drbdConfig);
                                    drbdXml = newDrbdXml;
                                    drbdUpdate = true;
@@ -905,7 +928,7 @@ public class ClusterBrowser extends Browser {
                                Tools.invokeLater(new Runnable() {
                                    @Override
                                    public void run() {
-                                       getDrbdGraph().getDrbdInfo().setParameters();
+                                       globalInfo.setParameters();
                                        updateDrbdResources();
                                    }
                                });
@@ -983,11 +1006,11 @@ public class ClusterBrowser extends Browser {
     }
 
     void startClStatusProgressIndicator(final String clusterName) {
-        Tools.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
+        guiData.startProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
     void stopClStatusProgressIndicator(final String clusterName) {
-        Tools.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
+        guiData.stopProgressIndicator(clusterName, Tools.getString("ClusterBrowser.HbUpdateStatus"));
     }
 
     /** Sets status and checks if it changes and if it does some action will be
@@ -1087,7 +1110,7 @@ public class ClusterBrowser extends Browser {
                     Thread.currentThread().interrupt();
                 }
                 if (crmStatusFailed()) {
-                     Tools.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
+                     guiData.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
                 } else {
                     Tools.invokeLater(new Runnable() {
                         @Override
@@ -1228,7 +1251,8 @@ public class ClusterBrowser extends Browser {
             classInfoMap.put(crmClass, raci);
             final DefaultMutableTreeNode classNode = new DefaultMutableTreeNode(raci);
             for (final ResourceAgent resourceAgent : crmXml.getServices(crmClass)) {
-                final AvailableServiceInfo availableService = new AvailableServiceInfo(resourceAgent, this);
+                final AvailableServiceInfo availableService = availableServiceInfoProvider.get();
+                availableService.init(resourceAgent, this);
                 availableServiceMap.put(resourceAgent, availableService);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(availableService);
                 setNode(resource);
@@ -1304,11 +1328,12 @@ public class ClusterBrowser extends Browser {
                 i++;
             }
             /* add new vms nodes */
-            final DomainInfo vmsvdi = new DomainInfo(domainName, this);
-            currentVMSVDIs.add(vmsvdi);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsvdi);
+            final DomainInfo domainInfo = domainInfoProvider.get();
+            domainInfo.init(domainName, this);
+            currentVMSVDIs.add(domainInfo);
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(domainInfo);
             setNode(resource);
-            vmsvdi.updateParameters();
+            domainInfo.updateParameters();
             final int index = i;
             Tools.invokeAndWait(new Runnable() {
                 @Override
@@ -1344,7 +1369,6 @@ public class ClusterBrowser extends Browser {
 
     public void updateDrbdResources() {
         Tools.isSwingThread();
-        final GlobalInfo globalInfo = drbdGraph.getDrbdInfo();
         drbdStatusLock();
         final DrbdXml dxml = drbdXml;
         if (dxml == null) {
@@ -1902,9 +1926,10 @@ public class ClusterBrowser extends Browser {
      * This is called from crm graph.
      */
     HbConnectionInfo getNewHbConnectionInfo() {
-        final HbConnectionInfo hbci = new HbConnectionInfo(this);
-        //hbci.getInfoPanel();
-        return hbci;
+        final HbConnectionInfo connectionInfo = connectionInfoProvider.get();
+        connectionInfo.init(this);
+        //connectionInfo.getInfoPanel();
+        return connectionInfo;
     }
 
     public ClusterStatus getClusterStatus() {
@@ -2101,14 +2126,14 @@ public class ClusterBrowser extends Browser {
         servicesInfo.checkResourceFields(null, servicesInfo.getParametersFromXML());
         servicesInfo.updateAdvancedPanels();
         rscDefaultsInfo.updateAdvancedPanels();
-        Tools.getGUIData().updateGlobalItems();
+        guiData.updateGlobalItems();
         for (final ServiceInfo si : getExistingServiceList(null)) {
             si.checkResourceFields(null, si.getParametersFromXML());
             si.updateAdvancedPanels();
         }
 
-        drbdGraph.getDrbdInfo().checkResourceFields(null, drbdGraph.getDrbdInfo().getParametersFromXML());
-        drbdGraph.getDrbdInfo().updateAdvancedPanels();
+        globalInfo.checkResourceFields(null, globalInfo.getParametersFromXML());
+        globalInfo.updateAdvancedPanels();
         for (final ResourceInfo dri : getDrbdResHashValues()) {
             dri.checkResourceFields(null, dri.getParametersFromXML());
             dri.updateAdvancedPanels();
@@ -2353,5 +2378,9 @@ public class ClusterBrowser extends Browser {
 
         /** Action that is caried out on the host. */
         protected abstract void action(final Host dcHost);
+    }
+
+    public GlobalInfo getGlobalInfo() {
+        return globalInfo;
     }
 }

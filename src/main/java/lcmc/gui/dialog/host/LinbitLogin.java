@@ -36,6 +36,8 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**.
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Component;
  * for the linbit website.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class LinbitLogin extends DialogHost {
     private static final int CHECKBOX_WIDTH = 120;
     private Widget downloadUserField;

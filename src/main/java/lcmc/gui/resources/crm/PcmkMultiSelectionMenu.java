@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JColorChooser;
+
+import lcmc.LCMC;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.ClusterStatus;
@@ -41,7 +43,13 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Openais;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class PcmkMultiSelectionMenu {
     private final PcmkMultiSelectionInfo pcmkMultiSelectionInfo;
 
@@ -558,7 +566,7 @@ public class PcmkMultiSelectionMenu {
                 public void action() {
                     final Host firstHost = selectedHostInfos.get(0).getHost();
                     final Color newColor = JColorChooser.showDialog(
-                                            Tools.getGUIData().getMainFrame(),
+                                            LCMC.MAIN_FRAME,
                                             "Choose " + selectedHostInfos
                                             + " color",
                                             firstHost.getPmColors()[0]);

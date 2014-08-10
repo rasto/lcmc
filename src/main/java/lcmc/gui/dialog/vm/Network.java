@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.vm;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -32,14 +31,19 @@ import javax.swing.JScrollPane;
 import lcmc.model.StringValue;
 import lcmc.model.vm.VmsXml.InterfaceData;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.resources.vms.InterfaceInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class Network extends VMConfig {
     private static final String[] PARAMS = {InterfaceData.TYPE,
                                             InterfaceData.MAC_ADDRESS,
@@ -49,20 +53,21 @@ final class Network extends VMConfig {
                                             InterfaceData.MODEL_TYPE};
     private JComponent inputPane = null;
     private InterfaceInfo interfaceInfo = null;
-    private WizardDialog nextDialogObject = null;
-
-    Network(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
-        super(previousDialog, vmsVirtualDomainInfo);
-    }
+    private VMConfig nextDialogObject = null;
+    @Autowired
+    private Display displayDialog;
+    @Autowired
+    private VMFinish VMFinishDialog;
 
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
             if (getVMSVirtualDomainInfo().needDisplay()) {
-                nextDialogObject = new Display(this, getVMSVirtualDomainInfo());
+                nextDialogObject = displayDialog;
             } else {
-                nextDialogObject = new Finish(this, getVMSVirtualDomainInfo());
+                nextDialogObject = VMFinishDialog;
             }
+            nextDialogObject.init(this, getVMSVirtualDomainInfo());
 
         }
         return nextDialogObject;
@@ -117,7 +122,7 @@ final class Network extends VMConfig {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
         interfaceInfo.savePreferredValues();
         interfaceInfo.getResource().setValue(InterfaceData.TYPE, InterfaceInfo.TYPE_NETWORK);
         interfaceInfo.getResource().setValue(InterfaceData.SOURCE_NETWORK, new StringValue("default"));

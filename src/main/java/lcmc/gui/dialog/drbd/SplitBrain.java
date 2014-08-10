@@ -44,21 +44,22 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class SplitBrain extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SplitBrain.class);
     private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
     private Widget hostWithBetterDataWidget;
     private final MyButton resolveButton = new MyButton(Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
-
-    public SplitBrain(final WizardDialog previousDialog, final VolumeInfo dvi) {
-        super(previousDialog, dvi);
-    }
 
     protected void resolve() {
         final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();

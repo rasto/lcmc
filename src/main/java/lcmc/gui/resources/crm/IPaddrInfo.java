@@ -33,28 +33,18 @@ import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
  * better ip entering capabilities.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class IPaddrInfo extends ServiceInfo {
-    /** Creates new IPaddrInfo object. */
-    IPaddrInfo(final String name,
-               final ResourceAgent ra,
-               final Browser browser) {
-        super(name, ra, browser);
-    }
-
-    /** Creates new IPaddrInfo object. */
-    IPaddrInfo(final String name,
-               final ResourceAgent ra,
-               final String hbId,
-               final Map<String, String> resourceNode,
-               final Browser browser) {
-        super(name, ra, hbId, resourceNode, browser);
-    }
-
     /**
      * Returns whether all the parameters are correct. If param is null,
      * all paremeters will be checked, otherwise only the param, but other

@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -44,18 +45,23 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter drbd resource
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Resource extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(Resource.class);
     private static final String WFC_TIMEOUT_PARAM = "wfc-timeout";
@@ -95,10 +101,10 @@ public final class Resource extends DrbdConfig {
     private boolean proxyHostNextDialog = false;
     @Autowired
     private HostFactory hostFactory;
-
-    public Resource(final WizardDialog previousDialog, final VolumeInfo dvi) {
-        super(previousDialog, dvi);
-    }
+    @Autowired
+    private Provider<NewProxyHostDialog> newProxyHostDialogProvider;
+    @Autowired
+    private Volume volumeDialog;
 
     private String getRandomSecret() {
         return Tools.getRandomSecret(SECRET_STRING_LENGTH);
@@ -113,9 +119,11 @@ public final class Resource extends DrbdConfig {
             final Host proxyHost = hostFactory.createInstance();
             proxyHost.init();
             proxyHost.setCluster(dri.getCluster());
-            return new NewProxyHostDialog(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
+            final NewProxyHostDialog newProxyHostDialog = newProxyHostDialogProvider.get();
+            newProxyHostDialog.init(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
+            return newProxyHostDialog;
         }
-        final GlobalInfo globalInfo = dri.getDrbdInfo();
+        final GlobalInfo globalInfo = dri.getBrowser().getGlobalInfo();
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
         if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {
@@ -132,7 +140,8 @@ public final class Resource extends DrbdConfig {
                 wi.setValue(value);
             }
         }
-        return new Volume(this, getDrbdVolumeInfo());
+        volumeDialog.init(this, getDrbdVolumeInfo());
+        return volumeDialog;
     }
 
     @Override
@@ -181,7 +190,6 @@ public final class Resource extends DrbdConfig {
     @Override
     protected JComponent getInputPane() {
         final ResourceInfo dri = getDrbdVolumeInfo().getDrbdResourceInfo();
-        final GlobalInfo globalInfo = dri.getDrbdInfo();
         final JPanel inputPane = new JPanel();
         inputPane.setLayout(new BoxLayout(inputPane, BoxLayout.LINE_AXIS));
 
@@ -196,6 +204,7 @@ public final class Resource extends DrbdConfig {
         commonPreferredValue.put(ON_IO_ERROR_PARAM, new StringValue("detach"));
         commonPreferredValue.put(PROXY_MEMLIMIT_PARAM, new StringValue("100", DrbdXml.getUnitMiBytes("")));
         commonPreferredValue.put(PROXY_PLUGIN_ZLIB_PARAM, new StringValue("level 9"));
+        final GlobalInfo globalInfo = dri.getBrowser().getGlobalInfo();
         final boolean protocolInNetSection = globalInfo.atLeastVersion("8.4");
         if (globalInfo.getDrbdResources().size() <= 1) {
             for (final String commonP : COMMON_PARAMS) {

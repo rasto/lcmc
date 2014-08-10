@@ -22,33 +22,44 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.gui.dialog.drbd.SplitBrain;
 import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that resolve a drbd split-brain.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class AddDrbdSplitBrainDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
-    private final VolumeInfo volumeInfo;
+    private VolumeInfo volumeInfo;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private SplitBrain splitBrainDialog;
 
-    public AddDrbdSplitBrainDialog(final VolumeInfo volumeInfo) {
+    public void init(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;
     }
 
     public void showDialogs() {
-        DrbdConfig dialog = new SplitBrain(null, volumeInfo);
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        splitBrainDialog.init(null, volumeInfo);
+        DrbdConfig dialog = splitBrainDialog;
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
@@ -59,7 +70,7 @@ public final class AddDrbdSplitBrainDialog {
             }
             dialog = newdialog;
         }
-        Tools.getGUIData().expandTerminalSplitPane(1);
-        Tools.getGUIData().getMainFrame().requestFocus();
+        guiData.expandTerminalSplitPane(1);
+        LCMC.MAIN_FRAME.requestFocus();
     }
 }

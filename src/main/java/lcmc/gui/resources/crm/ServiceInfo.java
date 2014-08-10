@@ -23,7 +23,6 @@ package lcmc.gui.resources.crm;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,6 +44,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+import javax.inject.Provider;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -55,6 +55,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.*;
@@ -85,11 +87,18 @@ import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.WidgetListener;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for one hearteat service and allows to enter
  * its arguments and execute operations on it.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ServiceInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceInfo.class);
 
@@ -187,11 +196,31 @@ public class ServiceInfo extends EditableInfo {
     /** Master/Slave info object, if is null, it is not master/slave
      * resource. */
     private volatile CloneInfo cloneInfo = null;
-    private final ResourceAgent resourceAgent;
+    private ResourceAgent resourceAgent;
     /** Radio buttons for clone/master/slave primitive resources. */
     private Widget typeRadioGroup;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private ServiceMenu serviceMenu;
+    @Autowired
+    private Provider<FilesystemInfo> filesystemInfoProvider;
+    @Autowired
+    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
+    @Autowired
+    private Provider<DrbddiskInfo> drbddiskInfoProvider;
+    @Autowired
+    private Provider<IPaddrInfo> ipaddrInfoProvider;
+    @Autowired
+    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
+    @Autowired
+    private Provider<GroupInfo> groupInfoProvider;
+    @Autowired
+    private Provider<CloneInfo> cloneInfoProvider;
+    @Autowired @Qualifier("serviceInfo")
+    private Provider<ServiceInfo> serviceInfoProvider;
 
-    protected ServiceInfo(final String name, final ResourceAgent resourceAgent, final Browser browser) {
+    protected void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, browser);
         this.resourceAgent = resourceAgent;
         if (resourceAgent != null && resourceAgent.isStonith()) {
@@ -208,12 +237,12 @@ public class ServiceInfo extends EditableInfo {
      * new service object. It also initializes parameters along with
      * heartbeat id with values from xml stored in resourceNode.
      */
-    protected ServiceInfo(final String name,
-                          final ResourceAgent ra,
-                          final String heartbeatId,
-                          final Map<String, String> resourceNode,
-                          final Browser browser) {
-        this(name, ra, browser);
+    protected void init(final String name,
+                        final ResourceAgent ra,
+                        final String heartbeatId,
+                        final Map<String, String> resourceNode,
+                        final Browser browser) {
+        init(name, ra, browser);
         getService().setHeartbeatId(heartbeatId);
         /* TODO: cannot call setParameters here, only after it is
          * constructed. */
@@ -2055,32 +2084,33 @@ public class ServiceInfo extends EditableInfo {
         if (masterSlave) {
             title = Application.PM_MASTER_SLAVE_SET_NAME;
         }
-        final CloneInfo ci = new CloneInfo(crmXML.getCloneResourceAgent(), title, masterSlave, getBrowser());
-        setCloneInfo(ci);
-        ci.setContainedService(this);
+        final CloneInfo cloneInfo = cloneInfoProvider.get();
+        cloneInfo.init(crmXML.getCloneResourceAgent(), title, masterSlave, getBrowser());
+        setCloneInfo(cloneInfo);
+        cloneInfo.setContainedService(this);
         if (oldCI == null) {
             final Widget prevWi = getWidget(GUI_ID, null);
             if (prevWi != null) {
-                ci.getService().setId(getName() + '_' + prevWi.getStringValue());
+                cloneInfo.getService().setId(getName() + '_' + prevWi.getStringValue());
             }
-            getBrowser().addNameToServiceInfoHash(ci);
-            getBrowser().addToHeartbeatIdList(ci);
-            getBrowser().getCrmGraph().exchangeObjectInTheVertex(ci, this);
-            ci.setPingComboBox(pingComboBox);
+            getBrowser().addNameToServiceInfoHash(cloneInfo);
+            getBrowser().addToHeartbeatIdList(cloneInfo);
+            getBrowser().getCrmGraph().exchangeObjectInTheVertex(cloneInfo, this);
+            cloneInfo.setPingComboBox(pingComboBox);
             for (final Map.Entry<HostInfo, Widget> hostInfoWidgetEntry : scoreComboBoxHash.entrySet()) {
-                ci.getScoreComboBoxHash().put(hostInfoWidgetEntry.getKey(), hostInfoWidgetEntry.getValue());
+                cloneInfo.getScoreComboBoxHash().put(hostInfoWidgetEntry.getKey(), hostInfoWidgetEntry.getValue());
             }
         } else {
             oldCI.removeNodeAndWait();
-            ci.getService().setId(oldCI.getWidget(GUI_ID, null).getStringValue());
-            getBrowser().addNameToServiceInfoHash(ci);
-            getBrowser().addToHeartbeatIdList(ci);
-            getBrowser().getCrmGraph().exchangeObjectInTheVertex(ci, oldCI);
+            cloneInfo.getService().setId(oldCI.getWidget(GUI_ID, null).getStringValue());
+            getBrowser().addNameToServiceInfoHash(cloneInfo);
+            getBrowser().addToHeartbeatIdList(cloneInfo);
+            getBrowser().getCrmGraph().exchangeObjectInTheVertex(cloneInfo, oldCI);
             cleanup();
             oldCI.cleanup();
-            ci.setPingComboBox(oldCI.getPingComboBox());
+            cloneInfo.setPingComboBox(oldCI.getPingComboBox());
             for (final HostInfo hi : oldCI.getScoreComboBoxHash().keySet()) {
-                ci.getScoreComboBoxHash().put(hi, oldCI.getScoreComboBoxHash().get(hi));
+                cloneInfo.getScoreComboBoxHash().put(hi, oldCI.getScoreComboBoxHash().get(hi));
             }
             getBrowser().removeFromServiceInfoHash(oldCI);
             getBrowser().mHeartbeatIdToServiceLock();
@@ -2091,7 +2121,7 @@ public class ServiceInfo extends EditableInfo {
                 oldCINode.setUserObject(null); /* would leak without it*/
             }
         }
-        ci.setCloneServicePanel(this);
+        cloneInfo.setCloneServicePanel(this);
         resetInfoPanel();
         infoPanel = null;
         getInfoPanel();
@@ -2395,7 +2425,7 @@ public class ServiceInfo extends EditableInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Actions */
         final JMenuBar mb = new JMenuBar();
@@ -3603,17 +3633,23 @@ public class ServiceInfo extends EditableInfo {
 
         final String name = newRA.getServiceName();
         if (newRA.isFilesystem()) {
-            newServiceInfo = new FilesystemInfo(name, newRA, getBrowser());
+            newServiceInfo = filesystemInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isLinbitDrbd()) {
-            newServiceInfo = new LinbitDrbdInfo(name, newRA, getBrowser());
+            newServiceInfo = linbitDrbdInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isDrbddisk()) {
-            newServiceInfo = new DrbddiskInfo(name, newRA, getBrowser());
+            newServiceInfo = drbddiskInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isIPaddr()) {
-            newServiceInfo = new IPaddrInfo(name, newRA, getBrowser());
+            newServiceInfo = ipaddrInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isVirtualDomain()) {
-            newServiceInfo = new VirtualDomainInfo(name, newRA, getBrowser());
+            newServiceInfo = virtualDomainInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isGroup()) {
-            newServiceInfo = new GroupInfo(newRA, getBrowser());
+            newServiceInfo = groupInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         } else if (newRA.isClone()) {
             final String cloneName;
             if (master) {
@@ -3621,9 +3657,12 @@ public class ServiceInfo extends EditableInfo {
             } else {
                 cloneName = Application.PM_CLONE_SET_NAME;
             }
-            newServiceInfo = new CloneInfo(newRA, cloneName, master, getBrowser());
+            final CloneInfo newCloneInfo = cloneInfoProvider.get();
+            newCloneInfo.init(newRA, cloneName, master, getBrowser());
+            newServiceInfo = newCloneInfo;
         } else {
-            newServiceInfo = new ServiceInfo(name, newRA, getBrowser());
+            newServiceInfo = serviceInfoProvider.get();
+            newServiceInfo.init(name, newRA, getBrowser());
         }
 
         addServicePanel(newServiceInfo,
@@ -3970,7 +4009,7 @@ public class ServiceInfo extends EditableInfo {
                     cleanupResource(dcHost, runMode);
                     setUpdated(false); /* must be here, is not a clone anymore*/
                     if (!ret && Application.isLive(runMode)) {
-                        Tools.progressIndicatorFailed(dcHost.getName(), "removing failed");
+                        guiData.progressIndicatorFailed(dcHost.getName(), "removing failed");
                     }
                 }
             }
@@ -4055,8 +4094,7 @@ public class ServiceInfo extends EditableInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final ServiceMenu serviceMenu = new ServiceMenu(this);
-        return serviceMenu.getPulldownMenu();
+        return serviceMenu.getPulldownMenu(this);
     }
 
     @Override

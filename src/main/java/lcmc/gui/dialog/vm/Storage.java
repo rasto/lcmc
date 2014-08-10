@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.vm;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -36,10 +35,16 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DiskInfo;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class Storage extends VMConfig {
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
@@ -61,15 +66,14 @@ final class Storage extends VMConfig {
     private JComponent inputPane = null;
     private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
-
-    Storage(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
-        super(previousDialog, vmsVirtualDomainInfo);
-    }
+    @Autowired
+    private Network networkDialog;
 
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
-            nextDialogObject = new Network(this, getVMSVirtualDomainInfo());
+            networkDialog.init(this, getVMSVirtualDomainInfo());
+            nextDialogObject = networkDialog;
         }
         return nextDialogObject;
     }
@@ -123,7 +127,7 @@ final class Storage extends VMConfig {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
         diskInfo.savePreferredValues();
         diskInfo.getResource().setValue(DiskData.TYPE, DiskInfo.FILE_TYPE);
         diskInfo.getResource().setValue(DiskData.TARGET_BUS_TYPE, DiskInfo.BUS_TYPE_IDE);

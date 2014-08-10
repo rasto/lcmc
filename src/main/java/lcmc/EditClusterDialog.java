@@ -22,6 +22,7 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
@@ -29,29 +30,34 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that configure a cluster.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class EditClusterDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditClusterDialog.class);
     private static final String CANCEL_BTN = Tools.getString("Dialog.Dialog.Cancel");
     private static final String FINISH_BTN = Tools.getString("Dialog.Dialog.Finish");
     @Autowired
     private Name nameDialog;
+    @Autowired
+    private GUIData guiData;
 
     public void showDialogs(final Cluster cluster) {
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton(CANCEL_BTN)) {
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -63,7 +69,7 @@ public final class EditClusterDialog {
             }
             dialog = newdialog;
         }
-        Tools.getGUIData().expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(1);
         cluster.setClusterTabClosable(true);
     }
 }

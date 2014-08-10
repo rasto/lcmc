@@ -43,12 +43,18 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info about Filesystem service. It is treated in special
  * way, so that it can use block device information and drbd devices. If
  * drbd device is selected, the drbddisk service will be added too.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class FilesystemInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
@@ -57,18 +63,6 @@ public final class FilesystemInfo extends ServiceInfo {
     private Widget blockDeviceParamWidget = null;
     private Widget fstypeParamWidget = null;
     private boolean drbddiskIsPreferred = false;
-
-    FilesystemInfo(final String name, final ResourceAgent ra, final Browser browser) {
-        super(name, ra, browser);
-    }
-
-    FilesystemInfo(final String name,
-                   final ResourceAgent ra,
-                   final String hbId,
-                   final Map<String, String> resourceNode,
-                   final Browser browser) {
-        super(name, ra, hbId, resourceNode, browser);
-    }
 
     /**
      * Sets Linbit::drbd info object for this Filesystem service if it uses

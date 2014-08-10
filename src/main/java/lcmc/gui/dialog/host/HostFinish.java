@@ -25,11 +25,15 @@ package lcmc.gui.dialog.host;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
+import lcmc.AppContext;
+import lcmc.gui.GUIData;
+import lcmc.gui.dialog.drbdConfig.NewProxyHostDialog;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
 import lcmc.model.UserConfig;
@@ -37,6 +41,9 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -44,6 +51,7 @@ import org.springframework.stereotype.Component;
  * clsuter.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class HostFinish extends DialogHost {
     /** Host icon for add another host button. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Host.Finish.HostIcon"));
@@ -53,7 +61,6 @@ final class HostFinish extends DialogHost {
     private MyButton addAnotherHostButton;
     private MyButton configureClusterButton;
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.Finish.Save"), true);
-    @Autowired
     private NewHostDialog newHostDialog;
     @Autowired
     private UserConfig userConfig;
@@ -61,6 +68,10 @@ final class HostFinish extends DialogHost {
     private HostFactory hostFactory;
     @Autowired
     private AddClusterDialog addClusterDialog;
+    @Autowired
+    private GUIData guiData;
+    @Autowired @Qualifier("newHostDialog")
+    private Provider<NewHostDialog> newHostDialogFactory;
 
     @Override
     public WizardDialog nextDialog() {
@@ -71,7 +82,7 @@ final class HostFinish extends DialogHost {
     protected void finishDialog() {
         if (saveCheckBox.isSelected()) {
             final String saveFile = Tools.getApplication().getSaveFile();
-            Tools.save(userConfig, saveFile, false);
+            Tools.save(guiData, userConfig, saveFile, false);
         }
     }
 
@@ -137,10 +148,11 @@ final class HostFinish extends DialogHost {
                         final Host newHost = hostFactory.createInstance();
                         newHost.init();
                         newHost.getSSH().setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(),
-                                                      getHost().getSSH().getLastSuccessfulRsaKey(),
-                                                      getHost().getSSH().getLastSuccessfulPassword());
+                                getHost().getSSH().getLastSuccessfulRsaKey(),
+                                getHost().getSSH().getLastSuccessfulPassword());
+                        newHostDialog = newHostDialogFactory.get();
                         newHostDialog.init(thisClass, newHost, getDrbdInstallation());
-                        Tools.getGUIData().allHostsUpdate();
+                        guiData.allHostsUpdate();
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {

@@ -41,10 +41,16 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Object that holds an order constraint information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ConstraintPHInfo extends ServiceInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintPHInfo.class);
     static final String NAME = "Placeholder";
@@ -66,13 +72,13 @@ public class ConstraintPHInfo extends ServiceInfo {
      * have on resource set info object. */
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
     /** Whether the all resources are required to be started. */
-    private final Preference preference;
+    private Preference preference;
 
 
-    ConstraintPHInfo(final Browser browser,
-                     final CrmXml.RscSetConnectionData rscSetConnectionData,
-                     final Preference preference) {
-        super(NAME, null, browser);
+    void init(final Browser browser,
+              final CrmXml.RscSetConnectionData rscSetConnectionData,
+              final Preference preference) {
+        super.init(NAME, null, browser);
         this.preference = preference;
         if (rscSetConnectionData != null) {
             if (rscSetConnectionData.isColocation()) {
@@ -312,8 +318,8 @@ public class ConstraintPHInfo extends ServiceInfo {
 
     @Override
     public List<UpdatableItem> createPopup() {
-        final ConstraintPHMenu constraintPHMenu = new ConstraintPHMenu(this);
-        return constraintPHMenu.getPulldownMenu();
+        final ConstraintPHMenu constraintPHMenu = new ConstraintPHMenu();
+        return constraintPHMenu.getPulldownMenu(this);
     }
 
     /** Removes the placeholder without confirmation dialog. */

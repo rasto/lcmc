@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JColorChooser;
+
+import lcmc.LCMC;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -44,23 +47,29 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class MultiSelectionMenu {
 
     private static final String LV_CREATE_MENU_ITEM =
                             Tools.getString("MultiSelectionInfo.LVCreate");
     
-    private final MultiSelectionInfo multiSelectionInfo;
+    private MultiSelectionInfo multiSelectionInfo;
 
-    private final List<Info> selectedInfos;
+    private List<Info> selectedInfos;
 
-    public MultiSelectionMenu(final MultiSelectionInfo multiSelectionInfo,
-                              final List<Info> selectedInfos) {
+    @Autowired
+    private GUIData guiData;
+
+    public List<UpdatableItem> getPulldownMenu(final MultiSelectionInfo multiSelectionInfo,
+                                               final List<Info> selectedInfos) {
         this.multiSelectionInfo = multiSelectionInfo;
         this.selectedInfos = selectedInfos;
-    }
-
-    public List<UpdatableItem> getPulldownMenu() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final List<BlockDevInfo> selectedBlockDevInfos =
                                                  new ArrayList<BlockDevInfo>();
@@ -290,7 +299,7 @@ public class MultiSelectionMenu {
                 public void action() {
                     final Host firstHost = selectedHostInfos.get(0).getHost();
                     final Color newColor = JColorChooser.showDialog(
-                                            Tools.getGUIData().getMainFrame(),
+                                            LCMC.MAIN_FRAME,
                                             "Choose " + selectedHostInfos
                                             + " color",
                                             firstHost.getPmColors()[0]);
@@ -337,9 +346,9 @@ public class MultiSelectionMenu {
                             || bdi.getBlockDevice().isPrimary())) {
                         final boolean ret = bdi.pvCreate(Application.RunMode.LIVE);
                         if (!ret) {
-                            Tools.progressIndicatorFailed(
-                                Tools.getString("BlockDevInfo.PVCreate.Failed",
-                                                bdi.getName()));
+                            guiData.progressIndicatorFailed(
+                                    Tools.getString("BlockDevInfo.PVCreate.Failed",
+                                            bdi.getName()));
                         }
                         hosts.add(bdi.getHost());
                     }
@@ -386,9 +395,9 @@ public class MultiSelectionMenu {
                             || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
                         final boolean ret = bdi.pvRemove(Application.RunMode.LIVE);
                         if (!ret) {
-                            Tools.progressIndicatorFailed(
-                                Tools.getString("BlockDevInfo.PVRemove.Failed",
-                                                bdi.getName()));
+                            guiData.progressIndicatorFailed(
+                                    Tools.getString("BlockDevInfo.PVRemove.Failed",
+                                            bdi.getName()));
                         }
                         hosts.add(bdi.getHost());
                     }

@@ -36,16 +36,19 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class SSH extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
     @Autowired
-    private Devices devicesDialog;
+    private Devices devices;
 
     private String connectHost() {
         final SSHGui sshGui = new SSHGui(getDialogPanel(), getHost(), getProgressBar());
@@ -89,8 +92,8 @@ public class SSH extends DialogHost {
 
     @Override
     public WizardDialog nextDialog() {
-        devicesDialog.init(getPreviousDialog(), getHost(), getDrbdInstallation());
-        return devicesDialog;
+        devices.init(getPreviousDialog(), getHost(), getDrbdInstallation());
+        return devices;
     }
 
     @Override

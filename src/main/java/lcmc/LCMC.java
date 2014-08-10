@@ -45,6 +45,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.GUIData;
 import lcmc.gui.MainMenu;
 import lcmc.model.UserConfig;
 import lcmc.view.MainPanel;
@@ -64,6 +65,8 @@ public final class LCMC extends JPanel {
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
 
+    public static Container MAIN_FRAME;
+
     protected static void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
         displayMainFrame(mainFrame);
@@ -72,7 +75,6 @@ public final class LCMC extends JPanel {
     protected static JPanel getMainPanel() {
         final MainPanel mainPanel = AppContext.getBean(MainPanel.class);
         mainPanel.init();
-        Tools.getGUIData().setMainPanel(mainPanel);
         mainPanel.setOpaque(true); //content panes must be opaque
         return mainPanel;
     }
@@ -81,18 +83,16 @@ public final class LCMC extends JPanel {
         /* glass pane is used for progress bar etc. */
         final MainMenu menu = AppContext.getBean(MainMenu.class);
         menu.init();
-        Tools.getGUIData().setMainMenu(menu);
         return menu.getMenuBar();
     }
 
     protected static ProgressIndicatorPanel getMainGlassPane() {
-        final ProgressIndicatorPanel mainGlassPane = new ProgressIndicatorPanel();
-        Tools.getGUIData().setMainGlassPane(mainGlassPane);
+        final ProgressIndicatorPanel mainGlassPane = AppContext.getBean(ProgressIndicatorPanel.class);
         return mainGlassPane;
     }
 
     /** Cleanup before closing. */
-    public static void cleanupBeforeClosing() {
+    private static void cleanupBeforeClosing() {
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -109,10 +109,11 @@ public final class LCMC extends JPanel {
             }
         });
         t.start();
-        Tools.getGUIData().getMainFrame().setVisible(false);
+        MAIN_FRAME.setVisible(false);
         final String saveFile = Tools.getApplication().getSaveFile();
         final UserConfig userConfig = AppContext.getBean(UserConfig.class);
-        Tools.save(userConfig, saveFile, false);
+        final GUIData guiData = AppContext.getBean(GUIData.class);
+        Tools.save(guiData, userConfig, saveFile, false);
         Tools.getApplication().disconnectAllHosts();
     }
 
@@ -143,6 +144,7 @@ public final class LCMC extends JPanel {
                 createAndShowGUI(mainFrame);
             }
         });
+        MAIN_FRAME = mainFrame;
         //final Thread t = new Thread(new Runnable() {
         //    public void run() {
         //        drbd.utilities.RoboTest.startMover(600000, true);
@@ -172,7 +174,6 @@ public final class LCMC extends JPanel {
     }
 
     private static void displayMainFrame(Container mainFrame) {
-        Tools.getGUIData().setMainFrame(mainFrame);
         mainFrame.setSize(Tools.getDefaultInt("DrbdMC.width"), Tools.getDefaultInt("DrbdMC.height"));
         mainFrame.setVisible(true);
     }
@@ -274,7 +275,7 @@ public final class LCMC extends JPanel {
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.out.println(e);
                         System.out.println(Tools.getStackTrace(e));
-                        if (!uncaughtExceptionFlag && Tools.getGUIData().getMainFrame() != null) {
+                        if (!uncaughtExceptionFlag && MAIN_FRAME != null) {
                             uncaughtExceptionFlag = true;
                             LOG.appError("", e.toString(), e);
                         }

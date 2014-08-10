@@ -43,10 +43,16 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Object that holds an order constraint information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class HbOrderInfo extends EditableInfo
                          implements HbConstraintInterface {
     /** Logger. */
@@ -60,13 +66,12 @@ final class HbOrderInfo extends EditableInfo
     /** Child resource in order constraint. */
     private ServiceInfo serviceInfoChild;
     /** Connection that keeps this constraint. */
-    private final HbConnectionInfo connectionInfo;
+    private HbConnectionInfo connectionInfo;
 
-    /** Prepares a new {@code HbOrderInfo} object. */
-    HbOrderInfo(final HbConnectionInfo connectionInfo,
-                final ServiceInfo serviceInfoParent,
-                final ServiceInfo serviceInfoChild,
-                final Browser browser) {
+    void init(final HbConnectionInfo connectionInfo,
+              final ServiceInfo serviceInfoParent,
+              final ServiceInfo serviceInfoChild,
+              final Browser browser) {
         super.init("Order", browser);
         setResource(new Service("Order"));
         this.connectionInfo = connectionInfo;

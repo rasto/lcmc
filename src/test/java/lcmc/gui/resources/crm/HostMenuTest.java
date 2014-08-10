@@ -21,6 +21,8 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
@@ -30,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -49,15 +52,17 @@ public class HostMenuTest {
     @Mock
     private Host hostStub;
 
-    private HostMenu hostMenu;
+    @Mock
+    private GUIData guiData;
+
+    @InjectMocks
+    private HostMenu hostMenu = new HostMenu();
 
     @Before
     public void setUp() {
         when(hostInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
         when(hostInfoStub.getHost()).thenReturn(hostStub);
-
-        hostMenu = new HostMenu();
     }
 
     @Test

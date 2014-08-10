@@ -20,6 +20,7 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.WizardDialog;
@@ -27,30 +28,40 @@ import lcmc.gui.dialog.drbdConfig.NewProxyHostDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Show step by step dialogs that add and configure new proxy host.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ProxyHostWizard {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostWizard.class);
-    private final VolumeInfo volumeInfo;
-    private final Host host;
+    private VolumeInfo volumeInfo;
+    private Host host;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private NewProxyHostDialog newProxyHostDialog;
 
-    public ProxyHostWizard(final Host host, final VolumeInfo volumeInfo) {
+    public void init(final Host host, final VolumeInfo volumeInfo) {
         this.host = host;
         this.volumeInfo = volumeInfo;
     }
 
     public void showDialogs() {
-        WizardDialog dialog = new NewProxyHostDialog(null, host, volumeInfo, null, new DrbdInstallation());
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        newProxyHostDialog.init(null, host, volumeInfo, null, new DrbdInstallation());
+        WizardDialog dialog = newProxyHostDialog;
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(1);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;

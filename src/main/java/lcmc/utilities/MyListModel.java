@@ -43,7 +43,7 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     private final List<E> filteredItems = new ArrayList<E>();
     private final FilterField filterField = new FilterField(START_TEXT);
 
-    FilterField getFilterField() {
+    public FilterField getFilterField() {
         return filterField;
     }
 

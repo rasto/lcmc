@@ -22,6 +22,7 @@
 
 package lcmc;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
@@ -29,43 +30,48 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
  * Shows step by step dialogs that add and configure new cluster.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class AddClusterDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddClusterDialog.class);
 
     @Autowired
     Name nameDialog;
+    @Autowired
+    private GUIData guiData;
 
     /**
      * Must always be called from new thread.
      */
     public void showDialogs() {
-        Tools.getGUIData().enableAddClusterButtons(false);
+        guiData.enableAddClusterButtons(false);
         final Cluster cluster = new Cluster();
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        Tools.getGUIData().expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(0);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
-                Tools.getGUIData().removeSelectedClusterTab();
+                guiData.removeSelectedClusterTab();
                 Tools.getApplication().getHosts().removeHostsFromCluster(cluster);
                 Tools.getApplication().removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
                 Tools.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.getGUIData().checkAddClusterButtons();
+                        guiData.checkAddClusterButtons();
                     }
                 });
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(1);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -79,7 +85,7 @@ public final class AddClusterDialog {
                 dialog = newDialog;
             }
         }
-        Tools.getGUIData().expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(1);
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -90,7 +96,7 @@ public final class AddClusterDialog {
         Tools.invokeLater(new Runnable() {
             @Override
             public void run() {
-                Tools.getGUIData().checkAddClusterButtons();
+                guiData.checkAddClusterButtons();
             }
         });
         cluster.setClusterTabClosable(true);

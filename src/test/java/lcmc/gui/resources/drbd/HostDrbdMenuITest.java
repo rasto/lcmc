@@ -1,6 +1,8 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
@@ -13,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -23,8 +26,6 @@ public class HostDrbdMenuITest {
     static {
         Tools.init();
     }
-
-    private HostDrbdMenu hostDrbdMenu;
 
     @Mock
     private Host hostStub;
@@ -41,13 +42,19 @@ public class HostDrbdMenuITest {
     private HostDrbdInfo hostDrbdInfoNoClusterStub;
     @Mock
     private HostBrowser hostBrowserNoClusterStub;
+    @Mock
+    private GUIData guiData;
+    @InjectMocks
+    private HostDrbdMenu hostDrbdMenu;
+    @InjectMocks
+    private HostDrbdMenu hostDrbdMenuNoCluster;
+
 
     @Before
     public void setUp() {
         when(hostDrbdInfoStub.getBrowser()).thenReturn(hostBrowserStub);
         when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
 
-        hostDrbdMenu = new HostDrbdMenu();
     }
 
     @Test
@@ -61,7 +68,6 @@ public class HostDrbdMenuITest {
     public void menuWithOrWithoutClusterShoulBeTheSameSize() {
         when(hostDrbdInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserNoClusterStub);
 
-        final HostDrbdMenu hostDrbdMenuNoCluster = new HostDrbdMenu();
         final List<UpdatableItem> itemsWithCluster = hostDrbdMenu.getPulldownMenu(hostStub, hostDrbdInfoStub);
 
         final List<UpdatableItem> itemsNoCluster =

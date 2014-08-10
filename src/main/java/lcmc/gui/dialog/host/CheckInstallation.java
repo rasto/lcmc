@@ -45,6 +45,8 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -52,6 +54,7 @@ import org.springframework.stereotype.Component;
  * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
  */
 @Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class CheckInstallation extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(CheckInstallation.class);
 

@@ -28,6 +28,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
 import lcmc.utilities.Tools;
@@ -49,6 +51,8 @@ public final class MainPanel extends JPanel {
     private ClustersPanel clustersPanel;
     @Autowired
     private HostFactory hostFactory;
+    @Autowired
+    private GUIData guiData;
 
     public void init() {
         setLayout(new BorderLayout());
@@ -57,7 +61,7 @@ public final class MainPanel extends JPanel {
         noHost.init();
         final JSplitPane splitPane =
                                 new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
-        Tools.getGUIData().setTerminalSplitPane(splitPane);
+        guiData.setTerminalSplitPane(splitPane);
 
         splitPane.setContinuousLayout(true);
         splitPane.setResizeWeight(1.0);
@@ -71,7 +75,7 @@ public final class MainPanel extends JPanel {
                     && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
                     expandingDone = true;
                     mExpanding.unlock();
-                    Tools.getGUIData().expandTerminalSplitPane(1);
+                    guiData.expandTerminalSplitPane(1);
                 } else {
                     mExpanding.unlock();
                 }

@@ -38,7 +38,6 @@ import lcmc.model.Value;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Logger;
@@ -46,11 +45,16 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class CreateFS extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
     /** No host string. (none) */
@@ -70,10 +74,6 @@ final class CreateFS extends DrbdConfig {
     private JLabel skipInitialSyncLabel;
     private final MyButton makeFileSystemButton =
                                         new MyButton(Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
-
-    CreateFS(final WizardDialog previousDialog, final VolumeInfo volumeInfo) {
-        super(previousDialog, volumeInfo);
-    }
 
     /**
      * Finishes the dialog. If primary bd was choosen it is forced to be a

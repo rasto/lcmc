@@ -24,6 +24,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import javax.swing.JCheckBox;
+
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
@@ -38,13 +40,19 @@ import static lcmc.robotest.RoboTest.press;
 import static lcmc.robotest.RoboTest.rightClick;
 import static lcmc.robotest.RoboTest.slowFactor;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
  *
  * @author Rasto Levrinc
  */
+@Component
 final class VMTest1 {
+    @Autowired
+    private static GUIData guiData;
+
     static void start(final Cluster cluster, final String vmTest, final int count) {
         startVMTest(cluster, vmTest, "kvm", count);
     }
@@ -327,7 +335,7 @@ final class VMTest1 {
                 moveTo("Apply"); /* apply */
                 leftClick();
                 checkVMTest(vmTest, 3.1, name);
-                Tools.getGUIData().expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(1);
                 moveTo("Readonly", JCheckBox.class);
                 leftClick();
 

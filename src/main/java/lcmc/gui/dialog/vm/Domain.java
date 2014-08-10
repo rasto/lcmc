@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.vm;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -34,10 +33,16 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Domain extends VMConfig {
     private static final String[] PARAMS = {VmsXml.VM_PARAM_DOMAIN_TYPE,
                                             VmsXml.VM_PARAM_NAME,
@@ -54,20 +59,21 @@ public final class Domain extends VMConfig {
                                             VmsXml.VM_PARAM_TYPE_MACHINE};
     private JComponent inputPane = null;
     private Widget domainNameWidget;
-    private WizardDialog nextDialogObject = null;
-
-    public Domain(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
-        super(previousDialog, vmsVirtualDomainInfo);
-    }
+    private VMConfig nextDialogObject = null;
+    @Autowired
+    private InstallationDisk installationDiskDialog;
+    @Autowired
+    private Filesystem filesystemDialog;
 
     @Override
     public WizardDialog nextDialog() {
         if (nextDialogObject == null) {
             if (getVMSVirtualDomainInfo().needFilesystem()) {
-                nextDialogObject = new Filesystem(this, getVMSVirtualDomainInfo());
+                nextDialogObject = filesystemDialog;
             } else {
-                nextDialogObject = new InstallationDisk(this, getVMSVirtualDomainInfo());
+                nextDialogObject = installationDiskDialog;
             }
+            nextDialogObject.init(this, getVMSVirtualDomainInfo());
         }
         return nextDialogObject;
     }
@@ -125,7 +131,7 @@ public final class Domain extends VMConfig {
 
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
 
         vdi.getResource().setValue(VmsXml.VM_PARAM_BOOT, DomainInfo.BOOT_CDROM);
         vdi.savePreferredValues();

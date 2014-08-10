@@ -52,12 +52,12 @@ public class ConstraintPHMenuTest {
     public void setUp() {
         when(constraintPHInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(constraintPHInfoStub.getService()).thenReturn(serviceStub);
-        constraintPHMenu = new ConstraintPHMenu(constraintPHInfoStub);
+        constraintPHMenu = new ConstraintPHMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = constraintPHMenu.getPulldownMenu();
+        final List<UpdatableItem> items = constraintPHMenu.getPulldownMenu(constraintPHInfoStub);
 
         assertEquals(4, items.size());
     }

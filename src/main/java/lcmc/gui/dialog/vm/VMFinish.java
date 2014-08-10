@@ -23,7 +23,6 @@
 
 package lcmc.gui.dialog.vm;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,16 +36,17 @@ import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-final class Finish extends VMConfig {
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+final class VMFinish extends VMConfig {
     private JComponent inputPane = null;
-
-    Finish(final WizardDialog previousDialog, final DomainInfo vmsVirtualDomainInfo) {
-        super(previousDialog, vmsVirtualDomainInfo);
-    }
 
     @Override
     public WizardDialog nextDialog() {
@@ -82,8 +82,8 @@ final class Finish extends VMConfig {
 
     @Override
     protected JComponent getInputPane() {
-        final DomainInfo vdi = getVMSVirtualDomainInfo();
-        vdi.selectMyself();
+        final DomainInfo domainInfo = getVMSVirtualDomainInfo();
+        domainInfo.selectMyself();
         if (inputPane != null) {
             return inputPane;
         }
@@ -103,7 +103,7 @@ final class Finish extends VMConfig {
                                 createConfigBtn.setEnabled(false);
                             }
                         });
-                        vdi.apply(Application.RunMode.LIVE);
+                        domainInfo.apply(Application.RunMode.LIVE);
                         Tools.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -117,9 +117,9 @@ final class Finish extends VMConfig {
         });
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-        vdi.waitForInfoPanel();
-        optionsPanel.add(vdi.getDefinedOnHostsPanel(Widget.WIZARD_PREFIX, createConfigBtn));
+        optionsPanel.setAlignmentY(java.awt.Component.TOP_ALIGNMENT);
+        domainInfo.waitForInfoPanel();
+        optionsPanel.add(domainInfo.getDefinedOnHostsPanel(Widget.WIZARD_PREFIX, createConfigBtn));
 
         optionsPanel.add(createConfigBtn);
         panel.add(optionsPanel);
