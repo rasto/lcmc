@@ -107,7 +107,7 @@ final class ClusterHosts extends DialogCluster {
 
     /** Checks whether at least two hosts are selected for the cluster. */
     protected void checkCheckBoxes() {
-        Tools.getApplication().getHosts().removeHostsFromCluster(getCluster());
+        Tools.getApplication().getAllHosts().removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
             if (button.isSelected()) {
@@ -179,7 +179,7 @@ final class ClusterHosts extends DialogCluster {
     protected JComponent getInputPane() {
         /* Hosts */
         final ScrollableFlowPanel p1 = new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
-        final Hosts hosts = Tools.getApplication().getHosts();
+        final Hosts hosts = Tools.getApplication().getAllHosts();
 
         final ItemListener chListener = new ItemListener() {
                 @Override

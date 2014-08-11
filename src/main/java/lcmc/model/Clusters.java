@@ -34,22 +34,13 @@ import lcmc.utilities.Tools;
 
 /**
  * This class holds a set of all clusters.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Clusters {
-    /** Set of cluster objects. */
     private final Set<Cluster> clusters = new TreeSet<Cluster>();
-    /** Clusters set lock. */
     private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();
-    /** Clusters set read lock. */
     private final Lock mClustersReadLock = mClustersLock.readLock();
-    /** Clusters set write lock. */
     private final Lock mClustersWriteLock = mClustersLock.writeLock();
 
-    /** Adds cluster to the set of clusters. */
     void addCluster(final Cluster cluster) {
         mClustersWriteLock.lock();
         try {
@@ -59,7 +50,6 @@ public final class Clusters {
         }
     }
 
-    /** Removes cluster from the clusters. */
     void removeCluster(final Cluster cluster) {
         mClustersWriteLock.lock();
         try {
@@ -69,7 +59,6 @@ public final class Clusters {
         }
     }
 
-    /** Returns true if cluster is in the clusters or false if it is not. */
     boolean isClusterInClusters(final Cluster cluster) {
         mClustersReadLock.lock();
         try {
@@ -79,7 +68,6 @@ public final class Clusters {
         }
     }
 
-    /** Gets set of clusters. */
     public Set<Cluster> getClusterSet() {
         mClustersReadLock.lock();
         try {
@@ -89,7 +77,6 @@ public final class Clusters {
         }
     }
 
-    /** Return whether cluster with this name already exists. */
     public boolean isClusterName(final String name) {
         mClustersReadLock.lock();
         try {
@@ -104,12 +91,10 @@ public final class Clusters {
         }
     }
 
-    /** Return default name with incremented index. */
     public String getDefaultClusterName() {
         return getNextClusterName(Tools.getString("Clusters.DefaultName"));
     }
 
-    /** Return default name with incremented index. */
     public String getNextClusterName(final String defaultName) {
         mClustersReadLock.lock();
         int index = 0;
@@ -118,9 +103,7 @@ public final class Clusters {
                 /* find the bigest index of cluster default name and
                  * increment it by one */
                 final String name = cluster.getName();
-                final Pattern p = Pattern.compile('^'
-                                                  + defaultName
-                                                  + "(\\d+)$");
+                final Pattern p = Pattern.compile('^' + defaultName + "(\\d+)$");
                 final Matcher m = p.matcher(name);
                 if (m.matches()) {
                     final int i = Integer.parseInt(m.group(1));

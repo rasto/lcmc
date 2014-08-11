@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -56,7 +55,6 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -444,7 +442,7 @@ public class ServiceMenu {
                 serviceInfo.hidePopup();
                 final ServiceLogs l = new ServiceLogs(serviceInfo.getBrowser().getCluster(),
                                                 serviceInfo.getNameForLog(),
-                                                serviceInfo.getService().getHeartbeatId());
+                                                serviceInfo.getService().getCrmId());
                 l.showDialog();
             }
         };

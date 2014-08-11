@@ -39,11 +39,11 @@ import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.model.Application;
+import lcmc.model.ColorText;
 import lcmc.model.crm.CrmXml;
 import lcmc.model.crm.ClusterStatus;
 import lcmc.model.Host;
 import lcmc.model.crm.ResourceAgent;
-import lcmc.model.Subtext;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Check;
@@ -281,7 +281,7 @@ public class GroupInfo extends ServiceInfo {
             final List<Map<String, String>> ordAttrsList = new ArrayList<Map<String, String>>();
             final List<String> parentIds = new ArrayList<String>();
             for (final ServiceInfo parentInfo : parents) {
-                final String parentId = parentInfo.getService().getHeartbeatId();
+                final String parentId = parentInfo.getService().getCrmId();
                 parentIds.add(parentId);
                 final Map<String, String> colAttrs = new LinkedHashMap<String, String>();
                 final Map<String, String> ordAttrs = new LinkedHashMap<String, String>();
@@ -621,7 +621,7 @@ public class GroupInfo extends ServiceInfo {
         if (Application.isLive(runMode)) {
             for (final ServiceInfo child : children) {
                 getBrowser().mHeartbeatIdToServiceLock();
-                getBrowser().getHeartbeatIdToServiceInfo().remove(child.getService().getHeartbeatId());
+                getBrowser().getHeartbeatIdToServiceInfo().remove(child.getService().getCrmId());
                 getBrowser().mHeartbeatIdToServiceUnlock();
                 getBrowser().removeFromServiceInfoHash(child);
                 child.cleanup();
@@ -695,20 +695,20 @@ public class GroupInfo extends ServiceInfo {
 
     /** Returns subtexts that appears in the service vertex. */
     @Override
-    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
-        final List<Subtext> texts = new ArrayList<Subtext>();
-        Subtext prevSubtext = null;
+    public ColorText[] getSubtextsForGraph(final Application.RunMode runMode) {
+        final List<ColorText> texts = new ArrayList<ColorText>();
+        ColorText prevColorText = null;
 
         for (final ServiceInfo child : getGroupServices()) {
-            final Subtext[] subtexts = child.getSubtextsForGraph(runMode);
+            final ColorText[] colorTexts = child.getSubtextsForGraph(runMode);
 
-            if (subtexts == null || subtexts.length == 0) {
+            if (colorTexts == null || colorTexts.length == 0) {
                 continue;
             }
-            final Subtext sSubtext = subtexts[0];
-            if (prevSubtext == null || !sSubtext.getSubtext().equals(prevSubtext.getSubtext())) {
-                texts.add(new Subtext(sSubtext.getSubtext() + ':', sSubtext.getColor(), Color.BLACK));
-                prevSubtext = sSubtext;
+            final ColorText sColorText = colorTexts[0];
+            if (prevColorText == null || !sColorText.getSubtext().equals(prevColorText.getSubtext())) {
+                texts.add(new ColorText(sColorText.getSubtext() + ':', sColorText.getColor(), Color.BLACK));
+                prevColorText = sColorText;
             }
             String unmanaged = "";
             if (!child.isManaged(runMode)) {
@@ -753,19 +753,19 @@ public class GroupInfo extends ServiceInfo {
                     }
                 }
             }
-            texts.add(new Subtext("   " + constraintLeft + child + unmanaged + migrated + constraint,
-                                  sSubtext.getColor(),
+            texts.add(new ColorText("   " + constraintLeft + child + unmanaged + migrated + constraint,
+                                  sColorText.getColor(),
                                   Color.BLACK));
             boolean skip = true;
-            for (final Subtext st : subtexts) {
+            for (final ColorText st : colorTexts) {
                 if (skip) {
                     skip = false;
                     continue;
                 }
-                texts.add(new Subtext("   " + st.getSubtext(), st.getColor(), Color.BLACK));
+                texts.add(new ColorText("   " + st.getSubtext(), st.getColor(), Color.BLACK));
             }
         }
-        return texts.toArray(new Subtext[texts.size()]);
+        return texts.toArray(new ColorText[texts.size()]);
     }
 
     /**

@@ -34,7 +34,7 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.VmsXml.SoundData;
+import lcmc.model.vm.SoundData;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;

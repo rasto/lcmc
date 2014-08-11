@@ -61,7 +61,7 @@ final class Finish extends DialogCluster {
     protected void finishDialog() {
         emptyBrowser.addClusterBox(getCluster());
         if (saveCheckBox.isSelected()) {
-            final String saveFile = Tools.getApplication().getSaveFile();
+            final String saveFile = Tools.getApplication().getDefaultSaveFile();
             Tools.save(guiData, userConfig, saveFile, false);
         }
     }

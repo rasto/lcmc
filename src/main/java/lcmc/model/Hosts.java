@@ -27,62 +27,44 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 
 /**
  * This class holds a set of all hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Hosts {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Hosts.class);
-    /** Hosts set. */
     private final Set<Host> hosts = new LinkedHashSet<Host>();
 
-    /**
-     * adds new host to the hosts.
-     *          host, that will be added to the hosts.
-     */
     void addHost(final Host host) {
         hosts.add(host);
     }
 
-    /** Returns number of all hosts. */
     int size() {
         return hosts.size();
     }
 
-    /** Removes host from the hosts. */
     void removeHost(final Host host) {
         hosts.remove(host);
     }
 
-    /** Returns true if host is in the hosts or false if it is not. */
     boolean isHostInHosts(final Host host) {
         return hosts.contains(host);
     }
 
-    /** Gets the host set. */
     public Set<Host> getHostSet() {
         return hosts;
     }
 
-    /** Gets an array of all hosts. */
     public Host[] getHostsArray() {
         return hosts.toArray(new Host [hosts.size()]);
     }
 
-    /** Disconnects all hosts. This is called after application closes. */
     void disconnectAllHosts() {
         for (final Host host : hosts) {
             host.disconnect();
         }
     }
 
-    /** Removes references to the cluster from all hosts. */
     public void removeHostsFromCluster(final Cluster cluster) {
         LOG.debug1("removeHostsFromCluster: cluster: " + cluster.getName());
         for (final Host host : hosts) {

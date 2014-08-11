@@ -1666,7 +1666,7 @@ public class CrmGraph extends ResourceGraph {
 
     /** Small text that appears in the right corner. */
     @Override
-    protected Subtext getRightCornerText(final Vertex v, final Application.RunMode runMode) {
+    protected ColorText getRightCornerText(final Vertex v, final Application.RunMode runMode) {
         if (vertexToHostMap.containsKey(v)) {
             final HostInfo hi = vertexToHostMap.get(v);
             return hi.getRightCornerTextForGraph(runMode);
@@ -1682,7 +1682,7 @@ public class CrmGraph extends ResourceGraph {
 
     /** Small text that appears down. */
     @Override
-    protected Subtext[] getSubtexts(final Vertex v, final Application.RunMode runMode) {
+    protected ColorText[] getSubtexts(final Vertex v, final Application.RunMode runMode) {
         if (vertexToHostMap.containsKey(v)) {
             return vertexToHostMap.get(v).getSubtextsForGraph(runMode);
         } else if (vertexToConstraintPHMap.containsKey(v)) {

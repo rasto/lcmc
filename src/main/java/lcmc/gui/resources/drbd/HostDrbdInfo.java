@@ -40,10 +40,9 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.model.Application;
+import lcmc.model.ColorText;
 import lcmc.model.Host;
-import lcmc.model.Subtext;
 import lcmc.gui.Browser;
-import lcmc.gui.DrbdGraph;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.Info;
@@ -213,18 +212,18 @@ public class HostDrbdInfo extends Info {
         return -1;
     }
 
-    public Subtext[] getSubtextsForDrbdGraph(final Application.RunMode runMode) {
-        final List<Subtext> texts = new ArrayList<Subtext>();
+    public ColorText[] getSubtextsForDrbdGraph(final Application.RunMode runMode) {
+        final List<ColorText> texts = new ArrayList<ColorText>();
         if (getHost().isConnected()) {
             if (!getHost().isDrbdLoaded()) {
-               texts.add(new Subtext("DRBD not loaded", null, Color.BLACK));
+               texts.add(new ColorText("DRBD not loaded", null, Color.BLACK));
             } else if (!getHost().isDrbdStatusOk()) {
-               texts.add(new Subtext("waiting...", null, Color.BLACK));
+               texts.add(new ColorText("waiting...", null, Color.BLACK));
             }
         } else {
-            texts.add(new Subtext("connecting...", null, Color.BLACK));
+            texts.add(new ColorText("connecting...", null, Color.BLACK));
         }
-        return texts.toArray(new Subtext[texts.size()]);
+        return texts.toArray(new ColorText[texts.size()]);
     }
 
     public String getIconTextForDrbdGraph(final Application.RunMode runMode) {
@@ -234,7 +233,7 @@ public class HostDrbdInfo extends Info {
         return null;
     }
 
-    public Subtext getRightCornerTextForDrbdGraph(final Application.RunMode runMode) {
+    public ColorText getRightCornerTextForDrbdGraph(final Application.RunMode runMode) {
         return null;
     }
 

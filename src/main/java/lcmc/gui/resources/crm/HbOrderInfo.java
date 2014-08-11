@@ -43,7 +43,6 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -99,7 +98,7 @@ final class HbOrderInfo extends EditableInfo
     /** Sets the order's parameters. */
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String ordId = getService().getHeartbeatId();
+        final String ordId = getService().getCrmId();
         final Map<String, Value> resourceNode = new HashMap<String, Value>();
 
         if (serviceInfoParent == null || serviceInfoChild == null) {
@@ -338,7 +337,7 @@ final class HbOrderInfo extends EditableInfo
             }
         }
         if (changed) {
-            final String ordId = getService().getHeartbeatId();
+            final String ordId = getService().getCrmId();
             if (serviceInfoParent == null || serviceInfoChild == null) {
                 /* rsc set order */
                 final PcmkRscSetsInfo prsi = (PcmkRscSetsInfo) connectionInfo;
@@ -471,7 +470,7 @@ final class HbOrderInfo extends EditableInfo
     /** Returns the score of this order. */
     int getScore() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String ordId = getService().getHeartbeatId();
+        final String ordId = getService().getCrmId();
         final CrmXml.OrderData data = clStatus.getOrderData(ordId);
         if (data == null) {
             return 0;

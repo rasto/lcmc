@@ -1727,7 +1727,7 @@ public class ClusterBrowser extends Browser {
      */
     public void addToHeartbeatIdList(final ServiceInfo si) {
         final String id = si.getService().getId();
-        String pmId = si.getService().getHeartbeatId();
+        String pmId = si.getService().getCrmId();
         if (pmId == null) {
             if (Application.PACEMAKER_GROUP_NAME.equals(si.getService().getName())) {
                 pmId = Service.GRP_ID_PREFIX;
@@ -1750,7 +1750,7 @@ public class ClusterBrowser extends Browser {
                 si.getService().setId("1");
             } else {
                 newPmId = pmId + id;
-                si.getService().setHeartbeatId(newPmId);
+                si.getService().setCrmId(newPmId);
             }
             mHeartbeatIdToServiceLock();
             heartbeatIdToServiceInfo.put(newPmId, si);
@@ -2296,7 +2296,7 @@ public class ClusterBrowser extends Browser {
                 crmGraph.startTestAnimation((JComponent) component, startTestLatch);
                 ptestLockAcquire();
                 try {
-                    clusterStatus.setPtestData(null);
+                    clusterStatus.setPtestResult(null);
                     final Host h;
                     if (menuHost == null) {
                         h = getDCHost();
@@ -2306,7 +2306,7 @@ public class ClusterBrowser extends Browser {
                     action(h);
                     final PtestData ptestData = new PtestData(CRM.getPtest(h));
                     component.setToolTipText(ptestData.getToolTip());
-                    clusterStatus.setPtestData(ptestData);
+                    clusterStatus.setPtestResult(ptestData);
                 } finally {
                     ptestLockRelease();
                 }

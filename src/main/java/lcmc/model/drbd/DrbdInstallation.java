@@ -113,17 +113,14 @@ public class DrbdInstallation {
         this.drbdInstallMethodIndex = drbdInstallMethodIndex;
     }
 
-    /** Returns drbd installation method. */
     public String getDrbdInstallMethodIndex() {
         return drbdInstallMethodIndex;
     }
 
-    /** Sets proxy installation method index. */
     public void setProxyInstallMethodIndex(final String proxyInstallMethodIndex) {
         this.proxyInstallMethodIndex = proxyInstallMethodIndex;
     }
 
-    /** Returns proxy installation method. */
     public String getProxyInstallMethodIndex() {
         return proxyInstallMethodIndex;
     }

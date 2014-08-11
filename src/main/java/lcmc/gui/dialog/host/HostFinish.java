@@ -31,9 +31,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
-import lcmc.AppContext;
 import lcmc.gui.GUIData;
-import lcmc.gui.dialog.drbdConfig.NewProxyHostDialog;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
 import lcmc.model.UserConfig;
@@ -81,7 +79,7 @@ final class HostFinish extends DialogHost {
     @Override
     protected void finishDialog() {
         if (saveCheckBox.isSelected()) {
-            final String saveFile = Tools.getApplication().getSaveFile();
+            final String saveFile = Tools.getApplication().getDefaultSaveFile();
             Tools.save(guiData, userConfig, saveFile, false);
         }
     }

@@ -110,7 +110,7 @@ public final class LCMC extends JPanel {
         });
         t.start();
         MAIN_FRAME.setVisible(false);
-        final String saveFile = Tools.getApplication().getSaveFile();
+        final String saveFile = Tools.getApplication().getDefaultSaveFile();
         final UserConfig userConfig = AppContext.getBean(UserConfig.class);
         final GUIData guiData = AppContext.getBean(GUIData.class);
         Tools.save(guiData, userConfig, saveFile, false);

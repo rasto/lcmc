@@ -33,42 +33,23 @@ import lcmc.utilities.Tools;
 
 /**
  * This class holds data that were retrieved from ptest command.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class PtestData {
     /** Pattern for LogActions. e.g. "Start res_IPaddr2_1     (hardy-a)" */
     private static final Pattern PTEST_ACTIONS_PATTERN =
-          Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)"
-                          + "\\s+\\(([^)]*)\\).*");
+          Pattern.compile(".*LogActions:\\s+(\\S+)\\s*(?:resource)?\\s+(\\S+)\\s+\\(([^)]*)\\).*");
     /** Pattern for pending actions. */
     private static final Pattern PTEST_ERROR_PATTERN = Pattern.compile(
-                           "(?i).*ERROR: print_elem:\\s+\\[Action.*?: Pending "
-                           + "\\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
-           //".*native_color:\\s+Resource\\s+(\\S+)\\s+cannot run anywhere.*");
+                        "(?i).*ERROR: print_elem:\\s+\\[Action.*?: Pending \\(id: (\\S+)_(\\S+)_.*?, loc: ([^,]+).*");
     /** Pattern that gets cloned resource id. */
-    private static final Pattern PTEST_CLONE_PATTERN =
-                                                 Pattern.compile("(.*):\\d+");
-    /** Tool tip. */
+    private static final Pattern PTEST_CLONE_RESOURCE_ID_PATTERN = Pattern.compile("(.*):\\d+");
     private final String toolTip;
-    /** Shadow cib. */
     private final String shadowCib;
-    /** Running on nodes. */
-    private final Map<String, List<String>> runningOnNodes =
-                                     new LinkedHashMap<String, List<String>>();
-    /** Slave on nodes. */
-    private final Map<String, List<String>> slaveOnNodes =
-                                     new LinkedHashMap<String, List<String>>();
-    /** Master on nodes. */
-    private final Map<String, List<String>> masterOnNodes =
-                                     new LinkedHashMap<String, List<String>>();
-    /** Which resources are managed. */
-    private final Map<String, Boolean> managedHash =
-                                     new LinkedHashMap<String, Boolean>();
+    private final Map<String, List<String>> runningOnNodes = new LinkedHashMap<String, List<String>>();
+    private final Map<String, List<String>> slaveOnNodes = new LinkedHashMap<String, List<String>>();
+    private final Map<String, List<String>> masterOnNodes = new LinkedHashMap<String, List<String>>();
+    private final Map<String, Boolean> managedResources = new LinkedHashMap<String, Boolean>();
 
-    /** Prepares a new {@code PtestData} object. */
     public PtestData(final String raw) {
         if (raw == null) {
             toolTip = null;
@@ -94,7 +75,7 @@ public final class PtestData {
                 String res = m.group(2);
                 /* Clone */
                 boolean clone = false;
-                final Matcher cm = PTEST_CLONE_PATTERN.matcher(res);
+                final Matcher cm = PTEST_CLONE_RESOURCE_ID_PATTERN.matcher(res);
                 if (cm.matches()) {
                     res = cm.group(1);
                     clone = true;
@@ -132,7 +113,7 @@ public final class PtestData {
                             final String what = parts[0];
                             final String node = parts[1];
                             if ("unmanaged".equals(node)) {
-                                managedHash.put(res, false);
+                                managedResources.put(res, false);
                                 continue;
                             }
                             if ("Started".equals(what)) {
@@ -178,8 +159,8 @@ public final class PtestData {
                     if (state.contains(" -> Slave ")) {
                         final String[] parts = state.split(" -> Slave ");
                         if (parts.length > 0 && clone) {
-                                masterNodes.remove(parts[parts.length - 1]);
-                                slaveNodes.add(parts[parts.length - 1]);
+                            masterNodes.remove(parts[parts.length - 1]);
+                            slaveNodes.add(parts[parts.length - 1]);
                         }
                     }
                 } else {
@@ -200,7 +181,7 @@ public final class PtestData {
                 final String node = mError.group(3);
                 /* Clone */
                 boolean clone = false;
-                final Matcher cm = PTEST_CLONE_PATTERN.matcher(res);
+                final Matcher cm = PTEST_CLONE_RESOURCE_ID_PATTERN.matcher(res);
                 if (cm.matches()) {
                     res = cm.group(1);
                     clone = true;
@@ -253,13 +234,10 @@ public final class PtestData {
             } else {
                 continue;
             }
-            if (line.contains("_post_notify_")
-                || line.contains("_pre_notify_")
-                || line.contains("_monitor_")) {
+            if (line.contains("_post_notify_") || line.contains("_pre_notify_") || line.contains("_monitor_")) {
                 continue;
             }
-            final String[] prefixes = {"LogActions: ",
-                    "ERROR: print_elem: "};
+            final String[] prefixes = {"LogActions: ", "ERROR: print_elem: "};
             for (final String prefix : prefixes) {
                 final int index = line.indexOf(prefix);
                 if (index >= 0) {
@@ -277,34 +255,28 @@ public final class PtestData {
         shadowCib = queries[1];
     }
 
-    /** Returns tooltip. */
     public String getToolTip() {
         return toolTip;
     }
 
-    /** Returns shadow cib. */
     String getShadowCib() {
         return shadowCib;
     }
 
-    /** Returns on which nodes is service running. */
     List<String> getRunningOnNodes(final String pmId) {
         return runningOnNodes.get(pmId);
     }
 
-    /** Returns on which nodes is service master. */
     List<String> getMasterOnNodes(final String pmId) {
         return masterOnNodes.get(pmId);
     }
 
-    /** Returns on which nodes is service slave. */
     List<String> getSlaveOnNodes(final String pmId) {
         return slaveOnNodes.get(pmId);
     }
 
-    /** Returns if service is managed. */
     boolean isManaged(final String pmId) {
-        final Boolean m = managedHash.get(pmId);
+        final Boolean m = managedResources.get(pmId);
         if (m == null) {
             return true;
         }

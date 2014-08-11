@@ -163,7 +163,7 @@ public final class BugReport extends ConfigDialog {
         pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         bugReportTextArea.setEditable(true);
         bugReportTextArea.setText("loading...");
-        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
         final JComponent clPane = getClustersPane(clusters);
         if (clusters.size() > 1) {
             pane.add(clPane);
@@ -181,7 +181,7 @@ public final class BugReport extends ConfigDialog {
 
     protected void refresh() {
         enableAllComponents(false);
-        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
         final String allOldText = bugReportTextArea.getText();
         final int i = allOldText.indexOf(GENERATED_DELIM);
         String oldText = "email: anonymous\nerror description:\n" + (errorText == null ? "" : errorText) + '\n';

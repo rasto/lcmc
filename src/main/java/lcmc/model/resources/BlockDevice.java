@@ -40,38 +40,28 @@ import lcmc.utilities.Tools;
 
 /**
  * This class holds data of one block device.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class BlockDevice extends Resource {
-    /** Logger. */
-    private static final Logger LOG =
-                                  LoggerFactory.getLogger(BlockDevice.class);
-    /** States that means that we are connected. */
+    private static final Logger LOG = LoggerFactory.getLogger(BlockDevice.class);
     private static final Set<String> CONNECTED_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                                                           "Connected",
-                                                           "SyncTarget",
-                                                           "SyncSource",
-                                                           "StartingSyncS",
-                                                           "StartingSyncT",
-                                                           "WFBitMapS",
-                                                           "WFBitMapT",
-                                                           "WFSyncUUID",
-                                                           "PausedSyncS",
-                                                           "PausedSyncT",
-                                                           "VerifyS",
-                                                           "VerifyT")));
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("Connected",
+                                                                      "SyncTarget",
+                                                                      "SyncSource",
+                                                                      "StartingSyncS",
+                                                                      "StartingSyncT",
+                                                                      "WFBitMapS",
+                                                                      "WFBitMapT",
+                                                                      "WFSyncUUID",
+                                                                      "PausedSyncS",
+                                                                      "PausedSyncT",
+                                                                      "VerifyS",
+                                                                      "VerifyT")));
 
-    /** Syncing states. */
     private static final Set<String> SYNCING_STATES =
-        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-                                                            "SyncTarget",
-                                                            "SyncSource",
-                                                            "PausedSyncS",
-                                                            "PausedSyncT")));
+        Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("SyncTarget",
+                                                                      "SyncSource",
+                                                                      "PausedSyncS",
+                                                                      "PausedSyncT")));
 
     private static final String TOKEN_UUID    = "uuid";
     private static final String TOKEN_SIZE    = "size";
@@ -81,58 +71,33 @@ public class BlockDevice extends Resource {
     private static final String TOKEN_LV      = "lv";
     private static final String TOKEN_PV      = "pv";
     private static final String TOKEN_DISK_ID = "disk-id";
-    /** Block size in blocks. */
     private String blockSize;
-    /** Disk UUID. */
     private String diskUuid;
-    /** Disk ID. */
     private final Collection<String> diskIds = new HashSet<String>();
-    /** Where is this block device mounted if it is at all. */
     private String mountedOn;
-    /** Filesytem type. */
     private String fsType;
-    /** Whether this device is drbd device. */
     private boolean drbd = false;
-    /** Whether this block device is used by crm in Filesystem service. */
     private boolean isUsedByCRM;
-    /** Drbd meta disk of this block device. */
     private BlockDevice metaDisk = null;
     /** Block device of which this block device is a meta disk. */
-    private List<BlockDevice> metaDiskOfBlockDevices =
-                                                new ArrayList<BlockDevice>();
-    /**
-     * Whether the block device is in drbd split-brain situation. */
+    private List<BlockDevice> metaDiskOfBlockDevices = new ArrayList<BlockDevice>();
     private boolean splitBrain = false;
-    /** The connection state. */
     private String connectionState = null;
-    /** The node state. */
     private String nodeState = null;
-    /** The disk state. */
     private String diskState = null;
-    /** The node state of the other bd. */
     private String nodeStateOther = null;
-    /** The disk state of the other bd. */
     private String diskStateOther = null;
-    /** The sync progress in percent as String. */
     private String syncedProgress = null;
-    /** Drbd flags. */
     private String drbdFlags = null;
     /** How much of the file system is used in percents. */
     private int used = -1;
-    /** LVM group. */
     private String volumeGroup = null;
-    /** VG on physical volume. */
     private String vgOnPhysicalVolume = null;
-    /** Logical volume. */
     private String logicalVolume = null;
-    /** DRBD block device. */
     private BlockDevice drbdBlockDevice = null;
-    /* Backing disk that is used in drbd config. */
     private String drbdBackingDisk = null;
 
     /**
-     * Creates a new {@code BlockDevice} object.
-     *
      * @param line
      *          line that contains device, blocksize, mount
      *          point and fs type delimited with space
@@ -142,7 +107,6 @@ public class BlockDevice extends Resource {
         update(line);
     }
 
-    /** Updates the block device. */
     public final void update(final String line) {
         final Pattern p = Pattern.compile("([^:]+):(.*)");
         final String[] cols = line.split(" ");
@@ -174,27 +138,22 @@ public class BlockDevice extends Resource {
         }
     }
 
-    /** Returns block size. */
     public String getBlockSize() {
         return blockSize;
     }
 
-    /** Returns mount point. */
     public String getMountedOn() {
         return mountedOn;
     }
 
-    /** Returns file system type. */
     public String getFsType() {
         return fsType;
     }
 
-    /** Returns whether this block device is mounted. */
     public boolean isMounted() {
         return mountedOn != null;
     }
 
-    /** Returns true if this device is drbd device. */
     public boolean isDrbd() {
         return drbd;
     }
@@ -217,17 +176,14 @@ public class BlockDevice extends Resource {
         drbdFlags       = null;
     }
 
-    /** Returns true if this device is used by CRM. */
     public boolean isUsedByCRM() {
         return isUsedByCRM;
     }
 
-    /** Returns true if this device is used as drbd meta-disk. */
     public boolean isDrbdMetaDisk() {
         return !metaDiskOfBlockDevices.isEmpty();
     }
 
-    /** Returns the block devices of which this block device is a meta disk. */
     public List<BlockDevice> getMetaDiskOfBlockDevices() {
         return metaDiskOfBlockDevices;
     }
@@ -238,10 +194,7 @@ public class BlockDevice extends Resource {
      * not used by CRM.
      */
     public boolean isAvailable() {
-        return !isMounted()
-               && !isUsedByCRM
-               && !isDrbdMetaDisk()
-               && !isVolumeGroupOnPhysicalVolume();
+        return !isMounted() && !isUsedByCRM && !isDrbdMetaDisk() && !isVolumeGroupOnPhysicalVolume();
     }
 
 
@@ -249,14 +202,14 @@ public class BlockDevice extends Resource {
     public void setDrbd(final boolean drbd) {
         this.drbd = drbd;
         if (!drbd) {
-            connectionState       = null;
-            nodeState             = null;
-            diskState             = null;
-            syncedProgress        = null;
-            drbdFlags             = null;
+            connectionState = null;
+            nodeState = null;
+            diskState = null;
+            syncedProgress = null;
+            drbdFlags = null;
             if (metaDisk != null) {
                 metaDisk.removeMetadiskOfBlockDevice(this);
-                metaDisk              = null;
+                metaDisk = null;
             }
             metaDiskOfBlockDevices = new ArrayList<BlockDevice>();
         }
@@ -266,17 +219,15 @@ public class BlockDevice extends Resource {
      * Returns whether the specified data are different than the stored data.
      */
     public boolean isDifferent(final String connectionState,
-                                         final String nodeState,
-                                         final String diskState,
-                                         final String drbdFlags) {
+                               final String nodeState,
+                               final String diskState,
+                               final String drbdFlags) {
         return !Tools.areEqual(this.connectionState, connectionState)
                || !Tools.areEqual(this.nodeState, nodeState)
                || !Tools.areEqual(this.diskState, diskState)
                || !Tools.areEqual(this.drbdFlags, drbdFlags);
     }
 
-
-    /** Sets this device used by CRM flag. */
     public void setUsedByCRM(final boolean isUsedByCRM) {
         this.isUsedByCRM = isUsedByCRM;
     }
@@ -291,7 +242,6 @@ public class BlockDevice extends Resource {
         }
     }
 
-    /** Sets meta disk. */
     public void setMetaDisk(final BlockDevice metaDisk) {
         this.metaDisk = metaDisk;
         if (metaDisk != null) {
@@ -299,85 +249,67 @@ public class BlockDevice extends Resource {
         }
     }
 
-    /** Removes the meta disk info. */
-    public void removeMetadiskOfBlockDevice(
-                                    final BlockDevice metaDiskOfBlockDevice) {
+    public void removeMetadiskOfBlockDevice(final BlockDevice metaDiskOfBlockDevice) {
         metaDiskOfBlockDevices.remove(metaDiskOfBlockDevice);
     }
 
-    /** Returns meta-disk. */
     public BlockDevice getMetaDisk() {
         return metaDisk;
     }
 
-    /** Sets drbd connection state as it is in /proc/drbd. */
     public void setConnectionState(final String connectionState) {
         this.connectionState = connectionState;
     }
 
-    /** Sets all drbd flags at once. */
     public void setDrbdFlags(final String drbdFlags) {
         this.drbdFlags = drbdFlags;
     }
 
-    /** Sets drbd node state as it is in /proc/drbd. */
     public void setNodeState(final String nodeState) {
         this.nodeState = nodeState;
     }
 
-    /** Sets drbd node state of the other bd as it is in /proc/drbd. */
     public void setNodeStateOther(final String nodeStateOther) {
         this.nodeStateOther = nodeStateOther;
     }
 
-    /** Sets disk node state as it is in /proc/drbd. */
     public void setDiskState(final String diskState) {
         this.diskState = diskState;
     }
 
-    /** Sets disk node state of the other block device as it is in /proc/drbd.
-     */
+    /** Sets disk node state of the other block device as it is in /proc/drbd. */
     public void setDiskStateOther(final String diskStateOther) {
         this.diskStateOther = diskStateOther;
     }
 
-    /** Returns connection state. */
     public String getConnectionState() {
         return connectionState;
     }
 
-    /** Returns node state. */
     public String getNodeState() {
         return nodeState;
     }
 
-    /** Returns node state of the other bd. */
     public String getNodeStateOther() {
         return nodeStateOther;
     }
 
-    /** Returns disk state. */
     public String getDiskState() {
         return diskState;
     }
 
-
-    /** Returns disk state of the other bd. */
     public String getDiskStateOther() {
         return diskStateOther;
     }
 
-    /** Sets the synced progress in percents. */
-    public void setSyncedProgress(final String syncedProgress) {
+    public void setSyncedProgressInPercents(final String syncedProgress) {
         this.syncedProgress = syncedProgress;
     }
 
-    /** Returns synced progress in percent. */
     public String getSyncedProgress() {
         return syncedProgress;
     }
 
-    /** Returns whether this block device is attached. */
     public boolean isAttached() {
         if (!drbd) {
             return true;
@@ -388,7 +320,6 @@ public class BlockDevice extends Resource {
         return !"Diskless".equals(diskState);
     }
 
-    /** Returns whether this block device is diskless. */
     public boolean isDiskless() {
         if (!drbd) {
             return false;
@@ -419,7 +350,6 @@ public class BlockDevice extends Resource {
         return isWFConnection() || isConnected();
     }
 
-    /** Returns whether this device is waiting for connection. */
     public boolean isWFConnection() {
         if (connectionState == null) {
             return false;
@@ -427,7 +357,6 @@ public class BlockDevice extends Resource {
         return "WFConnection".equals(connectionState);
     }
 
-    /** Returns whether this device is primary. */
     public boolean isPrimary() {
         if (nodeState == null) {
             return false;
@@ -435,7 +364,6 @@ public class BlockDevice extends Resource {
         return "Primary".equals(nodeState);
     }
 
-    /** Returns whether this device is secondary. */
     public boolean isSecondary() {
         if (nodeState == null) {
             return false;
@@ -443,12 +371,10 @@ public class BlockDevice extends Resource {
         return "Secondary".equals(nodeState);
     }
 
-    /** Returns the boolean value of the specified flag. */
     private boolean checkDrbdFlag(final int flag) {
         return drbdFlags.indexOf(flag) >= 0;
     }
 
-    /** Returns whether the sync was paused on this block device. */
     public boolean isPausedSync() {
         if (drbdFlags == null) {
             return false;
@@ -456,7 +382,6 @@ public class BlockDevice extends Resource {
         return checkDrbdFlag('u');
     }
 
-    /** Returns whether the node is syncing with other node. */
     public boolean isSyncing() {
         if (nodeState == null) {
             syncedProgress = null;
@@ -469,13 +394,11 @@ public class BlockDevice extends Resource {
         return false;
     }
 
-    /** Returns whether the node is verifying with other node. */
     public boolean isVerifying() {
         if (nodeState == null) {
             return false;
         }
-        return "VerifyS".equals(connectionState)
-                || "VerifyT".equals(connectionState);
+        return "VerifyS".equals(connectionState) || "VerifyT".equals(connectionState);
     }
 
 
@@ -498,19 +421,16 @@ public class BlockDevice extends Resource {
         return "SyncTarget".equals(connectionState);
     }
 
-    /** Sets this block device to be in a split-brain situation. */
     public void setSplitBrain(final boolean splitBrain) {
         this.splitBrain = splitBrain;
     }
 
-    /** Returns whether this block device is in split-brain. */
     public boolean isSplitBrain() {
         return splitBrain;
     }
 
     /** Returns string with meta disk and index in the parenthesis. */
-    public String getMetaDiskString(final String md,
-                                    final String mdi) {
+    public String getMetaDiskString(final String md, final String mdi) {
         if (md == null || mdi == null) {
             return null;
         }
@@ -536,90 +456,72 @@ public class BlockDevice extends Resource {
                                  getValue("DrbdMetaDiskIndex").getValueForConfig());
     }
 
-    /** Returns section by which the parameter is grouped in the views. */
     public String getSection(final String parameter) {
         return Tools.getString("BlockDevice.MetaDiskSection");
     }
 
-    /** Returns whether the block device is swap. */
     public boolean isSwap() {
         return fsType != null && "swap".equals(fsType);
     }
 
-    /** Returns disk uuid. */
     public String getDiskUuid() {
         return diskUuid;
     }
 
-    /** Returns whether the disk device is disk id. */
     public Collection<String> getDiskIds() {
         return diskIds;
     }
 
-    /** Returns lvm group or null. */
     public String getVolumeGroup() {
         return volumeGroup;
     }
 
-    /** Returns whether it is a physical volume. */
     public boolean isPhysicalVolume() {
         return vgOnPhysicalVolume != null;
     }
 
-    /** Returns volume group that is on this physical volume. */
     public String getVolumeGroupOnPhysicalVolume() {
         return vgOnPhysicalVolume;
     }
 
-    /** Returns whether there's a volume group on the physical volume. */
     public boolean isVolumeGroupOnPhysicalVolume() {
         return vgOnPhysicalVolume != null && !"".equals(vgOnPhysicalVolume);
     }
 
     /** Set volume group that is on this physical volume.
      * "", for no VG, but still it's physical volume. */
-    public void setVolumeGroupOnPhysicalVolume(
-                                            final String vgOnPhysicalVolume) {
+    public void setVolumeGroupOnPhysicalVolume(final String vgOnPhysicalVolume) {
         this.vgOnPhysicalVolume = vgOnPhysicalVolume;
     }
 
-    /** Returns logical volume. */
     public String getLogicalVolume() {
         return logicalVolume;
     }
 
-    /** Returns DRBD block device. */
     public BlockDevice getDrbdBlockDevice() {
         return drbdBlockDevice;
     }
 
-    /** Return whether the drbd block device is a physical volume. */
     public boolean isDrbdPhysicalVolume() {
         return drbdBlockDevice != null && drbdBlockDevice.isPhysicalVolume();
     }
 
-    /** Returns whether there's a volume group on the drbd physical volume. */
     public boolean isDrbdVolumeGroupOnPhysicalVolume() {
-        return drbdBlockDevice != null
-               && drbdBlockDevice.isVolumeGroupOnPhysicalVolume();
+        return drbdBlockDevice != null && drbdBlockDevice.isVolumeGroupOnPhysicalVolume();
     }
 
-    /** Sets DRBD block device. */
     public void setDrbdBlockDevice(final BlockDevice drbdBlockDevice) {
         this.drbdBlockDevice = drbdBlockDevice;
     }
 
-    /** Return DRBD config disk. */
     public String getDrbdBackingDisk() {
         return drbdBackingDisk;
     }
 
-    /** Set DRBD backing disk. */
     public void setDrbdBackingDisk(final String drbdBackingDisk) {
         this.drbdBackingDisk = drbdBackingDisk;
     }
 
-    /** Set used. */
     public void setUsed(final String usedStr) {
         if (usedStr != null) {
             this.used = Integer.parseInt(usedStr);

@@ -40,7 +40,6 @@ import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -90,7 +89,7 @@ final class HbColocationInfo extends EditableInfo
     /** Sets the colocation's parameters. */
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String colId = getService().getHeartbeatId();
+        final String colId = getService().getCrmId();
         final Map<String, Value> resourceNode = new HashMap<String, Value>();
 
         if (serviceInfoRsc == null
@@ -331,7 +330,7 @@ final class HbColocationInfo extends EditableInfo
             }
         }
         if (changed) {
-            final String colId = getService().getHeartbeatId();
+            final String colId = getService().getCrmId();
             if (serviceInfoRsc == null || serviceInfoWithRsc == null) {
                 /* placeholder */
                 final PcmkRscSetsInfo prsi = (PcmkRscSetsInfo) connectionInfo;
@@ -437,7 +436,7 @@ final class HbColocationInfo extends EditableInfo
         //final String withRsc =
         //                  serviceInfoWithRsc.getService().getHeartbeatId();
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
-        final String colId = getService().getHeartbeatId();
+        final String colId = getService().getCrmId();
         final CrmXml.ColocationData data = clStatus.getColocationData(colId);
         if (data == null) {
             return 0;

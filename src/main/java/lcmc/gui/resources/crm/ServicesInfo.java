@@ -473,7 +473,7 @@ public class ServicesInfo extends EditableInfo {
         boolean newService = false;
         int pos = 0;
         for (final String hbId : gs) {
-            if (clStatus.isOrphaned(hbId) && Tools.getApplication().isNoLRM()) {
+            if (clStatus.isOrphaned(hbId) && Tools.getApplication().isHideLRM()) {
                 continue;
             }
             ServiceInfo newSi;
@@ -535,7 +535,7 @@ public class ServicesInfo extends EditableInfo {
                         newSi = serviceInfoProvider.get();
                     }
                     newSi.init(serviceName, newRA, hbId, resourceNode, getBrowser());
-                    newSi.getService().setHeartbeatId(hbId);
+                    newSi.getService().setCrmId(hbId);
                     getBrowser().addToHeartbeatIdList(newSi);
                     if (newGi != null) {
                         newGi.addGroupServicePanel(newSi, false);
@@ -1019,12 +1019,12 @@ public class ServicesInfo extends EditableInfo {
                 try {
                     final ClusterStatus clStatus =
                                               getBrowser().getClusterStatus();
-                    clStatus.setPtestData(null);
+                    clStatus.setPtestResult(null);
                     apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData =
                                           new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
-                    clStatus.setPtestData(ptestData);
+                    clStatus.setPtestResult(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();
                 }
@@ -1176,7 +1176,7 @@ public class ServicesInfo extends EditableInfo {
             newServiceInfo.init(name, newRA, getBrowser());
         }
         if (heartbeatId != null) {
-            newServiceInfo.getService().setHeartbeatId(heartbeatId);
+            newServiceInfo.getService().setCrmId(heartbeatId);
             getBrowser().addToHeartbeatIdList(newServiceInfo);
         }
         if (newCi == null) {
@@ -1328,7 +1328,7 @@ public class ServicesInfo extends EditableInfo {
         for (final String param : oldSi.getParametersFromXML()) {
             if (ServiceInfo.GUI_ID.equals(param)
                 || ServiceInfo.PCMK_ID.equals(param)) {
-                if (getBrowser().isCrmId(oldSi.getService().getHeartbeatId())) {
+                if (getBrowser().isCrmId(oldSi.getService().getCrmId())) {
                     continue;
                 }
             }
@@ -1419,7 +1419,7 @@ public class ServicesInfo extends EditableInfo {
                         if (ServiceInfo.GUI_ID.equals(param)
                             || ServiceInfo.PCMK_ID.equals(param)) {
                             if (getBrowser().isCrmId(
-                                    oldCi.getService().getHeartbeatId())) {
+                                    oldCi.getService().getCrmId())) {
                                 continue;
                             }
                         }

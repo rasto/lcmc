@@ -32,31 +32,24 @@ package lcmc.model.crm;
  *
  */
 public final class CastAddress {
-    /** Type of the cast address. */
-    private final String type; /* bcast, mcast or ucast */
+    /** Type of the cast address,  bcast, mcast or ucast */
+    private final String type;
     /** Interface like eth0. */
     private final String iface;
     /** An IP address. */
-    private final String address;
+    private final String ipAddress;
     /** Serial device. */
-    private final String serial;
+    private final String serialDevice;
 
-    /** Prepares a new {@code CastAddress} object. */
-    public CastAddress(final String type,
-                       final String iface,
-                       final String address,
-                       final String serial) {
+    public CastAddress(final String type, final String iface, final String ipAddress, final String serialDevice) {
         this.type       = type;
         this.iface      = iface;
-        this.address    = address;
-        this.serial     = serial;
+        this.ipAddress = ipAddress;
+        this.serialDevice = serialDevice;
     }
 
     /** Convert the info to the line as it appears in the ha.cf. */
-    private String convert(final String type,
-                           final String iface,
-                           final String address,
-                           final String serial) {
+    private String convert(final String type, final String iface, final String address, final String serial) {
         if ("mcast".equals(type) || "ucast".equals(type)) {
             return type + ' ' + iface + ' ' + address;
         }
@@ -74,14 +67,13 @@ public final class CastAddress {
      * Convert the info of this object to the line as it appears in the ha.cf.
      */
     public String getConfigString() {
-        return convert(type, iface, address, serial);
+        return convert(type, iface, ipAddress, serialDevice);
     }
 
-    /** Compares two cast addresses if they are the same. */
-    public boolean equals(final String t,
-                          final String i,
-                          final String a,
-                          final String s) {
-        return getConfigString().equals(convert(t, i, a, s));
+    public boolean equals(final String thatType,
+                          final String thatIface,
+                          final String thatIpAddress,
+                          final String thatSerialDevice) {
+        return getConfigString().equals(convert(thatType, thatIface, thatIpAddress, thatSerialDevice));
     }
 }

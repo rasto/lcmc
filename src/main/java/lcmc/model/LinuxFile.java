@@ -36,27 +36,18 @@ import lcmc.utilities.ssh.SshOutput;
  * everything that browse file system may ask about the file.
  */
 public final class LinuxFile extends File {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-
     static final char separatorChar = '/';
     static final String separator = "" + separatorChar;
     static final char pathSeparatorChar = '/';
     static final String pathSeparator = "" + pathSeparatorChar;
-    /** Host on which is this file. */
     private final Host host;
-    /** Whether it is directory. */
     private boolean directory = false;
-    /** Last modified. */
     private long lastModified;
-    /** File length. */
     private long fileLength;
     /** Is true if this file exists, false it doesn't, null - it is not known.*/
     private Boolean existCache = null;
-    /** VMs disk info object. */
     private final HardwareInfo vmsHardwareInfo;
 
-    /** Creates new LinuxFile object. */
     public LinuxFile(final HardwareInfo vmsHardwareInfo,
                      final Host host,
                      final String name,
@@ -73,10 +64,7 @@ public final class LinuxFile extends File {
         this.fileLength = fileLength;
     }
 
-    /** Updates this file with possible new info. */
-    public void update(final String type,
-                       final long lastModified,
-                       final long fileLength) {
+    public void update(final String type, final long lastModified, final long fileLength) {
         if ("d".equals(type)) {
             directory = true;
         }
@@ -84,72 +72,63 @@ public final class LinuxFile extends File {
         this.fileLength = fileLength;
     }
 
-    /** Returns whether it is a file. */
     @Override
     public boolean isFile() {
         return true;
     }
 
-    /** Returns whether it exists. */
     @Override
     public boolean exists() {
         if (existCache != null) {
             return existCache;
         }
-        final SshOutput out = host.captureCommandProgressIndicator("executing...",
-                                                                   new ExecCommandConfig().command(DistResource.SUDO
-                                                                                                   + "stat "
-                                                                                                   + Tools.getUnixPath(toString())
-                                                                                                   + " 2>/dev/null")
-                                                                       .silentOutput());
+        final SshOutput out = host.captureCommandProgressIndicator(
+                                            "executing...",
+                                            new ExecCommandConfig().command(DistResource.SUDO
+                                                                            + "stat "
+                                                                            + Tools.getUnixPath(toString())
+                                                                            + " 2>/dev/null")
+                                                                    .silentOutput());
         return out.getExitCode() == 0;
     }
 
-    /** Returns whether it readable. */
     @Override
     public boolean canRead() {
         return true;
     }
 
-    /** Returns whether it executable. */
     @Override
     public boolean canExecute() {
         return true;
     }
 
-    /** Returns whether it is directory. */
     @Override
     public boolean isDirectory() {
         return directory;
     }
 
-    /** Returns last modified time. */
     @Override
     public long lastModified() {
         return lastModified;
     }
 
-    /** Returns length of the file. */
     @Override
     public long length() {
         return fileLength;
     }
 
-    /** Returns file with absolute path. */
     @Override
     public File getAbsoluteFile() {
         final String absPath = getAbsolutePath();
         return vmsHardwareInfo.getLinuxDir(absPath, host);
     }
 
-    /** Returns cannonical file name. */
     @Override
     public File getCanonicalFile() throws IOException {
         final String canonPath = getCanonicalPath();
         return vmsHardwareInfo.getLinuxDir(canonPath, host);
     }
 
-    /** Returns parent dir. */
     @Override
     public File getParentFile() {
         final String p = getParent();

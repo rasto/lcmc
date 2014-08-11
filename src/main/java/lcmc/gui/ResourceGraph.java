@@ -86,9 +86,8 @@ import javax.swing.JScrollBar;
 
 import lcmc.LCMC;
 import lcmc.model.Application;
-import lcmc.model.Cluster;
+import lcmc.model.ColorText;
 import lcmc.model.Host;
-import lcmc.model.Subtext;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -801,10 +800,10 @@ public abstract class ResourceGraph {
     protected abstract String getIconText(final Vertex v, final Application.RunMode runMode);
 
     /** Small text that appears in the right corner. */
-    protected abstract Subtext getRightCornerText(final Vertex v, final Application.RunMode runMode);
+    protected abstract ColorText getRightCornerText(final Vertex v, final Application.RunMode runMode);
 
     /** Small text that appears down. */
-    protected abstract Subtext[] getSubtexts(final Vertex v, final Application.RunMode runMode);
+    protected abstract ColorText[] getSubtexts(final Vertex v, final Application.RunMode runMode);
     /** Returns positions of the vertices (by value). */
     final void getPositions(final Map<String, Point2D> positions) {
         mGraphLock.lock();
@@ -1548,7 +1547,7 @@ public abstract class ResourceGraph {
             }
 
             /* right corner text */
-            final Subtext rightCornerText = getRightCornerText((Vertex) v, getRunMode());
+            final ColorText rightCornerText = getRightCornerText((Vertex) v, getRunMode());
             TextLayout rightCornerTextLayout = null;
             if (rightCornerText != null && !"".equals(rightCornerText.getSubtext())) {
                 rightCornerTextLayout = getVertexTextLayout(g2d, rightCornerText.getSubtext(), 0.8);
@@ -1560,13 +1559,13 @@ public abstract class ResourceGraph {
             }
 
             /* subtext */
-            final Subtext[] subtexts = getSubtexts((Vertex) v, getRunMode());
+            final ColorText[] colorTexts = getSubtexts((Vertex) v, getRunMode());
             TextLayout[] subtextLayouts = null;
-            if (subtexts != null) {
-                subtextLayouts = new TextLayout[subtexts.length];
+            if (colorTexts != null) {
+                subtextLayouts = new TextLayout[colorTexts.length];
                 int i = 0;
-                for (final Subtext subtext : subtexts) {
-                    subtextLayouts[i] = getVertexTextLayout(g2d, subtext.getSubtext(), 0.8);
+                for (final ColorText colorText : colorTexts) {
+                    subtextLayouts[i] = getVertexTextLayout(g2d, colorText.getSubtext(), 0.8);
                     final int subtextWidth = (int) subtextLayouts[i].getBounds().getWidth();
                     if (subtextWidth + 10 > shapeWidth) {
                         shapeWidth = subtextWidth + 10;
@@ -1663,11 +1662,11 @@ public abstract class ResourceGraph {
                 int i = 0;
                 for (final TextLayout l : subtextLayouts) {
                     int alpha = 255;
-                    final Subtext subtext = subtexts[i];
-                    if (" ".equals(subtext.getSubtext().substring(0, 1))) {
+                    final ColorText colorText = colorTexts[i];
+                    if (" ".equals(colorText.getSubtext().substring(0, 1))) {
                         alpha = 128;
                     }
-                    final Color color = subtext.getColor();
+                    final Color color = colorText.getColor();
                     if (color != null) {
                         final Paint p =
                             new GradientPaint((float) x + shapeWidth / 2,
@@ -1680,7 +1679,7 @@ public abstract class ResourceGraph {
                         g2d.setPaint(p);
                         g2d.fillRect((int) x + 4, (int) (y + height - 3 + 8 * (i - 1)), shapeWidth - 8, 9);
                     }
-                    final Color textColor = subtext.getTextColor();
+                    final Color textColor = colorText.getTextColor();
                     drawVertexText(g2d, l, x + 4, y + height - 4 + 8 * i, textColor, alpha);
                     i++;
                 }

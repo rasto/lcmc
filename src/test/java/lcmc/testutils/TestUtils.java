@@ -214,7 +214,7 @@ public class TestUtils {
             HOSTS.add(host);
             host.setCluster(cluster);
             cluster.addHost(host);
-            final String saveFile = Tools.getApplication().getSaveFile();
+            final String saveFile = Tools.getApplication().getDefaultSaveFile();
             Tools.save(guiData, new UserConfig(), saveFile, false);
         }
         for (final Host host : HOSTS) {
@@ -243,7 +243,7 @@ public class TestUtils {
         });
         
         //guiData.getEmptyBrowser().addClusterBox(cluster);
-        final String saveFile = Tools.getApplication().getSaveFile();
+        final String saveFile = Tools.getApplication().getDefaultSaveFile();
         Tools.save(guiData, new UserConfig(), saveFile, false);
         guiData.refreshClustersPanel();
         

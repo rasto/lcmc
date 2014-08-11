@@ -188,23 +188,23 @@ public class ArgumentParser {
             }
             final boolean advanced = cmd.hasOption(ADVANCED_OP);
             lcmc.utilities.Tools.getApplication().setAdvancedMode(advanced);
-            lcmc.utilities.Tools.getApplication().setTightvnc(tightvnc);
-            lcmc.utilities.Tools.getApplication().setUltravnc(ultravnc);
-            lcmc.utilities.Tools.getApplication().setRealvnc(realvnc);
+            lcmc.utilities.Tools.getApplication().setUseTightvnc(tightvnc);
+            lcmc.utilities.Tools.getApplication().setUseUltravnc(ultravnc);
+            lcmc.utilities.Tools.getApplication().setUseRealvnc(realvnc);
 
             lcmc.utilities.Tools.getApplication().setUpgradeCheckEnabled(!cmd.hasOption(NO_UPGRADE_CHECK_OP));
             lcmc.utilities.Tools.getApplication().setBigDRBDConf(cmd.hasOption(BIGDRBDCONF_OP));
             lcmc.utilities.Tools.getApplication().setStagingDrbd(cmd.hasOption(STAGING_DRBD_OP));
             lcmc.utilities.Tools.getApplication().setStagingPacemaker(cmd.hasOption(STAGING_PACEMAKER_OP));
-            lcmc.utilities.Tools.getApplication().setNoLRM(cmd.hasOption(NOLRM_OP));
+            lcmc.utilities.Tools.getApplication().setHideLRM(cmd.hasOption(NOLRM_OP));
             lcmc.utilities.Tools.getApplication().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
             lcmc.utilities.Tools.getApplication().setOneHostCluster(cmd.hasOption(ONE_HOST_CLUSTER_OP));
             lcmc.utilities.Tools.getApplication().setNoPassphrase(cmd.hasOption(NO_PASSPHRASE_OP));
             if (cmd.hasOption(EMBED_OP)) {
-                lcmc.utilities.Tools.getApplication().setEmbed(true);
+                lcmc.utilities.Tools.getApplication().setEmbedApplet(true);
             }
             if (cmd.hasOption(NO_EMBED_OP)) {
-                lcmc.utilities.Tools.getApplication().setEmbed(false);
+                lcmc.utilities.Tools.getApplication().setEmbedApplet(false);
             }
             if (cmd.hasOption(CMD_LOG_OP)) {
                 lcmc.utilities.Tools.getApplication().setCmdLog(true);
@@ -327,7 +327,7 @@ public class ArgumentParser {
                     throw new ParseException(SUDO_OP + " must be defined after " + HOST_OP);
                 }
                 for (final HostOptions ho : hostsOptions) {
-                    ho.setSudo(true);
+                    ho.setUseSudo(true);
                 }
             } else if (USER_OP.equals(op)) {
                 if (hostsOptions == null) {
@@ -338,7 +338,7 @@ public class ArgumentParser {
                     throw new ParseException("could not parse " + USER_OP + " option");
                 }
                 for (final HostOptions ho : hostsOptions) {
-                    ho.setUser(userName);
+                    ho.setLoginUser(userName);
                 }
             } else if (PORT_OP.equals(op)) {
                 if (hostsOptions == null) {
@@ -461,12 +461,12 @@ public class ArgumentParser {
                     return hostnameEntered;
                 }
                 userConfig.setHost(hostMap,
-                        hostOptions.getUser(),
+                        hostOptions.getLoginUser(),
                         hostnameEntered,
                         ip,
                         hostOptions.getPort(),
                         null,
-                        hostOptions.getSudo(),
+                        hostOptions.getUseSudo(),
                         false);
             }
         }

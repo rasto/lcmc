@@ -235,11 +235,11 @@ public class MultiSelectionInfo extends EditableInfo {
                 getBrowser().ptestLockAcquire();
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
-                    cs.setPtestData(null);
+                    cs.setPtestResult(null);
                     apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
-                    cs.setPtestData(ptestData);
+                    cs.setPtestResult(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();
                 }

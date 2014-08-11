@@ -638,7 +638,7 @@ public class DomainMenu {
     /** Adds vnc viewer menu items. */
     private void addVncViewersToTheMenu(final Collection<UpdatableItem> items,
                                         final Host host) {
-        if (Tools.getApplication().isTightvnc()) {
+        if (Tools.getApplication().isUseTightvnc()) {
             /* tight vnc test menu */
             final UpdatableItem tightvncViewerMenu = new MyMenuItem(
                             getVNCMenuString("TIGHT", host),
@@ -671,7 +671,7 @@ public class DomainMenu {
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
                                                             domainInfo.getDomainName());
-                        final Host host = vxml.getHost();
+                        final Host host = vxml.getDefinedOnHost();
                         if (host != null && remotePort > 0) {
                             Tools.startTightVncViewer(host, remotePort);
                         }
@@ -681,7 +681,7 @@ public class DomainMenu {
             items.add(tightvncViewerMenu);
         }
 
-        if (Tools.getApplication().isUltravnc()) {
+        if (Tools.getApplication().isUseUltravnc()) {
             /* ultra vnc test menu */
             final UpdatableItem ultravncViewerMenu = new MyMenuItem(
                             getVNCMenuString("ULTRA", host),
@@ -714,7 +714,7 @@ public class DomainMenu {
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
                                                              domainInfo.getDomainName());
-                        final Host host = vxml.getHost();
+                        final Host host = vxml.getDefinedOnHost();
                         if (host != null && remotePort > 0) {
                             Tools.startUltraVncViewer(host, remotePort);
                         }
@@ -724,7 +724,7 @@ public class DomainMenu {
             items.add(ultravncViewerMenu);
         }
 
-        if (Tools.getApplication().isRealvnc()) {
+        if (Tools.getApplication().isUseRealvnc()) {
             /* real vnc test menu */
             final UpdatableItem realvncViewerMenu = new MyMenuItem(
                             getVNCMenuString("REAL", host),
@@ -757,7 +757,7 @@ public class DomainMenu {
                     if (vxml != null) {
                         final int remotePort = vxml.getRemotePort(
                                                             domainInfo.getDomainName());
-                        final Host host = vxml.getHost();
+                        final Host host = vxml.getDefinedOnHost();
                         if (host != null && remotePort > 0) {
                             Tools.startRealVncViewer(host, remotePort);
                         }

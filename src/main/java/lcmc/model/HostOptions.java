@@ -25,14 +25,10 @@ package lcmc.model;
 public final class HostOptions {
     /** Host name or ip. */
     private final String host;
-    /** User to log in. */
-    private String user = null;
-    /** Port. */
+    private String loginUser = null;
     private String port = null;
-    /** Whether to use sudo. */
-    private boolean sudo = false;
+    private boolean useSudo = false;
 
-    /** Create new HostOptions object. */
     public HostOptions(final String host) {
         this.host = host;
     }
@@ -42,33 +38,27 @@ public final class HostOptions {
         return host;
     }
 
-    /** Return user. */
-    public String getUser() {
-        return user;
+    public String getLoginUser() {
+        return loginUser;
     }
 
-    /** Set user. */
-    public void setUser(final String user) {
-        this.user = user;
+    public void setLoginUser(final String loginUser) {
+        this.loginUser = loginUser;
     }
 
-    /** Return port. */
     public String getPort() {
         return port;
     }
 
-    /** Set port. */
     public void setPort(final String port) {
         this.port = port;
     }
 
-    /** Return whether to use sudo. */
-    public boolean getSudo() {
-        return sudo;
+    public boolean getUseSudo() {
+        return useSudo;
     }
 
-    /** Set whether to use sudo. */
-    public void setSudo(final boolean sudo) {
-        this.sudo = sudo;
+    public void setUseSudo(final boolean useSudo) {
+        this.useSudo = useSudo;
     }
 }

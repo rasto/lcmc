@@ -42,7 +42,7 @@ public final class NetworkInfo extends Info {
     @Override
     public String getInfo() {
         return "Network: " + getNetwork().getName()
-                           + "\n IPs: " + getNetwork().getIps()
+                           + "\n IPs: " + getNetwork().getAllIPs()
                            + "\nCIDR: " + getNetwork().getCidr()
                            + '\n';
     }

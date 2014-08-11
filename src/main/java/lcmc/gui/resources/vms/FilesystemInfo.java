@@ -37,7 +37,7 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.VmsXml.FilesystemData;
+import lcmc.model.vm.FilesystemData;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.BlockDevInfo;

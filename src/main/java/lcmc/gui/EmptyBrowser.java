@@ -27,7 +27,6 @@ import javax.swing.tree.MutableTreeNode;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.resources.AllHostsInfo;
-import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,7 +68,7 @@ public final class EmptyBrowser extends Browser {
 
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
-        final Iterable<Host> allHosts = new TreeSet<Host>(Tools.getApplication().getHosts().getHostSet());
+        final Iterable<Host> allHosts = new TreeSet<Host>(Tools.getApplication().getAllHosts().getHostSet());
         Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public String toString() {

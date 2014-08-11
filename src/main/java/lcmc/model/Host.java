@@ -63,7 +63,6 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.ssh.SshOutput;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class holds host data and implementation of host related methods.
@@ -248,7 +247,7 @@ public class Host implements Comparable<Host>, Value {
         this.drbdXmlProvider = drbdXmlProvider;
 
 
-        if (Tools.getApplication().getHosts().size() == 1) {
+        if (Tools.getApplication().getAllHosts().size() == 1) {
             enteredHostOrIp = Tools.getDefault("SSH.SecHost");
         }
         mountPoints.add("/mnt/");

@@ -58,19 +58,15 @@ public class StringValue implements Value, Comparable<Value> {
         this(NOTHING_VALUE);
     }
 
-    public StringValue(final String valueForConfig,
-                       final Unit unit) {
+    public StringValue(final String valueForConfig, final Unit unit) {
         this(valueForConfig, valueForConfig, unit);
     }
 
-    public StringValue(final String valueForConfig,
-                       final String valueForGui) {
+    public StringValue(final String valueForConfig, final String valueForGui) {
         this(valueForConfig, valueForGui, null);
     }
 
-    public StringValue(final String valueForConfig,
-                       final String valueForGui,
-                       final Unit unit) {
+    public StringValue(final String valueForConfig, final String valueForGui, final Unit unit) {
         if (valueForConfig == null || valueForConfig.isEmpty()) {
             this.valueForConfig = NOTHING_VALUE;
         } else {
@@ -100,7 +96,6 @@ public class StringValue implements Value, Comparable<Value> {
         return getValueForGui();
     }
 
-    /** Returns the string that is used for config. */
     @Override
     public String getValueForConfig() {
         return valueForConfig;
@@ -114,7 +109,6 @@ public class StringValue implements Value, Comparable<Value> {
         return valueForGui;
     }
 
-    /** Returns the string that is used for config. */
     @Override
     public String getValueForConfigWithUnit() {
         if (unit == null) {
@@ -184,4 +178,3 @@ public class StringValue implements Value, Comparable<Value> {
         return valueForConfig.compareTo(otherValue);
     }
 }
-

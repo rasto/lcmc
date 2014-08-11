@@ -42,177 +42,97 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  *
  * Holds data, that are used globaly in the application and provides some
  * functions for this data.
- *
- * @author Rasto Levrinc
- * @version $Id$
  */
 public class Application {
-    /** Logger. */
-    private static final Logger LOG =
-                                   LoggerFactory.getLogger(Application.class);
-    /** Read only operating mode. */
-    public static final String OP_MODE_RO =
-                                        Tools.getString("Application.OpMode.RO");
-
-    /** Operator Level 1 operating mode. */
-    private static final String OP_MODE_OP =
-                                       Tools.getString("Application.OpMode.OP");
-
-    /** Administrator Level 1 operating mode. */
-    private static final String OP_MODE_ADMIN =
-                                    Tools.getString("Application.OpMode.ADMIN");
-
-    /** Developer Level 10 operating mode. */
-    public static final String OP_MODE_GOD =
-                                       Tools.getString("Application.OpMode.GOD");
-    /** Map from access type to its string representation. */
-    public static final Map<AccessType, String> OP_MODES_MAP =
-                                    new EnumMap<AccessType, String>(AccessType.class);
-    /** String representation to its access type. */
-    public static final Map<String, AccessType> ACCESS_TYPE_MAP =
-                                       new LinkedHashMap<String, AccessType>();
-    /** Name of the Heartbeat comm stack. */
+    private static final Logger LOG = LoggerFactory.getLogger(Application.class);
+    public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
+    private static final String OP_MODE_OPERATOR = Tools.getString("Application.OpMode.OP");
+    private static final String OP_MODE_ADMIN = Tools.getString("Application.OpMode.ADMIN");
+    public static final String OP_MODE_GOD = Tools.getString("Application.OpMode.GOD");
+    public static final Map<AccessType, String> OP_MODES_MAP = new EnumMap<AccessType, String>(AccessType.class);
+    public static final Map<String, AccessType> ACCESS_TYPE_MAP = new LinkedHashMap<String, AccessType>();
     public static final String HEARTBEAT_NAME = "Heartbeat";
-    /** Name of the Corosync/Openais comm stack. */
     public static final String COROSYNC_NAME = "Corosync/OpenAIS";
-    /** Name of the clone set pacemaker object. */
     public static final String PM_CLONE_SET_NAME = "Clone Set";
-    /** Name of the Master/Slave set pacemaker object. */
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
-    /** Name of the group pacemaker object. */
     public static final String PACEMAKER_GROUP_NAME = "Group";
-    /** Default frames per second for animations. */
     public static final float DEFAULT_ANIM_FPS = 20.0f;
     static {
-        OP_MODES_MAP.put(AccessType.RO, OP_MODE_RO);
-        OP_MODES_MAP.put(AccessType.OP, OP_MODE_OP);
+        OP_MODES_MAP.put(AccessType.RO, OP_MODE_READONLY);
+        OP_MODES_MAP.put(AccessType.OP, OP_MODE_OPERATOR);
         OP_MODES_MAP.put(AccessType.ADMIN, OP_MODE_ADMIN);
         OP_MODES_MAP.put(AccessType.GOD, OP_MODE_GOD);
 
-        ACCESS_TYPE_MAP.put(OP_MODE_RO, AccessType.RO);
-        ACCESS_TYPE_MAP.put(OP_MODE_OP, AccessType.OP);
+        ACCESS_TYPE_MAP.put(OP_MODE_READONLY, AccessType.RO);
+        ACCESS_TYPE_MAP.put(OP_MODE_OPERATOR, AccessType.OP);
         ACCESS_TYPE_MAP.put(OP_MODE_ADMIN, AccessType.ADMIN);
         ACCESS_TYPE_MAP.put(OP_MODE_GOD, AccessType.GOD);
     }
 
-    /**
-     * Return whether the run mode is "live" run mode.
-     */
     public static boolean isLive(final RunMode runMode) {
         return RunMode.LIVE == runMode;
     }
 
-    /**
-     * Return whether the run mode is "test" run mode.
-     */
     public static boolean isTest(final RunMode runMode) {
         return RunMode.TEST == runMode;
     }
-    /** All hosts object. */
-    private final Hosts hosts;
-    /** All clusters object. */
-    private final Clusters clusters;
-    /** Default user for download login. */
+    private final Hosts allHosts;
+    private final Clusters allClusters;
     private String downloadUser = Tools.getDefault("DownloadLogin.User");
-    /** Default password for download login. */
-    private String downloadPassword =
-                                    Tools.getDefault("DownloadLogin.Password");
-    /** User for download login. */
+    private String downloadPassword = Tools.getDefault("DownloadLogin.Password");
     private String savedDownloadUser = "";
-    /** Password for download login. */
     private String savedDownloadPassword = "";
-    /** If set to true user and password will be saved. */
     private boolean loginSave = true;
 
-    /** Whether it is an advanced mode. */
     private boolean advancedMode = false;
-    /** Default save file. */
-    private String saveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
-    /** Known hosts object. */
+    private String defaultSaveFile = Tools.getDefault("MainMenu.DrbdGuiFiles.Default");
     private final KnownHosts knownHosts = new KnownHosts();
-    /** Known hosts path. */
     private String knownHostPath;
-    /** Id dsa path. */
     private String idDSAPath;
-    /** Id rsa path. */
     private String idRSAPath;
-    /** Last installed clusterStack. */
     private String lastInstalledClusterStack = null;
-    /** Last installed method either Openais or Heartbeat with pacemaker. */
     private String lastHbPmInstalledMethod = null;
-    /** Last installed drbd method. */
     private String lastDrbdInstalledMethod = null;
-    /** Last entered user. */
     private String lastEnteredUser = null;
-    /** Last use sudo. */
     private Boolean lastEnteredUseSudo = null;
-    /** Last ssh port. */
     private String lastEnteredSSHPort = null;
     /** Whether drbd gui helper should be overwritten. */
     private boolean keepHelper = false;
-    /** Hosts that have auto options. */
     private final List<String> autoHosts = new ArrayList<String>();
-    /** Clusters that have auto options. */
     private final List<String> autoClusters = new ArrayList<String>();
     /** Auto options, that make automatic actions in the gui. */
-    private final MultiKeyMap<String, String> autoOptions =
-                                            new MultiKeyMap<String, String>();
-    /** Remote port offset when making ssh tunnel for vnc. */
+    private final MultiKeyMap<String, String> autoOptions = new MultiKeyMap<String, String>();
     private int vncPortOffset = 0;
-    /** Whether tight vnc viewer should be used. */
-    private boolean tightvnc = false;
-    /** Whether ultra vnc viewer should be used. */
-    private boolean ultravnc = false;
-    /** Whether real vnc viewer should be used. */
-    private boolean realvnc = false;
-    /** Whether the drbd packages should be downloaded from staging dir. */
+    private boolean useTightvnc = false;
+    private boolean useUltravnc = false;
+    private boolean useRealvnc = false;
     private boolean stagingDrbd = false;
-    /** Whether more pacemaker installation options should appear. */
     private boolean stagingPacemaker = false;
-    /** Do not show resources that are only in LRM. */
-    private boolean noLRM = false;
-    /** Frames per second for animations. */
+    private boolean hideLRM = false;
     private float animFPS = DEFAULT_ANIM_FPS;
-    /** Access type of the application at the moment. */
     private AccessType accessType = AccessType.ADMIN;
-    /** Maximum allowed access type of the application. */
     private AccessType maxAccessType = AccessType.ADMIN;
-    /** Whether the upgrade check is enabled. */
     private boolean upgradeCheckEnabled = true;
-    /** Whether big drbd.conf and not drbd.d/ should be used. */
     private boolean bigDRBDConf = false;
-    /** Allow one host cluster. */
     private boolean oneHostCluster = false;
-    /** Scale for fonts and GUI elements. 100 is the same size. */
     private int scale = 100;
-    /** Whether no passphrase should be tried first. */
     private boolean noPassphrase = false;
-    /** Whether to embed applet in the browser. Embed in Linux by default. */
-    private boolean embed = Tools.isLinux();
-    /** Whether to log commands on the servers. */
+    private boolean embedApplet = Tools.isLinux();
     private boolean cmdLog = false;
-    /** Auto test, null no auto test. */
     private Test autoTest = null;
-    /** Check swing threads. Print stack traces. */
     private boolean checkSwing = false;
 
-    /**
-     * Prepares a new {@code Application} object and creates new hosts
-     * and clusters objects.
-     */
     public Application() {
-        hosts = new Hosts();
-        clusters = new Clusters();
+        allHosts = new Hosts();
+        allClusters = new Clusters();
     }
 
-    /** Gets hosts object. */
-    public Hosts getHosts() {
-        return hosts;
+    public Hosts getAllHosts() {
+        return allHosts;
     }
 
-    /** Returns number of hosts that are not part of any cluster. */
     public int danglingHostsCount() {
-        final Hosts hosts0 = Tools.getApplication().getHosts();
+        final Hosts hosts0 = Tools.getApplication().getAllHosts();
         int c = 0;
         for (final Host host : hosts0.getHostSet()) {
             if (!host.isInCluster()) {
@@ -222,12 +142,10 @@ public class Application {
         return c;
     }
 
-    /** Gets clusters object. */
-    public Clusters getClusters() {
-        return clusters;
+    public Clusters getAllClusters() {
+        return allClusters;
     }
 
-    /** Gets user for download area. */
     public String getDownloadUser() {
         if (savedDownloadUser != null && !savedDownloadUser.isEmpty()) {
             downloadUser = savedDownloadUser;
@@ -236,10 +154,8 @@ public class Application {
         return downloadUser;
     }
 
-    /** Gets password for download area. */
     public String getDownloadPassword() {
-        if (savedDownloadPassword != null
-            && !savedDownloadPassword.isEmpty()) {
+        if (savedDownloadPassword != null && !savedDownloadPassword.isEmpty()) {
             downloadPassword = savedDownloadPassword;
             savedDownloadPassword = "";
         }
@@ -253,10 +169,7 @@ public class Application {
         return loginSave;
     }
 
-    /** Sets user and password for download area. */
-    public void setDownloadLogin(final String downloadUser,
-                                 final String downloadPassword,
-                                 final boolean loginSave) {
+    public void setDownloadLogin(final String downloadUser, final String downloadPassword, final boolean loginSave) {
         this.downloadUser = downloadUser;
         this.downloadPassword = downloadPassword;
         this.loginSave = loginSave;
@@ -269,59 +182,48 @@ public class Application {
         }
     }
 
-    /** Return whether host exists in the hosts. */
     public boolean existsHost(final Host host) {
-        return hosts.isHostInHosts(host);
+        return allHosts.isHostInHosts(host);
     }
 
-    /** Adds host object to the hosts object. */
     public void addHostToHosts(final Host host) {
-        hosts.addHost(host);
+        allHosts.addHost(host);
     }
 
-    /** Removes host object from hosts object. */
     public void removeHostFromHosts(final Host host) {
-        hosts.removeHost(host);
+        allHosts.removeHost(host);
     }
 
-    /** Return whether cluster exists in the clusters. */
     public boolean existsCluster(final Cluster cluster) {
-        return clusters.isClusterInClusters(cluster);
+        return allClusters.isClusterInClusters(cluster);
     }
 
-    /** Adds cluster object to the clusters object. */
     public void addClusterToClusters(final Cluster cluster) {
-        clusters.addCluster(cluster);
+        allClusters.addCluster(cluster);
     }
 
-    /** Removes cluster object from clusters object. */
     public void removeClusterFromClusters(final Cluster cluster) {
-        clusters.removeCluster(cluster);
+        allClusters.removeCluster(cluster);
     }
 
-    /** Disconnects all hosts. */
     public void disconnectAllHosts() {
-        hosts.disconnectAllHosts();
+        allHosts.disconnectAllHosts();
     }
 
-    /** Sets global advanced mode. */
     public void setAdvancedMode(final boolean advancedMode) {
         this.advancedMode = advancedMode;
     }
 
-    /** Gets advanced mode. */
     public boolean isAdvancedMode() {
         return advancedMode;
     }
 
-    /** Sets file name where gui data are saved. */
-    public void setSaveFile(final String saveFile) {
-        this.saveFile = saveFile;
+    public void setDefaultSaveFile(final String defaultSaveFile) {
+        this.defaultSaveFile = defaultSaveFile;
     }
 
-    /** Returns file name where gui data were saved the last time. */
-    public String getSaveFile() {
-        return saveFile;
+    public String getDefaultSaveFile() {
+        return defaultSaveFile;
     }
 
     /** Returns file name where gui data were saved the last time. The old
@@ -330,12 +232,10 @@ public class Application {
         return Tools.getDefault("MainMenu.DrbdGuiFiles.Old");
     }
 
-    /** Returns path of the known host file. */
     public String getKnownHostPath() {
         return knownHostPath;
     }
 
-    /** Sets path of the known host file. */
     public void setKnownHostPath(final String knownHostPath) {
         this.knownHostPath = knownHostPath;
         final File knownHostFile = new File(knownHostPath);
@@ -348,45 +248,36 @@ public class Application {
         }
     }
 
-    /** Returns Id DSA path. */
     public String getIdDSAPath() {
         return idDSAPath;
     }
 
-    /** Sets Id DSA path. */
     public void setIdDSAPath(final String idDSAPath) {
         this.idDSAPath = idDSAPath;
     }
 
-    /** Returns Id RSA path. */
     public String getIdRSAPath() {
         return idRSAPath;
     }
 
-    /** Sets Id RSA path. */
     public void setIdRSAPath(final String idRSAPath) {
         this.idRSAPath = idRSAPath;
     }
 
-    /** Returns the known hosts object. */
     public KnownHosts getKnownHosts() {
         return knownHosts;
     }
 
-    /** Sets what was the last installed cluster stack. */
-    public void setLastInstalledClusterStack(
-                                    final String lastInstalledClusterStack) {
+    public void setLastInstalledClusterStack(final String lastInstalledClusterStack) {
         this.lastInstalledClusterStack = lastInstalledClusterStack;
     }
 
-    /** Returns what was the last installed cluster stack. */
     public String getLastInstalledClusterStack() {
         return lastInstalledClusterStack;
     }
 
     /** Sets last installed method of either Openais or Heartbeat. */
-    public void setLastHbPmInstalledMethod(
-                                        final String lastHbPmInstalledMethod) {
+    public void setLastHbPmInstalledMethod(final String lastHbPmInstalledMethod) {
         this.lastHbPmInstalledMethod = lastHbPmInstalledMethod;
     }
 
@@ -395,43 +286,34 @@ public class Application {
         return lastHbPmInstalledMethod;
     }
 
-    /** Sets last drbd installed method. */
-    public void setLastDrbdInstalledMethod(
-                                        final String lastDrbdInstalledMethod) {
+    public void setLastDrbdInstalledMethod(final String lastDrbdInstalledMethod) {
         this.lastDrbdInstalledMethod = lastDrbdInstalledMethod;
     }
 
-    /** Returns last drbd installed method. */
     public String getLastDrbdInstalledMethod() {
         return lastDrbdInstalledMethod;
     }
 
-    /** Sets last entered user. */
     public void setLastEnteredUser(final String lastEnteredUser) {
         this.lastEnteredUser = lastEnteredUser;
     }
 
-    /** Gets last entered user. */
     public String getLastEnteredUser() {
         return lastEnteredUser;
     }
 
-    /** Sets last used sudo. */
     public void setLastEnteredUseSudo(final Boolean lastEnteredUseSudo) {
         this.lastEnteredUseSudo = lastEnteredUseSudo;
     }
 
-    /** Returns last entered sudo. */
     public Boolean getLastEnteredUseSudo() {
         return lastEnteredUseSudo;
     }
 
-    /** Sets last ssh port. */
     public void setLastEnteredSSHPort(final String lastEnteredSSHPort) {
         this.lastEnteredSSHPort = lastEnteredSSHPort;
     }
 
-    /** Returns last ssh port. */
     public String getLastEnteredSSHPort() {
         return lastEnteredSSHPort;
     }
@@ -453,9 +335,7 @@ public class Application {
     }
 
     /** Adds auto option that starts automatic actions in the gui. */
-    public void addAutoOption(final String hostOrCluster,
-                              final String option,
-                              final String value) {
+    public void addAutoOption(final String hostOrCluster, final String option, final String value) {
         autoOptions.put(hostOrCluster, option, value);
     }
 
@@ -469,7 +349,6 @@ public class Application {
         return autoHosts;
     }
 
-    /** Removes host after it is done. */
     public void removeAutoHost() {
         if (!autoHosts.isEmpty()) {
             autoHosts.remove(0);
@@ -486,14 +365,12 @@ public class Application {
         return autoClusters;
     }
 
-    /** Removes cluster after it is done. */
     public void removeAutoCluster() {
         if (!autoClusters.isEmpty()) {
             autoClusters.remove(0);
         }
     }
 
-    /** Returns an auto option for gui testing. */
     String getAutoOption(final String hostOrCluster, final String option) {
         return autoOptions.get(hostOrCluster, option);
     }
@@ -514,12 +391,10 @@ public class Application {
         return autoOptions.get(autoClusters.get(0), option);
     }
 
-    /** Returns a global option. */
     public String getAutoOptionGlobal(final String option) {
         return autoOptions.get("global", option);
     }
 
-    /** Returns remote port offset when making ssh tunnel for vnc. */
     public int getVncPortOffset() {
         return vncPortOffset;
     }
@@ -529,36 +404,29 @@ public class Application {
         this.vncPortOffset = vncPortOffset;
     }
 
-    /** Sets whether tight vnc viewer should be used. */
-    public void setTightvnc(final boolean tightvnc) {
-        this.tightvnc = tightvnc;
+    public void setUseTightvnc(final boolean useTightvnc) {
+        this.useTightvnc = useTightvnc;
     }
 
-    /** Sets whether ultra vnc viewer should be used. */
-    public void setUltravnc(final boolean ultravnc) {
-        this.ultravnc = ultravnc;
+    public void setUseUltravnc(final boolean useUltravnc) {
+        this.useUltravnc = useUltravnc;
     }
 
-    /** Sets whether real vnc viewer should be used. */
-    public void setRealvnc(final boolean realvnc) {
-        this.realvnc = realvnc;
+    public void setUseRealvnc(final boolean useRealvnc) {
+        this.useRealvnc = useRealvnc;
     }
 
-    /** Returns whether tight vnc viewer should be used. */
-    public boolean isTightvnc() {
-        return tightvnc;
+    public boolean isUseTightvnc() {
+        return useTightvnc;
     }
 
-    /** Set whether to show resources that are only in LRM. */
-    public void setNoLRM(final boolean noLRM) {
-        this.noLRM = noLRM;
+    public void setHideLRM(final boolean hideLRM) {
+        this.hideLRM = hideLRM;
     }
 
-    /** Return whether to show resources that are only in LRM. */
-    public boolean isNoLRM() {
-        return noLRM;
+    public boolean isHideLRM() {
+        return hideLRM;
     }
-
 
     /**
      * Sets whether the drbd packages should be downloaded from staging
@@ -568,70 +436,54 @@ public class Application {
         this.stagingDrbd = stagingDrbd;
     }
 
-    /** Sets whether more pacemaker installation options should be shown. */
     public void setStagingPacemaker(final boolean stagingPacemaker) {
         this.stagingPacemaker = stagingPacemaker;
     }
 
-    /** Returns whether more pacemaker installation options should be shown. */
     public boolean isStagingPacemaker() {
         return stagingPacemaker;
     }
 
-    /**
-     * Returns whether the drbd packages should be downloaded from staging
-     * directory for testing.
-     */
     public boolean isStagingDrbd() {
         return stagingDrbd;
     }
 
-    /** Returns whether ultra vnc viewer should be used. */
-    public boolean isUltravnc() {
-        return ultravnc;
+    public boolean isUseUltravnc() {
+        return useUltravnc;
     }
 
-    /** Returns whether real vnc viewer should be used. */
-    public boolean isRealvnc() {
-        return realvnc;
+    public boolean isUseRealvnc() {
+        return useRealvnc;
     }
 
-    /** Returns frames per second for animations. */
     public float getAnimFPS() {
         return animFPS;
     }
 
-    /** Returns whether anim fps is slower than default. */
     public boolean isSlow() {
         return animFPS < DEFAULT_ANIM_FPS;
     }
 
-    /** Returns whether anim fps is faster than default. */
     public boolean isFast() {
         return animFPS > DEFAULT_ANIM_FPS;
     }
 
-    /** Sets frames per second for animations. */
     public void setAnimFPS(final float animFPS) {
         this.animFPS = animFPS;
     }
 
-    /** Sets access type. */
     public void setAccessType(final AccessType accessType) {
         this.accessType = accessType;
     }
 
-    /** Returns access type. */
     public AccessType getAccessType() {
         return accessType;
     }
 
-    /** Sets maximum allowed access type of the application. */
     public void setMaxAccessType(final AccessType maxAccessType) {
         this.maxAccessType = maxAccessType;
     }
 
-    /** Gets maximum allowed access type of the application. */
     AccessType getMaxAccessType() {
         return maxAccessType;
     }
@@ -646,7 +498,6 @@ public class Application {
                    && (advancedMode || !required.isAdvancedMode()));
     }
 
-    /** Returns available operating modes. */
     public String[] getOperatingModes() {
         final List<String> modes = new ArrayList<String>();
         for (final AccessType at : Application.OP_MODES_MAP.keySet()) {
@@ -658,12 +509,10 @@ public class Application {
         return modes.toArray(new String[modes.size()]);
     }
 
-    /** Sets whether the upgrade check should be enabled. */
     public void setUpgradeCheckEnabled(final boolean upgradeCheckEnabled) {
         this.upgradeCheckEnabled = upgradeCheckEnabled;
     }
 
-    /** Returns whether the upgrade check is enabled. */
     public boolean isUpgradeCheckEnabled() {
         return upgradeCheckEnabled;
     }
@@ -678,82 +527,66 @@ public class Application {
         this.bigDRBDConf = bigDRBDConf;
     }
 
-    /** Return whether one host cluster is allowed. */
     public boolean isOneHostCluster() {
         return oneHostCluster;
     }
 
-    /** Set whether one host cluster is allowed. */
     public void setOneHostCluster(final boolean oneHostCluster) {
         this.oneHostCluster = oneHostCluster;
     }
 
-    /** Return scaled size. */
     public int scaled(final int size) {
         return size * scale / 100;
     }
 
-    /** Returns scale for fonts and GUI elements. */
     public int getScale() {
         return scale;
     }
 
-    /** Sets scale. */
     public void setScale(final int scale) {
         this.scale = scale;
     }
 
-    /** Set whether no passphrase should be tried first. */
     public void setNoPassphrase(final boolean noPassphrase) {
         this.noPassphrase = noPassphrase;
     }
 
-    /** Return whether no passphrase should be tried first. */
     public boolean isNoPassphrase() {
         return noPassphrase;
     }
 
-    /** Set whether to embed applet in the browser. */
-    public void setEmbed(final boolean embed) {
-        this.embed = embed;
+    public void setEmbedApplet(final boolean embedApplet) {
+        this.embedApplet = embedApplet;
     }
 
-    /** Return whether to embed applet in the browser. */
-    public boolean isEmbed() {
-        return embed;
+    public boolean isEmbedApplet() {
+        return embedApplet;
     }
 
-    /** Set auto test. */
     public void setAutoTest(final Test autoTest) {
         this.autoTest = autoTest;
     }
 
-    /** Get auto test. */
     public Test getAutoTest() {
         return autoTest;
     }
 
-    /** Set whether to log commands on the servers. */
     public void setCmdLog(final boolean cmdLog) {
         this.cmdLog = cmdLog;
     }
 
-    /** Return whether to log commands on the servers. */
     public boolean isCmdLog() {
         return cmdLog;
     }
 
-    /** Return whether to check swing threads. Testing only. */
     public boolean isCheckSwing() {
         return checkSwing;
     }
 
-    /** Set whether to check swing threads. Testing only. */
     public void setCheckSwing(final boolean checkSwing) {
         this.checkSwing = checkSwing;
     }
 
-    /** access type. */
     public enum AccessType {
         RO,
         OP,
@@ -761,6 +594,7 @@ public class Application {
         GOD,
         NEVER
     }
+
     /**
      * Run mode. TEST does shows changes in the GUI, but does not change the
      * cluster

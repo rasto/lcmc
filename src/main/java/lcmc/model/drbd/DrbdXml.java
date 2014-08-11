@@ -1313,7 +1313,7 @@ public class DrbdXml extends XML {
                 if (Tools.areEqual(bdi.getBlockDevice().getSyncedProgress(), synced)) {
                     return false;
                 } else {
-                    bdi.getBlockDevice().setSyncedProgress(synced);
+                    bdi.getBlockDevice().setSyncedProgressInPercents(synced);
                     bdi.updateInfo();
                     return true;
                 }

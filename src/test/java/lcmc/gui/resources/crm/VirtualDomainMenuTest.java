@@ -62,9 +62,9 @@ public class VirtualDomainMenuTest {
         Tools.setApplication(applicationStub);
 
         when(virtualDomainInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(applicationStub.isTightvnc()).thenReturn(true);
-        when(applicationStub.isRealvnc()).thenReturn(true);
-        when(applicationStub.isUltravnc()).thenReturn(true);
+        when(applicationStub.isUseTightvnc()).thenReturn(true);
+        when(applicationStub.isUseRealvnc()).thenReturn(true);
+        when(applicationStub.isUseUltravnc()).thenReturn(true);
         when(virtualDomainInfoStub.getService()).thenReturn(serviceStub);
         when(virtualDomainInfoStub.getResource()).thenReturn(resourceStub);
         final Host[] clusterHosts = {hostStub};

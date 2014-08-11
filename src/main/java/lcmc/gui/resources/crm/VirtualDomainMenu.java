@@ -30,7 +30,6 @@ import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -54,7 +53,7 @@ public class VirtualDomainMenu extends ServiceMenu {
 
     /** Adds vnc viewer menu items. */
     private void addVncViewersToTheMenu(final Collection<UpdatableItem> items) {
-        if (Tools.getApplication().isTightvnc()) {
+        if (Tools.getApplication().isUseTightvnc()) {
             /* tight vnc test menu */
             final UpdatableItem tightvncViewerMenu = new MyMenuItem(
                             "start TIGHT VNC viewer",
@@ -87,7 +86,7 @@ public class VirtualDomainMenu extends ServiceMenu {
                     if (vxml != null && vvdi != null) {
                         final int remotePort = vxml.getRemotePort(
                                                                vvdi.getName());
-                        final Host host = vxml.getHost();
+                        final Host host = vxml.getDefinedOnHost();
                         if (host != null && remotePort > 0) {
                             Tools.startTightVncViewer(host, remotePort);
                         }
@@ -97,7 +96,7 @@ public class VirtualDomainMenu extends ServiceMenu {
             items.add(tightvncViewerMenu);
         }
 
-        if (Tools.getApplication().isUltravnc()) {
+        if (Tools.getApplication().isUseUltravnc()) {
             /* ultra vnc test menu */
             final UpdatableItem ultravncViewerMenu = new MyMenuItem(
                             "start ULTRA VNC viewer",
@@ -130,7 +129,7 @@ public class VirtualDomainMenu extends ServiceMenu {
                     if (vxml != null && vvdi != null) {
                         final int remotePort = vxml.getRemotePort(
                                                            vvdi.getName());
-                        final Host host = vxml.getHost();
+                        final Host host = vxml.getDefinedOnHost();
                         if (host != null && remotePort > 0) {
                             Tools.startUltraVncViewer(host, remotePort);
                         }
@@ -140,7 +139,7 @@ public class VirtualDomainMenu extends ServiceMenu {
             items.add(ultravncViewerMenu);
         }
 
-        if (Tools.getApplication().isRealvnc()) {
+        if (Tools.getApplication().isUseRealvnc()) {
             /* real vnc test menu */
             final UpdatableItem realvncViewerMenu = new MyMenuItem(
                             "start REAL VNC test",
@@ -173,7 +172,7 @@ public class VirtualDomainMenu extends ServiceMenu {
                     if (vxml != null && vvdi != null) {
                         final int remotePort = vxml.getRemotePort(
                                                             vvdi.getName());
-                        final Host host = vxml.getHost();
+                        final Host host = vxml.getDefinedOnHost();
                         if (host != null && remotePort > 0) {
                             Tools.startRealVncViewer(host, remotePort);
                         }

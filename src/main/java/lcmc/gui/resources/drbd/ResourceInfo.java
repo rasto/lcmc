@@ -75,7 +75,6 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -257,7 +256,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                                                                         proxyIp,
                                                                                         null,
                                                                                         false,
-                                                                                        NetInterface.AF.IPV4),
+                                                                                        NetInterface.AddressFamily.IPV4),
                                                                        getBrowser(),
                                                                        proxyHost)));
                         }

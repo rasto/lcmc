@@ -302,7 +302,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  }
                  LOG.debug1("actionPerformed: MENU ACTION: load");
                  final JFileChooser fc = new JFileChooser();
-                 fc.setSelectedFile(new File(Tools.getApplication().getSaveFile()));
+                 fc.setSelectedFile(new File(Tools.getApplication().getDefaultSaveFile()));
                  final FileFilter filter = new FileFilter() {
                      @Override
                      public boolean accept(final File f) {
@@ -329,7 +329,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final int ret = fc.showOpenDialog(LCMC.MAIN_FRAME);
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
-                     Tools.getApplication().setSaveFile(name);
+                     Tools.getApplication().setDefaultSaveFile(name);
                      loadConfigData(name);
                  }
              }
@@ -376,7 +376,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread thread = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         Tools.save(guiData, userConfig, Tools.getApplication().getSaveFile(), true);
+                         Tools.save(guiData, userConfig, Tools.getApplication().getDefaultSaveFile(), true);
                      }
                  });
                  thread.start();
@@ -393,7 +393,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  }
                  LOG.debug1("actionPerformed: MENU ACTION: save as");
                  final JFileChooser fc = new JFileChooser();
-                 fc.setSelectedFile(new File(Tools.getApplication().getSaveFile()));
+                 fc.setSelectedFile(new File(Tools.getApplication().getDefaultSaveFile()));
                  final FileFilter filter = new FileFilter() {
                      @Override
                      public boolean accept(final File f) {
@@ -420,8 +420,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final int ret = fc.showSaveDialog(LCMC.MAIN_FRAME);
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
-                     Tools.getApplication().setSaveFile(name);
-                     Tools.save(guiData, userConfig, Tools.getApplication().getSaveFile(), true);
+                     Tools.getApplication().setDefaultSaveFile(name);
+                     Tools.save(guiData, userConfig, Tools.getApplication().getDefaultSaveFile(), true);
                  }
 
              }

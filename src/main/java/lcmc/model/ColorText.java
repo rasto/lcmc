@@ -25,25 +25,17 @@ import java.awt.Color;
 /**
  * Subtext for graph with its colors.
  */
- //TODO: rename to ColorText
-public final class Subtext {
-    /** Subtext. */
+public final class ColorText {
     private final String subtext;
-    /** Color. */
     private final Color color;
-    /** Text color. */
     private final Color textColor;
 
-    /** Creates new Subtext object. */
-    public Subtext(final String subtext,
-                   final Color color,
-                   final Color textColor) {
+    public ColorText(final String subtext, final Color color, final Color textColor) {
         this.subtext = subtext;
         this.color = color;
         this.textColor = textColor;
     }
 
-    /** Returns subtext. */
     public String getSubtext() {
         return subtext;
     }

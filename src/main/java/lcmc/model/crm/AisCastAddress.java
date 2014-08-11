@@ -27,21 +27,20 @@ package lcmc.model.crm;
  * communication.
  */
 public final class AisCastAddress {
-    /** Type of the cast address. */
-    private final String type; /* only mcast at the moment*/
+    /** Only mcast at the moment*/
+    private final String type;
     /** Bind net address like 192.168.122.0. */
-    private final String bindnetaddr;
-    /** A multicast IP address. */
-    private final String address;
+    private final String bindNetAddr;
+    private final String multicastAddr;
     private final String port;
 
     public AisCastAddress(final String type,
-                          final String bindnetaddr,
-                          final String address,
+                          final String bindNetAddr,
+                          final String multicastAddr,
                           final String port) {
         this.type        = type;
-        this.bindnetaddr = bindnetaddr;
-        this.address     = address;
+        this.bindNetAddr = bindNetAddr;
+        this.multicastAddr = multicastAddr;
         this.port        = port;
     }
 
@@ -49,8 +48,7 @@ public final class AisCastAddress {
      * Convert the info to the lines as they appear in the openais.conf without
      * the ringnumber so that two interfaces can be compared.
      */
-    private String convert(final String tab,
-                           final String type,
+    private String convert(final String tab, final String type,
                            final String bindnetaddr,
                            final String address,
                            final String port) {
@@ -74,8 +72,8 @@ public final class AisCastAddress {
             return tab + "interface {\n"
                  + tab + tab + "ringnumber: "  + Integer.toString(ringnumber)
                  + '\n'
-                 + tab + tab + "bindnetaddr: " + bindnetaddr + '\n'
-                 + tab + tab + "mcastaddr: "   + address + '\n'
+                 + tab + tab + "bindnetaddr: " + bindNetAddr + '\n'
+                 + tab + tab + "mcastaddr: "   + multicastAddr + '\n'
                  + tab + tab + "mcastport: "   + port + '\n'
                  + tab + '}';
         } else {
@@ -84,10 +82,11 @@ public final class AisCastAddress {
     }
 
     public boolean equals(final String tab,
-                          final String t,
-                          final String b,
-                          final String a,
-                          final String p) {
-        return convert(tab, type, bindnetaddr, address, port).equals(convert(tab, t, b, a, p));
+                          final String thatType,
+                          final String thatBindNetAddr,
+                          final String thatMulticastAddr,
+                          final String thatPort) {
+        return convert(tab, type, bindNetAddr, multicastAddr, port).equals(
+                                            convert(tab, thatType, thatBindNetAddr, thatMulticastAddr, thatPort));
     }
 }

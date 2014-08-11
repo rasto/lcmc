@@ -33,8 +33,5 @@ package lcmc.model.resources;
  *
  */
 public interface ClusterBlockDeviceInterface {
-    /**
-     * Returns device name.
-     */
-    String getDevice();
+    String getDeviceName();
 }

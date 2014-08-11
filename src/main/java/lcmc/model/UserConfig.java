@@ -104,7 +104,7 @@ public final class UserConfig extends XML {
             }
         }
         final Node hostsNode = root.appendChild(doc.createElement("hosts"));
-        final Set<Host> hosts = Tools.getApplication().getHosts().getHostSet();
+        final Set<Host> hosts = Tools.getApplication().getAllHosts().getHostSet();
         for (final Host host : hosts) {
             if (!saveAll && !host.isSavable()) {
                 continue;
@@ -114,7 +114,7 @@ public final class UserConfig extends XML {
         }
         final Node clusters = root.appendChild(doc.createElement("clusters"));
 
-        final Set<Cluster> clusterSet = Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusterSet = Tools.getApplication().getAllClusters().getClusterSet();
         for (final Cluster cluster : clusterSet) {
             if (!saveAll && !cluster.isSavable()) {
                 continue;
@@ -164,7 +164,7 @@ public final class UserConfig extends XML {
      * Starts specified clusters and connects to the hosts of this clusters.
      */
     public void startClusters(final Collection<Cluster> selectedClusters) {
-        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
         if (clusters != null) {
             /* clusters */
             for (final Cluster cluster : clusters) {

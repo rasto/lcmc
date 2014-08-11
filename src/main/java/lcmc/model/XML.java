@@ -36,15 +36,10 @@ import org.xml.sax.SAXException;
 
 /**
  * This class parses xml.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public abstract class XML {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(XML.class);
-    /** Returns child node of the node identified by the tag. */
+
     protected final Node getChildNode(final Node node, final String tag) {
         final NodeList nodeList = node.getChildNodes();
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -56,11 +51,7 @@ public abstract class XML {
         return null;
     }
 
-    /** Returns child node of the node identified by the tag on the specified
-     * position. */
-    protected final Node getChildNode(final Node node,
-                                      final String tag,
-                                      final int pos) {
+    protected final Node getChildNode(final Node node, final String tag, final int pos) {
         final NodeList nodeList = node.getChildNodes();
         int foundPos = 0;
         for (int i = 0; i < nodeList.getLength(); i++) {
@@ -75,7 +66,6 @@ public abstract class XML {
         return null;
     }
 
-    /** Returns attribute value for node and name of the attribute. */
     protected final String getAttribute(final Node node, final String name) {
         if (node.getAttributes().getNamedItem(name) == null) {
             return null;
@@ -84,7 +74,6 @@ public abstract class XML {
         }
     }
 
-    /** Returns text in the node. */
     protected final String getText(final Node node) {
         final Node ch = getChildNode(node, "#text");
         if (ch == null) {
@@ -93,20 +82,13 @@ public abstract class XML {
         return ch.getNodeValue();
     }
 
-    /**
-     * Parses xml passed as a string and returns document object with
-     * the tree.
-     */
     protected final Document getXMLDocument(final String xmlraw) {
         if (xmlraw == null) {
             return null;
         }
         final String xml = xmlraw.trim();
-        final DocumentBuilderFactory factory =
-            DocumentBuilderFactory.newInstance();
-        if (factory == null
-            || xml.isEmpty()
-            || "no resources defined!".equals(xml)) {
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        if (factory == null || xml.isEmpty() || "no resources defined!".equals(xml)) {
             return null;
         }
         final Document document;

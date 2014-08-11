@@ -53,7 +53,7 @@ public final class CommonBlockDevInfo extends HbCategoryInfo implements CommonDe
 
     @Override
     public String getDevice() {
-        return getCommonBlockDevice().getDevice();
+        return getCommonBlockDevice().getDeviceName();
     }
 
     @Override

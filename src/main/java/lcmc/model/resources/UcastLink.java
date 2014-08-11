@@ -29,43 +29,29 @@ import lcmc.utilities.Unit;
 
 /**
  * This class holds data of one ucast link for heartbeat.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class UcastLink extends Resource implements Value {
-    /** Host object. */
     private final Host host;
-    /** Net interface. */
     private final NetInterface netInterface;
 
-    /**
-     * Prepares a new {@code UcastLink} object.
-     */
     public UcastLink(final Host host, final NetInterface netInterface) {
-        super();
         this.host = host;
         this.netInterface = netInterface;
     }
 
-    /** Rerurns the string. */
     @Override
     public String toString() {
         return host.getName() + ':' + netInterface.getName();
     }
 
-    /** Returns net interface. */
     public String getInterface() {
         return netInterface.getName();
     }
 
-    /** Returns the ip. */
     public String getIp() {
         return netInterface.getIp();
     }
 
-    /** Returns the host. */
     public Host getHost() {
         return host;
     }

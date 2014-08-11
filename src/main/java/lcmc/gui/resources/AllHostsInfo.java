@@ -54,7 +54,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import lcmc.AddHostDialog;
-import lcmc.AppContext;
 import lcmc.gui.GUIData;
 import lcmc.model.*;
 import lcmc.gui.Browser;
@@ -66,8 +65,6 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
@@ -123,7 +120,7 @@ public final class AllHostsInfo extends Info {
                 final Collection<Cluster> selectedRunningClusters = new ArrayList<Cluster>();
                 final Collection<Cluster> selectedClusters = new ArrayList<Cluster>();
                 final List<String> clusterNames = new ArrayList<String>();
-                final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
+                final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
                 for (final Cluster cluster : clusters) {
                     final JCheckBox wi = allClusterCheckboxes.get(cluster);
                     LOG.debug1("removeMarkedClusters: cluster: " + cluster.getName() + ": wi: " + (wi != null));
@@ -153,7 +150,7 @@ public final class AllHostsInfo extends Info {
                 });
                 Tools.stopClusters(selectedRunningClusters);
                 Tools.removeClusters(selectedClusters);
-                final String saveFile = Tools.getApplication().getSaveFile();
+                final String saveFile = Tools.getApplication().getDefaultSaveFile();
                 Tools.save(guiData, userConfig, saveFile, false);
                 mainPanel.repaint();
                 Tools.invokeLater(new Runnable() {
@@ -197,7 +194,7 @@ public final class AllHostsInfo extends Info {
         mainPanel.setBackground(Browser.PANEL_BACKGROUND);
         mainPanel.setBackground(Color.WHITE);
 
-        final Set<Cluster> clusters = Tools.getApplication().getClusters().getClusterSet();
+        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
         if (clusters != null) {
             final JPanel bPanel = new JPanel(new BorderLayout());
             bPanel.setMaximumSize(new Dimension(10000, 60));
@@ -457,7 +454,7 @@ public final class AllHostsInfo extends Info {
                         } else {
                             newClusterName = clusterName;
                         }
-                        final Clusters clusters = Tools.getApplication().getClusters();
+                        final Clusters clusters = Tools.getApplication().getAllClusters();
                         if (clusters.isClusterName(newClusterName)) {
                             cluster.setName(clusters.getNextClusterName(newClusterName + ' '));
                         } else {

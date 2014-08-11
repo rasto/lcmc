@@ -34,27 +34,11 @@ import lcmc.utilities.Unit;
 
 /**
  * This class holds data of one network interface.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class NetInterface extends Resource implements Value {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(NetInterface.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NetInterface.class);
 
-    //private int getNumericIp(final String ip) {
-    //    final String[] ipParts = ip.split("\\.");
-    //    int numericIp = 0;
-    //    for (final String ipPart : ipParts) {
-    //        numericIp = (numericIp << 8) + new Integer(ipPart);
-    //    }
-    //    return numericIp;
-    //}
-
-    private static String getSymbolicIp(BigInteger numericIp,
-                                        final int size) {
+    private static String getSymbolicIp(BigInteger numericIp, final int size) {
         final byte[] addr = new byte[size];
         for (int i = size - 1; i >= 0; i--) {
             final byte a = (byte) numericIp.and(
@@ -69,24 +53,17 @@ public final class NetInterface extends Resource implements Value {
             return null;
         }
     }
-    /** Ip address. */
     private final String ip;
-    /** Cidr. */
     private final Integer cidr;
-    /** Network ip. */
     private final String networkIp;
-    /** Whether it is a bridge. */
     private final boolean bridge;
-    /** Address family. */
-    private final AF af;
+    private final AddressFamily addressFamily;
     private final String IPV6_STRING = "ipv6";
     private final String IPV4_STRING = "ipv4";
     private final String SSOCKS_STRING = "ssocks";
     private final String SDP_STRING = "sdp";
 
     /**
-     * Prepares a new {@code NetInterface} object.
-     *
      * @param line
      *          line with interface, ip, mac addr and net mask  delimited
      *          with space
@@ -103,27 +80,27 @@ public final class NetInterface extends Resource implements Value {
             iface = cols[0];
         }
         String ip0 = null;
-        AF af0 = null;
+        AddressFamily addressFamily0 = null;
         int size = 4;
         if (cols.length > 2) {
             final String af_string = cols[1];
             ip0 = cols[2];
             if (IPV6_STRING.equals(af_string)) {
-                af0 = AF.IPV6;
+                addressFamily0 = AddressFamily.IPV6;
                 size = 16;
             }else if (IPV4_STRING.equals(af_string)) {
-                af0 = AF.IPV4;
+                addressFamily0 = AddressFamily.IPV4;
             } else if (SSOCKS_STRING.equals(af_string)) {
-                af0 = AF.SSOCKS;
+                addressFamily0 = AddressFamily.SSOCKS;
             } else if (SDP_STRING.equals(af_string)) {
-                af0 = AF.SDP;
+                addressFamily0 = AddressFamily.SDP;
             } else {
                 LOG.debug1("NetInterface: af_string: " + af_string + "-> ipv4");
-                af0 = AF.IPV4;
+                addressFamily0 = AddressFamily.IPV4;
             }
         }
         this.ip = ip0;
-        this.af = af0;
+        this.addressFamily = addressFamily0;
         if (cols.length > 3) {
             this.cidr = new Integer(cols[3]);
             this.networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
@@ -135,41 +112,28 @@ public final class NetInterface extends Resource implements Value {
         setName(iface);
     }
 
-    /**
-     * Creates a new {@code NetInterface} object.
-     *
-     * @param iface
-     *          network interface
-     * @param ip
-     *          ip address
-     * @param cidr
-     *          cidr
-     */
     public NetInterface(final String iface,
                         final String ip,
                         final Integer cidr,
                         final boolean bridge,
-                        final AF af) throws UnknownHostException {
+                        final AddressFamily addressFamily) throws UnknownHostException {
         super(iface);
         this.ip = ip;
         this.cidr = cidr;
         this.bridge = bridge;
-        this.af = af;
+        this.addressFamily = addressFamily;
         int size = 4;
-        if (af == AF.IPV6) {
+        if (addressFamily == AddressFamily.IPV6) {
             size = 16;
         }
         this.networkIp = calcNetworkIp(getNumericIp(ip), cidr, size);
     }
 
-    private String calcNetworkIp(final BigInteger numericIp,
-                                 final Integer cidr,
-                                 final int size) {
-        return getSymbolicIp(
-                 numericIp.and(new BigInteger("2").pow(8 * size)
-                                                  .subtract(new BigInteger("1"))
-                                                  .shiftLeft(8 * size - cidr)),
-                 size);
+    private String calcNetworkIp(final BigInteger numericIp, final Integer cidr, final int size) {
+        return getSymbolicIp(numericIp.and(new BigInteger("2").pow(8 * size)
+                                                              .subtract(new BigInteger("1"))
+                                                              .shiftLeft(8 * size - cidr)),
+                             size);
     }
  
     private BigInteger getNumericIp(final String ip) throws UnknownHostException {
@@ -181,24 +145,19 @@ public final class NetInterface extends Resource implements Value {
         return numericIp;
     }
 
-    /** Returns ip. */
     public String getIp() {
         return ip;
     }
 
-    /** Returns CIDR. */
     public Integer getCidr() {
         return cidr;
     }
-
-    ///**
 
     // * Returns network ip. The ip has '*' instead of bytes, that are
     public String getNetworkIp() {
         return networkIp;
     }
 
-    /** Returns value for parameter. */
     @Override
     public Value getValue(final String parameter) {
         if ("ip".equals(parameter)) {
@@ -212,18 +171,14 @@ public final class NetInterface extends Resource implements Value {
         }
     }
 
-    /** Returns bindnetaddr. */
-        public String getBindnetaddr() {
-            return networkIp;
-        }
-    ///** Returns bindnetaddr. */
+    public String getBindnetaddr() {
+        return networkIp;
+    }
 
-    /** Returns whether it is a bridge. */
     public boolean isBridge() {
         return bridge;
     }
 
-    /** Return whether it's a localhost. */
     public boolean isLocalHost() {
         return "lo".equals(getName());
     }
@@ -258,7 +213,5 @@ public final class NetInterface extends Resource implements Value {
         return NOTHING_SELECTED;
     }
 
-
-    /** Address family. */
-    public enum AF {IPV4, IPV6, SSOCKS, SDP};
+    public enum AddressFamily {IPV4, IPV6, SSOCKS, SDP};
 }

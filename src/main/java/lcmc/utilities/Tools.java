@@ -317,7 +317,7 @@ public final class Tools {
                 Thread.currentThread().interrupt();
             }
 
-            final Clusters clusters = Tools.getApplication().getClusters();
+            final Clusters clusters = Tools.getApplication().getAllClusters();
             if (clusters != null) {
                 for (final Cluster cluster : clusters.getClusterSet()) {
                     final ClusterBrowser cb = cluster.getBrowser();
@@ -1604,7 +1604,7 @@ public final class Tools {
     }
 
     public static void checkAccessOfEverything() {
-        for (final Cluster c : getApplication().getClusters().getClusterSet()) {
+        for (final Cluster c : getApplication().getAllClusters().getClusterSet()) {
             final ClusterBrowser cb = c.getBrowser();
             if (cb != null) {
                 cb.checkAccessOfEverything();

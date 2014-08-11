@@ -50,7 +50,6 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -242,12 +241,12 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
                 getBrowser().ptestLockAcquire();
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
-                    cs.setPtestData(null);
+                    cs.setPtestResult(null);
                     apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData =
                                         new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
-                    cs.setPtestData(ptestData);
+                    cs.setPtestResult(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();
                 }

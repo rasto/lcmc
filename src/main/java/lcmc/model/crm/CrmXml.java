@@ -2907,8 +2907,8 @@ public final class CrmXml extends XML {
         }
         cibQueryData.setDC(dc);
         cibQueryData.setNodeParameters(nodeParametersMap);
-        cibQueryData.setParameters(parametersMap);
-        cibQueryData.setParametersNvpairsIds(parametersNvpairsIdsMap);
+        cibQueryData.setResourceParameters(parametersMap);
+        cibQueryData.setResourceParametersNvpairsIds(parametersNvpairsIdsMap);
         cibQueryData.setResourceType(resourceTypeMap);
         cibQueryData.setInLRM(inLRMList);
         cibQueryData.setOrphaned(orphanedList);
@@ -2923,8 +2923,8 @@ public final class CrmXml extends XML {
         cibQueryData.setRscSetConnections(rscSetConnections);
         cibQueryData.setOrderRsc(orderRscMap);
 
-        cibQueryData.setLocation(locationMap);
-        cibQueryData.setPingLocation(pingLocationMap);
+        cibQueryData.setLocations(locationMap);
+        cibQueryData.setPingLocations(pingLocationMap);
         cibQueryData.setLocationsId(locationsIdMap);
         cibQueryData.setResHostToLocId(resHostToLocIdMap);
         cibQueryData.setResPingToLocId(resPingToLocIdMap);
@@ -2939,9 +2939,9 @@ public final class CrmXml extends XML {
         cibQueryData.setGroupsToResources(groupsToResourcesMap);
         cibQueryData.setCloneToResource(cloneToResourceMap);
         cibQueryData.setMasterList(masterList);
-        cibQueryData.setFailed(failedMap);
-        cibQueryData.setFailedClones(failedClonesMap);
-        cibQueryData.setPingCount(pingCountMap);
+        cibQueryData.setNodeFailedCount(failedMap);
+        cibQueryData.setResourceFailedCloneIds(failedClonesMap);
+        cibQueryData.setNodePingCount(pingCountMap);
         cibQueryData.setRscDefaultsId(rscDefaultsId);
         cibQueryData.setRscDefaultsParams(rscDefaultsParams);
         cibQueryData.setRscDefaultsParamsNvpairIds(rscDefaultsParamsNvpairIds);

@@ -28,7 +28,7 @@ import java.util.Map;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.VmsXml.ParallelData;
+import lcmc.model.vm.ParallelData;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;

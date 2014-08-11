@@ -216,7 +216,7 @@ public final class ClustersPanel extends JPanel {
     }
 
     private void loadDefaultConfigFile() {
-        final String saveFile = Tools.getApplication().getSaveFile();
+        final String saveFile = Tools.getApplication().getDefaultSaveFile();
         String xml = Tools.loadFile(guiData, saveFile, false);
         if (xml == null) {
             final String saveFileOld = Tools.getApplication().getSaveFileOld();

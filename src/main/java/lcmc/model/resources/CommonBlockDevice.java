@@ -31,32 +31,19 @@ import lcmc.utilities.LoggerFactory;
 /**
  * This class holds data of one block device, that is the same
  * on all hosts. Unless it is used by drbd.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class CommonBlockDevice extends Resource {
-    /** Logger. */
-    private static final Logger LOG =
-                            LoggerFactory.getLogger(CommonBlockDevice.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CommonBlockDevice.class);
 
-    /**
-     * Prepares a new {@code CommonBlockDevice} object.
-     *
-     * @param name
-     *          block device name
-     */
-    public CommonBlockDevice(final String name) {
-        super(name);
+    public CommonBlockDevice(final String blockDeviceName) {
+        super(blockDeviceName);
     }
 
     /** Return device name. */
-    public String getDevice() {
+    public String getDeviceName() {
         return getName();
     }
 
-    /** Return value for parameter. */
     @Override
     public Value getValue(final String parameter) {
         if ("device".equals(parameter)) {
@@ -67,15 +54,6 @@ public final class CommonBlockDevice extends Resource {
         }
     }
 
-    /**
-     * Returns possible choices for the parameter. Here it makes no sense,
-     * don't call this method.
-     *
-     * @param param
-     *          param for which you shoudn't call this method.
-     *
-     * @return null
-     */
     @Override
     public Value[] getPossibleChoices(final String param) {
         LOG.appError("getPossibleChoices: wrong call");

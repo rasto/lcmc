@@ -27,47 +27,29 @@ import lcmc.model.StringValue;
 
 /**
  * This class holds data of one drbd volumes.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
-public final class DrbdVolume extends Resource
-implements ClusterBlockDeviceInterface {
-    /** DRBD device. */
-    private String device;
-    /** Whether the config for this volume was already written at least once.
-     */
+public final class DrbdVolume extends Resource implements ClusterBlockDeviceInterface {
+    private String drbdDevice;
     private boolean commited = false;
 
-    /**
-     * Prepares a new {@code DrbdVolume} object.
-     */
     public DrbdVolume(final String name) {
         super(name);
     }
 
-    /** Returns drbd device. */
     @Override
-    public String getDevice() {
-        return device;
+    public String getDeviceName() {
+        return drbdDevice;
     }
 
-    /** Sets drbd device. */
-    public void setDevice(final String device) {
-        this.device = device;
-        setValue("device", new StringValue(device));
+    public void setDrbdDevice(final String drbdDevice) {
+        this.drbdDevice = drbdDevice;
+        setValue("device", new StringValue(drbdDevice));
     }
 
-    /**
-     * Sets commited flag. Resource is commited after the config
-     * was generated and device cannot be changed.
-     */
     public void setCommited(final boolean commited) {
         this.commited = commited;
     }
 
-    /** Returns whether this resoure was commited. */
     public boolean isCommited() {
         return commited;
     }

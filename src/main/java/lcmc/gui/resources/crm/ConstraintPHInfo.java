@@ -28,13 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
-import lcmc.model.Application;
+
+import lcmc.model.*;
 import lcmc.model.crm.CrmXml;
 import lcmc.model.crm.ClusterStatus;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Subtext;
-import lcmc.model.Value;
+import lcmc.model.ColorText;
 import lcmc.gui.Browser;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
@@ -470,7 +468,7 @@ public class ConstraintPHInfo extends ServiceInfo {
         boolean createOrd = false;
         for (final ServiceInfo serviceInfo : servicesAll) {
             final boolean isFrom = servicesFrom.contains(serviceInfo);
-            final String idToAdd = serviceInfo.getService().getHeartbeatId();
+            final String idToAdd = serviceInfo.getService().getCrmId();
             if (colocation) {
                 final ClusterStatus clStatus = getBrowser().getClusterStatus();
                 /* colocation */
@@ -870,7 +868,7 @@ public class ConstraintPHInfo extends ServiceInfo {
         return "   " + getService().getId();
     }
     @Override
-    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
+    public ColorText[] getSubtextsForGraph(final Application.RunMode runMode) {
         return null;
     }
 

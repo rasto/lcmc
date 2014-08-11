@@ -62,7 +62,7 @@ public final class AddClusterDialog {
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 guiData.removeSelectedClusterTab();
-                Tools.getApplication().getHosts().removeHostsFromCluster(cluster);
+                Tools.getApplication().getAllHosts().removeHostsFromCluster(cluster);
                 Tools.getApplication().removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
                 Tools.invokeLater(new Runnable() {

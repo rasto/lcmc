@@ -299,7 +299,7 @@ public class HbConnectionInfo extends EditableInfo {
         final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
-                        c.getService().getHeartbeatId(),
+                        c.getService().getCrmId(),
                         ClusterBrowser.SERVICE_LABEL_WIDTH,
                         ClusterBrowser.SERVICE_FIELD_WIDTH,
                         height);
@@ -374,11 +374,11 @@ public class HbConnectionInfo extends EditableInfo {
                 getBrowser().ptestLockAcquire();
                 try {
                     final ClusterStatus clStatus = getBrowser().getClusterStatus();
-                    clStatus.setPtestData(null);
+                    clStatus.setPtestResult(null);
                     apply(dcHost, Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
-                    clStatus.setPtestData(ptestData);
+                    clStatus.setPtestResult(ptestData);
                 } finally {
                     getBrowser().ptestLockRelease();
                 }
@@ -525,9 +525,9 @@ public class HbConnectionInfo extends EditableInfo {
             }
             for (final HbConstraintInterface c : constraintsToRemove) {
                if (isOrder) {
-                   orderIds.remove(c.getService().getHeartbeatId());
+                   orderIds.remove(c.getService().getCrmId());
                } else {
-                   colocationIds.remove(c.getService().getHeartbeatId());
+                   colocationIds.remove(c.getService().getCrmId());
                }
                constraints.remove(c);
             }
@@ -572,7 +572,7 @@ public class HbConnectionInfo extends EditableInfo {
         orderInfo.setApplyButton(getApplyButton());
         orderInfo.setRevertButton(getRevertButton());
         orderIds.put(ordId, orderInfo);
-        orderInfo.getService().setHeartbeatId(ordId);
+        orderInfo.getService().setCrmId(ordId);
         orderInfo.setParameters();
         mConstraintsWriteLock.lock();
         try {
@@ -606,7 +606,7 @@ public class HbConnectionInfo extends EditableInfo {
         colocationInfo.setApplyButton(getApplyButton());
         colocationInfo.setRevertButton(getRevertButton());
         colocationIds.put(colId, colocationInfo);
-        colocationInfo.getService().setHeartbeatId(colId);
+        colocationInfo.getService().setCrmId(colId);
         colocationInfo.setParameters();
         mConstraintsWriteLock.lock();
         try {

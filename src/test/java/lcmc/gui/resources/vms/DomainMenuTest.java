@@ -57,9 +57,9 @@ public class DomainMenuTest {
     @Before
     public void setUp() {
         Tools.setApplication(applicationStub);
-        when(applicationStub.isTightvnc()).thenReturn(true);
-        when(applicationStub.isRealvnc()).thenReturn(true);
-        when(applicationStub.isUltravnc()).thenReturn(true);
+        when(applicationStub.isUseTightvnc()).thenReturn(true);
+        when(applicationStub.isUseRealvnc()).thenReturn(true);
+        when(applicationStub.isUseUltravnc()).thenReturn(true);
         when(domainInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(domainInfoStub.getResource()).thenReturn(resourceStub);
 

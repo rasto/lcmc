@@ -30,47 +30,35 @@ package lcmc.model.crm;
  *
  */
 public final class HostLocation {
-    /** Host score. */
     private final String score;
     /** Operation, eq. "eq", "ne". */
     private final String operator;
-    /** Value. */
     private final String value;
-    /** Role. */
     private final String role;
 
-    /** Prepares a new {@code AisCastAddress} object. */
-    public HostLocation(final String score,
-                        final String operator,
-                        final String value,
-                        final String role) {
+    public HostLocation(final String score, final String operator, final String value, final String role) {
         this.score = score;
         this.operator = operator;
         this.value = value;
         this.role = role;
     }
 
-    /** Returns score. */
     public String getScore() {
         return score;
     }
 
-    /** Returns score. */
     public String getOperation() {
         return operator;
     }
 
-    /** Returns value. */
     public String getValue() {
         return value;
     }
 
-    /** Returns role. */
     public String getRole() {
         return role;
     }
 
-    /** Return whether the two objects are equal. */
     @Override
     public boolean equals(final Object other) {
         if (other == null) {
@@ -97,9 +85,7 @@ public final class HostLocation {
                 return false;
             }
         }
-        if (operator == null
-            || "".equals(operator)
-            || "eq".equals(operator)) {
+        if (operator == null || "".equals(operator) || "eq".equals(operator)) {
             return otherHL.getOperation() == null
                    || "".equals(otherHL.getOperation())
                    || "eq".equals(otherHL.getOperation());

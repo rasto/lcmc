@@ -29,7 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.model.StringValue;
-import lcmc.model.vm.VmsXml.InterfaceData;
+import lcmc.model.vm.InterfaceData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.InterfaceInfo;
 import lcmc.gui.widget.Widget;

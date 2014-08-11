@@ -79,7 +79,7 @@ public final class Name extends DialogCluster {
         if (name.isEmpty()) {
             v = false;
         } else {
-            for (final Cluster c : Tools.getApplication().getClusters().getClusterSet()) {
+            for (final Cluster c : Tools.getApplication().getAllClusters().getClusterSet()) {
                 if (c != getCluster() && name.equals(c.getName())) {
                     v = false;
                     break;
@@ -159,7 +159,7 @@ public final class Name extends DialogCluster {
         pane.add(nameLabel);
         String name = getCluster().getName();
         if (name == null) {
-            name = Tools.getApplication().getClusters().getDefaultClusterName();
+            name = Tools.getApplication().getAllClusters().getDefaultClusterName();
         }
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";

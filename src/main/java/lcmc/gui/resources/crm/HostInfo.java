@@ -44,13 +44,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
+import lcmc.model.*;
 import lcmc.model.crm.ClusterStatus;
-import lcmc.model.Host;
 import lcmc.model.crm.PtestData;
-import lcmc.model.Subtext;
+import lcmc.model.ColorText;
 import lcmc.gui.*;
 import lcmc.gui.CrmGraph;
 import lcmc.gui.resources.Info;
@@ -86,16 +83,16 @@ public class HostInfo extends Info {
                                      Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStopCommLayerIcon"));
     static final ImageIcon HOST_START_COMM_LAYER_ICON =
                                      Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStartCommLayerIcon"));
-    private static final Subtext OFFLINE_SUBTEXT = new Subtext("offline", null, Color.BLUE);
-    private static final Subtext PENDING_SUBTEXT = new Subtext("pending", null, Color.BLUE);
-    private static final Subtext FENCED_SUBTEXT = new Subtext("fencing...", null, Color.RED);
-    private static final Subtext CORO_STOPPED_SUBTEXT = new Subtext("stopped", null, Color.RED);
-    private static final Subtext PCMK_STOPPED_SUBTEXT = new Subtext("pcmk stopped", null, Color.RED);
-    private static final Subtext UNKNOWN_SUBTEXT = new Subtext("wait...", null, Color.BLUE);
-    private static final Subtext ONLINE_SUBTEXT = new Subtext("online", null, Color.BLUE);
-    private static final Subtext STANDBY_SUBTEXT = new Subtext("STANDBY", null, Color.RED);
-    private static final Subtext STOPPING_SUBTEXT = new Subtext("stopping...", null, Color.RED);
-    private static final Subtext STARTING_SUBTEXT = new Subtext("starting...", null, Color.BLUE);
+    private static final ColorText OFFLINE_COLOR_TEXT = new ColorText("offline", null, Color.BLUE);
+    private static final ColorText PENDING_COLOR_TEXT = new ColorText("pending", null, Color.BLUE);
+    private static final ColorText FENCED_COLOR_TEXT = new ColorText("fencing...", null, Color.RED);
+    private static final ColorText CORO_STOPPED_COLOR_TEXT = new ColorText("stopped", null, Color.RED);
+    private static final ColorText PCMK_STOPPED_COLOR_TEXT = new ColorText("pcmk stopped", null, Color.RED);
+    private static final ColorText UNKNOWN_COLOR_TEXT = new ColorText("wait...", null, Color.BLUE);
+    private static final ColorText ONLINE_COLOR_TEXT = new ColorText("online", null, Color.BLUE);
+    private static final ColorText STANDBY_COLOR_TEXT = new ColorText("STANDBY", null, Color.RED);
+    private static final ColorText STOPPING_COLOR_TEXT = new ColorText("stopping...", null, Color.RED);
+    private static final ColorText STARTING_COLOR_TEXT = new ColorText("starting...", null, Color.BLUE);
 
     static final String NO_PCMK_STATUS_STRING = "cluster status is not available";
     private Host host;
@@ -283,11 +280,11 @@ public class HostInfo extends Info {
                 getBrowser().getClusterBrowser().ptestLockAcquire();
                 try {
                     final ClusterStatus clStatus = getBrowser().getClusterBrowser().getClusterStatus();
-                    clStatus.setPtestData(null);
+                    clStatus.setPtestResult(null);
                     CRM.crmConfigureCommit(host, ta.getText(), Application.RunMode.TEST);
                     final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
-                    clStatus.setPtestData(ptestData);
+                    clStatus.setPtestResult(ptestData);
                 } finally {
                     getBrowser().getClusterBrowser().ptestLockRelease();
                 }
@@ -393,16 +390,16 @@ public class HostInfo extends Info {
         return -1;
     }
 
-    public Subtext[] getSubtextsForGraph(final Application.RunMode runMode) {
-        final List<Subtext> texts = new ArrayList<Subtext>();
+    public ColorText[] getSubtextsForGraph(final Application.RunMode runMode) {
+        final List<ColorText> texts = new ArrayList<ColorText>();
         if (getHost().isConnected()) {
             if (!getHost().isCrmStatusOk()) {
-               texts.add(new Subtext("waiting for Pacemaker...", null, Color.BLACK));
+               texts.add(new ColorText("waiting for Pacemaker...", null, Color.BLACK));
             }
         } else {
-            texts.add(new Subtext("connecting...", null, Color.BLACK));
+            texts.add(new ColorText("connecting...", null, Color.BLACK));
         }
-        return texts.toArray(new Subtext[texts.size()]);
+        return texts.toArray(new ColorText[texts.size()]);
     }
 
     public String getIconTextForGraph(final Application.RunMode runMode) {
@@ -425,38 +422,38 @@ public class HostInfo extends Info {
         return b.getClusterStatus();
     }
 
-    public Subtext getRightCornerTextForGraph(final Application.RunMode runMode) {
+    public ColorText getRightCornerTextForGraph(final Application.RunMode runMode) {
         if (getHost().isCommLayerStopping()) {
-            return STOPPING_SUBTEXT;
+            return STOPPING_COLOR_TEXT;
         } else if (getHost().isCommLayerStarting()) {
-            return STARTING_SUBTEXT;
+            return STARTING_COLOR_TEXT;
         } else if (getHost().isPacemakerStarting()) {
-            return STARTING_SUBTEXT;
+            return STARTING_COLOR_TEXT;
         }
         final ClusterStatus cs = getClusterStatus();
         if (cs != null && cs.isFencedNode(host.getName())) {
-            return FENCED_SUBTEXT;
+            return FENCED_COLOR_TEXT;
         } else if (getHost().isCrmStatusOk()) {
             if (isStandby(runMode)) {
-                return STANDBY_SUBTEXT;
+                return STANDBY_COLOR_TEXT;
             } else {
-                return ONLINE_SUBTEXT;
+                return ONLINE_COLOR_TEXT;
             }
         } else if (getHost().isConnected()) {
             final Boolean running = getHost().getCorosyncOrHeartbeatRunning();
             if (running == null) {
-                return UNKNOWN_SUBTEXT;
+                return UNKNOWN_COLOR_TEXT;
             } else if (!running) {
-                return CORO_STOPPED_SUBTEXT;
+                return CORO_STOPPED_COLOR_TEXT;
             }
             if (cs != null && cs.isPendingNode(host.getName())) {
-                return PENDING_SUBTEXT;
+                return PENDING_COLOR_TEXT;
             } else if (!getHost().isPacemakerRunning()) {
-                return PCMK_STOPPED_SUBTEXT;
+                return PCMK_STOPPED_COLOR_TEXT;
             } else if (cs != null && "no".equals(cs.isOnlineNode(host.getName()))) {
-                return OFFLINE_SUBTEXT;
+                return OFFLINE_COLOR_TEXT;
             } else {
-                return UNKNOWN_SUBTEXT;
+                return UNKNOWN_COLOR_TEXT;
             }
         }
         return null;

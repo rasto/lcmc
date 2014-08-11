@@ -36,7 +36,7 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.VmsXml.InterfaceData;
+import lcmc.model.vm.InterfaceData;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
@@ -210,7 +210,7 @@ public final class InterfaceInfo extends HardwareInfo {
             for (final Host h : getBrowser().getClusterHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(h);
                 if (vmsXml != null) {
-                    if (vmsXml.getMacAddresses().contains(mac)) {
+                    if (vmsXml.getUsedMacAddresses().contains(mac)) {
                         continue LOOP;
                     }
                 }

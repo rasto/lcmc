@@ -44,13 +44,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.Exceptions;
 import lcmc.gui.*;
-import lcmc.model.Application;
+import lcmc.model.*;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Subtext;
-import lcmc.model.Value;
+import lcmc.model.ColorText;
 import lcmc.model.resources.BlockDevice;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
@@ -99,17 +96,17 @@ public class BlockDevInfo extends EditableInfo {
     public static final ImageIcon HARDDISK_ICON = Tools.createImageIcon(
                                 Tools.getDefault("BlockDevInfo.HarddiskIcon"));
     /** Meta-disk subtext. */
-    private static final Subtext METADISK_SUBTEXT =
-                             new Subtext("meta-disk", Color.BLUE, Color.BLACK);
+    private static final ColorText METADISK_COLOR_TEXT =
+                             new ColorText("meta-disk", Color.BLUE, Color.BLACK);
     /** Swap subtext. */
-    private static final Subtext SWAP_SUBTEXT =
-                                  new Subtext("swap", Color.BLUE, Color.BLACK);
+    private static final ColorText SWAP_COLOR_TEXT =
+                                  new ColorText("swap", Color.BLUE, Color.BLACK);
     /** Mounted subtext. */
-    private static final Subtext MOUNTED_SUBTEXT =
-                               new Subtext("mounted", Color.BLUE, Color.BLACK);
+    private static final ColorText MOUNTED_COLOR_TEXT =
+                               new ColorText("mounted", Color.BLUE, Color.BLACK);
     /** Physical volume subtext. */
-    private static final Subtext PHYSICAL_VOLUME_SUBTEXT =
-                               new Subtext("PV", Color.BLUE, Color.GREEN);
+    private static final ColorText PHYSICAL_VOLUME_COLOR_TEXT =
+                               new ColorText("PV", Color.BLUE, Color.GREEN);
     /** String length after the cut. */
     private static final int MAX_RIGHT_CORNER_STRING_LENGTH = 28;
     /** String that is displayed as a tool tip for disabled menu item. */
@@ -1213,7 +1210,7 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     /** Returns text that appears in the corner of the drbd graph. */
-    public Subtext getRightCornerTextForDrbdGraph(final Application.RunMode runMode) {
+    public ColorText getRightCornerTextForDrbdGraph(final Application.RunMode runMode) {
         final String vg;
         if (isLVM()) {
             vg = getBlockDevice().getVolumeGroup();
@@ -1222,11 +1219,11 @@ public class BlockDevInfo extends EditableInfo {
         }
 
         if (getBlockDevice().isDrbdMetaDisk()) {
-            return METADISK_SUBTEXT;
+            return METADISK_COLOR_TEXT;
         } else if (getBlockDevice().isSwap()) {
-            return SWAP_SUBTEXT;
+            return SWAP_COLOR_TEXT;
         } else if (getBlockDevice().getMountedOn() != null) {
-            return MOUNTED_SUBTEXT;
+            return MOUNTED_COLOR_TEXT;
         } else if (getBlockDevice().isDrbd()) {
             String s = getBlockDevice().getName();
             // TODO: cache that
@@ -1245,15 +1242,15 @@ public class BlockDevInfo extends EditableInfo {
                     s += " PV";
                 }
             }
-            return new Subtext(s, Color.BLUE, Color.BLACK);
+            return new ColorText(s, Color.BLUE, Color.BLACK);
         } else if (vg != null && !"".equals(vg)) {
             if (isLVM()) {
-                return new Subtext("LV in " + vg, Color.BLUE, Color.GREEN);
+                return new ColorText("LV in " + vg, Color.BLUE, Color.GREEN);
             } else {
-                return new Subtext(getName(), Color.BLUE, Color.GREEN);
+                return new ColorText(getName(), Color.BLUE, Color.GREEN);
             }
         } else if (getBlockDevice().isPhysicalVolume()) {
-            return PHYSICAL_VOLUME_SUBTEXT;
+            return PHYSICAL_VOLUME_COLOR_TEXT;
         }
         return null;
     }

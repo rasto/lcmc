@@ -25,31 +25,21 @@ package lcmc.model;
 
 /**
  * This class holds access type and mode (advanced or not advanced).
- *
- * @author Rasto Levrinc
- *
  */
 public final class AccessMode {
-    /** Advanced mode. */
     public static final boolean ADVANCED = true;
-    /** Access type. */
     private final Application.AccessType accessType;
-    /** Whether it is advanced mode or not. */
     private final boolean advancedMode;
 
-    /** Prepares a new {@code AccessMode} object. */
-    public AccessMode(final Application.AccessType accessType,
-                      final boolean advancedMode) {
+    public AccessMode(final Application.AccessType accessType, final boolean advancedMode) {
         this.accessType = accessType;
         this.advancedMode = advancedMode;
     }
 
-    /** Returns access type. */
     public Application.AccessType getAccessType() {
         return accessType;
     }
 
-    /** Returns advanced mode. */
     public boolean isAdvancedMode() {
         return advancedMode == ADVANCED;
     }

@@ -39,8 +39,8 @@ import javax.swing.JPopupMenu;
 
 import lcmc.gui.resources.drbd.*;
 import lcmc.model.Application;
+import lcmc.model.ColorText;
 import lcmc.model.Host;
-import lcmc.model.Subtext;
 import lcmc.model.resources.BlockDevice;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Tools;
@@ -398,7 +398,7 @@ public class DrbdGraph extends ResourceGraph {
 
     /** Small text that appears in the right corner. */
     @Override
-    protected Subtext getRightCornerText(final Vertex v, final Application.RunMode runMode) {
+    protected ColorText getRightCornerText(final Vertex v, final Application.RunMode runMode) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null) {
@@ -416,7 +416,7 @@ public class DrbdGraph extends ResourceGraph {
 
     /** Small text that appears down. */
     @Override
-    protected Subtext[] getSubtexts(final Vertex v, final Application.RunMode runMode) {
+    protected ColorText[] getSubtexts(final Vertex v, final Application.RunMode runMode) {
         if (isVertexBlockDevice(v)) {
             final BlockDevInfo bdi = (BlockDevInfo) getInfo(v);
             if (bdi != null && bdi.getBlockDevice().isDrbd()
@@ -440,8 +440,8 @@ public class DrbdGraph extends ResourceGraph {
                     color = Color.RED;
                     textColor = Color.WHITE;
                 }
-                return new Subtext[]{
-                    new Subtext(Tools.join(" / ", new String[]{connState, diskState, diskStateOther, proxyState}),
+                return new ColorText[]{
+                    new ColorText(Tools.join(" / ", new String[]{connState, diskState, diskStateOther, proxyState}),
                                 color,
                                 textColor)};
             }

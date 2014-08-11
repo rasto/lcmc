@@ -25,19 +25,12 @@ package lcmc.model.resources;
 
 /**
  * This class holds data of one drbd resource.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class DrbdResource extends Resource {
     /** Whether the config for this resource was already written at least once.
      */
     private boolean commited = false;
 
-    /**
-     * Prepares a new {@code DrbdResource} object.
-     */
     public DrbdResource(final String name) {
         super(name);
     }
@@ -50,7 +43,6 @@ public final class DrbdResource extends Resource {
         this.commited = commited;
     }
 
-    /** Returns whether this resoure was commited. */
     public boolean isCommited() {
         return commited;
     }

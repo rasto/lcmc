@@ -31,46 +31,27 @@ import lcmc.utilities.Tools;
 
 /**
  * This class holds data of one cluster network.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Network extends Resource {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Network.class);
     /** List of all ips in the network. */
-    private final String[] ips;
-    /** Net mask. */
+    private final String[] allIPs;
     private final Integer cidr;
 
-    /**
-     * Prepares a new {@code Network} object.
-     *
-     * @param name
-     *          ip with *
-     * @param ips
-     *          ips that are in the network
-     */
-    public Network(final String name,
-                   final String[] ips,
-                   final Integer cidr) {
+    public Network(final String name, final String[] allIPs, final Integer cidr) {
         super(name);
-        this.ips = ips;
+        this.allIPs = allIPs;
         this.cidr = cidr;
     }
 
-    /** Returns list of ips delimited with comma. */
-    public String getIps() {
-        return Tools.join(", ", ips);
+    public String getAllIPs() {
+        return Tools.join(", ", allIPs);
     }
 
-    /** Returns net mask of this network. */
     public Integer getCidr() {
         return cidr;
     }
 
-    /** Returns value of the parameter. */
     @Override
     public Value getValue(final String parameter) {
         LOG.appError("getValue: wrong call to getValue");

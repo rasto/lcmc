@@ -37,14 +37,10 @@ public final class DRBDtestData {
     /** Pattern for dry run output: drbdsetup 0 disconnect. */
     private static final Pattern DRBDSETUP_PATTERN = Pattern.compile(".*drbdsetup\\s+(\\S+)\\s+(\\S+).*");
     private final String toolTip;
-    /** Hash with host and drbd resource, that will be connected. */
-    private final MultiKeyMap<String, Integer> connectedHash = new MultiKeyMap<String, Integer>();
-    /** Hash with host and drbd resource, that will be disconnected. */
-    private final MultiKeyMap<String, Integer> disconnectedHash = new MultiKeyMap<String, Integer>();
-    /** Hash with host and drbd resource, that will be attached. */
-    private final MultiKeyMap<String, Integer> attachedHash = new MultiKeyMap<String, Integer>();
-    /** Hash with host and drbd resource, that will be dettached. */
-    private final MultiKeyMap<String, Integer> disklessHash = new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> hostResConnected = new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> hostResDisconnected = new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> hostResAttached = new MultiKeyMap<String, Integer>();
+    private final MultiKeyMap<String, Integer> hostResDiskless = new MultiKeyMap<String, Integer>();
 
     public DRBDtestData(final Map<Host, String> testOutput) {
         if (testOutput == null) {
@@ -70,13 +66,13 @@ public final class DRBDtestData {
                     final String resOrVol = m.group(1);
                     final String action = m.group(2);
                     if ("disconnect".equals(action)) {
-                        disconnectedHash.put(hostStringEntry.getKey().getName(), resOrVol, 1);
+                        hostResDisconnected.put(hostStringEntry.getKey().getName(), resOrVol, 1);
                     } else if ("net".equals(action)) {
-                        connectedHash.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
+                        hostResConnected.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
                     } else if ("detach".equals(action)) {
-                        disklessHash.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
+                        hostResDiskless.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
                     } else if ("disk".equals(action)) {
-                        attachedHash.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
+                        hostResAttached.put(hostStringEntry.getKey().getName(), "/dev/drbd" + resOrVol, 1);
                     }
                 }
                 final int index = line.indexOf("--set-defaults");
@@ -100,23 +96,19 @@ public final class DRBDtestData {
         return toolTip;
     }
 
-    /** Returns whether the device will be disconnected on the host. */
     public boolean isDisconnected(final Host host, final String resource) {
-        return disconnectedHash.get(host.getName(), resource) != null;
+        return hostResDisconnected.get(host.getName(), resource) != null;
     }
 
-    /** Returns whether the device will be connected on the host. */
     public boolean isConnected(final Host host, final String resource) {
-        return connectedHash.get(host.getName(), resource) != null;
+        return hostResConnected.get(host.getName(), resource) != null;
     }
 
-    /** Returns whether the drbd device is diskless on the host. */
     public boolean isDiskless(final Host host, final String dev) {
-        return disklessHash.get(host.getName(), dev) != null;
+        return hostResDiskless.get(host.getName(), dev) != null;
     }
 
-    /** Returns whether the drbd device is diskless on the host. */
     public boolean isAttached(final Host host, final String dev) {
-        return attachedHash.get(host.getName(), dev) != null;
+        return hostResAttached.get(host.getName(), dev) != null;
     }
 }

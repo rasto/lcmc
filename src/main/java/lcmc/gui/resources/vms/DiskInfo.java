@@ -42,7 +42,7 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.VmsXml.DiskData;
+import lcmc.model.vm.DiskData;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.drbd.BlockDevInfo;

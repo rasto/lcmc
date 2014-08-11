@@ -36,58 +36,32 @@ import lcmc.utilities.LoggerFactory;
  *
  */
 public class Service extends Resource {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Service.class);
-    /** Heartbeat id prefix for resource. */
     public static final String RES_ID_PREFIX = "res_";
-    /** Heartbeat id prefix for stonith device. */
     public static final String STONITH_ID_PREFIX = "stonith_";
-    /** Heartbeat id prefix for group. */
     public static final String GRP_ID_PREFIX = "grp_";
-    /** Pacemaker id prefix for clone. */
     public static final String CL_ID_PREFIX = "cl_";
-    /** Pacemaker id prefix for master/slave. */
     public static final String MS_ID_PREFIX = "ms_";
-    /** Name of the clone set pacemaker object. */
     private static final String CLONE_SET_NAME = Application.PM_CLONE_SET_NAME;
-    /** Name of the master / slave set pacemaker object. */
-    private static final String MASTER_SLAVE_SET_NAME =
-                                        Application.PM_MASTER_SLAVE_SET_NAME;
-    /** Name of the group pacemaker object. */
+    private static final String MASTER_SLAVE_SET_NAME = Application.PM_MASTER_SLAVE_SET_NAME;
     private static final String GROUP_NAME = Application.PACEMAKER_GROUP_NAME;
-    /** Id is crmId whithout name of the service. */
     private String id = null;
-    /** Heartbeat id of this service. */
     private String crmId = null;
-    /** Whether the service is removed. */
     private boolean removed = false;
-    /** Whether the service is being removed. */
     private boolean removing = false;
-    /** Whether the service is modified. */
     private boolean modified = false;
-    /** Whether the service is being modified. */
     private boolean modifying = false;
-    /** Whether the service is orphaned. */
     private boolean orphaned = false;
     /** Heartbeat class:  heartbeat, ocf, service (upstart, systemd). */
     private String resourceClass = null;
-    /** Whether this service master when it is clone. */
     private boolean master = false;
-    /** Whether this service is stonith device. */
     private boolean stonith = false;
 
-    /**
-     * Prepares a new {@code Service} object.
-     *
-     * @param name
-     *          name of this service.
-     */
     public Service(final String name) {
         super(name);
     }
 
-    /** Returns id that is used in the heartbeat for this service. */
-    public final String getHeartbeatId() {
+    public final String getCrmId() {
         return crmId;
     }
 
@@ -100,7 +74,7 @@ public class Service extends Resource {
     }
 
     /** Sets heartbeat id and gui id without the service name part. */
-    public final void setHeartbeatId(final String crmId) {
+    public final void setCrmId(final String crmId) {
         this.crmId = crmId;
         LOG.debug1("setHeartbeatId: set crm id: " + crmId);
         if (GROUP_NAME.equals(getName())) {
@@ -129,11 +103,9 @@ public class Service extends Resource {
             }
         } else {
             if (crmId.startsWith(RES_ID_PREFIX + getName() + '_')) {
-                id = crmId.substring((RES_ID_PREFIX + getName()).length()
-                                           + 1);
+                id = crmId.substring((RES_ID_PREFIX + getName()).length() + 1);
             } else if (crmId.startsWith(STONITH_ID_PREFIX + getName() + '_')) {
-                id = crmId.substring((STONITH_ID_PREFIX + getName()).length()
-                                           + 1);
+                id = crmId.substring((STONITH_ID_PREFIX + getName()).length() + 1);
             } else {
                 id = crmId;
             }
@@ -142,7 +114,6 @@ public class Service extends Resource {
         setValue("id", new StringValue(id));
     }
 
-    /** Sets the id. */
     public final void setId(final String id) {
         this.id = id;
         LOG.debug1("setId: id: " + id);
@@ -181,14 +152,12 @@ public class Service extends Resource {
         }
     }
 
-    /** Sets the id and crm id. */
     public final void setIdAndCrmId(final String id) {
         this.id = id;
         crmId = getCrmIdFromId(id);
         setValue("id", new StringValue(id));
     }
 
-    /** Sets whether the service was removed. */
     public final void setRemoved(final boolean removed) {
         this.removed = removed;
         if (removed) {
@@ -196,17 +165,14 @@ public class Service extends Resource {
         }
     }
 
-    /** Returns whether the service was removed. */
     public final boolean isRemoved() {
         return removed || removing;
     }
 
-    /** Sets that the service was done being removed. */
     public final void doneRemoving() {
         this.removing = false;
     }
 
-    /** Sets whether the service was modified. */
     public final void setModified(final boolean modified) {
         this.modified = modified;
         if (modified) {
@@ -214,7 +180,6 @@ public class Service extends Resource {
         }
     }
 
-    /** Sets that the service is done being modified. */
     public final void doneModifying() {
         modifying = false;
     }
@@ -234,12 +199,7 @@ public class Service extends Resource {
      * just created, it was just removed or modified.
      */
     public final boolean isAvailable() {
-        return !isNew()
-               && !modified
-               && !removed
-               && !modifying
-               && !removing
-               && !orphaned;
+        return !isNew() && !modified && !removed && !modifying && !removing && !orphaned;
     }
 
     /**
@@ -276,27 +236,22 @@ public class Service extends Resource {
         return resourceClass;
     }
 
-    /** Sets this service if it is master. */
     public void setMaster(final boolean master) {
         this.master = master;
     }
 
-    /** Returns whether this clone is master, if it is clone. */
     public boolean isMaster() {
         return master;
     }
 
-    /** Sets whether it is a stonith device. */
     public final void setStonith(final boolean stonith) {
         this.stonith = stonith;
     }
 
-    /** Returns whether this service is orphaned. */
     public final boolean isOrphaned() {
         return orphaned;
     }
 
-    /** Sets whether this service is orphaned. */
     public final void setOrphaned(final boolean orphaned) {
         this.orphaned = orphaned;
     }
