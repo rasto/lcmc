@@ -34,9 +34,9 @@ import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -59,6 +59,8 @@ public final class AddDrbdConfigDialog {
     private Start startDialog;
     @Autowired
     private Resource resourceDialog;
+    @Autowired
+    private Application application;
 
     public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {
         this.globalInfo = globalInfo;
@@ -79,7 +81,7 @@ public final class AddDrbdConfigDialog {
             final VolumeInfo dvi = globalInfo.getNewDrbdVolume(resourceInfo, blockDevices);
             resourceInfo.addDrbdVolume(dvi);
             globalInfo.addDrbdResource(resourceInfo);
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     globalInfo.addDrbdVolume(dvi);

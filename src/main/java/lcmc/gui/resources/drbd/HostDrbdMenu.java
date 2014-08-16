@@ -23,10 +23,13 @@ package lcmc.gui.resources.drbd;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Provider;
 import javax.swing.JColorChooser;
+
 import lcmc.EditHostDialog;
 import lcmc.LCMC;
 import lcmc.ProxyHostWizard;
+import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
@@ -38,12 +41,7 @@ import lcmc.gui.dialog.drbd.DrbdsLog;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -63,532 +61,552 @@ public class HostDrbdMenu {
     private GUIData guiData;
     @Autowired
     private ProxyHostWizard proxyHostWizard;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Provider<VGCreate> vgCreateProvider;
+    @Autowired
+    private Provider<LVCreate> lvCreateProvider;
+    @Autowired
+    private Provider<DrbdsLog> drbdsLogProvider;
 
     public List<UpdatableItem> getPulldownMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* host wizard */
         final MyMenuItem hostWizardItem =
-            new MyMenuItem(Tools.getString("HostBrowser.HostWizard"),
-                           HostBrowser.HOST_ICON_LARGE,
-                           Tools.getString("HostBrowser.HostWizard"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    editHostDialog.showDialogs(host);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.HostWizard"),
+                        HostBrowser.HOST_ICON_LARGE,
+                        Tools.getString("HostBrowser.HostWizard"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                editHostDialog.showDialogs(host);
+                            }
+                        });
         items.add(hostWizardItem);
         guiData.registerAddHostButton(hostWizardItem);
 
         /* proxy host wizard */
         final MyMenuItem proxyHostWizardItem =
-            new MyMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
-                           HostBrowser.HOST_ICON_LARGE,
-                           Tools.getString("HostBrowser.ProxyHostWizard"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    proxyHostWizard.init(host, null);
-                    proxyHostWizard.showDialogs();
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
+                        HostBrowser.HOST_ICON_LARGE,
+                        Tools.getString("HostBrowser.ProxyHostWizard"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                proxyHostWizard.init(host, null);
+                                proxyHostWizard.showDialogs();
+                            }
+                        });
         items.add(proxyHostWizardItem);
         guiData.registerAddHostButton(proxyHostWizardItem);
         final Application.RunMode runMode = Application.RunMode.LIVE;
         /* load drbd */
         final UpdatableItem loadItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.LoadDrbd"),
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isConnected()) {
-                        if (host.isDrbdLoaded()) {
-                            return "already loaded";
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.load(host, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.LoadDrbd"),
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isConnected()) {
+                                    if (host.isDrbdLoaded()) {
+                                        return "already loaded";
+                                    } else {
+                                        return null;
+                                    }
+                                } else {
+                                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.load(host, runMode);
+                                hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
+                            }
+                        });
         items.add(loadItem);
 
         /* proxy start/stop */
         final UpdatableItem proxyItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
-                           null,
-                           hostDrbdInfo.getMenuToolTip("DRBD.stopProxy", ""),
-                           Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
-                           null,
-                           hostDrbdInfo.getMenuToolTip("DRBD.startProxy", ""),
-                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean predicate() {
-                    return host.isDrbdProxyRunning();
-                }
-
-                @Override
-                public void action() {
-                    if (host.isDrbdProxyRunning()) {
-                        DRBD.stopProxy(host, runMode);
-                    } else {
-                        DRBD.startProxy(host, runMode);
-                    }
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
+                        null,
+                        hostDrbdInfo.getMenuToolTip("DRBD.stopProxy", ""),
+                        Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
+                        null,
+                        hostDrbdInfo.getMenuToolTip("DRBD.startProxy", ""),
+                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        .predicate(new Predicate() {
+                            @Override
+                            public boolean check() {
+                                return host.isDrbdProxyRunning();
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                if (host.isDrbdProxyRunning()) {
+                                    DRBD.stopProxy(host, runMode);
+                                } else {
+                                    DRBD.startProxy(host, runMode);
+                                }
+                                hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
+                            }
+                        });
         items.add(proxyItem);
 
         /* all proxy connections up */
         final UpdatableItem allProxyUpItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
-                           null,
-                           hostDrbdInfo.getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
-                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return host.isConnected() && host.isDrbdProxyRunning();
-                }
-
-                @Override
-                public void action() {
-                    DRBD.proxyUp(host, DRBD.ALL, null, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
+                        null,
+                        hostDrbdInfo.getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
+                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        .visiblePredicate(new VisiblePredicate() {
+                            @Override
+                            public boolean check() {
+                                return host.isConnected() && host.isDrbdProxyRunning();
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.proxyUp(host, DRBD.ALL, null, runMode);
+                                hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
+                            }
+                        });
         items.add(allProxyUpItem);
 
         /* all proxy connections down */
         final UpdatableItem allProxyDownItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
-                           null,
-                           hostDrbdInfo.getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
-                           new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return host.isConnected() && host.isDrbdProxyRunning();
-                }
-
-                @Override
-                public void action() {
-                    DRBD.proxyDown(host, DRBD.ALL, null, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
+                        null,
+                        hostDrbdInfo.getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
+                        new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        .visiblePredicate(new VisiblePredicate() {
+                            @Override
+                            public boolean check() {
+                                return host.isConnected() && host.isDrbdProxyRunning();
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.proxyDown(host, DRBD.ALL, null, runMode);
+                                hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
+                            }
+                        });
         items.add(allProxyDownItem);
 
         /* load DRBD config / adjust all */
         final MyMenuItem adjustAllItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isConnected()) {
-                        return null;
-                    } else {
-                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.adjust(host, DRBD.ALL, null, runMode);
-                    hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isConnected()) {
+                                    return null;
+                                } else {
+                                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.adjust(host, DRBD.ALL, null, runMode);
+                                hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
+                            }
+                        });
         items.add(adjustAllItem);
         final ClusterBrowser cb = hostDrbdInfo.getBrowser().getClusterBrowser();
         if (cb != null) {
-            final ButtonCallback adjustAllItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.adjust(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback adjustAllItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.adjust(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(adjustAllItem, adjustAllItemCallback);
         }
 
         /* start drbd */
         final MyMenuItem upAllItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.UpAll"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.UpAll"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.ADMIN, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (!host.isDrbdStatusOk()) {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    DRBD.up(host, DRBD.ALL, null, runMode);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.UpAll"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.UpAll"),
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (!host.isDrbdStatusOk()) {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.up(host, DRBD.ALL, null, runMode);
+                            }
+                        });
         items.add(upAllItem);
         if (cb != null) {
-            final ButtonCallback upAllItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.up(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback upAllItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.up(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(upAllItem, upAllItemCallback);
         }
 
         /* change host color */
         final UpdatableItem changeHostColorItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    final Color newColor = JColorChooser.showDialog(LCMC.MAIN_FRAME,
-                            "Choose " + host.getName() + " color",
-                            host.getPmColors()[0]);
-                    if (newColor != null) {
-                        host.setSavedHostColorInGraphs(newColor);
-                    }
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                final Color newColor = JColorChooser.showDialog(LCMC.MAIN_FRAME,
+                                        "Choose " + host.getName() + " color",
+                                        host.getPmColors()[0]);
+                                if (newColor != null) {
+                                    host.setSavedHostColorInGraphs(newColor);
+                                }
+                            }
+                        });
         items.add(changeHostColorItem);
 
         /* view logs */
         final UpdatableItem viewLogsItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                           Info.LOGFILE_ICON,
-                           Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (!host.isConnected()) {
-                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    final DrbdsLog l = new DrbdsLog(host);
-                    l.showDialog();
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
+                        Info.LOGFILE_ICON,
+                        Tools.getString("HostBrowser.Drbd.ViewLogs"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (!host.isConnected()) {
+                                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                final DrbdsLog drbdsLog = drbdsLogProvider.get();
+                                drbdsLog.init(host);
+                                drbdsLog.showDialog();
+                            }
+                        });
         items.add(viewLogsItem);
 
         /* connect all */
         final MyMenuItem connectAllItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.ConnectAll"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.ConnectAll"),
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isDrbdStatusOk()) {
-                        return null;
-                    } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ConnectAll"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.ConnectAll"),
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isDrbdStatusOk()) {
+                                    return null;
+                                } else {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            }
+                        });
         items.add(connectAllItem);
         if (cb != null) {
-            final ButtonCallback connectAllItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback connectAllItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(connectAllItem, connectAllItemCallback);
         }
 
         /* disconnect all */
         final MyMenuItem disconnectAllItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.DisconnectAll"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.DisconnectAll"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isDrbdStatusOk()) {
-                        return null;
-                    } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.disconnect(host, DRBD.ALL, null, runMode);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.DisconnectAll"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.DisconnectAll"),
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isDrbdStatusOk()) {
+                                    return null;
+                                } else {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.disconnect(host, DRBD.ALL, null, runMode);
+                            }
+                        });
         items.add(disconnectAllItem);
         if (cb != null) {
-            final ButtonCallback disconnectAllItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.disconnect(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback disconnectAllItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.disconnect(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(disconnectAllItem, disconnectAllItemCallback);
         }
 
         /* attach dettached */
         final MyMenuItem attachAllItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.AttachAll"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.AttachAll"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isDrbdStatusOk()) {
-                        return null;
-                    } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.attach(host, DRBD.ALL, null, runMode);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.AttachAll"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.AttachAll"),
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isDrbdStatusOk()) {
+                                    return null;
+                                } else {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.attach(host, DRBD.ALL, null, runMode);
+                            }
+                        });
         items.add(attachAllItem);
         if (cb != null) {
-            final ButtonCallback attachAllItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.attach(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback attachAllItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.attach(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(attachAllItem, attachAllItemCallback);
         }
 
         /* detach */
         final MyMenuItem detachAllItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.DetachAll"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.DetachAll"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isDrbdStatusOk()) {
-                        return null;
-                    } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.detach(host, DRBD.ALL, null, runMode);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.DetachAll"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.DetachAll"),
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isDrbdStatusOk()) {
+                                    return null;
+                                } else {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.detach(host, DRBD.ALL, null, runMode);
+                            }
+                        });
         items.add(detachAllItem);
         if (cb != null) {
-            final ButtonCallback detachAllItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.detach(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback detachAllItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.detach(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(detachAllItem, detachAllItemCallback);
         }
 
         /* set all primary */
         final MyMenuItem setAllPrimaryItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isDrbdStatusOk()) {
-                        return null;
-                    } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.setPrimary(host, DRBD.ALL, null, runMode);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isDrbdStatusOk()) {
+                                    return null;
+                                } else {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.setPrimary(host, DRBD.ALL, null, runMode);
+                            }
+                        });
         items.add(setAllPrimaryItem);
         if (cb != null) {
-            final ButtonCallback setAllPrimaryItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.setPrimary(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback setAllPrimaryItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.setPrimary(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(setAllPrimaryItem, setAllPrimaryItemCallback);
         }
 
         /* set all secondary */
         final MyMenuItem setAllSecondaryItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
-                           null,
-                           Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.ADMIN, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (host.isDrbdStatusOk()) {
-                        return null;
-                    } else {
-                        return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
-                    }
-                }
-
-                @Override
-                public void action() {
-                    DRBD.setSecondary(host, DRBD.ALL, null, runMode);
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
+                        null,
+                        Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
+                        new AccessMode(Application.AccessType.ADMIN, false),
+                        new AccessMode(Application.AccessType.ADMIN, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (host.isDrbdStatusOk()) {
+                                    return null;
+                                } else {
+                                    return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.setSecondary(host, DRBD.ALL, null, runMode);
+                            }
+                        });
         items.add(setAllSecondaryItem);
         if (cb != null) {
-            final ButtonCallback setAllSecondaryItemCallback = cb.new DRBDMenuItemCallback(host) {
-                @Override
-                public void action(final Host dcHost) {
-                    DRBD.setSecondary(host, DRBD.ALL, null, Application.RunMode.TEST);
-                }
-            };
+            final ButtonCallback setAllSecondaryItemCallback = cb.new DRBDMenuItemCallback(host)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            DRBD.setSecondary(host, DRBD.ALL, null, Application.RunMode.TEST);
+                        }
+                    });
             hostDrbdInfo.addMouseOverListener(setAllSecondaryItem, setAllSecondaryItemCallback);
         }
 
         /* remove host from gui */
         final UpdatableItem removeHostItem =
-            new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
-                           HostBrowser.HOST_REMOVE_ICON,
-                           Tools.getString("HostBrowser.RemoveHost"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (!host.isInCluster()) {
-                        return "it is a member of a cluster";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    host.disconnect();
-                    Tools.getApplication().removeHostFromHosts(host);
-                    guiData.allHostsUpdate();
-                }
-            };
+                menuFactory.createMenuItem(Tools.getString("HostBrowser.RemoveHost"),
+                        HostBrowser.HOST_REMOVE_ICON,
+                        Tools.getString("HostBrowser.RemoveHost"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (!host.isInCluster()) {
+                                    return "it is a member of a cluster";
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                host.disconnect();
+                                application.removeHostFromHosts(host);
+                                guiData.allHostsUpdate();
+                            }
+                        });
         items.add(removeHostItem);
 
         /* advanced options */
-        final UpdatableItem hostAdvancedSubmenu = new MyMenu(
-                                Tools.getString("HostBrowser.AdvancedSubmenu"),
-                                new AccessMode(Application.AccessType.OP, false),
-                                new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
+        final MyMenu hostAdvancedSubmenu = menuFactory.createMenu(
+                Tools.getString("HostBrowser.AdvancedSubmenu"),
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (!host.isConnected()) {
+                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                        }
+                        return null;
+                    }
+                });
+        hostAdvancedSubmenu.onUpdate(new Runnable() {
             @Override
-            public String enablePredicate() {
-                if (!host.isConnected()) {
-                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                }
-                return null;
+            public void run() {
+                hostAdvancedSubmenu.updateMenuComponents();
+                hostDrbdInfo.getBrowser().addAdvancedMenu(hostAdvancedSubmenu);
+                hostAdvancedSubmenu.processAccessMode();
             }
-
-            @Override
-            public void updateAndWait() {
-                super.updateAndWait();
-                hostDrbdInfo.getBrowser().addAdvancedMenu(this);
-            }
-        };
+        });
         items.add(hostAdvancedSubmenu);
         items.add(getLVMMenu(host));
         return items;
     }
 
-    /** Returns lvm menu. */
+    /**
+     * Returns lvm menu.
+     */
     private UpdatableItem getLVMMenu(final Host host) {
-        return new MyMenu(LVM_MENU,
-                          new AccessMode(Application.AccessType.OP, true),
-                          new AccessMode(Application.AccessType.OP, true)) {
-            private static final long serialVersionUID = 1L;
-
+        final MyMenu lvmMenu = menuFactory.createMenu(LVM_MENU,
+                new AccessMode(Application.AccessType.OP, true),
+                new AccessMode(Application.AccessType.OP, true));
+        lvmMenu.onUpdate(new Runnable() {
             @Override
-            public void updateAndWait() {
-                super.updateAndWait();
-                addLVMMenu(this, host);
+            public void run() {
+                lvmMenu.updateMenuComponents();
+                addLVMMenu(lvmMenu, host);
+                lvmMenu.processAccessMode();
             }
-        };
+        });
+        return lvmMenu;
     }
 
     private void addLVMMenu(final MyMenu submenu, final Host host) {
@@ -609,69 +627,71 @@ public class HostDrbdMenu {
     }
 
     private MyMenuItem getVGCreateItem(final Host host) {
-        final MyMenuItem mi = new MyMenuItem(VG_CREATE_MENU_ITEM,
-                                             null,
-                                             VG_CREATE_MENU_DESCRIPTION,
-                                             new AccessMode(Application.AccessType.OP, false),
-                                             new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                final VGCreate vgCreate = new VGCreate(host);
-                while (true) {
-                    vgCreate.showDialog();
-                    if (vgCreate.isPressedCancelButton()) {
-                        vgCreate.cancelDialog();
-                        return;
-                    } else if (vgCreate.isPressedFinishButton()) {
-                        break;
+        final MyMenuItem mi = menuFactory.createMenuItem(VG_CREATE_MENU_ITEM,
+                null,
+                VG_CREATE_MENU_DESCRIPTION,
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        final VGCreate vgCreate = vgCreateProvider.get();
+                        vgCreate.init(host);
+                        while (true) {
+                            vgCreate.showDialog();
+                            if (vgCreate.isPressedCancelButton()) {
+                                vgCreate.cancelDialog();
+                                return;
+                            } else if (vgCreate.isPressedFinishButton()) {
+                                break;
+                            }
+                        }
                     }
-                }
-            }
-        };
+                });
         mi.setToolTipText(VG_CREATE_MENU_DESCRIPTION);
         return mi;
     }
 
-    /** Return create LV menu item. */
-    private MyMenuItem getLVMCreateItem(final String volumeGroup,
-                                        final BlockDevice blockDevice,
-                                        final Host host) {
+    /**
+     * Return create LV menu item.
+     */
+    private MyMenuItem getLVMCreateItem(final String volumeGroup, final BlockDevice blockDevice, final Host host) {
         final String name = LV_CREATE_MENU_ITEM + volumeGroup;
-        final MyMenuItem mi = new MyMenuItem(name,
-                                             null,
-                                             LV_CREATE_MENU_DESCRIPTION,
-                                             new AccessMode(Application.AccessType.OP, false),
-                                             new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public boolean visiblePredicate() {
-                return volumeGroup != null
-                       && !volumeGroup.isEmpty()
-                       && host.getVolumeGroupNames().contains(volumeGroup);
-            }
-
-            @Override
-            public void action() {
-                final LVCreate lvCreate = new LVCreate(host, volumeGroup, blockDevice);
-                while (true) {
-                    lvCreate.showDialog();
-                    if (lvCreate.isPressedCancelButton()) {
-                        lvCreate.cancelDialog();
-                        return;
-                    } else if (lvCreate.isPressedFinishButton()) {
-                        break;
+        final MyMenuItem mi = menuFactory.createMenuItem(name,
+                null,
+                LV_CREATE_MENU_DESCRIPTION,
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                    @Override
+                    public boolean check() {
+                        return volumeGroup != null
+                                && !volumeGroup.isEmpty()
+                                && host.getVolumeGroupNames().contains(volumeGroup);
                     }
-                }
-            }
-
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        final LVCreate lvCreate = lvCreateProvider.get();
+                        lvCreate.init(host, volumeGroup, blockDevice);
+                        while (true) {
+                            lvCreate.showDialog();
+                            if (lvCreate.isPressedCancelButton()) {
+                                lvCreate.cancelDialog();
+                                return;
+                            } else if (lvCreate.isPressedFinishButton()) {
+                                break;
+                            }
+                        }
+                    }
+                });
+        mi.onUpdate(new Runnable() {
             @Override
-            public void updateAndWait() {
-                setText1(LV_CREATE_MENU_ITEM + volumeGroup);
-                super.updateAndWait();
+            public void run() {
+                mi.setText1(LV_CREATE_MENU_ITEM + volumeGroup);
             }
-        };
+        });
 
         mi.setToolTipText(LV_CREATE_MENU_DESCRIPTION);
         return mi;

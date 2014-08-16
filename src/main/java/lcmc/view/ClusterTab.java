@@ -27,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Cluster;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterViewPanel;
@@ -48,17 +49,16 @@ import org.springframework.stereotype.Component;
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
     private JLabel labelTitle;
-
     @Autowired
     private EmptyViewPanel emptyViewPanel;
-
     @Autowired
     private ClusterPresenter clusterPresenter;
-
     @Autowired
     private ClusterViewPanel clusterViewPanel;
 
     public static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void initWithCluster(final Cluster cluster0) {
         this.cluster = cluster0;
@@ -128,7 +128,7 @@ public final class ClusterTab extends JPanel {
     }
 
     private MyButton getCloseButton() {
-        final MyButton closeButton = new MyButton("X");
+        final MyButton closeButton = widgetFactory.createButton("X");
         closeButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         closeButton.setMargin(new Insets(0, 0, 0, 0));
         closeButton.setIconTextGap(0);

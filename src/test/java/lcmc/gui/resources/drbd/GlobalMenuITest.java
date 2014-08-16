@@ -21,34 +21,54 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-import lcmc.testutils.annotation.type.GuiTest;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+
+import lcmc.model.AccessMode;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@Category(GuiTest.class)
+import javax.swing.*;
+
+@RunWith(MockitoJUnitRunner.class)
 public class GlobalMenuITest {
 
     @Mock
     private GlobalInfo globalInfo;
-
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
     private GlobalMenu globalMenu;
 
     @Before
     public void setUp() {
-        Tools.init();
-
-        globalMenu = new GlobalMenu();
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = globalMenu.getPulldownMenu(globalInfo);
 
+        verify(menuItemStub, never()).predicate((Predicate) anyObject());
+        verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, never()).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(4)).addAction((MenuAction) anyObject());
         assertEquals(4, items.size());
     }
 }

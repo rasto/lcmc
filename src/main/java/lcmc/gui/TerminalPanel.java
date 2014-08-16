@@ -49,8 +49,10 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.robotest.RoboTest;
+import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
@@ -115,10 +117,10 @@ public class TerminalPanel extends JScrollPane {
     private RoboTest roboTest;
     private static final Map<String, Test> TEST_CHEATS = new HashMap<String, Test>();
     static {
-        for (final RoboTest.Type type : new RoboTest.Type[]{RoboTest.Type.PCMK,
-                                                            RoboTest.Type.DRBD,
-                                                            RoboTest.Type.VM,
-                                                            RoboTest.Type.GUI}) {
+        for (final StartTests.Type type : new StartTests.Type[]{StartTests.Type.PCMK,
+                                                                StartTests.Type.DRBD,
+                                                                StartTests.Type.VM,
+                                                                StartTests.Type.GUI}) {
             for (final char index : new Character[]{
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'}) {
                 TEST_CHEATS.put(type.getTestName() + index, new Test(type, index));
@@ -172,6 +174,10 @@ public class TerminalPanel extends JScrollPane {
     private Color defaultOutputColor;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private StartTests srartTests;
 
     public void initWithHost(final Host host0) {
         host = host0;
@@ -185,7 +191,7 @@ public class TerminalPanel extends JScrollPane {
         terminalColor.put("34", Tools.getDefaultColor("TerminalPanel.TerminalBlue"));
         terminalColor.put("35", Tools.getDefaultColor("TerminalPanel.TerminalPurple"));
         terminalColor.put("36", Tools.getDefaultColor("TerminalPanel.TerminalCyan"));
-        final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(14));
+        final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(14));
         terminalArea = new JTextPane();
         terminalArea.setStyledDocument(new MyDocument());
         final Caret caret = new DefaultCaret() {
@@ -441,7 +447,7 @@ public class TerminalPanel extends JScrollPane {
      * and scrolls the text up.
      */
     public void nextCommand() {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 append(prompt(), promptColor);
@@ -453,7 +459,7 @@ public class TerminalPanel extends JScrollPane {
     public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 append(lines[0], commandColor);
@@ -467,7 +473,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 append(output, outputColor);
@@ -477,7 +483,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds array of command output to the terminal textarea and scrolls up. */
     void addCommandOutput(final String[] output) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (int i = 0; i < output.length; i++) {
@@ -495,7 +501,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds content string (output of a command) to the terminal area. */
     public void addContent(final String c) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(c, outputColor);
@@ -505,7 +511,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds content to the terminal textarea and scrolls up. */
     public void addContentErr(final String c) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(c, errorColor);
@@ -577,7 +583,7 @@ public class TerminalPanel extends JScrollPane {
         } else if (DEBUG_DEC.equals(cheat)) {
             LoggerFactory.decrementDebugLevel();
         } else if (TEST_CHEATS.containsKey(cheat)) {
-            roboTest.startTest(TEST_CHEATS.get(cheat), host.getCluster());
+            srartTests.startTest(TEST_CHEATS.get(cheat), host.getCluster());
         } else if (REGISTER_MOVEMENT.equals(cheat)) {
             roboTest.registerMovement();
         }

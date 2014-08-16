@@ -28,6 +28,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.model.Application;
 import lcmc.model.vm.VmsXml;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
@@ -64,6 +66,8 @@ public final class Domain extends VMConfig {
     private InstallationDisk installationDiskDialog;
     @Autowired
     private Filesystem filesystemDialog;
+    @Autowired
+    private Application application;
 
     @Override
     public WizardDialog nextDialog() {
@@ -105,13 +109,13 @@ public final class Domain extends VMConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 domainNameWidget.requestFocus();
@@ -138,8 +142,8 @@ public final class Domain extends VMConfig {
         vdi.addWizardParams(optionsPanel,
                             PARAMS,
                             buttonClass(nextButton()),
-                            Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                            Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                            application.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                            application.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                             null);
         domainNameWidget = vdi.getWidget(VmsXml.VM_PARAM_NAME, Widget.WIZARD_PREFIX);
         panel.add(optionsPanel);

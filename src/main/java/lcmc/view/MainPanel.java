@@ -58,7 +58,6 @@ public final class MainPanel extends JPanel {
         setLayout(new BorderLayout());
         clustersPanel.init();
         final Host noHost = hostFactory.createInstance();
-        noHost.init();
         final JSplitPane splitPane =
                                 new JSplitPane(JSplitPane.VERTICAL_SPLIT, clustersPanel, noHost.getTerminalPanel());
         guiData.setTerminalSplitPane(splitPane);

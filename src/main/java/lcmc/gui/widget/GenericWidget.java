@@ -21,7 +21,6 @@ package lcmc.gui.widget;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -60,19 +59,25 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class GenericWidget<T extends JComponent> extends JPanel implements Widget {
     private static final Logger LOG = LoggerFactory.getLogger(GenericWidget.class);
     private T component;
     private boolean editable = false;
     private boolean alwaysEditable = false;
     /** File chooser button or some other button. */
-    private final MyButton fieldButton;
+    private MyButton fieldButton;
     /** Component part of field with button. */
     private T componentPart = null;
     private JLabel label = null;
@@ -86,18 +91,19 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private final Lock mValueReadLock = mValueLock.readLock();
     private final Lock mValueWriteLock = mValueLock.writeLock();
     /** Regexp that this field must match. */
-    private final String regexp;
+    private String regexp;
     private String disabledReason = null;
     private final Collection<WidgetListener> widgetListeners = new ArrayList<WidgetListener>();
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
+    @Autowired
+    private Application application;
 
-    public GenericWidget(final String regexp, final AccessMode enableAccessMode) {
-        this(regexp, enableAccessMode, NO_BUTTON);
+    public void init(final String regexp, final AccessMode enableAccessMode) {
+        this.init(regexp, enableAccessMode, NO_BUTTON);
     }
 
-    public GenericWidget(final String regexp, final AccessMode enableAccessMode, final MyButton fieldButton) {
-        super();
+    public void init(final String regexp, final AccessMode enableAccessMode, final MyButton fieldButton) {
         this.enableAccessMode = enableAccessMode;
         this.fieldButton = fieldButton;
         setLayout(new BorderLayout(0, 0));
@@ -152,7 +158,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
             text = text + "<br>" + disabledReason0;
         }
         if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
-            final boolean accessible = Tools.getApplication().isAccessible(enableAccessMode);
+            final boolean accessible = application.isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
             }
@@ -171,7 +177,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         String disabledTooltip = null;
         if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
-            final boolean accessible = Tools.getApplication().isAccessible(enableAccessMode);
+            final boolean accessible = application.isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
             }
@@ -265,7 +271,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         final JComponent comp = c;
         super.setVisible(visible);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -287,7 +293,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     @Override
     public final void setEnabled(final boolean enabled) {
         enablePredicate = enabled;
-        setComponentsEnabled(enablePredicate && Tools.getApplication().isAccessible(enableAccessMode));
+        setComponentsEnabled(enablePredicate && application.isAccessible(enableAccessMode));
     }
 
     /** Sets extra button enabled. */
@@ -363,7 +369,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         if (Tools.areEqual(item, getValue())) {
             return;
         }
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 mValueWriteLock.lock();
@@ -602,7 +608,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);
@@ -626,7 +632,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Sets this item enabled and visible according to its access type. */
     @Override
     public final void processAccessMode() {
-        final boolean accessible = Tools.getApplication().isAccessible(enableAccessMode);
+        final boolean accessible = application.isAccessible(enableAccessMode);
         setComponentsEnabled(enablePredicate && accessible);
         if (toolTipText != null) {
             setToolTipText(toolTipText);
@@ -667,7 +673,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     /** Returns this widget, so that the interface Widget can be used in other
      *  components. */
     @Override
-    public final Component getComponent() {
+    public final java.awt.Component getComponent() {
         return this;
     }
 
@@ -723,7 +729,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
 
         private void doClick(final EventObject e) {
-            final Component c = (Component) e.getSource();
+            final java.awt.Component c = (java.awt.Component) e.getSource();
 
             final JRootPane rootPane = SwingUtilities.getRootPane(c);
 

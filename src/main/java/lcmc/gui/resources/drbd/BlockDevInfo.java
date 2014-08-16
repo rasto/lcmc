@@ -124,6 +124,8 @@ public class BlockDevInfo extends EditableInfo {
     private GUIData guiData;
     @Autowired
     private BlockDevMenu blockDevMenu;
+    @Autowired
+    private Application application;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
         super.init(name, browser);
@@ -459,7 +461,7 @@ public class BlockDevInfo extends EditableInfo {
         final Widget paramWi;
         if (DRBD_MD_INDEX_PARAM.equals(param)) {
             paramWi = super.createWidget(param, prefix, width);
-            //Tools.invokeLater(new Runnable() {
+            //application.invokeLater(new Runnable() {
             //    @Override
             //    public void run() {
             //        gwi.setAlwaysEditable(true);
@@ -468,7 +470,7 @@ public class BlockDevInfo extends EditableInfo {
         } else {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     gwi.setEditable(false);
@@ -497,7 +499,7 @@ public class BlockDevInfo extends EditableInfo {
                             indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         }
                     }
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                    application.invokeLater(!Application.CHECK_SWING_THREAD,
                     new Runnable() {
                         @Override
                         public void run() {
@@ -505,7 +507,7 @@ public class BlockDevInfo extends EditableInfo {
                         }
                     });
                     if (indW != null) {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                        application.invokeLater(!Application.CHECK_SWING_THREAD,
                         new Runnable() {
                             @Override
                             public void run() {
@@ -902,7 +904,7 @@ public class BlockDevInfo extends EditableInfo {
     /** Returns the info panel. */
     @Override
     public JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         return getInfoPanelBD();
     }
 
@@ -920,7 +922,7 @@ public class BlockDevInfo extends EditableInfo {
     public void apply(final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -951,7 +953,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Returns block device panel. */
     JComponent getInfoPanelBD() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (infoPanel != null) {
             infoPanelDone();
             return infoPanel;
@@ -1038,8 +1040,8 @@ public class BlockDevInfo extends EditableInfo {
 
             addParams(optionsPanel,
                 params,
-                Tools.getDefaultSize("HostBrowser.DrbdDevLabelWidth"),
-                Tools.getDefaultSize("HostBrowser.DrbdDevFieldWidth"),
+                application.getDefaultSize("HostBrowser.DrbdDevLabelWidth"),
+                application.getDefaultSize("HostBrowser.DrbdDevFieldWidth"),
                 null);
 
             /* apply button */
@@ -1049,7 +1051,7 @@ public class BlockDevInfo extends EditableInfo {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.invokeAndWait(new Runnable() {
+                            application.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     getApplyButton().setEnabled(false);
@@ -1407,7 +1409,7 @@ public class BlockDevInfo extends EditableInfo {
 
     /** Sets stored parameters. */
     public void setParameters(final String resName) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         getBlockDevice().setNew(false);
 
         final ClusterBrowser clusterBrowser = getBrowser().getClusterBrowser();

@@ -41,7 +41,6 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.DRBD;
@@ -64,14 +63,18 @@ final class CreateMD extends DrbdConfig {
     private static final int COMBOBOX_WIDTH = 250;
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
-    private final MyButton makeMetaDataButton = new MyButton();
     @Autowired
     private GUIData guiData;
     @Autowired
     private CreateFS createFSDialog;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private MyButton makeMetaDataButton;
 
     private void createMetadataAndCheckResult(final boolean destroyData) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeMetaDataButton.setEnabled(false);
@@ -93,7 +96,7 @@ final class CreateMD extends DrbdConfig {
                         new ExecCallback() {
                             @Override
                             public void done(final String answer) {
-                                Tools.invokeLater(new Runnable() {
+                                application.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeMetaDataButton.setEnabled(false);
@@ -155,12 +158,12 @@ final class CreateMD extends DrbdConfig {
         if (error) {
             answerPaneSetTextError(Tools.join("\n", answerStore));
         } else {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMetaDataButton.setEnabled(false);
                     buttonClass(nextButton()).setEnabled(true);
-                    if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+                    if (application.getAutoOptionGlobal("autodrbd") != null) {
                         pressNextButton();
                     }
                 }
@@ -230,8 +233,8 @@ final class CreateMD extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
-            Tools.invokeLater(new Runnable() {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeMetaDataButton.pressButton();
@@ -252,11 +255,12 @@ final class CreateMD extends DrbdConfig {
         final String createNewMetadata = Tools.getString("Dialog.DrbdConfig.CreateMD.CreateNewMetadata");
         final String createNewMetadataDestroyData =
                                         Tools.getString("Dialog.DrbdConfig.CreateMD.CreateNewMetadataDestroyData");
+        makeMetaDataButton = widgetFactory.createButton();
         if (getDrbdVolumeInfo().getDrbdResourceInfo().isHaveToCreateMD()) {
             final Value[] choices = {new StringValue(createNewMetadata), new StringValue(createNewMetadataDestroyData)};
             makeMetaDataButton.setEnabled(true);
             makeMetaDataButton.setText(Tools.getString("Dialog.DrbdConfig.CreateMD.CreateMDButton"));
-            metadataWidget = WidgetFactory.createInstance(
+            metadataWidget = widgetFactory.createInstance(
                                         Widget.Type.COMBOBOX,
                                         new StringValue(createNewMetadata),
                                         choices,
@@ -272,11 +276,11 @@ final class CreateMD extends DrbdConfig {
             makeMetaDataButton.setEnabled(false);
             makeMetaDataButton.setText(Tools.getString("Dialog.DrbdConfig.CreateMD.OverwriteMDButton"));
             String metadataDefault = useExistingMetadata;
-            if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+            if (application.getAutoOptionGlobal("autodrbd") != null) {
                 metadataDefault = createNewMetadata;
                 makeMetaDataButton.setEnabled(true);
             }
-            metadataWidget = WidgetFactory.createInstance(
+            metadataWidget = widgetFactory.createInstance(
                                         Widget.Type.COMBOBOX,
                                         new StringValue(metadataDefault),
                                         choices,

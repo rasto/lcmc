@@ -21,31 +21,33 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
+
+import lcmc.model.AccessMode;
 import lcmc.model.Host;
 import lcmc.model.resources.Resource;
 import lcmc.model.resources.Service;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.swing.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CloneMenuTest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private CloneInfo cloneInfoStub;
-    @Mock
-    private ServiceInfo containedServiceInfoStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
@@ -54,26 +56,60 @@ public class CloneMenuTest {
     private Service serviceStub;
     @Mock
     private Host hostStub;
-
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MyMenu menuStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @Mock
+    private ServiceMenu serviceMenu;
     @InjectMocks
     private CloneMenu cloneMenu;
 
     @Before
     public void setUp() {
-        when(serviceStub.isMaster()).thenReturn(true);
         when(cloneInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(cloneInfoStub.getResource()).thenReturn(resourceStub);
         when(cloneInfoStub.getService()).thenReturn(serviceStub);
-        when(cloneInfoStub.getContainedService()).thenReturn(containedServiceInfoStub);
-        final Host[] hosts = new Host[]{hostStub};
-        when(clusterBrowserStub.getClusterHosts()).thenReturn(hosts);
-        cloneMenu = new CloneMenu();
+        when(clusterBrowserStub.getClusterHosts()).thenReturn(new Host[]{hostStub});
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
+        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = cloneMenu.getPulldownMenu(cloneInfoStub);
 
-        assertEquals(17, items.size());
+        verify(menuItemStub, times(3)).predicate((Predicate) anyObject());
+        verify(menuItemStub, times(4)).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(9)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(11)).addAction((MenuAction) anyObject());
+        verify(menuStub, times(4)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuStub, times(3)).onUpdate((Runnable) anyObject());
+        assertEquals(15, items.size());
     }
 }

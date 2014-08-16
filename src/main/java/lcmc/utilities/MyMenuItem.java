@@ -42,12 +42,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JToolTip;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.
  */
-public abstract class MyMenuItem extends JMenuItem
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+public class MyMenuItem extends JMenuItem
 implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Logger. */
     private static final Logger LOG =
@@ -60,7 +66,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Text of the item. */
     private String text1;
     /** Icon of the item. */
-    private final ImageIcon icon1;
+    private ImageIcon icon1;
     /** Short decription of the item for tool tip. */
     private String shortDesc1;
     /** Alternate text of the item. */
@@ -74,30 +80,52 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     /** Pos of the click that can be used in the overriden action method. */
     private Point2D pos;
     /** Robot to move a mouse a little if a tooltip has changed. */
-    private final Robot robot;
+    private Robot robot;
     /** Tooltip background color. */
     private Color toolTipBackground = null;
     /** Access Type for this component to become enabled. */
-    private final AccessMode enableAccessMode;
+    private AccessMode enableAccessMode;
     /** Access Type for this component to become visible. */
-    private final AccessMode visibleAccessMode;
+    private AccessMode visibleAccessMode;
     /** Original tool tip text. */
     private String origToolTipText = "";
+    @Autowired
+    private Application application;
 
-    /**
-     * Prepares a new {@code MyMenuItem} object with icon but without
-     * tooltip.
-     *
-     * @param text
-     *          text of the item
-     * @param icon
-     *          icon of the item
-     */
-    protected MyMenuItem(final String text,
-                         final ImageIcon icon,
-                         final AccessMode enableAccessMode,
-                         final AccessMode visibleAccessMode) {
-        super(text);
+    private MenuAction menuAction;
+
+    private Predicate predicate = new Predicate() {
+        @Override
+        public boolean check() {
+            return true;
+        }
+    };
+
+    private EnablePredicate enablePredicate = new EnablePredicate() {
+        @Override
+        public String check() {
+            return null;
+        }
+    };
+
+    private VisiblePredicate visiblePredicate = new VisiblePredicate() {
+        @Override
+        public boolean check() {
+            return true;
+        }
+    };
+
+    private Runnable update = new Runnable() {
+        @Override
+        public void run() {
+        }
+    };
+
+    protected void init(final String text,
+                        final ImageIcon icon,
+                        final AccessMode enableAccessMode,
+                        final AccessMode visibleAccessMode) {
+        super.setText(text);
         text1 = text;
         icon1 = icon;
         this.enableAccessMode = enableAccessMode;
@@ -106,16 +134,16 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         toolTip.setTipText(text);
         setNormalFont();
         addActionListener(this);
-        Robot r = null;
+        Robot robot = null;
         try {
-            r = new Robot(SCREEN_DEVICE);
+            robot = new Robot(SCREEN_DEVICE);
         } catch (final AWTException e) {
             LOG.appError("MyMenuItem: robot error");
         }
-        robot = r;
+        this.robot = robot;
         processAccessMode();
         setIconAndTooltip();
-        Tools.isSwingThread();
+        application.isSwingThread();
     }
 
 
@@ -129,12 +157,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * @param shortDesc
      *          short description for the tool tip of the item
      */
-    protected MyMenuItem(final String text,
-                         final ImageIcon icon,
-                         final String shortDesc,
-                         final AccessMode enableAccessMode,
-                         final AccessMode visibleAccessMode) {
-        super(text);
+    protected void init(final String text,
+                        final ImageIcon icon,
+                        final String shortDesc,
+                        final AccessMode enableAccessMode,
+                        final AccessMode visibleAccessMode) {
+        super.setText(text);
         if (shortDesc != null && !shortDesc.isEmpty()) {
             toolTip = createToolTip();
             toolTip.setTipText(shortDesc);
@@ -159,7 +187,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         robot = r;
         processAccessMode();
         setIconAndTooltip();
-        Tools.isSwingThread();
+        application.isSwingThread();
     }
 
     /**
@@ -179,15 +207,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
      * @param shortDesc2
      *          short description for the tool tip of the alternate item
      */
-    protected MyMenuItem(final String text1a,
-                         final ImageIcon icon1a,
-                         final String shortDesc1a,
-                         final String text2,
-                         final ImageIcon icon2,
-                         final String shortDesc2,
-                         final AccessMode enableAccessMode,
-                         final AccessMode visibleAccessMode) {
-        this(text1a, icon1a, shortDesc1a, enableAccessMode, visibleAccessMode);
+    protected void init(final String text1a,
+                        final ImageIcon icon1a,
+                        final String shortDesc1a,
+                        final String text2,
+                        final ImageIcon icon2,
+                        final String shortDesc2,
+                        final AccessMode enableAccessMode,
+                        final AccessMode visibleAccessMode) {
+        init(text1a, icon1a, shortDesc1a, enableAccessMode, visibleAccessMode);
         this.text2 = text2;
         this.icon2 = icon2;
         if (shortDesc2 == null) {
@@ -209,7 +237,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     }
 
     /** Returns the saved position. */
-    protected final Point2D getPos() {
+    public final Point2D getPos() {
         return pos;
     }
 
@@ -219,7 +247,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -233,7 +261,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.ITALIC;
         final int size    = font.getSize();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));
@@ -241,40 +269,41 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         });
     }
 
-    /**
-     * This method can be overriden to define an action that should be taken
-     * after the item is selected.
-     */
-    public abstract void action();
+    //  /**
+    //   * This method can be overriden to define an action that should be taken
+    //   * after the item is selected.
+    //   */
+  //    public abstract void action();
 
-    /** Returns false if the alternate menu item text etc. should be shown. */
-    public boolean predicate() {
-        return true;
-    }
+//    /** Returns false if the alternate menu item text etc. should be shown. */
+//    public boolean predicate() {
+//        return true;
+//    }
 
-    /**
-     * Returns whether the item should be enabled or not.
-     * null if it should be enabled or some string that can be used as
-     * tooltip if it should be disabled.
-     */
-    public String enablePredicate() {
-        return null;
-    }
+//    /**
+//     * Returns whether the item should be enabled or not.
+//     * null if it should be enabled or some string that can be used as
+//     * tooltip if it should be disabled.
+//     */
+//    public String enablePredicate() {
+//        return null;
+//    }
 
-    /** Returns whether the item should be visible or not. */
-    public boolean visiblePredicate() {
-        return true;
-    }
+//    /** Returns whether the item should be visible or not. */
+//    public boolean visiblePredicate() {
+//        return true;
+//    }
 
     /** Updates the menu item, checking the predicate and enablePredicate. */
     @Override
     public void updateAndWait() {
+        update.run();
         processAccessMode();
         setIconAndTooltip();
     }
 
     private void setIconAndTooltip() {
-        if (predicate()) {
+        if (predicate.check()) {
             setText(text1);
             if (icon1 != null) {
                 setIcon(icon1);
@@ -301,13 +330,11 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
 
     /** Sets this item enabled and visible according to its access type. */
     private void processAccessMode() {
-        final boolean accessible =
-                   Tools.getApplication().isAccessible(enableAccessMode);
-        final String disableTooltip = enablePredicate();
-        final boolean visible = visiblePredicate();
+        final boolean accessible = application.isAccessible(enableAccessMode);
+        final String disableTooltip = enablePredicate.check();
+        final boolean visible = visiblePredicate.check();
         setEnabled(disableTooltip == null && accessible);
-        setVisible(visible
-                   && Tools.getApplication().isAccessible(visibleAccessMode));
+        setVisible(visible && application.isAccessible(visibleAccessMode));
         if (toolTip != null && isVisible()) {
             if (!accessible && enableAccessMode.getAccessType()
                                != Application.AccessType.NEVER) {
@@ -341,11 +368,15 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     @Override
     public void actionPerformed(final ActionEvent e) {
         LOG.debug1("actionPerformed: ACTION: " + e.getSource());
+        actionThread();
+    }
+
+    public void actionThread() {
         final Thread thread = new Thread(
             new Runnable() {
                 @Override
                 public void run() {
-                    action();
+                    menuAction.run(getText());
                 }
             }
         );
@@ -469,4 +500,28 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.text1 = text1;
     }
 
+    public MyMenuItem addAction(final MenuAction menuAction) {
+        this.menuAction = menuAction;
+        return this;
+    }
+
+    public MyMenuItem predicate(final Predicate predicate) {
+        this.predicate = predicate;
+        return this;
+    }
+
+    public MyMenuItem enablePredicate(final EnablePredicate enablePredicate) {
+        this.enablePredicate = enablePredicate;
+        return this;
+    }
+
+    public MyMenuItem visiblePredicate(final VisiblePredicate visiblePredicate) {
+        this.visiblePredicate = visiblePredicate;
+        return this;
+    }
+
+    public MyMenuItem onUpdate(final Runnable update) {
+        this.update = update;
+        return this;
+    }
 }

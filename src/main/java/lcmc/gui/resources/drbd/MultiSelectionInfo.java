@@ -63,6 +63,8 @@ public class MultiSelectionInfo extends EditableInfo {
     private List<Info> selectedInfos;
     @Autowired
     private MultiSelectionMenu multiSelectionMenu;
+    @Autowired
+    private Application application;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.init("selection", browser);
@@ -308,7 +310,7 @@ public class MultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */
@@ -321,9 +323,7 @@ public class MultiSelectionInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth() + application.getServiceFieldWidth() + 4));
         newPanel.add(new JScrollPane(mainPanel));
         /* if id textfield was changed and this id is not used,
          * enable apply button */

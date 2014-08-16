@@ -23,15 +23,14 @@ package lcmc.gui.resources.crm;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.JMenuItem;
+
+import lcmc.gui.CallbackAction;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -40,35 +39,38 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CloneMenu extends ServiceMenu {
     private CloneInfo cloneInfo;
-    
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
+
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         this.cloneInfo = (CloneInfo) serviceInfo;
-        final List<UpdatableItem> items = super.getPulldownMenu(cloneInfo);
+        final List<UpdatableItem> items = super.getPulldownMenu(serviceInfo);
         final ServiceInfo cs = cloneInfo.getContainedService();
         if (cs == null) {
             return items;
         }
-        final UpdatableItem csMenu = new MyMenu(
-                                     cs.toString(),
-                                     new AccessMode(Application.AccessType.RO, false),
-                                     new AccessMode(Application.AccessType.RO, false)) {
-            private static final long serialVersionUID = 1L;
-
+        final MyMenu csMenu = menuFactory.createMenu(cs.toString(),
+                                                     new AccessMode(Application.AccessType.RO, false),
+                                                     new AccessMode(Application.AccessType.RO, false));
+        csMenu.onUpdate(new Runnable() {
             @Override
-            public void updateAndWait() {
-                Tools.isSwingThread();
-                removeAll();
+            public void run() {
+                application.isSwingThread();
+                csMenu.removeAll();
                 final ServiceInfo cs0 = cloneInfo.getContainedService();
                 if (cs0 != null) {
                     for (final UpdatableItem u : cs0.createPopup()) {
-                        add((JMenuItem) u);
+                        csMenu.add((JMenuItem) u);
                         u.updateAndWait();
                     }
                 }
-                super.updateAndWait();
+                csMenu.updateMenuComponents();
+                csMenu.processAccessMode();
             }
-        };
+        });
         items.add(csMenu);
         return items;
     }
@@ -83,79 +85,82 @@ public class CloneMenu extends ServiceMenu {
         for (final Host host : cloneInfo.getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateFromMenuItem =
-               new MyMenuItem(Tools.getString("ClusterBrowser.Hb.MigrateFromResource") + ' ' + hostName + " (stop)",
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    menuFactory.createMenuItem(
+                            Tools.getString("ClusterBrowser.Hb.MigrateFromResource") + ' ' + hostName + " (stop)",
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                              Tools.getString("ClusterBrowser.Hb.MigrateFromResource")
-                              + ' ' + hostName + " (stop) (offline)",
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(Application.AccessType.OP, false),
-                              new AccessMode(Application.AccessType.OP, false)) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public boolean predicate() {
-                        return host.isCrmStatusOk();
-                    }
-
-                    @Override
-                    public boolean visiblePredicate() {
-                        return !host.isCrmStatusOk() || enablePredicate() == null;
-                    }
-
-                    @Override
-                    public String enablePredicate() {
-                        final List<String> runningOnNodes = cloneInfo.getRunningOnNodes(runMode);
-                        if (runningOnNodes == null || runningOnNodes.size() < 1) {
-                            return "must run";
-                        }
-                        boolean runningOnNode = false;
-                        for (final String ron : runningOnNodes) {
-                            if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
-                                runningOnNode = true;
-                                break;
+                            Tools.getString("ClusterBrowser.Hb.MigrateFromResource")
+                                            + ' ' + hostName + " (stop) (offline)",
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false))
+                            .predicate(new Predicate() {
+                                @Override
+                                public boolean check() {
+                                    return host.isCrmStatusOk();
+                                }
+                            })
+                            .visiblePredicate(new VisiblePredicate() {
+                                @Override
+                                public boolean check() {
+                                    if (!host.isCrmStatusOk()) {
+                                        return false;
+                                    }
+                                    final List<String> runningOnNodes = cloneInfo.getRunningOnNodes(runMode);
+                                    if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                        return false;
+                                    }
+                                    boolean runningOnNode = false;
+                                    for (final String ron : runningOnNodes) {
+                                        if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                            runningOnNode = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!cloneInfo.getBrowser().crmStatusFailed()
+                                        && cloneInfo.getService().isAvailable()
+                                        && runningOnNode
+                                        && host.isCrmStatusOk()) {
+                                        return true;
+                                    } else {
+                                        return false;
+                                    }
+                                }
+                            })
+                            .addAction(new MenuAction() {
+                                @Override
+                                public void run(final String text) {
+                                    cloneInfo.hidePopup();
+                                    if (cloneInfo.getService().isMaster()) {
+                                       /* without role=master */
+                                        cloneInfo.superMigrateFromResource(cloneInfo.getBrowser().getDCHost(), hostName, runMode);
+                                    } else {
+                                        cloneInfo.migrateFromResource(cloneInfo.getBrowser().getDCHost(), hostName, runMode);
+                                    }
+                                }
+                            });
+            final ButtonCallback migrateItemCallback = cloneInfo.getBrowser().new ClMenuItemCallback(null)
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host host) {
+                            if (cloneInfo.getService().isMaster()) {
+                        /* without role=master */
+                                cloneInfo.superMigrateFromResource(host, hostName, Application.RunMode.TEST);
+                            } else {
+                                cloneInfo.migrateFromResource(host, hostName, Application.RunMode.TEST);
                             }
                         }
-                        if (!cloneInfo.getBrowser().crmStatusFailed()
-                            && cloneInfo.getService().isAvailable()
-                            && runningOnNode
-                            && host.isCrmStatusOk()) {
-                            return null;
-                        } else {
-                            return ""; /* is not visible anyway */
-                        }
-                    }
-
-                    @Override
-                    public void action() {
-                        cloneInfo.hidePopup();
-                        if (cloneInfo.getService().isMaster()) {
-                            /* without role=master */
-                            cloneInfo.superMigrateFromResource(cloneInfo.getBrowser().getDCHost(), hostName, runMode);
-                        } else {
-                            cloneInfo.migrateFromResource(cloneInfo.getBrowser().getDCHost(), hostName, runMode);
-                        }
-                    }
-                };
-            final ButtonCallback migrateItemCallback = cloneInfo.getBrowser().new ClMenuItemCallback(null) {
-                @Override
-                public void action(final Host dcHost) {
-                    if (cloneInfo.getService().isMaster()) {
-                        /* without role=master */
-                        cloneInfo.superMigrateFromResource(dcHost, hostName, Application.RunMode.TEST);
-                    } else {
-                        cloneInfo.migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
-                    }
-                }
-            };
+                    });
             cloneInfo.addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
             items.add(migrateFromMenuItem);
         }
     }
 
-    /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
+    /**
+     * Adds "migrate from" and "force migrate" menuitems to the submenu.
+     */
     @Override
     protected void addMoreMigrateMenuItems(final ServiceInfo serviceInfo, final MyMenu submenu) {
         /* no migrate / unmigrate menu advanced items for clones. */

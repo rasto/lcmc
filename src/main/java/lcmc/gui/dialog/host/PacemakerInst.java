@@ -49,6 +49,8 @@ final class PacemakerInst extends DialogHost {
     @Autowired
     private Provider<CheckInstallation> checkInstallationProvider;
     private CheckInstallation checkInstallationDialog = null;
+    @Autowired
+    private Application application;
 
     /**
      * Checks the answer of the installation and enables/disables the
@@ -62,7 +64,7 @@ final class PacemakerInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.PacemakerInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getApplication().getAutoOptionHost("pminst") != null) {
+        if (application.getAutoOptionHost("pminst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -106,9 +108,8 @@ final class PacemakerInst extends DialogHost {
                 }
             }
         }
-        Tools.getApplication().setLastHbPmInstalledMethod(
-                                                getHost().getDistString("PmInst.install.text." + installMethod));
-        Tools.getApplication().setLastInstalledClusterStack(Application.COROSYNC_NAME);
+        application.setLastHbPmInstalledMethod(getHost().getDistString("PmInst.install.text." + installMethod));
+        application.setLastInstalledClusterStack(Application.COROSYNC_NAME);
 
         getHost().execCommandInBash(new ExecCommandConfig()
                          .commandString(installCommand)

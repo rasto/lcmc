@@ -2,34 +2,30 @@ package lcmc.gui.resources.drbd;
 
 import java.util.List;
 
-import lcmc.gui.GUIData;
-import lcmc.model.Host;
+import lcmc.model.AccessMode;
 import lcmc.model.resources.BlockDevice;
-import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
-import lcmc.testutils.annotation.type.GuiTest;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Category(GuiTest.class)
+import javax.swing.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class BlockDevMenuITest {
-    static {
-        Tools.init();
-    }
-    
-    @Mock
-    private Host hostStub;
     @Mock
     private BlockDevInfo blockDevInfoStub;
     @Mock
@@ -37,35 +33,63 @@ public class BlockDevMenuITest {
     @Mock
     private HostBrowser hostBrowserStub;
     @Mock
-    private ClusterBrowser clusterBrowserStub;
-
-    @Mock
     private BlockDevInfo blockDevInfoNoClusterStub;
     @Mock
     private HostBrowser hostBrowserNoClusterStub;
-
-    private BlockDevMenu blockDevMenu = new BlockDevMenu();
-    private BlockDevMenu blockDevMenuNoCluster = new BlockDevMenu();
-
-    @Autowired
-    private GUIData guiData;
+    @Mock
+    private MyMenu menuStub;
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
+    private BlockDevMenu blockDevMenu;
+    @InjectMocks
+    private BlockDevMenu blockDevMenuNoCluster;
 
     @Before
     public void setUp() {
         when(blockDevInfoStub.getBrowser()).thenReturn(hostBrowserStub);
-        when(blockDevInfoStub.getHost()).thenReturn(hostStub);
         when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
-        when(hostBrowserStub.getClusterBrowser()).thenReturn(clusterBrowserStub);
 
-        when(blockDevInfoNoClusterStub.getBrowser()).thenReturn(hostBrowserStub);
-        when(blockDevInfoNoClusterStub.getHost()).thenReturn(hostStub);
         when(blockDevInfoNoClusterStub.getBlockDevice()).thenReturn(blockDeviceStub);
+        when(menuFactoryStub.createMenu(
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuStub);
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = blockDevMenu.getPulldownMenu(blockDevInfoStub);
 
+        verify(menuItemStub, times(6)).predicate((Predicate) anyObject());
+        verify(menuItemStub, times(19)).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(19)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(19)).addAction((MenuAction) anyObject());
+        verify(menuStub, times(1)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuStub, times(1)).onUpdate((Runnable) anyObject());
         assertEquals(20, items.size());
     }
 

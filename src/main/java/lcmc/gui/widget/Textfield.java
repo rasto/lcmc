@@ -27,27 +27,36 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import lcmc.model.AccessMode;
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Textfield extends GenericWidget<JComponent> {
+    @Autowired
+    private Application application;
 
-    public Textfield(final Value selectedValue,
+    public void init(final Value selectedValue,
                      final String regexp,
                      final int width,
                      final Map<String, String> abbreviations,
                      final AccessMode enableAccessMode,
                      final MyButton fieldButton) {
-        super(regexp, enableAccessMode, fieldButton);
+        super.init(regexp, enableAccessMode, fieldButton);
         addComponent(getTextField(selectedValue, regexp, abbreviations), width);
     }
 
@@ -135,7 +144,7 @@ public class Textfield extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

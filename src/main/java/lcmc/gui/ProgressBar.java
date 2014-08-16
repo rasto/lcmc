@@ -29,16 +29,25 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
+
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class creates titled pane with progress bar and functions that update
  * the progress bar.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ProgressBar implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressBar.class);
     private static final int DEFAULT_TIMEOUT = 50 * 1000;
@@ -48,9 +57,11 @@ public final class ProgressBar implements ActionListener {
     /** Max value in the progress bar. */
     private static final int MAX_PB_VALUE = 100;
     private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(Tools.getDefault("ProgressBar.CancelIcon"));
-    private final JProgressBar progressBar;
+    private JProgressBar progressBar;
     /** Progress bar panel. */
-    private final JPanel pbPanel;
+    private JPanel pbPanel;
+    @Autowired
+    private Application application;
     private volatile boolean stopNow = false;
     /** Whether to hold the progress bar. */
     private boolean holdIt = false;
@@ -64,12 +75,13 @@ public final class ProgressBar implements ActionListener {
     private Thread progressThread = null;
     private MyButton cancelButton = null;
     /** Cancel callback function that will be called, when cancel was pressed.  */
-    private final CancelCallback cancelCallback;
+    private CancelCallback cancelCallback;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
-    ProgressBar(final String title, final CancelCallback cancelCallback, final int width, final int height) {
-        super();
+    void init(final String title, final CancelCallback cancelCallback, final int width, final int height) {
         this.cancelCallback = cancelCallback;
-        Tools.isSwingThread();
+        application.isSwingThread();
         progressBar = new JProgressBar(0, MAX_PB_VALUE);
         progressBar.setPreferredSize(new Dimension(width, height));
         progressBar.setBackground(Tools.getDefaultColor("ProgressBar.Background"));
@@ -82,7 +94,7 @@ public final class ProgressBar implements ActionListener {
         pbPanel.add(progressBar);
 
         if (cancelCallback != null) {
-            cancelButton = new MyButton(Tools.getString("ProgressBar.Cancel"), CANCEL_ICON);
+            cancelButton = widgetFactory.createButton(Tools.getString("ProgressBar.Cancel"), CANCEL_ICON);
             cancelButton.setEnabled(false);
             cancelButton.addActionListener(this);
             pbPanel.add(cancelButton);
@@ -96,22 +108,22 @@ public final class ProgressBar implements ActionListener {
         }
     }
 
-    ProgressBar(final CancelCallback cancelCallbackA, final int width, final int height) {
-        this(null, cancelCallbackA, width, height);
+    void init(final CancelCallback cancelCallbackA, final int width, final int height) {
+        this.init(null, cancelCallbackA, width, height);
     }
 
-    public ProgressBar(final String title, final CancelCallback cancelCallbackA) {
-        this(title,
-             cancelCallbackA,
-             Tools.getDefaultInt("ProgressBar.DefaultWidth"),
-             Tools.getDefaultInt("ProgressBar.DefaultHeight"));
+    public void init(final String title, final CancelCallback cancelCallbackA) {
+        this.init(title,
+                cancelCallbackA,
+                Tools.getDefaultInt("ProgressBar.DefaultWidth"),
+                Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
 
-    public ProgressBar(final CancelCallback cancelCallbackA) {
-        this(null,
-             cancelCallbackA,
-             Tools.getDefaultInt("ProgressBar.DefaultWidth"),
-             Tools.getDefaultInt("ProgressBar.DefaultHeight"));
+    public void init(final CancelCallback cancelCallbackA) {
+        this.init(null,
+                  cancelCallbackA,
+                  Tools.getDefaultInt("ProgressBar.DefaultWidth"),
+                  Tools.getDefaultInt("ProgressBar.DefaultHeight"));
     }
 
     /** Enables or disables cancel button if it exists. */
@@ -146,7 +158,7 @@ public final class ProgressBar implements ActionListener {
                         /* show progress bar after delay */
                         if (time > progressBarDelay && !isVisible) {
                             isVisible = true;
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setVisible(true);
@@ -157,7 +169,7 @@ public final class ProgressBar implements ActionListener {
                             });
                         }
                         if (!holdIt) {
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setValue(progress * MAX_PB_VALUE / timeout);
@@ -173,7 +185,7 @@ public final class ProgressBar implements ActionListener {
                         }
                         if (progress >= timeout) {
                             /* premature end */
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     progressBar.setIndeterminate(true);
@@ -181,7 +193,7 @@ public final class ProgressBar implements ActionListener {
                             });
                         }
                     }
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBar.setIndeterminate(false);
@@ -211,7 +223,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = timeout;
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -227,7 +239,7 @@ public final class ProgressBar implements ActionListener {
         }
         stopNow = true;
         progress = 0;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);
@@ -241,7 +253,7 @@ public final class ProgressBar implements ActionListener {
      * state.
      */
     public void hold() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 progressBar.setVisible(true);
@@ -259,7 +271,7 @@ public final class ProgressBar implements ActionListener {
      * hold().
      */
     void cont() {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 progressBar.setIndeterminate(false);

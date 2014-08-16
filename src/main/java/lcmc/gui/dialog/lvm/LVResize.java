@@ -36,6 +36,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
@@ -56,10 +58,16 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class implements LVM resize dialog.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class LVResize extends LV {
     private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
     private static final String DESCRIPTION =
@@ -70,15 +78,19 @@ public final class LVResize extends LV {
                    + " like filesystem on the DRBD, you have to resize the"
                    + " filesystem yourself.";
     private static final int RESIZE_LV_TIMEOUT = 5000;
-    private final BlockDevInfo blockDevInfo;
-    private final MyButton resizeButton = new MyButton("Resize");
+    private BlockDevInfo blockDevInfo;
     private Widget sizeWidget;
     private Widget oldSizeWidget;
     private Widget maxSizeWidget;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private final MyButton resizeButton = widgetFactory.createButton("Resize");
 
-    public LVResize(final BlockDevInfo blockDevInfo) {
-        super(null);
+    public void init(final BlockDevInfo blockDevInfo) {
+        super.init(null);
         this.blockDevInfo = blockDevInfo;
     }
 
@@ -184,14 +196,15 @@ public final class LVResize extends LV {
         oldSizeLabel.setEnabled(false);
 
         final String oldBlockSize = blockDevInfo.getBlockDevice().getBlockSize();
-        oldSizeWidget = new TextfieldWithUnit(
-                      VmsXml.convertKilobytes(oldBlockSize),
-                      getUnits(),
-                      Widget.NO_REGEXP,
-                      250,
-                      Widget.NO_ABBRV,
-                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
-                      Widget.NO_BUTTON);
+        oldSizeWidget = widgetFactory.createInstance(
+                                          Widget.Type.TEXTFIELDWITHUNIT,
+                                          VmsXml.convertKilobytes(oldBlockSize),
+                                          getUnits(),
+                                          Widget.NO_REGEXP,
+                                          250,
+                                          Widget.NO_ABBRV,
+                                          new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                                          Widget.NO_BUTTON);
         oldSizeWidget.setEnabled(false);
         inputPane.add(oldSizeLabel);
         inputPane.add(oldSizeWidget.getComponent());
@@ -202,7 +215,8 @@ public final class LVResize extends LV {
         final String newBlockSize = Long.toString((Long.parseLong(oldBlockSize) + Long.parseLong(maxBlockSize)) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWidget = new TextfieldWithUnit(
+        sizeWidget =  widgetFactory.createInstance(
+                       Widget.Type.TEXTFIELDWITHUNIT,
                        VmsXml.convertKilobytes(newBlockSize),
                        getUnits(),
                        Widget.NO_REGEXP,
@@ -219,7 +233,7 @@ public final class LVResize extends LV {
                     @Override
                     public void run() {
                         if (checkDRBD()) {
-                            Tools.invokeAndWait(new Runnable() {
+                            application.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     enableResizeButton(false);
@@ -248,14 +262,15 @@ public final class LVResize extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWidget = new TextfieldWithUnit(
-                       VmsXml.convertKilobytes(maxBlockSize),
-                       getUnits(),
-                       Widget.NO_REGEXP,
-                       250,
-                       Widget.NO_ABBRV,
-                       new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
-                       Widget.NO_BUTTON);
+        maxSizeWidget = widgetFactory.createInstance(
+                                         Widget.Type.TEXTFIELDWITHUNIT,
+                                         VmsXml.convertKilobytes(maxBlockSize),
+                                         getUnits(),
+                                         Widget.NO_REGEXP,
+                                         250,
+                                         Widget.NO_ABBRV,
+                                         new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                                         Widget.NO_BUTTON);
         maxSizeWidget.setEnabled(false);
         inputPane.add(maxSizeLabel);
         inputPane.add(maxSizeWidget.getComponent());

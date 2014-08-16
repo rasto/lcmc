@@ -23,7 +23,6 @@
 package lcmc.gui.dialog;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -65,8 +64,14 @@ import javax.swing.event.DocumentListener;
 import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.gui.widget.Widget;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -74,6 +79,8 @@ import lcmc.utilities.Tools;
  * The dialogs should extend this class and overwrite at least
  * getDialogTitle(), getDescription(), getInputPane() and nextDialog() methods.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class ConfigDialog {
     private static final int INPUT_PANE_HEIGHT = 200;
     private volatile JOptionPane optionPane;
@@ -82,13 +89,17 @@ public abstract class ConfigDialog {
     private final Map<String, MyButton> buttonToObjectMap = new HashMap<String, MyButton>();
     private final StringBuilder answerPaneText = new StringBuilder(100);
     private JEditorPane answerPane = null;
-    private final Collection<Component> disabledComponents = new ArrayList<Component>();
+    private final Collection<java.awt.Component> disabledComponents = new ArrayList<java.awt.Component>();
     private CountDownLatch dialogGate;
     private JCheckBox skipButton = null;
     private volatile Object optionPaneAnswer;
     private boolean skipButtonShouldBeEnabled = true;
-    private final MyButton[] options = new MyButton[buttons().length];
     private final List<JComponent> additionalOptions = new ArrayList<JComponent>();
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private final MyButton[] options = new MyButton[buttons().length];
 
     protected final JDialog getDialogPanel() {
         return dialogPanel;
@@ -125,7 +136,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneSetText(final String text) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final int l = answerPaneText.length();
@@ -139,7 +150,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneAddText(final String text) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPaneText.append('\n');
@@ -151,7 +162,7 @@ public abstract class ConfigDialog {
 
 
     protected final void answerPaneSetTextError(final String text) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPane.setForeground(Tools.getDefaultColor("ConfigDialog.AnswerPane.Error"));
@@ -166,7 +177,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneAddTextError(final String text) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 answerPaneText.append('\n');
@@ -186,11 +197,11 @@ public abstract class ConfigDialog {
         pane.setLayout(new BoxLayout(pane, BoxLayout.PAGE_AXIS));
         final JEditorPane descPane = new JEditorPane(GUIData.MIME_TYPE_TEXT_HTML,
                                                      "<span style='font:bold italic;font-family:Dialog; font-size:"
-                                                     + Tools.getApplication().scaled(14)
+                                                     + application.scaled(14)
                                                      + ";'>"
                                                      + getDialogTitle() + "</span><br>"
                                                      + "<span style='font-family:Dialog; font-size:"
-                                                     + Tools.getApplication().scaled(12)
+                                                     + application.scaled(12)
                                                      + ";'>"
                                                      + getDescription() + "</span>");
         descPane.setSize(300, Integer.MAX_VALUE);
@@ -199,14 +210,14 @@ public abstract class ConfigDialog {
         descPane.setEditable(false);
         final JScrollPane descSP = new JScrollPane(descPane);
         descSP.setBorder(null);
-        descSP.setAlignmentX(Component.LEFT_ALIGNMENT);
+        descSP.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         descSP.setMinimumSize(new Dimension(0, 50));
         pane.add(descSP);
         final JComponent inputPane = getInputPane();
         if (inputPane != null) {
             inputPane.setMinimumSize(new Dimension(Short.MAX_VALUE, INPUT_PANE_HEIGHT));
             inputPane.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
-            inputPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            inputPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
             pane.add(inputPane);
         }
         pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
@@ -415,7 +426,7 @@ public abstract class ConfigDialog {
             /* populate buttonToObjectMap */
             MyButton defaultButtonClass = null;
             for (int i = 0; i < buttons.length; i++) {
-                options[i] = new MyButton(buttons[i], icons[i]);
+                options[i] = widgetFactory.createButton(buttons[i], icons[i]);
                 options[i].setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
                 allOptions.add(options[i]);
                 buttonToObjectMap.put(buttons[i], options[i]);
@@ -425,7 +436,7 @@ public abstract class ConfigDialog {
             }
             /* create option pane */
             final MyButton dbc = defaultButtonClass;
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     optionPane = new JOptionPane(body(),
@@ -482,7 +493,7 @@ public abstract class ConfigDialog {
             };
         optionPane.addPropertyChangeListener(propertyChangeListener);
         initDialogBeforeVisible();
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
@@ -492,7 +503,7 @@ public abstract class ConfigDialog {
                 dialogPanel.setVisible(true);
             }
         });
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 dialogPanel.setLocationRelativeTo(LCMC.MAIN_FRAME);
@@ -527,8 +538,8 @@ public abstract class ConfigDialog {
      * were enabled are stored in disabledComponents list so that they
      * can be later enabled with call to enableComponents.
      */
-    protected final void disableComponents(final Component[] components) {
-        Tools.invokeLater(new Runnable() {
+    protected final void disableComponents(final java.awt.Component[] components) {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final String b : buttons()) {
@@ -538,7 +549,7 @@ public abstract class ConfigDialog {
                         option.setEnabled(false);
                     }
                 }
-                for (final Component c : components) {
+                for (final java.awt.Component c : components) {
                     if (c.isEnabled()) {
                         disabledComponents.add(c);
                         c.setEnabled(false);
@@ -562,11 +573,11 @@ public abstract class ConfigDialog {
      * the ones that are in componentsToDisable array.
      */
     protected void enableComponents(final JComponent[] componentsToDisable) {
-        final Collection<Component> ctdHash = new HashSet<Component>(Arrays.asList(componentsToDisable));
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        final Collection<java.awt.Component> ctdHash = new HashSet<java.awt.Component>(Arrays.asList(componentsToDisable));
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                for (final Component dc : disabledComponents) {
+                for (final java.awt.Component dc : disabledComponents) {
                     if (!ctdHash.contains(dc)) {
                         dc.setEnabled(true);
                     }
@@ -598,13 +609,13 @@ public abstract class ConfigDialog {
     }
 
     /** Returns panel with checkbox. */
-    protected final JPanel getComponentPanel(final String text, final Component component) {
+    protected final JPanel getComponentPanel(final String text, final java.awt.Component component) {
         final JPanel mp = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         mp.setBackground(Tools.getDefaultColor("ConfigDialog.Background"));
         mp.add(new JLabel(text));
         mp.add(new JLabel(" "));
         mp.add(component);
-        mp.setAlignmentX(Component.LEFT_ALIGNMENT);
+        mp.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
         return mp;
     }
 
@@ -631,7 +642,7 @@ public abstract class ConfigDialog {
             final Thread t = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             optionPane.setValue(((AbstractButton) e.getSource()).getText());

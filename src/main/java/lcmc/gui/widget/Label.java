@@ -24,24 +24,34 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.text.Document;
 import lcmc.model.AccessMode;
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Label extends GenericWidget<JComponent> {
-    public Label(final Value selectedValue,
-                 final String regexp,
-                 final int width,
-                 final AccessMode enableAccessMode,
-                 final MyButton fieldButton) {
-        super(regexp, enableAccessMode, fieldButton);
+    @Autowired
+    private Application application;
+
+    public void init(final Value selectedValue,
+                     final String regexp,
+                     final int width,
+                     final AccessMode enableAccessMode,
+                     final MyButton fieldButton) {
+        super.init(regexp, enableAccessMode, fieldButton);
         addComponent(getLabelField(selectedValue), width);
     }
 
@@ -97,7 +107,7 @@ public final class Label extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

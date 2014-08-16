@@ -23,7 +23,6 @@
 package lcmc.gui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,6 +44,11 @@ import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows
@@ -52,6 +56,8 @@ import lcmc.utilities.Tools;
  * clusters.
  * Every resource has its Info object, that accessible through the tree view.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Browser {
     private static final Logger LOG = LoggerFactory.getLogger(Browser.class);
     public static final ImageIcon CATEGORY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
@@ -64,14 +70,17 @@ public class Browser {
     private DefaultTreeModel treeModel;
     private DefaultMutableTreeNode treeTop;
     private JTree tree;
+    @Autowired
+    private Application application;
+    @Autowired @Qualifier("categoryInfo")
+    private CategoryInfo resourcesCategory;
 
     private JSplitPane infoPanelSplitPane;
     private final Lock mDRBDtestLock = new ReentrantLock();
 
     protected final void setMenuTreeTop() {
-        final CategoryInfo categoryInfo = new CategoryInfo();
-        categoryInfo.init(Tools.getString("Browser.Resources"), this);
-        treeTop = new DefaultMutableTreeNode(categoryInfo);
+        resourcesCategory.init(Tools.getString("Browser.Resources"), this);
+        treeTop = new DefaultMutableTreeNode(resourcesCategory);
         treeModel = new DefaultTreeModel(treeTop);
     }
 
@@ -123,7 +132,7 @@ public class Browser {
             oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
         }
         final DefaultMutableTreeNode oldNode = oldN;
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 if (node != null) {
@@ -132,7 +141,7 @@ public class Browser {
             }
         });
         if (!select && t != null && oldNode != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     /* if don't want to select, we reselect the old path. */
@@ -148,7 +157,7 @@ public class Browser {
 
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         final String stacktrace = Tools.getStackTrace();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 try {
@@ -163,7 +172,7 @@ public class Browser {
     }
 
     protected final void topLevelAdd(final MutableTreeNode node) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         treeTop.add(node);
     }
 
@@ -197,7 +206,7 @@ public class Browser {
         if (gView == null) {
             return iPanel;
         } else {
-            final int maxWidth = ClusterBrowser.SERVICE_LABEL_WIDTH + ClusterBrowser.SERVICE_FIELD_WIDTH + 36;
+            final int maxWidth = application.getServiceLabelWidth() + application.getServiceFieldWidth() + 36;
             iPanel.setMinimumSize(new Dimension(maxWidth, 0));
             iPanel.setMaximumSize(new Dimension(maxWidth, Integer.MAX_VALUE));
             if (infoPanelSplitPane != null) {
@@ -231,7 +240,7 @@ public class Browser {
     }
 
     protected void selectPath(final Object[] path) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final TreePath tp = new TreePath(path);
@@ -242,7 +251,7 @@ public class Browser {
     }
 
     public final void addNode(final DefaultMutableTreeNode node, final MutableTreeNode child) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
               node.add(child);
@@ -267,7 +276,7 @@ public class Browser {
          * tooltips.
          */
         @Override
-        public Component getTreeCellRendererComponent(final JTree tree,
+        public java.awt.Component getTreeCellRendererComponent(final JTree tree,
                                                       final Object value,
                                                       final boolean sel,
                                                       final boolean expanded,

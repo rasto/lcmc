@@ -35,11 +35,13 @@ import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JToolTip;
+
 import lcmc.gui.widget.Check;
 
 /**
@@ -59,7 +61,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Second color in the gradient. */
     private Color color2 = DEFAULT_COLOR;
     /** Robot to move a mouse a little if a tooltip has changed. */
-    private final Robot robot;
+    private Robot robot;
     /** Button tooltip. */
     private JToolTip toolTip = null;
     /** Tooltip about simulation results. */
@@ -69,9 +71,7 @@ public class MyButton extends JButton implements ComponentWithTest {
     /** Tooltip background color. */
     private Color toolTipBackground = null;
 
-    /** Prepares a new {@code MyButton} object. */
     public MyButton() {
-        super();
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
@@ -83,13 +83,11 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /**
-     * Prepares a new {@code MyButton} object.
-     *
      * @param text
      *          text in the button
      */
     public MyButton(final String text) {
-        super(text);
+        super.setText(text);
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
@@ -101,15 +99,14 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /**
-     * Prepares a new {@code MyButton} object.
-     *
      * @param text
      *          text in the button
      * @param icon
      *          icon in the button
      */
     public MyButton(final String text, final Icon icon) {
-        super(text, icon);
+        super.setText(text);
+        super.setIcon(icon);
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
@@ -121,8 +118,6 @@ public class MyButton extends JButton implements ComponentWithTest {
     }
 
     /**
-     * Prepares a new {@code MyButton} object.
-     *
      * @param text
      *          text in the button
      * @param icon
@@ -130,22 +125,18 @@ public class MyButton extends JButton implements ComponentWithTest {
      * @param toolTipText
      *          tool tip in the button
      */
-    public MyButton(final String text,
-                    final Icon icon,
-                    final String toolTipText) {
-        this(text, icon);
+    public MyButton(final String text, final Icon icon, final String toolTipText) {
+        super.setText(text);
+        super.setIcon(icon);
         super.setToolTipText(toolTipText);
     }
     /**
-     * Prepares a new {@code MyButton} object.
-     *
      * @param c1
      *          color 1 in the gradient
      * @param c2
      *          color 2 in the gradient
      */
     public MyButton(final Color c1, final Color c2) {
-        super();
         Robot r = null;
         try {
             r = new Robot(SCREEN_DEVICE);
@@ -281,11 +272,6 @@ public class MyButton extends JButton implements ComponentWithTest {
         fireActionPerformed(new ActionEvent(this, 0, "pressed"));
     }
 
-    /** Make it a mini button. */
-    public final void miniButton() {
-        Tools.makeMiniButton(this);
-    }
-
     public final void setEnabled(final Check check) {
         setEnabled(check.isChanged() && check.isCorrect());
         checkToolTip = check.getToolTip();
@@ -303,5 +289,15 @@ public class MyButton extends JButton implements ComponentWithTest {
         setEnabled(check.isCorrect());
         checkToolTip = check.getToolTip();
         updateToolTip();
+    }
+
+    public MyButton addAction(final Runnable action) {
+        addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                action.run();
+            }
+        });
+        return this;
     }
 }

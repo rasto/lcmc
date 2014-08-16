@@ -56,6 +56,8 @@ final class ProxyInst extends DialogHost {
     private WizardDialog origDialog;
     @Autowired
     private Provider<ProxyCheckInstallation> proxyCheckInstallationProvider;
+    @Autowired
+    private Application application;
 
     void init(final WizardDialog previousDialog,
               final Host host,
@@ -80,7 +82,7 @@ final class ProxyInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.ProxyInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getApplication().getAutoOptionHost("hbinst") != null) {
+        if (application.getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }

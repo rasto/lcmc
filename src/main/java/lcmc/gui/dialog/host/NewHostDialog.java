@@ -72,6 +72,10 @@ public class NewHostDialog extends DialogHost {
     private Configuration configuration;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     /** Finishes the dialog, stores the values and adds the host tab. */
     @Override
@@ -80,15 +84,15 @@ public class NewHostDialog extends DialogHost {
         getHost().setEnteredHostOrIp(hostnameEntered);
         final String username = usernameField.getStringValue().trim();
         getHost().setUsername(username);
-        Tools.getApplication().setLastEnteredUser(username);
+        application.setLastEnteredUser(username);
         final String sshPort = sshPortField.getStringValue().trim();
         getHost().setSSHPort(sshPort);
-        Tools.getApplication().setLastEnteredSSHPort(sshPort);
+        application.setLastEnteredSSHPort(sshPort);
         final String useSudoString = useSudoField.getStringValue().trim();
         getHost().setUseSudo("true".equals(useSudoString));
-        Tools.getApplication().setLastEnteredUseSudo("true".equals(useSudoString));
-        if (!Tools.getApplication().existsHost(getHost())) {
-            Tools.getApplication().addHostToHosts(getHost());
+        application.setLastEnteredUseSudo("true".equals(useSudoString));
+        if (!application.existsHost(getHost())) {
+            application.addHostToHosts(getHost());
             guiData.setTerminalPanel(getHost().getTerminalPanel());
         }
     }
@@ -136,7 +140,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (hf) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostField.setBackground(new StringValue(getHost().getEnteredHostOrIp()),
@@ -150,7 +154,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (uf) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     usernameField.setBackground(new StringValue(getHost().getUsername()),
@@ -173,7 +177,7 @@ public class NewHostDialog extends DialogHost {
         }
 
         if (pf) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sshPortField.setBackground(new StringValue(getHost().getSSHPort()),
@@ -210,17 +214,17 @@ public class NewHostDialog extends DialogHost {
         enableComponents();
         makeDefaultButton(buttonClass(nextButton()));
         checkFields(null);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hostField.requestFocus();
             }
         });
-        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
-            Tools.invokeLater(new Runnable() {
+        if (!application.getAutoHosts().isEmpty()) {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    hostField.setValue(new StringValue(Tools.getApplication().getAutoHosts().get(0)));
+                    hostField.setValue(new StringValue(application.getAutoHosts().get(0)));
                 }
             });
             Tools.sleep(3000);
@@ -250,7 +254,7 @@ public class NewHostDialog extends DialogHost {
             hn = hostname;
         }
         final String regexp = "^[,\\w.-]+$";
-        hostField = WidgetFactory.createInstance(
+        hostField = widgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
                                        new StringValue(hn),
                                        Widget.NO_ITEMS,
@@ -281,12 +285,12 @@ public class NewHostDialog extends DialogHost {
         inputPane.add(sshPortLabel);
         String sshPort = getHost().getSSHPort();
         if (sshPort == null) {
-            sshPort = Tools.getApplication().getLastEnteredSSHPort();
+            sshPort = application.getLastEnteredSSHPort();
             if (sshPort == null) {
                 sshPort = DEFAULT_SSH_PORT;
             }
         }
-        sshPortField = WidgetFactory.createInstance(
+        sshPortField = widgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
                                       new StringValue(sshPort),
                                       Widget.NO_ITEMS,
@@ -309,7 +313,7 @@ public class NewHostDialog extends DialogHost {
         inputPane.add(usernameLabel);
         String userName = getHost().getUsername();
         if (userName == null) {
-            userName = Tools.getApplication().getLastEnteredUser();
+            userName = application.getLastEnteredUser();
             if (userName == null) {
                 userName = DEFAULT_SSH_ROOT_USER;
             }
@@ -320,7 +324,7 @@ public class NewHostDialog extends DialogHost {
             users.add(new StringValue(DEFAULT_SSH_ROOT_USER));
         }
         users.add(new StringValue(user));
-        usernameField = WidgetFactory.createInstance(
+        usernameField = widgetFactory.createInstance(
                                    Widget.GUESS_TYPE,
                                    new StringValue(userName),
                                    users.toArray(new Value[users.size()]),
@@ -342,13 +346,13 @@ public class NewHostDialog extends DialogHost {
         inputPane.add(useSudoLabel);
         Boolean useSudo = getHost().isUseSudo();
         if (useSudo == null) {
-            useSudo = Tools.getApplication().getLastEnteredUseSudo();
+            useSudo = application.getLastEnteredUseSudo();
             if (useSudo == null) {
                 useSudo = false;
             }
         }
         final Value useSudoValue = new StringValue(useSudo.toString());
-        useSudoField = WidgetFactory.createInstance(
+        useSudoField = widgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
                                       useSudoValue,
                                       new Value[]{new StringValue("true"), new StringValue("false")},

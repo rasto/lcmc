@@ -29,10 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.StringValue;
+import lcmc.model.*;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
@@ -59,6 +56,12 @@ public final class Name extends DialogCluster {
     private ClusterTabFactory clusterTabFactory;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Clusters allClusters;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     @Override
     protected void finishDialog() {
@@ -79,7 +82,7 @@ public final class Name extends DialogCluster {
         if (name.isEmpty()) {
             v = false;
         } else {
-            for (final Cluster c : Tools.getApplication().getAllClusters().getClusterSet()) {
+            for (final Cluster c : allClusters.getClusterSet()) {
                 if (c != getCluster() && name.equals(c.getName())) {
                     v = false;
                     break;
@@ -87,7 +90,7 @@ public final class Name extends DialogCluster {
             }
         }
         final boolean isValid = v;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(isValid);
@@ -117,9 +120,9 @@ public final class Name extends DialogCluster {
         final JComponent[] c = {buttonClass(nextButton()) };
         enableComponentsLater(c);
         enableComponents();
-        if (!Tools.getApplication().existsCluster(getCluster())) {
-            Tools.getApplication().addClusterToClusters(getCluster());
-            Tools.invokeLater(new Runnable() {
+        if (!application.existsCluster(getCluster())) {
+            application.addClusterToClusters(getCluster());
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     clusterTabFactory.createClusterTab(getCluster());
@@ -130,16 +133,16 @@ public final class Name extends DialogCluster {
 
     @Override
     protected void initDialogAfterVisible() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 nameField.requestFocus();
             }
         });
-        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
-            final String name = Tools.getApplication().getAutoClusters().get(0);
+        if (!application.getAutoClusters().isEmpty()) {
+            final String name = application.getAutoClusters().get(0);
             if (!".".equals(name)) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         nameField.setValue(new StringValue(name));
@@ -159,11 +162,11 @@ public final class Name extends DialogCluster {
         pane.add(nameLabel);
         String name = getCluster().getName();
         if (name == null) {
-            name = Tools.getApplication().getAllClusters().getDefaultClusterName();
+            name = allClusters.getDefaultClusterName();
         }
         getCluster().setName(name);
         final String regexp = "^[ ,\\w.-]+$";
-        nameField = WidgetFactory.createInstance(
+        nameField = widgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
                                        new StringValue(getCluster().getName()),
                                        Widget.NO_ITEMS,

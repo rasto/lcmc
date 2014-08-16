@@ -80,6 +80,10 @@ public class Configuration extends DialogHost {
     private Devices devices;
     @Autowired @Qualifier("SSH")
     private SSH sshDialog;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     /** Finishes the dialog and stores the values. */
     @Override
@@ -254,7 +258,7 @@ public class Configuration extends DialogHost {
                         enableComponents();
                         makeDefaultAndRequestFocus(buttonClass(nextButton()));
                         checkFields(null);
-                        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
+                        if (!application.getAutoHosts().isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
                         }
@@ -267,7 +271,7 @@ public class Configuration extends DialogHost {
                 public void run() {
                     getHost().setHostname(
                                        Tools.join(",", hostnames, getHops()));
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (int i = 0; i < getHops(); i++) {
@@ -279,7 +283,7 @@ public class Configuration extends DialogHost {
                     makeDefaultAndRequestFocus(buttonClass(nextButton()));
                     checkFields(null);
                     hostnameOk = true;
-                    if (!Tools.getApplication().getAutoHosts().isEmpty()) {
+                    if (!application.getAutoHosts().isEmpty()) {
                         Tools.sleep(1000);
                         pressNextButton();
                     }
@@ -310,7 +314,7 @@ public class Configuration extends DialogHost {
             hostnames = hostname.split(",");
         }
         for (int i = 0; i < hops; i++) {
-            hostnameField[i] = WidgetFactory.createInstance(
+            hostnameField[i] = widgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
                                       new StringValue(hostnames[i]),
                                       Widget.NO_ITEMS,
@@ -331,7 +335,7 @@ public class Configuration extends DialogHost {
             if (getHost().getIp(i) == null) {
                 getHost().setIps(i, null);
             }
-            ipCombo[i] = WidgetFactory.createInstance(
+            ipCombo[i] = widgetFactory.createInstance(
                                 Widget.Type.COMBOBOX,
                                 new StringValue(getHost().getIp(i)),
                                 StringValue.getValues(getHost().getIps(i)),
@@ -394,7 +398,7 @@ public class Configuration extends DialogHost {
             }
             final Value[] items = StringValue.getValues(getHost().getIps(hop));
             if (items != null) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final String savedIp = getHost().getIp(hop);

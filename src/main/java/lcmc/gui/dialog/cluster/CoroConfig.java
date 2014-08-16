@@ -104,8 +104,6 @@ final class CoroConfig extends DialogCluster {
     /** Set of mcast etc. addresses. */
     private final Collection<AisCastAddress> aisCastAddresses = new LinkedHashSet<AisCastAddress>();
     private final JLabel configStatus = new JLabel("");
-    private final MyButton makeConfigButton =
-                                        new MyButton(Tools.getString("Dialog.Cluster.CoroConfig.CreateAisConfig"));
     /** Connection type pulldown menu: mcast ... */
     private Widget typeWidget;
     private Widget ifaceWidget;
@@ -126,9 +124,15 @@ final class CoroConfig extends DialogCluster {
     private InitCluster initClusterDialog;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private MyButton makeConfigButton;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
+        makeConfigButton = widgetFactory.createButton(Tools.getString("Dialog.Cluster.CoroConfig.CreateAisConfig"));
         final Host[] hosts = getCluster().getHostsArray();
         configs = new String[hosts.length];
         makeConfigButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
@@ -140,7 +144,7 @@ final class CoroConfig extends DialogCluster {
                         new Runnable() {
                             @Override
                             public void run() {
-                                Tools.invokeLater(new Runnable() {
+                                application.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         makeConfigButton.setEnabled(false);
@@ -180,7 +184,7 @@ final class CoroConfig extends DialogCluster {
                                 }
                                 nextButtonSetEnabled(new Check(incorrect, changed));
                                 if (configOk) {
-                                    if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+                                    if (!application.getAutoClusters().isEmpty()) {
                                         Tools.sleep(1000);
                                         pressNextButton();
                                     }
@@ -229,7 +233,7 @@ final class CoroConfig extends DialogCluster {
                 @Override
                 public void run() {
                     final boolean configOk = updateOldAisConfig();
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             makeConfigButton.setEnabled(false);
@@ -243,7 +247,7 @@ final class CoroConfig extends DialogCluster {
                     }
                     nextButtonSetEnabled(new Check(incorrect, changed));
                     if (configOk) {
-                        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+                        if (!application.getAutoClusters().isEmpty()) {
                             Tools.sleep(1000);
                             pressNextButton();
                         }
@@ -386,14 +390,14 @@ final class CoroConfig extends DialogCluster {
         boolean noConfigs = true;
         boolean configOk = false;
         if (configs[0].equals(OPENAIS_CONF_READ_ERROR_STRING)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     configStatus.setText(hosts[0] + Tools.getString("Dialog.Cluster.CoroConfig.NoConfigFound"));
                 }
             });
             retry();
-            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+            if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 addAddressButton.pressButton();
             }
@@ -403,7 +407,7 @@ final class CoroConfig extends DialogCluster {
             for (j = 1; j < configs.length; j++) {
                 final Host host = hosts[j];
                 if (configs[j].equals(OPENAIS_CONF_READ_ERROR_STRING)) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(host
@@ -414,7 +418,7 @@ final class CoroConfig extends DialogCluster {
                     });
                     break;
                 } else if (!configs[0].equals(configs[j])) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             configStatus.setText(Tools.getString("Dialog.Cluster.CoroConfig.ConfigsNotTheSame"));
@@ -433,7 +437,7 @@ final class CoroConfig extends DialogCluster {
                     generated = true;
                 }
                 final boolean editableConfig = generated;
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         configStatus.setText(configFile + Tools.getString("Dialog.Cluster.CoroConfig.ais.conf.ok"));
@@ -458,7 +462,7 @@ final class CoroConfig extends DialogCluster {
         }
         if (!configOk) {
             final boolean noConfigsF = noConfigs;
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (noConfigsF) {
@@ -482,7 +486,7 @@ final class CoroConfig extends DialogCluster {
     /** Shows all corosync or openais.conf config files. */
     private void updateConfigPanelExisting() {
         final Host[] hosts = getCluster().getHostsArray();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeConfigButton.setEnabled(false);
@@ -522,7 +526,7 @@ final class CoroConfig extends DialogCluster {
     private void updateConfigPanelEditable(final boolean configChanged) {
         this.configChangedByUser = configChanged;
         final Host[] hosts = getCluster().getHostsArray();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!configChanged) {
@@ -609,7 +613,7 @@ final class CoroConfig extends DialogCluster {
                     } else {
                         guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
                     }
-                    if (!Tools.getApplication().getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
+                    if (!application.getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
                         makeConfigButton.pressButton();
                     }
@@ -619,7 +623,7 @@ final class CoroConfig extends DialogCluster {
     }
 
     private MyButton getRemoveButton(final AisCastAddress c) {
-        final MyButton removeButton = new MyButton(Tools.getString("Dialog.Cluster.CoroConfig.RemoveIntButton"));
+        final MyButton removeButton = widgetFactory.createButton(Tools.getString("Dialog.Cluster.CoroConfig.RemoveIntButton"));
         removeButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         removeButton.setMaximumSize(new Dimension(REMOVE_BUTTON_WIDTH, REMOVE_BUTTON_HEIGHT));
         removeButton.setPreferredSize(new Dimension(REMOVE_BUTTON_WIDTH, REMOVE_BUTTON_HEIGHT));
@@ -660,7 +664,7 @@ final class CoroConfig extends DialogCluster {
 
         for (final AisCastAddress c : aisCastAddresses) {
             if (c.equals("\t", type.getValueForConfig(), bindnetaddr, address, port)) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         addAddressButton.setEnabled(false);
@@ -669,7 +673,7 @@ final class CoroConfig extends DialogCluster {
                 return;
             }
         }
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 addAddressButton.setEnabled(true);
@@ -851,7 +855,7 @@ final class CoroConfig extends DialogCluster {
         final Host[] hosts = getCluster().getHostsArray();
         final Value[] types = {MCAST_TYPE};
 
-        typeWidget = WidgetFactory.createInstance(Widget.GUESS_TYPE,
+        typeWidget = widgetFactory.createInstance(Widget.GUESS_TYPE,
                                                   MCAST_TYPE,
                                                   types,
                                                   Widget.NO_REGEXP,
@@ -873,7 +877,7 @@ final class CoroConfig extends DialogCluster {
         if (defaultNi == null) {
             LOG.appError("getInputPane: " + hosts[0].getName() + ": missing network interfaces");
         }
-        ifaceWidget = WidgetFactory.createInstance(
+        ifaceWidget = widgetFactory.createInstance(
                                           Widget.Type.COMBOBOX,
                                           defaultNi,
                                           ni,
@@ -888,7 +892,7 @@ final class CoroConfig extends DialogCluster {
          * that it must match also during the thing is written.
          */
         final String regexp = "^[\\d.]+$";
-        addrWidget = WidgetFactory.createInstance(
+        addrWidget = widgetFactory.createInstance(
                               Widget.GUESS_TYPE,
                               new StringValue(Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastAddress")),
                               Widget.NO_ITEMS,
@@ -913,7 +917,7 @@ final class CoroConfig extends DialogCluster {
         });
 
         final String portRegexp = "^\\d+$";
-        portWidget = WidgetFactory.createInstance(
+        portWidget = widgetFactory.createInstance(
                 Widget.GUESS_TYPE,
                 new StringValue(Tools.getDefault("Dialog.Cluster.CoroConfig.DefaultMCastPort")),
                 Widget.NO_ITEMS,
@@ -936,7 +940,7 @@ final class CoroConfig extends DialogCluster {
             }
         });
 
-        addAddressButton = new MyButton(Tools.getString("Dialog.Cluster.CoroConfig.AddIntButton"));
+        addAddressButton = widgetFactory.createButton(Tools.getString("Dialog.Cluster.CoroConfig.AddIntButton"));
         addAddressButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         addAddressButton.addActionListener(
                 new ActionListener() {
@@ -973,7 +977,7 @@ final class CoroConfig extends DialogCluster {
                         public void run() {
                             if (CHECKBOX_EDIT_CONFIG_STRING.equals(text)) {
                                 updateConfigPanelEditable(configChangedByUser);
-                                Tools.invokeLater(new Runnable() {
+                                application.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(CHECKBOX_SEE_EXISTING_STRING);
@@ -983,7 +987,7 @@ final class CoroConfig extends DialogCluster {
                                 });
                             } else if (CHECKBOX_SEE_EXISTING_STRING.equals(text)) {
                                 updateConfigPanelExisting();
-                                Tools.invokeLater(new Runnable() {
+                                application.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         configCheckbox.setText(CHECKBOX_EDIT_CONFIG_STRING);

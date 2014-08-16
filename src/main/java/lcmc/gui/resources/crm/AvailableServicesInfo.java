@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import lcmc.gui.ClusterBrowser;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class AvailableServicesInfo extends HbCategoryInfo {
+    @Autowired
+    private WidgetFactory widgetFactory;
+
     @Override
     protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Description"};
@@ -48,7 +52,7 @@ public final class AvailableServicesInfo extends HbCategoryInfo {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
         for (final String cl : ClusterBrowser.CRM_CLASSES) {
-            final MyButton className = new MyButton(cl.toUpperCase(Locale.US));
+            final MyButton className = widgetFactory.createButton(cl.toUpperCase(Locale.US));
             rows.add(new Object[]{className, ClusterBrowser.CRM_CLASS_MENU.get(cl)});
         }
         return rows.toArray(new Object[rows.size()][]);

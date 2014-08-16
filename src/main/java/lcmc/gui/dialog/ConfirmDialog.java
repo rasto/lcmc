@@ -26,7 +26,13 @@ package lcmc.gui.dialog;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+
+import lcmc.model.Application;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * Creates confirm dialog with yes and no options.
@@ -35,14 +41,17 @@ import lcmc.utilities.Tools;
  * this dialog.
  *
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ConfirmDialog extends ConfigDialog {
-    private final String description;
-    private final String title;
-    private final String yesButton;
-    private final String noButton;
+    private String description;
+    private String title;
+    private String yesButton;
+    private String noButton;
+    @Autowired
+    private Application application;
 
-    public ConfirmDialog(final String title, final String description, final String yesButton, final String noButton) {
-        super();
+    public void init(final String title, final String description, final String yesButton, final String noButton) {
         this.title       = title;
         this.description = description;
         this.yesButton   = yesButton;
@@ -136,7 +145,7 @@ public final class ConfirmDialog extends ConfigDialog {
         super.initDialogBeforeVisible();
         enableComponentsLater(new JComponent[]{buttonClass(noButton())});
         enableComponents();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(noButton()).setEnabled(true);
@@ -148,7 +157,7 @@ public final class ConfirmDialog extends ConfigDialog {
     @Override
     protected void initDialogAfterVisible() {
         super.initDialogAfterVisible();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(noButton()).requestFocus();

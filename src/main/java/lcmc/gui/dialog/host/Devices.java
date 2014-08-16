@@ -31,6 +31,7 @@ import javax.swing.SpringLayout;
 
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.model.Application;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
@@ -49,6 +50,8 @@ import org.springframework.stereotype.Component;
 public class Devices extends DialogHost {
     @Autowired
     private DistDetection distDetection;
+    @Autowired
+    private Application application;
 
     /** Checks the answer and makes it visible to the user. */
     final void checkAnswer(final String ans) {
@@ -67,7 +70,7 @@ public class Devices extends DialogHost {
             buttonClass(nextButton()).requestFocus();
         }
         enableNextButtons(incorrect, changed);
-        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
+        if (!application.getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }

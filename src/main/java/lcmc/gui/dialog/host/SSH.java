@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 
 import lcmc.gui.SSHGui;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.model.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;
@@ -49,6 +50,8 @@ public class SSH extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
     @Autowired
     private Devices devices;
+    @Autowired
+    private Application application;
 
     private String connectHost() {
         final SSHGui sshGui = new SSHGui(getDialogPanel(), getHost(), getProgressBar());
@@ -63,7 +66,7 @@ public class SSH extends DialogHost {
                              getHost().setConnected();
                              progressBarDone();
                              answerPaneSetText(Tools.getString("Dialog.Host.SSH.Connected"));
-                             Tools.invokeLater(new Runnable() {
+                             application.invokeLater(new Runnable() {
                                  @Override
                                  public void run() {
                                     buttonClass(nextButton()).pressButton();

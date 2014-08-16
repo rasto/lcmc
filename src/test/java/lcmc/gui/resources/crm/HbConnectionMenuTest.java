@@ -21,44 +21,69 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
-import lcmc.gui.CrmGraph;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.model.AccessMode;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.swing.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HbConnectionMenuTest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private HbConnectionInfo hbConnectionInfoStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private CrmGraph crmGraphStub;
-
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
     private HbConnectionMenu hbConnectionMenu;
 
     @Before
     public void setUp() {
         when(hbConnectionInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(clusterBrowserStub.getCrmGraph()).thenReturn(crmGraphStub);
+        when(menuFactoryStub.createMenuItem(anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
 
-        hbConnectionMenu = new HbConnectionMenu(hbConnectionInfoStub);
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = hbConnectionMenu.getPulldownMenu();
+        final List<UpdatableItem> items = hbConnectionMenu.getPulldownMenu(hbConnectionInfoStub);
+        verify(menuItemStub, times(2)).predicate((Predicate) anyObject());
+        verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(3)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(3)).addAction((MenuAction) anyObject());
 
         assertEquals(3, items.size());
     }

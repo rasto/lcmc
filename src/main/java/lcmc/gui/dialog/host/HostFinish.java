@@ -32,6 +32,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
 import lcmc.gui.GUIData;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
 import lcmc.model.UserConfig;
@@ -70,6 +72,10 @@ final class HostFinish extends DialogHost {
     private GUIData guiData;
     @Autowired @Qualifier("newHostDialog")
     private Provider<NewHostDialog> newHostDialogFactory;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     @Override
     public WizardDialog nextDialog() {
@@ -79,8 +85,8 @@ final class HostFinish extends DialogHost {
     @Override
     protected void finishDialog() {
         if (saveCheckBox.isSelected()) {
-            final String saveFile = Tools.getApplication().getDefaultSaveFile();
-            Tools.save(guiData, userConfig, saveFile, false);
+            final String saveFile = application.getDefaultSaveFile();
+            application.saveConfig(saveFile, false);
         }
     }
 
@@ -93,16 +99,16 @@ final class HostFinish extends DialogHost {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
-        if (Tools.getApplication().danglingHostsCount() < 2) {
+        if (application.danglingHostsCount() < 2) {
             makeDefaultAndRequestFocusLater(addAnotherHostButton);
         } else {
             makeDefaultAndRequestFocusLater(configureClusterButton);
         }
-        Tools.getApplication().removeAutoHost();
-        if (Tools.getApplication().getAutoHosts().isEmpty()) {
-            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+        application.removeAutoHost();
+        if (application.getAutoHosts().isEmpty()) {
+            if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         configureClusterButton.pressButton();
@@ -111,7 +117,7 @@ final class HostFinish extends DialogHost {
             }
         } else {
             Tools.sleep(1000);
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addAnotherHostButton.pressButton();
@@ -134,7 +140,7 @@ final class HostFinish extends DialogHost {
     protected JComponent getInputPane() {
         final JPanel pane = new JPanel();
         /* host wizard button */
-        addAnotherHostButton = new MyButton(Tools.getString("Dialog.Host.Finish.AddAnotherHostButton"), HOST_ICON);
+        addAnotherHostButton = widgetFactory.createButton(Tools.getString("Dialog.Host.Finish.AddAnotherHostButton"), HOST_ICON);
         addAnotherHostButton.setPreferredSize(BUTTON_DIMENSION);
         final DialogHost thisClass = this;
         addAnotherHostButton.addActionListener(new ActionListener() {
@@ -144,14 +150,13 @@ final class HostFinish extends DialogHost {
                     @Override
                     public void run() {
                         final Host newHost = hostFactory.createInstance();
-                        newHost.init();
                         newHost.getSSH().setPasswords(getHost().getSSH().getLastSuccessfulDsaKey(),
                                 getHost().getSSH().getLastSuccessfulRsaKey(),
                                 getHost().getSSH().getLastSuccessfulPassword());
                         newHostDialog = newHostDialogFactory.get();
                         newHostDialog.init(thisClass, newHost, getDrbdInstallation());
                         guiData.allHostsUpdate();
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 addAnotherHostButton.setEnabled(false);
@@ -164,8 +169,8 @@ final class HostFinish extends DialogHost {
             }
         });
         /* cluster wizard button */
-        configureClusterButton = new MyButton(Tools.getString("Dialog.Host.Finish.ConfigureClusterButton"),
-                                              CLUSTER_ICON);
+        configureClusterButton = widgetFactory.createButton(Tools.getString("Dialog.Host.Finish.ConfigureClusterButton"),
+                                                            CLUSTER_ICON);
         configureClusterButton.setPreferredSize(BUTTON_DIMENSION);
         configureClusterButton.addActionListener(new ActionListener() {
             @Override
@@ -173,7 +178,7 @@ final class HostFinish extends DialogHost {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 configureClusterButton.setEnabled(false);
@@ -187,7 +192,7 @@ final class HostFinish extends DialogHost {
             }
         });
         pane.add(addAnotherHostButton);
-        if (Tools.getApplication().danglingHostsCount() < 1) {
+        if (application.danglingHostsCount() < 1) {
             configureClusterButton.setEnabled(false);
         }
         pane.add(configureClusterButton);

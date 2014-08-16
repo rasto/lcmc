@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
@@ -40,11 +42,17 @@ import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual video device.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class VideoInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {VideoData.MODEL_TYPE,
@@ -94,30 +102,15 @@ final class VideoInfo extends HardwareInfo {
                                         new StringValue("xen")});
     }
 
-
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Video Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addVideosPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the VideoInfo object. */
-    VideoInfo(final String name, final Browser browser,
-                 final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
+        super.init(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -125,9 +118,9 @@ final class VideoInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Video Devices",
                                    DomainInfo.VIDEO_TABLE,
-                                   getNewBtn(getVMSVirtualDomainInfo()));
+                                   getVMSVirtualDomainInfo().getNewVideoBtn());
         if (getResource().isNew()) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -235,7 +228,7 @@ final class VideoInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -264,7 +257,7 @@ final class VideoInfo extends HardwareInfo {
         getBrowser().reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);

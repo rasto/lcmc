@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import lcmc.gui.EmptyBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.model.Application;
 import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,8 @@ final class Finish extends DialogCluster {
     private UserConfig userConfig;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
     @Override
     public WizardDialog nextDialog() {
@@ -61,8 +64,8 @@ final class Finish extends DialogCluster {
     protected void finishDialog() {
         emptyBrowser.addClusterBox(getCluster());
         if (saveCheckBox.isSelected()) {
-            final String saveFile = Tools.getApplication().getDefaultSaveFile();
-            Tools.save(guiData, userConfig, saveFile, false);
+            final String saveFile = application.getDefaultSaveFile();
+            application.saveConfig(saveFile, false);
         }
     }
 
@@ -75,8 +78,8 @@ final class Finish extends DialogCluster {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents(new JComponent[]{buttonClass(nextButton())});
-        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
-            Tools.getApplication().removeAutoCluster();
+        if (!application.getAutoClusters().isEmpty()) {
+            application.removeAutoCluster();
             Tools.sleep(1000);
             buttonClass(finishButton()).pressButton();
         }

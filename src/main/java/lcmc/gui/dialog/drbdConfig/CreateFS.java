@@ -45,6 +45,7 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -72,8 +73,11 @@ final class CreateFS extends DrbdConfig {
     private Widget filesystemWidget;
     private Widget skipInitialSyncWidget;
     private JLabel skipInitialSyncLabel;
-    private final MyButton makeFileSystemButton =
-                                        new MyButton(Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private MyButton makeFileSystemButton;
 
     /**
      * Finishes the dialog. If primary bd was choosen it is forced to be a
@@ -110,7 +114,7 @@ final class CreateFS extends DrbdConfig {
             public void run() {
                 getProgressBar().start(1);
                 answerPaneSetText(Tools.getString("Dialog.DrbdConfig.CreateFS.MakeFS"));
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(finishButton()).setEnabled(false);
@@ -165,8 +169,8 @@ final class CreateFS extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
-            Tools.invokeLater(new Runnable() {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     makeFileSystemButton.pressButton();
@@ -182,7 +186,7 @@ final class CreateFS extends DrbdConfig {
     protected void checkButtons() {
         final boolean noHost = hostChoiceWidget.getValue().equals(NO_HOST_STRING);
         final boolean noFileSystem = filesystemWidget.getValue().equals(NO_FILESYSTEM_STRING);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (noHost) {
@@ -198,7 +202,7 @@ final class CreateFS extends DrbdConfig {
             }
         });
         if (noFileSystem) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(true);
@@ -207,7 +211,7 @@ final class CreateFS extends DrbdConfig {
                 }
             });
         } else if (noHost) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);
@@ -215,7 +219,7 @@ final class CreateFS extends DrbdConfig {
             });
             makeFileSystemButton.setEnabled(false);
         } else {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(finishButton()).setEnabled(false);
@@ -231,6 +235,7 @@ final class CreateFS extends DrbdConfig {
 
     @Override
     protected JComponent getInputPane() {
+        makeFileSystemButton = widgetFactory.createButton(Tools.getString("Dialog.DrbdConfig.CreateFS.CreateFsButton"));
         makeFileSystemButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -245,10 +250,10 @@ final class CreateFS extends DrbdConfig {
         }
         final JLabel hostLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.ChooseHost"));
         Value defaultHost = NO_HOST_STRING;
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
             defaultHost = hosts[1];
         }
-        hostChoiceWidget = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+        hostChoiceWidget = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                         defaultHost,
                                                         hosts,
                                                         Widget.NO_REGEXP,
@@ -271,7 +276,7 @@ final class CreateFS extends DrbdConfig {
         final Value defaultValue = NO_FILESYSTEM_STRING;
         final Value[] filesystems = getDrbdVolumeInfo().getDrbdResourceInfo().getCommonFileSystems( defaultValue);
 
-        filesystemWidget = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+        filesystemWidget = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                         defaultValue,
                                                         filesystems,
                                                         Widget.NO_REGEXP,
@@ -279,7 +284,7 @@ final class CreateFS extends DrbdConfig {
                                                         Widget.NO_ABBRV,
                                                         new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                                         Widget.NO_BUTTON);
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
             filesystemWidget.setValueAndWait(new StringValue("ext3"));
         }
         inputPane.add(filesystemLabel);
@@ -306,7 +311,7 @@ final class CreateFS extends DrbdConfig {
         /* skip initial full sync */
         skipInitialSyncLabel = new JLabel(Tools.getString("Dialog.DrbdConfig.CreateFS.SkipSync"));
         skipInitialSyncLabel.setEnabled(false);
-        skipInitialSyncWidget = WidgetFactory.createInstance(Widget.Type.CHECKBOX,
+        skipInitialSyncWidget = widgetFactory.createInstance(Widget.Type.CHECKBOX,
                                                              SKIP_SYNC_FALSE,
                                                              new Value[]{SKIP_SYNC_TRUE, SKIP_SYNC_FALSE},
                                                              Widget.NO_REGEXP,

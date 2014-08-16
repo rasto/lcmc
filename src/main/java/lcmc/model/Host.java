@@ -63,10 +63,16 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.ssh.SshOutput;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds host data and implementation of host related methods.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Host implements Comparable<Host>, Value {
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     public static final String NOT_CONNECTED_MENU_TOOLTIP_TEXT = "not connected to the host";
@@ -196,7 +202,6 @@ public class Host implements Comparable<Host>, Value {
     private String sshPort = null;
     private Boolean useSudo = null;
     private String sudoPassword = "";
-    private HostBrowser hostBrowser;
     /** A gate that is used to synchronize the loading sequence. */
     private CountDownLatch isLoadingGate;
     private final CountDownLatch waitForServerStatusLatch = new CountDownLatch(1);
@@ -224,42 +229,33 @@ public class Host implements Comparable<Host>, Value {
     /** Whether dist info was already logged. */
     private boolean distInfoAlreadyLogged = false;
 
-    private final DrbdHost drbdHost;
     private boolean drbdStatusOk = false;
 
+    @Autowired
+    private DrbdHost drbdHost;
+    @Autowired
     private TerminalPanel terminalPanel;
-
+    @Autowired
     private GUIData guiData;
+    @Autowired
     private Ssh ssh;
-
+    @Autowired
+    private HostBrowser hostBrowser;
+    @Autowired
     private Provider<DrbdXml> drbdXmlProvider;
+    @Autowired
+    private Hosts allHosts;
+    @Autowired
+    private Application application;
 
-    public Host(final GUIData guiData,
-                final Ssh ssh,
-                final DrbdHost drbdHost,
-                final TerminalPanel terminalPanel,
-                final Provider<DrbdXml> drbdXmlProvider) {
-        this.guiData = guiData;
-        this.ssh = ssh;
-
-        this.drbdHost = drbdHost;
-        this.terminalPanel = terminalPanel;
-        this.drbdXmlProvider = drbdXmlProvider;
-
-
-        if (Tools.getApplication().getAllHosts().size() == 1) {
+    public void init() {
+        if (allHosts.size() == 1) {
             enteredHostOrIp = Tools.getDefault("SSH.SecHost");
         }
         mountPoints.add("/mnt/");
-    }
 
-    public void init() {
         hostBrowser.init(this);
         terminalPanel.initWithHost(this);
-    }
-
-    public void setBrowser(final HostBrowser hostBrowser) {
-        this.hostBrowser = hostBrowser;
     }
 
     public HostBrowser getBrowser() {
@@ -1153,7 +1149,7 @@ public class Host implements Comparable<Host>, Value {
         if (!enableOnConnectElements.contains(c)) {
             enableOnConnectElements.add(c);
         }
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 c.setEnabled(isConnected());
@@ -1168,7 +1164,7 @@ public class Host implements Comparable<Host>, Value {
      */
     public void setConnected() {
         final boolean con = isConnected();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final JComponent c : enableOnConnectElements) {
@@ -1446,7 +1442,7 @@ public class Host implements Comparable<Host>, Value {
                                      dxml.init(cluster.getHostsArray(), cb.getHostDrbdParameters());
                                      dxml.update(drbdUpdate);
                                      cb.setDrbdXml(dxml);
-                                     Tools.invokeLater(new Runnable() {
+                                     application.invokeLater(new Runnable() {
                                          @Override
                                          public void run() {
                                              hostBrowser.getClusterBrowser().getGlobalInfo().setParameters();
@@ -1531,17 +1527,17 @@ public class Host implements Comparable<Host>, Value {
      */
     public String replaceVars(String command, final boolean hidePassword) {
         if (command.indexOf("@USER@") > -1) {
-            command = command.replaceAll("@USER@", Tools.getApplication().getDownloadUser());
+            command = command.replaceAll("@USER@", application.getDownloadUser());
         }
         if (command.indexOf("@PASSWORD@") > -1) {
             if (hidePassword) {
                 command = command.replaceAll("@PASSWORD@", "*****");
             } else {
-                command = command.replaceAll("@PASSWORD@", Tools.getApplication().getDownloadPassword());
+                command = command.replaceAll("@PASSWORD@", application.getDownloadPassword());
             }
         }
         String supportDir = "support";
-        if (Tools.getApplication().isStagingDrbd()) {
+        if (application.isStagingDrbd()) {
             supportDir = "support/staging";
         }
         if (kernelVersion != null
@@ -1566,7 +1562,7 @@ public class Host implements Comparable<Host>, Value {
         if (command.indexOf("@GUI-HELPER@") > -1) {
             final StringBuilder helperProg = new StringBuilder("/usr/local/bin/lcmc-gui-helper-");
             helperProg.append(Tools.getRelease());
-            if (Tools.getApplication().isCmdLog()) {
+            if (application.isCmdLog()) {
                 helperProg.append(' ');
                 helperProg.append(LOG_COMMANDS_ON_SERVER_OPTION);
             }
@@ -2356,7 +2352,7 @@ public class Host implements Comparable<Host>, Value {
     /** This is part of testsuite, it checks DRBD. */
     public boolean checkDRBDTest(final String test, final double index) {
         final StringBuilder testName = new StringBuilder(20);
-        if (Tools.getApplication().getBigDRBDConf()) {
+        if (application.getBigDRBDConf()) {
             testName.append("big-");
         }
         if (!hasVolumes()) {

@@ -73,14 +73,8 @@ public class Cluster implements Comparable<Cluster> {
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
-
-    public Cluster(final String name) {
-        this.name = name;
-    }
-
-    public Cluster() {
-
-    }
+    @Autowired
+    private Application application;
 
     public void setName(final String name) {
         this.name = name;
@@ -364,7 +358,7 @@ public class Cluster implements Comparable<Cluster> {
             host.disconnect();
         }
         final Cluster thisCluster = this;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 guiData.getClustersPanel().removeTabWithCluster(thisCluster);

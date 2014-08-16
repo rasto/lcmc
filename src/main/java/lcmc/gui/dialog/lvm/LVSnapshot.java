@@ -38,26 +38,35 @@ import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 /**
  * This class implements LVM snapshot dialog.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class LVSnapshot extends LV {
     private static final int SNAPSHOT_TIMEOUT = 5000;
     private static final String SNAPSHOT_DESCRIPTION = "Create a snapshot of the logical volume.";
-    private final BlockDevInfo blockDevInfo;
-    private final MyButton snapshotButton = new MyButton("Create Snapshot");
+    private BlockDevInfo blockDevInfo;
     private Widget lvNameWi;
     private Widget sizeWi;
     private Widget maxSizeWi;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private final MyButton snapshotButton = widgetFactory.createButton("Create Snapshot");
 
-    public LVSnapshot(final BlockDevInfo blockDevInfo) {
-        super(null);
+    public void init(final BlockDevInfo blockDevInfo) {
+        super.init(null);
         this.blockDevInfo = blockDevInfo;
     }
 
@@ -84,7 +93,7 @@ public final class LVSnapshot extends LV {
     }
 
     protected void checkButtons() {
-        Tools.invokeLater(new EnableSnapshotRunnable(true));
+        application.invokeLater(new EnableSnapshotRunnable(true));
     }
 
     private void setComboBoxes() {
@@ -115,7 +124,7 @@ public final class LVSnapshot extends LV {
             }
             i++;
         }
-        lvNameWi = WidgetFactory.createInstance(
+        lvNameWi = widgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
                                       new StringValue(defaultName),
                                       Widget.NO_ITEMS,
@@ -139,7 +148,8 @@ public final class LVSnapshot extends LV {
         final String newBlockSize = Long.toString(Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        sizeWi = new TextfieldWithUnit(
+        sizeWi =  widgetFactory.createInstance(
+                       Widget.Type.TEXTFIELDWITHUNIT,
                        VmsXml.convertKilobytes(newBlockSize),
                        getUnits(),
                        Widget.NO_REGEXP,
@@ -155,7 +165,7 @@ public final class LVSnapshot extends LV {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeAndWait(new EnableSnapshotRunnable(false));
+                        application.invokeAndWait(new EnableSnapshotRunnable(false));
                         disableComponents();
                         getProgressBar().start(SNAPSHOT_TIMEOUT);
                         final boolean ret = lvSnapshot(lvNameWi.getStringValue(), sizeWi.getStringValue());
@@ -179,7 +189,8 @@ public final class LVSnapshot extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWi = new TextfieldWithUnit(
+        maxSizeWi =  widgetFactory.createInstance(
+                        Widget.Type.TEXTFIELDWITHUNIT,
                         VmsXml.convertKilobytes(maxBlockSize),
                         getUnits(),
                         Widget.NO_REGEXP,

@@ -62,6 +62,8 @@ public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
     @Autowired
     private CloneMenu cloneMenu;
+    @Autowired
+    private Application application;
 
     void init(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {
         super.init(name, ra, browser);
@@ -81,7 +83,7 @@ public class CloneInfo extends ServiceInfo {
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final DefaultMutableTreeNode node = getNode();
@@ -103,7 +105,7 @@ public class CloneInfo extends ServiceInfo {
         newServiceInfo.setCloneInfo(this);
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
         setNode(node);
-        Tools.isSwingThread();
+        application.isSwingThread();
         getBrowser().getServicesNode().add(node);
         node.add(newServiceInfo.getNode());
         getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);

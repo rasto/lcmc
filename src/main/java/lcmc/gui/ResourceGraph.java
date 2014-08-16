@@ -162,7 +162,8 @@ public abstract class ResourceGraph {
     /** List of edges that are being tested during test. */
     private volatile Edge existingTestEdge = null;
     private final Lock mTestEdgeLock = new ReentrantLock();
-    private final int animInterval = (int) (1000 / Tools.getApplication().getAnimFPS());
+    @Autowired
+    private Application application;
     private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
     private double scaledSoFar = 1.0;
 
@@ -172,6 +173,7 @@ public abstract class ResourceGraph {
 
     /** Starts the animation if vertex is being updated. */
     public final void startAnimation(final Info info) {
+        final int animInterval = (int) (1000 / application.getAnimFPS());
         mAnimationListLock.lock();
         if (animationList.isEmpty()) {
             /* start animation thread */
@@ -223,11 +225,12 @@ public abstract class ResourceGraph {
 
     /** Starts the animation if vertex is being tested. */
     public final void startTestAnimation(final JComponent component, final CountDownLatch startTestLatch) {
+        final int animInterval = (int) (1000 / application.getAnimFPS());
         mTestAnimationListLock.lock();
         mRunModeFlag.lock();
         runModeFlag = Application.RunMode.LIVE;
         mRunModeFlag.unlock();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 Tools.setMenuOpaque(component, false);
@@ -632,7 +635,7 @@ public abstract class ResourceGraph {
     protected final void showPopup(final JPopupMenu popup, final Point2D p) {
         final int posX = (int) p.getX();
         final int posY = (int) p.getY();
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 if (visualizationViewer.isShowing() && visualizationViewer.isDisplayable()) {
@@ -922,7 +925,7 @@ public abstract class ResourceGraph {
 
     protected final void removeTestEdge() {
         if (testEdge != null) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     mTestEdgeLock.lock();
@@ -943,7 +946,7 @@ public abstract class ResourceGraph {
         if (vP == null || v == null) {
             throw new IllegalArgumentException("addTestEdge: vP: " + vP + ", v: " + v);
         }
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!mTestEdgeLock.tryLock()) {
@@ -1028,7 +1031,7 @@ public abstract class ResourceGraph {
             public void scale(final VisualizationServer vv, final float amount, final Point2D from) {
                 final JScrollBar sbV = getScrollPane().getVerticalScrollBar();
                 final JScrollBar sbH = getScrollPane().getHorizontalScrollBar();
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Point2D prevPoint = getVisualizationViewer().getRenderContext()
@@ -1606,7 +1609,7 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                    application.invokeLater(!Application.CHECK_SWING_THREAD,
                                       new Runnable() {
                                           @Override
                                           public void run() {

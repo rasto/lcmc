@@ -34,8 +34,8 @@ import lcmc.gui.dialog.HostLogs;
  */
 public final class DrbdsLog extends HostLogs {
 
-    public DrbdsLog(final Host host) {
-        super(host);
+    public void init(final Host host) {
+        super.init(host);
     }
 
     @Override

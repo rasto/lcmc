@@ -40,28 +40,36 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ClusterStatus {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterStatus.class);
     private volatile CibQuery cibQuery = new CibQuery();
     private volatile CibQuery shadowCibQuery = new CibQuery();
-    private final CrmXml crmXML;
+    private CrmXml crmXML;
     /** On which node the resource is running or is a slave. */
     private volatile Map<String, ResourceStatus> resStateMap = null;
     private volatile PtestData ptestResult = null;
     private String oldStatus = null;
     private String oldCib = null;
     private boolean oldAdvancedMode = false;
-    private final Host host;
+    private Host host;
+    @Autowired
+    private Application application;
 
     /**
      * Gets and parses metadata from pengine and crmd.
      */
-    public ClusterStatus(final Host host, final CrmXml crmXML) {
+    public void init(final Host host, final CrmXml crmXML) {
         this.host = host;
         this.crmXML = crmXML;
         final String command = host.getDistCommand("Heartbeat.getClusterMetadata",
@@ -453,7 +461,7 @@ public final class ClusterStatus {
                 }
             } else if ("cibadmin".equals(cmd)) {
                 final String cib = Tools.join("\n", data.toArray(new String[data.size()]));
-                final boolean advancedMode = Tools.getApplication().isAdvancedMode();
+                final boolean advancedMode = application.isAdvancedMode();
                 if (!cib.equals(oldCib) || oldAdvancedMode != advancedMode) {
                     LOG.debug1("parseCommand: cib update: " + host.getName());
                     oldCib = cib;

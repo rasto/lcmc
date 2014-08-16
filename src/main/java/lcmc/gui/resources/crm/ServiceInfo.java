@@ -70,7 +70,6 @@ import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Check;
-import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.ButtonCallback;
@@ -200,7 +199,7 @@ public class ServiceInfo extends EditableInfo {
     @Autowired
     private ServiceMenu serviceMenu;
     @Autowired
-    private Provider<FilesystemInfo> filesystemInfoProvider;
+    private Provider<FilesystemRaInfo> filesystemInfoProvider;
     @Autowired
     private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
     @Autowired
@@ -215,6 +214,10 @@ public class ServiceInfo extends EditableInfo {
     private Provider<CloneInfo> cloneInfoProvider;
     @Autowired @Qualifier("serviceInfo")
     private Provider<ServiceInfo> serviceInfoProvider;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     protected void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, browser);
@@ -328,14 +331,14 @@ public class ServiceInfo extends EditableInfo {
             if (savedMetaAttrInfoRef == null
                 && defaultValues != allMetaAttrsAreDefaultValues) {
                 if (allMetaAttrsAreDefaultValues) {
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             sameAsMetaAttrsWi.setValueNoListeners(META_ATTRS_DEFAULT_VALUES);
                         }
                     });
                 } else {
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             sameAsMetaAttrsWi.setValueNoListeners(null);
@@ -686,7 +689,7 @@ public class ServiceInfo extends EditableInfo {
                             } finally {
                                 mOperationsComboBoxHashReadLock.unlock();
                             }
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     wi.setEnabled(operationIdRef == null);
@@ -1144,14 +1147,14 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (savedOperationIdRef == null && defaultValues != allAreDefaultValues) {
                     if (allAreDefaultValues) {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(OPERATIONS_DEFAULT_VALUES);
                             }
                         });
                     } else {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(null);
@@ -1278,8 +1281,8 @@ public class ServiceInfo extends EditableInfo {
         ci.getResource().setValue(GUI_ID, new StringValue(ci.getService().getId()));
         ci.addParams(optionsPanel,
                      params,
-                     ClusterBrowser.SERVICE_LABEL_WIDTH,
-                     ClusterBrowser.SERVICE_FIELD_WIDTH,
+                     application.getServiceLabelWidth(),
+                     application.getServiceFieldWidth(),
                      ci.getSameAsFields(savedMAIdRef));
         if (!ci.getService().isNew()) {
             ci.getWidget(GUI_ID, null).setEnabled(false);
@@ -1291,7 +1294,7 @@ public class ServiceInfo extends EditableInfo {
             }
         }
 
-        ci.addHostLocations(optionsPanel, ClusterBrowser.SERVICE_LABEL_WIDTH, ClusterBrowser.SERVICE_FIELD_WIDTH);
+        ci.addHostLocations(optionsPanel, application.getServiceLabelWidth(), application.getServiceFieldWidth());
     }
 
     /**
@@ -1323,7 +1326,7 @@ public class ServiceInfo extends EditableInfo {
             abbreviations.put("I", CrmXml.INFINITY_VALUE.getValueForConfig());
             abbreviations.put("a", "ALWAYS");
             abbreviations.put("n", "NEVER");
-            final Widget wi = WidgetFactory.createInstance(
+            final Widget wi = widgetFactory.createInstance(
                                   Widget.Type.COMBOBOX,
                                   NOTHING_SELECTED_VALUE,
                                   new Value[]{NOTHING_SELECTED_VALUE,
@@ -1391,7 +1394,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void mousePressed(final MouseEvent e) {
                     final String currentText = label.getText();
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (currentText.equals(onText)) {
@@ -1430,7 +1433,7 @@ public class ServiceInfo extends EditableInfo {
         } else {
             savedPO = prevWi.getValue();
         }
-        final Widget pingWi = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+        final Widget pingWi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                            savedPO,
                                                            new Value[]{NOTHING_SELECTED_VALUE,
                                                                        PING_ATTRIBUTES.get("defined"),
@@ -1477,7 +1480,7 @@ public class ServiceInfo extends EditableInfo {
      * values.
      */
     private void setMetaAttrsSameAs(final Value info) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (sameAsMetaAttrsWi == null || info == null || info.isNothingSelected()) {
             return;
         }
@@ -1641,7 +1644,7 @@ public class ServiceInfo extends EditableInfo {
      * values.
      */
     private void setOperationsSameAs(final Value info) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (sameAsOperationsWi == null) {
             return;
         }
@@ -1691,7 +1694,7 @@ public class ServiceInfo extends EditableInfo {
     protected void addOperations(final JPanel optionsPanel, final int leftWidth, final int rightWidth) {
         final JPanel sectionPanel = getParamPanel(Tools.getString("ClusterBrowser.Operations"));
         final Info savedOpIdRef = getSameServiceOpIdRef();
-        sameAsOperationsWi = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+        sameAsOperationsWi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                           savedOpIdRef,
                                                           getSameServicesOperations(),
                                                           Widget.NO_REGEXP,
@@ -1721,7 +1724,7 @@ public class ServiceInfo extends EditableInfo {
         final JPanel advancedOpPanel = new JPanel(new SpringLayout());
         advancedOpPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         addToAdvancedList(advancedOpPanel);
-        advancedOpPanel.setVisible(Tools.getApplication().isAdvancedMode());
+        advancedOpPanel.setVisible(application.isAdvancedMode());
         int advancedRows = 0;
         boolean allAreDefaultValues = true;
         int normalRows = 0;
@@ -1766,7 +1769,7 @@ public class ServiceInfo extends EditableInfo {
                 }
                 final Widget wi;
                 if (CrmXml.PARAM_OCF_CHECK_LEVEL.equals(param)) {
-                    wi = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+                    wi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                       defaultValue,
                                                       new Value[]{NOTHING_SELECTED_VALUE,
                                                                   new StringValue("10"),
@@ -1778,7 +1781,10 @@ public class ServiceInfo extends EditableInfo {
                                                       Widget.NO_BUTTON);
                 } else {
                     final String regexp = "^-?\\d*$";
-                    wi = new TextfieldWithUnit(defaultValue,
+                    wi = widgetFactory.createInstance(
+                                               Widget.Type.TEXTFIELDWITHUNIT,
+                                               defaultValue,
+                                               Widget.NO_ITEMS,
                                                getUnits(param),
                                                regexp,
                                                rightWidth,
@@ -1806,7 +1812,7 @@ public class ServiceInfo extends EditableInfo {
                     normalRows++;
                 }
                 addField(panel, wiLabel, wi.getComponent(), leftWidth, rightWidth, 0);
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         wiLabel.setToolTipText(labelText);
@@ -1832,7 +1838,7 @@ public class ServiceInfo extends EditableInfo {
                     @Override
                     public void check(final Value value) {
                         final String[] params = getParametersFromXML();
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 final Value info = sameAsOperationsWiValue();
@@ -2170,7 +2176,7 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = clone0;
         final boolean masterSlave = masterSlave0;
 
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (clone) {
@@ -2191,7 +2197,7 @@ public class ServiceInfo extends EditableInfo {
                                 @Override
                                 public void check(final Value value) {
                                     setApplyButtons(CACHED_FIELD, params);
-                                    Tools.invokeLater(
+                                    application.invokeLater(
                                         new Runnable() {
                                             @Override
                                             public void run() {
@@ -2244,11 +2250,11 @@ public class ServiceInfo extends EditableInfo {
      * attributes".
      */
     protected final Map<String, Widget> getSameAsFields(final Value savedMAIdRef) {
-        sameAsMetaAttrsWi = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+        sameAsMetaAttrsWi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                          savedMAIdRef,
                                                          getSameServicesMetaAttrs(),
                                                          Widget.NO_REGEXP,
-                                                         ClusterBrowser.SERVICE_FIELD_WIDTH,
+                                                         application.getServiceFieldWidth(),
                                                          Widget.NO_ABBRV,
                                                          new AccessMode(Application.AccessType.ADMIN, false),
                                                          Widget.NO_BUTTON);
@@ -2265,7 +2271,7 @@ public class ServiceInfo extends EditableInfo {
                 @Override
                 public void check(final Value value) {
                     final String[] params = getParametersFromXML();
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             final Value v = sameAsMetaAttrsWiValue();
@@ -2442,14 +2448,14 @@ public class ServiceInfo extends EditableInfo {
             }
         }
         if (!getResourceAgent().isClone() && getGroupInfo() == null) {
-            typeRadioGroup = WidgetFactory.createInstance(Widget.Type.RADIOGROUP,
+            typeRadioGroup = widgetFactory.createInstance(Widget.Type.RADIOGROUP,
                                                           defaultValue,
                                                           new Value[]{PRIMITIVE_TYPE_STRING,
                                                                       CLONE_TYPE_STRING,
                                                                       MASTER_SLAVE_TYPE_STRING},
                                                           Widget.NO_REGEXP,
-                                                          ClusterBrowser.SERVICE_LABEL_WIDTH
-                                                          + ClusterBrowser.SERVICE_FIELD_WIDTH,
+                                                          application.getServiceLabelWidth()
+                                                          + application.getServiceFieldWidth(),
                                                           Widget.NO_ABBRV,
                                                           new AccessMode(Application.AccessType.ADMIN, false),
                                                           Widget.NO_BUTTON);
@@ -2473,7 +2479,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (ci != null) {
             /* add clone fields */
-            addCloneFields(optionsPanel, ClusterBrowser.SERVICE_LABEL_WIDTH, ClusterBrowser.SERVICE_FIELD_WIDTH, ci);
+            addCloneFields(optionsPanel, application.getServiceLabelWidth(), application.getServiceFieldWidth(), ci);
         }
         getResource().setValue(GUI_ID, new StringValue(getService().getId()));
 
@@ -2483,12 +2489,12 @@ public class ServiceInfo extends EditableInfo {
         final Info savedMAIdRef = savedMetaAttrInfoRef;
         addParams(optionsPanel,
                   params,
-                  ClusterBrowser.SERVICE_LABEL_WIDTH,
-                  ClusterBrowser.SERVICE_FIELD_WIDTH,
+                  application.getServiceLabelWidth(),
+                  application.getServiceFieldWidth(),
                   getSameAsFields(savedMAIdRef));
         if (ci == null) {
             /* score combo boxes */
-            addHostLocations(optionsPanel, ClusterBrowser.SERVICE_LABEL_WIDTH, ClusterBrowser.SERVICE_FIELD_WIDTH);
+            addHostLocations(optionsPanel, application.getServiceLabelWidth(), application.getServiceFieldWidth());
         }
 
         for (final String param : params) {
@@ -2502,7 +2508,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (!getResourceAgent().isGroup() && !getResourceAgent().isClone()) {
             /* Operations */
-            addOperations(optionsPanel, ClusterBrowser.SERVICE_LABEL_WIDTH, ClusterBrowser.SERVICE_FIELD_WIDTH);
+            addOperations(optionsPanel, application.getServiceLabelWidth(), application.getServiceFieldWidth());
             /* add item listeners to the operations combos */
             for (final String op : getResourceAgent().getOperationNames()) {
                 for (final String param : getBrowser().getCrmOperationParams(op)) {
@@ -2519,7 +2525,7 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */
@@ -2531,8 +2537,8 @@ public class ServiceInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(ClusterBrowser.SERVICE_LABEL_WIDTH
-                                         + ClusterBrowser.SERVICE_FIELD_WIDTH
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
+                                         + application.getServiceFieldWidth()
                                          + 4));
         newPanel.add(new JScrollPane(mainPanel));
         /* if id textfield was changed and this id is not used,
@@ -2951,7 +2957,7 @@ public class ServiceInfo extends EditableInfo {
                         mOperationsComboBoxHashReadLock.unlock();
                     }
                     if (wi != null) {
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 wi.setEnabled(savedOpIdRef == null);
@@ -2971,7 +2977,7 @@ public class ServiceInfo extends EditableInfo {
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         LOG.debug1("apply: start: test: " + runMode);
         if (Application.isLive(runMode)) {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -3003,7 +3009,7 @@ public class ServiceInfo extends EditableInfo {
             master = clInfo.getService().isMaster();
         }
         if (Application.isLive(runMode)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");
@@ -3280,7 +3286,7 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getWidget(PCMK_ID, null).setValueAndWait(getParamSaved(PCMK_ID));
@@ -3687,7 +3693,7 @@ public class ServiceInfo extends EditableInfo {
             serviceInfo.getService().setResourceClass(ra.getResourceClass());
         }
         if (getBrowser().getCrmGraph().addResource(serviceInfo, this, pos, colocation, order, runMode)) {
-            Tools.waitForSwing();
+            application.waitForSwing();
             /* edge added */
             if (isConstraintPlaceholder() || serviceInfo.isConstraintPlaceholder()) {
                 final ConstraintPHInfo cphi;
@@ -3751,7 +3757,7 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(serviceInfo);
@@ -3775,7 +3781,7 @@ public class ServiceInfo extends EditableInfo {
         }
         getBrowser().getCrmGraph().reloadServiceMenus();
         if (reloadNode) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().getCrmGraph().scale();
@@ -4029,7 +4035,7 @@ public class ServiceInfo extends EditableInfo {
         String desc = Tools.getString("ClusterBrowser.confirmRemoveService.Description");
 
         desc  = desc.replaceAll("@SERVICE@", Matcher.quoteReplacement(toString()));
-        if (Tools.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveService.Title"),
+        if (application.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveService.Title"),
                                 desc,
                                 Tools.getString("ClusterBrowser.confirmRemoveService.Yes"),
                                 Tools.getString("ClusterBrowser.confirmRemoveService.No"))) {
@@ -4046,7 +4052,7 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
         final CloneInfo ci = cloneInfo;
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 removeNodeAndWait();
@@ -4336,7 +4342,7 @@ public class ServiceInfo extends EditableInfo {
     public void reloadComboBoxes() {
         if (sameAsOperationsWi != null) {
             final Value savedOpIdRef = sameAsOperationsWiValue();
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     sameAsOperationsWi.reloadComboBox(savedOpIdRef, getSameServicesOperations());
@@ -4345,7 +4351,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (sameAsMetaAttrsWi != null) {
             final Value savedMAIdRef = sameAsMetaAttrsWiValue();
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     sameAsMetaAttrsWi.reloadComboBox(savedMAIdRef, getSameServicesMetaAttrs());

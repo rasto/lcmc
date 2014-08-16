@@ -28,6 +28,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.vm.InterfaceData;
 import lcmc.gui.dialog.WizardDialog;
@@ -58,6 +60,8 @@ final class Network extends VMConfig {
     private Display displayDialog;
     @Autowired
     private VMFinish VMFinishDialog;
+    @Autowired
+    private Application application;
 
     @Override
     public WizardDialog nextDialog() {
@@ -102,7 +106,7 @@ final class Network extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = interfaceInfo.checkResourceFields(null, interfaceInfo.getRealParametersFromXML())
@@ -130,8 +134,8 @@ final class Network extends VMConfig {
         interfaceInfo.addWizardParams(optionsPanel,
                                       PARAMS,
                                       buttonClass(nextButton()),
-                                      Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                                      Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                      application.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                      application.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                                       null);
         interfaceInfo.getWidget(InterfaceData.MODEL_TYPE, Widget.WIZARD_PREFIX).setValue(new StringValue());
 

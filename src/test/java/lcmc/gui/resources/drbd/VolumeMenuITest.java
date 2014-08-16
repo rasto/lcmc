@@ -21,30 +21,27 @@
 package lcmc.gui.resources.drbd;
 
 import java.util.List;
-import lcmc.model.Application;
-import lcmc.model.drbd.DrbdXml;
+
+import lcmc.model.AccessMode;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.DrbdGraph;
-import lcmc.testutils.annotation.type.GuiTest;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
 
-@Category(GuiTest.class)
+import javax.swing.*;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class VolumeMenuITest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private VolumeInfo volumeInfoStub;
     @Mock
@@ -52,37 +49,46 @@ public class VolumeMenuITest {
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private DrbdXml drbdXmlStub;
+    private MyMenuItem menuItemStub;
     @Mock
-    private DrbdGraph drbdGraphStub;
-    @Mock
-    private BlockDevInfo sourceStub;
-    @Mock
-    private BlockDevInfo destStub;
-
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
     private VolumeMenu volumeMenu;
 
     @Before
     public void setUp() {
         when(volumeInfoStub.getDrbdResourceInfo()).thenReturn(resourceInfoStub);
         when(volumeInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(volumeInfoStub.isConnected(Application.RunMode.LIVE)).thenReturn(true);
-        when(resourceInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
-        when(clusterBrowserStub.getDrbdXml()).thenReturn(drbdXmlStub);
-        when(clusterBrowserStub.getDrbdGraph()).thenReturn(drbdGraphStub);
-        when(drbdGraphStub.getSource(volumeInfoStub)).thenReturn(sourceStub);
-        when(drbdGraphStub.getDest(volumeInfoStub)).thenReturn(destStub);
-        volumeMenu = new VolumeMenu(volumeInfoStub);
+        when(menuFactoryStub.createMenuItem(anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = volumeMenu.getPulldownMenu();
-        
-        for (final UpdatableItem item : items) {
-            ((MyMenuItem) item).action();
-        }
+        final List<UpdatableItem> items = volumeMenu.getPulldownMenu(volumeInfoStub);
 
+        verify(menuItemStub, times(2)).predicate((Predicate) anyObject());
+        verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(5)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(6)).addAction((MenuAction) anyObject());
         assertEquals(6, items.size());
     }
 }

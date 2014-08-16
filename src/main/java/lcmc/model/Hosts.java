@@ -27,10 +27,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds a set of all hosts.
  */
+@Component
 public final class Hosts {
     private static final Logger LOG = LoggerFactory.getLogger(Hosts.class);
     private final Set<Host> hosts = new LinkedHashSet<Host>();

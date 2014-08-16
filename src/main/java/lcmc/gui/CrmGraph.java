@@ -59,6 +59,8 @@ import lcmc.gui.resources.crm.HbConnectionInfo;
 import lcmc.gui.resources.crm.HostInfo;
 import lcmc.gui.resources.crm.PcmkMultiSelectionInfo;
 import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +76,7 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CrmGraph extends ResourceGraph {
     /** X position of a new block device. */
+
     private static final int BD_X_POS = 15;
     /** Y position of the host. */
     private static final int HOST_Y_POS = 40;
@@ -145,6 +148,10 @@ public class CrmGraph extends ResourceGraph {
     private GUIData guiData;
     @Autowired
     private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
+    @Autowired
+    private Application application;
+    @Autowired
+    private MenuFactory menuFactory;
 
     @Override
     protected void initGraph(final ClusterBrowser clusterBrowser) {
@@ -363,7 +370,7 @@ public class CrmGraph extends ResourceGraph {
                 addOrder(null, parent, serviceInfo);
             }
         }
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 repaint();
@@ -407,7 +414,7 @@ public class CrmGraph extends ResourceGraph {
         final Vertex vP0 = vP;
         final Vertex v0 = v;
 
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mHbConnectionWriteLock.lock();
@@ -525,7 +532,7 @@ public class CrmGraph extends ResourceGraph {
         }
         final Vertex vWithRsc0 = vWithRsc;
         final Vertex vRsc0 = vRsc;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mHbConnectionWriteLock.lock();
@@ -699,24 +706,24 @@ public class CrmGraph extends ResourceGraph {
         boolean separatorAdded = false;
         final Application.RunMode runMode = getRunMode();
         for (final ServiceInfo asi : getClusterBrowser().getExistingServiceList(si)) {
-            final MyMenuItem mmi = new MyMenuItem(asi.toString(),
+            final MyMenuItem mmi = menuFactory.createMenuItem(asi.toString(),
                                                   null,
                                                   null,
                                                   new AccessMode(Application.AccessType.ADMIN, false),
-                                                  new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-                @Override
-                public void action() {
-                    si.addServicePanel(asi,
-                                       null,
-                                       false, /* TODO: colocation only */
-                                       false, /* order only */
-                                       true,
-                                       getClusterBrowser().getDCHost(),
-                                       runMode);
-                    repaint();
-                }
-            };
+                                                  new AccessMode(Application.AccessType.OP, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        si.addServicePanel(asi,
+                                null,
+                                false, /* TODO: colocation only */
+                                false, /* order only */
+                                true,
+                                getClusterBrowser().getDCHost(),
+                                runMode);
+                        repaint();
+                    }
+                });
             if ("Filesystem".equals(asi.getInternalValue()) || "IPaddr2".equals(asi.getInternalValue())) {
 
                 mmi.setSpecialFont();
@@ -1472,7 +1479,7 @@ public class CrmGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeEdge(edge, runMode);
@@ -1506,7 +1513,7 @@ public class CrmGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeEdge(edge, runMode);
@@ -1563,7 +1570,7 @@ public class CrmGraph extends ResourceGraph {
             addExistingTestEdge(edge);
         } else {
             if (hbci.isNew()) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         removeEdge(edge, runMode);

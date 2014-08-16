@@ -7,20 +7,26 @@ import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public final class DiskInfoTest {
-    private DiskInfo vmsdi;
+    private DiskInfo diskInfo;
     @Before
     public void setUp() {
         Tools.init();
-        vmsdi = new DiskInfo("", null, null);
+        diskInfo = new DiskInfo();
+        diskInfo.init("", null, null);
     }
 
     private String invokeFixSourceHostParams(final String names, final  String ports) {
         final Map<String, String> params = new HashMap<String, String>();
         params.put(DiskData.SOURCE_HOST_NAME, names);
         params.put(DiskData.SOURCE_HOST_PORT, ports);
-        vmsdi.fixSourceHostParams(params);
+        diskInfo.fixSourceHostParams(params);
         return params.get(DiskData.SOURCE_HOST_NAME) + ":" + params.get(DiskData.SOURCE_HOST_PORT);
     }
 

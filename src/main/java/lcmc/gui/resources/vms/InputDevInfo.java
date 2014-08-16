@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
@@ -40,11 +42,17 @@ import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual input devices.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class InputDevInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {InputDevData.TYPE,
@@ -81,29 +89,16 @@ final class InputDevInfo extends HardwareInfo {
                             new Value[]{new StringValue("usb")}); /* no ps2 */
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Input Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addInputDevPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
+    @Autowired
+    private static WidgetFactory widgetFactory;
+    @Autowired
+    private Application application;
+
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the InputDevInfo object. */
-    InputDevInfo(final String name, final Browser browser,
-                    final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
+        super.init(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -111,9 +106,9 @@ final class InputDevInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Input Devices",
                                    DomainInfo.INPUTDEVS_TABLE,
-                                   getNewBtn(getVMSVirtualDomainInfo()));
+                                   getVMSVirtualDomainInfo().getNewInputDevBtn());
         if (getResource().isNew()) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -223,7 +218,7 @@ final class InputDevInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -266,7 +261,7 @@ final class InputDevInfo extends HardwareInfo {
         getBrowser().reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);

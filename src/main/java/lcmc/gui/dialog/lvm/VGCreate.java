@@ -55,31 +55,41 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.LVM;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /** Create VG dialog. */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class VGCreate extends LV {
     private static final String VG_CREATE_DESCRIPTION = "Create a volume group.";
     private static final int CREATE_TIMEOUT = 5000;
-    private final Host host;
+    private Host host;
     private final Collection<BlockDevInfo> selectedBlockDevInfos = new ArrayList<BlockDevInfo>();
-    private final MyButton createButton = new MyButton("Create VG");
     private Widget vgNameWi;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private final MyButton createButton = widgetFactory.createButton("Create VG");
 
-    public VGCreate(final Host host) {
-        super(null);
+    public void init(final Host host) {
+        super.init(null);
         this.host = host;
     }
 
-    public VGCreate(final Host host, final BlockDevInfo sbdi) {
-        super(null);
+    public void init(final Host host, final BlockDevInfo sbdi) {
+        super.init(null);
         this.host = host;
         selectedBlockDevInfos.add(sbdi);
     }
 
-    public VGCreate(final Host host, final Collection<BlockDevInfo> sbdis) {
-        super(null);
+    public void init(final Host host, final Collection<BlockDevInfo> sbdis) {
+        super.init(null);
         this.host = host;
         selectedBlockDevInfos.addAll(sbdis);
     }
@@ -196,7 +206,7 @@ public final class VGCreate extends LV {
             }
             i++;
         }
-        vgNameWi = WidgetFactory.createInstance(
+        vgNameWi = widgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
                                       new StringValue(defaultName),
                                       Widget.NO_ITEMS,
@@ -316,7 +326,7 @@ public final class VGCreate extends LV {
     private class CreateRunnable implements Runnable {
         @Override
         public void run() {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     enableCreateButton(false);
@@ -345,7 +355,7 @@ public final class VGCreate extends LV {
                 for (final Host h : hostCheckBoxes.keySet()) {
                     h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                 }
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         checkButtons();

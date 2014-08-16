@@ -23,16 +23,13 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import lcmc.configs.DistResource;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
-import lcmc.model.crm.ResourceAgent;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.gui.Browser;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.VolumeInfo;
@@ -55,7 +52,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public final class FilesystemInfo extends ServiceInfo {
+public final class FilesystemRaInfo extends ServiceInfo {
     /** Name of the device parameter in the file system. */
     private static final String FS_RES_PARAM_DEV = "device";
     private LinbitDrbdInfo linbitDrbdInfo = null;
@@ -63,6 +60,10 @@ public final class FilesystemInfo extends ServiceInfo {
     private Widget blockDeviceParamWidget = null;
     private Widget fstypeParamWidget = null;
     private boolean drbddiskIsPreferred = false;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     /**
      * Sets Linbit::drbd info object for this Filesystem service if it uses
@@ -115,7 +116,7 @@ public final class FilesystemInfo extends ServiceInfo {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -139,7 +140,7 @@ public final class FilesystemInfo extends ServiceInfo {
                     title = title.replaceAll("@HOST@", host.getName());
                     desc  = desc.replaceAll("@DIR@", dir);
                     desc  = desc.replaceAll("@HOST@", host.getName());
-                    if (confirm || Tools.confirmDialog(title,
+                    if (confirm || application.confirmDialog(title,
                                                        desc,
                                                        Tools.getString("ClusterBrowser.CreateDir.Yes"),
                                                        Tools.getString("ClusterBrowser.CreateDir.No"))) {
@@ -206,7 +207,7 @@ public final class FilesystemInfo extends ServiceInfo {
                                };
             }
             final Value[] commonBlockDevInfos = getCommonBlockDevInfos(defaultValue, getName());
-            blockDeviceParamWidget = WidgetFactory.createInstance(
+            blockDeviceParamWidget = widgetFactory.createInstance(
                                    Widget.GUESS_TYPE,
                                    selectedValue,
                                    commonBlockDevInfos,
@@ -236,7 +237,7 @@ public final class FilesystemInfo extends ServiceInfo {
                 selectedValue = defaultValue;
             }
 
-            paramWi = WidgetFactory.createInstance(
+            paramWi = widgetFactory.createInstance(
                               Widget.GUESS_TYPE,
                               selectedValue,
                               getBrowser().getCommonFileSystems(defaultValue),
@@ -274,7 +275,7 @@ public final class FilesystemInfo extends ServiceInfo {
                 selectedValue = defaultValue;
             }
             final String regexp = "^.+$";
-            paramWi = WidgetFactory.createInstance(
+            paramWi = widgetFactory.createInstance(
                                  Widget.GUESS_TYPE,
                                  selectedValue,
                                  items,

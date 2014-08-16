@@ -49,6 +49,8 @@ final class HeartbeatInst extends DialogHost {
     private CheckInstallation checkInstallationDialog;
     @Autowired
     private Provider<CheckInstallation> checkInstallationFactory;
+    @Autowired
+    private Application application;
 
     /**
      * Checks the answer of the installation and enables/disables the
@@ -62,7 +64,7 @@ final class HeartbeatInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.HeartbeatInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getApplication().getAutoOptionHost("hbinst") != null) {
+        if (application.getAutoOptionHost("hbinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -91,9 +93,8 @@ final class HeartbeatInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "HbPmInst.install." + installMethod;
         }
-        Tools.getApplication().setLastHbPmInstalledMethod(
-            getHost().getDistString("HbPmInst.install.text." + installMethod));
-        Tools.getApplication().setLastInstalledClusterStack(Application.HEARTBEAT_NAME);
+        application.setLastHbPmInstalledMethod(getHost().getDistString("HbPmInst.install.text." + installMethod));
+        application.setLastInstalledClusterStack(Application.HEARTBEAT_NAME);
 
         getHost().execCommandInBash(new ExecCommandConfig()
                 .commandString(installCommand)

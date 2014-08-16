@@ -23,19 +23,30 @@
 package lcmc.model;
 
 import ch.ethz.ssh2.KnownHosts;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
+import java.awt.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.List;
+import java.util.regex.Matcher;
+
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.GUIData;
+import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.robotest.Test;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Provider;
+import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 
 /**
  * Application
@@ -43,9 +54,11 @@ import org.apache.commons.collections15.map.MultiKeyMap;
  * Holds data, that are used globaly in the application and provides some
  * functions for this data.
  */
+@Component
 public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
+    public static final boolean CHECK_SWING_THREAD = true;
     private static final String OP_MODE_OPERATOR = Tools.getString("Application.OpMode.OP");
     private static final String OP_MODE_ADMIN = Tools.getString("Application.OpMode.ADMIN");
     public static final String OP_MODE_GOD = Tools.getString("Application.OpMode.GOD");
@@ -76,8 +89,6 @@ public class Application {
     public static boolean isTest(final RunMode runMode) {
         return RunMode.TEST == runMode;
     }
-    private final Hosts allHosts;
-    private final Clusters allClusters;
     private String downloadUser = Tools.getDefault("DownloadLogin.User");
     private String downloadPassword = Tools.getDefault("DownloadLogin.Password");
     private String savedDownloadUser = "";
@@ -121,29 +132,25 @@ public class Application {
     private boolean cmdLog = false;
     private Test autoTest = null;
     private boolean checkSwing = false;
-
-    public Application() {
-        allHosts = new Hosts();
-        allClusters = new Clusters();
-    }
-
-    public Hosts getAllHosts() {
-        return allHosts;
-    }
+    @Autowired
+    private Hosts allHosts;
+    @Autowired
+    private Clusters allClusters;
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private UserConfig userConfig;
+    @Autowired
+    private Provider<ConfirmDialog> confirmDialogProvider;
 
     public int danglingHostsCount() {
-        final Hosts hosts0 = Tools.getApplication().getAllHosts();
         int c = 0;
-        for (final Host host : hosts0.getHostSet()) {
+        for (final Host host : allHosts.getHostSet()) {
             if (!host.isInCluster()) {
                 c++;
             }
         }
         return c;
-    }
-
-    public Clusters getAllClusters() {
-        return allClusters;
     }
 
     public String getDownloadUser() {
@@ -185,6 +192,58 @@ public class Application {
     public boolean existsHost(final Host host) {
         return allHosts.isHostInHosts(host);
     }
+
+    /** Removes the specified clusters from the gui. */
+    public void removeClusters(final Iterable<Cluster> selectedClusters) {
+        for (final Cluster cluster : selectedClusters) {
+            LOG.debug1("removeClusters: remove hosts from cluster: " + cluster.getName());
+            removeClusterFromClusters(cluster);
+            for (final Host host : cluster.getHosts()) {
+                host.removeFromCluster();
+            }
+        }
+    }
+
+    /** Removes all the hosts and clusters from all the panels and data. */
+    public void removeEverything() {
+        guiData.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+        disconnectAllHosts();
+        guiData.getClustersPanel().removeAllTabs();
+        guiData.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
+    }
+
+    /**
+     * @param saveAll whether to save clusters specified from the command line
+     */
+    public void saveConfig(final String filename,
+                           final boolean saveAll) {
+        LOG.debug1("save: start");
+        final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
+                                            Matcher.quoteReplacement(filename));
+        guiData.startProgressIndicator(text);
+        try {
+            final FileOutputStream fileOut = new FileOutputStream(filename);
+            userConfig.saveXML(fileOut, saveAll);
+            LOG.debug("save: filename: " + filename);
+        } catch (final IOException e) {
+            LOG.appError("save: error saving: " + filename, "", e);
+        } finally {
+            try {
+                Thread.sleep(1000);
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+            for (final Cluster cluster : allClusters.getClusterSet()) {
+                final ClusterBrowser cb = cluster.getBrowser();
+                if (cb != null) {
+                    cb.saveGraphPositions();
+                }
+            }
+            guiData.stopProgressIndicator(text);
+        }
+    }
+
 
     public void addHostToHosts(final Host host) {
         allHosts.addHost(host);
@@ -480,10 +539,6 @@ public class Application {
         return accessType;
     }
 
-    public void setMaxAccessType(final AccessType maxAccessType) {
-        this.maxAccessType = maxAccessType;
-    }
-
     AccessType getMaxAccessType() {
         return maxAccessType;
     }
@@ -586,6 +641,240 @@ public class Application {
     public void setCheckSwing(final boolean checkSwing) {
         this.checkSwing = checkSwing;
     }
+
+    /**
+     * Returns default value for integer option from AppDefaults resource
+     * bundle and scales it according the --scale option.
+     */
+    public int getDefaultSize(final String option) {
+        return scaled(Tools.getDefaultInt(option));
+    }
+
+    /** Starts Real VNC viewer. */
+    public void startRealVncViewer(final Host host, final int remotePort) {
+        final int localPort = prepareVncViewer(host, remotePort);
+        if (localPort < 0) {
+            return;
+        }
+        final vncviewer.VNCViewer v = new vncviewer.VNCViewer(new String[]{"127.0.0.1:"
+                + (Integer.toString(localPort - 5900))});
+
+        v.start();
+        v.join();
+        cleanupVncViewer(host, localPort);
+    }
+
+    /**
+     * Prepares vnc viewer, gets the port and creates ssh tunnel. Returns true
+     * if ssh tunnel was created.
+     */
+    private int prepareVncViewer(final Host host, final int remotePort) {
+        if (remotePort < 0 || host == null) {
+            return -1;
+        }
+        if (Tools.isLocalIp(host.getIpAddress())) {
+            return remotePort;
+        }
+        final int localPort = remotePort + getVncPortOffset();
+        LOG.debug("prepareVncViewer: start port forwarding " + remotePort + " -> " + localPort);
+        try {
+            host.getSSH().startVncPortForwarding(host.getIpAddress(), remotePort);
+        } catch (final IOException e) {
+            LOG.error("prepareVncViewer: unable to create the tunnel "
+                    + remotePort + " -> " + localPort
+                    + ": " + e.getMessage()
+                    + "\ntry the --vnc-port-offset option");
+            return -1;
+        }
+        return localPort;
+    }
+
+    /** Cleans up after vnc viewer. It stops ssh tunnel. */
+    private void cleanupVncViewer(final Host host, final int localPort) {
+        if (Tools.isLocalIp(host.getIpAddress())) {
+            return;
+        }
+        final int remotePort = localPort - getVncPortOffset();
+        LOG.debug("cleanupVncViewer: stop port forwarding " + remotePort);
+        try {
+            host.getSSH().stopVncPortForwarding(remotePort);
+        } catch (final IOException e) {
+            LOG.appError("cleanupVncViewer: unable to close tunnel", e);
+        }
+    }
+
+    /** Starts Tight VNC viewer. */
+    public void startTightVncViewer(final Host host, final int remotePort) {
+        final int localPort = prepareVncViewer(host, remotePort);
+        if (localPort < 0) {
+            return;
+        }
+        final tightvnc.VncViewer v = new tightvnc.VncViewer(new String[]{"HOST",
+                "127.0.0.1",
+                "PORT",
+                Integer.toString(localPort)},
+                false,
+                true);
+        v.init();
+        v.start();
+        v.join();
+        cleanupVncViewer(host, localPort);
+    }
+
+    /** Starts Ultra VNC viewer. */
+    public void startUltraVncViewer(final Host host, final int remotePort) {
+        final int localPort = prepareVncViewer(host, remotePort);
+        if (localPort < 0) {
+            return;
+        }
+        final JavaViewer.VncViewer v = new JavaViewer.VncViewer(new String[]{"HOST",
+                                                                             "127.0.0.1",
+                                                                             "PORT",
+                                                                             Integer.toString(localPort)},
+                                                                             false,
+                                                                             true);
+
+        v.init();
+        v.start();
+        v.join();
+        cleanupVncViewer(host, localPort);
+    }
+
+    /** Makes the buttons font smaller. */
+    public void makeMiniButton(final AbstractButton ab) {
+        final Font font = ab.getFont();
+        final String name = font.getFontName();
+        final int style = font.getStyle();
+        ab.setFont(new Font(name, style, scaled(10)));
+        ab.setMargin(new Insets(2, 2, 2, 2));
+        ab.setIconTextGap(0);
+    }
+
+    /**
+     * Resize all fonts. Must be called before GUI is started.
+     * @param scale in percent 100% - is the same size.
+     */
+    public void resizeFonts(int scale) {
+        if (scale == 100) {
+            return;
+        }
+        if (scale < 5) {
+            scale = 5;
+        }
+        if (scale > 10000) {
+            scale = 10000;
+        }
+        for (final Enumeration<Object> e = UIManager.getDefaults().keys(); e.hasMoreElements();) {
+            final Object key = e.nextElement();
+            final Object value = UIManager.get(key);
+            if (value instanceof Font)    {
+                final Font f = (Font) value;
+                UIManager.put(key, new FontUIResource(f.getName(), f.getStyle(), scaled(f.getSize())));
+            }
+        }
+    }
+
+    public void setMaxAccessType(final Application.AccessType maxAccessType) {
+        this.maxAccessType = maxAccessType;
+        setAccessType(maxAccessType);
+        checkAccessOfEverything();
+    }
+
+    public void checkAccessOfEverything() {
+        for (final Cluster c : allClusters.getClusterSet()) {
+            final ClusterBrowser cb = c.getBrowser();
+            if (cb != null) {
+                cb.checkAccessOfEverything();
+            }
+        }
+    }
+
+    /**
+     * Print stack trace if it's not in a swing thread.
+     */
+    public void isSwingThread() {
+        if (!isCheckSwing()) {
+            return;
+        }
+        if (!SwingUtilities.isEventDispatchThread()) {
+            System.out.println("not a swing thread: " + Tools.getStackTrace());
+        }
+    }
+
+    /**
+     * Print stack trace if it's in a swing thread.
+     */
+    public void isNotSwingThread() {
+        if (!isCheckSwing()) {
+            return;
+        }
+        if (SwingUtilities.isEventDispatchThread()) {
+            System.out.println("swing thread: " + Tools.getStackTrace());
+        }
+    }
+
+    /** Wait for next swing threads to finish. It's used for synchronization */
+    public void waitForSwing() {
+        invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                /* just wait */
+            }
+        });
+    }
+
+    /**
+     * Convenience invoke and wait function if not already in an event
+     * dispatch thread.
+     */
+    public void invokeAndWaitIfNeeded(final Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            invokeAndWait(runnable);
+        }
+    }
+
+    public void invokeAndWait(final Runnable runnable) {
+        isNotSwingThread();
+        try {
+            SwingUtilities.invokeAndWait(runnable);
+        } catch (final InterruptedException ix) {
+            Thread.currentThread().interrupt();
+        } catch (final InvocationTargetException x) {
+            LOG.appError("invokeAndWait: exception", x);
+        }
+    }
+
+    public void invokeLater(final Runnable runnable) {
+        invokeLater(CHECK_SWING_THREAD, runnable);
+    }
+
+    public void invokeLater(final boolean checkSwingThread, final Runnable runnable) {
+        if (checkSwingThread) {
+            isNotSwingThread();
+        }
+        SwingUtilities.invokeLater(runnable);
+    }
+
+    public int getServiceLabelWidth() {
+        return getDefaultSize("ClusterBrowser.ServiceLabelWidth");
+    }
+    public int getServiceFieldWidth() {
+        return getDefaultSize("ClusterBrowser.ServiceFieldWidth");
+    }
+
+    /**
+     * Shows confirm dialog with yes and no options and returns true if yes
+     * button was pressed.
+     */
+    public boolean confirmDialog(final String title, final String desc, final String yesButton, final String noButton) {
+        final ConfirmDialog confirmDialog = confirmDialogProvider.get();
+        confirmDialog.init(title, desc, yesButton, noButton);
+        confirmDialog.showDialog();
+        return confirmDialog.isPressedYesButton();
+    }
+
 
     public enum AccessType {
         RO,

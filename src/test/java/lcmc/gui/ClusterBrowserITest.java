@@ -31,6 +31,7 @@ public final class ClusterBrowserITest {
 
     @Test
     public void testProcessClusterOutput() {
+        final Application application = new Application();
         final CountDownLatch nolatch = new CountDownLatch(0);
         for (final Host host : testSuite.getHosts()) {
             final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
@@ -131,16 +132,16 @@ public final class ClusterBrowserITest {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
                 cb.getClusterViewPanel().setDisabledDuringLoad(true);
                 cb.parseClusterOutput(cib, new StringBuffer(""), host, firstTime, runMode);
-                Tools.waitForSwing();
+                application.waitForSwing();
                 cb.getClusterViewPanel().setDisabledDuringLoad(false);
                 cb.getCrmGraph().repaint();
             }
             guiData.stopProgressIndicator(i + ": " + file);
             for (final Host host : testSuite.getHosts()) {
                 final ClusterBrowser cb = host.getBrowser().getClusterBrowser();
-                Tools.waitForSwing();
+                application.waitForSwing();
                 cb.parseClusterOutput(emptyCib, new StringBuffer(""), host, firstTime, runMode);
-                Tools.waitForSwing();
+                application.waitForSwing();
             }
         }
         testSuite.clearStdout();

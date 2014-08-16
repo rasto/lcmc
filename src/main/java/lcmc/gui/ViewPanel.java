@@ -40,12 +40,20 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import lcmc.gui.resources.Info;
+import lcmc.model.Application;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
  * in the host tab as well in the cluster tab.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ViewPanel extends JPanel {
     private static final Dimension MENU_TREE_MIN_SIZE = new Dimension(200, 200);
     private static final Dimension INFO_PANEL_MIN_SIZE = new Dimension(200, 200);
@@ -60,6 +68,8 @@ public class ViewPanel extends JPanel {
     private final Lock mSetPanelLock = new ReentrantLock();
     /** Last selected info object in the right pane. */
     private Info lastSelectedInfo = null;
+    @Autowired
+    private Application application;
 
     ViewPanel() {
         super(new BorderLayout());
@@ -160,7 +170,7 @@ public class ViewPanel extends JPanel {
                     final Object[] path = e.getPath();
                     if (!disabledDuringLoad) {
                         final TreePath tp = new TreePath(path);
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD,
+                        application.invokeLater(!Application.CHECK_SWING_THREAD,
                                           new Runnable() {
                                               @Override
                                               public void run() {
@@ -201,7 +211,7 @@ public class ViewPanel extends JPanel {
             lastSelectedInfo = (Info) nodeInfo;
         }
         if (nodeInfo != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {
@@ -222,7 +232,7 @@ public class ViewPanel extends JPanel {
     /** Sets the right component in the view. */
     final void setRightComponentInView(final Browser browser, final Info nodeInfo) {
         if (viewSP != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {

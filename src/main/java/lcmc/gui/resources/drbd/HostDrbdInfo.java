@@ -39,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.ColorText;
 import lcmc.model.Host;
@@ -70,6 +71,10 @@ public class HostDrbdInfo extends Info {
     @Autowired
     private HostDrbdMenu hostDrbdMenu;
     private Host host;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -103,7 +108,7 @@ public class HostDrbdInfo extends Info {
 
     @Override
     public JComponent getInfoPanel() {
-        final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(12));
+        final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(12));
         final JTextArea textArea = new JTextArea();
         textArea.setFont(f);
 
@@ -123,7 +128,7 @@ public class HostDrbdInfo extends Info {
 
             };
         // TODO: disable buttons if disconnected?
-        final MyButton procDrbdButton = new MyButton("/proc/drbd");
+        final MyButton procDrbdButton = widgetFactory.createButton("/proc/drbd");
         procDrbdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -134,7 +139,7 @@ public class HostDrbdInfo extends Info {
             }
         });
         host.registerEnableOnConnect(procDrbdButton);
-        final MyButton drbdProcsButton = new MyButton("DRBD Processes");
+        final MyButton drbdProcsButton = widgetFactory.createButton("DRBD Processes");
         drbdProcsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -152,9 +157,9 @@ public class HostDrbdInfo extends Info {
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
-        buttonPanel.setMinimumSize(new Dimension(0, Tools.getApplication().scaled(50)));
-        buttonPanel.setPreferredSize(new Dimension(0, Tools.getApplication().scaled(50)));
-        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, Tools.getApplication().scaled(50)));
+        buttonPanel.setMinimumSize(new Dimension(0, application.scaled(50)));
+        buttonPanel.setPreferredSize(new Dimension(0, application.scaled(50)));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, application.scaled(50)));
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -167,10 +172,10 @@ public class HostDrbdInfo extends Info {
         SpringUtilities.makeCompactGrid(panel, 2, 1,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
-        mainPanel.setMinimumSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                                               Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
-        mainPanel.setPreferredSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                                                 Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setMinimumSize(new Dimension(application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                               application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setPreferredSize(new Dimension(application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                                 application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(panel);
         mainPanel.add(new JScrollPane(textArea));
         host.execCommand(new ExecCommandConfig().commandString("DRBD.getProcDrbd")

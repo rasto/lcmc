@@ -65,6 +65,10 @@ public final class Start extends WizardDialog {
     @Autowired
     private Volume volumeDialog;
     private GlobalInfo globalInfo;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final WizardDialog previousDialog,
                      final BlockDevInfo blockDevInfo1,
@@ -92,7 +96,7 @@ public final class Start extends WizardDialog {
         final VolumeInfo dvi = globalInfo.getNewDrbdVolume(
                                              resourceInfo,
                                              new ArrayList<BlockDevInfo>(Arrays.asList(blockDevInfo1, blockDevInfo2)));
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 resourceInfo.addDrbdVolume(dvi);
@@ -128,7 +132,7 @@ public final class Start extends WizardDialog {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -146,7 +150,7 @@ public final class Start extends WizardDialog {
         for (final ResourceInfo dri : globalInfo.getDrbdResources()) {
             choices.add(dri);
         }
-        drbdResourceWidget = WidgetFactory.createInstance(
+        drbdResourceWidget = widgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
                                     Widget.NO_DEFAULT,
                                     choices.toArray(new Value[choices.size()]),

@@ -22,6 +22,7 @@ package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lcmc.EditClusterDialog;
 import lcmc.ProxyHostWizard;
 import lcmc.model.AccessMode;
@@ -29,7 +30,8 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.model.HostFactory;
-import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,84 +50,79 @@ public class GlobalMenu {
     private HostFactory hostFactory;
     @Autowired
     private Provider<ProxyHostWizard> proxyHostWizardProvider;
+    @Autowired
+    private MenuFactory menuFactory;
 
     public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /** Add proxy host */
-        final UpdatableItem addProxyHostMenu = new MyMenuItem(
-                Tools.getString("GlobalInfo.AddProxyHost"), null,
-                Tools.getString("GlobalInfo.AddProxyHost"), new AccessMode(
-                        Application.AccessType.OP, false), new AccessMode(
-                        Application.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                addProxyHostWizard(globalInfo);
-            }
-        };
+        final UpdatableItem addProxyHostMenu = menuFactory.createMenuItem(
+                Tools.getString("GlobalInfo.AddProxyHost"),
+                null,
+                Tools.getString("GlobalInfo.AddProxyHost"),
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        addProxyHostWizard(globalInfo);
+                    }
+                });
         items.add(addProxyHostMenu);
 
         /* cluster wizard */
-        final UpdatableItem clusterWizardItem = new MyMenuItem(
+        final UpdatableItem clusterWizardItem = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
-                GlobalInfo.CLUSTER_ICON, null, new AccessMode(
-                        Application.AccessType.ADMIN, AccessMode.ADVANCED),
-                new AccessMode(Application.AccessType.ADMIN,
-                        !AccessMode.ADVANCED)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                final EditClusterDialog editClusterDialog = editClusterDialogProvider.get();
-                editClusterDialog.showDialogs(globalInfo.getBrowser().getCluster());
-            }
-        };
+                GlobalInfo.CLUSTER_ICON,
+                null,
+                new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
+                new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        final EditClusterDialog editClusterDialog = editClusterDialogProvider.get();
+                        editClusterDialog.showDialogs(globalInfo.getBrowser().getCluster());
+                    }
+                });
         items.add(clusterWizardItem);
 
         /* Rescan LVM */
-        final UpdatableItem rescanLvmItem = new MyMenuItem(
-                Tools.getString("GlobalInfo.RescanLvm"), null, /* icon */
-                null, new AccessMode(Application.AccessType.OP,
-                        !AccessMode.ADVANCED), new AccessMode(
-                        Application.AccessType.OP, AccessMode.ADVANCED)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                globalInfo.getBrowser().updateHWInfo(
-                        Host.UPDATE_LVM);
-            }
-        };
+        final UpdatableItem rescanLvmItem = menuFactory.createMenuItem(
+                Tools.getString("GlobalInfo.RescanLvm"),
+                null, /* icon */
+                null,
+                new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                new AccessMode(Application.AccessType.OP, AccessMode.ADVANCED))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        globalInfo.getBrowser().updateHWInfo(Host.UPDATE_LVM);
+                    }
+                });
         items.add(rescanLvmItem);
 
         /* view log */
-        final UpdatableItem viewLogMenu = new MyMenuItem(
+        final UpdatableItem viewLogMenu = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                GlobalInfo.LOGFILE_ICON, null, new AccessMode(
-                        Application.AccessType.RO, false), new AccessMode(
-                        Application.AccessType.RO, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void action() {
-                globalInfo.hidePopup();
-                final DrbdLogs l = new DrbdLogs(
-                        globalInfo.getCluster(),
-                        GlobalInfo.ALL_LOGS_PATTERN);
-                l.showDialog();
-            }
-        };
+                GlobalInfo.LOGFILE_ICON,
+                null,
+                new AccessMode(Application.AccessType.RO, false),
+                new AccessMode(Application.AccessType.RO, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        globalInfo.hidePopup();
+                        final DrbdLogs l = new DrbdLogs(globalInfo.getCluster(), GlobalInfo.ALL_LOGS_PATTERN);
+                        l.showDialog();
+                    }
+                });
         items.add(viewLogMenu);
         return items;
     }
 
     private void addProxyHostWizard(final GlobalInfo globalInfo) {
         final Host proxyHost = hostFactory.createInstance();
-        proxyHost.init();
         proxyHost.setCluster(globalInfo.getCluster());
         final ProxyHostWizard proxyHostWizard = proxyHostWizardProvider.get();
         proxyHostWizard.init(proxyHost, null);

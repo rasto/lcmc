@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Provider;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -81,6 +82,14 @@ public final class UserConfig extends XML {
     private HostFactory hostFactory;
     @Autowired
     private ClustersPanel clustersPanel;
+    @Autowired
+    private Provider<Cluster> clusterProvider;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Hosts allHosts;
+    @Autowired
+    private Clusters allClusters;
 
     /** Saves data about clusters and hosts to the supplied output stream. */
     public String saveXML(final OutputStream outputStream, final boolean saveAll) throws IOException {
@@ -95,16 +104,16 @@ public final class UserConfig extends XML {
         }
         final Document doc = db.newDocument();
         final Element root = (Element) doc.appendChild(doc.createElement("drbdgui"));
-        if (Tools.getApplication().getLoginSave()) {
-            final String downloadUser = Tools.getApplication().getDownloadUser();
-            final String downloadPasswd = Tools.getApplication().getDownloadPassword();
+        if (application.getLoginSave()) {
+            final String downloadUser = application.getDownloadUser();
+            final String downloadPasswd = application.getDownloadPassword();
             if (downloadUser != null && downloadPasswd != null) {
                 root.setAttribute(DOWNLOAD_USER_ATTR, downloadUser);
                 root.setAttribute(DOWNLOAD_PASSWD_ATTR, downloadPasswd);
             }
         }
         final Node hostsNode = root.appendChild(doc.createElement("hosts"));
-        final Set<Host> hosts = Tools.getApplication().getAllHosts().getHostSet();
+        final Set<Host> hosts = allHosts.getHostSet();
         for (final Host host : hosts) {
             if (!saveAll && !host.isSavable()) {
                 continue;
@@ -114,7 +123,7 @@ public final class UserConfig extends XML {
         }
         final Node clusters = root.appendChild(doc.createElement("clusters"));
 
-        final Set<Cluster> clusterSet = Tools.getApplication().getAllClusters().getClusterSet();
+        final Set<Cluster> clusterSet = allClusters.getClusterSet();
         for (final Cluster cluster : clusterSet) {
             if (!saveAll && !cluster.isSavable()) {
                 continue;
@@ -164,14 +173,14 @@ public final class UserConfig extends XML {
      * Starts specified clusters and connects to the hosts of this clusters.
      */
     public void startClusters(final Collection<Cluster> selectedClusters) {
-        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
+        final Set<Cluster> clusters = allClusters.getClusterSet();
         if (clusters != null) {
             /* clusters */
             for (final Cluster cluster : clusters) {
                 if (selectedClusters != null && !selectedClusters.contains(cluster)) {
                     continue;
                 }
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         clusterTabFactory.createClusterTab(cluster);
@@ -182,7 +191,7 @@ public final class UserConfig extends XML {
                 }
                 final boolean ok = cluster.connect(null, true, 1);
                 if (!ok) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             clustersPanel.removeTabWithCluster(cluster);
@@ -196,7 +205,7 @@ public final class UserConfig extends XML {
                         for (final Host host : cluster.getHosts()) {
                             host.waitOnLoading();
                         }
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 final ClusterTab clusterTab = cluster.getClusterTab();
@@ -231,7 +240,7 @@ public final class UserConfig extends XML {
             final String downloadUser = getAttribute(rootNode, DOWNLOAD_USER_ATTR);
             final String downloadPasswd = getAttribute(rootNode, DOWNLOAD_PASSWD_ATTR);
             if (downloadUser != null && downloadPasswd != null) {
-                Tools.getApplication().setDownloadLogin(downloadUser, downloadPasswd, true);
+                application.setDownloadLogin(downloadUser, downloadPasswd, true);
             }
             /* hosts */
             final Node hostsNode = getChildNode(rootNode, "hosts");
@@ -267,9 +276,9 @@ public final class UserConfig extends XML {
                         final Node clusterNode = clusters.item(i);
                         if ("cluster".equals(clusterNode.getNodeName())) {
                             final String clusterName = getAttribute(clusterNode, CLUSTER_NAME_ATTR);
-                            final Cluster cluster = new Cluster();
+                            final Cluster cluster = clusterProvider.get();
                             cluster.setName(clusterName);
-                            Tools.getApplication().addClusterToClusters(cluster);
+                            application.addClusterToClusters(cluster);
                             loadClusterHosts(clusterNode, cluster, hostMap);
                         }
                     }
@@ -287,22 +296,21 @@ public final class UserConfig extends XML {
                         final String color,
                         final boolean sudo,
                         final boolean savable) {
-        Tools.getApplication().setLastEnteredUser(username);
+        application.setLastEnteredUser(username);
         final Host host = hostFactory.createInstance();
-        host.init();
         host.setSavable(savable);
         host.setHostname(nodeName);
         if (sshPort == null) {
             sshPort = "22";
         }
         host.setSSHPort(sshPort);
-        Tools.getApplication().setLastEnteredSSHPort(sshPort);
+        application.setLastEnteredSSHPort(sshPort);
         if (color != null) {
             host.setSavedColor(color);
         }
         host.setUseSudo(sudo);
-        Tools.getApplication().setLastEnteredUseSudo(sudo);
-        Tools.getApplication().addHostToHosts(host);
+        application.setLastEnteredUseSudo(sudo);
+        application.addHostToHosts(host);
 
         host.setIpAddress(ip);
         if (username == null && sudo) {

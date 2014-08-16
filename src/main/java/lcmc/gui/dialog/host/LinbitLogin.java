@@ -53,10 +53,14 @@ public class LinbitLogin extends DialogHost {
     private JCheckBox saveCheckBox;
     @Autowired
     private DrbdLinbitInst drbdLinbitInst;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     @Override
     protected final void finishDialog() {
-        Tools.getApplication().setDownloadLogin(downloadUserField.getStringValue().trim(),
+        application.setDownloadLogin(downloadUserField.getStringValue().trim(),
                                                 downloadPasswordField.getStringValue().trim(),
                                                 saveCheckBox.isSelected());
     }
@@ -72,7 +76,7 @@ public class LinbitLogin extends DialogHost {
      * TODO: two checkfields?
      */
     protected final void checkFields() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 boolean v = (!downloadUserField.getStringValue().trim().isEmpty());
@@ -84,7 +88,7 @@ public class LinbitLogin extends DialogHost {
 
     @Override
     protected final void checkFields(final Widget field) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 boolean v = (!downloadUserField.getStringValue().trim().isEmpty());
@@ -114,13 +118,13 @@ public class LinbitLogin extends DialogHost {
     protected void initDialogAfterVisible() {
         enableComponents();
         checkFields();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 downloadUserField.requestFocus();
             }
         });
-        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+        if (application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -135,9 +139,9 @@ public class LinbitLogin extends DialogHost {
         /* user */
         final JLabel userLabel = new JLabel(Tools.getString("Dialog.Host.LinbitLogin.EnterUser"));
         inputPane.add(userLabel);
-        downloadUserField = WidgetFactory.createInstance(
+        downloadUserField = widgetFactory.createInstance(
                                        Widget.GUESS_TYPE,
-                                       new StringValue(Tools.getApplication().getDownloadUser()),
+                                       new StringValue(application.getDownloadUser()),
                                        Widget.NO_ITEMS,
                                        "^[,\\w.-]+$",
                                        CHECKBOX_WIDTH,
@@ -153,9 +157,9 @@ public class LinbitLogin extends DialogHost {
         final JLabel passwordLabel = new JLabel(Tools.getString("Dialog.Host.LinbitLogin.EnterPassword"));
 
         inputPane.add(passwordLabel);
-        downloadPasswordField = WidgetFactory.createInstance(
+        downloadPasswordField = widgetFactory.createInstance(
                                   Widget.Type.PASSWDFIELD,
-                                  new StringValue(Tools.getApplication().getDownloadPassword()),
+                                  new StringValue(application.getDownloadPassword()),
                                   Widget.NO_ITEMS,
                                   Widget.NO_REGEXP,
                                   CHECKBOX_WIDTH,
@@ -172,8 +176,7 @@ public class LinbitLogin extends DialogHost {
         saveLabel.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
         inputPane.add(saveLabel);
-        saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.LinbitLogin.Save"),
-                                     Tools.getApplication().getLoginSave());
+        saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.LinbitLogin.Save"), application.getLoginSave());
         saveLabel.setLabelFor(saveCheckBox);
         saveCheckBox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
         inputPane.add(saveCheckBox);

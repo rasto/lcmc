@@ -28,6 +28,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.vm.VmsXml;
 import lcmc.model.vm.DiskData;
@@ -67,6 +69,8 @@ final class Storage extends VMConfig {
     private WizardDialog nextDialogObject = null;
     @Autowired
     private Network networkDialog;
+    @Autowired
+    private Application application;
 
     @Override
     public WizardDialog nextDialog() {
@@ -106,7 +110,7 @@ final class Storage extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final boolean enable = diskInfo.checkResourceFields(null, diskInfo.getRealParametersFromXML())
@@ -146,8 +150,8 @@ final class Storage extends VMConfig {
         diskInfo.addWizardParams(optionsPanel,
                                  PARAMS,
                                  buttonClass(nextButton()),
-                                 Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                                 Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                 application.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                 application.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                                  null);
         panel.add(optionsPanel);
         final JScrollPane scrollPane = new JScrollPane(panel);

@@ -105,13 +105,10 @@ public final class Tools {
     private static ResourceBundle resourceAppDefaults = null;
 
     /** Config data object. */
-    private static Application application;
     private static final Pattern UNIT_PATTERN = Pattern.compile("(\\d*)(\\D*)");
-    public static final boolean CHECK_SWING_THREAD = true;
 
     public static void init() {
         setDefaults();
-        application = new Application();
     }
 
     /**
@@ -157,19 +154,6 @@ public final class Tools {
         if (getDefault("AppError").equals("y")) {
             LoggerFactory.setAppError(true);
         }
-    }
-
-    /**
-     * Shows confirm dialog with yes and no options and returns true if yes
-     * button was pressed.
-     */
-    public static boolean confirmDialog(final String title,
-                                        final String desc,
-                                        final String yesButton,
-                                        final String noButton) {
-        final ConfirmDialog cd = new ConfirmDialog(title, desc, yesButton, noButton);
-        cd.showDialog();
-        return cd.isPressedYesButton();
     }
 
     public static String getStackTrace(final Throwable e) {
@@ -273,71 +257,6 @@ public final class Tools {
         }
     }
 
-    /** Removes the specified clusters from the gui. */
-    public static void removeClusters(final Iterable<Cluster> selectedClusters) {
-        for (final Cluster cluster : selectedClusters) {
-            LOG.debug1("removeClusters: remove hosts from cluster: " + cluster.getName());
-            getApplication().removeClusterFromClusters(cluster);
-            for (final Host host : cluster.getHosts()) {
-                host.removeFromCluster();
-            }
-        }
-    }
-
-    /** Removes all the hosts and clusters from all the panels and data. */
-    public static void removeEverything(final GUIData guiData) {
-        guiData.startProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
-        Tools.getApplication().disconnectAllHosts();
-        guiData.getClustersPanel().removeAllTabs();
-        guiData.stopProgressIndicator(Tools.getString("MainMenu.RemoveEverything"));
-    }
-
-    /**
-     * Saves config data.
-     *
-     * @param filename
-     *          filename where are the data stored.
-     * @param saveAll whether to save clusters specified from the command line
-     */
-    public static void save(final GUIData guiData, final UserConfig userConfig, final String filename, final boolean saveAll) {
-        LOG.debug1("save: start");
-        final String text = Tools.getString("Tools.Saving").replaceAll("@FILENAME@",
-                                                                       Matcher.quoteReplacement(filename));
-        guiData.startProgressIndicator(text);
-        try {
-            final FileOutputStream fileOut = new FileOutputStream(filename);
-            userConfig.saveXML(fileOut, saveAll);
-            LOG.debug("save: filename: " + filename);
-        } catch (final IOException e) {
-            LOG.appError("save: error saving: " + filename, "", e);
-        } finally {
-            try {
-                Thread.sleep(1000);
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            final Clusters clusters = Tools.getApplication().getAllClusters();
-            if (clusters != null) {
-                for (final Cluster cluster : clusters.getClusterSet()) {
-                    final ClusterBrowser cb = cluster.getBrowser();
-                    if (cb != null) {
-                        cb.saveGraphPositions();
-                    }
-                }
-            }
-            guiData.stopProgressIndicator(text);
-        }
-    }
-
-    public static void setApplication(final Application app) {
-        application = app;
-    }
-
-    public static Application getApplication() {
-        return application;
-    }
-
     /**
      * Returns default value for option from AppDefaults resource bundle.
      */
@@ -370,14 +289,6 @@ public final class Tools {
             LOG.appError("getDefaultColor: unresolved config resource", option, e);
             return Color.WHITE;
         }
-    }
-
-    /**
-     * Returns default value for integer option from AppDefaults resource
-     * bundle and scales it according the --scale option.
-     */
-    public static int getDefaultSize(final String option) {
-        return getApplication().scaled(getDefaultInt(option));
     }
 
     /**
@@ -985,96 +896,6 @@ public final class Tools {
         }
     }
 
-    /**
-     * Prepares vnc viewer, gets the port and creates ssh tunnel. Returns true
-     * if ssh tunnel was created.
-     */
-    private static int prepareVncViewer(final Host host, final int remotePort) {
-        if (remotePort < 0 || host == null) {
-            return -1;
-        }
-        if (Tools.isLocalIp(host.getIpAddress())) {
-            return remotePort;
-        }
-        final int localPort = remotePort + getApplication().getVncPortOffset();
-        LOG.debug("prepareVncViewer: start port forwarding " + remotePort + " -> " + localPort);
-        try {
-            host.getSSH().startVncPortForwarding(host.getIpAddress(), remotePort);
-        } catch (final IOException e) {
-            LOG.error("prepareVncViewer: unable to create the tunnel "
-                      + remotePort + " -> " + localPort
-                      + ": " + e.getMessage()
-                      + "\ntry the --vnc-port-offset option");
-            return -1;
-        }
-        return localPort;
-    }
-
-    /** Cleans up after vnc viewer. It stops ssh tunnel. */
-    private static void cleanupVncViewer(final Host host, final int localPort) {
-        if (Tools.isLocalIp(host.getIpAddress())) {
-            return;
-        }
-        final int remotePort = localPort - getApplication().getVncPortOffset();
-        LOG.debug("cleanupVncViewer: stop port forwarding " + remotePort);
-        try {
-            host.getSSH().stopVncPortForwarding(remotePort);
-        } catch (final IOException e) {
-            LOG.appError("cleanupVncViewer: unable to close tunnel", e);
-        }
-    }
-
-    /** Starts Tight VNC viewer. */
-    public static void startTightVncViewer(final Host host, final int remotePort) {
-        final int localPort = prepareVncViewer(host, remotePort);
-        if (localPort < 0) {
-            return;
-        }
-        final tightvnc.VncViewer v = new tightvnc.VncViewer(new String[]{"HOST",
-                                                                         "127.0.0.1",
-                                                                         "PORT",
-                                                                         Integer.toString(localPort)},
-                                                            false,
-                                                            true);
-        v.init();
-        v.start();
-        v.join();
-        cleanupVncViewer(host, localPort);
-    }
-
-    /** Starts Ultra VNC viewer. */
-    public static void startUltraVncViewer(final Host host, final int remotePort) {
-        final int localPort = prepareVncViewer(host, remotePort);
-        if (localPort < 0) {
-            return;
-        }
-        final JavaViewer.VncViewer v = new JavaViewer.VncViewer(new String[]{"HOST",
-                                                                             "127.0.0.1",
-                                                                             "PORT",
-                                                                             Integer.toString(localPort)},
-                                                                false,
-                                                                true);
-        
-        v.init();
-        v.start();
-        v.join();
-        cleanupVncViewer(host, localPort);
-    }
-
-    /** Starts Real VNC viewer. */
-    public static void startRealVncViewer(final Host host, final int remotePort) {
-        final int localPort = prepareVncViewer(host, remotePort);
-        if (localPort < 0) {
-            return;
-        }
-        final vncviewer.VNCViewer v = new vncviewer.VNCViewer(new String[]{"127.0.0.1:"
-                                                                           + (Integer.toString(localPort - 5900))});
-        
-        v.start();
-        v.join();
-        cleanupVncViewer(host, localPort);
-    }
-
     /** Check whether the string is number. */
     public static boolean isNumber(final String s) {
         try {
@@ -1417,50 +1238,6 @@ public final class Tools {
         return out.toString();
     }
 
-    /** Wait for next swing threads to finish. It's used for synchronization */
-    public static void waitForSwing() {
-        invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                /* just wait */
-            }
-        });
-    }
-
-    /**
-     * Convenience invoke and wait function if not already in an event
-     * dispatch thread.
-     */
-    public static void invokeAndWaitIfNeeded(final Runnable runnable) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            runnable.run();
-        } else {
-            invokeAndWait(runnable);
-        }
-    }
-
-    public static void invokeAndWait(final Runnable runnable) {
-        isNotSwingThread();
-        try {
-            SwingUtilities.invokeAndWait(runnable);
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException x) {
-            LOG.appError("invokeAndWait: exception", x);
-        }
-    }
-
-    public static void invokeLater(final Runnable runnable) {
-        invokeLater(CHECK_SWING_THREAD, runnable);
-    }
-
-    public static void invokeLater(final boolean checkSwingThread, final Runnable runnable) {
-        if (checkSwingThread) {
-            isNotSwingThread();
-        }
-        SwingUtilities.invokeLater(runnable);
-    }
-
     /** Return directory part (to the /) of the filename. */
     public static String getDirectoryPart(final String filename) {
         if (filename == null) {
@@ -1547,16 +1324,6 @@ public final class Tools {
         }
     }
 
-    /** Makes the buttons font smaller. */
-    public static void makeMiniButton(final AbstractButton ab) {
-        final Font font = ab.getFont();
-        final String name = font.getFontName();
-        final int style = font.getStyle();
-        ab.setFont(new Font(name, style, getApplication().scaled(10)));
-        ab.setMargin(new Insets(2, 2, 2, 2));
-        ab.setIconTextGap(0);
-    }
-
     /** Trim the white space (' ', '\n') at the end of the string buffer.*/
     public static void chomp(final StringBuffer sb) {
         final int l = sb.length();
@@ -1567,48 +1334,6 @@ public final class Tools {
         }
         if (i >= 0 && i < l - 1) {
             sb.delete(i, l - 1);
-        }
-    }
-
-    /**
-     * Resize all fonts. Must be called before GUI is started.
-     * @param scale in percent 100% - is the same size.
-     */
-    public static void resizeFonts(int scale) {
-        if (scale == 100) {
-            return;
-        }
-        if (scale < 5) {
-            scale = 5;
-        }
-        if (scale > 10000) {
-            scale = 10000;
-        }
-        for (final Enumeration<Object> e = UIManager.getDefaults().keys();
-             e.hasMoreElements();) {
-            final Object key = e.nextElement();
-            final Object value = UIManager.get(key);
-            if (value instanceof Font)    {
-                final Font f = (Font) value;
-                UIManager.put(key, new FontUIResource(f.getName(),
-                                                      f.getStyle(),
-                                                      getApplication().scaled(f.getSize())));
-            }
-        }
-    }
-
-    public static void setMaxAccessType(final Application.AccessType accessType) {
-        getApplication().setAccessType(accessType);
-        getApplication().setMaxAccessType(accessType);
-        checkAccessOfEverything();
-    }
-
-    public static void checkAccessOfEverything() {
-        for (final Cluster c : getApplication().getAllClusters().getClusterSet()) {
-            final ClusterBrowser cb = c.getBrowser();
-            if (cb != null) {
-                cb.checkAccessOfEverything();
-            }
         }
     }
 
@@ -1679,30 +1404,6 @@ public final class Tools {
             return 0;
         }
         return -1;
-    }
-
-    /**
-     * Print stack trace if it's not in a swing thread.
-     */
-    public static void isSwingThread() {
-        if (!getApplication().isCheckSwing()) {
-            return;
-        }
-        if (!SwingUtilities.isEventDispatchThread()) {
-            System.out.println("not a swing thread: " + Tools.getStackTrace());
-        }
-    }
-
-    /**
-     * Print stack trace if it's in a swing thread.
-     */
-    public static void isNotSwingThread() {
-        if (!getApplication().isCheckSwing()) {
-            return;
-        }
-        if (SwingUtilities.isEventDispatchThread()) {
-            System.out.println("swing thread: " + Tools.getStackTrace());
-        }
     }
 
     private Tools() {

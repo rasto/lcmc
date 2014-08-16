@@ -32,6 +32,9 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
@@ -54,13 +57,15 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
                                             Tools.getDefault("BackIcon"));
     /** Map from ResourceAgent name to its object. It is possible only within
      * a class. */
-    private final Map<String, ResourceAgent> raMap =
-                                         new HashMap<String, ResourceAgent>();
-    /** Prepares a new {@code ResourceAgentClassInfo} object. */
-    public ResourceAgentClassInfo(final String name, final Browser browser) {
+    private final Map<String, ResourceAgent> raMap = new HashMap<String, ResourceAgent>();
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+
+    public void init(final String name, final Browser browser) {
         super.init(name, browser);
-        for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(
-                                                                      name)) {
+        for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(name)) {
             raMap.put(ra.getServiceName(), ra);
         }
     }
@@ -78,7 +83,7 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
         /** Get classes */
         for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(
                                                                   getName())) {
-            final MyButton nameLabel = new MyButton(ra.getServiceName());
+            final MyButton nameLabel = widgetFactory.createButton(ra.getServiceName());
             rows.add(new Object[]{nameLabel,
                                   ra.getProvider()});
         }
@@ -116,11 +121,10 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        final MyButton overviewButton = new MyButton(
+        final MyButton overviewButton = widgetFactory.createButton(
                      Tools.getString("ClusterBrowser.ClassesOverviewButton"),
                      BACK_ICON);
-        overviewButton.setPreferredSize(
-                        new Dimension(Tools.getApplication().scaled(180), 50));
+        overviewButton.setPreferredSize(new Dimension(application.scaled(180), 50));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

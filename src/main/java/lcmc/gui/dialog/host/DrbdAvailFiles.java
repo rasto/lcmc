@@ -60,6 +60,10 @@ public class DrbdAvailFiles extends DialogHost {
     /** Combo box with drbd builds. (kernel, arch) */
     private Widget drbdBuildCombo = null;
     private boolean listenersAdded = false;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     @Override
     protected final void initDialogBeforeVisible() {
@@ -79,7 +83,7 @@ public class DrbdAvailFiles extends DialogHost {
         if (versions != null && versions.length != 0) {
             final Value version = versions[versions.length - 1];
             drbdVersionCombo.reloadComboBox(version, versions);
-            Tools.waitForSwing();
+            application.waitForSwing();
         }
         final String selectedItem = drbdVersionCombo.getStringValue();
         if (selectedItem == null) {
@@ -111,7 +115,7 @@ public class DrbdAvailFiles extends DialogHost {
                     }
                     drbdBuildCombo.clear();
                     drbdBuildCombo.reloadComboBox(new StringValue(defaultValue), StringValue.getValues(items));
-                    Tools.waitForSwing();
+                    application.waitForSwing();
                     final String selectedItem = drbdBuildCombo.getStringValue();
                     drbdBuildCombo.setEnabled(true);
                     if (selectedItem == null) {
@@ -126,7 +130,7 @@ public class DrbdAvailFiles extends DialogHost {
 
                 @Override
                 public void doneError(final String answer, final int errorCode) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailFiles.NoBuilds"), answer, errorCode);
@@ -151,7 +155,7 @@ public class DrbdAvailFiles extends DialogHost {
                         files.remove(0);
                     }
                     final String[] filesA = files.toArray(new String[files.size()]);
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             answerPaneSetText(Tools.join("\n", filesA));
@@ -160,7 +164,7 @@ public class DrbdAvailFiles extends DialogHost {
                     getDrbdInstallation().setDrbdPackagesToInstall(Tools.shellList(filesA));
                     allDone();
                 } else {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailFiles.NoFiles"));
@@ -171,7 +175,7 @@ public class DrbdAvailFiles extends DialogHost {
 
             @Override
             public void doneError(final String answer, final int errorCode) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailFiles.NoBuilds"), answer, errorCode);
@@ -194,7 +198,7 @@ public class DrbdAvailFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
-        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+        if (application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -219,7 +223,7 @@ public class DrbdAvailFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* drbd version combo box */
-        drbdVersionCombo = WidgetFactory.createInstance(
+        drbdVersionCombo = widgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
                                       Widget.NO_DEFAULT,
                                       Widget.NO_ITEMS,
@@ -231,7 +235,7 @@ public class DrbdAvailFiles extends DialogHost {
         pane.add(drbdVersionCombo.getComponent());
 
         /* build combo box */
-        drbdBuildCombo = WidgetFactory.createInstance(
+        drbdBuildCombo = widgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
                                       Widget.NO_DEFAULT,
                                       Widget.NO_ITEMS,
@@ -259,7 +263,7 @@ public class DrbdAvailFiles extends DialogHost {
                     enableComponentsLater(new JComponent[]{buttonClass(nextButton())});
                     disableComponents(new java.awt.Component[]{drbdBuildCombo.getComponent()});
                     final String item = drbdVersionCombo.getStringValue();
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             getDrbdInstallation().setDrbdVersionToInstall(item);

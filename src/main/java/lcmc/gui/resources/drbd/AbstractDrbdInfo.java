@@ -52,6 +52,8 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     /** Name of the drbd after parameter. Before 8.4 */
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     /** Returns browser object of this info. */
     @Override
@@ -222,7 +224,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                 }
             }
             final Unit[] units = getUnits(param);
-            paramWi = WidgetFactory.createInstance(
+            paramWi = widgetFactory.createInstance(
                                  Widget.Type.TEXTFIELDWITHUNIT,
                                  selectedValue,
                                  getPossibleChoices(param),

@@ -100,6 +100,8 @@ public class DrbdGraph extends ResourceGraph {
     private int hostDefaultXPos = 10;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
     @Override
     protected void initGraph(final ClusterBrowser clusterBrowser) {
@@ -165,7 +167,7 @@ public class DrbdGraph extends ResourceGraph {
                         removeDrbdVolume(dvi);
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(dvi);
                     }
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             lockGraph();
@@ -324,7 +326,7 @@ public class DrbdGraph extends ResourceGraph {
                 if (sourceBDI.isWFConnection(runMode)
                     && !destBDI.isWFConnection(runMode)) {
                     edge.setDirection(dest, source);
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             repaint();
@@ -334,7 +336,7 @@ public class DrbdGraph extends ResourceGraph {
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         repaint();

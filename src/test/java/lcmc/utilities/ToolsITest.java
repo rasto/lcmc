@@ -4,8 +4,8 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Host;
-import lcmc.model.UserConfig;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.testutils.annotation.type.IntegrationTest;
@@ -91,7 +91,8 @@ public final class ToolsITest {
         testSuite.initMain();
         assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
-        Tools.save(guiData, new UserConfig(), testFile, false);
+        final Application application = new Application();
+        application.saveConfig(testFile, false);
         final String file = Tools.loadFile(guiData, testFile, false);
         assertNotNull(file);
         testSuite.clearStdout();

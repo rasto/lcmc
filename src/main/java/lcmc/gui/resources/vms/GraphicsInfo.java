@@ -34,6 +34,8 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
@@ -44,11 +46,17 @@ import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual graphics displays.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class GraphicsInfo extends HardwareInfo {
 
     /** Parameters. AUTOPORT is generated */
@@ -124,23 +132,11 @@ public final class GraphicsInfo extends HardwareInfo {
                                         new StringValue("5901", "5901")});
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Graphics Display");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addGraphicsPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+
     /** Combo box that can be made invisible. */
     private final Map<String, Widget> portWi = new HashMap<String, Widget>();
     /** Combo box that can be made invisible. */
@@ -155,10 +151,9 @@ public final class GraphicsInfo extends HardwareInfo {
     private final Map<String, Widget> xauthWi = new HashMap<String, Widget>();
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the GraphicsInfo object. */
-    GraphicsInfo(final String name, final Browser browser,
-                           final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
+        super.init(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -166,9 +161,9 @@ public final class GraphicsInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Displays",
                                    DomainInfo.GRAPHICS_TABLE,
-                                   getNewBtn(getVMSVirtualDomainInfo()));
+                                   getVMSVirtualDomainInfo().getNewGraphicsBtn());
         if (getResource().isNew()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -335,7 +330,7 @@ public final class GraphicsInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -380,7 +375,7 @@ public final class GraphicsInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -410,7 +405,7 @@ public final class GraphicsInfo extends HardwareInfo {
         getBrowser().reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -474,7 +469,7 @@ public final class GraphicsInfo extends HardwareInfo {
         if (GraphicsData.TYPE.equals(param)) {
             final boolean vnc = TYPE_VNC.equals(newValue);
             final boolean sdl = TYPE_SDL.equals(newValue);
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {

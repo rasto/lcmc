@@ -34,6 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.AppContext;
+import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
@@ -46,14 +47,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.EditConfig;
 import lcmc.gui.dialog.pacemaker.ServiceLogs;
 import lcmc.gui.widget.Widget;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.MyList;
-import lcmc.utilities.MyListModel;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -62,11 +56,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ServiceMenu {
-    
     @Autowired
     private GUIData drbdGui;
     @Autowired
     private EditConfig editDialog;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -76,473 +73,478 @@ public class ServiceMenu {
             addDependencyMenuItems(serviceInfo, items, false, runMode);
         }
         /* start resource */
-        final ComponentWithTest startMenuItem =
-            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StartResource"),
-                           ServiceInfo.START_ICON,
-                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (serviceInfo.isStarted(runMode)) {
-                        return Tools.getString("ServiceInfo.AlreadyStarted");
-                    } else {
-                        return serviceInfo.getService().isAvailableWithText();
-                    }
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.startResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                }
-            };
-        final ButtonCallback startItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                serviceInfo.startResource(dcHost, Application.RunMode.TEST);
-            }
-        };
+        final ComponentWithTest startMenuItem = menuFactory.createMenuItem(
+                        Tools.getString("ClusterBrowser.Hb.StartResource"),
+                        ServiceInfo.START_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                                } else if (serviceInfo.isStarted(runMode)) {
+                                    return Tools.getString("ServiceInfo.AlreadyStarted");
+                                } else {
+                                    return serviceInfo.getService().isAvailableWithText();
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                serviceInfo.startResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            }
+                        });
+        final ButtonCallback startItemCallback = serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                serviceInfo.startResource(dcHost, Application.RunMode.TEST);
+                            }
+                        });
         serviceInfo.addMouseOverListener(startMenuItem, startItemCallback);
         items.add((UpdatableItem) startMenuItem);
 
         /* stop resource */
         final ComponentWithTest stopMenuItem =
-            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.StopResource"),
-                           ServiceInfo.STOP_ICON,
-                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (serviceInfo.isStopped(runMode)) {
-                        return Tools.getString("ServiceInfo.AlreadyStopped");
-                    } else {
-                        return serviceInfo.getService().isAvailableWithText();
-                    }
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.stopResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                }
-            };
-        final ButtonCallback stopItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                serviceInfo.stopResource(dcHost, Application.RunMode.TEST);
-            }
-        };
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.StopResource"),
+                        ServiceInfo.STOP_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                                } else if (serviceInfo.isStopped(runMode)) {
+                                    return Tools.getString("ServiceInfo.AlreadyStopped");
+                                } else {
+                                    return serviceInfo.getService().isAvailableWithText();
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                serviceInfo.stopResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            }
+                        });
+        final ButtonCallback stopItemCallback = serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                serviceInfo.stopResource(dcHost, Application.RunMode.TEST);
+                            }
+                        });
         serviceInfo.addMouseOverListener(stopMenuItem, stopItemCallback);
         items.add((UpdatableItem) stopMenuItem);
 
         /* up group resource */
         final ComponentWithTest upMenuItem =
-            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.UpResource"),
-                           ServiceInfo.GROUP_UP_ICON,
-                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.UpResource"),
+                        ServiceInfo.GROUP_UP_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .visiblePredicate(new VisiblePredicate() {
+                            @Override
+                            public boolean check() {
+                                return serviceInfo.getGroupInfo() != null;
+                            }
+                        })
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (serviceInfo.getResource().isNew()) {
+                                    return ServiceInfo.IS_NEW_STRING;
+                                }
+                                final GroupInfo gi = serviceInfo.getGroupInfo();
+                                if (gi == null) {
+                                    return "no";
+                                }
+                                if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                                }
+                                final DefaultMutableTreeNode giNode = gi.getNode();
+                                if (giNode == null) {
+                                    return "no";
+                                }
+                                final DefaultMutableTreeNode node = serviceInfo.getNode();
+                                if (node == null) {
+                                    return "no";
+                                }
+                                final int index = giNode.getIndex(node);
+                                if (index == 0) {
+                                    return "already up";
+                                }
+                                return null;
+                            }
+                        })
 
-                @Override
-                public boolean visiblePredicate() {
-                    return serviceInfo.getGroupInfo() != null;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getResource().isNew()) {
-                        return ServiceInfo.IS_NEW_STRING;
-                    }
-                    final GroupInfo gi = serviceInfo.getGroupInfo();
-                    if (gi == null) {
-                        return "no";
-                    }
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    }
-                    final DefaultMutableTreeNode giNode = gi.getNode();
-                    if (giNode == null) {
-                        return "no";
-                    }
-                    final DefaultMutableTreeNode node = serviceInfo.getNode();
-                    if (node == null) {
-                        return "no";
-                    }
-                    final int index = giNode.getIndex(node);
-                    if (index == 0) {
-                        return "already up";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.upResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                }
-            };
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                serviceInfo.upResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            }
+                        });
         final ButtonCallback upItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                serviceInfo.upResource(dcHost, Application.RunMode.TEST);
-            }
-        };
+                serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                serviceInfo.upResource(dcHost, Application.RunMode.TEST);
+                            }
+                        });
         serviceInfo.addMouseOverListener(upMenuItem, upItemCallback);
         items.add((UpdatableItem) upMenuItem);
 
         /* down group resource */
         final ComponentWithTest downMenuItem =
-            new MyMenuItem(Tools.getString("ClusterBrowser.Hb.DownResource"),
-                           ServiceInfo.GROUP_DOWN_ICON,
-                           ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return serviceInfo.getGroupInfo() != null;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getResource().isNew()) {
-                        return ServiceInfo.IS_NEW_STRING;
-                    }
-                    final GroupInfo gi = serviceInfo.getGroupInfo();
-                    if (gi == null) {
-                        return "no";
-                    }
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    }
-                    final DefaultMutableTreeNode giNode = gi.getNode();
-                    if (giNode == null) {
-                        return "no";
-                    }
-                    final DefaultMutableTreeNode node = serviceInfo.getNode();
-                    if (node == null) {
-                        return "no";
-                    }
-                    final int index = giNode.getIndex(node);
-                    if (index >= giNode.getChildCount() - 1) {
-                        return "already down";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.downResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                }
-            };
-        final ButtonCallback downItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                serviceInfo.downResource(dcHost, Application.RunMode.TEST);
-            }
-        };
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.DownResource"),
+                        ServiceInfo.GROUP_DOWN_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .visiblePredicate(new VisiblePredicate() {
+                            @Override
+                            public boolean check() {
+                                return serviceInfo.getGroupInfo() != null;
+                            }
+                        })
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (serviceInfo.getResource().isNew()) {
+                                    return ServiceInfo.IS_NEW_STRING;
+                                }
+                                final GroupInfo gi = serviceInfo.getGroupInfo();
+                                if (gi == null) {
+                                    return "no";
+                                }
+                                if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                                }
+                                final DefaultMutableTreeNode giNode = gi.getNode();
+                                if (giNode == null) {
+                                    return "no";
+                                }
+                                final DefaultMutableTreeNode node = serviceInfo.getNode();
+                                if (node == null) {
+                                    return "no";
+                                }
+                                final int index = giNode.getIndex(node);
+                                if (index >= giNode.getChildCount() - 1) {
+                                    return "already down";
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                serviceInfo.downResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            }
+                        });
+        final ButtonCallback downItemCallback = serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                serviceInfo.downResource(dcHost, Application.RunMode.TEST);
+                            }
+                        });
         serviceInfo.addMouseOverListener(downMenuItem, downItemCallback);
         items.add((UpdatableItem) downMenuItem);
 
         /* clean up resource */
-        final UpdatableItem cleanupMenuItem =
-            new MyMenuItem(
-               Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
-               ServiceInfo.SERVICE_RUNNING_ICON,
-               ClusterBrowser.STARTING_PTEST_TOOLTIP,
+        final UpdatableItem cleanupMenuItem = menuFactory.createMenuItem(
+                        Tools.getString("ClusterBrowser.Hb.CleanUpFailedResource"),
+                        ServiceInfo.SERVICE_RUNNING_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-               Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
-               ServiceInfo.SERVICE_RUNNING_ICON,
-               ClusterBrowser.STARTING_PTEST_TOOLTIP,
-               new AccessMode(Application.AccessType.OP, false),
-               new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
+                        Tools.getString("ClusterBrowser.Hb.CleanUpResource"),
+                        ServiceInfo.SERVICE_RUNNING_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
 
-                @Override
-                public boolean predicate() {
-                    return serviceInfo.getService().isAvailable()
-                           && serviceInfo.isOneFailed(runMode);
-                }
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (!serviceInfo.isOneFailedCount(runMode)) {
-                        return "no fail count";
-                    } else {
-                        return serviceInfo.getService().isAvailableWithText();
-                    }
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.cleanupResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                }
-            };
+                        .predicate(new Predicate() {
+                            @Override
+                            public boolean check() {
+                                return serviceInfo.getService().isAvailable() && serviceInfo.isOneFailed(runMode);
+                            }
+                        })
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                                } else if (!serviceInfo.isOneFailedCount(runMode)) {
+                                    return "no fail count";
+                                } else {
+                                    return serviceInfo.getService().isAvailableWithText();
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                serviceInfo.cleanupResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            }
+                        });
         /* cleanup ignores CIB_file */
         items.add(cleanupMenuItem);
 
-
         /* manage resource */
         final ComponentWithTest manageMenuItem =
-            new MyMenuItem(
-                  Tools.getString("ClusterBrowser.Hb.ManageResource"),
-                  ServiceInfo.MANAGE_BY_CRM_ICON,
-                  ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.ManageResource"),
+                        ServiceInfo.MANAGE_BY_CRM_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                  Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
-                  ServiceInfo.UNMANAGE_BY_CRM_ICON,
-                  ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        Tools.getString("ClusterBrowser.Hb.UnmanageResource"),
+                        ServiceInfo.UNMANAGE_BY_CRM_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                  new AccessMode(Application.AccessType.OP, false),
-                  new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean predicate() {
-                    return !serviceInfo.isManaged(runMode);
-                }
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else {
-                        return serviceInfo.getService().isAvailableWithText();
-                    }
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    if (getText().equals(Tools.getString(
-                                    "ClusterBrowser.Hb.ManageResource"))) {
-                        serviceInfo.setManaged(true, serviceInfo.getBrowser().getDCHost(), runMode);
-                    } else {
-                        serviceInfo.setManaged(false, serviceInfo.getBrowser().getDCHost(), runMode);
-                    }
-                }
-            };
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .predicate(new Predicate() {
+                            @Override
+                            public boolean check() {
+                                return !serviceInfo.isManaged(runMode);
+                            }
+                        })
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                                } else {
+                                    return serviceInfo.getService().isAvailableWithText();
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                if (text.equals(Tools.getString("ClusterBrowser.Hb.ManageResource"))) {
+                                    serviceInfo.setManaged(true, serviceInfo.getBrowser().getDCHost(), runMode);
+                                } else {
+                                    serviceInfo.setManaged(false, serviceInfo.getBrowser().getDCHost(), runMode);
+                                }
+                            }
+                        });
         final ButtonCallback manageItemCallback =
-                                     serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                serviceInfo.setManaged(!serviceInfo.isManaged(Application.RunMode.TEST),
-                                       dcHost,
-                                       Application.RunMode.TEST);
-            }
-        };
+                serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                serviceInfo.setManaged(!serviceInfo.isManaged(Application.RunMode.TEST),
+                                                       dcHost,
+                                                       Application.RunMode.TEST);
+                            }
+                        });
         serviceInfo.addMouseOverListener(manageMenuItem, manageItemCallback);
         items.add((UpdatableItem) manageMenuItem);
         addMigrateMenuItems(serviceInfo, items);
         if (ci == null) {
             /* remove service */
-            final ComponentWithTest removeMenuItem = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Hb.RemoveService"),
-                        ClusterBrowser.REMOVE_ICON,
-                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getService().isNew()) {
-                        return null;
-                    }
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (serviceInfo.getService().isRemoved()) {
-                        return ServiceInfo.IS_BEING_REMOVED_STRING;
-                    } else if (serviceInfo.isRunning(runMode)
-                               && !Tools.getApplication().isAdvancedMode()) {
-                        return "cannot remove running resource<br>"
-                               + "(advanced mode only)";
-                    }
-                    if (serviceInfo.getGroupInfo() == null) {
-                        return null;
-                    }
-                    final ClusterStatus cs = serviceInfo.getBrowser().getClusterStatus();
-                    final List<String> gr = cs.getGroupResources(
-                                          serviceInfo.getGroupInfo().getHeartbeatId(runMode),
-                                          runMode);
+            final ComponentWithTest removeMenuItem = menuFactory.createMenuItem(
+                    Tools.getString("ClusterBrowser.Hb.RemoveService"),
+                    ClusterBrowser.REMOVE_ICON,
+                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    new AccessMode(Application.AccessType.ADMIN, false),
+                    new AccessMode(Application.AccessType.OP, false))
+                    .enablePredicate(new EnablePredicate() {
+                        @Override
+                        public String check() {
+                            if (serviceInfo.getService().isNew()) {
+                                return null;
+                            }
+                            if (serviceInfo.getBrowser().crmStatusFailed()) {
+                                return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                            } else if (serviceInfo.getService().isRemoved()) {
+                                return ServiceInfo.IS_BEING_REMOVED_STRING;
+                            } else if (serviceInfo.isRunning(runMode) && !application.isAdvancedMode()) {
+                                return "cannot remove running resource<br>(advanced mode only)";
+                            }
+                            if (serviceInfo.getGroupInfo() == null) {
+                                return null;
+                            }
+                            final ClusterStatus cs = serviceInfo.getBrowser().getClusterStatus();
+                            final List<String> gr = cs.getGroupResources(
+                                                          serviceInfo.getGroupInfo().getHeartbeatId(runMode),
+                                                          runMode);
 
 
-                    if (gr != null && gr.size() > 1) {
-                        return null;
-                    } else {
-                        return "you can remove the group";
-                    }
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    if (serviceInfo.getService().isOrphaned()) {
-                        serviceInfo.cleanupResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                    } else {
-                        serviceInfo.removeMyself(Application.RunMode.LIVE);
-                    }
-                    serviceInfo.getBrowser().getCrmGraph().repaint();
-                }
-            };
+                            if (gr != null && gr.size() > 1) {
+                                return null;
+                            } else {
+                                return "you can remove the group";
+                            }
+                        }
+                    })
+                    .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
+                            serviceInfo.hidePopup();
+                            if (serviceInfo.getService().isOrphaned()) {
+                                serviceInfo.cleanupResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            } else {
+                                serviceInfo.removeMyself(Application.RunMode.LIVE);
+                            }
+                            serviceInfo.getBrowser().getCrmGraph().repaint();
+                        }
+                    });
             final ButtonCallback removeItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-                @Override
-                public boolean isEnabled() {
-                    return super.isEnabled() && !serviceInfo.getService().isNew();
-                }
-                @Override
-                public void action(final Host dcHost) {
-                    serviceInfo.removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
-                }
-            };
+                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
+                        @Override
+                        public boolean isEnabled() {
+                            return super.isEnabled() && !serviceInfo.getService().isNew();
+                        }
+                    }
+                    .addAction(new CallbackAction() {
+                        @Override
+                        public void run(final Host dcHost) {
+                            serviceInfo.removeMyselfNoConfirm(dcHost, Application.RunMode.TEST);
+                        }
+                    });
             serviceInfo.addMouseOverListener(removeMenuItem, removeItemCallback);
             items.add((UpdatableItem) removeMenuItem);
         }
+
         /* view log */
-        final UpdatableItem viewLogMenu = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Hb.ViewServiceLog"),
-                        ServiceInfo.LOGFILE_ICON,
-                        null,
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (serviceInfo.getService().isNew()) {
-                    return ServiceInfo.IS_NEW_STRING;
-                } else {
-                    return null;
-                }
-            }
-
-            @Override
-            public void action() {
-                serviceInfo.hidePopup();
-                final ServiceLogs l = new ServiceLogs(serviceInfo.getBrowser().getCluster(),
-                                                serviceInfo.getNameForLog(),
-                                                serviceInfo.getService().getCrmId());
-                l.showDialog();
-            }
-        };
+        final UpdatableItem viewLogMenu = menuFactory.createMenuItem(
+                Tools.getString("ClusterBrowser.Hb.ViewServiceLog"),
+                ServiceInfo.LOGFILE_ICON,
+                null,
+                new AccessMode(Application.AccessType.RO, false),
+                new AccessMode(Application.AccessType.RO, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (serviceInfo.getService().isNew()) {
+                            return ServiceInfo.IS_NEW_STRING;
+                        } else {
+                            return null;
+                        }
+                    }
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        serviceInfo.hidePopup();
+                        final ServiceLogs l = new ServiceLogs(serviceInfo.getBrowser().getCluster(),
+                                                              serviceInfo.getNameForLog(),
+                                                              serviceInfo.getService().getCrmId());
+                        l.showDialog();
+                    }
+                });
         items.add(viewLogMenu);
         /* more migrate options */
-        final MyMenu migrateSubmenu = new MyMenu(
-                        Tools.getString("ClusterBrowser.MigrateSubmenu"),
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public String enablePredicate() {
-                return null; //TODO: enable only if it has items
-            }
-        };
+        final MyMenu migrateSubmenu = menuFactory.createMenu(
+                Tools.getString("ClusterBrowser.MigrateSubmenu"),
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    public String check() {
+                        return null; //TODO: enable only if it has items
+                    }
+                });
         items.add(migrateSubmenu);
+
         addMoreMigrateMenuItems(serviceInfo, migrateSubmenu);
 
         /* config files */
-        final UpdatableItem filesSubmenu = new MyMenu(
-                        Tools.getString("ClusterBrowser.FilesSubmenu"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false)) {
-            private static final long serialVersionUID = 1L;
+        final MyMenu filesSubmenu = menuFactory.createMenu(
+                Tools.getString("ClusterBrowser.FilesSubmenu"),
+                new AccessMode(Application.AccessType.ADMIN, false),
+                new AccessMode(Application.AccessType.ADMIN, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        return null; //TODO: enable only if it has items
+                    }
+                });
+        filesSubmenu.onUpdate(new Runnable() {
             @Override
-            public String enablePredicate() {
-                return null; //TODO: enable only if it has items
-            }
-            @Override
-            public void updateAndWait() {
-                super.updateAndWait();
-                Tools.isSwingThread();
-                final MyMenu self = this;
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            public void run() {
+                application.isSwingThread();
+                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
-                        removeAll();
-                        addFilesMenuItems(serviceInfo, self);
+                        filesSubmenu.removeAll();
+                        addFilesMenuItems(serviceInfo, filesSubmenu);
+                        filesSubmenu.updateMenuComponents();
+                        filesSubmenu.processAccessMode();
                     }
                 });
             }
-        };
+        });
         items.add(filesSubmenu);
         return items;
     }
 
-    /** Adds new Service and dependence. */
+    /**
+     * Adds new Service and dependence.
+     */
     private MyMenu getAddServiceMenuItem(final ServiceInfo serviceInfo,
                                          final Application.RunMode runMode,
                                          final String name) {
-        return new MyMenu(name,
-                          new AccessMode(Application.AccessType.ADMIN, false),
-                          new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
+        final MyMenu serviceMenu = menuFactory.createMenu(name,
+                                                          new AccessMode(Application.AccessType.ADMIN, false),
+                                                          new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (serviceInfo.getBrowser().crmStatusFailed()) {
+                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                        } else if (serviceInfo.getService().isRemoved()) {
+                            return ServiceInfo.IS_BEING_REMOVED_STRING;
+                        } else if (serviceInfo.getService().isOrphaned()) {
+                            return ServiceInfo.IS_ORPHANED_STRING;
+                        } else if (serviceInfo.getService().isNew()) {
+                            return ServiceInfo.IS_NEW_STRING;
+                        }
+                        return null;
+                    }
+                });
+        serviceMenu.onUpdate(new Runnable() {
             @Override
-            public String enablePredicate() {
-                if (serviceInfo.getBrowser().crmStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                } else if (serviceInfo.getService().isRemoved()) {
-                    return ServiceInfo.IS_BEING_REMOVED_STRING;
-                } else if (serviceInfo.getService().isOrphaned()) {
-                    return ServiceInfo.IS_ORPHANED_STRING;
-                } else if (serviceInfo.getService().isNew()) {
-                    return ServiceInfo.IS_NEW_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void updateAndWait() {
-                Tools.isSwingThread();
-                removeAll();
-                final Point2D pos = getPos();
+            public void run() {
+                application.isSwingThread();
+                serviceMenu.removeAll();
+                final Point2D pos = serviceMenu.getPos();
                 final CrmXml crmXML = serviceInfo.getBrowser().getCrmXml();
-                final ResourceAgent fsService =
-                     crmXML.getResourceAgent("Filesystem",
-                                             ResourceAgent.HEARTBEAT_PROVIDER,
-                                             ResourceAgent.OCF_CLASS_NAME);
-                if (crmXML.isLinbitDrbdResourceAgentPresent()) { /* just skip it, if it
-                                                       is not */
+                final ResourceAgent fsService = crmXML.getResourceAgent("Filesystem",
+                                                                        ResourceAgent.HEARTBEAT_PROVIDER,
+                                                                        ResourceAgent.OCF_CLASS_NAME);
+                if (crmXML.isLinbitDrbdResourceAgentPresent()) { /* just skip it, if it is not */
                     /* Linbit:DRBD */
-                    addDrbdLinbitMenu(serviceInfo, this, crmXML, pos, fsService, runMode);
+                    addDrbdLinbitMenu(serviceInfo, serviceMenu, crmXML, pos, fsService, runMode);
                 }
                 if (crmXML.isDrbddiskResourceAgentPresent()) { /* just skip it,
                                                      if it is not */
                     /* drbddisk */
-                    addDrbddiskMenu(serviceInfo, this, crmXML, pos, fsService, runMode);
+                    addDrbddiskMenu(serviceInfo, serviceMenu, crmXML, pos, fsService, runMode);
                 }
-                final ResourceAgent ipService = crmXML.getResourceAgent(
-                                         "IPaddr2",
-                                         ResourceAgent.HEARTBEAT_PROVIDER,
-                                         ResourceAgent.OCF_CLASS_NAME);
+                final ResourceAgent ipService = crmXML.getResourceAgent("IPaddr2",
+                                                                        ResourceAgent.HEARTBEAT_PROVIDER,
+                                                                        ResourceAgent.OCF_CLASS_NAME);
                 if (ipService != null) { /* just skip it, if it is not*/
                     /* ipaddr */
-                    addIpMenu(serviceInfo, this, pos, ipService, runMode);
+                    addIpMenu(serviceInfo, serviceMenu, pos, ipService, runMode);
                 }
                 if (fsService != null) { /* just skip it, if it is not*/
                     /* Filesystem */
-                    addFilesystemMenu(serviceInfo, this, pos, fsService, runMode);
+                    addFilesystemMenu(serviceInfo, serviceMenu, pos, fsService, runMode);
                 }
                 final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.CRM_CLASSES) {
@@ -553,265 +555,232 @@ public class ServiceMenu {
                     }
                     final JCheckBox colocationWi = new JCheckBox("Colo", true);
                     final JCheckBox orderWi = new JCheckBox("Order", true);
-                    colocationWi.setBackground(
-                                            ClusterBrowser.STATUS_BACKGROUND);
-                    colocationWi.setPreferredSize(
-                                            colocationWi.getMinimumSize());
+                    colocationWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
+                    colocationWi.setPreferredSize(colocationWi.getMinimumSize());
                     orderWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                     orderWi.setPreferredSize(orderWi.getMinimumSize());
-                    final JPanel colOrdPanel =
-                            new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+                    final JPanel colOrdPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
                     colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                     colOrdPanel.add(colocationWi);
                     colOrdPanel.add(orderWi);
                     boolean mode = !AccessMode.ADVANCED;
-                    if (ResourceAgent.UPSTART_CLASS_NAME.equals(cl)
-                        || ResourceAgent.SYSTEMD_CLASS_NAME.equals(cl)) {
+                    if (ResourceAgent.UPSTART_CLASS_NAME.equals(cl) || ResourceAgent.SYSTEMD_CLASS_NAME.equals(cl)) {
                         mode = AccessMode.ADVANCED;
                     }
-                    if (ResourceAgent.LSB_CLASS_NAME.equals(cl)
-                        && !serviceInfo.getAddServiceList(
-                                    ResourceAgent.SERVICE_CLASS_NAME).isEmpty()) {
+                    if (ResourceAgent.LSB_CLASS_NAME.equals(cl) && !serviceInfo.getAddServiceList(
+                                                                        ResourceAgent.SERVICE_CLASS_NAME).isEmpty()) {
                         mode = AccessMode.ADVANCED;
                     }
-                    final MyMenu classItem = new MyMenu(
+                    final MyMenu classItem = menuFactory.createMenu(
                             ClusterBrowser.getClassMenuName(cl),
                             new AccessMode(Application.AccessType.ADMIN, mode),
                             new AccessMode(Application.AccessType.OP, mode));
-                    final MyListModel<MyMenuItem> dlm =
-                                                 new MyListModel<MyMenuItem>();
+                    final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
-                        addResourceAgentMenu(serviceInfo,
-                                             ra,
-                                             dlm,
-                                             pos,
-                                             popups,
-                                             colocationWi,
-                                             orderWi,
-                                             runMode);
+                        addResourceAgentMenu(serviceInfo, ra, dlm, pos, popups, colocationWi, orderWi, runMode);
                     }
                     final boolean ret = drbdGui.getScrollingMenu(
-                            ClusterBrowser.getClassMenuName(cl),
-                            colOrdPanel,
-                            classItem,
-                            dlm,
-                            new MyList<MyMenuItem>(dlm,
-                                                   getBackground()),
-                            serviceInfo,
-                            popups,
-                            null);
+                                                      ClusterBrowser.getClassMenuName(cl),
+                                                      colOrdPanel,
+                                                      classItem,
+                                                      dlm,
+                                                      new MyList<MyMenuItem>(dlm, serviceMenu.getBackground()),
+                                                      serviceInfo,
+                                                      popups,
+                                                      null);
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
-                    add(classItem);
+                    serviceMenu.add(classItem);
                 }
-                super.updateAndWait();
+                serviceMenu.updateMenuComponents();
+                serviceMenu.processAccessMode();
             }
-        };
+        });
+        return serviceMenu;
     }
 
-    /** Adds migrate and unmigrate menu items. */
+    /**
+     * Adds migrate and unmigrate menu items.
+     */
     protected void addMigrateMenuItems(final ServiceInfo serviceInfo, final List<UpdatableItem> items) {
         /* migrate resource */
         final Application.RunMode runMode = Application.RunMode.LIVE;
         for (final Host host : serviceInfo.getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateFromMenuItem =
-               new MyMenuItem(Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + ' ' + hostName,
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.MigrateFromResource")
+                                               + ' ' + hostName,
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                              Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateFromResource")
-                                   + ' ' + hostName + " (offline)",
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(Application.AccessType.OP, false),
-                              new AccessMode(Application.AccessType.OP, false)) {
-                    private static final long serialVersionUID = 1L;
-
-                    @Override
-                    public boolean predicate() {
-                        return host.isCrmStatusOk();
-                    }
-
-                    @Override
-                    public boolean visiblePredicate() {
-                        return !host.isCrmStatusOk()
-                               || enablePredicate() == null;
-                    }
-
-                    @Override
-                    public String enablePredicate() {
-                        final List<String> runningOnNodes =
-                                     serviceInfo.getRunningOnNodes(runMode);
-                        if (runningOnNodes == null
-                            || runningOnNodes.size() < 1) {
-                            return "must run";
-                        }
-                        boolean runningOnNode = false;
-                        for (final String ron : runningOnNodes) {
-                            if (hostName.toLowerCase(Locale.US).equals(
-                                               ron.toLowerCase(Locale.US))) {
-                                runningOnNode = true;
-                                break;
-                            }
-                        }
-                        if (!serviceInfo.getBrowser().crmStatusFailed()
-                               && serviceInfo.getService().isAvailable()
-                               && runningOnNode
-                               && host.isCrmStatusOk()) {
-                            return null;
-                        } else {
-                            return ""; /* is not visible anyway */
-                        }
-                    }
-
-                    @Override
-                    public void action() {
-                        serviceInfo.hidePopup();
-                        serviceInfo.migrateFromResource(
-                                            serviceInfo.getBrowser().getDCHost(),
-                                            hostName,
-                                            runMode);
-                    }
-                };
+                            Tools.getString("ClusterBrowser.Hb.MigrateFromResource") + ' ' + hostName + " (offline)",
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false))
+                            .predicate(new Predicate() {
+                                @Override
+                                public boolean check() {
+                                    return host.isCrmStatusOk();
+                                }
+                            })
+                            .visiblePredicate(new VisiblePredicate() {
+                                public boolean check() {
+                                    if (!host.isCrmStatusOk()) {
+                                        return false;
+                                    }
+                                    final List<String> runningOnNodes = serviceInfo.getRunningOnNodes(runMode);
+                                    if (runningOnNodes == null || runningOnNodes.size() < 1) {
+                                        return false;
+                                    }
+                                    boolean runningOnNode = false;
+                                    for (final String ron : runningOnNodes) {
+                                        if (hostName.toLowerCase(Locale.US).equals(ron.toLowerCase(Locale.US))) {
+                                            runningOnNode = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!serviceInfo.getBrowser().crmStatusFailed()
+                                        && serviceInfo.getService().isAvailable()
+                                        && runningOnNode
+                                        && host.isCrmStatusOk()) {
+                                        return true;
+                                    } else {
+                                        return false;
+                                    }
+                                }
+                            })
+                            .addAction(new MenuAction() {
+                                @Override
+                                public void run(final String text) {
+                                    serviceInfo.hidePopup();
+                                    serviceInfo.migrateFromResource(serviceInfo.getBrowser().getDCHost(),
+                                                                    hostName,
+                                                                    runMode);
+                                }
+                            });
             final ButtonCallback migrateItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-                @Override
-                public void action(final Host dcHost) {
-                    serviceInfo.migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
-                }
-            };
+                    serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                            .addAction(new CallbackAction() {
+                                @Override
+                                public void run(final Host dcHost) {
+                                    serviceInfo.migrateFromResource(dcHost, hostName, Application.RunMode.TEST);
+                                }
+                            });
             serviceInfo.addMouseOverListener(migrateFromMenuItem, migrateItemCallback);
             items.add(migrateFromMenuItem);
         }
 
         /* unmigrate resource */
         final ComponentWithTest unmigrateMenuItem =
-            new MyMenuItem(
-                    Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
-                    ServiceInfo.UNMIGRATE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return enablePredicate() == null;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    // TODO: if it was migrated
-                    if (!serviceInfo.getBrowser().crmStatusFailed()
-                           && serviceInfo.getService().isAvailable()
-                           && (serviceInfo.getMigratedTo(runMode) != null
-                               || serviceInfo.getMigratedFrom(runMode) != null)) {
-                        return null;
-                    } else {
-                        return ""; /* it's not visible anyway */
-                    }
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.unmigrateResource(serviceInfo.getBrowser().getDCHost(), runMode);
-                }
-            };
+                menuFactory.createMenuItem(
+                        Tools.getString("ClusterBrowser.Hb.UnmigrateResource"),
+                        ServiceInfo.UNMIGRATE_ICON,
+                        ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                        new AccessMode(Application.AccessType.OP, false),
+                        new AccessMode(Application.AccessType.OP, false))
+                        .visiblePredicate(new VisiblePredicate() {
+                            public boolean check() {
+                                if (!serviceInfo.getBrowser().crmStatusFailed()
+                                    && serviceInfo.getService().isAvailable()
+                                    && (serviceInfo.getMigratedTo(runMode) != null
+                                    || serviceInfo.getMigratedFrom(runMode) != null)) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                serviceInfo.hidePopup();
+                                serviceInfo.unmigrateResource(serviceInfo.getBrowser().getDCHost(), runMode);
+                            }
+                        });
         final ButtonCallback unmigrateItemCallback =
-                                    serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                serviceInfo.unmigrateResource(dcHost, Application.RunMode.TEST);
-            }
-        };
+                serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                                       @Override
+                                       public void run(final Host dcHost) {
+                                           serviceInfo.unmigrateResource(dcHost, Application.RunMode.TEST);
+                                       }
+                                   }
+
+                        );
         serviceInfo.addMouseOverListener(unmigrateMenuItem, unmigrateItemCallback);
         items.add((UpdatableItem) unmigrateMenuItem);
     }
 
-    /** Adds "migrate from" and "force migrate" menuitems to the submenu. */
+    /**
+     * Adds "migrate from" and "force migrate" menuitems to the submenu.
+     */
     protected void addMoreMigrateMenuItems(final ServiceInfo serviceInfo, final MyMenu submenu) {
         final Application.RunMode runMode = Application.RunMode.LIVE;
         for (final Host host : serviceInfo.getBrowser().getClusterHosts()) {
             final String hostName = host.getName();
             final MyMenuItem migrateMenuItem =
-               new MyMenuItem(Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateResource")
-                                   + ' ' + hostName,
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    menuFactory.createMenuItem(
+                            Tools.getString("ClusterBrowser.Hb.MigrateResource") + ' ' + hostName,
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                              Tools.getString(
-                                   "ClusterBrowser.Hb.MigrateResource")
-                                   + ' ' + hostName + " (offline)",
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(Application.AccessType.OP, false),
-                              new AccessMode(Application.AccessType.OP, false)) {
-                    private static final long serialVersionUID = 1L;
+                            Tools.getString("ClusterBrowser.Hb.MigrateResource") + ' ' + hostName + " (offline)",
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                    @Override
-                    public boolean predicate() {
-                        return host.isCrmStatusOk();
-                    }
-
-                    @Override
-                    public boolean visiblePredicate() {
-                        return !host.isCrmStatusOk()
-                               || enablePredicate() == null;
-                    }
-
-                    @Override
-                    public String enablePredicate() {
-                        final List<String> runningOnNodes =
-                                     serviceInfo.getRunningOnNodes(runMode);
-                        if (runningOnNodes == null
-                            || runningOnNodes.isEmpty()) {
-                            return Tools.getString(
-                                            "ServiceInfo.NotRunningAnywhere");
-                        }
-                        final String runningOnNode =
-                                runningOnNodes.get(0).toLowerCase(Locale.US);
-                        if (serviceInfo.getBrowser().crmStatusFailed()
-                            || !host.isCrmStatusOk()) {
-                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                        } else {
-                            final String tp =
-                                            serviceInfo.getService().isAvailableWithText();
-                            if (tp != null) {
-                                return tp;
-                            }
-                        }
-                        if (hostName.toLowerCase(Locale.US).equals(
-                                                             runningOnNode)) {
-                            return Tools.getString(
-                                           "ServiceInfo.AlreadyRunningOnNode");
-                        } else {
-                            return null;
-                        }
-                    }
-
-                    @Override
-                    public void action() {
-                        serviceInfo.hidePopup();
-                        serviceInfo.migrateResource(
-                                                 hostName,
-                                                 serviceInfo.getBrowser().getDCHost(),
-                                                 runMode);
-                    }
-                };
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false))
+                            .predicate(new Predicate() {
+                                @Override
+                                public boolean check() {
+                                    return host.isCrmStatusOk();
+                                }
+                            })
+                            .visiblePredicate(new VisiblePredicate() {
+                                @Override
+                                public boolean check() {
+                                    if (!host.isCrmStatusOk()) {
+                                        return false;
+                                    }
+                                    final List<String> runningOnNodes = serviceInfo.getRunningOnNodes(runMode);
+                                    if (runningOnNodes == null || runningOnNodes.isEmpty()) {
+                                        return false;
+                                    }
+                                    final String runningOnNode = runningOnNodes.get(0).toLowerCase(Locale.US);
+                                    if (serviceInfo.getBrowser().crmStatusFailed() || !host.isCrmStatusOk()) {
+                                        return false;
+                                    } else {
+                                        final String tp = serviceInfo.getService().isAvailableWithText();
+                                        if (tp != null) {
+                                            return false;
+                                        }
+                                    }
+                                    if (hostName.toLowerCase(Locale.US).equals(runningOnNode)) {
+                                        return false;
+                                    } else {
+                                        return true;
+                                    }
+                                }
+                            })
+                            .addAction(new MenuAction() {
+                                @Override
+                                public void run(final String text) {
+                                    serviceInfo.hidePopup();
+                                    serviceInfo.migrateResource(hostName,
+                                                                serviceInfo.getBrowser().getDCHost(),
+                                                                runMode);
+                                }
+                            });
             final ButtonCallback migrateItemCallback =
-                                     serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-                @Override
-                public void action(final Host dcHost) {
-                    serviceInfo.migrateResource(hostName, dcHost, Application.RunMode.TEST);
-                }
-            };
+                    serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                            .addAction(new CallbackAction() {
+                                @Override
+                                public void run(final Host dcHost) {
+                                    serviceInfo.migrateResource(hostName, dcHost, Application.RunMode.TEST);
+                                }
+                            });
             serviceInfo.addMouseOverListener(migrateMenuItem, migrateItemCallback);
             submenu.add(migrateMenuItem);
         }
@@ -819,80 +788,71 @@ public class ServiceMenu {
             final String hostName = host.getName();
 
             final MyMenuItem forceMigrateMenuItem =
-               new MyMenuItem(Tools.getString(
-                                   "ClusterBrowser.Hb.ForceMigrateResource")
-                                   + ' ' + hostName,
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                    menuFactory.createMenuItem(
+                            Tools.getString("ClusterBrowser.Hb.ForceMigrateResource") + ' ' + hostName,
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                              Tools.getString(
-                                   "ClusterBrowser.Hb.ForceMigrateResource")
-                                   + ' ' + hostName + " (offline)",
-                              ServiceInfo.MIGRATE_ICON,
-                              ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                              new AccessMode(Application.AccessType.OP, false),
-                              new AccessMode(Application.AccessType.OP, false)) {
-                    private static final long serialVersionUID = 1L;
+                            Tools.getString("ClusterBrowser.Hb.ForceMigrateResource") + ' ' + hostName + " (offline)",
+                            ServiceInfo.MIGRATE_ICON,
+                            ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                    @Override
-                    public boolean predicate() {
-                        return host.isCrmStatusOk();
-                    }
-
-                    @Override
-                    public boolean visiblePredicate() {
-                        return !host.isCrmStatusOk()
-                               || enablePredicate() == null;
-                    }
-
-                    @Override
-                    public String enablePredicate() {
-                        final List<String> runningOnNodes =
-                                     serviceInfo.getRunningOnNodes(runMode);
-                        if (runningOnNodes == null
-                            || runningOnNodes.isEmpty()) {
-                            return Tools.getString(
-                                            "ServiceInfo.NotRunningAnywhere");
-                        }
-                        final String runningOnNode =
-                                runningOnNodes.get(0).toLowerCase(Locale.US);
-                        if (!serviceInfo.getBrowser().crmStatusFailed()
-                               && serviceInfo.getService().isAvailable()
-                               && !hostName.toLowerCase(Locale.US).equals(
-                                                                 runningOnNode)
-                               && host.isCrmStatusOk()) {
-                            return null;
-                        } else {
-                            return "";
-                        }
-                    }
-
-                    @Override
-                    public void action() {
-                        serviceInfo.hidePopup();
-                        serviceInfo.forceMigrateResource(
-                                             hostName,
-                                             serviceInfo.getBrowser().getDCHost(),
-                                             runMode);
-                    }
-                };
+                            new AccessMode(Application.AccessType.OP, false),
+                            new AccessMode(Application.AccessType.OP, false))
+                            .predicate(new Predicate() {
+                                @Override
+                                public boolean check() {
+                                    return host.isCrmStatusOk();
+                                }
+                            })
+                            .visiblePredicate(new VisiblePredicate() {
+                                @Override
+                                public boolean check() {
+                                    if (!host.isCrmStatusOk()) {
+                                        return false;
+                                    }
+                                    final List<String> runningOnNodes = serviceInfo.getRunningOnNodes(runMode);
+                                    if (runningOnNodes == null || runningOnNodes.isEmpty()) {
+                                        return false;
+                                    }
+                                    final String runningOnNode = runningOnNodes.get(0).toLowerCase(Locale.US);
+                                    if (!serviceInfo.getBrowser().crmStatusFailed()
+                                        && serviceInfo.getService().isAvailable()
+                                        && !hostName.toLowerCase(Locale.US).equals(runningOnNode)
+                                        && host.isCrmStatusOk()) {
+                                        return true;
+                                    } else {
+                                        return false;
+                                    }
+                                }
+                            })
+                            .addAction(new MenuAction() {
+                                @Override
+                                public void run(final String text) {
+                                    serviceInfo.hidePopup();
+                                    serviceInfo.forceMigrateResource(hostName,
+                                                                     serviceInfo.getBrowser().getDCHost(),
+                                                                     runMode);
+                                }
+                            });
             final ButtonCallback forceMigrateItemCallback =
-                                     serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-                @Override
-                public void action(final Host dcHost) {
-                    serviceInfo.forceMigrateResource(
-                                         hostName,
-                                         dcHost,
-                                         Application.RunMode.TEST);
-                }
-            };
-            serviceInfo.addMouseOverListener(forceMigrateMenuItem,
-                                 forceMigrateItemCallback);
+                    serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                            .addAction(new CallbackAction() {
+                                @Override
+                                public void run(final Host dcHost) {
+                                    serviceInfo.forceMigrateResource(hostName,
+                                                                     dcHost,
+                                                                     Application.RunMode.TEST);
+                                }
+                            });
+            serviceInfo.addMouseOverListener(forceMigrateMenuItem, forceMigrateItemCallback);
             submenu.add(forceMigrateMenuItem);
         }
     }
 
-    /** Return config files defined in DistResource config files. */
+    /**
+     * Return config files defined in DistResource config files.
+     */
     private List<String> getConfigFiles(final ServiceInfo serviceInfo) {
         final String raName;
         final ServiceInfo cs = serviceInfo.getContainedService();
@@ -902,10 +862,8 @@ public class ServiceMenu {
             raName = cs.getResourceAgent().getRAString();
         }
         final Host[] hosts = serviceInfo.getBrowser().getCluster().getHostsArray();
-        final List<String> cfs =
-             new ArrayList<String>(hosts[0].getDistStrings(raName + ".files"));
-        final Collection<String> params =
-            new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
+        final List<String> cfs = new ArrayList<String>(hosts[0].getDistStrings(raName + ".files"));
+        final Collection<String> params = new ArrayList<String>(hosts[0].getDistStrings(raName + ".params"));
         params.add("configfile");
         params.add("config");
         params.add("conffile");
@@ -933,74 +891,70 @@ public class ServiceMenu {
         return cfs;
     }
 
-
-    /** Adds config files menuitems to the submenu. */
+    /**
+     * Adds config files menuitems to the submenu.
+     */
     protected void addFilesMenuItems(final ServiceInfo serviceInfo, final MyMenu submenu) {
         final List<String> configFiles = getConfigFiles(serviceInfo);
         for (final String configFile : configFiles) {
             final MyMenuItem fileItem =
-               new MyMenuItem(
-                          configFile,
-                          null,
-                          null,
-                          new AccessMode(Application.AccessType.ADMIN, false),
-                          new AccessMode(Application.AccessType.ADMIN, false)) {
-                    private static final long serialVersionUID = 1L;
+                    menuFactory.createMenuItem(
+                            configFile,
+                            null,
+                            null,
+                            new AccessMode(Application.AccessType.ADMIN, false),
+                            new AccessMode(Application.AccessType.ADMIN, false))
+                            .addAction(new MenuAction() {
+                                @Override
+                                public void run(final String text) {
+                                    editDialog.init(configFile, serviceInfo.getBrowser().getCluster().getHosts());
+                                    editDialog.showDialog();
 
-                   @Override
-                    public void action() {
-                        editDialog.init(configFile, serviceInfo.getBrowser().getCluster().getHosts());
-                        editDialog.showDialog();
-
-                    }
-                };
+                                }
+                            });
             submenu.add(fileItem);
         }
     }
 
-    /** Adds existing service menu item for every member of a group. */
-    protected void addExistingGroupServiceMenuItems(
-                        final ServiceInfo serviceInfo,
-                        final ServiceInfo existingService,
-                        final MyListModel<MyMenuItem> dlm,
-                        final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final MyList<MyMenuItem> list,
-                        final JCheckBox colocationWi,
-                        final JCheckBox orderWi,
-                        final List<JDialog> popups,
-                        final Application.RunMode runMode) {
+    /**
+     * Adds existing service menu item for every member of a group.
+     */
+    protected void addExistingGroupServiceMenuItems(final ServiceInfo serviceInfo,
+                                                    final ServiceInfo existingService,
+                                                    final MyListModel<MyMenuItem> dlm,
+                                                    final Map<MyMenuItem, ButtonCallback> callbackHash,
+                                                    final MyList<MyMenuItem> list,
+                                                    final JCheckBox colocationWi,
+                                                    final JCheckBox orderWi,
+                                                    final List<JDialog> popups,
+                                                    final Application.RunMode runMode) {
         /* empty */
     }
 
-    /** Adds existing service menu item. */
-    protected void addExistingServiceMenuItem(
-                        final ServiceInfo serviceInfo,
-                        final String name,
-                        final ServiceInfo otherService,
-                        final MyListModel<MyMenuItem> dlm,
-                        final Map<MyMenuItem, ButtonCallback> callbackHash,
-                        final MyList<MyMenuItem> list,
-                        final JCheckBox colocationWi,
-                        final JCheckBox orderWi,
-                        final Iterable<JDialog> popups,
-                        final Application.RunMode runMode) {
-        final MyMenuItem mmi = new MyMenuItem(name,
-                                              null,
-                                              null,
-                                              new AccessMode(
-                                                   Application.AccessType.ADMIN,
-                                                   false),
-                                              new AccessMode(
-                                                   Application.AccessType.OP,
-                                                   false)) {
-            private static final long serialVersionUID = 1L;
+    protected void addExistingServiceMenuItem(final ServiceInfo serviceInfo,
+                                              final String name,
+                                              final ServiceInfo otherService,
+                                              final MyListModel<MyMenuItem> dlm,
+                                              final Map<MyMenuItem, ButtonCallback> callbackHash,
+                                              final MyList<MyMenuItem> list,
+                                              final JCheckBox colocationWi,
+                                              final JCheckBox orderWi,
+                                              final Iterable<JDialog> popups,
+                                              final Application.RunMode runMode) {
+        final MyMenuItem existingServiceMenu = menuFactory.createMenuItem(
+                                                    name,
+                                                    null,
+                                                    null,
+                                                    new AccessMode(Application.AccessType.ADMIN, false),
+                                                    new AccessMode(Application.AccessType.OP, false));
+        existingServiceMenu.addAction(new MenuAction() {
             @Override
-            public void action() {
+            public void run(final String text) {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         serviceInfo.hidePopup();
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 for (final JDialog otherP : popups) {
@@ -1015,89 +969,86 @@ public class ServiceMenu {
                                                     true,
                                                     serviceInfo.getBrowser().getDCHost(),
                                                     runMode);
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                repaint();
+                                existingServiceMenu.repaint();
                             }
                         });
                     }
                 });
                 thread.start();
             }
-        };
-        dlm.addElement(mmi);
+        });
+        dlm.addElement(existingServiceMenu);
         final ButtonCallback mmiCallback =
-                       serviceInfo.getBrowser().new ClMenuItemCallback(null) {
-                           @Override
-                           public void action(final Host dcHost) {
-                               serviceInfo.addServicePanel(
-                                       otherService,
-                                               null,
-                                               colocationWi.isSelected(),
-                                               orderWi.isSelected(),
-                                               true,
-                                               dcHost,
-                                               Application.RunMode.TEST);
-                           }
-                       };
-        callbackHash.put(mmi, mmiCallback);
+                serviceInfo.getBrowser().new ClMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                serviceInfo.addServicePanel(otherService,
+                                                            null,
+                                                            colocationWi.isSelected(),
+                                                            orderWi.isSelected(),
+                                                            true,
+                                                            dcHost,
+                                                            Application.RunMode.TEST);
+                            }
+                        });
+        callbackHash.put(existingServiceMenu, mmiCallback);
     }
 
-    /** Returns existing service manu item. */
+    /**
+     * Returns existing service manu item.
+     */
     private MyMenu getExistingServiceMenuItem(final ServiceInfo serviceInfo,
                                               final String name,
                                               final boolean enableForNew,
                                               final Application.RunMode runMode) {
-        return new MyMenu(name,
-                          new AccessMode(Application.AccessType.ADMIN, false),
-                          new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
+        final MyMenu serviceMenu = menuFactory.createMenu(name,
+                new AccessMode(Application.AccessType.ADMIN, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (serviceInfo.getBrowser().crmStatusFailed()) {
+                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                        } else if (serviceInfo.getService().isRemoved()) {
+                            return ServiceInfo.IS_BEING_REMOVED_STRING;
+                        } else if (serviceInfo.getService().isOrphaned()) {
+                            return ServiceInfo.IS_ORPHANED_STRING;
+                        } else if (!enableForNew && serviceInfo.getService().isNew()) {
+                            return ServiceInfo.IS_NEW_STRING;
+                        }
+                        if (serviceInfo.getBrowser().getExistingServiceList(serviceInfo).isEmpty()) {
+                            return "&lt;&lt;empty;&gt;&gt;";
+                        }
+                        return null;
+                    }
+                });
+        serviceMenu.onUpdate(new Runnable() {
             @Override
-            public String enablePredicate() {
-                if (serviceInfo.getBrowser().crmStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                } else if (serviceInfo.getService().isRemoved()) {
-                    return ServiceInfo.IS_BEING_REMOVED_STRING;
-                } else if (serviceInfo.getService().isOrphaned()) {
-                    return ServiceInfo.IS_ORPHANED_STRING;
-                } else if (!enableForNew && serviceInfo.getService().isNew()) {
-                    return ServiceInfo.IS_NEW_STRING;
-                }
-                if (serviceInfo.getBrowser().getExistingServiceList(serviceInfo).isEmpty()) {
-                    return "&lt;&lt;empty;&gt;&gt;";
-                }
-                return null;
-            }
-
-            @Override
-            public void updateAndWait() {
-                Tools.isSwingThread();
+            public void run() {
+                application.isSwingThread();
                 final JCheckBox colocationWi = new JCheckBox("Colo", true);
                 final JCheckBox orderWi = new JCheckBox("Order", true);
                 colocationWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 colocationWi.setPreferredSize(colocationWi.getMinimumSize());
                 orderWi.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 orderWi.setPreferredSize(orderWi.getMinimumSize());
-                setEnabled(false);
-                removeAll();
+                serviceMenu.setEnabled(false);
+                serviceMenu.removeAll();
 
-                final MyListModel<MyMenuItem> dlm =
-                                                new MyListModel<MyMenuItem>();
-                final Map<MyMenuItem, ButtonCallback> callbackHash =
-                                 new HashMap<MyMenuItem, ButtonCallback>();
-                final MyList<MyMenuItem> list =
-                                   new MyList<MyMenuItem>(dlm, getBackground());
+                final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
+                final Map<MyMenuItem, ButtonCallback> callbackHash = new HashMap<MyMenuItem, ButtonCallback>();
+                final MyList<MyMenuItem> list = new MyList<MyMenuItem>(dlm, serviceMenu.getBackground());
 
                 final List<JDialog> popups = new ArrayList<JDialog>();
-                for (final ServiceInfo otherService
-                            : serviceInfo.getBrowser().getExistingServiceList(serviceInfo)) {
+                for (final ServiceInfo otherService : serviceInfo.getBrowser().getExistingServiceList(serviceInfo)) {
                     if (otherService.isConstraintPlaceholder() && serviceInfo.isConstraintPlaceholder()) {
                         continue;
                     }
-                    if (otherService.getCloneInfo() != null
-                        || otherService.getGroupInfo() != null) {
+                    if (otherService.getCloneInfo() != null || otherService.getGroupInfo() != null) {
                         /* skip services that are clones or in groups. */
                         continue;
                     }
@@ -1114,135 +1065,137 @@ public class ServiceMenu {
                     if (otherService.getResourceAgent() != null && otherService.getResourceAgent().isGroup()) {
                         final GroupMenu groupMenu = AppContext.getBean(GroupMenu.class);
                         groupMenu.addExistingGroupServiceMenuItems(serviceInfo,
-                                otherService,
-                                dlm,
-                                callbackHash,
-                                list,
-                                colocationWi,
-                                orderWi,
-                                popups,
-                                runMode);
+                                                                   otherService,
+                                                                   dlm,
+                                                                   callbackHash,
+                                                                   list,
+                                                                   colocationWi,
+                                                                   orderWi,
+                                                                   popups,
+                                                                   runMode);
                     }
                 }
-                final JPanel colOrdPanel =
-                            new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
+                final JPanel colOrdPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
                 colOrdPanel.setBackground(ClusterBrowser.STATUS_BACKGROUND);
                 colOrdPanel.add(colocationWi);
                 colOrdPanel.add(orderWi);
-                final boolean ret =
-                            drbdGui.getScrollingMenu(name,
-                                                     colOrdPanel,
-                                                     this,
-                                                     dlm,
-                                                     list,
-                                                     serviceInfo,
-                                                     popups,
-                                                     callbackHash);
+                final boolean ret = drbdGui.getScrollingMenu(name,
+                                                             colOrdPanel,
+                                                             serviceMenu,
+                                                             dlm,
+                                                             list,
+                                                             serviceInfo,
+                                                             popups,
+                                                             callbackHash);
                 if (!ret) {
-                    setEnabled(false);
+                    serviceMenu.setEnabled(false);
                 }
-                super.updateAndWait();
+                serviceMenu.updateMenuComponents();
+                serviceMenu.processAccessMode();
             }
-        };
+        });
+        return serviceMenu;
     }
 
-    /** Adds Linbit DRBD RA menu item. It is called in swing thread. */
+    /**
+     * Adds Linbit DRBD RA menu item. It is called in swing thread.
+     */
     private void addDrbdLinbitMenu(final ServiceInfo serviceInfo,
                                    final MyMenu menu,
                                    final CrmXml crmXML,
                                    final Point2D pos,
                                    final ResourceAgent fsService,
                                    final Application.RunMode runMode) {
-        final MyMenuItem ldMenuItem = new MyMenuItem(
-                           Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
-                           null,
-                           null,
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
+        final MyMenuItem ldMenuItem = menuFactory.createMenuItem(
+                                            Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
+                                            null,
+                                            null,
+                                            new AccessMode(Application.AccessType.ADMIN, false),
+                                            new AccessMode(Application.AccessType.OP, false));
+        ldMenuItem.addAction(new MenuAction() {
             @Override
-            public void action() {
+            public void run(final String text) {
                 serviceInfo.hidePopup();
                 if (!serviceInfo.getBrowser().linbitDrbdConfirmDialog()) {
                     return;
                 }
 
-                final FilesystemInfo fsi = (FilesystemInfo)
-                                               serviceInfo.addServicePanel(
-                                                    fsService,
-                                                    getPos(),
-                                                    true, /* colocation */
-                                                    true, /* order */
-                                                    true,
-                                                    false,
-                                                    runMode);
+                final FilesystemRaInfo fsi = (FilesystemRaInfo) serviceInfo.addServicePanel(
+                                                                                  fsService,
+                                                                                  ldMenuItem.getPos(),
+                                                                                  true, /* colocation */
+                                                                                  true, /* order */
+                                                                                  true,
+                                                                                  false,
+                                                                                  runMode);
                 fsi.setDrbddiskIsPreferred(false);
                 serviceInfo.getBrowser().getCrmGraph().repaint();
             }
-        };
-        if (serviceInfo.getBrowser().atLeastOneDrbddiskConfigured()
-            || !crmXML.isLinbitDrbdResourceAgentPresent()) {
+        });
+        if (serviceInfo.getBrowser().atLeastOneDrbddiskConfigured() || !crmXML.isLinbitDrbdResourceAgentPresent()) {
             ldMenuItem.setEnabled(false);
         }
         ldMenuItem.setPos(pos);
         menu.add(ldMenuItem);
     }
 
-    /** Adds drbddisk RA menu item. It is called in swing thread. */
+    /**
+     * Adds drbddisk RA menu item. It is called in swing thread.
+     */
     private void addDrbddiskMenu(final ServiceInfo serviceInfo,
                                  final MyMenu menu,
                                  final CrmXml crmXML,
                                  final Point2D pos,
                                  final ResourceAgent fsService,
                                  final Application.RunMode runMode) {
-        final MyMenuItem ddMenuItem = new MyMenuItem(
-                         Tools.getString("ClusterBrowser.DrbddiskMenuName"),
-                         null,
-                         null,
-                         new AccessMode(Application.AccessType.ADMIN, false),
-                         new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
+        final MyMenuItem ddMenuItem = menuFactory.createMenuItem(
+                                                     Tools.getString("ClusterBrowser.DrbddiskMenuName"),
+                                                     null,
+                                                     null,
+                                                     new AccessMode(Application.AccessType.ADMIN, false),
+                                                     new AccessMode(Application.AccessType.OP, false));
+        ddMenuItem.addAction(new MenuAction() {
             @Override
-            public void action() {
+            public void run(final String text) {
                 serviceInfo.hidePopup();
-                final FilesystemInfo fsi = (FilesystemInfo) serviceInfo.addServicePanel(
-                                                    fsService,
-                                                    getPos(),
-                                                    true, /* colocation */
-                                                    true, /* order */
-                                                    true,
-                                                    false,
-                                                    runMode);
+                final FilesystemRaInfo fsi = (FilesystemRaInfo) serviceInfo.addServicePanel(
+                                                                                fsService,
+                                                                                ddMenuItem.getPos(),
+                                                                                true, /* colocation */
+                                                                                true, /* order */
+                                                                                true,
+                                                                                false,
+                                                                                runMode);
                 fsi.setDrbddiskIsPreferred(true);
                 serviceInfo.getBrowser().getCrmGraph().repaint();
             }
-        };
-        if (serviceInfo.getBrowser().isOneLinbitDrbdRaConfigured()
-            || !crmXML.isDrbddiskResourceAgentPresent()) {
+        });
+        if (serviceInfo.getBrowser().isOneLinbitDrbdRaConfigured() || !crmXML.isDrbddiskResourceAgentPresent()) {
             ddMenuItem.setEnabled(false);
         }
         ddMenuItem.setPos(pos);
         menu.add(ddMenuItem);
     }
 
-    /** Adds Ipaddr RA menu item. It is called in swing thread. */
+    /**
+     * Adds Ipaddr RA menu item. It is called in swing thread.
+     */
     private void addIpMenu(final ServiceInfo serviceInfo,
                            final MyMenu menu,
                            final Point2D pos,
                            final ResourceAgent ipService,
                            final Application.RunMode runMode) {
-        final MyMenuItem ipMenuItem =
-          new MyMenuItem(ipService.getPullDownMenuName(),
-                         null,
-                         null,
-                         new AccessMode(Application.AccessType.ADMIN, false),
-                         new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
+        final MyMenuItem ipMenuItem = menuFactory.createMenuItem(ipService.getPullDownMenuName(),
+                                            null,
+                                            null,
+                                            new AccessMode(Application.AccessType.ADMIN, false),
+                                            new AccessMode(Application.AccessType.OP, false));
+        ipMenuItem.addAction(new MenuAction() {
             @Override
-            public void action() {
+            public void run(final String text) {
                 serviceInfo.hidePopup();
                 serviceInfo.addServicePanel(ipService,
-                                            getPos(),
+                                            ipMenuItem.getPos(),
                                             true, /* colocation */
                                             true, /* order */
                                             true,
@@ -1250,42 +1203,46 @@ public class ServiceMenu {
                                             runMode);
                 serviceInfo.getBrowser().getCrmGraph().repaint();
             }
-        };
+        });
         ipMenuItem.setPos(pos);
         menu.add(ipMenuItem);
     }
 
-    /** Adds Filesystem RA menu item. It is called in swing thread. */
+    /**
+     * Adds Filesystem RA menu item. It is called in swing thread.
+     */
     private void addFilesystemMenu(final ServiceInfo serviceInfo,
                                    final MyMenu menu,
                                    final Point2D pos,
                                    final ResourceAgent fsService,
                                    final Application.RunMode runMode) {
         final MyMenuItem fsMenuItem =
-              new MyMenuItem(fsService.getPullDownMenuName(),
-                             null,
-                             null,
-                             new AccessMode(Application.AccessType.ADMIN, false),
-                             new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    serviceInfo.addServicePanel(fsService,
-                                                getPos(),
-                                                true, /* colocation */
-                                                true, /* order */
-                                                true,
-                                                false,
-                                                runMode);
-                    serviceInfo.getBrowser().getCrmGraph().repaint();
-                }
-        };
+                menuFactory.createMenuItem(fsService.getPullDownMenuName(),
+                                           null,
+                                           null,
+                                           new AccessMode(Application.AccessType.ADMIN, false),
+                                           new AccessMode(Application.AccessType.OP, false));
+        fsMenuItem.addAction(new MenuAction() {
+            @Override
+            public void run(final String text) {
+                serviceInfo.hidePopup();
+                serviceInfo.addServicePanel(fsService,
+                                            fsMenuItem.getPos(),
+                                            true, /* colocation */
+                                            true, /* order */
+                                            true,
+                                            false,
+                                            runMode);
+                serviceInfo.getBrowser().getCrmGraph().repaint();
+            }
+        });
         fsMenuItem.setPos(pos);
         menu.add(fsMenuItem);
     }
 
-    /** Adds resource agent RA menu item. It is called in swing thread. */
+    /**
+     * Adds resource agent RA menu item. It is called in swing thread.
+     */
     private void addResourceAgentMenu(final ServiceInfo serviceInfo,
                                       final ResourceAgent ra,
                                       final MyListModel<MyMenuItem> dlm,
@@ -1294,20 +1251,17 @@ public class ServiceMenu {
                                       final JCheckBox colocationWi,
                                       final JCheckBox orderWi,
                                       final Application.RunMode runMode) {
-        final MyMenuItem mmi =
-               new MyMenuItem(
-                     ra.getPullDownMenuName(),
-                     null,
-                     null,
-                     new AccessMode(Application.AccessType.ADMIN,
-                                    false),
-                     new AccessMode(Application.AccessType.OP,
-                                    false)) {
-            private static final long serialVersionUID = 1L;
+        final MyMenuItem resourceAgentMenu = menuFactory.createMenuItem(
+                                                              ra.getPullDownMenuName(),
+                                                              null,
+                                                              null,
+                                                              new AccessMode(Application.AccessType.ADMIN, false),
+                                                              new AccessMode(Application.AccessType.OP, false));
+        resourceAgentMenu.addAction(new MenuAction() {
             @Override
-            public void action() {
+            public void run(final String text) {
                 serviceInfo.hidePopup();
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         for (final JDialog otherP : popups) {
@@ -1315,16 +1269,13 @@ public class ServiceMenu {
                         }
                     }
                 });
-                if (ra.isLinbitDrbd()
-                    &&
-                     !serviceInfo.getBrowser().linbitDrbdConfirmDialog()) {
+                if (ra.isLinbitDrbd() && !serviceInfo.getBrowser().linbitDrbdConfirmDialog()) {
                     return;
-                } else if (ra.isHbDrbd()
-                     && !serviceInfo.getBrowser().hbDrbdConfirmDialog()) {
+                } else if (ra.isHbDrbd() && !serviceInfo.getBrowser().hbDrbdConfirmDialog()) {
                     return;
                 }
                 serviceInfo.addServicePanel(ra,
-                                            getPos(),
+                                            resourceAgentMenu.getPos(),
                                             colocationWi.isSelected(),
                                             orderWi.isSelected(),
                                             true,
@@ -1332,71 +1283,70 @@ public class ServiceMenu {
                                             runMode);
                 serviceInfo.getBrowser().getCrmGraph().repaint();
             }
-        };
-        mmi.setPos(pos);
-        dlm.addElement(mmi);
+        });
+        resourceAgentMenu.setPos(pos);
+        dlm.addElement(resourceAgentMenu);
     }
 
 
-    /** Adds menu items with dependend services and groups. */
+    /**
+     * Adds menu items with dependend services and groups.
+     */
     protected void addDependencyMenuItems(final ServiceInfo serviceInfo,
                                           final Collection<UpdatableItem> items,
                                           final boolean enableForNew,
                                           final Application.RunMode runMode) {
         /* add new group and dependency*/
-        final UpdatableItem addGroupMenuItem =
-            new MyMenuItem(Tools.getString(
-                                "ClusterBrowser.Hb.AddDependentGroup"),
-                           null,
-                           null,
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (serviceInfo.getBrowser().crmStatusFailed()) {
-                        return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                    } else if (serviceInfo.getService().isRemoved()) {
-                        return ServiceInfo.IS_BEING_REMOVED_STRING;
-                    } else if (serviceInfo.getService().isOrphaned()) {
-                        return ServiceInfo.IS_ORPHANED_STRING;
-                    } else if (serviceInfo.getService().isNew()) {
-                        return ServiceInfo.IS_NEW_STRING;
+        final MyMenuItem addGroupMenuItem =
+                menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.AddDependentGroup"),
+                                           null,
+                                           null,
+                                           new AccessMode(Application.AccessType.ADMIN, false),
+                                           new AccessMode(Application.AccessType.OP, false));
+        addGroupMenuItem.enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (serviceInfo.getBrowser().crmStatusFailed()) {
+                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                        } else if (serviceInfo.getService().isRemoved()) {
+                            return ServiceInfo.IS_BEING_REMOVED_STRING;
+                        } else if (serviceInfo.getService().isOrphaned()) {
+                            return ServiceInfo.IS_ORPHANED_STRING;
+                        } else if (serviceInfo.getService().isNew()) {
+                            return ServiceInfo.IS_NEW_STRING;
+                        }
+                        return null;
                     }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    serviceInfo.hidePopup();
-                    final CrmXml crmXML = serviceInfo.getBrowser().getCrmXml();
-                    serviceInfo.addServicePanel(
-                                    crmXML.getGroupResourceAgent(),
-                                    getPos(),
-                                    false, /* colocation only */
-                                    false, /* order only */
-                                    true,
-                                    false,
-                                    runMode);
-                    serviceInfo.getBrowser().getCrmGraph().repaint();
-                }
-            };
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        serviceInfo.hidePopup();
+                        final CrmXml crmXML = serviceInfo.getBrowser().getCrmXml();
+                        serviceInfo.addServicePanel(crmXML.getGroupResourceAgent(),
+                                                    addGroupMenuItem.getPos(),
+                                                    false, /* colocation only */
+                                                    false, /* order only */
+                                                    true,
+                                                    false,
+                                                    runMode);
+                        serviceInfo.getBrowser().getCrmGraph().repaint();
+                    }
+                });
         items.add(addGroupMenuItem);
 
         /* add new service and dependency*/
-        final MyMenu addServiceMenuItem = getAddServiceMenuItem(
-                        serviceInfo,
-                        runMode,
-                        Tools.getString("ClusterBrowser.Hb.AddDependency"));
+        final MyMenu addServiceMenuItem = getAddServiceMenuItem(serviceInfo,
+                                                                runMode,
+                                                                Tools.getString("ClusterBrowser.Hb.AddDependency"));
         items.add(addServiceMenuItem);
 
         /* add existing service dependency*/
         final MyMenu existingServiceMenuItem = getExistingServiceMenuItem(
-                    serviceInfo,
-                    Tools.getString("ClusterBrowser.Hb.AddStartBefore"),
-                    enableForNew,
-                    runMode);
+                                                     serviceInfo,
+                                                     Tools.getString("ClusterBrowser.Hb.AddStartBefore"),
+                                                     enableForNew,
+                                                     runMode);
         items.add(existingServiceMenuItem);
     }
 }

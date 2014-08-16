@@ -75,6 +75,7 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -137,6 +138,12 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private Set<Host> hosts;
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
     private GlobalInfo globalInfo;
+    @Autowired
+    private Application application;
+    @Autowired
+    private ResourceMenu resourceMenu;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
@@ -331,7 +338,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             } else {
                 resName = new StringValue(getResource().getName());
             }
-            paramWi = WidgetFactory.createInstance(
+            paramWi = widgetFactory.createInstance(
                                       Widget.GUESS_TYPE,
                                       resName,
                                       Widget.NO_ITEMS,
@@ -370,7 +377,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 }
             }
             getBrowser().putDrbdResHash();
-            resyncAfterParamWi = WidgetFactory.createInstance(
+            resyncAfterParamWi = widgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
                                       defaultItem,
                                       l.toArray(new Value[l.size()]),
@@ -424,7 +431,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Returns panel with form to configure a drbd resource. */
     @Override
     public JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (infoPanel != null) {
             infoPanelDone();
             return infoPanel;
@@ -502,15 +509,15 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final String[] params = getParametersFromXML();
         /* address combo boxes */
         addHostAddresses(optionsPanel,
-                         ClusterBrowser.SERVICE_LABEL_WIDTH,
-                         ClusterBrowser.SERVICE_FIELD_WIDTH,
+                         application.getServiceLabelWidth(),
+                         application.getServiceFieldWidth(),
                          false,
                          getApplyButton());
         enableSection(SECTION_PROXY, !DrbdProxy.PROXY, !WIZARD);
         addParams(optionsPanel,
                   params,
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
         getApplyButton().addActionListener(new ActionListener() {
@@ -520,7 +527,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeAndWait(new Runnable() {
+                        application.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 getApplyButton().setEnabled(false);
@@ -578,8 +585,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth")
-                                         + Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
+        newPanel.add(getMoreOptionsPanel(application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth")
+                                         + application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
         setProxyPanels(!WIZARD);
@@ -791,7 +798,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     }
 
     public void setParameters() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         getDrbdResource().setCommited(true);
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final String resName = getResource().getName();
@@ -1164,7 +1171,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         panel.setLayout(new SpringLayout());
         for (final Host host : getHosts()) {
             final Value haSaved = savedHostAddresses.get(host);
-            final Widget wi = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+            final Widget wi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                            haSaved,
                                                            getNetInterfacesWithProxies(host.getBrowser()),
                                                            Widget.NO_REGEXP,
@@ -1199,7 +1206,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         }
         final List<Value> drbdPorts = getPossibleDrbdPorts(defaultPortInt);
 
-        final Widget pwi = WidgetFactory.createInstance(Widget.Type.COMBOBOX,
+        final Widget pwi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
                                                         defaultPort,
                                                         drbdPorts.toArray(new Value[drbdPorts.size()]),
                                                         "^\\d*$",
@@ -1265,7 +1272,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final int insideDefaultPortInt = getDefaultInsidePort();
         final String insideDefaultPort = Integer.toString(insideDefaultPortInt);
         final List<Value> insideDrbdPorts = getPossibleDrbdPorts(insideDefaultPortInt);
-        final Widget insidePortWi = WidgetFactory.createInstance(
+        final Widget insidePortWi = widgetFactory.createInstance(
                                                         Widget.Type.COMBOBOX,
                                                         new StringValue(insideDefaultPort),
                                                         insideDrbdPorts.toArray(new Value[insideDrbdPorts.size()]),
@@ -1300,7 +1307,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             outsideDefaultPortInt = Integer.parseInt(outsideDefaultPort.getValueForConfig());
         }
         final List<Value> outsideDrbdPorts = getPossibleDrbdPorts(outsideDefaultPortInt);
-        final Widget outsidePortWi = WidgetFactory.createInstance(
+        final Widget outsidePortWi = widgetFactory.createInstance(
                                                         Widget.Type.COMBOBOX,
                                                         outsideDefaultPort,
                                                         outsideDrbdPorts.toArray(new Value[outsideDrbdPorts.size()]),
@@ -1346,7 +1353,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             if (proxyNetInterfaces == null) {
                 //TODO: just textfield
             }
-            final Widget iIpWi = WidgetFactory.createInstance(
+            final Widget iIpWi = widgetFactory.createInstance(
                                         Widget.Type.COMBOBOX,
                                         Widget.NO_DEFAULT,
                                         proxyNetInterfaces,
@@ -1367,7 +1374,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             sectionPanel.add(panel);
 
             /* outside ip */
-            final Widget oIpWi = WidgetFactory.createInstance(
+            final Widget oIpWi = widgetFactory.createInstance(
                                                     Widget.Type.COMBOBOX,
                                                     Widget.NO_DEFAULT,
                                                     proxyNetInterfaces,
@@ -1698,7 +1705,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         final int s = ProxyNetInfo.PROXY_PREFIX.length();
                         /* select the IP part */
                         wi.setAlwaysEditable(true);
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 wi.select(s, s + NetInfo.IP_PLACEHOLDER.length());
@@ -1875,8 +1882,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     /** Creates popup for the block device. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final ResourceMenu resourceMenu = new ResourceMenu(this);
-        return resourceMenu.getPulldownMenu();
+        return resourceMenu.getPulldownMenu(this);
     }
 
     /** Sets that this drbd resource is used by crm. */

@@ -23,13 +23,13 @@
 package lcmc;
 
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.NewHostDialog;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -48,6 +48,8 @@ public final class AddHostDialog {
     private NewHostDialog newHostDialog;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
     public void showDialogs(final Host host) {
         guiData.enableAddHostButtons(false);
@@ -60,7 +62,7 @@ public final class AddHostDialog {
             if (dialog.isPressedCancelButton()) {
                 /* remove host tab from main window */
                 host.disconnect();
-                Tools.getApplication().removeHostFromHosts(host);
+                application.removeHostFromHosts(host);
                 dialog.cancelDialog();
                 guiData.enableAddHostButtons(true);
                 guiData.expandTerminalSplitPane(1);
@@ -71,7 +73,7 @@ public final class AddHostDialog {
             } else if (dialog.isPressedFinishButton()) {
                 LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " finished");
                 guiData.allHostsUpdate();
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         guiData.checkAddClusterButtons();

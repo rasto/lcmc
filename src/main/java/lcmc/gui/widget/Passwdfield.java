@@ -28,19 +28,24 @@ import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Passwdfield extends Textfield {
-    public Passwdfield(final Value selectedValue,
+    public void init(final Value selectedValue,
                        final String regexp,
                        final int width,
                        final AccessMode enableAccessMode,
                        final MyButton fieldButton) {
-        super(selectedValue, regexp, width, NO_ABBRV, enableAccessMode, fieldButton);
+        super.init(selectedValue, regexp, width, NO_ABBRV, enableAccessMode, fieldButton);
         addComponent(getPasswdField(selectedValue, regexp), width);
     }
 

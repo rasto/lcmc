@@ -58,6 +58,10 @@ final class DrbdAvailSourceFiles extends DialogHost {
     private DrbdCommandInst drbdCommandInst = null;
     private Widget drbdTarballCombo = null;
     private boolean listenersAdded = false;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     /**
      * Inits the dialog and starts detecting the available drbd source
@@ -100,7 +104,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
                         }
                     }
                     drbdTarballCombo.clear();
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (!items.isEmpty()) {
@@ -115,7 +119,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
 
                 @Override
                 public void doneError(final String answer, final int errorCode) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             progressBarDoneError();
@@ -149,7 +153,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
             addListeners();
             listenersAdded = true;
         }
-        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+        if (application.getAutoOptionHost("drbdinst") != null) {
             pressNextButton();
         }
     }
@@ -173,7 +177,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
 
         /* build combo box */
-        drbdTarballCombo = WidgetFactory.createInstance(
+        drbdTarballCombo = widgetFactory.createInstance(
                                       Widget.Type.COMBOBOX,
                                       Widget.NO_DEFAULT,
                                       Widget.NO_ITEMS,

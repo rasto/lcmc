@@ -47,6 +47,7 @@ import lcmc.configs.AppDefaults;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.MainMenu;
+import lcmc.model.Application;
 import lcmc.model.UserConfig;
 import lcmc.view.MainPanel;
 import lcmc.gui.ProgressIndicatorPanel;
@@ -88,6 +89,7 @@ public final class LCMC extends JPanel {
 
     protected static ProgressIndicatorPanel getMainGlassPane() {
         final ProgressIndicatorPanel mainGlassPane = AppContext.getBean(ProgressIndicatorPanel.class);
+        mainGlassPane.init();
         return mainGlassPane;
     }
 
@@ -110,11 +112,12 @@ public final class LCMC extends JPanel {
         });
         t.start();
         MAIN_FRAME.setVisible(false);
-        final String saveFile = Tools.getApplication().getDefaultSaveFile();
         final UserConfig userConfig = AppContext.getBean(UserConfig.class);
         final GUIData guiData = AppContext.getBean(GUIData.class);
-        Tools.save(guiData, userConfig, saveFile, false);
-        Tools.getApplication().disconnectAllHosts();
+        final Application application = AppContext.getBean(Application.class);
+        final String saveFile = application.getDefaultSaveFile();
+        application.saveConfig(saveFile, false);
+        application.disconnectAllHosts();
     }
 
     protected static void initApp(final String[] args) {
@@ -137,7 +140,8 @@ public final class LCMC extends JPanel {
         }
         mainFrame.setIconImages(il);
         initApp(args);
-        Tools.invokeLater(new Runnable() {
+        final Application application = AppContext.getBean(Application.class);
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 createMainFrame(mainFrame);

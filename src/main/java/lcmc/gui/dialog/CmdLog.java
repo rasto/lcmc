@@ -26,22 +26,31 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an dialog with log files.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class CmdLog extends HostLogs {
     private static final Value DEFAULT_TIME = new StringValue("5m");
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     protected static Unit[] getUnits() {
         return new Unit[]{
@@ -53,10 +62,10 @@ public final class CmdLog extends HostLogs {
     }
     private String getLogsCommand = "CmdLog.Processed";
     /** Time in minutes of the logs. */
-    private TextfieldWithUnit logTimeInMinutes;
+    private Widget logTimeInMinutes;
 
-    public CmdLog(final Host host) {
-        super(host);
+    public void init(final Host host) {
+        super.init(host);
     }
 
     @Override
@@ -66,7 +75,7 @@ public final class CmdLog extends HostLogs {
 
     @Override
     protected JComponent[] getAdditionalComponents() {
-        final MyButton processed = new MyButton(Tools.getString("CmdLog.Processed.Btn"));
+        final MyButton processed = widgetFactory.createButton(Tools.getString("CmdLog.Processed.Btn"));
         processed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -75,7 +84,7 @@ public final class CmdLog extends HostLogs {
             }
         });
 
-        final MyButton raw = new MyButton(Tools.getString("CmdLog.Raw.Btn"));
+        final MyButton raw = widgetFactory.createButton(Tools.getString("CmdLog.Raw.Btn"));
         raw.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -84,7 +93,7 @@ public final class CmdLog extends HostLogs {
             }
         });
 
-        final MyButton clear = new MyButton(Tools.getString("CmdLog.Clear.Btn"));
+        final MyButton clear = widgetFactory.createButton(Tools.getString("CmdLog.Clear.Btn"));
         clear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -92,18 +101,20 @@ public final class CmdLog extends HostLogs {
                 refreshLogsThread();
             }
         });
-        logTimeInMinutes = new TextfieldWithUnit(DEFAULT_TIME,
-                                                 getUnits(),
-                                                 Widget.NO_REGEXP,
-                                                 150,
-                                                 Widget.NO_ABBRV,
-                                                 new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                                                 Widget.NO_BUTTON);
+        logTimeInMinutes = widgetFactory.createInstance(
+                                   Widget.Type.TEXTFIELDWITHUNIT,
+                                   DEFAULT_TIME,
+                                   getUnits(),
+                                   Widget.NO_REGEXP,
+                                   150,
+                                   Widget.NO_ABBRV,
+                                   new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                                   Widget.NO_BUTTON);
         return new JComponent[]{processed,
                                 raw,
                                 clear,
                                 new JLabel(Tools.getString("CmdLog.Last.Label")),
-                                logTimeInMinutes,
+                                (JComponent) logTimeInMinutes,
                                 getRefreshBtn()};
     }
 

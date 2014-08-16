@@ -42,6 +42,7 @@ import javax.swing.text.Document;
 
 import lcmc.configs.DistResource;
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
@@ -74,6 +75,8 @@ public final class EditConfig extends ConfigDialog {
     private volatile boolean configInProgress = true;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
     public void init(final String fileToEdit, final Set<Host> hosts) {
         this.fileToEdit = fileToEdit;
@@ -192,7 +195,7 @@ public final class EditConfig extends ConfigDialog {
             hcb.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             setConfigArea(results[index], errors[index], e.getStateChange() == ItemEvent.SELECTED);
@@ -211,7 +214,7 @@ public final class EditConfig extends ConfigDialog {
                 }
             });
         }
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setConfigArea(results[0], errors[0], true);

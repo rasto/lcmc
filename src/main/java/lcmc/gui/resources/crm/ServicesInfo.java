@@ -96,7 +96,7 @@ public class ServicesInfo extends EditableInfo {
     @Autowired
     private GUIData guiData;
     @Autowired
-    private Provider<FilesystemInfo> filesystemInfoProvider;
+    private Provider<FilesystemRaInfo> filesystemInfoProvider;
     @Autowired
     private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
     @Autowired
@@ -115,6 +115,8 @@ public class ServicesInfo extends EditableInfo {
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
     @Autowired
     private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
+    @Autowired
+    private Application application;
 
     @Override
     public void init(final String name, final Browser browser) {
@@ -262,7 +264,7 @@ public class ServicesInfo extends EditableInfo {
         LOG.debug1("apply: start: test: " + runMode);
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -347,7 +349,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         if (infoPanel == null) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getInfoPanel();
@@ -363,10 +365,10 @@ public class ServicesInfo extends EditableInfo {
                                        final ServiceInfo si) {
         if (siP.getResourceAgent().isLinbitDrbd()) {
             /* linbit::drbd -> Filesystem */
-            ((FilesystemInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
+            ((FilesystemRaInfo) si).setLinbitDrbdInfo((LinbitDrbdInfo) siP);
         } else {
             /* drbddisk -> Filesystem */
-            ((FilesystemInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
+            ((FilesystemRaInfo) si).setDrbddiskInfo((DrbddiskInfo) siP);
         }
     }
 
@@ -473,7 +475,7 @@ public class ServicesInfo extends EditableInfo {
         boolean newService = false;
         int pos = 0;
         for (final String hbId : gs) {
-            if (clStatus.isOrphaned(hbId) && Tools.getApplication().isHideLRM()) {
+            if (clStatus.isOrphaned(hbId) && application.isHideLRM()) {
                 continue;
             }
             ServiceInfo newSi;
@@ -558,7 +560,7 @@ public class ServicesInfo extends EditableInfo {
             final DefaultMutableTreeNode n = newSi.getNode();
             if (n != null) {
                 final int p = pos;
-                Tools.invokeAndWait(new Runnable() {
+                application.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         final MutableTreeNode parent =
@@ -585,7 +587,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         if (newService) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().reloadAndWait(
@@ -895,7 +897,7 @@ public class ServicesInfo extends EditableInfo {
         }
         hg.setServiceIsPresentList(serviceIsPresent);
         /** Set placeholders to "new", if they have no connections. */
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hg.killRemovedEdges();
@@ -1054,14 +1056,14 @@ public class ServicesInfo extends EditableInfo {
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
                   params,
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
         addRscDefaultsPanel(
                       optionsPanel,
-                      Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                      Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"));
+                      application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                      application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"));
         getApplyButton().addActionListener(
             new ActionListener() {
                 @Override
@@ -1102,7 +1104,7 @@ public class ServicesInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -1111,9 +1113,7 @@ public class ServicesInfo extends EditableInfo {
 
         mainPanel.add(optionsPanel);
 
-        newPanel.add(getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth() + application.getServiceFieldWidth() + 4));
         newPanel.add(new JScrollPane(mainPanel));
 
         hg.pickBackground();
@@ -1212,7 +1212,7 @@ public class ServicesInfo extends EditableInfo {
             final DefaultMutableTreeNode newServiceNode =
                                 new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().getServicesNode().add(newServiceNode);
@@ -1235,7 +1235,7 @@ public class ServicesInfo extends EditableInfo {
                 getBrowser().reloadNode(newServiceNode, true);
             }
             getBrowser().reloadAllComboBoxes(newServiceInfo);
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hg.scale();
@@ -1310,7 +1310,7 @@ public class ServicesInfo extends EditableInfo {
             return;
         }
         final Value oldValue = oldWi.getValue();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 if (oldValue == null || oldValue.isNothingSelected()) {
@@ -1385,7 +1385,7 @@ public class ServicesInfo extends EditableInfo {
                                     null, /* clone id */
                                     null,
                                     Application.RunMode.LIVE);
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (!(newSi instanceof CloneInfo)) {
@@ -1423,7 +1423,7 @@ public class ServicesInfo extends EditableInfo {
                                 continue;
                             }
                         }
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 copyPasteField(oldCi.getWidget(param, null),
@@ -1436,7 +1436,7 @@ public class ServicesInfo extends EditableInfo {
                     final GroupInfo oldGi = (GroupInfo) oldI;
                     final GroupInfo newGi = (GroupInfo) newSi;
 
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             @SuppressWarnings("unchecked")

@@ -116,8 +116,8 @@ public class ClusterBrowser extends Browser {
     public static final ImageIcon REMOVE_ICON_SMALL = Tools.createImageIcon(
                                                                 Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
 
-    public static final int SERVICE_LABEL_WIDTH = Tools.getDefaultSize("ClusterBrowser.ServiceLabelWidth");
-    public static final int SERVICE_FIELD_WIDTH = Tools.getDefaultSize("ClusterBrowser.ServiceFieldWidth");
+    @Autowired
+    private Application application;
     public static final Color SERVICE_STOPPED_FILL_PAINT = Tools.getDefaultColor("CRMGraph.FillPaintStopped");
     public static final String IDENT_4 = "    ";
     public static final String DRBD_RESOURCE_BOOL_TYPE_NAME = "boolean";
@@ -207,6 +207,14 @@ public class ClusterBrowser extends Browser {
     private Provider<AvailableServiceInfo> availableServiceInfoProvider;
     @Autowired
     private Provider<DrbdXml> drbdXmlProvider;
+    @Autowired
+    private Provider<ClusterStatus> clusterStatusProvider;
+    @Autowired @Qualifier("categoryInfo")
+    private CategoryInfo networksCategory;
+    @Autowired
+    private Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
+    @Autowired
+    private AvailableServicesInfo availableServicesInfo;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -269,6 +277,7 @@ public class ClusterBrowser extends Browser {
     /** Map from ResourceAgent to AvailableServicesInfo. */
     private final Map<ResourceAgent, AvailableServiceInfo> availableServiceMap =
                                                                new HashMap<ResourceAgent, AvailableServiceInfo>();
+    @Autowired
     private ClusterHostsInfo clusterHostsInfo;
     @Autowired
     private ServicesInfo servicesInfo;
@@ -458,16 +467,14 @@ public class ClusterBrowser extends Browser {
     void initClusterBrowser() {
         LOG.debug1("initClusterBrowser: start");
         /* hosts */
-        clusterHostsInfo = new ClusterHostsInfo();
         clusterHostsInfo.init(Tools.getString("ClusterBrowser.ClusterHosts"), this);
         clusterHostsNode = new DefaultMutableTreeNode(clusterHostsInfo);
         setNode(clusterHostsNode);
         topLevelAdd(clusterHostsNode);
 
         /* networks */
-        final CategoryInfo categoryInfo = new CategoryInfo();
-        categoryInfo.init(Tools.getString("ClusterBrowser.Networks"), this);
-        networksNode = new DefaultMutableTreeNode(categoryInfo);
+        networksCategory.init(Tools.getString("ClusterBrowser.Networks"), this);
+        networksNode = new DefaultMutableTreeNode(networksCategory);
         setNode(networksNode);
         topLevelAdd(networksNode);
 
@@ -484,7 +491,6 @@ public class ClusterBrowser extends Browser {
         topLevelAdd(crmNode);
 
         /* available services */
-        final AvailableServicesInfo availableServicesInfo = new AvailableServicesInfo();
         availableServicesInfo.init(Tools.getString("ClusterBrowser.availableServices"), this);
         availableServicesNode = new DefaultMutableTreeNode(availableServicesInfo);
         setNode(availableServicesNode);
@@ -527,7 +533,7 @@ public class ClusterBrowser extends Browser {
         this.commonMountPoints = commonMountPoints.clone();
 
         /* cluster hosts */
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 clusterHostsNode.removeAllChildren();
@@ -548,7 +554,7 @@ public class ClusterBrowser extends Browser {
 
         /* networks */
         updateNetworks();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 crmGraph.scale();
@@ -575,7 +581,7 @@ public class ClusterBrowser extends Browser {
                         host.getName(),
                         Tools.getString("ClusterBrowser.UpdatingServerInfo"));
                 }
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         getClusterViewPanel().setDisabledDuringLoad(false);
@@ -589,7 +595,7 @@ public class ClusterBrowser extends Browser {
             @Override
             public void run() {
                 final Host[] hosts = cluster.getHostsArray();
-                Tools.invokeAndWait(new Runnable() {
+                application.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         for (final Host host : hosts) {
@@ -637,7 +643,9 @@ public class ClusterBrowser extends Browser {
 
                 LOG.debug1("updateHeartbeatDrbdThread: first host: " + firstHost);
                 crmXml.init(firstHost, getServicesInfo());
-                clusterStatus = new ClusterStatus(firstHost, crmXml);
+                final ClusterStatus newClusterStatus = clusterStatusProvider.get();
+                newClusterStatus.init(firstHost, crmXml);
+                clusterStatus = newClusterStatus;
                 initOperations();
                 drbdXml = drbdXmlProvider.get();
                 drbdXml.init(cluster.getHostsArray(), hostDrbdParameters);
@@ -710,13 +718,13 @@ public class ClusterBrowser extends Browser {
     }
 
     public void updateServerStatus(final Host host) {
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
         });
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.scale();
@@ -830,7 +838,7 @@ public class ClusterBrowser extends Browser {
                 } catch (final InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         drbdGraph.scale();
@@ -930,7 +938,7 @@ public class ClusterBrowser extends Browser {
                            } while (event != null || drbdConfig != null);
                            Tools.chomp(outputBuffer);
                            if (drbdUpdate) {
-                               Tools.invokeLater(new Runnable() {
+                               application.invokeLater(new Runnable() {
                                    @Override
                                    public void run() {
                                        globalInfo.setParameters();
@@ -949,7 +957,7 @@ public class ClusterBrowser extends Browser {
                                        public void run() {
                                            repaintSplitPane();
                                            drbdGraph.updatePopupMenus();
-                                           Tools.invokeLater(
+                                           application.invokeLater(
                                                new Runnable() {
                                                    @Override
                                                    public void run() {
@@ -1117,7 +1125,7 @@ public class ClusterBrowser extends Browser {
                 if (crmStatusFailed()) {
                      guiData.progressIndicatorFailed(clusterName, Tools.getString("ClusterBrowser.ClusterStatusFailed"));
                 } else {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                            crmGraph.scale();
@@ -1199,7 +1207,7 @@ public class ClusterBrowser extends Browser {
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     final List<String> bd = cluster.getCommonBlockDevices();
@@ -1245,14 +1253,15 @@ public class ClusterBrowser extends Browser {
     /** Updates available services. */
     private void updateAvailableServices() {
         LOG.debug("updateAvailableServices: start");
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 availableServicesNode.removeAllChildren();
             }
         });
         for (final String crmClass : CRM_CLASSES) {
-            final ResourceAgentClassInfo raci = new ResourceAgentClassInfo(crmClass, this);
+            final ResourceAgentClassInfo raci = resourceAgentClassInfoProvider.get();
+            raci.init(crmClass, this);
             classInfoMap.put(crmClass, raci);
             final DefaultMutableTreeNode classNode = new DefaultMutableTreeNode(raci);
             for (final ResourceAgent resourceAgent : crmXml.getServices(crmClass)) {
@@ -1306,7 +1315,7 @@ public class ClusterBrowser extends Browser {
         }
 
         /* remove nodes */
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final DefaultMutableTreeNode node : nodesToRemove) {
@@ -1340,7 +1349,7 @@ public class ClusterBrowser extends Browser {
             setNode(resource);
             domainInfo.updateParameters();
             final int index = i;
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     vmsNode.insert(resource, index);
@@ -1373,7 +1382,7 @@ public class ClusterBrowser extends Browser {
     }
 
     public void updateDrbdResources() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         drbdStatusLock();
         final DrbdXml dxml = drbdXml;
         if (dxml == null) {
@@ -1472,7 +1481,7 @@ public class ClusterBrowser extends Browser {
     private void updateNetworks() {
         if (networksNode != null) {
             final Network[] networks = cluster.getCommonNetworks();
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     networksNode.removeAllChildren();
@@ -1875,7 +1884,7 @@ public class ClusterBrowser extends Browser {
      * Returns true if user wants the heartbeat:drbd, which is not recommended.
      */
     public boolean hbDrbdConfirmDialog() {
-        return Tools.confirmDialog(
+        return application.confirmDialog(
            Tools.getString("ClusterBrowser.confirmHbDrbd.Title"),
            Tools.getString("ClusterBrowser.confirmHbDrbd.Description"),
            Tools.getString("ClusterBrowser.confirmHbDrbd.Yes"),
@@ -1896,7 +1905,7 @@ public class ClusterBrowser extends Browser {
 
             final Host dcHost = getDCHost();
             final String hbV = dcHost.getHeartbeatVersion();
-            return Tools.confirmDialog(Tools.getString("ClusterBrowser.confirmLinbitDrbd.Title"),
+            return application.confirmDialog(Tools.getString("ClusterBrowser.confirmLinbitDrbd.Title"),
                                        desc.replaceAll("@VERSION@", hbV),
                                        Tools.getString("ClusterBrowser.confirmLinbitDrbd.Yes"),
                                        Tools.getString("ClusterBrowser.confirmLinbitDrbd.No"));
@@ -2205,7 +2214,7 @@ public class ClusterBrowser extends Browser {
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
                        new ResourceGraph[]{drbdGraph, crmGraph},
                        updateLVM);
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
@@ -2247,10 +2256,12 @@ public class ClusterBrowser extends Browser {
     }
 
     /** Callback to service menu items, that show ptest results in tooltips. */
-    public abstract class ClMenuItemCallback implements ButtonCallback {
+    public class ClMenuItemCallback implements ButtonCallback {
         /** Host if over a menu item that belongs to a host. */
         private final Host menuHost;
         private volatile boolean mouseStillOver = false;
+
+        private CallbackAction action;
 
         public ClMenuItemCallback(final Host menuHost) {
             this.menuHost = menuHost;
@@ -2303,7 +2314,7 @@ public class ClusterBrowser extends Browser {
                     } else {
                         h = menuHost;
                     }
-                    action(h);
+                    action.run(h);
                     final PtestData ptestData = new PtestData(CRM.getPtest(h));
                     component.setToolTipText(ptestData.getToolTip());
                     clusterStatus.setPtestResult(ptestData);
@@ -2314,15 +2325,22 @@ public class ClusterBrowser extends Browser {
             }
         }
 
-        /** Action that is caried out on the host. */
-        protected abstract void action(final Host dcHost);
+        public ClMenuItemCallback addAction(final CallbackAction action) {
+            this.action = action;
+            return this;
+        }
+
+        ///** Action that is caried out on the host. */
+        //protected abstract void action(final Host dcHost);
     }
 
     /** Callback to service menu items, that show ptest results in tooltips. */
-    public abstract class DRBDMenuItemCallback implements ButtonCallback {
+    public class DRBDMenuItemCallback implements ButtonCallback {
         /** Host if over a menu item that belongs to a host. */
         private final Host menuHost;
         private volatile boolean mouseStillOver = false;
+
+        private CallbackAction action;
 
         public DRBDMenuItemCallback(final Host menuHost) {
             this.menuHost = menuHost;
@@ -2364,11 +2382,11 @@ public class ClusterBrowser extends Browser {
             final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
             if (menuHost == null) {
                 for (final Host h : cluster.getHostsArray()) {
-                    action(h);
+                    action.run(h);
                     testOutput.put(h, DRBD.getDRBDtest());
                 }
             } else {
-                action(menuHost);
+                action.run(menuHost);
                 testOutput.put(menuHost, DRBD.getDRBDtest());
             }
             final DRBDtestData dtd = new DRBDtestData(testOutput);
@@ -2381,8 +2399,13 @@ public class ClusterBrowser extends Browser {
             startTestLatch.countDown();
         }
 
-        /** Action that is caried out on the host. */
-        protected abstract void action(final Host dcHost);
+        ///** Action that is caried out on the host. */
+        //protected abstract void action(final Host dcHost);
+
+        public DRBDMenuItemCallback addAction(final CallbackAction action) {
+            this.action = action;
+            return this;
+        }
     }
 
     public GlobalInfo getGlobalInfo() {

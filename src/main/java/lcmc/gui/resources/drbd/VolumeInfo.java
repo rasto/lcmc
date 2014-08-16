@@ -46,6 +46,7 @@ import javax.swing.JScrollPane;
 import lcmc.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
 import lcmc.gui.GUIData;
+import lcmc.gui.resources.crm.*;
 import lcmc.model.Application;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
@@ -59,12 +60,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.EditableInfo;
-import lcmc.gui.resources.crm.CloneInfo;
-import lcmc.gui.resources.crm.DrbddiskInfo;
-import lcmc.gui.resources.crm.FilesystemInfo;
-import lcmc.gui.resources.crm.GroupInfo;
-import lcmc.gui.resources.crm.LinbitDrbdInfo;
-import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.gui.resources.crm.FilesystemRaInfo;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.ComponentWithTest;
@@ -147,6 +143,10 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
     @Autowired
     private Provider<DrbdXml> drbdXmlProvider;
+    @Autowired
+    private Application application;
+    @Autowired
+    private VolumeMenu volumeMenu;
 
     void init(final String name,
               final String device,
@@ -182,7 +182,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     @Override
     public JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         getBrowser().getDrbdGraph().pickInfo(this);
         final JComponent driPanel = getDrbdResourceInfo().getInfoPanel();
         getInfoPanelVolume();
@@ -272,8 +272,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         final String[] params = getParametersFromXML();
         addParams(optionsPanel,
                   params,
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
         getApplyButton().addActionListener(new ActionListener() {
@@ -283,7 +283,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeAndWait(new Runnable() {
+                        application.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 getApplyButton().setEnabled(false);
@@ -380,8 +380,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     /** Returns the list of items for the popup menu for drbd volume. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final VolumeMenu volumeMenu = new VolumeMenu(this);
-        return volumeMenu.getPulldownMenu();
+        return volumeMenu.getPulldownMenu(this);
     }
     
     /** Returns tool tip when mouse is over the volume edge. */
@@ -436,7 +435,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
      * infos without confirmation dialog.
      */
     private void removeMyselfNoConfirm(final Application.RunMode runMode) {
-        Tools.isNotSwingThread();
+        application.isNotSwingThread();
         final ClusterBrowser clusterBrowser = getBrowser();
         removeMyselfNoConfirm0(runMode, clusterBrowser);
     }
@@ -474,7 +473,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
         }
         super.removeMyself(runMode);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clusterBrowser.reloadNode(clusterBrowser.getDrbdNode(), true);
@@ -515,7 +514,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             clusterBrowser.setDrbdXml(dxml);
             clusterBrowser.updateDrbdResources();
             if (Application.isLive(runMode)) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         clusterBrowser.getDrbdGraph().updatePopupMenus();
@@ -542,7 +541,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         }
         String desc = Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Description");
         desc = desc.replaceAll("@RESOURCE@", Matcher.quoteReplacement(getDrbdResourceInfo() + "/" + getName()));
-        if (Tools.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
+        if (application.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Title"),
                                 desc,
                                 Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.Yes"),
                                 Tools.getString("ClusterBrowser.confirmRemoveDrbdResource.No"))) {
@@ -692,14 +691,14 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         getFirstBlockDevInfo().verify(runMode);
     }
 
-    public void removeDrbdDisk(final FilesystemInfo fi, final Host dcHost, final Application.RunMode runMode) {
+    public void removeDrbdDisk(final FilesystemRaInfo fi, final Host dcHost, final Application.RunMode runMode) {
         final DrbddiskInfo drbddiskInfo = fi.getDrbddiskInfo();
         if (drbddiskInfo != null) {
             drbddiskInfo.removeMyselfNoConfirm(dcHost, runMode);
         }
     }
 
-    public void removeLinbitDrbd(final FilesystemInfo fi, final Host dcHost, final Application.RunMode runMode) {
+    public void removeLinbitDrbd(final FilesystemRaInfo fi, final Host dcHost, final Application.RunMode runMode) {
         final LinbitDrbdInfo linbitDrbdInfo = fi.getLinbitDrbdInfo();
         if (linbitDrbdInfo != null) {
             linbitDrbdInfo.removeMyselfNoConfirm(dcHost, runMode);
@@ -707,7 +706,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     }
 
     /** Adds old style drbddisk service in the heartbeat and graph. */
-    public void addDrbdDisk(final FilesystemInfo fi, final Host dcHost, final String drbdId, final Application.RunMode runMode) {
+    public void addDrbdDisk(final FilesystemRaInfo fi, final Host dcHost, final String drbdId, final Application.RunMode runMode) {
         final Point2D p = null;
         final CrmGraph crmg = getBrowser().getCrmGraph();
         final DrbddiskInfo di =
@@ -732,7 +731,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         di.getWidget("1", null).setValueAndWait(new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, runMode);
         di.getResource().setNew(false);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 di.setApplyButtons(null, di.getParametersFromXML());
@@ -741,7 +740,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     }
 
     /** Adds linbit::drbd service in the pacemaker graph. */
-    public void addLinbitDrbd(final FilesystemInfo fi,
+    public void addLinbitDrbd(final FilesystemRaInfo fi,
                               final Host dcHost,
                               final String drbdId,
                               final Application.RunMode runMode) {
@@ -755,7 +754,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                                      drbdId,
                                      null,
                                      runMode);
-        Tools.waitForSwing();
+        application.waitForSwing();
         ldi.setGroupInfo(fi.getGroupInfo());
         getBrowser().addToHeartbeatIdList(ldi);
         fi.setLinbitDrbdInfo(ldi);
@@ -773,10 +772,10 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         ldi.waitForInfoPanel();
         ldi.getWidget("drbd_resource", null).setValueAndWait(new StringValue(getDrbdResourceInfo().getName()));
         /* apply gets parents from graph and adds colocations. */
-        Tools.waitForSwing();
+        application.waitForSwing();
         ldi.apply(dcHost, runMode);
         ldi.getResource().setNew(false);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 ldi.setApplyButtons(null, ldi.getParametersFromXML());
@@ -1067,7 +1066,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
 
     /** Sets stored parameters. */
     public void setParameters() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         getBrowser().getDrbdDeviceHash().put(device, this);
         getBrowser().putDrbdDevHash();
         getDrbdVolume().setCommited(true);

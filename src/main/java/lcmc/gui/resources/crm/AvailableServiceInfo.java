@@ -29,6 +29,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.crm.CrmXml;
 import lcmc.model.crm.ResourceAgent;
@@ -37,6 +39,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -52,6 +55,12 @@ public class AvailableServiceInfo extends HbCategoryInfo {
                                     Tools.createImageIcon(Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     private ResourceAgent resourceAgent;
+    @Autowired
+    private Application application;
+    @Autowired
+    private AvailableServiceMenu availableServiceInfo;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final ResourceAgent resourceAgent, final Browser browser) {
         super.init(resourceAgent.getServiceName(), browser);
@@ -101,10 +110,10 @@ public class AvailableServiceInfo extends HbCategoryInfo {
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
-        final MyButton overviewButton = new MyButton(Tools.getString("ClusterBrowser.RAsOverviewButton"),
-                                                     BACK_TO_OVERVIEW_ICON);
-        overviewButton.setPreferredSize(new Dimension(Tools.getApplication().scaled(180),
-                                                      Tools.getApplication().scaled(50)));
+        final MyButton overviewButton = widgetFactory.createButton(Tools.getString("ClusterBrowser.RAsOverviewButton"),
+                                                                   BACK_TO_OVERVIEW_ICON);
+        overviewButton.setPreferredSize(new Dimension(application.scaled(180),
+                                                      application.scaled(50)));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -123,8 +132,7 @@ public class AvailableServiceInfo extends HbCategoryInfo {
 
     @Override
     public List<UpdatableItem> createPopup() {
-        final AvailableServiceMenu availableServiceInfo = new AvailableServiceMenu(this);
-        return availableServiceInfo.getPulldownMenu();
+        return availableServiceInfo.getPulldownMenu(this);
     }
 
     public ResourceAgent getResourceAgent() {

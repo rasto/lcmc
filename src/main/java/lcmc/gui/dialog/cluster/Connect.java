@@ -26,6 +26,8 @@ package lcmc.gui.dialog.cluster;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
+
+import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.SpringUtilities;
@@ -49,6 +51,8 @@ final class Connect extends DialogCluster {
 
     @Autowired
     private CommStack commStackDialog;
+    @Autowired
+    private Application application;
 
     @Override
     public WizardDialog nextDialog() {
@@ -97,7 +101,7 @@ final class Connect extends DialogCluster {
                  Thread.currentThread().interrupt();
              }
 
-             Tools.invokeLater(new Runnable() {
+             application.invokeLater(new Runnable() {
                  @Override
                  public void run() {
                     buttonClass(nextButton()).pressButton();

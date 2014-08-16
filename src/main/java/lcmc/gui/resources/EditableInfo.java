@@ -23,7 +23,6 @@ package lcmc.gui.resources;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -62,10 +61,16 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
 import org.apache.commons.collections15.map.MultiKeyMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info objects.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class EditableInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(EditableInfo.class);
     /** Whether is's a wizard element. */
@@ -86,6 +91,10 @@ public abstract class EditableInfo extends Info {
     private boolean dialogStarted = false;
     /** Disabled section, not visible. */
     private final Collection<String> disabledSections = new HashSet<String>();
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     protected abstract String getSection(String param);
 
@@ -151,14 +160,14 @@ public abstract class EditableInfo extends Info {
     /** Inits apply or commit button button. */
     protected final void initApplyButton(final ButtonCallback buttonCallback, final String text) {
         if (oldApplyButton == null) {
-            applyButton = new MyButton(text, Browser.APPLY_ICON);
-            applyButton.miniButton();
+            applyButton = widgetFactory.createButton(text, Browser.APPLY_ICON);
+            application.makeMiniButton(applyButton);
             applyButton.setEnabled(false);
             oldApplyButton = applyButton;
-            revertButton = new MyButton(Tools.getString("Browser.RevertResource"), Browser.REVERT_ICON);
+            revertButton = widgetFactory.createButton(Tools.getString("Browser.RevertResource"), Browser.REVERT_ICON);
             revertButton.setEnabled(false);
             revertButton.setToolTipText(Tools.getString("Browser.RevertResource.ToolTip"));
-            revertButton.miniButton();
+            application.makeMiniButton(revertButton);
             revertButton.setPreferredSize(new Dimension(65, 50));
         } else {
             applyButton = oldApplyButton;
@@ -201,14 +210,14 @@ public abstract class EditableInfo extends Info {
      * with spring layout for this.
      */
     public final void addField(final JPanel panel,
-                               final Component left,
-                               final Component right,
+                               final java.awt.Component left,
+                               final java.awt.Component right,
                                final int leftWidth,
                                final int rightWidth,
                                int height) {
         /* right component with fixed width. */
         if (height == 0) {
-            height = Tools.getDefaultSize("Browser.FieldHeight");
+            height = application.getDefaultSize("Browser.FieldHeight");
         }
         Tools.setSize(left, leftWidth, height);
         panel.add(left);
@@ -247,7 +256,7 @@ public abstract class EditableInfo extends Info {
                            final int leftWidth,
                            final int rightWidth,
                            final Map<String, Widget> sameAsFields) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (params == null) {
             return;
         }
@@ -276,7 +285,7 @@ public abstract class EditableInfo extends Info {
                 panel.setBackground(getSectionColor(section));
                 if (advanced) {
                     advancedPanelList.add(panel);
-                    panel.setVisible(Tools.getApplication().isAdvancedMode());
+                    panel.setVisible(application.isAdvancedMode());
                 }
                 panelPartsMap.put(section, accessTypeString, advancedString, panel);
                 panelPartsList.add(new PanelPart(section, accessType, advanced));
@@ -293,7 +302,7 @@ public abstract class EditableInfo extends Info {
             label.setToolTipText(longDesc + additionalToolTip(param));
             int height = 0;
             if (paramWi instanceof Label) {
-                height = Tools.getDefaultSize("Browser.LabelFieldHeight");
+                height = application.getDefaultSize("Browser.LabelFieldHeight");
             }
             addField(panel, label, paramWi.getComponent(), leftWidth, rightWidth, height);
         }
@@ -386,11 +395,10 @@ public abstract class EditableInfo extends Info {
             }
             if (!notAdvancedSections.contains(sectionPanel)) {
                 advancedOnlySectionList.add(sectionEntry.getKey());
-                sectionPanel.setVisible(Tools.getApplication().isAdvancedMode()
-                                        && isSectionEnabled(sectionEntry.getKey()));
+                sectionPanel.setVisible(application.isAdvancedMode() && isSectionEnabled(sectionEntry.getKey()));
             }
         }
-        moreOptionsPanel.setVisible(advanced && !Tools.getApplication().isAdvancedMode());
+        moreOptionsPanel.setVisible(advanced && !application.isAdvancedMode());
     }
 
 
@@ -422,10 +430,10 @@ public abstract class EditableInfo extends Info {
             public void run() {
                 final Check check;
                 if (realParamWi == null) {
-                    Tools.waitForSwing();
+                    application.waitForSwing();
                     check = checkResourceFields(param, params);
                 } else {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (paramWi.getValue() == null || paramWi.getValue().isNothingSelected()) {
@@ -436,10 +444,10 @@ public abstract class EditableInfo extends Info {
                             }
                         }
                     });
-                    Tools.waitForSwing();
+                    application.waitForSwing();
                     check = checkResourceFields(param, params);
                 }
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (getResource().isNew()) {
@@ -536,7 +544,7 @@ public abstract class EditableInfo extends Info {
         } else if (isLabel(param)) {
             type = Widget.Type.LABELFIELD;
         }
-        final Widget paramWi = WidgetFactory.createInstance(
+        final Widget paramWi = widgetFactory.createInstance(
                                       type,
                                       initValue,
                                       getPossibleChoices(param),
@@ -680,7 +688,7 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param, final String[] params) {
         final Check check = checkResourceFields(param, params);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();
@@ -808,10 +816,10 @@ public abstract class EditableInfo extends Info {
     @Override
     public void updateAdvancedPanels() {
         super.updateAdvancedPanels();
-        final boolean advancedMode = Tools.getApplication().isAdvancedMode();
+        final boolean advancedMode = application.isAdvancedMode();
         boolean advanced = false;
         for (final JPanel apl : advancedPanelList) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     apl.setVisible(advancedMode);
@@ -822,7 +830,7 @@ public abstract class EditableInfo extends Info {
         for (final String section : advancedOnlySectionList) {
             final JPanel p = sectionPanels.get(section, Boolean.toString(!WIZARD));
             final JPanel pw = sectionPanels.get(section, Boolean.toString(WIZARD));
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final boolean v = advancedMode && isSectionEnabled(section);
@@ -835,7 +843,7 @@ public abstract class EditableInfo extends Info {
             advanced = true;
         }
         final boolean a = advanced;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 moreOptionsPanel.setVisible(a && !advancedMode);

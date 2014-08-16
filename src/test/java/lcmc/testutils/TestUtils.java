@@ -36,10 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.model.HostFactory;
-import lcmc.model.UserConfig;
+import lcmc.model.*;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
@@ -65,6 +62,7 @@ public class TestUtils {
     private static volatile boolean clusterLoaded = false;
 
     private final GUIData guiData = new GUIData();
+    private final Application application = new Application();
 
     static {
         if (System.getProperty("test.password") == null) {
@@ -168,7 +166,7 @@ public class TestUtils {
     public synchronized void initMain() {
         lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
         guiData.setTerminalPanel(null);
-        Tools.waitForSwing();
+        application.waitForSwing();
     }
     
     public void initStdout() {
@@ -179,7 +177,7 @@ public class TestUtils {
     public void initTestCluster() {
         initCluster();
         initStdout();
-        Tools.waitForSwing();
+        application.waitForSwing();
         clearStdout();
     }
 
@@ -189,7 +187,7 @@ public class TestUtils {
             return;
         }
         initMain();
-        Tools.waitForSwing();
+        application.waitForSwing();
         
         LoggerFactory.setDebugLevel(-1);
         String username;
@@ -214,8 +212,8 @@ public class TestUtils {
             HOSTS.add(host);
             host.setCluster(cluster);
             cluster.addHost(host);
-            final String saveFile = Tools.getApplication().getDefaultSaveFile();
-            Tools.save(guiData, new UserConfig(), saveFile, false);
+            final String saveFile = application.getDefaultSaveFile();
+            application.saveConfig(saveFile, false);
         }
         for (final Host host : HOSTS) {
             host.disconnect();
@@ -233,8 +231,8 @@ public class TestUtils {
                 error("could not establish connection to " + host.getName());
             }
         }
-        Tools.getApplication().addClusterToClusters(cluster);
-        Tools.invokeAndWait(new Runnable() {
+        application.addClusterToClusters(cluster);
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final ClusterTabFactory clusterTabFactory = new ClusterTabFactory();
@@ -243,8 +241,8 @@ public class TestUtils {
         });
         
         //guiData.getEmptyBrowser().addClusterBox(cluster);
-        final String saveFile = Tools.getApplication().getDefaultSaveFile();
-        Tools.save(guiData, new UserConfig(), saveFile, false);
+        final String saveFile = application.getDefaultSaveFile();
+        application.saveConfig(saveFile, false);
         guiData.refreshClustersPanel();
         
         guiData.expandTerminalSplitPane(1);
@@ -265,8 +263,8 @@ public class TestUtils {
         host.setSSHPort("22");
         host.setUseSudo(useSudo);
         
-        if (!Tools.getApplication().existsHost(host)) {
-            Tools.getApplication().addHostToHosts(host);
+        if (!application.existsHost(host)) {
+            application.addHostToHosts(host);
         }
         String ip;
         InetAddress[] addresses;

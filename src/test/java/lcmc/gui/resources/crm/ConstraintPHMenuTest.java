@@ -21,43 +21,71 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
+
+import lcmc.model.AccessMode;
 import lcmc.model.resources.Service;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.swing.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConstraintPHMenuTest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private ConstraintPHInfo constraintPHInfoStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
     private Service serviceStub;
-
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MyMenu menuStub;
+    @InjectMocks
     private ConstraintPHMenu constraintPHMenu;
 
     @Before
     public void setUp() {
         when(constraintPHInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(constraintPHInfoStub.getService()).thenReturn(serviceStub);
-        constraintPHMenu = new ConstraintPHMenu();
+        when(menuFactoryStub.createMenuItem(anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuStub);
+        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = constraintPHMenu.getPulldownMenu(constraintPHInfoStub);
+        verify(menuItemStub, never()).predicate((Predicate) anyObject());
+        verify(menuItemStub, never()).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(2)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(2)).addAction((MenuAction) anyObject());
+        verify(menuStub, times(2)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuStub, times(2)).onUpdate((Runnable) anyObject());
 
         assertEquals(4, items.size());
     }

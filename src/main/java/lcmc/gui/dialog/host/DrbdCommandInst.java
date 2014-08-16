@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.AppContext;
+import lcmc.model.Application;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -55,6 +56,8 @@ final class DrbdCommandInst extends DialogHost {
     @Autowired
     private Provider<CheckInstallation> checkInstallationProvider;
     private CheckInstallation checkInstallation;
+    @Autowired
+    private Application application;
 
     /**
      * Checks the answer of the installation and enables/disables the
@@ -78,7 +81,7 @@ final class DrbdCommandInst extends DialogHost {
         answerPaneSetText(Tools.getString("Dialog.Host.DrbdCommandInst.InstOk"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
         buttonClass(nextButton()).requestFocus();
-        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+        if (application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -110,8 +113,7 @@ final class DrbdCommandInst extends DialogHost {
         }
         final String drbdVersion = drbdInstallation.getDrbdVersionToInstall();
         final String drbdVersionUrlString = drbdInstallation.getDrbdVersionUrlStringToInstall();
-        Tools.getApplication().setLastDrbdInstalledMethod(
-                                                getHost().getDistString("DrbdInst.install.text." + installMethod));
+        application.setLastDrbdInstalledMethod(getHost().getDistString("DrbdInst.install.text." + installMethod));
         LOG.debug1("installDrbd: cmd: " + installCommand
                    + " arch: " + archString
                    + " version: " + drbdVersionUrlString

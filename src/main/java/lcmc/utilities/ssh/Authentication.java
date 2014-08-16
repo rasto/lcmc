@@ -22,32 +22,43 @@ package lcmc.utilities.ssh;
 
 import java.io.File;
 import java.io.IOException;
+
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
+
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Authentication {
     private static final Logger LOG = LoggerFactory.getLogger(Authentication.class);
 
-    private final LastSuccessfulPassword lastSuccessfulPassword;
-    private final Host host;
-    private final SSHGui sshGui;
+    private LastSuccessfulPassword lastSuccessfulPassword;
+    private Host host;
+    private SSHGui sshGui;
 
     private boolean enablePublicKey = true;
     private int publicKeyTry = 3;
     private final int connectTimeout = Tools.getDefaultInt("SSH.ConnectTimeout");
     private final int kexTimeout = Tools.getDefaultInt("SSH.KexTimeout");
-    private final boolean noPassphrase = Tools.getApplication().isNoPassphrase();
     private String lastError = null;
     private boolean authenticated = false;
     private int passwdTry = 3;
     private boolean enableKeyboardInteractive = true;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
-    public Authentication(final LastSuccessfulPassword lastSuccessfulPassword,
-                          final Host host,
-                          final SSHGui sshGui) {
+    public void init(final LastSuccessfulPassword lastSuccessfulPassword, final Host host, final SSHGui sshGui) {
         this.lastSuccessfulPassword = lastSuccessfulPassword;
         this.host = host;
         this.sshGui = sshGui;
@@ -58,9 +69,9 @@ public class Authentication {
         final String username = host.getFirstUsername();
         while (!sshConnection.isCanceled() && !authenticated) {
             if (lastSuccessfulPassword.getPassword() == null) {
-                String lastPassword = Tools.getApplication().getAutoOptionHost("pw");
+                String lastPassword = application.getAutoOptionHost("pw");
                 if (lastPassword == null) {
-                    lastPassword = Tools.getApplication().getAutoOptionCluster("pw");
+                    lastPassword = application.getAutoOptionCluster("pw");
                 }
                 lastSuccessfulPassword.setPassword(lastPassword);
             }
@@ -79,8 +90,8 @@ public class Authentication {
     }
 
     private void authenticateWithKey(final SshConnection sshConnection, final String username) throws IOException {
-        final File dsaKey = new File(Tools.getApplication().getIdDSAPath());
-        final File rsaKey = new File(Tools.getApplication().getIdRSAPath());
+        final File dsaKey = new File(application.getIdDSAPath());
+        final File rsaKey = new File(application.getIdRSAPath());
         if (dsaKey.exists() || rsaKey.exists()) {
             String key = "";
             if (lastSuccessfulPassword.getDsaKey() != null) {
@@ -89,7 +100,7 @@ public class Authentication {
                 key = lastSuccessfulPassword.getRsaKey();
             }
             /* Passwordless auth */
-            if (noPassphrase || !"".equals(key)) {
+            if (application.isNoPassphrase() || !"".equals(key)) {
                 if (lastSuccessfulPassword.getRsaKey() == null && dsaKey.exists()) {
                     authenticateWithDsaKey(sshConnection, username, dsaKey, key);
                     if (authenticated) {
@@ -156,7 +167,9 @@ public class Authentication {
             LOG.debug("authenticate: rsa key failed");
         }
         sshConnection.close();
-        sshConnection.connect(new PopupHostKeyVerifier(sshGui), connectTimeout, kexTimeout);
+        final PopupHostKeyVerifier popupHostKeyVerifier = popupHostKeyVerifierProvider.get();
+        popupHostKeyVerifier.init(sshGui);
+        sshConnection.connect(popupHostKeyVerifier, connectTimeout, kexTimeout);
     }
 
     private void authenticateWithDsaKey(final SshConnection sshConnection,
@@ -179,7 +192,9 @@ public class Authentication {
             LOG.debug("authenticate: dsa key failed");
         }
         sshConnection.close();
-        sshConnection.connect(new PopupHostKeyVerifier(sshGui), connectTimeout, kexTimeout);
+        final PopupHostKeyVerifier popupHostKeyVerifier = popupHostKeyVerifierProvider.get();
+        popupHostKeyVerifier.init(sshGui);
+        sshConnection.connect(popupHostKeyVerifier, connectTimeout, kexTimeout);
     }
 
     private void authenticateWithKeyboardInteractive(final SshConnection sshConnection,

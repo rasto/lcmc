@@ -29,9 +29,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
 import lcmc.LCMC;
+import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
@@ -42,11 +44,7 @@ import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -55,9 +53,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class MultiSelectionMenu {
-
-    private static final String LV_CREATE_MENU_ITEM =
-                            Tools.getString("MultiSelectionInfo.LVCreate");
+    private static final String LV_CREATE_MENU_ITEM = Tools.getString("MultiSelectionInfo.LVCreate");
     
     private MultiSelectionInfo multiSelectionInfo;
 
@@ -65,16 +61,24 @@ public class MultiSelectionMenu {
 
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Provider<VGCreate> vgCreateProvider;
+    @Autowired
+    private Provider<VGRemove> vgRemoveProvider;
+    @Autowired
+    private Provider<LVCreate> lvCreateProvider;
 
     public List<UpdatableItem> getPulldownMenu(final MultiSelectionInfo multiSelectionInfo,
                                                final List<Info> selectedInfos) {
         this.multiSelectionInfo = multiSelectionInfo;
         this.selectedInfos = selectedInfos;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final List<BlockDevInfo> selectedBlockDevInfos =
-                                                 new ArrayList<BlockDevInfo>();
-        final List<HostDrbdInfo> selectedHostInfos =
-                                                new ArrayList<HostDrbdInfo>();
+        final List<BlockDevInfo> selectedBlockDevInfos = new ArrayList<BlockDevInfo>();
+        final List<HostDrbdInfo> selectedHostInfos = new ArrayList<HostDrbdInfo>();
         for (final Info i : selectedInfos) {
             if (i instanceof BlockDevInfo) {
                 selectedBlockDevInfos.add((BlockDevInfo) i);
@@ -92,438 +96,393 @@ public class MultiSelectionMenu {
     }
 
     /** Create menu items for selected hosts. */
-    private void createSelectedHostsPopup(
-                                    final List<HostDrbdInfo> selectedHostInfos,
-                                    final Collection<UpdatableItem> items) {
+    private void createSelectedHostsPopup(final List<HostDrbdInfo> selectedHostInfos,
+                                          final Collection<UpdatableItem> items) {
         /* load drbd */
         final UpdatableItem loadItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.LoadDrbd"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.LoadDrbd"),
                            null,
                            Tools.getString("MultiSelectionInfo.LoadDrbd"),
                            new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    for (final HostDrbdInfo hi : selectedHostInfos) {
-                        if (hi.getHost().isConnected()) {
-                            if (hi.getHost().isDrbdLoaded()) {
-                                return "already loaded";
+                           new AccessMode(Application.AccessType.OP, false))
+            .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        for (final HostDrbdInfo hi : selectedHostInfos) {
+                            if (hi.getHost().isConnected()) {
+                                if (hi.getHost().isDrbdLoaded()) {
+                                    return "already loaded";
+                                }
+                            } else {
+                                return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                             }
-                        } else {
-                            return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                         }
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.load(hi.getHost(), Application.RunMode.LIVE);
-                    }
-                    for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost(),
-                                                  !Host.UPDATE_LVM);
-                    }
-                }
-            };
+                        return null;
+                    }})
+            .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        for (final HostDrbdInfo hi : selectedHostInfos) {
+                            DRBD.load(hi.getHost(), Application.RunMode.LIVE);
+                        }
+                        for (final HostDrbdInfo hi : selectedHostInfos) {
+                            getBrowser().updateHWInfo(hi.getHost(), !Host.UPDATE_LVM);
+                        }
+                    }});
         items.add(loadItem);
 
         /* load DRBD config / adjust all */
         final MyMenuItem adjustAllItem =
-            new MyMenuItem(
+            menuFactory.createMenuItem(
                    Tools.getString("MultiSelectionInfo.AdjustAllDrbd"),
                    null,
                    Tools.getString("MultiSelectionInfo.AdjustAllDrbd"),
                            new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (!hi.getHost().isConnected()) {
                             return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
                         }
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.adjustApply(hi.getHost(),
-                                         DRBD.ALL,
-                                         null,
-                                         Application.RunMode.LIVE);
+                        DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost(),
-                                                  !Host.UPDATE_LVM);
+                        getBrowser().updateHWInfo(hi.getHost(), !Host.UPDATE_LVM);
                     }
-                }
-            };
+                }});
         items.add(adjustAllItem);
         final ButtonCallback adjustAllItemCallback =
-               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
-            @Override
-            public void action(final Host dcHost) {
+               getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost())
+                   .addAction(new CallbackAction() {
+                           @Override
+                           public void run(final Host host) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.adjustApply(hi.getHost(),
-                                     DRBD.ALL,
-                                     null,
-                                     Application.RunMode.TEST);
+                    DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
-            }
-        };
-        multiSelectionInfo.addMouseOverListener(adjustAllItem,
-                                                adjustAllItemCallback);
+            }});
+        multiSelectionInfo.addMouseOverListener(adjustAllItem, adjustAllItemCallback);
 
         /* start drbd */
         final MyMenuItem upAllItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.UpAll"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.UpAll"),
                            null,
                            Tools.getString("MultiSelectionInfo.UpAll"),
                            new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.ADMIN, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
+                           new AccessMode(Application.AccessType.ADMIN, false))
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (!hi.getHost().isDrbdStatusOk()) {
                             return HostDrbdInfo.NO_DRBD_STATUS_TOOLTIP;
                         }
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.LIVE);
                     }
-                }
-            };
+                }});
         items.add(upAllItem);
         final ButtonCallback upAllItemCallback =
-             getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
-            @Override
-            public void action(final Host dcHost) {
+             getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost())
+                 .addAction(new CallbackAction() {
+                         @Override
+                         public void run(final Host host) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
                     DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.TEST);
                 }
-            }
-        };
+            }});
         multiSelectionInfo.addMouseOverListener(upAllItem, upAllItemCallback);
 
         /* stop drbd proxy with init script */
         final UpdatableItem stopProxyItem =
-            new MyMenuItem(
+            menuFactory.createMenuItem(
                         Tools.getString("MultiSelectionInfo.HostStopProxy"),
                         null,
                         Tools.getString("MultiSelectionInfo.HostStopProxy"),
                         new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                        new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (hi.getHost().isDrbdProxyRunning()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         DRBD.stopProxy(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost(),
-                                                  !Host.UPDATE_LVM);
+                        getBrowser().updateHWInfo(hi.getHost(), !Host.UPDATE_LVM);
                     }
-                }
-            };
+                }});
         items.add(stopProxyItem);
 
         /* start drbd proxy with init script */
-        final UpdatableItem startProxyItem =
-            new MyMenuItem(
+        final UpdatableItem startProxyItem = menuFactory.createMenuItem(
                       Tools.getString("MultiSelectionInfo.HostStartProxy"),
                       null,
                       Tools.getString("MultiSelectionInfo.HostStartProxy"),
                       new AccessMode(Application.AccessType.OP, false),
-                      new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                      new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         if (!hi.getHost().isDrbdProxyRunning()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         DRBD.startProxy(hi.getHost(), Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        getBrowser().updateHWInfo(hi.getHost(),
-                                                  !Host.UPDATE_LVM);
+                        getBrowser().updateHWInfo(hi.getHost(), !Host.UPDATE_LVM);
                     }
-                }
-            };
+                }});
         items.add(startProxyItem);
 
         /* change host color */
-        final UpdatableItem changeHostColorItem =
-            new MyMenuItem(
+        final UpdatableItem changeHostColorItem = menuFactory.createMenuItem(
                     Tools.getString("MultiSelectionInfo.ChangeHostColor"),
                     null,
                     "",
                     new AccessMode(Application.AccessType.RO, false),
-                    new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    final Host firstHost = selectedHostInfos.get(0).getHost();
-                    final Color newColor = JColorChooser.showDialog(
-                                            LCMC.MAIN_FRAME,
-                                            "Choose " + selectedHostInfos
-                                            + " color",
-                                            firstHost.getPmColors()[0]);
-                    for (final HostDrbdInfo hi : selectedHostInfos) {
-                        if (newColor != null) {
-                            hi.getHost().setSavedHostColorInGraphs(newColor);
+                    new AccessMode(Application.AccessType.RO, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        final Host firstHost = selectedHostInfos.get(0).getHost();
+                        final Color newColor = JColorChooser.showDialog(
+                                LCMC.MAIN_FRAME,
+                                "Choose " + selectedHostInfos + " color",
+                                firstHost.getPmColors()[0]);
+                        for (final HostDrbdInfo hi : selectedHostInfos) {
+                            if (newColor != null) {
+                                hi.getHost().setSavedHostColorInGraphs(newColor);
+                            }
                         }
                     }
-                }
-            };
+                });
         items.add(changeHostColorItem);
     }
 
     /** Returns 'PV create' menu item. */
-    private UpdatableItem getPVCreateItem(
-                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
-        return new MyMenuItem(
+    private UpdatableItem getPVCreateItem(final Iterable<BlockDevInfo> selectedBlockDevInfos) {
+        return menuFactory.createMenuItem(
                     Tools.getString("MultiSelectionInfo.PVCreate"),
                     null,
                     Tools.getString("MultiSelectionInfo.PVCreate.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean visiblePredicate() {
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canCreatePV()
-                        && (!bdi.getBlockDevice().isDrbd()
-                            || bdi.getBlockDevice().isPrimary())) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public void action() {
-                /* at least one must be true */
-                final Collection<Host> hosts = new HashSet<Host>();
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canCreatePV()
-                        && (!bdi.getBlockDevice().isDrbd()
-                            || bdi.getBlockDevice().isPrimary())) {
-                        final boolean ret = bdi.pvCreate(Application.RunMode.LIVE);
-                        if (!ret) {
-                            guiData.progressIndicatorFailed(
-                                    Tools.getString("BlockDevInfo.PVCreate.Failed",
-                                            bdi.getName()));
+                    new AccessMode(Application.AccessType.OP, false))
+            .visiblePredicate(new VisiblePredicate() {
+                @Override
+                public boolean check() {
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (bdi.canCreatePV()
+                                && (!bdi.getBlockDevice().isDrbd() || bdi.getBlockDevice().isPrimary())) {
+                            return true;
                         }
-                        hosts.add(bdi.getHost());
+                    }
+                    return false;
+                }
+            })
+            .addAction(new MenuAction() {
+                @Override
+                public void run(final String text) {
+                /* at least one must be true */
+                    final Collection<Host> hosts = new HashSet<Host>();
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (bdi.canCreatePV() && (!bdi.getBlockDevice().isDrbd() || bdi.getBlockDevice().isPrimary())) {
+                            final boolean ret = bdi.pvCreate(Application.RunMode.LIVE);
+                            if (!ret) {
+                                guiData.progressIndicatorFailed(
+                                        Tools.getString("BlockDevInfo.PVCreate.Failed", bdi.getName()));
+                            }
+                            hosts.add(bdi.getHost());
+                        }
+                    }
+                    for (final Host h : hosts) {
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                     }
                 }
-                for (final Host h : hosts) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(
-                                                            h,
-                                                            Host.UPDATE_LVM);
-                }
-            }
-        };
+            });
     }
 
     /** Returns 'PV remove' menu item. */
-    private UpdatableItem getPVRemoveItem(
-                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
-        return new MyMenuItem(
+    private UpdatableItem getPVRemoveItem(final Iterable<BlockDevInfo> selectedBlockDevInfos) {
+        return menuFactory.createMenuItem(
                     Tools.getString("MultiSelectionInfo.PVRemove"),
                     null,
                     Tools.getString("MultiSelectionInfo.PVRemove.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean visiblePredicate() {
+                    new AccessMode(Application.AccessType.OP, false))
+            .visiblePredicate(new VisiblePredicate() {
+                @Override
+                public boolean check() {
                 /* at least one must be true */
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canRemovePV()
-                        && (!bdi.getBlockDevice().isDrbd()
-                            || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public void action() {
-                final Collection<Host> hosts = new HashSet<Host>();
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canRemovePV()
-                        && (!bdi.getBlockDevice().isDrbd()
-                            || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
-                        final boolean ret = bdi.pvRemove(Application.RunMode.LIVE);
-                        if (!ret) {
-                            guiData.progressIndicatorFailed(
-                                    Tools.getString("BlockDevInfo.PVRemove.Failed",
-                                            bdi.getName()));
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (bdi.canRemovePV()
+                                && (!bdi.getBlockDevice().isDrbd() || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
+                            return true;
                         }
-                        hosts.add(bdi.getHost());
+                    }
+                    return false;
+                }
+            })
+            .addAction(new MenuAction() {
+                @Override
+                public void run(final String text) {
+                    final Collection<Host> hosts = new HashSet<Host>();
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (bdi.canRemovePV()
+                                && (!bdi.getBlockDevice().isDrbd() || !bdi.getBlockDevice().isDrbdPhysicalVolume())) {
+                            final boolean ret = bdi.pvRemove(Application.RunMode.LIVE);
+                            if (!ret) {
+                                guiData.progressIndicatorFailed(
+                                        Tools.getString("BlockDevInfo.PVRemove.Failed", bdi.getName()));
+                            }
+                            hosts.add(bdi.getHost());
+                        }
+                    }
+                    for (final Host h : hosts) {
+                        h.getBrowser().getClusterBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                     }
                 }
-                for (final Host h : hosts) {
-                    h.getBrowser().getClusterBrowser().updateHWInfo(
-                                                            h,
-                                                            Host.UPDATE_LVM);
-                }
-            }
-        };
+            });
     }
 
     /** Returns 'vg create' menu item. */
-    private UpdatableItem getVGCreateItem(
-                              final List<BlockDevInfo> selectedBlockDevInfos) {
-        return new MyMenuItem(
+    private UpdatableItem getVGCreateItem(final List<BlockDevInfo> selectedBlockDevInfos) {
+        return menuFactory.createMenuItem(
                   Tools.getString("MultiSelectionInfo.VGCreate"),
                   null,
                   Tools.getString("MultiSelectionInfo.VGCreate.ToolTip"),
                   new AccessMode(Application.AccessType.OP, false),
-                  new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean visiblePredicate() {
+                  new AccessMode(Application.AccessType.OP, false))
+            .visiblePredicate(new VisiblePredicate() {
+                @Override
+                public boolean check() {
                 /* all of them must be true */
 
-                if (selectedBlockDevInfos.isEmpty()) {
-                    return false;
-                }
-
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    final BlockDevice bd;
-                    if (bdi.getBlockDevice().isDrbd()) {
-                        if (!bdi.getBlockDevice().isPrimary()) {
-                            return false;
-                        }
-                        bd = bdi.getBlockDevice().getDrbdBlockDevice();
-                        if (bd == null) {
-                            return false;
-                        }
-                    } else {
-                        bd = bdi.getBlockDevice();
-                    }
-                    if (!bd.isPhysicalVolume()
-                        || bd.isVolumeGroupOnPhysicalVolume()) {
+                    if (selectedBlockDevInfos.isEmpty()) {
                         return false;
                     }
-                }
-                return true;
-            }
 
-            @Override
-            public void action() {
-                final VGCreate vgCreate = new VGCreate(
-                                        selectedBlockDevInfos.get(0).getHost(),
-                                        selectedBlockDevInfos);
-                while (true) {
-                    vgCreate.showDialog();
-                    if (vgCreate.isPressedCancelButton()) {
-                        vgCreate.cancelDialog();
-                        return;
-                    } else if (vgCreate.isPressedFinishButton()) {
-                        break;
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        final BlockDevice bd;
+                        if (bdi.getBlockDevice().isDrbd()) {
+                            if (!bdi.getBlockDevice().isPrimary()) {
+                                return false;
+                            }
+                            bd = bdi.getBlockDevice().getDrbdBlockDevice();
+                            if (bd == null) {
+                                return false;
+                            }
+                        } else {
+                            bd = bdi.getBlockDevice();
+                        }
+                        if (!bd.isPhysicalVolume() || bd.isVolumeGroupOnPhysicalVolume()) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            })
+            .addAction(new MenuAction() {
+                @Override
+                public void run(final String text) {
+                    final VGCreate vgCreate = vgCreateProvider.get();
+                    vgCreate.init(selectedBlockDevInfos.get(0).getHost(), selectedBlockDevInfos);
+                    while (true) {
+                        vgCreate.showDialog();
+                        if (vgCreate.isPressedCancelButton()) {
+                            vgCreate.cancelDialog();
+                            return;
+                        } else if (vgCreate.isPressedFinishButton()) {
+                            break;
+                        }
                     }
                 }
-            }
-        };
+            });
     }
 
     /** Returns 'vg remove' menu item. */
-    private UpdatableItem getVGRemoveItem(
-                              final Collection<BlockDevInfo> selectedBlockDevInfos) {
-        return new MyMenuItem(
+    private UpdatableItem getVGRemoveItem(final Collection<BlockDevInfo> selectedBlockDevInfos) {
+        return menuFactory.createMenuItem(
                   Tools.getString("MultiSelectionInfo.VGRemove"),
                   null,
                   Tools.getString("MultiSelectionInfo.VGRemove.ToolTip"),
                   new AccessMode(Application.AccessType.OP, false),
-                  new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean visiblePredicate() {
+                  new AccessMode(Application.AccessType.OP, false))
+            .visiblePredicate(new VisiblePredicate() {
+                @Override
+                public boolean check() {
                 /* all of them must be true */
 
-                if (selectedBlockDevInfos.isEmpty()) {
+                    if (selectedBlockDevInfos.isEmpty()) {
+                        return false;
+                    }
+                /* at least one can be removed */
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (bdi.canRemoveVG()) {
+                            return true;
+                        }
+                    }
                     return false;
                 }
-                /* at least one can be removed */
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canRemoveVG()) {
-                        return true;
+            })
+            .addAction(new MenuAction() {
+                @Override
+                public void run(final String text) {
+                    final List<BlockDevInfo> canRemove = new ArrayList<BlockDevInfo>();
+                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                        if (bdi.canRemoveVG()) {
+                            canRemove.add(bdi);
+                        }
+                    }
+                    final VGRemove vgRemove = vgRemoveProvider.get();
+                    vgRemove.init(canRemove);
+                    while (true) {
+                        vgRemove.showDialog();
+                        if (vgRemove.isPressedCancelButton()) {
+                            vgRemove.cancelDialog();
+                            return;
+                        } else if (vgRemove.isPressedFinishButton()) {
+                            break;
+                        }
                     }
                 }
-                return false;
-            }
-
-            @Override
-            public void action() {
-                final List<BlockDevInfo> canRemove =
-                                                 new ArrayList<BlockDevInfo>();
-                for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                    if (bdi.canRemoveVG()) {
-                        canRemove.add(bdi);
-                    }
-                }
-                final VGRemove vgRemove = new VGRemove(canRemove);
-                while (true) {
-                    vgRemove.showDialog();
-                    if (vgRemove.isPressedCancelButton()) {
-                        vgRemove.cancelDialog();
-                        return;
-                    } else if (vgRemove.isPressedFinishButton()) {
-                        break;
-                    }
-                }
-            }
-        };
+            });
     }
 
     /** Returns 'lv create' menu item. */
-    private Collection<MyMenuItem> getLVCreateItems(
-                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
-        final Map<String, Set<BlockDevInfo>> vgs =
-                                new LinkedHashMap<String, Set<BlockDevInfo>>();
+    private Collection<MyMenuItem> getLVCreateItems(final Iterable<BlockDevInfo> selectedBlockDevInfos) {
+        final Map<String, Set<BlockDevInfo>> vgs = new LinkedHashMap<String, Set<BlockDevInfo>>();
         final Collection<MyMenuItem> mis = new ArrayList<MyMenuItem>();
         for (final BlockDevInfo bdi : selectedBlockDevInfos) {
             final String vgName = bdi.getVGName();
@@ -534,8 +493,7 @@ public class MultiSelectionMenu {
             }
             bdis.add(bdi);
         }
-        for (final Map.Entry<String, Set<BlockDevInfo>> entry
-                                                            : vgs.entrySet()) {
+        for (final Map.Entry<String, Set<BlockDevInfo>> entry : vgs.entrySet()) {
             final String vgName = entry.getKey();
             final Set<BlockDevInfo> bdis = entry.getValue();
             String name = LV_CREATE_MENU_ITEM;
@@ -543,96 +501,84 @@ public class MultiSelectionMenu {
                 name += vgName;
             }
 
-            final MyMenuItem mi = new MyMenuItem(
+            final MyMenuItem mi = menuFactory.createMenuItem(
                     name,
                     null,
                     Tools.getString("MultiSelectionInfo.LVCreate.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    for (final BlockDevInfo bdi : bdis) {
-                        final String vg = bdi.getVGName();
-                        if (vg != null
-                            && !vg.isEmpty()
-                            && bdi.getHost().getVolumeGroupNames()
-                                            .contains(vg)) {
-                            return true;
+                    new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                    @Override
+                    public boolean check() {
+                        for (final BlockDevInfo bdi : bdis) {
+                            final String vg = bdi.getVGName();
+                            if (vg != null && !vg.isEmpty() && bdi.getHost().getVolumeGroupNames().contains(vg)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        final LVCreate lvCreate = lvCreateProvider.get();
+                        lvCreate.init(bdis, bdis.iterator().next().getVGName());
+                        while (true) {
+                            lvCreate.showDialog();
+                            if (lvCreate.isPressedCancelButton()) {
+                                lvCreate.cancelDialog();
+                                return;
+                            } else if (lvCreate.isPressedFinishButton()) {
+                                break;
+                            }
                         }
                     }
-                    return false;
-                }
-
+                });
+            mi.onUpdate(new Runnable() {
                 @Override
-                public void action() {
-                    final LVCreate lvCreate = new LVCreate(
-                                           bdis,
-                                           bdis.iterator().next().getVGName());
-                    while (true) {
-                        lvCreate.showDialog();
-                        if (lvCreate.isPressedCancelButton()) {
-                            lvCreate.cancelDialog();
-                            return;
-                        } else if (lvCreate.isPressedFinishButton()) {
-                            break;
-                        }
-                    }
-                }
-
-                @Override
-                public void updateAndWait() {
-                    setText1(LV_CREATE_MENU_ITEM
+                public void run() {
+                    mi.setText1(LV_CREATE_MENU_ITEM
                              + bdis.iterator().next().getVGName());
-                    super.updateAndWait();
                 }
-            };
+            });
             mis.add(mi);
         }
         return mis;
     }
 
     /** Returns 'LV remove' menu item. */
-    private UpdatableItem getLVRemoveItem(
-                              final Iterable<BlockDevInfo> selectedBlockDevInfos) {
-        return new MyMenuItem(
+    private UpdatableItem getLVRemoveItem(final Iterable<BlockDevInfo> selectedBlockDevInfos) {
+        return menuFactory.createMenuItem(
                     Tools.getString("MultiSelectionInfo.LVRemove"),
                     null,
                     Tools.getString("MultiSelectionInfo.LVRemove.ToolTip"),
                     new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean visiblePredicate() {
+                    new AccessMode(Application.AccessType.OP, false))
+            .visiblePredicate(new VisiblePredicate() {
+                    @Override
+                    public boolean check() {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.isLVM() && !bdi.getBlockDevice().isDrbd()) {
                         return true;
                     }
                 }
                 return false;
-            }
-
-            @Override
-            public void action() {
+            }})
+            .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
                 final Collection<Host> selectedHosts = new HashSet<Host>();
                 final Collection<String> bdNames = new ArrayList<String>();
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     bdNames.add(bdi.getName());
                     selectedHosts.add(bdi.getHost());
                 }
-                if (Tools.confirmDialog(
-                        Tools.getString(
-                            "MultiSelectionInfo.LVRemove.Confirm.Title"),
-                        Tools.getString(
-                            "MultiSelectionInfo.LVRemove.Confirm.Desc",
-                            Tools.join(", ", bdNames)),
-                        Tools.getString(
-                            "MultiSelectionInfo.LVRemove.Confirm.Remove"),
-                        Tools.getString(
-                            "MultiSelectionInfo.LVRemove.Confirm.Cancel")
-                        )) {
+                if (application.confirmDialog(
+                        Tools.getString("MultiSelectionInfo.LVRemove.Confirm.Title"),
+                        Tools.getString("MultiSelectionInfo.LVRemove.Confirm.Desc", Tools.join(", ", bdNames)),
+                        Tools.getString("MultiSelectionInfo.LVRemove.Confirm.Remove"),
+                        Tools.getString("MultiSelectionInfo.LVRemove.Confirm.Cancel"))) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         bdi.lvRemove(Application.RunMode.LIVE);
                     }
@@ -640,102 +586,96 @@ public class MultiSelectionMenu {
                         getBrowser().updateHWInfo(h, Host.UPDATE_LVM);
                     }
                 }
-            }
-        };
+            }});
     }
 
     /** Create menu items for selected block devices. */
-    private void createSelectedBlockDevPopup(
-                                 final List<BlockDevInfo> selectedBlockDevInfos,
-                                 final Collection<UpdatableItem> items) {
+    private void createSelectedBlockDevPopup(final List<BlockDevInfo> selectedBlockDevInfos,
+                                             final Collection<UpdatableItem> items) {
         /* detach */
         final MyMenuItem detachMenu =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.Detach"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Detach"),
                            BlockDevInfo.NO_HARDDISK_ICON_LARGE,
                            Tools.getString("MultiSelectionInfo.Detach"),
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    boolean oneAttached = false;
-                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                        if (!bdi.getBlockDevice().isDrbd()) {
-                            continue;
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                    @Override
+                    public boolean check() {
+                        boolean oneAttached = false;
+                        for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                            if (!bdi.getBlockDevice().isDrbd()) {
+                                continue;
+                            }
+                            if (!bdi.isDiskless(Application.RunMode.LIVE)) {
+                                oneAttached = true;
+                            }
                         }
-                        if (!bdi.isDiskless(Application.RunMode.LIVE)) {
-                            oneAttached = true;
-                        }
+                        return oneAttached;
                     }
-                    return oneAttached;
-                }
-
-                @Override
-                public String enablePredicate() {
-                    boolean detachable = false;
-                    for (final BlockDevInfo bdi : selectedBlockDevInfos) {
-                        if (!bdi.getBlockDevice().isDrbd()) {
-                            continue;
+                })
+                    .enablePredicate(new EnablePredicate() {
+                        @Override
+                        public String check() {
+                            boolean detachable = false;
+                            for (final BlockDevInfo bdi : selectedBlockDevInfos) {
+                                if (!bdi.getBlockDevice().isDrbd()) {
+                                    continue;
+                                }
+                                if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                                    continue;
+                                }
+                                if (bdi.getBlockDevice().isSyncing()) {
+                                    continue;
+                                }
+                                detachable = true;
+                            }
+                            if (detachable) {
+                                return null;
+                            } else {
+                                return "nothing do detach";
+                            }
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
-                            continue;
-                        }
-                        if (bdi.getBlockDevice().isSyncing()) {
-                            continue;
-                        }
-                        detachable = true;
-                    }
-                    if (detachable) {
-                        return null;
-                    } else {
-                        return "nothing do detach";
-                    }
-                }
-
-                @Override
-                public void action() {
+                    })
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.isDiskless(Application.RunMode.LIVE)) {
                             bdi.detach(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         final ButtonCallback detachItemCallback =
-              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
-            @Override
-            public void action(final Host dcHost) {
+              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost())
+                  .addAction(new CallbackAction() {
+                          @Override
+                          public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (Tools.getApplication().isAdvancedMode()
-                            || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
                         && !bdi.isDiskless(Application.RunMode.LIVE)) {
                         bdi.detach(Application.RunMode.TEST);
                     }
                 }
-            }
-        };
+            }});
         multiSelectionInfo.addMouseOverListener(detachMenu, detachItemCallback);
         items.add(detachMenu);
 
         /* attach */
         final MyMenuItem attachMenu =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.Attach"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Attach"),
                            BlockDevInfo.HARDDISK_DRBD_ICON_LARGE,
                            Tools.getString("MultiSelectionInfo.Attach"),
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     boolean oneDetached = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
@@ -746,17 +686,16 @@ public class MultiSelectionMenu {
                         }
                     }
                     return oneDetached;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean attachable = true;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()) {
@@ -769,50 +708,46 @@ public class MultiSelectionMenu {
                     } else {
                         return "nothing to attach";
                     }
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && bdi.isDiskless(Application.RunMode.LIVE)) {
                             bdi.attach(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         final ButtonCallback attachItemCallback =
-             getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
-            @Override
-            public void action(final Host dcHost) {
+             getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost())
+                 .addAction(new CallbackAction() {
+                         @Override
+                         public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (Tools.getApplication().isAdvancedMode()
-                            || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.getBlockDevice().isSyncing()
                         && bdi.isDiskless(Application.RunMode.LIVE)) {
                         bdi.attach(Application.RunMode.TEST);
                     }
                 }
-            }
-        };
+            }});
         multiSelectionInfo.addMouseOverListener(attachMenu, attachItemCallback);
         items.add(attachMenu);
 
         /* connect */
         final MyMenuItem connectMenu =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.Connect"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Connect"),
                            null,
                            Tools.getString("MultiSelectionInfo.Connect"),
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     boolean oneDisconnected = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
@@ -823,17 +758,16 @@ public class MultiSelectionMenu {
                         }
                     }
                     return oneDisconnected;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean connectable = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
@@ -846,48 +780,44 @@ public class MultiSelectionMenu {
                     } else {
                         return "nothing to connect";
                     }
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                             bdi.connect(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         final ButtonCallback connectItemCallback =
-              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
-            @Override
-            public void action(final Host dcHost) {
+              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost())
+                  .addAction(new CallbackAction() {
+                          @Override
+                          public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
-                        && (Tools.getApplication().isAdvancedMode()
-                            || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && !bdi.isConnectedOrWF(Application.RunMode.LIVE)) {
                         bdi.connect(Application.RunMode.TEST);
                     }
                 }
-            }
-        };
+            }});
         multiSelectionInfo.addMouseOverListener(connectMenu, connectItemCallback);
         items.add(connectMenu);
 
         /* disconnect */
         final MyMenuItem disconnectMenu =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.Disconnect"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Disconnect"),
                            null,
                            Tools.getString("MultiSelectionInfo.Disconnect"),
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     boolean oneConnected = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
@@ -898,24 +828,21 @@ public class MultiSelectionMenu {
                         }
                     }
                     return oneConnected;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean disconnectable = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()
-                            && ((bdi.getBlockDevice().isPrimary()
-                                 && bdi.getBlockDevice().isSyncTarget())
-                                || (bdi.getOtherBlockDevInfo().getBlockDevice().
-                                                                    isPrimary()
+                            && ((bdi.getBlockDevice().isPrimary() && bdi.getBlockDevice().isSyncTarget())
+                                || (bdi.getOtherBlockDevInfo().getBlockDevice().isPrimary()
                                     && bdi.getBlockDevice().isSyncSource()))) {
                             continue;
                         }
@@ -929,83 +856,73 @@ public class MultiSelectionMenu {
                     } else {
                         return "nothing to disconnect";
                     }
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && bdi.isConnectedOrWF(Application.RunMode.LIVE)
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && (!bdi.getBlockDevice().isSyncing()
-                                || (bdi.getBlockDevice().isPrimary()
-                                    && bdi.getBlockDevice().isSyncSource())
-                                   || (bdi.getOtherBlockDevInfo()
-                                          .getBlockDevice().isPrimary()
+                                || (bdi.getBlockDevice().isPrimary() && bdi.getBlockDevice().isSyncSource())
+                                   || (bdi.getOtherBlockDevInfo().getBlockDevice().isPrimary()
                                        && bdi.getBlockDevice().isSyncTarget()))) {
                             bdi.disconnect(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         final ButtonCallback disconnectItemCallback =
-              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost()) {
-            @Override
-            public void action(final Host dcHost) {
+              getBrowser().new DRBDMenuItemCallback(getBrowser().getDCHost())
+                  .addAction(new CallbackAction() {
+                          @Override
+                          public void run(final Host host) {
                 for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                     if (bdi.getBlockDevice().isDrbd()
                         && bdi.isConnectedOrWF(Application.RunMode.LIVE)
-                        && (Tools.getApplication().isAdvancedMode()
-                            || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                        && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                         && (!bdi.getBlockDevice().isSyncing()
-                            || (bdi.getBlockDevice().isPrimary()
-                                && bdi.getBlockDevice().isSyncSource())
-                               || (bdi.getOtherBlockDevInfo()
-                                      .getBlockDevice().isPrimary()
+                            || (bdi.getBlockDevice().isPrimary() && bdi.getBlockDevice().isSyncSource())
+                               || (bdi.getOtherBlockDevInfo().getBlockDevice().isPrimary()
                                    && bdi.getBlockDevice().isSyncTarget()))) {
                         bdi.disconnect(Application.RunMode.TEST);
                     }
                 }
-            }
-        };
+            }});
         multiSelectionInfo.addMouseOverListener(disconnectMenu, disconnectItemCallback);
         items.add(disconnectMenu);
 
         /* set primary */
         final UpdatableItem setPrimaryItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.SetPrimary"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.SetPrimary"),
                            null,
                            Tools.getString("MultiSelectionInfo.SetPrimary"),
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean oneSecondary = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                         if (bdi.getBlockDevice().isSecondary()
-                            && ((!oBdi.getBlockDevice().isPrimary()
-                                 && !selectedBlockDevInfos.contains(oBdi))
+                            && ((!oBdi.getBlockDevice().isPrimary() && !selectedBlockDevInfos.contains(oBdi))
                                 || bdi.allowTwoPrimaries())) {
                             oneSecondary = true;
                         }
@@ -1014,17 +931,15 @@ public class MultiSelectionMenu {
                         return "nothing to promote";
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isPrimary()
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
-                            final BlockDevInfo oBdi =
-                                                    bdi.getOtherBlockDevInfo();
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                             if (oBdi != null
                                 && oBdi.getBlockDevice().isPrimary()
                                 && !selectedBlockDevInfos.contains(oBdi)
@@ -1034,39 +949,36 @@ public class MultiSelectionMenu {
                             bdi.setPrimary(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(setPrimaryItem);
 
         /* set secondary */
         final UpdatableItem setSecondaryItem =
-            new MyMenuItem(
+            menuFactory.createMenuItem(
                         Tools.getString("MultiSelectionInfo.SetSecondary"),
                         null,
                         Tools.getString("MultiSelectionInfo.SetSecondary"),
                         new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                        new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean onePrimary = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isPrimary()) {
@@ -1077,57 +989,52 @@ public class MultiSelectionMenu {
                         return "nothing to demote";
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && bdi.getBlockDevice().isPrimary()
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             bdi.setSecondary(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(setSecondaryItem);
 
         /* force primary */
         final UpdatableItem forcePrimaryItem =
-            new MyMenuItem(
+            menuFactory.createMenuItem(
                         Tools.getString("MultiSelectionInfo.ForcePrimary"),
                         null,
                         Tools.getString("MultiSelectionInfo.ForcePrimary"),
                         new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                        new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean oneSecondary = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                         if (bdi.getBlockDevice().isSecondary()
-                            && ((!oBdi.getBlockDevice().isPrimary()
-                                 && !selectedBlockDevInfos.contains(oBdi))
+                            && ((!oBdi.getBlockDevice().isPrimary() && !selectedBlockDevInfos.contains(oBdi))
                                 || bdi.allowTwoPrimaries())) {
                             oneSecondary = true;
                         }
@@ -1136,17 +1043,15 @@ public class MultiSelectionMenu {
                         return "nothing to promote";
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isPrimary()
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
-                            final BlockDevInfo oBdi =
-                                                    bdi.getOtherBlockDevInfo();
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            final BlockDevInfo oBdi = bdi.getOtherBlockDevInfo();
                             if (oBdi != null
                                 && oBdi.getBlockDevice().isPrimary()
                                 && !selectedBlockDevInfos.contains(oBdi)
@@ -1156,38 +1061,35 @@ public class MultiSelectionMenu {
                             bdi.forcePrimary(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(forcePrimaryItem);
 
         /* invalidate */
         final UpdatableItem invalidateItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.Invalidate"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Invalidate"),
                            null,
                            Tools.getString("MultiSelectionInfo.Invalidate"),
                            new AccessMode(Application.AccessType.ADMIN, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean canInvalidate = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()) {
@@ -1196,8 +1098,7 @@ public class MultiSelectionMenu {
                         if (bdi.getDrbdVolumeInfo().isVerifying()) {
                             continue;
                         }
-                        if (selectedBlockDevInfos.contains(
-                                               bdi.getOtherBlockDevInfo())) {
+                        if (selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())) {
                             continue;
                         }
                         canInvalidate = true;
@@ -1207,47 +1108,43 @@ public class MultiSelectionMenu {
                     } else {
                         return "nothing to invalidate";
                     }
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.getDrbdVolumeInfo().isVerifying()
-                            && !selectedBlockDevInfos.contains(
-                                                   bdi.getOtherBlockDevInfo())
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
+                            && !selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())) {
                             bdi.invalidateBD(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(invalidateItem);
 
         /* resume */
         final UpdatableItem resumeSyncItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.ResumeSync"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.ResumeSync"),
                            null,
                            Tools.getString("MultiSelectionInfo.ResumeSync"),
 
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean resumable = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
@@ -1256,8 +1153,7 @@ public class MultiSelectionMenu {
                         if (!bdi.getBlockDevice().isSyncing()) {
                             continue;
                         }
-                        if (bdi.getBlockDevice().isSyncTarget()
-                            || bdi.getBlockDevice().isSyncSource()) {
+                        if (bdi.getBlockDevice().isSyncTarget() || bdi.getBlockDevice().isSyncSource()) {
                             continue;
                         }
                         resumable = true;
@@ -1266,10 +1162,10 @@ public class MultiSelectionMenu {
                         return "nothing to resume";
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
                             && bdi.getBlockDevice().isSyncing()
@@ -1278,38 +1174,35 @@ public class MultiSelectionMenu {
                             bdi.resumeSync(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(resumeSyncItem);
 
         /* pause sync */
         final UpdatableItem pauseSyncItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.PauseSync"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.PauseSync"),
                            null,
                            Tools.getString("MultiSelectionInfo.PauseSync"),
                            new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean pausable = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!bdi.getBlockDevice().isSyncTarget()
-                            && !bdi.getBlockDevice().isSyncSource()) {
+                        if (!bdi.getBlockDevice().isSyncTarget() && !bdi.getBlockDevice().isSyncSource()) {
                             continue;
                         }
                         pausable = true;
@@ -1318,42 +1211,39 @@ public class MultiSelectionMenu {
                         return "nothing to pause";
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && (bdi.getBlockDevice().isSyncTarget()
-                                || bdi.getBlockDevice().isSyncSource())) {
+                            && (bdi.getBlockDevice().isSyncTarget() || bdi.getBlockDevice().isSyncSource())) {
                             bdi.pauseSync(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(pauseSyncItem);
 
         /* resize */
         final UpdatableItem resizeItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.Resize"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Resize"),
                            null,
                            Tools.getString("MultiSelectionInfo.Resize"),
                            new AccessMode(Application.AccessType.ADMIN, true),
-                           new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean resizable = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
@@ -1362,8 +1252,7 @@ public class MultiSelectionMenu {
                         if (bdi.getBlockDevice().isSyncing()) {
                             continue;
                         }
-                        if (selectedBlockDevInfos.contains(
-                                               bdi.getOtherBlockDevInfo())) {
+                        if (selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())) {
                             continue;
                         }
                         resizable = true;
@@ -1373,51 +1262,47 @@ public class MultiSelectionMenu {
                     } else {
                         return "nothing to resize";
                     }
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && !selectedBlockDevInfos.contains(
-                                                   bdi.getOtherBlockDevInfo())
+                            && !selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())
                             && !bdi.getBlockDevice().isSyncing()) {
                             bdi.resizeDrbd(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(resizeItem);
 
         /* discard my data */
         final UpdatableItem discardDataItem =
-            new MyMenuItem(
+            menuFactory.createMenuItem(
                          Tools.getString("MultiSelectionInfo.DiscardData"),
                          null,
                          Tools.getString("MultiSelectionInfo.DiscardData"),
                          new AccessMode(Application.AccessType.ADMIN, true),
-                         new AccessMode(Application.AccessType.OP, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                         new AccessMode(Application.AccessType.OP, false))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()) {
                             return true;
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     boolean discardable = false;
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        if (!Tools.getApplication().isAdvancedMode()
-                            && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
+                        if (!application.isAdvancedMode() && bdi.getDrbdVolumeInfo().isUsedByCRM()) {
                             continue;
                         }
                         if (bdi.getBlockDevice().isSyncing()) {
@@ -1426,8 +1311,7 @@ public class MultiSelectionMenu {
                         if (bdi.getBlockDevice().isPrimary()) {
                             continue;
                         }
-                        if (selectedBlockDevInfos.contains(
-                                               bdi.getOtherBlockDevInfo())) {
+                        if (selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())) {
                             continue;
                         }
                         discardable = true;
@@ -1437,47 +1321,38 @@ public class MultiSelectionMenu {
                     } else {
                         return "nothing to discard";
                     }
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (bdi.getBlockDevice().isDrbd()
-                            && !selectedBlockDevInfos.contains(
-                                                   bdi.getOtherBlockDevInfo())
-                            && (Tools.getApplication().isAdvancedMode()
-                                || !bdi.getDrbdVolumeInfo().isUsedByCRM())
+                            && !selectedBlockDevInfos.contains(bdi.getOtherBlockDevInfo())
+                            && (application.isAdvancedMode() || !bdi.getDrbdVolumeInfo().isUsedByCRM())
                             && !bdi.getBlockDevice().isSyncing()
                             && !bdi.getBlockDevice().isPrimary()) {
                             bdi.discardData(Application.RunMode.LIVE);
                         }
                     }
-                }
-            };
+                }});
         items.add(discardDataItem);
 
         /* proxy down */
         final UpdatableItem proxyDownItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.ProxyDown"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.ProxyDown"),
                            null,
                            Tools.getString("MultiSelectionInfo.ProxyDown"),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final ResourceInfo dri =
-                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
-                        final Host pHost =
-                                    dri.getProxyHost(bdi.getHost(),
-                                                     !ResourceInfo.WIZARD);
+                        final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return false;
                         }
@@ -1486,19 +1361,16 @@ public class MultiSelectionMenu {
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final ResourceInfo dri =
-                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
-                        final Host pHost =
-                                    dri.getProxyHost(bdi.getHost(),
-                                                     !ResourceInfo.WIZARD);
+                        final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return "";
                         }
@@ -1507,20 +1379,17 @@ public class MultiSelectionMenu {
                         }
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     final Collection<Host> hosts = new HashSet<Host>();
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final ResourceInfo dri =
-                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
-                        final Host pHost =
-                                    dri.getProxyHost(bdi.getHost(),
-                                                     !ResourceInfo.WIZARD);
+                        final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
                         if (pHost.isDrbdProxyUp(dri.getName())) {
                             DRBD.proxyDown(pHost,
                                            dri.getName(),
@@ -1532,32 +1401,25 @@ public class MultiSelectionMenu {
                     for (final Host h : hosts) {
                         getBrowser().updateProxyHWInfo(h);
                     }
-                }
-            };
+                }});
         items.add(proxyDownItem);
 
         /* proxy up */
         final UpdatableItem proxyUpItem =
-            new MyMenuItem(Tools.getString("MultiSelectionInfo.ProxyUp"),
+            menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.ProxyUp"),
                            null,
                            Tools.getString("MultiSelectionInfo.ProxyUp"),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
+                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                .visiblePredicate(new VisiblePredicate() {
+                        @Override
+                        public boolean check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final ResourceInfo dri =
-                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
-                        final Host pHost =
-                                    dri.getProxyHost(bdi.getHost(),
-                                                     !ResourceInfo.WIZARD);
+                        final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return false;
                         }
@@ -1566,19 +1428,16 @@ public class MultiSelectionMenu {
                         }
                     }
                     return false;
-                }
-
-                @Override
-                public String enablePredicate() {
+                }})
+                    .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final ResourceInfo dri =
-                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
-                        final Host pHost =
-                                    dri.getProxyHost(bdi.getHost(),
-                                                     !ResourceInfo.WIZARD);
+                        final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
                         if (pHost == null) {
                             return "";
                         }
@@ -1587,20 +1446,17 @@ public class MultiSelectionMenu {
                         }
                     }
                     return null;
-                }
-
-                @Override
-                public void action() {
+                }})
+                .addAction(new MenuAction() {
+                        @Override
+                        public void run(final String text) {
                     final Collection<Host> hosts = new HashSet<Host>();
                     for (final BlockDevInfo bdi : selectedBlockDevInfos) {
                         if (!bdi.getBlockDevice().isDrbd()) {
                             continue;
                         }
-                        final ResourceInfo dri =
-                                 bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
-                        final Host pHost =
-                                    dri.getProxyHost(bdi.getHost(),
-                                                     !ResourceInfo.WIZARD);
+                        final ResourceInfo dri = bdi.getDrbdVolumeInfo().getDrbdResourceInfo();
+                        final Host pHost = dri.getProxyHost(bdi.getHost(), !ResourceInfo.WIZARD);
                         if (!pHost.isDrbdProxyUp(dri.getName())) {
                             DRBD.proxyUp(pHost,
                                          dri.getName(),
@@ -1612,8 +1468,7 @@ public class MultiSelectionMenu {
                     for (final Host h : hosts) {
                         getBrowser().updateProxyHWInfo(h);
                     }
-                }
-            };
+                }});
         items.add(proxyUpItem);
         /* PV Create */
         items.add(getPVCreateItem(selectedBlockDevInfos));

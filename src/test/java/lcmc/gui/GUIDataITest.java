@@ -1,9 +1,9 @@
 package lcmc.gui;
 
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.testutils.TestUtils;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import lcmc.utilities.Tools;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,13 +29,14 @@ public final class GUIDataITest {
     public void testExpandTerminalSplitPane() {
         float count = 200;
         float errors = 0;
+        final Application application = new Application();
         for (int i = 0; i < count; i++) {
             guiData.expandTerminalSplitPane(1);
             for (final Host host : testSuite.getHosts()) {
                 guiData.setTerminalPanel(host.getTerminalPanel());
                 guiData.expandTerminalSplitPane(0);
             }
-            Tools.waitForSwing();
+            application.waitForSwing();
             if (guiData.getTerminalPanelPos() < 100) {
                 errors++;
             }

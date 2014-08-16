@@ -22,6 +22,7 @@ package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import lcmc.ProxyHostWizard;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
@@ -30,236 +31,234 @@ import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.dialog.drbd.DrbdsLog;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
+
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ProxyHostMenu {
-    /** Not connectable. */
-    private static final String NOT_CONNECTABLE_STRING =
-                               Tools.getString("ProxyHostInfo.NotConnectable");
-    
+    /**
+     * Not connectable.
+     */
+    private static final String NOT_CONNECTABLE_STRING = Tools.getString("ProxyHostInfo.NotConnectable");
+
     private ProxyHostInfo proxyHostInfo;
     @Autowired
     private GUIData guiData;
     @Autowired
     private ProxyHostWizard proxyHostWizard;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Provider<DrbdsLog> drbdsLogProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ProxyHostInfo proxyHostInfo) {
         this.proxyHostInfo = proxyHostInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
 
         /* connect */
-        final UpdatableItem connectItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Connect"),
-                           null,
-                           Tools.getString("HostDrbdInfo.Connect"),
-                           Tools.getString("HostDrbdInfo.Disconnect"),
-                           null,
-                           Tools.getString("HostDrbdInfo.Disconnect"),
-                           new AccessMode(Application.AccessType.RO,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.RO,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean predicate() {
-                    return !getHost().isConnected();
-                }
-
-                @Override
-                public String enablePredicate() {
-                    if (getHost().getUsername() == null) {
-                        return NOT_CONNECTABLE_STRING;
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    if (getHost().isConnected()) {
-                        getHost().disconnect();
-                    } else {
-                        getHost().connect(null, null);
-                    }
-                    getClusterBrowser().updateProxyHWInfo(getHost());
-                }
-            };
+        final UpdatableItem connectItem = menuFactory.createMenuItem(
+                        Tools.getString("HostDrbdInfo.Connect"),
+                        null,
+                        Tools.getString("HostDrbdInfo.Connect"),
+                        Tools.getString("HostDrbdInfo.Disconnect"),
+                        null,
+                        Tools.getString("HostDrbdInfo.Disconnect"),
+                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED))
+                        .predicate(new Predicate() {
+                            @Override
+                            public boolean check() {
+                                return !getHost().isConnected();
+                            }
+                        })
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (getHost().getUsername() == null) {
+                                    return NOT_CONNECTABLE_STRING;
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                if (getHost().isConnected()) {
+                                    getHost().disconnect();
+                                } else {
+                                    getHost().connect(null, null);
+                                }
+                                getClusterBrowser().updateProxyHWInfo(getHost());
+                            }
+                        });
         items.add(connectItem);
 
         /* host wizard */
-        final MyMenuItem hostWizardItem =
-            new MyMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
-                           HostBrowser.HOST_ICON_LARGE,
-                           Tools.getString("HostBrowser.ProxyHostWizard"),
-                           new AccessMode(Application.AccessType.RO,
-                                          false),
-                           new AccessMode(Application.AccessType.RO,
-                                          false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public void action() {
-                    proxyHostWizard.init(getHost(), null);
-                    proxyHostWizard.showDialogs();
-                }
-            };
+        final MyMenuItem hostWizardItem = menuFactory.createMenuItem(
+                        Tools.getString("HostBrowser.ProxyHostWizard"),
+                        HostBrowser.HOST_ICON_LARGE,
+                        Tools.getString("HostBrowser.ProxyHostWizard"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                proxyHostWizard.init(getHost(), null);
+                                proxyHostWizard.showDialogs();
+                            }
+                        });
         items.add(hostWizardItem);
         guiData.registerAddHostButton(hostWizardItem);
         final Application.RunMode runMode = Application.RunMode.LIVE;
 
         /* proxy start/stop */
-        final UpdatableItem proxyItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
-                           null,
-                           getMenuToolTip("DRBD.stopProxy", ""),
-                           Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
-                           null,
-                           getMenuToolTip("DRBD.startProxy", ""),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean predicate() {
-                    return getHost().isDrbdProxyRunning();
-                }
-
-                @Override
-                public String enablePredicate() {
-                    if (!getHost().isConnected()) {
-                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    if (getHost().isDrbdProxyRunning()) {
-                        DRBD.stopProxy(getHost(), runMode);
-                    } else {
-                        DRBD.startProxy(getHost(), runMode);
-                    }
-                    getClusterBrowser().updateProxyHWInfo(getHost());
-                }
-            };
+        final UpdatableItem proxyItem = menuFactory.createMenuItem(
+                        Tools.getString("HostDrbdInfo.Drbd.StopProxy"),
+                        null,
+                        getMenuToolTip("DRBD.stopProxy", ""),
+                        Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
+                        null,
+                        getMenuToolTip("DRBD.startProxy", ""),
+                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        .predicate(new Predicate() {
+                            @Override
+                            public boolean check() {
+                                return getHost().isDrbdProxyRunning();
+                            }
+                        })
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (!getHost().isConnected()) {
+                                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                if (getHost().isDrbdProxyRunning()) {
+                                    DRBD.stopProxy(getHost(), runMode);
+                                } else {
+                                    DRBD.startProxy(getHost(), runMode);
+                                }
+                                getClusterBrowser().updateProxyHWInfo(getHost());
+                            }
+                        });
         items.add(proxyItem);
 
         /* all proxy connections up */
-        final UpdatableItem allProxyUpItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
-                           null,
-                           getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return getHost().isConnected()
-                           && getHost().isDrbdProxyRunning();
-                }
-
-                @Override
-                public void action() {
-                    DRBD.proxyUp(getHost(), DRBD.ALL, null, runMode);
-                    getClusterBrowser().updateProxyHWInfo(getHost());
-                }
-            };
+        final UpdatableItem allProxyUpItem = menuFactory.createMenuItem(
+                        Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
+                        null,
+                        getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
+                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        .visiblePredicate(new VisiblePredicate() {
+                            @Override
+                            public boolean check() {
+                                return getHost().isConnected() && getHost().isDrbdProxyRunning();
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.proxyUp(getHost(), DRBD.ALL, null, runMode);
+                                getClusterBrowser().updateProxyHWInfo(getHost());
+                            }
+                        });
         items.add(allProxyUpItem);
 
         /* all proxy connections down */
-        final UpdatableItem allProxyDownItem =
-            new MyMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
-                           null,
-                           getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
-                           new AccessMode(Application.AccessType.ADMIN,
-                                          AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP,
-                                          !AccessMode.ADVANCED)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean visiblePredicate() {
-                    return getHost().isConnected()
-                           && getHost().isDrbdProxyRunning();
-                }
-
-                @Override
-                public void action() {
-                    DRBD.proxyDown(getHost(), DRBD.ALL, null, runMode);
-                    getClusterBrowser().updateProxyHWInfo(getHost());
-                }
-            };
+        final UpdatableItem allProxyDownItem = menuFactory.createMenuItem(
+                        Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
+                        null,
+                        getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
+                        new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        .visiblePredicate(new VisiblePredicate() {
+                            @Override
+                            public boolean check() {
+                                return getHost().isConnected() && getHost().isDrbdProxyRunning();
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                DRBD.proxyDown(getHost(), DRBD.ALL, null, runMode);
+                                getClusterBrowser().updateProxyHWInfo(getHost());
+                            }
+                        });
         items.add(allProxyDownItem);
 
         /* view logs */
-        final UpdatableItem viewLogsItem =
-            new MyMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                           ProxyHostInfo.LOGFILE_ICON,
-                           Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (!getHost().isConnected()) {
-                        return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    final DrbdsLog l = new DrbdsLog(getHost());
-                    l.showDialog();
-                }
-            };
+        final UpdatableItem viewLogsItem = menuFactory.createMenuItem(
+                        Tools.getString("HostBrowser.Drbd.ViewLogs"),
+                        ProxyHostInfo.LOGFILE_ICON,
+                        Tools.getString("HostBrowser.Drbd.ViewLogs"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (!getHost().isConnected()) {
+                                    return Host.NOT_CONNECTED_MENU_TOOLTIP_TEXT;
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                final DrbdsLog drbdsLog = drbdsLogProvider.get();
+                                drbdsLog.init(getHost());
+                                drbdsLog.showDialog();
+                            }
+                        });
         items.add(viewLogsItem);
 
         /* remove host from gui */
-        final UpdatableItem removeHostItem =
-            new MyMenuItem(Tools.getString("HostBrowser.RemoveHost"),
-                           HostBrowser.HOST_REMOVE_ICON,
-                           Tools.getString("HostBrowser.RemoveHost"),
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public String enablePredicate() {
-                    if (getHost().isInCluster()) {
-                        return "it is a member of a cluster";
-                    }
-                    return null;
-                }
-
-                @Override
-                public void action() {
-                    getHost().disconnect();
-                    Tools.getApplication().removeHostFromHosts(getHost());
-                    guiData.allHostsUpdate();
-                }
-            };
+        final UpdatableItem removeHostItem = menuFactory.createMenuItem(
+                        Tools.getString("HostBrowser.RemoveHost"),
+                        HostBrowser.HOST_REMOVE_ICON,
+                        Tools.getString("HostBrowser.RemoveHost"),
+                        new AccessMode(Application.AccessType.RO, false),
+                        new AccessMode(Application.AccessType.RO, false))
+                        .enablePredicate(new EnablePredicate() {
+                            @Override
+                            public String check() {
+                                if (getHost().isInCluster()) {
+                                    return "it is a member of a cluster";
+                                }
+                                return null;
+                            }
+                        })
+                        .addAction(new MenuAction() {
+                            @Override
+                            public void run(final String text) {
+                                getHost().disconnect();
+                                application.removeHostFromHosts(getHost());
+                                guiData.allHostsUpdate();
+                            }
+                        });
         items.add(removeHostItem);
 
         return items;
     }
 
-    /** Tool tip for menu items. */
+    /**
+     * Tool tip for menu items.
+     */
     private String getMenuToolTip(final String cmd, final String res) {
         final String distString = getHost().getDistString(cmd);
         if (distString == null) {
@@ -267,10 +266,11 @@ public class ProxyHostMenu {
         }
         return distString.replaceAll("@RES-VOL@", res).replaceAll("@.*?@", "");
     }
+
     private Host getHost() {
         return proxyHostInfo.getHost();
     }
-    
+
     private ClusterBrowser getClusterBrowser() {
         return proxyHostInfo.getBrowser().getClusterBrowser();
     }

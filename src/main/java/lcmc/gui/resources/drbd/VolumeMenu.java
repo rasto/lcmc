@@ -22,69 +22,69 @@ package lcmc.gui.resources.drbd;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lcmc.gui.CallbackAction;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class VolumeMenu {
-    
-    private final VolumeInfo volumeInfo;
+    private VolumeInfo volumeInfo;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
 
-    public VolumeMenu(VolumeInfo volumeInfo) {
+    public List<UpdatableItem> getPulldownMenu(final VolumeInfo volumeInfo) {
         this.volumeInfo = volumeInfo;
-    }
-
-    public List<UpdatableItem> getPulldownMenu() {
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-    
-        final MyMenuItem connectMenu = new MyMenuItem(
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
-            + ' ' + getResourceInfo().getName(),
-            null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
-    
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect")
-            + ' ' + getResourceInfo().getName(),
-            null,
-            Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-            new AccessMode(Application.AccessType.OP, true),
-            new AccessMode(Application.AccessType.OP, false)) {
-    
-            private static final long serialVersionUID = 1L;
-    
+
+        final MyMenuItem connectMenu = menuFactory.createMenuItem(
+                Tools.getString("ClusterBrowser.Drbd.ResourceConnect") + ' ' + getResourceInfo().getName(),
+                null,
+                Tools.getString("ClusterBrowser.Drbd.ResourceConnect.ToolTip"),
+
+                Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect") + ' ' + getResourceInfo().getName(),
+                null,
+                Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
+                new AccessMode(Application.AccessType.OP, true),
+                new AccessMode(Application.AccessType.OP, false))
+                .predicate(new Predicate() {
+                    @Override
+                    public boolean check() {
+                        return !volumeInfo.isConnectedOrWF(runMode);
+                    }
+                })
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (!application.isAdvancedMode() && getResourceInfo().isUsedByCRM()) {
+                            return VolumeInfo.IS_USED_BY_CRM_STRING;
+                        }
+                        if (volumeInfo.isSyncing()) {
+                            return VolumeInfo.IS_SYNCING_STRING;
+                        }
+                        return null;
+                    }
+                });
+        connectMenu.addAction(new MenuAction() {
             @Override
-            public boolean predicate() {
-                return !volumeInfo.isConnectedOrWF(runMode);
-            }
-    
-            @Override
-            public String enablePredicate() {
-                if (!Tools.getApplication().isAdvancedMode()
-                    && getResourceInfo().isUsedByCRM()) {
-                    return VolumeInfo.IS_USED_BY_CRM_STRING;
-                }
-                if (volumeInfo.isSyncing()) {
-                    return VolumeInfo.IS_SYNCING_STRING;
-                }
-                return null;
-            }
-    
-            @Override
-            public void action() {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(volumeInfo);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(volumeInfo);
-                if (this.getText().equals(
-                         Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
-                         + ' ' + getResourceInfo().getName())) {
+            public void run(final String text) {
+                final BlockDevInfo sourceBDI = getBrowser().getDrbdGraph().getSource(volumeInfo);
+                final BlockDevInfo destBDI = getBrowser().getDrbdGraph().getDest(volumeInfo);
+                if (connectMenu.getText().equals(
+                        Tools.getString("ClusterBrowser.Drbd.ResourceConnect")
+                                + ' ' + getResourceInfo().getName())) {
                     if (!destBDI.isConnectedOrWF(runMode)) {
                         destBDI.connect(runMode);
                     }
@@ -96,66 +96,63 @@ public class VolumeMenu {
                     sourceBDI.disconnect(runMode);
                 }
             }
-        };
+        });
         final ButtonCallback connectItemCallback =
-               getBrowser().new DRBDMenuItemCallback(null) {
-            @Override
-            public void action(final Host dcHost) {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(volumeInfo);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(volumeInfo);
-                final BlockDevInfo bdi;
-                if (sourceBDI.getHost() == dcHost) {
-                    bdi = sourceBDI;
-                } else if (destBDI.getHost() == dcHost) {
-                    bdi = destBDI;
-                } else {
-                    return;
-                }
-                if (sourceBDI.isConnected(Application.RunMode.LIVE)
-                    && destBDI.isConnected(Application.RunMode.LIVE)) {
-                    bdi.disconnect(Application.RunMode.TEST);
-                } else {
-                    bdi.connect(Application.RunMode.TEST);
-                }
-            }
-        };
+                getBrowser().new DRBDMenuItemCallback(null)
+                        .addAction(new CallbackAction() {
+                            @Override
+                            public void run(final Host dcHost) {
+                                final BlockDevInfo sourceBDI = getBrowser().getDrbdGraph().getSource(volumeInfo);
+                                final BlockDevInfo destBDI = getBrowser().getDrbdGraph().getDest(volumeInfo);
+                                final BlockDevInfo bdi;
+                                if (sourceBDI.getHost() == dcHost) {
+                                    bdi = sourceBDI;
+                                } else if (destBDI.getHost() == dcHost) {
+                                    bdi = destBDI;
+                                } else {
+                                    return;
+                                }
+                                if (sourceBDI.isConnected(Application.RunMode.LIVE) && destBDI.isConnected(Application.RunMode.LIVE)) {
+                                    bdi.disconnect(Application.RunMode.TEST);
+                                } else {
+                                    bdi.connect(Application.RunMode.TEST);
+                                }
+                            }
+                        });
         volumeInfo.addMouseOverListener(connectMenu, connectItemCallback);
         items.add(connectMenu);
-    
-        final UpdatableItem resumeSync = new MyMenuItem(
-           Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync"),
-           null,
-           Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync.ToolTip"),
-    
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
-           null,
-           Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-           new AccessMode(Application.AccessType.OP, false),
-           new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-    
+
+        final MyMenuItem resumeSync = menuFactory.createMenuItem(
+                Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync"),
+                null,
+                Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync.ToolTip"),
+
+                Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
+                null,
+                Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
+                new AccessMode(Application.AccessType.OP, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .predicate(new Predicate() {
+                    @Override
+                    public boolean check() {
+                        return volumeInfo.isPausedSync();
+                    }
+                })
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (!volumeInfo.isSyncing()) {
+                            return "it is not syncing";
+                        }
+                        return null;
+                    }
+                });
+        resumeSync.addAction(new MenuAction() {
             @Override
-            public boolean predicate() {
-                return volumeInfo.isPausedSync();
-            }
-    
-            @Override
-            public String enablePredicate() {
-                if (!volumeInfo.isSyncing()) {
-                    return "it is not syncing";
-                }
-                return null;
-            }
-            @Override
-            public void action() {
-                final BlockDevInfo sourceBDI =
-                              getBrowser().getDrbdGraph().getSource(volumeInfo);
-                final BlockDevInfo destBDI =
-                                getBrowser().getDrbdGraph().getDest(volumeInfo);
-                if (this.getText().equals(Tools.getString(
-                            "ClusterBrowser.Drbd.ResourceResumeSync"))) {
+            public void run(final String text) {
+                final BlockDevInfo sourceBDI = getBrowser().getDrbdGraph().getSource(volumeInfo);
+                final BlockDevInfo destBDI = getBrowser().getDrbdGraph().getDest(volumeInfo);
+                if (resumeSync.getText().equals(Tools.getString("ClusterBrowser.Drbd.ResourceResumeSync"))) {
                     if (destBDI.getBlockDevice().isPausedSync()) {
                         destBDI.resumeSync(runMode);
                     }
@@ -167,117 +164,111 @@ public class VolumeMenu {
                     destBDI.pauseSync(runMode);
                 }
             }
-        };
+        });
         items.add(resumeSync);
     
         /* resolve split-brain */
-        final UpdatableItem splitBrainMenu = new MyMenuItem(
+        final UpdatableItem splitBrainMenu = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain"),
                 null,
-                Tools.getString(
-                            "ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
+                Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
                 new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false)) {
-    
-            private static final long serialVersionUID = 1L;
-    
-            @Override
-            public String enablePredicate() {
-                if (volumeInfo.isSplitBrain()) {
-                    return null;
-                } else {
-                    return "";
-                }
-            }
-    
-            @Override
-            public void action() {
-                volumeInfo.resolveSplitBrain();
-            }
-        };
+                new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (volumeInfo.isSplitBrain()) {
+                            return null;
+                        } else {
+                            return "";
+                        }
+                    }
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        volumeInfo.resolveSplitBrain();
+                    }
+                });
         items.add(splitBrainMenu);
     
         /* start online verification */
-        final UpdatableItem verifyMenu = new MyMenuItem(
+        final UpdatableItem verifyMenu = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Drbd.Verify"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
                 new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false)) {
-    
-            private static final long serialVersionUID = 1L;
-    
-            @Override
-            public String enablePredicate() {
-                if (!volumeInfo.isConnected(runMode)) {
-                    return "not connected";
-                }
-                if (volumeInfo.isSyncing()) {
-                    return VolumeInfo.IS_SYNCING_STRING;
-                }
-                if (volumeInfo.isVerifying()) {
-                    return VolumeInfo.IS_VERIFYING_STRING;
-                }
-                return null;
-            }
-    
-            @Override
-            public void action() {
-                volumeInfo.verify(runMode);
-            }
-        };
+                new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (!volumeInfo.isConnected(runMode)) {
+                            return "not connected";
+                        }
+                        if (volumeInfo.isSyncing()) {
+                            return VolumeInfo.IS_SYNCING_STRING;
+                        }
+                        if (volumeInfo.isVerifying()) {
+                            return VolumeInfo.IS_VERIFYING_STRING;
+                        }
+                        return null;
+                    }
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        volumeInfo.verify(runMode);
+                    }
+                });
         items.add(verifyMenu);
         /* remove resource */
-        final UpdatableItem removeResMenu = new MyMenuItem(
-                        Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
-                        ClusterBrowser.REMOVE_ICON,
-                        Tools.getString(
-                                "ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-            @Override
-            public void action() {
-                /* this resourceInfo remove myself and this calls
-                   removeDrbdResource in this class, that removes the edge
-                   in the graph. */
-                volumeInfo.removeMyself(runMode);
-            }
-    
-            @Override
-            public String enablePredicate() {
-                final DrbdXml dxml = getBrowser().getDrbdXml();
-                if (!Tools.getApplication().isAdvancedMode()
-                    && getResourceInfo().isUsedByCRM()) {
-                    return VolumeInfo.IS_USED_BY_CRM_STRING;
-                } else if (dxml.isDrbdDisabled()) {
-                    return "disabled because of config";
-                }
-                return null;
-            }
-        };
+        final UpdatableItem removeResMenu = menuFactory.createMenuItem(
+                Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
+                ClusterBrowser.REMOVE_ICON,
+                Tools.getString("ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
+                new AccessMode(Application.AccessType.ADMIN, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        /* this resourceInfo remove myself and this calls
+                           removeDrbdResource in this class, that removes the edge
+                           in the graph. */
+                        volumeInfo.removeMyself(runMode);
+                    }
+                })
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        final DrbdXml dxml = getBrowser().getDrbdXml();
+                        if (!application.isAdvancedMode() && getResourceInfo().isUsedByCRM()) {
+                            return VolumeInfo.IS_USED_BY_CRM_STRING;
+                        } else if (dxml.isDrbdDisabled()) {
+                            return "disabled because of config";
+                        }
+                        return null;
+                    }
+                });
         items.add(removeResMenu);
     
         /* view log */
-        final UpdatableItem viewLogMenu = new MyMenuItem(
-                           Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
-                           VolumeInfo.LOGFILE_ICON,
-                           null,
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false)) {
-    
-            private static final long serialVersionUID = 1L;
-    
-            @Override
-            public void action() {
-                volumeInfo.hidePopup();
-                volumeInfo.startDrbdLogsDialog();
-            }
-        };
+        final UpdatableItem viewLogMenu = menuFactory.createMenuItem(
+                Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
+                VolumeInfo.LOGFILE_ICON,
+                null,
+                new AccessMode(Application.AccessType.RO, false),
+                new AccessMode(Application.AccessType.RO, false))
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        volumeInfo.hidePopup();
+                        volumeInfo.startDrbdLogsDialog();
+                    }
+                });
         items.add(viewLogMenu);
         return items;
     }
-    
+
     private ResourceInfo getResourceInfo() {
         return volumeInfo.getDrbdResourceInfo();
     }
@@ -285,5 +276,4 @@ public class VolumeMenu {
     private ClusterBrowser getBrowser() {
         return volumeInfo.getBrowser();
     }
-
 }

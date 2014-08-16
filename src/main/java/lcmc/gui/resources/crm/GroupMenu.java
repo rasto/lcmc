@@ -34,13 +34,7 @@ import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.ButtonCallback;
-import lcmc.utilities.MyList;
-import lcmc.utilities.MyListModel;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -55,73 +49,72 @@ public class GroupMenu extends ServiceMenu {
     private GUIData drbdGui;
     @Autowired @Qualifier("serviceMenu")
     private Provider<ServiceMenu> serviceMenuProvider;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
 
     @Override
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final GroupInfo groupInfo = (GroupInfo) serviceInfo;
 
         /* add group service */
-        final UpdatableItem addGroupServiceMenuItem = new MyMenu(
+        final MyMenu addGroupServiceMenuItem = menuFactory.createMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService"),
                         new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
+                        new AccessMode(Application.AccessType.OP, false))
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (groupInfo.getBrowser().crmStatusFailed()) {
+                            return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                        } else {
+                            return null;
+                        }
+                    }
+                });
+        addGroupServiceMenuItem.onUpdate(new Runnable() {
             @Override
-            public String enablePredicate() {
-                if (groupInfo.getBrowser().crmStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                } else {
-                    return null;
-                }
-            }
-
-            @Override
-            public void updateAndWait() {
-                Tools.isSwingThread();
-                removeAll();
+            public void run() {
+                application.isSwingThread();
+                addGroupServiceMenuItem.removeAll();
                 final Collection<JDialog> popups = new ArrayList<JDialog>();
                 for (final String cl : ClusterBrowser.CRM_CLASSES) {
-                    final MyMenu classItem =
-                            new MyMenu(ClusterBrowser.CRM_CLASS_MENU.get(cl),
-                                   new AccessMode(Application.AccessType.ADMIN,
-                                                  false),
-                                   new AccessMode(Application.AccessType.OP,
-                                                  false));
+                    final MyMenu classItem = menuFactory.createMenu(
+                                                        ClusterBrowser.CRM_CLASS_MENU.get(cl),
+                                                        new AccessMode(Application.AccessType.ADMIN, false),
+                                                        new AccessMode(Application.AccessType.OP, false));
                     final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : groupInfo.getAddGroupServiceList(cl)) {
-                        final MyMenuItem mmi =
-                            new MyMenuItem(
-                                   ra.getPullDownMenuName(),
-                                   null,
-                                   null,
-                                   new AccessMode(Application.AccessType.ADMIN,
-                                                  false),
-                                   new AccessMode(Application.AccessType.OP,
-                                                  false)) {
-                            private static final long serialVersionUID = 1L;
-                            @Override
-                            public void action() {
-                                final CloneInfo ci = groupInfo.getCloneInfo();
-                                if (ci != null) {
-                                    ci.hidePopup();
-                                }
-                                groupInfo.hidePopup();
-                                Tools.invokeLater(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        for (final JDialog otherP : popups) {
-                                            otherP.dispose();
-                                        }
+                        final MyMenuItem mmi = menuFactory.createMenuItem(
+                                        ra.getPullDownMenuName(),
+                                        null,
+                                        null,
+                                        new AccessMode(Application.AccessType.ADMIN, false),
+                                        new AccessMode(Application.AccessType.OP, false));
+                        mmi.addAction(new MenuAction() {
+                                @Override
+                                public void run(final String text) {
+                                    final CloneInfo ci = groupInfo.getCloneInfo();
+                                    if (ci != null) {
+                                        ci.hidePopup();
                                     }
-                                });
-                                if (ra.isLinbitDrbd() && !groupInfo.getBrowser().linbitDrbdConfirmDialog()) {
-                                    return;
+                                    groupInfo.hidePopup();
+                                    application.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            for (final JDialog otherP : popups) {
+                                                otherP.dispose();
+                                            }
+                                        }
+                                    });
+                                    if (ra.isLinbitDrbd() && !groupInfo.getBrowser().linbitDrbdConfirmDialog()) {
+                                        return;
+                                    }
+                                    groupInfo.addGroupServicePanel(ra, true);
+                                    mmi.repaint();
                                 }
-                                groupInfo.addGroupServicePanel(ra, true);
-                                repaint();
-                            }
-                        };
+                            });
                         dlm.addElement(mmi);
                     }
                     final boolean ret = drbdGui.getScrollingMenu(
@@ -129,18 +122,19 @@ public class GroupMenu extends ServiceMenu {
                             null, /* options */
                             classItem,
                             dlm,
-                            new MyList<MyMenuItem>(dlm, getBackground()),
+                            new MyList<MyMenuItem>(dlm, addGroupServiceMenuItem.getBackground()),
                             groupInfo,
                             popups,
                             null);
                     if (!ret) {
                         classItem.setEnabled(false);
                     }
-                    add(classItem);
+                    addGroupServiceMenuItem.add(classItem);
                 }
-                super.updateAndWait();
+                addGroupServiceMenuItem.updateMenuComponents();
+                addGroupServiceMenuItem.processAccessMode();
             }
-        };
+        });
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         items.add(addGroupServiceMenuItem);
         for (final UpdatableItem item : super.getPulldownMenu(groupInfo)) {
@@ -148,30 +142,29 @@ public class GroupMenu extends ServiceMenu {
         }
 
         /* group services */
-        if (!Tools.getApplication().isSlow()) {
+        if (!application.isSlow()) {
             for (final ServiceInfo child : groupInfo.getGroupServices()) {
-                final UpdatableItem groupServicesMenu = new MyMenu(
+                final MyMenu groupServicesMenu = menuFactory.createMenu(
                         child.toString(),
                         new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false)) {
-                    private static final long serialVersionUID = 1L;
-
+                        new AccessMode(Application.AccessType.RO, false));
+                groupServicesMenu.onUpdate(new Runnable() {
                     @Override
-                    public void updateAndWait() {
-                        Tools.isSwingThread();
-                        removeAll();
-                        final Collection<UpdatableItem> serviceMenus =
-                                        new ArrayList<UpdatableItem>();
+                    public void run() {
+                        application.isSwingThread();
+                        groupServicesMenu.removeAll();
+                        final Collection<UpdatableItem> serviceMenus = new ArrayList<UpdatableItem>();
                         for (final UpdatableItem u : child.createPopup()) {
                             serviceMenus.add(u);
                             u.updateAndWait();
                         }
                         for (final UpdatableItem u : serviceMenus) {
-                            add((JMenuItem) u);
+                            groupServicesMenu.add((JMenuItem) u);
                         }
-                        super.updateAndWait();
+                        groupServicesMenu.updateMenuComponents();
+                        groupServicesMenu.processAccessMode();
                     }
-                };
+                });
                 items.add(groupServicesMenu);
             }
         }

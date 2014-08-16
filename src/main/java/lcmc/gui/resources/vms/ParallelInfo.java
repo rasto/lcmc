@@ -25,6 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.vm.VmsXml;
@@ -34,33 +36,23 @@ import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual parallel device.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class ParallelInfo extends ParallelSerialInfo {
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Parallel Device");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addParallelsPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
+    @Autowired
+    private WidgetFactory widgetFactory;
 
-    /** Creates the ParallelInfo object. */
-    ParallelInfo(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
+        super.init(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Returns data for the table. */
@@ -160,7 +152,7 @@ final class ParallelInfo extends ParallelSerialInfo {
     /** Returns "add new" button. */
     @Override
     protected MyButton getNewBtn0(final DomainInfo vdi) {
-        return getNewBtn(vdi);
+        return vdi.getNewParallelBtn();
     }
 
     /** Modify device xml. */

@@ -106,25 +106,30 @@ public class InitCluster extends DialogCluster {
      * override this one and use different finish/next button.
      */
     private String otherFinishButton = null;
+    @Autowired
+    private WidgetFactory widgetFactory;
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
-    private final Widget useOpenaisButton = WidgetFactory.createInstance(
-                                   Widget.Type.RADIOGROUP,
-                                   Widget.NO_DEFAULT,
-                                   new Value[]{new StringValue(COROSYNC_INIT_SCRIPT),
-                                               new StringValue(OPENAIS_INIT_SCRIPT)},
-                                   Widget.NO_REGEXP,
-                                   0,
-                                   Widget.NO_ABBRV,
-                                   new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                                   Widget.NO_BUTTON);
+    private Widget useOpenaisButton;
     @Autowired
     private Finish finishDialog;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
+        useOpenaisButton = widgetFactory.createInstance(
+                Widget.Type.RADIOGROUP,
+                Widget.NO_DEFAULT,
+                new Value[]{new StringValue(COROSYNC_INIT_SCRIPT),
+                        new StringValue(OPENAIS_INIT_SCRIPT)},
+                Widget.NO_REGEXP,
+                0,
+                Widget.NO_ABBRV,
+                new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                Widget.NO_BUTTON);
         setOtherFinishButton(finishButton());
         finishDialog.init(this, getCluster());
     }
@@ -281,7 +286,7 @@ public class InitCluster extends DialogCluster {
             boolean drbdFailed = false;
             if (drbdLoaded) {
                 if (drbdLoadedChanged) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsLoaded"));
@@ -293,7 +298,7 @@ public class InitCluster extends DialogCluster {
                 drbdFailed = true;
                 if (drbdLoadedChanged) {
                     final MyButton drbdLoadButton = drbdLoadButtons.get(i);
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             drbdLoadedInfo.setText(Tools.getString("Dialog.Cluster.Init.DrbdIsNotLoaded"));
@@ -387,7 +392,7 @@ public class InitCluster extends DialogCluster {
             boolean csAisFailed = false;
             if (csAisRunning) {
                 if (csAisChanged || hbChanged) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             pmStartedInfo.setText(
@@ -410,7 +415,7 @@ public class InitCluster extends DialogCluster {
             } else {
                 csAisFailed = true;
                 if (csAisChanged || hbChanged) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (heartbeatIsRunning || heartbeatIsRc) {
@@ -448,7 +453,7 @@ public class InitCluster extends DialogCluster {
             boolean hbFailed = false;
             if (heartbeatIsRunning) {
                 if (hbChanged || csAisChanged) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             hbStartedInfo.setText(Tools.getString("Dialog.Cluster.Init.HbIsRunning"));
@@ -469,7 +474,7 @@ public class InitCluster extends DialogCluster {
             } else {
                 hbFailed = true;
                 if (hbChanged || csAisChanged) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (csAisRunning || csAisIsRc) {
@@ -503,7 +508,7 @@ public class InitCluster extends DialogCluster {
             i++;
         }
         final boolean nob = needOpenaisButton;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 useOpenaisButton.setEnabled(nob);
@@ -511,7 +516,7 @@ public class InitCluster extends DialogCluster {
         });
 
         if (oneChanged || !periodic) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     mainPanel.invalidate();
@@ -523,7 +528,7 @@ public class InitCluster extends DialogCluster {
         final List<String> incorrect = new ArrayList<String>();
         if (oneFailed) {
             incorrect.add("one component failed");
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         buttonClass(otherFinishButton).setEnabled(false);
@@ -533,7 +538,7 @@ public class InitCluster extends DialogCluster {
         final List<String> changed = new ArrayList<String>();
             enableComponents();
             nextButtonSetEnabled(new Check(incorrect, changed));
-            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+            if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -584,7 +589,7 @@ public class InitCluster extends DialogCluster {
             pane.setBorder(titledBorder);
 
             drbdLoadedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingDrbd")));
-            final MyButton drbdb = new MyButton(Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
+            final MyButton drbdb = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.LoadDrbdButton"));
             drbdb.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             drbdLoadButtons.add(drbdb);
             drbdLoadButtons.get(i).setVisible(false);
@@ -597,7 +602,7 @@ public class InitCluster extends DialogCluster {
                             new Runnable() {
                                 @Override
                                 public void run() {
-                                    Tools.invokeLater(new Runnable() {
+                                    application.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             drbdLoadButtons.get(index).setVisible(false);
@@ -620,9 +625,9 @@ public class InitCluster extends DialogCluster {
             heartbeatStartedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingHb")));
             final MyButton btn;
             if (host.isCorosyncRunning() || host.isOpenaisRunning() || host.isCorosyncInRc() || host.isOpenaisInRc()) {
-                btn = new MyButton(HEARTBEAT_BUTTON_SWITCH_TEXT);
+                btn = widgetFactory.createButton(HEARTBEAT_BUTTON_SWITCH_TEXT);
             } else {
-                btn = new MyButton(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
+                btn = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.StartHbButton"));
             }
             btn.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             startHeartbeatButtons.add(btn);
@@ -637,7 +642,7 @@ public class InitCluster extends DialogCluster {
                                 @Override
                                 public void run() {
                                     disableComponents();
-                                    Tools.invokeLater(new Runnable() {
+                                    application.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
                                             startHeartbeatButtons.get(index).setVisible(false);
@@ -672,7 +677,7 @@ public class InitCluster extends DialogCluster {
 
             /* Pacemaker */
             pacemakerStartedLabels.add(new JLabel(Tools.getString("Dialog.Cluster.Init.CheckingPm")));
-            final MyButton pmsb = new MyButton(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
+            final MyButton pmsb = widgetFactory.createButton(Tools.getString("Dialog.Cluster.Init.StartCsAisButton"));
             pmsb.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
             startPacemakerButtons.add(pmsb);
             startPacemakerButtons.get(i).setVisible(false);
@@ -684,7 +689,7 @@ public class InitCluster extends DialogCluster {
                         @Override
                         public void run() {
                             disableComponents();
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     startPacemakerButtons.get(index).setVisible(false);

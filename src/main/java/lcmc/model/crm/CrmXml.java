@@ -47,6 +47,7 @@ import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.resources.crm.ServicesInfo;
 import lcmc.robotest.RoboTest;
+import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
@@ -336,6 +337,10 @@ public final class CrmXml extends XML {
     private static final Application.AccessType DEFAULT_ACCESS_TYPE = Application.AccessType.ADMIN;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private StartTests startTests;
 
     public static Unit getUnitMilliSec() {
         return new Unit("ms", "ms", "Millisecond", "Milliseconds");
@@ -416,9 +421,6 @@ public final class CrmXml extends XML {
     private final List<Value> stonithHostlistChoices = new ArrayList<Value>();
     private Map<String, String> metaAttrParams = null;
     private Map<String, String> resourceDefaultsMetaAttrs = null;
-
-    @Autowired
-    private RoboTest roboTest;
 
     public void init(final Host host, final ServicesInfo allServicesInfo) {
         this.host = host;
@@ -735,9 +737,9 @@ public final class CrmXml extends XML {
                 }
                 guiData.stopProgressIndicator(hn, text);
                 LOG.debug("CRMXML: RAs loaded");
-                final Test autoTest = Tools.getApplication().getAutoTest();
+                final Test autoTest = application.getAutoTest();
                 if (autoTest != null) {
-                    roboTest.startTest(autoTest, allServicesInfo.getBrowser().getCluster());
+                    startTests.startTest(autoTest, allServicesInfo.getBrowser().getCluster());
                 }
             }
         });

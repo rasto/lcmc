@@ -24,8 +24,6 @@ package lcmc.gui.resources.vms;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +41,7 @@ import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.AddVMConfigDialog;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -53,10 +52,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -68,37 +64,57 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class VMListInfo extends CategoryInfo {
-    /** Default widths for columns. */
+    /**
+     * Default widths for columns.
+     */
     private static final Map<Integer, Integer> DEFAULT_WIDTHS =
             Collections.unmodifiableMap(new HashMap<Integer, Integer>() {
-                    private static final long serialVersionUID = 1L;
-            {
-                put(4, 80); /* remove button column */
-            }});
-    /** On what raw is the vms virtual domain info object. */
+                private static final long serialVersionUID = 1L;
+
+                {
+                    put(4, 80); /* remove button column */
+                }
+            });
+    /**
+     * On what raw is the vms virtual domain info object.
+     */
     private volatile Map<String, DomainInfo> domainToInfo =
-                                   new HashMap<String, DomainInfo>();
-    /** Colors for some rows. */
+            new HashMap<String, DomainInfo>();
+    /**
+     * Colors for some rows.
+     */
     private volatile Map<String, Color> domainToColor =
-                                                  new HashMap<String, Color>();
+            new HashMap<String, Color>();
     @Autowired
     private Provider<AddVMConfigDialog> addVMConfigDialogProvider;
     @Autowired
     private Provider<DomainInfo> domainInfoProvider;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
-    /** Returns browser object of this info. */
+    /**
+     * Returns browser object of this info.
+     */
     @Override
     public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns columns for the table. */
+    /**
+     * Returns columns for the table.
+     */
     @Override
     protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Defined on", "Status", "Memory", ""};
     }
 
-    /** Returns data for the table. */
+    /**
+     * Returns data for the table.
+     */
     @Override
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
@@ -110,7 +126,7 @@ public final class VMListInfo extends CategoryInfo {
             }
         }
         final Map<String, DomainInfo> dti =
-                                   new HashMap<String, DomainInfo>();
+                new HashMap<String, DomainInfo>();
         final Map<String, Color> dtc = new HashMap<String, Color>();
         for (final String domainName : domainNames) {
             ImageIcon hostIcon = HostBrowser.HOST_OFF_ICON_LARGE;
@@ -128,22 +144,22 @@ public final class VMListInfo extends CategoryInfo {
                 }
             }
             final DomainInfo vmsvdi =
-                        getBrowser().findVMSVirtualDomainInfo(domainName);
+                    getBrowser().findVMSVirtualDomainInfo(domainName);
             if (vmsvdi != null) {
                 dti.put(domainName, vmsvdi);
-                final MyButton domainNameLabel = new MyButton(domainName,
-                                                              hostIcon);
-                final MyButton removeDomain = new MyButton(
-                                               "Remove",
-                                               ClusterBrowser.REMOVE_ICON_SMALL,
-                                               "Remove " + domainName
-                                               + " domain");
-                removeDomain.miniButton();
+                final MyButton domainNameLabel = widgetFactory.createButton(domainName,
+                        hostIcon);
+                final MyButton removeDomain = widgetFactory.createButton(
+                        "Remove",
+                        ClusterBrowser.REMOVE_ICON_SMALL,
+                        "Remove " + domainName
+                                + " domain");
+                application.makeMiniButton(removeDomain);
                 rows.add(new Object[]{domainNameLabel,
-                                      vmsvdi.getDefinedOnString(),
-                                      vmsvdi.getRunningOnString(),
-                                      vmsvdi.getResource().getValue("memory"),
-                                      removeDomain});
+                        vmsvdi.getDefinedOnString(),
+                        vmsvdi.getRunningOnString(),
+                        vmsvdi.getResource().getValue("memory"),
+                        removeDomain});
             }
         }
         domainToInfo = dti;
@@ -151,13 +167,17 @@ public final class VMListInfo extends CategoryInfo {
         return rows.toArray(new Object[rows.size()][]);
     }
 
-    /** Returns info object for the key. */
+    /**
+     * Returns info object for the key.
+     */
     @Override
     protected Info getTableInfo(final String tableName, final String key) {
         return domainToInfo.get(key);
     }
 
-    /** Execute when row in the table was clicked. */
+    /**
+     * Execute when row in the table was clicked.
+     */
     @Override
     protected void rowClicked(final String tableName,
                               final String key,
@@ -179,7 +199,9 @@ public final class VMListInfo extends CategoryInfo {
         }
     }
 
-    /** Alignment for the specified column. */
+    /**
+     * Alignment for the specified column.
+     */
     @Override
     protected int getTableColumnAlignment(final String tableName,
                                           final int column) {
@@ -189,14 +211,18 @@ public final class VMListInfo extends CategoryInfo {
         return SwingConstants.LEFT;
     }
 
-    /** Selects the node in the menu. */
+    /**
+     * Selects the node in the menu.
+     */
     @Override
     public void selectMyself() {
         super.selectMyself();
         getBrowser().nodeChanged(getNode());
     }
 
-    /** Returns comparator for column. */
+    /**
+     * Returns comparator for column.
+     */
     @Override
     protected Comparator<Object> getColComparator(final String tableName,
                                                   final int col) {
@@ -206,7 +232,7 @@ public final class VMListInfo extends CategoryInfo {
                 @Override
                 public int compare(final Object o1, final Object o2) {
                     return ((AbstractButton) o1).getText().compareToIgnoreCase(
-                                                    ((AbstractButton) o2).getText());
+                            ((AbstractButton) o2).getText());
                 }
             };
         } else if (col == 3) {
@@ -229,7 +255,9 @@ public final class VMListInfo extends CategoryInfo {
         return null;
     }
 
-    /** Retrurns color for some rows. */
+    /**
+     * Retrurns color for some rows.
+     */
     @Override
     protected Color getTableRowColor(final String tableName, final String key) {
         final Color c = domainToColor.get(key);
@@ -240,23 +268,24 @@ public final class VMListInfo extends CategoryInfo {
         }
     }
 
-    /** Returns new button. */
+    /**
+     * Returns new button.
+     */
     @Override
     protected JComponent getNewButton() {
-        final MyButton newButton = new MyButton(
-                                     Tools.getString("VMListInfo.AddNewDomain"));
-        newButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
+        final MyButton newButton = widgetFactory.createButton(Tools.getString("VMListInfo.AddNewDomain"))
+                .addAction(new Runnable() {
                     @Override
                     public void run() {
-                        addDomainPanel();
+                        final Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                addDomainPanel();
+                            }
+                        });
+                        t.start();
                     }
                 });
-                t.start();
-            }
-        });
         final JPanel bp = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         bp.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         bp.add(newButton);
@@ -265,15 +294,17 @@ public final class VMListInfo extends CategoryInfo {
         return bp;
     }
 
-    /** Adds new virtual domain. */
+    /**
+     * Adds new virtual domain.
+     */
     public void addDomainPanel() {
         final DomainInfo domainInfo = domainInfoProvider.get();
         domainInfo.init(null, getBrowser());
         domainInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
-                                           new DefaultMutableTreeNode(domainInfo);
+                new DefaultMutableTreeNode(domainInfo);
         getBrowser().setNode(resource);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getNode().add(resource);
@@ -293,41 +324,49 @@ public final class VMListInfo extends CategoryInfo {
         });
     }
 
-    /** Returns list of menu items for VM. */
+    /**
+     * Returns list of menu items for VM.
+     */
     @Override
     public List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* New domain */
-        final UpdatableItem newDomainMenuItem = new MyMenuItem(
-                       Tools.getString("VMListInfo.AddNewDomain"),
-                       HostBrowser.HOST_OFF_ICON_LARGE,
-                       new AccessMode(Application.AccessType.ADMIN, false),
-                       new AccessMode(Application.AccessType.OP, false)) {
-                        private static final long serialVersionUID = 1L;
-                        @Override
-                        public void action() {
-                            hidePopup();
-                            addDomainPanel();
-                        }
-        };
+        final UpdatableItem newDomainMenuItem = menuFactory.createMenuItem(
+                Tools.getString("VMListInfo.AddNewDomain"),
+                HostBrowser.HOST_OFF_ICON_LARGE,
+                new AccessMode(Application.AccessType.ADMIN, false),
+                new AccessMode(Application.AccessType.OP, false))
+            .addAction(new MenuAction() {
+                @Override
+                public void run(final String text) {
+                    hidePopup();
+                    addDomainPanel();
+                }
+            });
         items.add(newDomainMenuItem);
         return items;
     }
 
-    /** Returns whether the column is a button, 0 column is always a button. */
+    /**
+     * Returns whether the column is a button, 0 column is always a button.
+     */
     @Override
     protected Map<Integer, Integer> getDefaultWidths(final String tableName) {
         return DEFAULT_WIDTHS;
     }
 
-    /** Returns if this column contains remove button. */
+    /**
+     * Returns if this column contains remove button.
+     */
     @Override
     protected boolean isControlButton(final String tableName,
                                       final int column) {
         return DEFAULT_WIDTHS.containsKey(column);
     }
 
-    /** Returns tool tip text in the table. */
+    /**
+     * Returns tool tip text in the table.
+     */
     @Override
     protected String getTableToolTip(final String tableName,
                                      final String key,

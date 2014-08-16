@@ -27,6 +27,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
+import lcmc.model.Application;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,6 +43,9 @@ import org.springframework.stereotype.Component;
 final class DistDetection extends DialogHost {
     @Autowired
     private CheckInstallation checkInstallation;
+    @Autowired
+    private Application application;
+
     @Override
     protected void initDialogBeforeVisible() {
         super.initDialogBeforeVisible();
@@ -57,7 +61,7 @@ final class DistDetection extends DialogHost {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
+        if (!application.getAutoHosts().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }

@@ -36,20 +36,29 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import lcmc.model.AccessMode;
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
+    @Autowired
+    private Application application;
 
     protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {
         Value selectedValueInfo = null;
@@ -68,14 +77,14 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         return selectedValueInfo;
     }
 
-    public ComboBox(final Value selectedValue,
+    void init(final Value selectedValue,
                     final Value[] items,
                     final String regexp,
                     final int width,
                     final Map<String, String> abbreviations,
                     final AccessMode enableAccessMode,
                     final MyButton fieldButton) {
-        super(regexp, enableAccessMode, fieldButton);
+        super.init(regexp, enableAccessMode, fieldButton);
         addComponent(getComboBox(selectedValue, items, regexp, abbreviations), width);
     }
 
@@ -134,7 +143,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Reloads combo box with items and selects supplied value. */
     @Override
     public void reloadComboBox(final Value selectedValue, final Value[] items) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final MComboBox<Value> cb = getInternalComponent();
@@ -185,7 +194,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
         final JComponent comp = getInternalComponent();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final Value v = getValue();
@@ -249,7 +258,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Clears the combo box. */
     @Override
     public void clear() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getInternalComponent().removeAllItems();
@@ -266,7 +275,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Set item/value in the component and waits till it is set. */
     @Override
     protected void setValueAndWait0(final Value item) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         final MComboBox<Value> cb = getInternalComponent();
         if (item == null) {
             cb.setSelectedItem(new StringValue());
@@ -302,7 +311,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
         }
         final int pos = p + 3;
         if (pos >= 0 && pos < ip.length()) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tc.select(pos, ip.length());
@@ -325,7 +334,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -24,44 +24,50 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.swing.JMenuItem;
+
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
+import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyMenu;
-import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ResourceMenu {
-    
-    private final ResourceInfo resourceInfo;
+    private ResourceInfo resourceInfo;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private Application application;
 
-    public ResourceMenu(final ResourceInfo resourceInfo) {
+    public List<UpdatableItem> getPulldownMenu(final ResourceInfo resourceInfo) {
         this.resourceInfo = resourceInfo;
-    }
-
-    public List<UpdatableItem> getPulldownMenu() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         for (final VolumeInfo dvi : resourceInfo.getDrbdVolumes()) {
-            final UpdatableItem volumesMenu = new MyMenu(
-                            dvi.toString(),
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false)) {
-                private static final long serialVersionUID = 1L;
-
+            final MyMenu volumesMenu = menuFactory.createMenu(
+                    dvi.toString(),
+                    new AccessMode(Application.AccessType.RO, false),
+                    new AccessMode(Application.AccessType.RO, false));
+            volumesMenu.onUpdate(new Runnable() {
                 @Override
-                public void updateAndWait() {
-                    Tools.isSwingThread();
-                    removeAll();
-                    final Collection<UpdatableItem> volumeMenus =
-                                    new ArrayList<UpdatableItem>();
+                public void run() {
+                    application.isSwingThread();
+                    volumesMenu.removeAll();
+                    final Collection<UpdatableItem> volumeMenus = new ArrayList<UpdatableItem>();
                     for (final UpdatableItem u : dvi.createPopup()) {
                         volumeMenus.add(u);
                     }
                     for (final UpdatableItem u : volumeMenus) {
-                        add((JMenuItem) u);
+                        volumesMenu.add((JMenuItem) u);
                     }
-                    super.updateAndWait();
+                    volumesMenu.updateMenuComponents();
+                    volumesMenu.processAccessMode();
                 }
-            };
+            });
             items.add(volumesMenu);
         }
         return items;

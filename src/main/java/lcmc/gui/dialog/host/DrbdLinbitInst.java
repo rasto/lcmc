@@ -28,6 +28,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.model.Application;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
@@ -51,6 +52,8 @@ public class DrbdLinbitInst extends DialogHost {
     private CheckInstallation checkInstallationDialog;
     @Autowired
     private Provider<CheckInstallation> checkInstallationFactory;
+    @Autowired
+    private Application application;
 
     @Override
     protected final void initDialogBeforeVisible() {
@@ -120,8 +123,8 @@ public class DrbdLinbitInst extends DialogHost {
     final void installDrbd() {
         final DrbdInstallation drbdInstallation = getDrbdInstallation();
         drbdInstallation.setDrbdWasNewlyInstalled(true); /* even if we fail */
-        Tools.getApplication().setLastDrbdInstalledMethod(drbdInstallation.getDrbdInstallMethodIndex());
-        Tools.getApplication().setLastDrbdInstalledMethod(
+        application.setLastDrbdInstalledMethod(drbdInstallation.getDrbdInstallMethodIndex());
+        application.setLastDrbdInstalledMethod(
                            getHost().getDistString("DrbdInst.install.text."
                                                    + drbdInstallation.getDrbdInstallMethodIndex()));
         answerPaneSetText(Tools.getString("Dialog.Host.DrbdLinbitInst.Installing"));
@@ -159,7 +162,7 @@ public class DrbdLinbitInst extends DialogHost {
         progressBarDone();
         answerPaneSetText(Tools.getString("Dialog.Host.DrbdLinbitInst.InstallationDone"));
         enableComponents(new JComponent[]{buttonClass(backButton())});
-        if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+        if (application.getAutoOptionHost("drbdinst") != null) {
             Tools.sleep(1000);
             pressNextButton();
         }

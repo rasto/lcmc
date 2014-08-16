@@ -38,7 +38,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
+
+import lcmc.model.Application;
 import lcmc.model.Cluster;
+import lcmc.model.Clusters;
 import lcmc.model.crm.ClusterStatus;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.Host;
@@ -48,10 +51,16 @@ import lcmc.utilities.Http;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a bug report dialog.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class BugReport extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(BugReport.class);
 
@@ -64,15 +73,18 @@ public final class BugReport extends ConfigDialog {
     public static final String NO_ERROR_TEXT = null;
     public static final int MINIMUM_CLUSTERS_PANE_HEIGHT = 75;
 
-    private final Cluster selectedCluster;
-    private final String errorText;
+    private Cluster selectedCluster;
+    private String errorText;
     private final JTextPane bugReportTextArea = new JTextPane();
     private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
-    private final String logBuffer;
+    private String logBuffer;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Clusters allClusters;
 
-    public BugReport(final Cluster selectedCluster, final String errorText) {
-        super();
+    public void init(final Cluster selectedCluster, final String errorText) {
         this.selectedCluster = selectedCluster;
         this.errorText = errorText;
         logBuffer = LoggerFactory.getLogBuffer();
@@ -86,7 +98,7 @@ public final class BugReport extends ConfigDialog {
     }
 
     private void enableAllComponents(final boolean enable) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Map.Entry<String, JCheckBox> configEntry : configCheckBoxMap.entrySet()) {
@@ -163,7 +175,7 @@ public final class BugReport extends ConfigDialog {
         pane.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Dark"));
         bugReportTextArea.setEditable(true);
         bugReportTextArea.setText("loading...");
-        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
+        final Set<Cluster> clusters = allClusters.getClusterSet();
         final JComponent clPane = getClustersPane(clusters);
         if (clusters.size() > 1) {
             pane.add(clPane);
@@ -181,7 +193,7 @@ public final class BugReport extends ConfigDialog {
 
     protected void refresh() {
         enableAllComponents(false);
-        final Set<Cluster> clusters = Tools.getApplication().getAllClusters().getClusterSet();
+        final Set<Cluster> clusters = allClusters.getClusterSet();
         final String allOldText = bugReportTextArea.getText();
         final int i = allOldText.indexOf(GENERATED_DELIM);
         String oldText = "email: anonymous\nerror description:\n" + (errorText == null ? "" : errorText) + '\n';
@@ -200,7 +212,7 @@ public final class BugReport extends ConfigDialog {
             }
         }
         appendLogText(text);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 bugReportTextArea.setText(text.toString());

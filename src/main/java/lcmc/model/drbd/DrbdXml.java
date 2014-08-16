@@ -96,6 +96,10 @@ public class DrbdXml extends XML {
     /** Hardcoded defaults, for options that have it but we don't get
         it from the drbdsetup. */
     static final Map<String, Value> HARDCODED_DEFAULTS = new HashMap<String, Value>();
+
+    @Autowired
+    private Application application;
+
     static {
         NOT_ADVANCED_PARAMS.add("rate");
         NOT_ADVANCED_PARAMS.add(PROTOCOL_PARAM);
@@ -1368,7 +1372,7 @@ public class DrbdXml extends XML {
      * want to overwrite.
      */
     public boolean isDrbdDisabled() {
-        return unknownSections && !Tools.getApplication().isAdvancedMode();
+        return unknownSections && !application.isAdvancedMode();
     }
 
     public String getOldConfig() {

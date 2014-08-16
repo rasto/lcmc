@@ -21,45 +21,76 @@
 package lcmc.gui.resources.crm;
 
 import java.util.List;
-import lcmc.model.Host;
+
+import lcmc.model.AccessMode;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 import org.mockito.runners.MockitoJUnitRunner;
+
+import javax.swing.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ServicesMenuTest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private ServicesInfo servicesInfoStub;
     @Mock
     private ClusterBrowser clusterBrowserStub;
     @Mock
-    private Host hostStub;
-
+    private MyMenu menuStub;
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
     private ServicesMenu servicesMenu;
 
     @Before
     public void setUp() {
-        when(clusterBrowserStub.getDCHost()).thenReturn(hostStub);
         when(servicesInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenu(
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
+        when(menuStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuStub);
 
-        servicesMenu = new ServicesMenu();
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = servicesMenu.getPulldownMenu(servicesInfoStub);
 
+        verify(menuItemStub, never()).predicate((Predicate) anyObject());
+        verify(menuItemStub).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(5)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(8)).addAction((MenuAction) anyObject());
+        verify(menuStub, times(1)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuStub, times(1)).onUpdate((Runnable) anyObject());
         assertEquals(9, items.size());
     }
 

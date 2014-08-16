@@ -24,15 +24,19 @@ package lcmc.gui.dialog;
 
 import lcmc.model.Host;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an dialog, with log files.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostLogs extends Logs {
-    private final Host host;
+    private Host host;
 
-    public HostLogs(final Host host) {
-        super();
+    public void init(final Host host) {
         this.host = host;
     }
 

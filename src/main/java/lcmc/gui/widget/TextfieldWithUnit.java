@@ -37,51 +37,43 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import lcmc.model.AccessMode;
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
-import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class TextfieldWithUnit extends GenericWidget<JComponent> {
-    private static Unit addItems(final Collection<Unit> comboList, final Unit selectedValue, final Unit[] items) {
-        Unit selectedUnit = null;
-        if (items != null) {
-            for (final Unit item : items) {
-                if (item.equals(selectedValue)) {
-                    selectedUnit = item;
-                }
-                comboList.add(item);
-            }
-            if (selectedUnit == null && selectedValue != null) {
-                comboList.add(selectedValue);
-                selectedUnit = selectedValue;
-            }
-        }
-        return selectedUnit;
-    }
+    @Autowired
+    private Application application;
     /** Text field in widget with units. */
-    private final JTextField textFieldPart;
+    private JTextField textFieldPart;
     /** Combo box with units. */
-    private final MComboBox<Unit> unitComboBox;
+    private MComboBox<Unit> unitComboBox;
     private boolean unitEnabled = true;
 
-    public TextfieldWithUnit(final Value selectedValue,
-                             final Unit[] units,
-                             final String regexp,
-                             final int width,
-                             final Map<String, String> abbreviations,
-                             final AccessMode enableAccessMode,
-                             final MyButton fieldButton) {
-        super(regexp, enableAccessMode, fieldButton);
+    public void init(final Value selectedValue,
+                     final Unit[] units,
+                     final String regexp,
+                     final int width,
+                     final Map<String, String> abbreviations,
+                     final AccessMode enableAccessMode,
+                     final MyButton fieldButton) {
+        super.init(regexp, enableAccessMode, fieldButton);
         final JPanel newComp = new JPanel();
         newComp.setLayout(new SpringLayout());
 
@@ -114,6 +106,23 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         unitComboBox.setPreferredSize(new Dimension(width / 3 << 1, WIDGET_HEIGHT));
         unitComboBox.setMinimumSize(unitComboBox.getPreferredSize());
         unitComboBox.setMaximumSize(unitComboBox.getPreferredSize());
+    }
+
+    private Unit addItems(final Collection<Unit> comboList, final Unit selectedValue, final Unit[] items) {
+        Unit selectedUnit = null;
+        if (items != null) {
+            for (final Unit item : items) {
+                if (item.equals(selectedValue)) {
+                    selectedUnit = item;
+                }
+                comboList.add(item);
+            }
+            if (selectedUnit == null && selectedValue != null) {
+                comboList.add(selectedValue);
+                selectedUnit = selectedValue;
+            }
+        }
+        return selectedUnit;
     }
 
     private JComponent getTextField(final String value, final String regexp, final Map<String, String> abbreviations) {
@@ -151,7 +160,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
             public void focusGained(final FocusEvent e) {
                 final Value v = getValue();
                 if (v.isNothingSelected()) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             editor.setText("");
@@ -196,12 +205,12 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 unit.setPlural(!"1".equals(text));
                 unitComboBox.repaint();
             }
-            final boolean accessible = Tools.getApplication().isAccessible(getEnableAccessMode());
+            final boolean accessible = application.isAccessible(getEnableAccessMode());
             if (text == null || text.isEmpty()) {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
-                    Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                         @Override
                         public void run() {
                             unitComboBox.repaint();
@@ -214,7 +223,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                     unit.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                             @Override
                             public void run() {
                                 unitComboBox.repaint();
@@ -235,7 +244,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     @Override
     protected void setComponentsVisible(final boolean visible) {
         super.setComponentsEnabled(visible);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 textFieldPart.setVisible(visible);
@@ -296,7 +305,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

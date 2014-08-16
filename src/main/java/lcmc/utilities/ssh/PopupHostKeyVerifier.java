@@ -24,20 +24,29 @@ import ch.ethz.ssh2.ServerHostKeyVerifier;
 import java.io.File;
 import java.io.IOException;
 import lcmc.gui.SSHGui;
+import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This ServerHostKeyVerifier asks the user on how to proceed if a key
  * cannot be found in the in-memory database.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
     private static final Logger LOG = LoggerFactory.getLogger(PopupHostKeyVerifier.class);
 
-    private final SSHGui sshGui;
+    private SSHGui sshGui;
+    @Autowired
+    private Application application;
 
-    public PopupHostKeyVerifier(final SSHGui sshGui) {
+    public void init(final SSHGui sshGui) {
         this.sshGui = sshGui;
     }
 
@@ -47,9 +56,9 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
                                        final int port,
                                        final String serverHostKeyAlgorithm,
                                        final byte[] serverHostKey) throws Exception {
-        final int hostKeyResult = Tools.getApplication().getKnownHosts().verifyHostkey(hostname,
-                                                                                       serverHostKeyAlgorithm,
-                                                                                       serverHostKey);
+        final int hostKeyResult = application.getKnownHosts().verifyHostkey(hostname,
+                                                                            serverHostKeyAlgorithm,
+                                                                            serverHostKey);
         if (hostKeyResult == KnownHosts.HOSTKEY_IS_OK) {
             return true;
         }
@@ -74,9 +83,7 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
                                       final byte[] serverHostKey)
             throws IOException {
         final String hashedHostname = KnownHosts.createHashedHostname(hostname);
-        Tools.getApplication().getKnownHosts().addHostkey(new String[]{hashedHostname},
-                                                          serverHostKeyAlgorithm,
-                                                          serverHostKey);
+        application.getKnownHosts().addHostkey(new String[]{hashedHostname}, serverHostKeyAlgorithm, serverHostKey);
         /* Also try to add the key to a known_host file */
         /* It does this only in Linux.
          * TODO: do this also for other OSes, when I find out the
@@ -86,7 +93,7 @@ public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
             LOG.debug("verifyServerHostKey: not using known_hosts" + " file, because this is Windows.");
         } else {
             try {
-                KnownHosts.addHostkeyToFile(new File(Tools.getApplication().getKnownHostPath()),
+                KnownHosts.addHostkeyToFile(new File(application.getKnownHostPath()),
                                             new String[]{hashedHostname},
                                             serverHostKeyAlgorithm,
                                             serverHostKey);

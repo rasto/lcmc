@@ -35,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.AppContext;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.StringValue;
@@ -75,6 +74,10 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private DrbdAvailFiles drbdAvailFilesDialog;
     @Autowired
     private Provider<CheckInstallation> checkInstallationFactory;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     protected final void availDrbdVersions() {
         /* get drbd available versions,
@@ -110,7 +113,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
     /** Checks the available distributions. */
     protected final void availDistributions() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 drbdKernelDirWidget.setEnabled(false);
@@ -126,7 +129,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                         answer = NO_MATCH_STRING + '\n' + answer;
                         final String[] items = answer.split(NEWLINE);
                         drbdDistItems = Arrays.asList(items);
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 drbdDistributionWidget.reloadComboBox(
@@ -157,7 +160,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     protected final void availKernels() {
         final String distVersion = getHost().getDistributionVersion();
         if (drbdDistItems == null || !drbdDistItems.contains(distVersion)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     drbdKernelDirWidget.reloadComboBox(null, new Value[]{new StringValue(NO_MATCH_STRING)});
@@ -175,7 +178,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 answer = NO_MATCH_STRING + '\n' + answer;
                                 final String[] items = answer.split(NEWLINE);
                                 drbdKernelDirItems = Arrays.asList(items);
-                                Tools.invokeLater(new Runnable() {
+                                application.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         drbdKernelDirWidget.reloadComboBox(
@@ -206,7 +209,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             || arch == null
             || !drbdDistItems.contains(getHost().getDistributionVersion())
             || !drbdKernelDirItems.contains(kernelVersion)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     drbdArchWidget.reloadComboBox(null, new Value[]{new StringValue(NO_MATCH_STRING)});
@@ -225,7 +228,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                         answer = NO_MATCH_STRING + '\n' + answer;
                         final String[] items = answer.split(NEWLINE);
                         drbdArchItems = Arrays.asList(items);
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 drbdArchWidget.reloadComboBox(new StringValue(arch), StringValue.getValues(items));
@@ -302,7 +305,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
             answerPaneSetText(Tools.getString("Dialog.Host.DrbdLinbitAvailPackages.AvailVersions")
                                               + " "
                                               + Tools.join(", ", versions));
-            if (Tools.getApplication().getAutoOptionHost("drbdinst") != null) {
+            if (application.getAutoOptionHost("drbdinst") != null) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -350,7 +353,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
         pane.setMaximumSize(new Dimension(maxX, CHOICE_BOX_HEIGHT));
 
         /* combo boxes */
-        drbdDistributionWidget = WidgetFactory.createInstance(
+        drbdDistributionWidget = widgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
                                        Widget.NO_ITEMS,
@@ -362,7 +365,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
         drbdDistributionWidget.setEnabled(false);
         pane.add(drbdDistributionWidget.getComponent());
-        drbdKernelDirWidget = WidgetFactory.createInstance(
+        drbdKernelDirWidget = widgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
                                        Widget.NO_ITEMS,
@@ -374,7 +377,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
 
         drbdKernelDirWidget.setEnabled(false);
         pane.add(drbdKernelDirWidget.getComponent());
-        drbdArchWidget = WidgetFactory.createInstance(
+        drbdArchWidget = widgetFactory.createInstance(
                                        Widget.Type.COMBOBOX,
                                        Widget.NO_DEFAULT,
                                        Widget.NO_ITEMS,

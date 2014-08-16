@@ -28,12 +28,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import javax.swing.*;
 
 import lcmc.LCMC;
-import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.dialog.BugReport;
@@ -145,14 +142,14 @@ public final class Logger {
         final String msg0 = ERROR_STRING + msg;
         System.out.println(msg0);
         LoggerFactory.LOG_BUFFER.add(msg0);
-        Tools.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(
-                            LCMC.MAIN_FRAME,
-                            new JScrollPane(new JTextArea(msg, 20, 60)),
-                            Tools.getString("Error.Title"),
-                            JOptionPane.ERROR_MESSAGE);
+                        LCMC.MAIN_FRAME,
+                        new JScrollPane(new JTextArea(msg, 20, 60)),
+                        Tools.getString("Error.Title"),
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -300,9 +297,9 @@ public final class Logger {
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                final BugReport br = new BugReport(BugReport.UNKNOWN_CLUSTER,
-                                                   errorString.toString());
-                br.showDialog();
+                final BugReport bugReport = new BugReport();
+                bugReport.init(BugReport.UNKNOWN_CLUSTER, errorString.toString());
+                bugReport.showDialog();
             }
         });
         t.start();

@@ -20,15 +20,6 @@
 
 package lcmc.model;
 
-import lcmc.gui.Browser;
-import lcmc.gui.GUIData;
-import lcmc.gui.HostBrowser;
-import lcmc.gui.TerminalPanel;
-import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.model.drbd.DrbdHost;
-import lcmc.model.drbd.DrbdXml;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.Ssh;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,21 +28,11 @@ import javax.inject.Provider;
 @Component
 public class HostFactory {
     @Autowired
-    private Provider<HostBrowser> hostBrowserProvider;
-    @Autowired
-    private Provider<TerminalPanel> terminalPanelProvider;
-    @Autowired
-    private GUIData guiData;
-    @Autowired
-    private Provider<Ssh> sshProvider;
-    @Autowired
-    private Provider<DrbdXml> drbdXmlProvider;
+    private Provider<Host> hostProvider;
 
     public Host createInstance() {
-        final TerminalPanel terminalPanel = terminalPanelProvider.get();
-        final HostBrowser hostBrowser = hostBrowserProvider.get();
-        final Host host = new Host(guiData, sshProvider.get(), new DrbdHost(), terminalPanel, drbdXmlProvider);
-        host.setBrowser(hostBrowser);
+        final Host host = hostProvider.get();
+        host.init();
         return host;
     }
 

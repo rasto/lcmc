@@ -22,26 +22,31 @@ package lcmc.gui.resources.crm;
 
 import java.util.Arrays;
 import java.util.List;
+
+import lcmc.model.AccessMode;
 import lcmc.model.Host;
-import lcmc.model.resources.Service;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.swing.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class PcmkMultiSelectionMenuTest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private PcmkMultiSelectionInfo pcmkMultiSelectionInfoStub;
     @Mock
@@ -49,12 +54,14 @@ public class PcmkMultiSelectionMenuTest {
     @Mock
     private ServiceInfo serviceInfoStub;
     @Mock
-    private Service serviceStub;
-    @Mock
     private HostInfo hostInfoStub;
     @Mock
     private Host hostStub;
-
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
     private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
 
     @Before
@@ -62,18 +69,36 @@ public class PcmkMultiSelectionMenuTest {
         final List<Info> selectedInfos = Arrays.asList(serviceInfoStub, hostInfoStub);
         when(pcmkMultiSelectionInfoStub.getBrowser()).thenReturn(clusterBrowserStub);
         when(pcmkMultiSelectionInfoStub.getSelectedInfos()).thenReturn(selectedInfos);
-        when(clusterBrowserStub.getDCHost()).thenReturn(hostStub);
         when(clusterBrowserStub.getClusterHosts()).thenReturn(new Host[]{hostStub});
-        when(hostInfoStub.getHost()).thenReturn(hostStub);
-        when(serviceInfoStub.getService()).thenReturn(serviceStub);
+        when(menuFactoryStub.createMenuItem(anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuFactoryStub.createMenuItem(anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
 
-        pcmkMultiSelectionMenu = new PcmkMultiSelectionMenu(pcmkMultiSelectionInfoStub);
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.predicate((Predicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
-        final List<UpdatableItem> items = pcmkMultiSelectionMenu.getPulldownMenu();
+        final List<UpdatableItem> items = pcmkMultiSelectionMenu.getPulldownMenu(pcmkMultiSelectionInfoStub);
 
+        verify(menuItemStub, times(3)).predicate((Predicate) anyObject());
+        verify(menuItemStub, times(12)).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(10)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(17)).addAction((MenuAction) anyObject());
         assertEquals(17, items.size());
     }
 }

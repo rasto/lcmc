@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import lcmc.LCMC;
 import lcmc.configs.DistResource;
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
@@ -64,7 +65,8 @@ public final class Ssh {
     /** Callback when connection is failed or properly closed. */
     private ConnectionCallback connectionCallback;
     private Host host;
-    private volatile ConnectionThread connectionThread = null;
+    @Autowired
+    private ConnectionThread connectionThread;
     private ProgressBar progressBar = null;
 
     private final LastSuccessfulPassword lastSuccessfulPassword = new LastSuccessfulPassword();
@@ -73,9 +75,13 @@ public final class Ssh {
     private LocalPortForwarder localPortForwarder = null;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Authentication authentication;
 
     boolean reconnect() {
-        Tools.isNotSwingThread();
+        application.isNotSwingThread();
         mConnectionThreadLock.lock();
         if (connectionThread == null) {
             mConnectionThreadLock.unlock();
@@ -356,7 +362,7 @@ public final class Ssh {
 
     /** Installs gui-helper on the remote host. */
     public void installGuiHelper() {
-        if (!Tools.getApplication().getKeepHelper()) {
+        if (!application.getKeepHelper()) {
             final String fileName = "/help-progs/lcmc-gui-helper";
             final String file = Tools.getFile(fileName);
             if (file != null) {
@@ -481,7 +487,7 @@ public final class Ssh {
     }
 
     public void startVncPortForwarding(final String remoteHost, final int remotePort) throws IOException {
-        final int localPort = remotePort + Tools.getApplication().getVncPortOffset();
+        final int localPort = remotePort + application.getVncPortOffset();
         try {
             localPortForwarder = connectionThread.getConnection().createLocalPortForwarder(localPort,
                                                                                            "127.0.0.1",
@@ -522,15 +528,9 @@ public final class Ssh {
 
     private void authenticateAndConnect() {
         host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
-        final Authentication authentication = new Authentication(lastSuccessfulPassword, host, sshGui);
-        final ConnectionThread ct = new ConnectionThread(host, sshGui, progressBar, connectionCallback, authentication);
-        mConnectionThreadLock.lock();
-        try {
-            connectionThread = ct;
-        } finally {
-            mConnectionThreadLock.unlock();
-        }
-        ct.start();
+        authentication.init(lastSuccessfulPassword, host, sshGui);
+        connectionThread.init(host, sshGui, progressBar, connectionCallback, authentication);
+        connectionThread.start();
     }
 
     private String buildScpCommand(final String remoteFilename, final boolean makeBackup, final String preCommand) {

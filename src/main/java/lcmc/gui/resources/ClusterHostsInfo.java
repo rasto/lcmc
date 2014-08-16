@@ -24,17 +24,28 @@ package lcmc.gui.resources;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.resources.crm.HostInfo;
 import lcmc.utilities.MyButton;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds the information hosts in this cluster.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ClusterHostsInfo extends CategoryInfo {
+    @Autowired
+    private WidgetFactory widgetFactory;
+
     @Override
     public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
@@ -49,7 +60,7 @@ public final class ClusterHostsInfo extends CategoryInfo {
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         for (final Host host : getBrowser().getClusterHosts()) {
-            final MyButton hostLabel = new MyButton(host.getName(), HostBrowser.HOST_ICON_LARGE);
+            final MyButton hostLabel = widgetFactory.createButton(host.getName(), HostBrowser.HOST_ICON_LARGE);
             hostLabel.setOpaque(true);
             rows.add(new Object[]{hostLabel,
                                   host.getBrowser().host.getDrbdInfoAboutInstallation(),

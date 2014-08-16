@@ -21,6 +21,8 @@
 package lcmc.utilities.ssh;
 
 import java.io.IOException;
+
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
@@ -28,28 +30,39 @@ import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
+
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ConnectionThread extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionThread.class);
-    private final String hostname;
-    private final SSHGui sshGui;
-    private final Host host;
-    private final ProgressBar progressBar;
+    private String hostname;
+    private SSHGui sshGui;
+    private Host host;
+    private ProgressBar progressBar;
     /** Callback when connection is failed or properly closed. */
-    private final ConnectionCallback connectionCallback;
-    private final Authentication authentication;
+    private ConnectionCallback connectionCallback;
+    private Authentication authentication;
 
     private SshConnection sshConnection = null;
 
     private volatile boolean connectionFailed;
     private volatile boolean connectionEstablished = false;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
-    ConnectionThread(final Host host,
-                     final SSHGui sshGui,
-                     final ProgressBar progressBar,
-                     final ConnectionCallback connectionCallback,
-                     final Authentication authentication) {
-        super();
+    void init(final Host host,
+              final SSHGui sshGui,
+              final ProgressBar progressBar,
+              final ConnectionCallback connectionCallback,
+              final Authentication authentication) {
         this.host = host;
         this.sshGui = sshGui;
         this.progressBar = progressBar;
@@ -123,8 +136,7 @@ public class ConnectionThread extends Thread {
 
     private void connect(final SshConnection newSshConnection) throws IOException {
         LOG.debug2("run: verify host keys: " + hostname);
-        final String[] hostkeyAlgos = Tools.getApplication().getKnownHosts()
-                                           .getPreferredServerHostkeyAlgorithmOrder(hostname);
+        final String[] hostkeyAlgos = application.getKnownHosts().getPreferredServerHostkeyAlgorithmOrder(hostname);
         if (hostkeyAlgos != null) {
             newSshConnection.setServerHostKeyAlgorithms(hostkeyAlgos);
         }
@@ -135,7 +147,9 @@ public class ConnectionThread extends Thread {
             progressBar.start(timeout);
         }
         LOG.debug2("run: connect");
-        newSshConnection.connect(new PopupHostKeyVerifier(sshGui), connectTimeout, kexTimeout);
+        final PopupHostKeyVerifier popupHostKeyVerifier = popupHostKeyVerifierProvider.get();
+        popupHostKeyVerifier.init(sshGui);
+        newSshConnection.connect(popupHostKeyVerifier, connectTimeout, kexTimeout);
     }
 
     private void handleFailedConnection(final String message) {
@@ -176,7 +190,7 @@ public class ConnectionThread extends Thread {
         sshConnection = newSshConnection;
         connectionEstablished = true;
         host.setConnected();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 host.getTerminalPanel().nextCommand();

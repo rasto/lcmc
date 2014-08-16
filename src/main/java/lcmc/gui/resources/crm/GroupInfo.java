@@ -78,7 +78,7 @@ public class GroupInfo extends ServiceInfo {
     @Autowired @Qualifier("serviceInfo")
     private Provider<ServiceInfo> serviceInfoProvider;
     @Autowired
-    private Provider<FilesystemInfo> filesystemInfoProvider;
+    private Provider<FilesystemRaInfo> filesystemInfoProvider;
     @Autowired
     private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
     @Autowired
@@ -87,6 +87,8 @@ public class GroupInfo extends ServiceInfo {
     private Provider<IPaddrInfo> ipaddrInfoProvider;
     @Autowired
     private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
+    @Autowired
+    private Application application;
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);
@@ -99,7 +101,7 @@ public class GroupInfo extends ServiceInfo {
                     final Application.RunMode runMode) {
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     final MyButton ab = getApplyButton();
@@ -147,14 +149,14 @@ public class GroupInfo extends ServiceInfo {
             if (gsi == null) {
                 continue;
             }
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     gsi.getInfoPanel();
                 }
             });
         }
-        Tools.waitForSwing();
+        application.waitForSwing();
         for (final String resId : newOrder) {
             final ServiceInfo gsi = getBrowser().getServiceInfoFromCRMId(resId);
             if (gsi == null) {
@@ -226,7 +228,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -238,7 +240,7 @@ public class GroupInfo extends ServiceInfo {
         waitForInfoPanel();
         final String[] params = getParametersFromXML();
         if (Application.isLive(runMode)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setToolTipText("");
@@ -406,7 +408,7 @@ public class GroupInfo extends ServiceInfo {
         } finally {
             mGroupServiceWriteLock.unlock();
         }
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 gn.add(newServiceNode);
@@ -563,7 +565,7 @@ public class GroupInfo extends ServiceInfo {
 
         desc  = desc.replaceAll("@GROUP@", '\'' + Matcher.quoteReplacement(toString()) + '\'');
         desc  = desc.replaceAll("@SERVICES@", Matcher.quoteReplacement(services.toString()));
-        if (Tools.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveGroup.Title"),
+        if (application.confirmDialog(Tools.getString("ClusterBrowser.confirmRemoveGroup.Title"),
                                 desc,
                                 Tools.getString("ClusterBrowser.confirmRemoveGroup.Yes"),
                                 Tools.getString("ClusterBrowser.confirmRemoveGroup.No"))) {
@@ -897,7 +899,7 @@ public class GroupInfo extends ServiceInfo {
     @Override
     public void updateMenus(final Point2D pos) {
         super.updateMenus(pos);
-        if (!Tools.getApplication().isSlow()) {
+        if (!application.isSlow()) {
             for (final ServiceInfo child : getGroupServices()) {
                 child.updateMenus(pos);
             }

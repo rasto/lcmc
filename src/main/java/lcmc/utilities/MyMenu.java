@@ -22,7 +22,6 @@
 
 package lcmc.utilities;
 
-import java.awt.Component;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,23 +30,43 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This is a menu object that holds MyMenuItems.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class MyMenu extends JMenu implements UpdatableItem {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
     /** Access Type for this component to become enabled. */
-    private final AccessMode enableAccessMode;
+    private AccessMode enableAccessMode;
+    @Autowired
+    private Application application;
 
-    /** Prepares a new {@code MyMenu} object. */
-    public MyMenu(final String text,
-                  final AccessMode enableAccessMode,
-                  final AccessMode visibleAccessMode) {
-        super(text);
+    private EnablePredicate enablePredicate = new EnablePredicate() {
+        @Override
+        public String check() {
+            return null;
+        }
+    };
+
+    private Runnable update = new Runnable() {
+        @Override
+        public void run() {
+            updateMenuComponents();
+            processAccessMode();
+        }
+    };
+
+    void init(final String text, final AccessMode enableAccessMode, final AccessMode visibleAccessMode) {
+        super.setText(text);
         this.enableAccessMode = enableAccessMode;
         setOpaque(false);
         setEnabled(false);
@@ -60,33 +79,9 @@ public class MyMenu extends JMenu implements UpdatableItem {
     }
 
     /** Gets the position. */
-    protected final Point2D getPos() {
+    public final Point2D getPos() {
         return pos;
     }
-
-    /** Predicate that can be used, but it is not. */
-    boolean predicate() {
-        return true;
-    }
-
-    /**
-     * Returns whether the item should be enabled or not.
-     * null if it should be enabled or some string that can be used as
-     * tooltip if it should be disabled.
-     */
-    public String enablePredicate() {
-        return null;
-    }
-
-    //@Override
-    //public void update() {
-    //    Tools.invokeAndWait(new Runnable() {
-    //        @Override
-    //        public void run() {
-    //            updateAndWait();
-    //        }
-    //    });
-    //}
 
     /**
      * This function is usually overriden and is called when the menu and its
@@ -94,23 +89,26 @@ public class MyMenu extends JMenu implements UpdatableItem {
      */
     @Override
     public void updateAndWait() {
-        final Collection<Component> copy = new ArrayList<Component>();
-        for (final Component m : getMenuComponents()) {
+        update.run();
+    }
+
+    public void updateMenuComponents() {
+        final Collection<java.awt.Component> copy = new ArrayList<java.awt.Component>();
+        for (final java.awt.Component m : getMenuComponents()) {
             copy.add(m);
         }
-        for (final Component m : copy) {
+        for (final java.awt.Component m : copy) {
             if (m instanceof UpdatableItem) {
                 ((UpdatableItem) m).updateAndWait();
             }
         }
-        processAccessMode();
     }
 
     /** Sets this item enabled and visible according to its access type. */
-    private void processAccessMode() {
+    public void processAccessMode() {
         final boolean accessible =
-                   Tools.getApplication().isAccessible(enableAccessMode);
-        final String disableTooltip = enablePredicate();
+                   application.isAccessible(enableAccessMode);
+        final String disableTooltip = enablePredicate.check();
         setEnabled(disableTooltip == null && accessible);
         if (isVisible()) {
             if (!accessible && enableAccessMode.getAccessType()
@@ -139,7 +137,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
     /** Cleanup. */
     @Override
     public final void cleanup() {
-        for (final Component m : getMenuComponents()) {
+        for (final java.awt.Component m : getMenuComponents()) {
             if (m instanceof UpdatableItem) {
                 ((UpdatableItem) m).cleanup();
             } else if (m instanceof JScrollPane) {
@@ -160,5 +158,14 @@ public class MyMenu extends JMenu implements UpdatableItem {
             }
         }
         super.removeAll();
+    }
+
+    public MyMenu enablePredicate(final EnablePredicate enablePredicate) {
+        this.enablePredicate = enablePredicate;
+        return this;
+    }
+
+    public void onUpdate(final Runnable update) {
+        this.update = update;
     }
 }

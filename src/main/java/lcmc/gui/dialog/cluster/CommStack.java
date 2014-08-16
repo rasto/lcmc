@@ -64,6 +64,10 @@ final class CommStack extends DialogCluster {
     private HbConfig hbConfigDialog;
     @Autowired
     private CoroConfig coroConfigDialog;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     @Override
     public WizardDialog nextDialog() {
@@ -74,7 +78,7 @@ final class CommStack extends DialogCluster {
         } else {
             configDialog = coroConfigDialog;
         }
-        Tools.getApplication().setLastInstalledClusterStack(chosenStack);
+        application.setLastInstalledClusterStack(chosenStack);
         configDialog.init(this, getCluster());
         return configDialog;
     }
@@ -150,7 +154,7 @@ final class CommStack extends DialogCluster {
         final boolean ais = aisIsPossible;
         final boolean hb = hbIsPossible;
         if (ais || hb) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (ais) {
@@ -164,14 +168,14 @@ final class CommStack extends DialogCluster {
         }
         enableComponents();
         if (ais || hb) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     buttonClass(nextButton()).setEnabled(true);
                     makeDefaultAndRequestFocus(buttonClass(nextButton()));
                 }
             });
-            if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+            if (!application.getAutoClusters().isEmpty()) {
                 Tools.sleep(1000);
                 pressNextButton();
             }
@@ -225,12 +229,12 @@ final class CommStack extends DialogCluster {
         } else if (aisIsRunning > hbIsRunning) {
             defaultValue = Application.COROSYNC_NAME;
         } else {
-            defaultValue = Tools.getApplication().getLastInstalledClusterStack();
+            defaultValue = application.getLastInstalledClusterStack();
         }
         if (defaultValue == null) {
             defaultValue = Application.COROSYNC_NAME;
         }
-        chooseStackCombo = WidgetFactory.createInstance(
+        chooseStackCombo = widgetFactory.createInstance(
                                           Widget.Type.RADIOGROUP,
                                           new StringValue(defaultValue),
                                           new Value[]{new StringValue(Application.HEARTBEAT_NAME),

@@ -43,6 +43,7 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.Hosts;
 import lcmc.gui.dialog.WizardDialog;
@@ -72,6 +73,10 @@ final class ClusterHosts extends DialogCluster {
     private Connect connectDialog;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Hosts allHosts;
 
     /** It is executed after the dialog is applied. */
     @Override
@@ -107,7 +112,7 @@ final class ClusterHosts extends DialogCluster {
 
     /** Checks whether at least two hosts are selected for the cluster. */
     protected void checkCheckBoxes() {
-        Tools.getApplication().getAllHosts().removeHostsFromCluster(getCluster());
+        allHosts.removeHostsFromCluster(getCluster());
         int selected = 0;
         for (final JCheckBox button : checkBoxToHost.keySet()) {
             if (button.isSelected()) {
@@ -116,7 +121,7 @@ final class ClusterHosts extends DialogCluster {
         }
         boolean enable = true;
         final Collection<String> hostNames = new ArrayList<String>();
-        if (selected < 1 || (selected == 1 && !Tools.getApplication().isOneHostCluster())) {
+        if (selected < 1 || (selected == 1 && !application.isOneHostCluster())) {
             enable = false;
         } else {
             /* check if some of the hosts are the same. It will not work all
@@ -134,13 +139,13 @@ final class ClusterHosts extends DialogCluster {
             }
         }
         final boolean enableButton = enable;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enableButton);
             }
         });
-        if (!Tools.getApplication().getAutoClusters().isEmpty()) {
+        if (!application.getAutoClusters().isEmpty()) {
             Tools.sleep(1000);
             pressNextButton();
         }
@@ -179,7 +184,7 @@ final class ClusterHosts extends DialogCluster {
     protected JComponent getInputPane() {
         /* Hosts */
         final ScrollableFlowPanel p1 = new ScrollableFlowPanel(new FlowLayout(FlowLayout.LEADING, 1, 1));
-        final Hosts hosts = Tools.getApplication().getAllHosts();
+        final Hosts hosts = allHosts;
 
         final ItemListener chListener = new ItemListener() {
                 @Override

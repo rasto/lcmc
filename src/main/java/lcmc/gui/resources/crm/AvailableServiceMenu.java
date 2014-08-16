@@ -25,9 +25,7 @@ import java.util.List;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -36,43 +34,39 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class AvailableServiceMenu {
-    private final AvailableServiceInfo availableServiceInfo;
-    
-    public AvailableServiceMenu(final AvailableServiceInfo availableServiceInfo) {
-        this.availableServiceInfo = availableServiceInfo;
-    }
+    private AvailableServiceInfo availableServiceInfo;
+    @Autowired
+    private MenuFactory menuFactory;
 
-    public List<UpdatableItem> getPulldownMenu() {
+    public List<UpdatableItem> getPulldownMenu(final AvailableServiceInfo availableServiceInfo) {
+        this.availableServiceInfo = availableServiceInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
-        final UpdatableItem addServiceMenu = new MyMenuItem(
+        final UpdatableItem addServiceMenu = menuFactory.createMenuItem(
                         Tools.getString("ClusterBrowser.AddServiceToCluster"),
                         null,
                         null,
                         new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false)) {
-
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public String enablePredicate() {
-                if (availableServiceInfo.getBrowser().crmStatusFailed()) {
-                    return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
-                }
-                return null;
-            }
-
-            @Override
-            public void action() {
-                availableServiceInfo.hidePopup();
-                final ServicesInfo si = availableServiceInfo.getBrowser().getServicesInfo();
-                si.addServicePanel(availableServiceInfo.getResourceAgent(),
-                                   null, /* pos */
-                                   true,
-                                   null,
-                                   null,
-                                   Application.RunMode.LIVE);
-            }
-        };
+                        new AccessMode(Application.AccessType.OP, false))
+            .enablePredicate(new EnablePredicate() {
+                        @Override
+                        public String check() {
+                            if (availableServiceInfo.getBrowser().crmStatusFailed()) {
+                                return ClusterBrowser.UNKNOWN_CLUSTER_STATUS_STRING;
+                            }
+                            return null;
+                        }})
+            .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        availableServiceInfo.hidePopup();
+                        final ServicesInfo si = availableServiceInfo.getBrowser().getServicesInfo();
+                        si.addServicePanel(availableServiceInfo.getResourceAgent(),
+                                           null, /* pos */
+                                           true,
+                                           null,
+                                           null,
+                                           Application.RunMode.LIVE);
+                    }});
         items.add(addServiceMenu);
         return items;
     }

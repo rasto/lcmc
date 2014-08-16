@@ -50,6 +50,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -65,6 +66,10 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
                         LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     /** All selected objects. */
     private List<Info> selectedInfos;
+    @Autowired
+    private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
+    @Autowired
+    private Application application;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {
         super.init("selection", browser);
@@ -90,9 +95,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
     }
     @Override
     public List<UpdatableItem> createPopup() {
-        PcmkMultiSelectionMenu pcmkMultiSelectionMenu =
-                                             new PcmkMultiSelectionMenu(this);
-        return pcmkMultiSelectionMenu.getPulldownMenu();
+        return pcmkMultiSelectionMenu.getPulldownMenu(this);
     }
 
     @Override
@@ -197,7 +200,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
 
     @Override
     public JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         final boolean abExisted = getApplyButton() != null;
         final ButtonCallback buttonCallback = new ButtonCallback() {
             private volatile boolean mouseStillOver = false;
@@ -317,7 +320,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */
@@ -330,9 +333,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth() + application.getServiceFieldWidth() + 4));
         newPanel.add(new JScrollPane(mainPanel));
         /* if id textfield was changed and this id is not used,
          * enable apply button */

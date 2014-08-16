@@ -45,11 +45,17 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual filesystem.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class FilesystemInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {FilesystemData.TYPE,
@@ -106,23 +112,11 @@ public final class FilesystemInfo extends HardwareInfo {
         PREFERRED_MAP.put(FilesystemData.TARGET_DIR, new StringValue("/"));
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Filesystem");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addFilesystemPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+
     /** Source file combo box, so that it can be disabled, depending on type. */
     private final Map<String, Widget> sourceDirWi =
                                             new HashMap<String, Widget>();
@@ -130,14 +124,12 @@ public final class FilesystemInfo extends HardwareInfo {
     private final Map<String, Widget> sourceNameWi =
                                             new HashMap<String, Widget>();
     /** Choices for source directories. */
-    private final Value[] sourceDirs;
+    private Value[] sourceDirs;
     /** Table panel. */
     private JComponent tablePanel = null;
 
-    /** Creates the FilesystemInfo object. */
-    FilesystemInfo(final String name, final Browser browser,
-                      final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+    void init(final String name, final Browser browser, final DomainInfo domainInfo) {
+        super.init(name, browser, domainInfo);
         final List<Host> hosts = getVMSVirtualDomainInfo().getDefinedOnHosts();
         final Set<Value> sds = new LinkedHashSet<Value>();
         sds.add(new StringValue());
@@ -154,9 +146,9 @@ public final class FilesystemInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Filesystem",
                                    DomainInfo.FILESYSTEM_TABLE,
-                                   getNewBtn(getVMSVirtualDomainInfo()));
+                                   getVMSVirtualDomainInfo().getNewFilesystemBtn());
         if (getResource().isNew()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -279,7 +271,7 @@ public final class FilesystemInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -314,7 +306,7 @@ public final class FilesystemInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -342,7 +334,7 @@ public final class FilesystemInfo extends HardwareInfo {
         getBrowser().reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -399,7 +391,7 @@ public final class FilesystemInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (FilesystemData.TYPE.equals(param)) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     for (final Map.Entry<String, Widget> entry : sourceDirWi.entrySet()) {
@@ -527,11 +519,11 @@ public final class FilesystemInfo extends HardwareInfo {
     protected Widget createWidget(final String param, final String prefix, final int width) {
         if (FilesystemData.SOURCE_DIR.equals(param)) {
             final Value sourceDir = getParamSaved(FilesystemData.SOURCE_DIR);
-            final MyButton fileChooserBtn = new MyButton("Browse...");
-            fileChooserBtn.miniButton();
+            final MyButton fileChooserBtn = widgetFactory.createButton("Browse...");
+            application.makeMiniButton(fileChooserBtn);
             final String regexp = ".*[^/]?$";
-            final Widget paramWi = WidgetFactory.createInstance(
-                getFieldType(param),
+            final Widget paramWi = widgetFactory.createInstance(
+                                     getFieldType(param),
                                      sourceDir,
                                      getParamPossibleChoices(param),
                                      regexp,
@@ -574,8 +566,8 @@ public final class FilesystemInfo extends HardwareInfo {
             return paramWi;
         } else if (FilesystemData.SOURCE_NAME.equals(param)) {
             final Value sourceName = getParamSaved(FilesystemData.SOURCE_NAME);
-            final Widget paramWi = WidgetFactory.createInstance(
-                getFieldType(param),
+            final Widget paramWi = widgetFactory.createInstance(
+                                    getFieldType(param),
                                     sourceName,
                                     getParamPossibleChoices(param),
                                     Widget.NO_REGEXP,

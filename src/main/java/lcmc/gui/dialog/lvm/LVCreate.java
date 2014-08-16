@@ -57,30 +57,39 @@ import lcmc.utilities.LVM;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /** Create LV dialog. */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class LVCreate extends LV {
-
     private static final String LV_CREATE_DESCRIPTION = "Create a logical volume in an existing volume group.";
     private static final int LV_CREATE_TIMEOUT = 5000;
     private final Collection<Host> selectedHosts = new LinkedHashSet<Host>();
-    private final MyButton createButton = new MyButton("Create");
     private Widget lvNameWidget;
     private Widget lvSizeWidget;
     private Widget maxSizeWidget;
-    private final String volumeGroup;
+    private String volumeGroup;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<BlockDevice>();
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private final MyButton createButton = widgetFactory.createButton("Create");
 
-    public LVCreate(final Host host, final String volumeGroup, final BlockDevice selectedBlockDevice) {
-        super(null);
+    public void init(final Host host, final String volumeGroup, final BlockDevice selectedBlockDevice) {
+        super.init(null);
         selectedHosts.add(host);
         this.volumeGroup = volumeGroup;
         selectedBlockDevices.add(selectedBlockDevice);
     }
 
-    public LVCreate(final Iterable<BlockDevInfo> sbdis, final String volumeGroup) {
-        super(null);
+    public void init(final Iterable<BlockDevInfo> sbdis, final String volumeGroup) {
+        super.init(null);
         this.volumeGroup = volumeGroup;
         for (final BlockDevInfo bdi : sbdis) {
             selectedHosts.add(bdi.getHost());
@@ -121,7 +130,7 @@ public final class LVCreate extends LV {
     }
 
     private void enableCreateButton(boolean enable) {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (enable) {
             final String maxBlockSize = getMaxBlockSize(getSelectedHostCbs());
             final long maxSize = Long.parseLong(maxBlockSize);
@@ -186,7 +195,7 @@ public final class LVCreate extends LV {
             }
             i++;
         }
-        lvNameWidget = WidgetFactory.createInstance(
+        lvNameWidget = widgetFactory.createInstance(
                                       Widget.Type.TEXTFIELD,
                                       new StringValue(defaultName),
                                       Widget.NO_ITEMS,
@@ -210,7 +219,9 @@ public final class LVCreate extends LV {
         final String newBlockSize = Long.toString(Long.parseLong(maxBlockSize) / 2);
         final JLabel sizeLabel = new JLabel("New Size");
 
-        lvSizeWidget = new TextfieldWithUnit(VmsXml.convertKilobytes(newBlockSize),
+        lvSizeWidget = widgetFactory.createInstance(
+                                       Widget.Type.TEXTFIELDWITHUNIT,
+                                       VmsXml.convertKilobytes(newBlockSize),
                                        getUnits(),
                                        Widget.NO_REGEXP,
                                        250,
@@ -225,7 +236,7 @@ public final class LVCreate extends LV {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeAndWait(new Runnable() {
+                        application.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 enableCreateButton(false);
@@ -264,7 +275,8 @@ public final class LVCreate extends LV {
         /* max size */
         final JLabel maxSizeLabel = new JLabel("Max Size");
         maxSizeLabel.setEnabled(false);
-        maxSizeWidget = new TextfieldWithUnit(
+        maxSizeWidget = widgetFactory.createInstance(
+                                      Widget.Type.TEXTFIELDWITHUNIT,
                                       VmsXml.convertKilobytes(maxBlockSize),
                                       getUnits(),
                                       Widget.NO_REGEXP,

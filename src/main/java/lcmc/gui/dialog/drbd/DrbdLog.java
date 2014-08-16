@@ -34,10 +34,10 @@ import lcmc.gui.dialog.HostLogs;
  */
 public final class DrbdLog extends HostLogs {
     /** Drbd device name. */
-    private final String drbdDeviceName;
+    private String drbdDeviceName;
 
-    public DrbdLog(final Host host, final String device) {
-        super(host);
+    public void init(final Host host, final String device) {
+        super.init(host);
         drbdDeviceName = device.substring(device.lastIndexOf('/') + 1);
     }
 

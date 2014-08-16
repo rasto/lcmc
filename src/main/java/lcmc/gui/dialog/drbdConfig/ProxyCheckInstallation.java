@@ -30,6 +30,8 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
@@ -69,8 +71,9 @@ final class ProxyCheckInstallation extends DialogHost {
     private final JLabel checkingProxyLabel = new JLabel(": "
                                                          + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
 
-    private final MyButton installProxyButton =
-                                         new MyButton(Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private MyButton installProxyButton;
     private Widget proxyInstallationMethodWidget;
 
     private final JLabel proxyCheckingIcon = new JLabel(CHECKING_ICON);
@@ -79,6 +82,8 @@ final class ProxyCheckInstallation extends DialogHost {
     private WizardDialog origDialog;
     @Autowired
     private ProxyInst proxyInstDialog;
+    @Autowired
+    private Application application;
 
     void init(final WizardDialog previousDialog,
               final Host proxyHost,
@@ -86,6 +91,7 @@ final class ProxyCheckInstallation extends DialogHost {
               final WizardDialog origDialog,
               final DrbdInstallation drbdInstallation) {
         super.init(previousDialog, proxyHost, drbdInstallation);
+        installProxyButton = widgetFactory.createButton(Tools.getString("ProxyCheckInstallation.ProxyInstallButton"));
         this.proxyHost = proxyHost;
         this.volumeInfo = volumeInfo;
         this.origDialog = origDialog;
@@ -101,7 +107,7 @@ final class ProxyCheckInstallation extends DialogHost {
     protected void initDialogAfterVisible() {
         nextDialogObject = null;
         final ProxyCheckInstallation thisClass = this;
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 installProxyButton.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
@@ -117,7 +123,7 @@ final class ProxyCheckInstallation extends DialogHost {
                     nextDialogObject = proxyInstDialog;
                     final InstallMethods im = (InstallMethods) proxyInstallationMethodWidget.getValue();
                     getDrbdInstallation().setProxyInstallMethodIndex(im.getIndex());
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             buttonClass(nextButton()).pressButton();
@@ -144,7 +150,7 @@ final class ProxyCheckInstallation extends DialogHost {
 
     void checkProxyInstallation(final String ans) {
         if (ans != null && ans.isEmpty() || "\n".equals(ans)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingProxyLabel.setText(": " + Tools.getString("ProxyCheckInstallation.ProxyNotInstalled"));
@@ -159,7 +165,7 @@ final class ProxyCheckInstallation extends DialogHost {
             progressBarDone();
             printErrorAndRetry(Tools.getString("Dialog.Host.CheckInstallation.SomeFailed"));
         } else {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     checkingProxyLabel.setText(": " + ans.trim());
@@ -176,7 +182,7 @@ final class ProxyCheckInstallation extends DialogHost {
             });
             progressBarDone();
             enableComponents();
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     answerPaneSetText(Tools.getString("Dialog.Host.CheckInstallation.AllOk"));
@@ -223,7 +229,7 @@ final class ProxyCheckInstallation extends DialogHost {
         /* get proxy installation methods */
         proxyInstallationMethodWidget = getInstallationMethods(
                              PROXY_PREFIX,
-                             Tools.getApplication().isStagingPacemaker(),
+                             application.isStagingPacemaker(),
                              null, /* last installed method */
                              PROXY_AUTO_OPTION,
                              installProxyButton);

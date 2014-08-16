@@ -22,63 +22,69 @@ package lcmc.gui.resources.drbd;
 
 import java.util.Arrays;
 import java.util.List;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
-import lcmc.model.resources.BlockDevice;
+
+import lcmc.model.AccessMode;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
-import lcmc.testutils.annotation.type.GuiTest;
-import lcmc.utilities.Tools;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
+
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
+
 import org.mockito.runners.MockitoJUnitRunner;
 
-@Category(GuiTest.class)
+import javax.swing.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class MultiSelectionMenuITest {
-    static {
-        Tools.init();
-    }
-
     @Mock
     private MultiSelectionInfo multiSelectionInfoStub;
     @Mock
-    private Host hostStub;
-    @Mock
-    private DrbdInstallation drbdInstallationStub;
-    @Mock
     private ClusterBrowser browserStub;
-    @Mock
-    private BlockDevice blockDeviceStub;
 
     // can't use @Mock annotation, for these two, because the instanceof
     // wouldn't work in the SUT
     private final BlockDevInfo blockDevInfoStub = mock(BlockDevInfo.class);
     private final HostDrbdInfo hostDrbdInfoStub = mock(HostDrbdInfo.class);
-    
+
     private final List<Info> selectedInfos = Arrays.asList(blockDevInfoStub, hostDrbdInfoStub);
+    @Mock
+    private MyMenuItem menuItemStub;
+    @Mock
+    private MenuFactory menuFactoryStub;
+    @InjectMocks
     private MultiSelectionMenu multiSelectionMenu;
 
     @Before
     public void setUp() {
         when(multiSelectionInfoStub.getBrowser()).thenReturn(browserStub);
-        when(hostDrbdInfoStub.getHost()).thenReturn(hostStub);
-        when(blockDevInfoStub.getBlockDevice()).thenReturn(blockDeviceStub);
-
-        multiSelectionMenu = new MultiSelectionMenu();
+        when(menuFactoryStub.createMenuItem(
+                anyString(),
+                (ImageIcon) anyObject(),
+                anyString(),
+                (AccessMode) anyObject(),
+                (AccessMode) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.enablePredicate((EnablePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.visiblePredicate((VisiblePredicate) anyObject())).thenReturn(menuItemStub);
+        when(menuItemStub.addAction((MenuAction) anyObject())).thenReturn(menuItemStub);
     }
 
     @Test
     public void menuShouldHaveItems() {
         final List<UpdatableItem> items = multiSelectionMenu.getPulldownMenu(multiSelectionInfoStub, selectedInfos);
 
+        verify(menuItemStub, never()).predicate((Predicate) anyObject());
+        verify(menuItemStub, times(22)).visiblePredicate((VisiblePredicate) anyObject());
+        verify(menuItemStub, times(17)).enablePredicate((EnablePredicate) anyObject());
+        verify(menuItemStub, times(26)).addAction((MenuAction) anyObject());
         assertEquals(26, items.size());
     }
 }

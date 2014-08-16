@@ -23,12 +23,13 @@
 package lcmc;
 
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.gui.dialog.cluster.DialogCluster;
 import lcmc.gui.dialog.cluster.Name;
+import lcmc.model.Hosts;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -46,13 +47,18 @@ public final class AddClusterDialog {
     Name nameDialog;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Cluster cluster;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Hosts allHosts;
 
     /**
      * Must always be called from new thread.
      */
     public void showDialogs() {
         guiData.enableAddClusterButtons(false);
-        final Cluster cluster = new Cluster();
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
@@ -62,10 +68,10 @@ public final class AddClusterDialog {
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 guiData.removeSelectedClusterTab();
-                Tools.getApplication().getAllHosts().removeHostsFromCluster(cluster);
-                Tools.getApplication().removeClusterFromClusters(cluster);
+                allHosts.removeHostsFromCluster(cluster);
+                application.removeClusterFromClusters(cluster);
                 dialog.cancelDialog();
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         guiData.checkAddClusterButtons();
@@ -86,14 +92,14 @@ public final class AddClusterDialog {
             }
         }
         guiData.expandTerminalSplitPane(1);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 cluster.getClusterTab().addClusterView();
                 cluster.getClusterTab().requestFocus();
             }
         });
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 guiData.checkAddClusterButtons();

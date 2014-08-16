@@ -23,12 +23,9 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lcmc.model.AccessMode;
-import lcmc.model.crm.ResourceAgent;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.gui.Browser;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
@@ -45,6 +42,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class IPaddrInfo extends ServiceInfo {
+    @Autowired
+    private WidgetFactory widgetFactory;
+
     /**
      * Returns whether all the parameters are correct. If param is null,
      * all paremeters will be checked, otherwise only the param, but other
@@ -105,16 +105,14 @@ final class IPaddrInfo extends ServiceInfo {
                                     getBrowser().getNetworksNode().children());
 
             final String regexp = "^[\\d.*]*|Select\\.\\.\\.$";
-            paramWi = WidgetFactory.createInstance(
+            paramWi = widgetFactory.createInstance(
                                  Widget.Type.COMBOBOX,
                                  ip,
                                  networks,
                                  regexp,
                                  width,
                                  Widget.NO_ABBRV,
-                                 new AccessMode(
-                                           getAccessType(param),
-                                           isEnabledOnlyInAdvancedMode(param)),
+                                 new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
                                  Widget.NO_BUTTON);
 
             paramWi.setAlwaysEditable(true);

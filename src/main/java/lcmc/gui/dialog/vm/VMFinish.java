@@ -30,12 +30,15 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -47,6 +50,10 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class VMFinish extends VMConfig {
     private JComponent inputPane = null;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     @Override
     public WizardDialog nextDialog() {
@@ -72,7 +79,7 @@ final class VMFinish extends VMConfig {
     @Override
     protected void initDialogAfterVisible() {
         enableComponents();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(finishButton()).setEnabled(false);
@@ -89,7 +96,7 @@ final class VMFinish extends VMConfig {
         }
         final JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-        final MyButton createConfigBtn = new MyButton("Create Config");
+        final MyButton createConfigBtn = widgetFactory.createButton("Create Config");
         createConfigBtn.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Button"));
         createConfigBtn.addActionListener(new ActionListener() {
             @Override
@@ -97,14 +104,14 @@ final class VMFinish extends VMConfig {
                 final Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeAndWait(new Runnable() {
+                        application.invokeAndWait(new Runnable() {
                             @Override
                             public void run() {
                                 createConfigBtn.setEnabled(false);
                             }
                         });
                         domainInfo.apply(Application.RunMode.LIVE);
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 buttonClass(finishButton()).setEnabled(true);

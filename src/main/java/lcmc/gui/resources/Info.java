@@ -22,7 +22,6 @@
 package lcmc.gui.resources;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -66,6 +65,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
 import lcmc.gui.GUIData;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Value;
@@ -83,16 +83,21 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
  * etc. It provides methods to show this info and graphical view if
  * available.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Info implements Comparable<Info>, Value {
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Amount of frames per second. */
-    private static final float FPS = Tools.getApplication().getAnimFPS();
     public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(Tools.getDefault("Info.LogIcon"));
     /** Menu node of this object. */
     private DefaultMutableTreeNode node = null;
@@ -125,6 +130,8 @@ public class Info implements Comparable<Info>, Value {
                                                                 new HashMap<JTextComponent, AccessMode>();
     /** Hash from component to the enable access mode. */
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
+    @Autowired
+    private Application application;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -225,7 +232,7 @@ public class Info implements Comparable<Info>, Value {
      * than 100.
      */
     public final void incAnimationIndex() {
-        animationIndex += 3.0 * 20.0 / FPS;
+        animationIndex += 3.0 * 20.0 / application.getAnimFPS();
         if (animationIndex > 100) {
             animationIndex = 0;
         }
@@ -246,7 +253,7 @@ public class Info implements Comparable<Info>, Value {
             final String newInfo = getInfo();
             if (newInfo != null && !newInfo.equals(infoCache)) {
                 infoCache = newInfo;
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         ria.setText(newInfo);
@@ -281,14 +288,14 @@ public class Info implements Comparable<Info>, Value {
             panel.setBackground(Browser.PANEL_BACKGROUND);
             return panel;
         } else {
-            final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(12));
+            final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(12));
             resourceInfoArea = new JEditorPane(getInfoMimeType(), info);
             resourceInfoArea.setMinimumSize(new Dimension(
-                                                    Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                                                    Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                                                    application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                                    application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
             resourceInfoArea.setPreferredSize(new Dimension(
-                                                    Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                                                    Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                                                    application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                                    application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
             resourceInfoArea.setEditable(false);
             resourceInfoArea.setFont(f);
             resourceInfoArea.setBackground(Browser.PANEL_BACKGROUND);
@@ -370,7 +377,7 @@ public class Info implements Comparable<Info>, Value {
         // this fires an event in ViewPanel.
         final DefaultMutableTreeNode n = node;
         if (n != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().reloadAndWait(n, true);
@@ -406,7 +413,7 @@ public class Info implements Comparable<Info>, Value {
                 final JPopupMenu pm = getPopup();
                 if (pm != null) {
                     updateMenus(null);
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             if (!c.isShowing() || !c.isDisplayable()) {
@@ -441,7 +448,7 @@ public class Info implements Comparable<Info>, Value {
             mPopupLock.unlock();
         }
         if (popup0 != null) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     popup0.setVisible(false);
@@ -457,7 +464,7 @@ public class Info implements Comparable<Info>, Value {
     public final JPopupMenu getPopup() {
         mPopupLock.lock();
         try {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     if (popup == null) {
@@ -483,7 +490,7 @@ public class Info implements Comparable<Info>, Value {
         pm.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -492,7 +499,7 @@ public class Info implements Comparable<Info>, Value {
             }
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -523,14 +530,14 @@ public class Info implements Comparable<Info>, Value {
     protected final JToggleButton getActionsButton() {
         final JToggleButton b = new JToggleButton(Tools.getString("Browser.ActionsMenu"), Browser.ACTIONS_MENU_ICON);
         b.setToolTipText(Tools.getString("Browser.ActionsMenu"));
-        Tools.makeMiniButton(b);
+        application.makeMiniButton(b);
         b.addMouseListener(
             new MouseAdapter() {
                 @Override
                 public void mousePressed(final MouseEvent e) {
                     final JToggleButton source = (JToggleButton) (e.getSource());
                     if (source.isSelected()) {
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                         @Override
                             public void run() {
                                 b.setSelected(true);
@@ -543,7 +550,7 @@ public class Info implements Comparable<Info>, Value {
                                 final JPopupMenu pm = getPopup();
                                 if (pm != null) {
                                     updateMenus(null);
-                                    Tools.invokeLater(new Runnable() {
+                                    application.invokeLater(new Runnable() {
                                     @Override
                                         public void run() {
                                             showPopup(pm, b);
@@ -575,14 +582,14 @@ public class Info implements Comparable<Info>, Value {
 
     /** Update menus with positions and calles their update methods. */
     public void updateMenus(final Point2D pos) {
-        Tools.isNotSwingThread();
+        application.isNotSwingThread();
         mMenuListLock.lock();
         if (menuList == null) {
             mMenuListLock.unlock();
         } else {
             final Collection<UpdatableItem> menuListCopy = new ArrayList<UpdatableItem>(menuList);
             mMenuListLock.unlock();
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     for (final UpdatableItem i : menuListCopy) {
@@ -597,7 +604,7 @@ public class Info implements Comparable<Info>, Value {
             });
             for (final UpdatableItem i : menuListCopy) {
                 if (i instanceof MyMenu) {
-                    Tools.invokeAndWait(new Runnable() {
+                    application.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             i.updateAndWait();
@@ -646,7 +653,7 @@ public class Info implements Comparable<Info>, Value {
         if (bc == null) {
             return;
         }
-        ((Component) c).addMouseListener(new MouseListener() {
+        ((java.awt.Component) c).addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 /* do nothing */
@@ -654,7 +661,7 @@ public class Info implements Comparable<Info>, Value {
 
             @Override
             public void mouseEntered(final MouseEvent e) {
-                if (((Component) c).isShowing() && ((Component) c).isEnabled()) {
+                if (((java.awt.Component) c).isShowing() && ((java.awt.Component) c).isEnabled()) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -965,7 +972,7 @@ public class Info implements Comparable<Info>, Value {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
@@ -1023,7 +1030,7 @@ public class Info implements Comparable<Info>, Value {
 
     /** Remove node in tree menu. Call it from swing thread. */
     protected final void removeNodeAndWait() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         final DefaultMutableTreeNode n = node;
         node = null;
         if (n == null) {
@@ -1037,7 +1044,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     protected final void removeNode() {
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 removeNodeAndWait();
@@ -1061,11 +1068,11 @@ public class Info implements Comparable<Info>, Value {
     /** Process access lists. TODO: rename.*/
     public void updateAdvancedPanels() {
         for (final Map.Entry<JComponent, AccessMode> componentEntry : componentToEnableAccessMode.entrySet()) {
-            final boolean accessible = Tools.getApplication().isAccessible(componentEntry.getValue());
+            final boolean accessible = application.isAccessible(componentEntry.getValue());
             componentEntry.getKey().setEnabled(accessible);
         }
         for (final Map.Entry<JTextComponent, AccessMode> componentEntry : componentToEditAccessMode.entrySet()) {
-            final boolean accessible = Tools.getApplication().isAccessible(componentEntry.getValue());
+            final boolean accessible = application.isAccessible(componentEntry.getValue());
             componentEntry.getKey().setEditable(accessible);
         }
     }

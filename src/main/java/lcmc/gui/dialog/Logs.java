@@ -54,6 +54,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
+
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.ExecCallback;
@@ -62,16 +65,26 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an dialog with log files from many hosts.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 class Logs extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
     private final JTextPane logTextArea = new JTextPane();
     private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Lock mRefreshLock = new ReentrantLock();
     private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     /**
      * Command that gets the log. The command must be specified in the
@@ -129,7 +142,7 @@ class Logs extends ConfigDialog {
     }
 
     protected void enableAllComponents(final boolean enable) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Map.Entry<String, JCheckBox> checkBoxEntry : patternToCheckBoxMap.entrySet()) {
@@ -337,7 +350,7 @@ class Logs extends ConfigDialog {
     }
 
     protected MyButton getRefreshBtn() {
-        final MyButton refreshBtn = new MyButton(Tools.getString("Dialog.Logs.RefreshButton"));
+        final MyButton refreshBtn = widgetFactory.createButton(Tools.getString("Dialog.Logs.RefreshButton"));
         refreshBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

@@ -44,6 +44,7 @@ import lcmc.gui.widget.Check;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -60,6 +61,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                                           new LinkedHashSet<ConstraintPHInfo>();
     /** constraints lock. */
     private final Lock mConstraintPHLock = new ReentrantLock();
+    @Autowired
+    private Application application;
 
     void init(final Browser browser, final ConstraintPHInfo cphi) {
         super.init(browser);
@@ -104,12 +107,12 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
-        final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
+        final int height = application.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
                         c.getService().getCrmId(),
-                        ClusterBrowser.SERVICE_LABEL_WIDTH,
-                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        application.getServiceLabelWidth(),
+                        application.getServiceFieldWidth(),
                         height);
         final int rows = 1;
         SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */

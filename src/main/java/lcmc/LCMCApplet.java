@@ -28,6 +28,8 @@ package lcmc;
 
 import javax.swing.JApplet;
 import javax.swing.JFrame;
+
+import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -56,7 +58,8 @@ public final class LCMCApplet extends JApplet {
 
         LCMC.initApp(params);
 
-        if (Tools.getApplication().isEmbedApplet()) {
+        final Application application = AppContext.getBean(Application.class);
+        if (application.isEmbedApplet()) {
             LCMC.MAIN_FRAME = this;
             setJMenuBar(LCMC.getMenuBar());
             setContentPane(LCMC.getMainPanel());

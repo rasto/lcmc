@@ -44,6 +44,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.*;
 import lcmc.model.crm.ClusterStatus;
 import lcmc.model.crm.PtestData;
@@ -100,6 +101,10 @@ public class HostInfo extends Info {
     private volatile boolean crmShowInProgress = true;
     @Autowired
     private HostMenu hostMenu;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -140,28 +145,29 @@ public class HostInfo extends Info {
         if (getBrowser().getClusterBrowser() == null) {
             return new JPanel();
         }
-        final Font f = new Font("Monospaced", Font.PLAIN, Tools.getApplication().scaled(12));
+        final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(12));
         crmShowInProgress = true;
         final JTextArea ta = new JTextArea(Tools.getString("HostInfo.crmShellLoading"));
         ta.setEditable(false);
         ta.setFont(f);
 
         final MyButton crmConfigureCommitButton =
-                                new MyButton(Tools.getString("HostInfo.crmShellCommitButton"), Browser.APPLY_ICON);
+                      widgetFactory.createButton(Tools.getString("HostInfo.crmShellCommitButton"), Browser.APPLY_ICON);
         registerComponentEnableAccessMode(crmConfigureCommitButton,
                                           new AccessMode(Application.AccessType.ADMIN, false));
-        final MyButton hostInfoButton = new MyButton(Tools.getString("HostInfo.crmShellStatusButton"));
-        hostInfoButton.miniButton();
+        final MyButton hostInfoButton = widgetFactory.createButton(Tools.getString("HostInfo.crmShellStatusButton"));
+        application.makeMiniButton(hostInfoButton);
 
-        final MyButton crmConfigureShowButton = new MyButton(Tools.getString("HostInfo.crmShellShowButton"));
-        crmConfigureShowButton.miniButton();
+        final MyButton crmConfigureShowButton =
+                                           widgetFactory.createButton(Tools.getString("HostInfo.crmShellShowButton"));
+        application.makeMiniButton(crmConfigureShowButton);
         crmConfigureCommitButton.setEnabled(false);
         final ExecCallback execCallback =
             new ExecCallback() {
                 @Override
                 public void done(final String answer) {
                     ta.setText(answer);
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                     @Override
                         public void run() {
                             crmConfigureShowButton.setEnabled(true);
@@ -175,7 +181,7 @@ public class HostInfo extends Info {
                 public void doneError(final String answer, final int errorCode) {
                     ta.setText(answer);
                     LOG.sshError(host, "", answer, "", errorCode);
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                     @Override
                         public void run() {
                             crmConfigureCommitButton.setEnabled(false);
@@ -337,10 +343,10 @@ public class HostInfo extends Info {
         SpringUtilities.makeCompactGrid(p, 1, 3,  // rows, cols
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
-        mainPanel.setMinimumSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                                               Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
-        mainPanel.setPreferredSize(new Dimension(Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                                                 Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setMinimumSize(new Dimension(application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                               application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+        mainPanel.setPreferredSize(new Dimension(application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                                 application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JLabel(Tools.getString("HostInfo.crmShellInfo")));
         mainPanel.add(new JScrollPane(ta));

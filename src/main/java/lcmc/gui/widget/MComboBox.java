@@ -19,6 +19,10 @@
  */
 package lcmc.gui.widget;
 
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.awt.Container;
 import java.awt.Dimension;
 import java.util.Vector;

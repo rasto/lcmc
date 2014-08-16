@@ -22,10 +22,10 @@ package lcmc;
 
 import lcmc.model.*;
 import lcmc.robotest.RoboTest;
+import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -36,6 +36,7 @@ import org.apache.commons.cli.PosixParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -101,6 +102,10 @@ public class ArgumentParser {
     private UserConfig userConfig;
     @Autowired
     private RoboTest roboTest;
+    @Autowired
+    private Provider<Cluster> clusterProvider;
+    @Autowired
+    private Application application;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {
         final Options options = new Options();
@@ -187,37 +192,37 @@ public class ArgumentParser {
                 }
             }
             final boolean advanced = cmd.hasOption(ADVANCED_OP);
-            lcmc.utilities.Tools.getApplication().setAdvancedMode(advanced);
-            lcmc.utilities.Tools.getApplication().setUseTightvnc(tightvnc);
-            lcmc.utilities.Tools.getApplication().setUseUltravnc(ultravnc);
-            lcmc.utilities.Tools.getApplication().setUseRealvnc(realvnc);
+            application.setAdvancedMode(advanced);
+            application.setUseTightvnc(tightvnc);
+            application.setUseUltravnc(ultravnc);
+            application.setUseRealvnc(realvnc);
 
-            lcmc.utilities.Tools.getApplication().setUpgradeCheckEnabled(!cmd.hasOption(NO_UPGRADE_CHECK_OP));
-            lcmc.utilities.Tools.getApplication().setBigDRBDConf(cmd.hasOption(BIGDRBDCONF_OP));
-            lcmc.utilities.Tools.getApplication().setStagingDrbd(cmd.hasOption(STAGING_DRBD_OP));
-            lcmc.utilities.Tools.getApplication().setStagingPacemaker(cmd.hasOption(STAGING_PACEMAKER_OP));
-            lcmc.utilities.Tools.getApplication().setHideLRM(cmd.hasOption(NOLRM_OP));
-            lcmc.utilities.Tools.getApplication().setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
-            lcmc.utilities.Tools.getApplication().setOneHostCluster(cmd.hasOption(ONE_HOST_CLUSTER_OP));
-            lcmc.utilities.Tools.getApplication().setNoPassphrase(cmd.hasOption(NO_PASSPHRASE_OP));
+            application.setUpgradeCheckEnabled(!cmd.hasOption(NO_UPGRADE_CHECK_OP));
+            application.setBigDRBDConf(cmd.hasOption(BIGDRBDCONF_OP));
+            application.setStagingDrbd(cmd.hasOption(STAGING_DRBD_OP));
+            application.setStagingPacemaker(cmd.hasOption(STAGING_PACEMAKER_OP));
+            application.setHideLRM(cmd.hasOption(NOLRM_OP));
+            application.setKeepHelper(cmd.hasOption(KEEP_HELPER_OP));
+            application.setOneHostCluster(cmd.hasOption(ONE_HOST_CLUSTER_OP));
+            application.setNoPassphrase(cmd.hasOption(NO_PASSPHRASE_OP));
             if (cmd.hasOption(EMBED_OP)) {
-                lcmc.utilities.Tools.getApplication().setEmbedApplet(true);
+                application.setEmbedApplet(true);
             }
             if (cmd.hasOption(NO_EMBED_OP)) {
-                lcmc.utilities.Tools.getApplication().setEmbedApplet(false);
+                application.setEmbedApplet(false);
             }
             if (cmd.hasOption(CMD_LOG_OP)) {
-                lcmc.utilities.Tools.getApplication().setCmdLog(true);
+                application.setCmdLog(true);
             }
             if (cmd.hasOption(CHECK_SWING_OP)) {
-                lcmc.utilities.Tools.getApplication().setCheckSwing(true);
+                application.setCheckSwing(true);
             }
             final String pwd = System.getProperty("user.home");
             final String scaleOp = cmd.getOptionValue(SCALE_OP, "100");
             try {
                 final int scale = Integer.parseInt(scaleOp);
-                lcmc.utilities.Tools.getApplication().setScale(scale);
-                lcmc.utilities.Tools.resizeFonts(scale);
+                application.setScale(scale);
+                application.resizeFonts(scale);
             } catch (final NumberFormatException e) {
                 LOG.appWarning("initApp: cannot parse scale: " + scaleOp);
             }
@@ -225,9 +230,9 @@ public class ArgumentParser {
             final String idDsaPath = cmd.getOptionValue(ID_DSA_OP, pwd + "/.ssh/id_dsa");
             final String idRsaPath = cmd.getOptionValue(ID_RSA_OP, pwd + "/.ssh/id_rsa");
             final String knownHostsPath = cmd.getOptionValue(KNOWN_HOSTS_OP, pwd + "/.ssh/known_hosts");
-            lcmc.utilities.Tools.getApplication().setIdDSAPath(idDsaPath);
-            lcmc.utilities.Tools.getApplication().setIdRSAPath(idRsaPath);
-            lcmc.utilities.Tools.getApplication().setKnownHostPath(knownHostsPath);
+            application.setIdDSAPath(idDsaPath);
+            application.setIdRSAPath(idRsaPath);
+            application.setKnownHostPath(knownHostsPath);
 
             final String opMode = cmd.getOptionValue(OP_MODE_OP);
             autoArgs = cmd.getOptionValue(AUTO_OP);
@@ -241,14 +246,14 @@ public class ArgumentParser {
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
-                lcmc.utilities.Tools.getApplication().setAccessType(Application.AccessType.RO);
-                lcmc.utilities.Tools.getApplication().setMaxAccessType(Application.AccessType.RO);
+                application.setAccessType(Application.AccessType.RO);
+                application.setMaxAccessType(Application.AccessType.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
-                lcmc.utilities.Tools.getApplication().setAccessType(Application.AccessType.OP);
-                lcmc.utilities.Tools.getApplication().setMaxAccessType(Application.AccessType.OP);
+                application.setAccessType(Application.AccessType.OP);
+                application.setMaxAccessType(Application.AccessType.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
-                lcmc.utilities.Tools.getApplication().setAccessType(Application.AccessType.ADMIN);
-                lcmc.utilities.Tools.getApplication().setMaxAccessType(Application.AccessType.ADMIN);
+                application.setAccessType(Application.AccessType.ADMIN);
+                application.setMaxAccessType(Application.AccessType.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }
@@ -263,9 +268,9 @@ public class ArgumentParser {
             }
             final String vncPortOffsetString = cmd.getOptionValue(VNC_PORT_OFFSET_OP);
             if (vncPortOffsetString != null && lcmc.utilities.Tools.isNumber(vncPortOffsetString)) {
-                lcmc.utilities.Tools.getApplication().setVncPortOffset(Integer.parseInt(vncPortOffsetString));
+                application.setVncPortOffset(Integer.parseInt(vncPortOffsetString));
             }
-            lcmc.utilities.Tools.getApplication().setAnimFPS(fps);
+            application.setAnimFPS(fps);
             if (cmd.hasOption(CLUSTER_OP) || cmd.hasOption(HOST_OP)) {
                 parseClusterOptionsAndCreateClusterButton(cmd);
             }
@@ -354,28 +359,28 @@ public class ArgumentParser {
             } else if (PCMKTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.PCMK, index.charAt(0)));
+                    application.setAutoTest(new Test(StartTests.Type.PCMK, index.charAt(0)));
                 }
             } else if (DRBDTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.DRBD, index.charAt(0)));
+                    application.setAutoTest(new Test(StartTests.Type.DRBD, index.charAt(0)));
                 }
             } else if (VMTEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.VM, index.charAt(0)));
+                    application.setAutoTest(new Test(StartTests.Type.VM, index.charAt(0)));
                 }
             } else if (GUITEST_OP.equals(op)) {
                 final String index = option.getValue();
                 if (index != null && !index.isEmpty()) {
-                    lcmc.utilities.Tools.getApplication().setAutoTest(new Test(RoboTest.Type.GUI, index.charAt(0)));
+                    application.setAutoTest(new Test(StartTests.Type.GUI, index.charAt(0)));
                 }
             }
         }
         for (final Map.Entry<String, List<HostOptions>> clusterEntry : clusters.entrySet()) {
             final List<HostOptions> hostOptions = clusterEntry.getValue();
-            if (hostOptions.size() < 1 || (hostOptions.size() == 1 && !lcmc.utilities.Tools.getApplication().isOneHostCluster())) {
+            if (hostOptions.size() < 1 || (hostOptions.size() == 1 && !application.isOneHostCluster())) {
                 throw new ParseException("not enough hosts for cluster: " + clusterEntry.getKey());
             }
         }
@@ -411,12 +416,12 @@ public class ArgumentParser {
             if ("host".equals(option)) {
                 cluster = null;
                 host = value;
-                lcmc.utilities.Tools.getApplication().addAutoHost(host);
+                application.addAutoHost(host);
                 continue;
             } else if ("cluster".equals(option)) {
                 host = null;
                 cluster = value;
-                lcmc.utilities.Tools.getApplication().addAutoCluster(cluster);
+                application.addAutoCluster(cluster);
                 continue;
             } else if ("global".equals(option)) {
                 host = null;
@@ -425,11 +430,11 @@ public class ArgumentParser {
                 continue;
             }
             if (host != null) {
-                lcmc.utilities.Tools.getApplication().addAutoOption(host, option, value);
+                application.addAutoOption(host, option, value);
             } else if (cluster != null) {
-                lcmc.utilities.Tools.getApplication().addAutoOption(cluster, option, value);
+                application.addAutoOption(cluster, option, value);
             } else if (global) {
-                Tools.getApplication().addAutoOption("global", option, value);
+                application.addAutoOption("global", option, value);
             } else {
                 LOG.appWarning("parseAutoArgs: cannot parse: " + line);
                 return;
@@ -471,10 +476,10 @@ public class ArgumentParser {
             }
         }
         for (final String clusterName : clusters.keySet()) {
-            final Cluster cluster = new Cluster();
+            final Cluster cluster = clusterProvider.get();
             cluster.setName(clusterName);
             cluster.setSavable(false);
-            Tools.getApplication().addClusterToClusters(cluster);
+            application.addClusterToClusters(cluster);
             for (final HostOptions ho : clusters.get(clusterName)) {
                 userConfig.setHostCluster(hostMap, cluster, ho.getHost(), !UserConfig.PROXY_HOST);
             }

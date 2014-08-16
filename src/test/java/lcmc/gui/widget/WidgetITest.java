@@ -14,13 +14,14 @@ import org.junit.experimental.categories.Category;
 @Category(GuiTest.class)
 public final class WidgetITest {
     private final TestUtils testSuite = new TestUtils();
+    private final WidgetFactory widgetFactory = new WidgetFactory();
 
     private Widget widget;
     @Before
     public void setUp() {
         testSuite.initMain();
         for (int i = 0; i < 10; i++) {
-            widget = WidgetFactory.createInstance(Widget.GUESS_TYPE,
+            widget = widgetFactory.createInstance(Widget.GUESS_TYPE,
                                                   Widget.NO_DEFAULT,
                                                   new Value[]{new StringValue("a"),
                                                               new StringValue("b"),

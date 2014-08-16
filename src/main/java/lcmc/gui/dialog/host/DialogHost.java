@@ -39,13 +39,11 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandThread;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-/**
- * DialogHost.
- */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class DialogHost extends WizardDialog {
@@ -53,6 +51,10 @@ public abstract class DialogHost extends WizardDialog {
     private ExecCommandThread commandThread = null;
 
     private DrbdInstallation drbdInstallation;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {
         setPreviousDialog(previousDialog);
@@ -180,7 +182,7 @@ public abstract class DialogHost extends WizardDialog {
             methods.add(installMethod);
             i++;
         }
-        final Widget instMethodWidget = WidgetFactory.createInstance(
+        final Widget instMethodWidget = widgetFactory.createInstance(
                        Widget.Type.COMBOBOX,
                        defaultValue,
                        methods.toArray(new InstallMethods[methods.size()]),
@@ -189,12 +191,12 @@ public abstract class DialogHost extends WizardDialog {
                        Widget.NO_ABBRV,
                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                        Widget.NO_BUTTON);
-        if (Tools.getApplication().getAutoOptionHost(autoOption) != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        if (application.getAutoOptionHost(autoOption) != null) {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     instMethodWidget.setSelectedIndex(
-                            Integer.parseInt(Tools.getApplication().getAutoOptionHost(autoOption)));
+                            Integer.parseInt(application.getAutoOptionHost(autoOption)));
                 }
             });
         }
@@ -203,7 +205,7 @@ public abstract class DialogHost extends WizardDialog {
             public void check(final Value value) {
                 final InstallMethods method = (InstallMethods) instMethodWidget.getValue();
                 final String toolTip = getInstToolTip(prefix, method.getIndex());
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         instMethodWidget.setToolTipText(toolTip);
@@ -227,7 +229,7 @@ public abstract class DialogHost extends WizardDialog {
 
     protected void enableNextButtons(final List<String> incorrect, final List<String> changed) {
         final Check check = new Check(incorrect, changed);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabledCorrect(check);

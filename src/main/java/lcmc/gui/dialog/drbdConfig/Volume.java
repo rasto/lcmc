@@ -30,6 +30,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.model.Application;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -48,11 +49,13 @@ public final class Volume extends DrbdConfig {
     private static final String[] PARAMS = {"number", "device"};
     @Autowired
     private BlockDev blockDevDialog;
+    @Autowired
+    private Application application;
 
     /** Applies the changes and returns next dialog (BlockDev). */
     @Override
     public WizardDialog nextDialog() {
-        Tools.waitForSwing();
+        application.waitForSwing();
         blockDevDialog.init(this, getDrbdVolumeInfo(), getDrbdVolumeInfo().getFirstBlockDevInfo());
         return blockDevDialog;
     }
@@ -88,7 +91,7 @@ public final class Volume extends DrbdConfig {
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
         enableComponents();
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -106,8 +109,8 @@ public final class Volume extends DrbdConfig {
         getDrbdVolumeInfo().addWizardParams(optionsPanel,
                                             PARAMS,
                                             buttonClass(nextButton()),
-                                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
-                                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
+                                            application.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
+                                            application.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth"),
                                             null);
 
         inputPane.add(optionsPanel);

@@ -96,6 +96,10 @@ public class HbConnectionInfo extends EditableInfo {
     private Provider<HbColocationInfo> colocationInfoProvider;
     @Autowired
     private Provider<HbOrderInfo> orderInfoProvider;
+    @Autowired
+    private Application application;
+    @Autowired
+    private HbConnectionMenu hbConnectionMenu;
 
     public void init(final Browser browser) {
         super.init("HbConnectionInfo", browser);
@@ -245,7 +249,7 @@ public class HbConnectionInfo extends EditableInfo {
     /** Applies the changes to the constraints. */
     void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
-            Tools.invokeAndWait(new Runnable() {
+            application.invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     getApplyButton().setEnabled(false);
@@ -296,24 +300,24 @@ public class HbConnectionInfo extends EditableInfo {
     protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
         panel.setLayout(new SpringLayout());
-        final int height = Tools.getDefaultSize("Browser.LabelFieldHeight");
+        final int height = application.getDefaultSize("Browser.LabelFieldHeight");
         c.addLabelField(panel,
                         Tools.getString("ClusterBrowser.HeartbeatId"),
                         c.getService().getCrmId(),
-                        ClusterBrowser.SERVICE_LABEL_WIDTH,
-                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        application.getServiceLabelWidth(),
+                        application.getServiceFieldWidth(),
                         height);
         c.addLabelField(panel,
                         c.getRsc1Name(),
                         c.getRsc1(),
-                        ClusterBrowser.SERVICE_LABEL_WIDTH,
-                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        application.getServiceLabelWidth(),
+                        application.getServiceFieldWidth(),
                         height);
         c.addLabelField(panel,
                         c.getRsc2Name(),
                         c.getRsc2(),
-                        ClusterBrowser.SERVICE_LABEL_WIDTH,
-                        ClusterBrowser.SERVICE_FIELD_WIDTH,
+                        application.getServiceLabelWidth(),
+                        application.getServiceFieldWidth(),
                         height);
         final int rows = 3;
         SpringUtilities.makeCompactGrid(panel, rows, 2, /* rows, cols */
@@ -328,7 +332,7 @@ public class HbConnectionInfo extends EditableInfo {
      */
     @Override
     public final JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -428,8 +432,8 @@ public class HbConnectionInfo extends EditableInfo {
                 optionsPanel.add(panel);
                 c.addParams(optionsPanel,
                             params,
-                            ClusterBrowser.SERVICE_LABEL_WIDTH,
-                            ClusterBrowser.SERVICE_FIELD_WIDTH,
+                            application.getServiceLabelWidth(),
+                            application.getServiceFieldWidth(),
                             null);
             }
         } finally {
@@ -471,7 +475,7 @@ public class HbConnectionInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, null);
@@ -484,17 +488,16 @@ public class HbConnectionInfo extends EditableInfo {
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         if (firstConstraint != null) {
-        newPanel.add(firstConstraint.getMoreOptionsPanel(
-                                  ClusterBrowser.SERVICE_LABEL_WIDTH
-                                  + ClusterBrowser.SERVICE_FIELD_WIDTH + 4));
+        newPanel.add(firstConstraint.getMoreOptionsPanel(application.getServiceLabelWidth()
+                                                         + application.getServiceFieldWidth() + 4));
         }
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         newPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
@@ -506,8 +509,7 @@ public class HbConnectionInfo extends EditableInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final HbConnectionMenu hbConnectionMenu = new HbConnectionMenu(this);
-        return hbConnectionMenu.getPulldownMenu();
+        return hbConnectionMenu.getPulldownMenu(this);
     }
 
     /** Removes colocations or orders. */

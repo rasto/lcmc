@@ -23,7 +23,6 @@ package lcmc.gui.resources.vms;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -47,6 +46,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
 import lcmc.LCMC;
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -61,64 +61,60 @@ import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
-import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
-import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Hardware.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class HardwareInfo extends EditableInfo {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(HardwareInfo.class);
-    /** Back to overview icon. */
-    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
-                                                 Tools.getDefault("BackIcon"));
-    /** Pattern that parses stat output. */
-    private static final Pattern STAT_PATTERN = Pattern.compile(
-                                                       "(.).{9}\\s+(\\d+)\\s+"
-                                                       + "(\\d+)\\s+"
-                                                       + "(\\d+) (.*)$");
-    /** Whether file chooser needs file or dir. */
+    /**
+     * Back to overview icon.
+     */
+    private static final ImageIcon BACK_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
+    /**
+     * Pattern that parses stat output.
+     */
+    private static final Pattern STAT_PATTERN = Pattern.compile("(.).{9}\\s+(\\d+)\\s+(\\d+)\\s+(\\d+) (.*)$");
+    /**
+     * Whether file chooser needs file or dir.
+     */
     protected static final boolean FILECHOOSER_DIR_ONLY = true;
-    protected static final boolean FILECHOOSER_FILE_ONLY =
-                                                        !FILECHOOSER_DIR_ONLY;
-    /** Cache for the info panel. */
+    protected static final boolean FILECHOOSER_FILE_ONLY = !FILECHOOSER_DIR_ONLY;
     private JComponent infoPanel = null;
-    /** VMS virtual domain info object. */
-    private final DomainInfo vmsVirtualDomainInfo;
-    /** Cache for files. */
-    private final Map<String, LinuxFile> linuxFileCache =
-                                            new HashMap<String, LinuxFile>();
+    private DomainInfo vmsVirtualDomainInfo;
+    private final Map<String, LinuxFile> linuxFileCache = new HashMap<String, LinuxFile>();
+    @Autowired
+    private Application application;
+    @Autowired
+    private MenuFactory menuFactory;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
-    /** Creates the HardwareInfo object. */
-    HardwareInfo(final String name,
-                    final Browser browser,
-                    final DomainInfo vmsVirtualDomainInfo) {
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser);
         setResource(new Resource(name));
         this.vmsVirtualDomainInfo = vmsVirtualDomainInfo;
     }
 
-    /** Returns browser object of this info. */
     @Override
     public final ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns info panel. */
     @Override
     public final JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -143,56 +139,51 @@ public abstract class HardwareInfo extends EditableInfo {
         final JPanel optionsPanel = new JPanel();
         optionsPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.PAGE_AXIS));
-        optionsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        optionsPanel.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         final String[] params = getParametersFromXML();
         initApplyButton(null);
         /* add item listeners to the apply button. */
         if (!abExisted) {
-            getApplyButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                apply(Application.RunMode.LIVE);
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
-                    }
+            getApplyButton().addAction(new Runnable() {
+                @Override
+                public void run() {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getBrowser().clStatusLock();
+                            apply(Application.RunMode.LIVE);
+                            getBrowser().clStatusUnlock();
+                        }
+                    });
+                    thread.start();
                 }
-            );
+            });
             getRevertButton().addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getBrowser().clStatusLock();
-                                revert();
-                                getBrowser().clStatusUnlock();
-                            }
-                        });
-                        thread.start();
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(final ActionEvent e) {
+                            final Thread thread = new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    getBrowser().clStatusLock();
+                                    revert();
+                                    getBrowser().clStatusUnlock();
+                                }
+                            });
+                            thread.start();
+                        }
                     }
-                }
             );
         }
-        final JPanel extraButtonPanel =
-                           new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 0));
+        final JPanel extraButtonPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 0));
         extraButtonPanel.setBackground(Browser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
         addRevertButton(extraButtonPanel);
-        final MyButton overviewButton = new MyButton("VM Host Overview",
-                                                     BACK_ICON);
-        overviewButton.miniButton();
+        final MyButton overviewButton = widgetFactory.createButton("VM Host Overview", BACK_ICON);
+        application.makeMiniButton(overviewButton);
         overviewButton.setPreferredSize(new Dimension(130, 50));
-        //overviewButton.setPreferredSize(new Dimension(200, 50));
         overviewButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -202,8 +193,8 @@ public abstract class HardwareInfo extends EditableInfo {
         extraButtonPanel.add(overviewButton);
         addParams(optionsPanel,
                   params,
-                  ClusterBrowser.SERVICE_LABEL_WIDTH,
-                  ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
+                  application.getServiceLabelWidth(),
+                  application.getServiceFieldWidth() * 2,
                   null);
         /* Actions */
         buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
@@ -213,15 +204,13 @@ public abstract class HardwareInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(
-                              ClusterBrowser.SERVICE_LABEL_WIDTH
-                              + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
+                                         + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
-                getApplyButton().setVisible(
-                            !getVMSVirtualDomainInfo().getResource().isNew());
+                getApplyButton().setVisible(!getVMSVirtualDomainInfo().getResource().isNew());
                 setApplyButtons(null, params);
             }
         });
@@ -230,28 +219,31 @@ public abstract class HardwareInfo extends EditableInfo {
         return infoPanel;
     }
 
-    /** Returns units. */
     @Override
     protected final Unit[] getUnits(final String param) {
         return VmsXml.getUnits();
     }
 
-    /** Returns the default unit for the parameter. */
+    /**
+     * Returns the default unit for the parameter.
+     */
     protected final String getDefaultUnit(final String param) {
         return null;
     }
 
-    /** Returns columns for the table. */
+    /**
+     * Returns columns for the table.
+     */
     @Override
     protected final String[] getColumnNames(final String tableName) {
         return vmsVirtualDomainInfo.getColumnNames(tableName);
     }
 
-    /** Execute when row in the table was clicked. */
+    /**
+     * Execute when row in the table was clicked.
+     */
     @Override
-    protected final void rowClicked(final String tableName,
-                                    final String key,
-                                    final int column) {
+    protected final void rowClicked(final String tableName, final String key, final int column) {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -265,43 +257,43 @@ public abstract class HardwareInfo extends EditableInfo {
         thread.start();
     }
 
-    /** Retrurns color for some rows. */
+    /**
+     * Retrurns color for some rows.
+     */
     @Override
-    protected final Color getTableRowColor(final String tableName,
-                                           final String key) {
+    protected final Color getTableRowColor(final String tableName, final String key) {
         if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo.getTableRowColor(tableName, key);
         }
         return Browser.PANEL_BACKGROUND;
     }
 
-    /** Alignment for the specified column. */
     @Override
-    protected final int getTableColumnAlignment(final String tableName,
-                                                final int column) {
+    protected final int getTableColumnAlignment(final String tableName, final int column) {
         if (DomainInfo.HEADER_TABLE.equals(tableName)) {
-            return vmsVirtualDomainInfo.getTableColumnAlignment(tableName,
-                                                                column);
+            return vmsVirtualDomainInfo.getTableColumnAlignment(tableName, column);
         }
         return SwingConstants.LEFT;
     }
 
-    /** Returns info object for this row. */
+    /**
+     * Returns info object for this row.
+     */
     @Override
-    protected final Info getTableInfo(final String tableName,
-                                      final String key) {
+    protected final Info getTableInfo(final String tableName, final String key) {
         if (DomainInfo.HEADER_TABLE.equals(tableName)) {
             return vmsVirtualDomainInfo;
         }
         return null;
     }
 
-    /** Return info object of the whole domain. */
     protected final DomainInfo getVMSVirtualDomainInfo() {
         return vmsVirtualDomainInfo;
     }
 
-    /** Get first host that has this vm and is connected. */
+    /**
+     * Get first host that has this vm and is connected.
+     */
     protected final Host getFirstConnectedHost() {
         for (final Host h : getBrowser().getClusterHosts()) {
             final VmsXml vmsXml = getBrowser().getVmsXml(h);
@@ -317,50 +309,57 @@ public abstract class HardwareInfo extends EditableInfo {
      */
     protected abstract String isRemoveable();
 
-    /** Updates parameters. */
+    /**
+     * Updates parameters.
+     */
     abstract void updateParameters();
 
-    /** Returns list of menu items. */
+    /**
+     * Returns list of menu items.
+     */
     @Override
     public final List<UpdatableItem> createPopup() {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         /* remove service */
-        final ComponentWithTest removeMenuItem = new MyMenuItem(
-                    Tools.getString("HardwareInfo.Menu.Remove"),
-                    ClusterBrowser.REMOVE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    Tools.getString("HardwareInfo.Menu.Cancel"),
-                    ClusterBrowser.REMOVE_ICON,
-                    ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                    new AccessMode(Application.AccessType.ADMIN, false),
-                    new AccessMode(Application.AccessType.OP, false)) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public boolean predicate() {
-                return !getResource().isNew();
-            }
-
-            @Override
-            public String enablePredicate() {
-                if (getResource().isNew()) {
-                    return null;
-                }
-                return isRemoveable();
-            }
-
-            @Override
-            public void action() {
-                hidePopup();
-                removeMyself(Application.RunMode.LIVE);
-            }
-        };
+        final ComponentWithTest removeMenuItem = menuFactory.createMenuItem(
+                Tools.getString("HardwareInfo.Menu.Remove"),
+                ClusterBrowser.REMOVE_ICON,
+                ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                Tools.getString("HardwareInfo.Menu.Cancel"),
+                ClusterBrowser.REMOVE_ICON,
+                ClusterBrowser.STARTING_PTEST_TOOLTIP,
+                new AccessMode(Application.AccessType.ADMIN, false),
+                new AccessMode(Application.AccessType.OP, false))
+                .predicate(new Predicate() {
+                    @Override
+                    public boolean check() {
+                        return !getResource().isNew();
+                    }
+                })
+                .enablePredicate(new EnablePredicate() {
+                    @Override
+                    public String check() {
+                        if (getResource().isNew()) {
+                            return null;
+                        }
+                        return isRemoveable();
+                    }
+                })
+                .addAction(new MenuAction() {
+                    @Override
+                    public void run(final String text) {
+                        hidePopup();
+                        removeMyself(Application.RunMode.LIVE);
+                    }
+                });
         addMouseOverListener(removeMenuItem, null);
         items.add((UpdatableItem) removeMenuItem);
         return items;
     }
 
-    /** Removes this hardware from the libvirt with confirmation dialog. */
+    /**
+     * Removes this hardware from the libvirt with confirmation dialog.
+     */
     @Override
     public final void removeMyself(final Application.RunMode runMode) {
         if (getResource().isNew()) {
@@ -369,45 +368,52 @@ public abstract class HardwareInfo extends EditableInfo {
             removeNode();
             return;
         }
-        String desc = Tools.getString(
-                                "HardwareInfo.confirmRemove.Description");
+        String desc = Tools.getString("HardwareInfo.confirmRemove.Description");
 
-        desc  = desc.replaceAll("@HW@", Matcher.quoteReplacement(toString()));
-        if (Tools.confirmDialog(
-               Tools.getString("HardwareInfo.confirmRemove.Title"),
-               desc,
-               Tools.getString("HardwareInfo.confirmRemove.Yes"),
-               Tools.getString("HardwareInfo.confirmRemove.No"))) {
+        desc = desc.replaceAll("@HW@", Matcher.quoteReplacement(toString()));
+        if (application.confirmDialog(
+                Tools.getString("HardwareInfo.confirmRemove.Title"),
+                desc,
+                Tools.getString("HardwareInfo.confirmRemove.Yes"),
+                Tools.getString("HardwareInfo.confirmRemove.No"))) {
             removeMyselfNoConfirm(runMode);
             getResource().setNew(false);
         }
     }
 
-    /** Removes this disk without confirmation dialog. */
+    /**
+     * Removes this disk without confirmation dialog.
+     */
     protected abstract void removeMyselfNoConfirm(final Application.RunMode runMode);
 
-    /** Applies the changes. */
+    /**
+     * Applies the changes.
+     */
     abstract void apply(final Application.RunMode runMode);
 
-    /** Adds disk table with only this disk to the main panel. */
+    /**
+     * Adds disk table with only this disk to the main panel.
+     */
     protected abstract void addHardwareTable(final JPanel mainPanel);
 
-    /** Modify device xml. */
+    /**
+     * Modify device xml.
+     */
     protected abstract void modifyXML(final VmsXml vmsXml,
                                       final Node node,
                                       final String domainName,
                                       final Map<String, String> params);
 
-    /** Returns whether the column is a button, 0 column is always a button. */
+    /**
+     * Returns whether the column is a button, 0 column is always a button.
+     */
     @Override
-    protected final Map<Integer, Integer> getDefaultWidths(
-                                                    final String tableName) {
+    protected final Map<Integer, Integer> getDefaultWidths(final String tableName) {
         return vmsVirtualDomainInfo.getDefaultWidths(tableName);
     }
 
-    /** Returns device parameters. */
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -416,8 +422,7 @@ public abstract class HardwareInfo extends EditableInfo {
         final Map<String, String> parameters = new HashMap<String, String>();
         for (final String param : getParametersFromXML()) {
             final Value value = getComboBoxValue(param);
-            if (allParams
-                || !getParamSaved(param).equals(value)) {
+            if (allParams || !getParamSaved(param).equals(value)) {
                 if (Tools.areEqual(getParamDefault(param), value)) {
                     parameters.put(param, null);
                 } else {
@@ -428,29 +433,29 @@ public abstract class HardwareInfo extends EditableInfo {
         return parameters;
     }
 
-
-    /** Returns default widths for columns. Null for computed width. */
+    /**
+     * Returns default widths for columns. Null for computed width.
+     */
     @Override
-    protected final boolean isControlButton(final String tableName,
-                                            final int column) {
+    protected final boolean isControlButton(final String tableName, final int column) {
         return vmsVirtualDomainInfo.isControlButton(tableName, column);
     }
 
-    /** Returns tool tip text in the table. */
+    /**
+     * Returns tool tip text in the table.
+     */
     @Override
     protected final String getTableToolTip(final String tableName,
                                            final String key,
                                            final Object object,
                                            final int raw,
                                            final int column) {
-        return vmsVirtualDomainInfo.getTableToolTip(tableName,
-                                                    key,
-                                                    object,
-                                                    raw,
-                                                    column);
+        return vmsVirtualDomainInfo.getTableToolTip(tableName, key, object, raw, column);
     }
 
-    /** Returns cached file object. */
+    /**
+     * Returns cached file object.
+     */
     public final LinuxFile getLinuxDir(final String dir, final Host host) {
         LinuxFile ret = linuxFileCache.get(dir);
         if (ret == null) {
@@ -460,9 +465,10 @@ public abstract class HardwareInfo extends EditableInfo {
         return ret;
     }
 
-    /** Returns file system view that allows remote browsing. */
-    private FileSystemView getFileSystemView(final Host host,
-                                             final String directory) {
+    /**
+     * Returns file system view that allows remote browsing.
+     */
+    private FileSystemView getFileSystemView(final Host host, final String directory) {
         final HardwareInfo thisClass = this;
         return new FileSystemView() {
             @Override
@@ -498,8 +504,7 @@ public abstract class HardwareInfo extends EditableInfo {
             }
 
             @Override
-            public File[] getFiles(final File dir,
-                                   final boolean useFileHiding) {
+            public File[] getFiles(final File dir, final boolean useFileHiding) {
                 final StringBuilder dirSB = new StringBuilder(dir.toString());
                 if ("/".equals(dir.toString())) {
                     dirSB.append('*');
@@ -509,7 +514,7 @@ public abstract class HardwareInfo extends EditableInfo {
                 final SshOutput out = host.captureCommandProgressIndicator(
                         "executing...",
                         new ExecCommandConfig().command("stat -c \"%A %a %Y %s %n\" " + dirSB + " 2>/dev/null")
-                                               .silentOutput());
+                                .silentOutput());
                 final List<LinuxFile> files = new ArrayList<LinuxFile>();
                 if (out.getExitCode() == 0) {
                     for (final String line : out.getOutput().split("\r\n")) {
@@ -519,18 +524,12 @@ public abstract class HardwareInfo extends EditableInfo {
                         final Matcher m = STAT_PATTERN.matcher(line);
                         if (m.matches()) {
                             final String type = m.group(1);
-                            final long lastModified =
-                                           Long.parseLong(m.group(3)) * 1000;
+                            final long lastModified = Long.parseLong(m.group(3)) * 1000;
                             final long size = Long.parseLong(m.group(4));
                             final String filename = m.group(5);
                             LinuxFile lf = linuxFileCache.get(filename);
                             if (lf == null) {
-                                lf = new LinuxFile(thisClass,
-                                                   host,
-                                                   filename,
-                                                   type,
-                                                   lastModified,
-                                                   size);
+                                lf = new LinuxFile(thisClass, host, filename, type, lastModified, size);
                                 linuxFileCache.put(filename, lf);
                             } else {
                                 lf.update(type, lastModified, size);
@@ -547,7 +546,6 @@ public abstract class HardwareInfo extends EditableInfo {
     }
 
     /**
-     * Starts file chooser.
      * @param directory whether it needs dir or file
      */
     protected final void startFileChooser(final Widget paramWi,
@@ -559,38 +557,23 @@ public abstract class HardwareInfo extends EditableInfo {
             return;
         }
         final HardwareInfo thisClass = this;
-        final JFileChooser fc = new JFileChooser(
-                                    getLinuxDir(directory, host),
-                                    getFileSystemView(host, directory)) {
-            /** Serial version UID. */
-            private static final long serialVersionUID = 1L;
-                @Override
-                public void setCurrentDirectory(final File dir) {
-                    super.setCurrentDirectory(new LinuxFile(
-                                                    thisClass,
-                                                    host,
-                                                    dir.toString(),
-                                                    "d",
-                                                    0,
-                                                    0));
-                }
-
-            };
+        final JFileChooser fc = new JFileChooser(getLinuxDir(directory, host), getFileSystemView(host, directory)) {
+            @Override
+            public void setCurrentDirectory(final File dir) {
+                super.setCurrentDirectory(new LinuxFile(thisClass, host, dir.toString(), "d", 0, 0));
+            }
+        };
         fc.setBackground(ClusterBrowser.STATUS_BACKGROUND);
         fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
         if (dirOnly) {
             fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         }
-        fc.setDialogTitle(Tools.getString("DiskInfo.FileChooserTitle")
-                          + host.getName());
-//        fc.setApproveButtonText(Tools.getString("DiskInfo.Approve"));
-        fc.setApproveButtonToolTipText(
-                               Tools.getString("DiskInfo.Approve.ToolTip"));
+        fc.setDialogTitle(Tools.getString("DiskInfo.FileChooserTitle") + host.getName());
+        fc.setApproveButtonToolTipText(Tools.getString("DiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
         final int ret = fc.showDialog(LCMC.MAIN_FRAME, Tools.getString("DiskInfo.Approve"));
         linuxFileCache.clear();
-        if (ret == JFileChooser.APPROVE_OPTION
-            && fc.getSelectedFile() != null) {
+        if (ret == JFileChooser.APPROVE_OPTION && fc.getSelectedFile() != null) {
             final String name = fc.getSelectedFile().getAbsolutePath();
             paramWi.setValue(new StringValue(name));
         }
@@ -601,8 +584,7 @@ public abstract class HardwareInfo extends EditableInfo {
      * have changed. Don't check the invisible for the type parameters.
      */
     @Override
-    public final Check checkResourceFields(final String param,
-                                           final String[] params) {
+    public final Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 
@@ -610,9 +592,7 @@ public abstract class HardwareInfo extends EditableInfo {
      * Returns whether the specified parameter or any of the parameters
      * have changed. Don't check the invisible for the type parameters.
      */
-    final Check checkResourceFields(final String param,
-                                    final String[] params,
-                                    final boolean fromDomain) {
+    final Check checkResourceFields(final String param, final String[] params, final boolean fromDomain) {
         final DomainInfo vdi = vmsVirtualDomainInfo;
         if (!fromDomain && vdi != null && params.length != 1) {
             vdi.setApplyButtons(null, vdi.getParametersFromXML());
@@ -627,17 +607,14 @@ public abstract class HardwareInfo extends EditableInfo {
         return super.checkResourceFields(param, parameters);
     }
 
-    /** Checks one parameter. */
     protected final void checkOneParam(final String param) {
         checkResourceFields(param, new String[]{param}, true);
     }
 
-    /** Returns parameters. */
     String[] getRealParametersFromXML() {
         return getParametersFromXML();
     }
 
-    /** Saves all preferred values. */
     public final void savePreferredValues() {
         for (final String param : getParametersFromXML()) {
             final Value pv = getParamPreferred(param);
@@ -660,9 +637,9 @@ public abstract class HardwareInfo extends EditableInfo {
             return false;
         }
         return this.vmsVirtualDomainInfo == other.vmsVirtualDomainInfo
-               || (this.vmsVirtualDomainInfo != null
-                   && this.vmsVirtualDomainInfo.equals(
-                                                  other.vmsVirtualDomainInfo));
+                || (this.vmsVirtualDomainInfo != null
+                && this.vmsVirtualDomainInfo.equals(
+                other.vmsVirtualDomainInfo));
     }
 
     @Override

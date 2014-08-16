@@ -52,6 +52,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import lcmc.configs.AppDefaults;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
@@ -93,7 +95,6 @@ import org.springframework.stereotype.Component;
 public final class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     private static final int RAMP_DELAY_STOP  = 1000;
-    private static final float FPS = Tools.getApplication().getAnimFPS();
     private static final ImageIcon CANCEL_ICON = Tools.createImageIcon(
                                                             Tools.getDefault("ProgressIndicatorPanel.CancelIcon"));
     private static final int MAX_ALPHA_LEVEL = 255;
@@ -120,8 +121,10 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private RenderingHints hints = null;
     private final Lock mAnimatorLock = new ReentrantLock();
     private final Lock mTextsLock = new ReentrantLock();
+    @Autowired
+    private WidgetFactory widgetFactory;
     /** Cancel button. TODO: not used. */
-    private final MyButton cancelButton = new MyButton(Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
+    private MyButton cancelButton;
     /** Animator thread. */
     private Animator animator;
 
@@ -135,9 +138,12 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private MainMenu mainMenu;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
-    public ProgressIndicatorPanel() {
-        this(0.40f, 300);
+    public void init() {
+        cancelButton = widgetFactory.createButton(Tools.getString("ProgressIndicatorPanel.Cancel"), CANCEL_ICON);
+        this.init(0.40f, 300);
     }
 
     /**
@@ -147,8 +153,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
      * @param rampDelay The duration, in milli seconds, of the fade in and
      *                  the fade out of the veil.
      */
-    private ProgressIndicatorPanel(final float shield, final int rampDelay) {
-        super();
+    private void init(final float shield, final int rampDelay) {
         this.rampDelay = rampDelay >= 0 ? rampDelay : 0;
         this.shield    = shield >= 0.0f ? shield : 0.0f;
 
@@ -290,7 +295,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
                     g2.fillRect((int) (width  - barPos), startAtHeight, (int) (barPos * 2 - width), barHeight);
                 }
             }
-            barPos += 5.0 * 20.0 / FPS;
+            barPos += 5.0 * 20.0 / application.getAnimFPS();
             if (barPos >= width / 2 + getWidth() / 2) {
                 barPos = width / 2 - getWidth() / 2;
             }
@@ -468,7 +473,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
 
                 mTextsLock.unlock();
                 try {
-                    Thread.sleep((long) (1000 / FPS));
+                    Thread.sleep((long) (1000 / application.getAnimFPS()));
                 } catch (final InterruptedException ie) {
                     Thread.currentThread().interrupt();
                 }

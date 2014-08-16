@@ -31,10 +31,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lcmc.utilities.Tools;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds a set of all clusters.
  */
+@Component
 public final class Clusters {
     private final Set<Cluster> clusters = new TreeSet<Cluster>();
     private final ReadWriteLock mClustersLock = new ReentrantReadWriteLock();

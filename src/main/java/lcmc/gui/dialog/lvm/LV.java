@@ -39,7 +39,7 @@ class LV extends WizardDialog {
         };
     }
 
-    protected LV(final WizardDialog previousDialog) {
+    protected void init(final WizardDialog previousDialog) {
         setPreviousDialog(previousDialog);
     }
 

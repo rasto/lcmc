@@ -28,11 +28,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.model.Application;
 import lcmc.gui.Browser;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 
 /**
  * This class holds info data for a category.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class CategoryInfo extends Info {
     public static final String MAIN_TABLE = "main";
     private JComponent infoPanel = null;

@@ -43,11 +43,17 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual parallel or serial device.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {
@@ -175,11 +181,13 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    /** Creates the ParallelSerialInfo object. */
-    ParallelSerialInfo(final String name,
-                          final Browser browser,
-                          final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
+        super.init(name, browser, vmsVirtualDomainInfo);
     }
 
     /** Adds disk table with only this disk to the main panel. */
@@ -189,7 +197,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
                                    getTableName(),
                                    getNewBtn0(getVMSVirtualDomainInfo()));
         if (getResource().isNew()) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -299,7 +307,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -334,7 +342,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
         getBrowser().reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -350,7 +358,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -410,7 +418,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     protected final boolean checkParam(final String param,
                                        final Value newValue) {
         if (ParallelSerialData.TYPE.equals(param)) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final String thisParam : PARAMETERS) {
@@ -441,8 +449,8 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
             final Value sourceFile =
                                 getParamSaved(ParallelSerialData.SOURCE_PATH);
             final String regexp = ".*[^/]$";
-            final MyButton fileChooserBtn = new MyButton("Browse...");
-            final Widget paramWi = WidgetFactory.createInstance(
+            final MyButton fileChooserBtn = widgetFactory.createButton("Browse...");
+            final Widget paramWi = widgetFactory.createInstance(
                                   Widget.Type.TEXTFIELD,
                                   sourceFile,
                                   Widget.NO_ITEMS,

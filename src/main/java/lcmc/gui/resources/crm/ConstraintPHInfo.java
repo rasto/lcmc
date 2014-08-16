@@ -73,6 +73,8 @@ public class ConstraintPHInfo extends ServiceInfo {
     private Preference preference;
     @Autowired
     private ConstraintPHMenu constraintPHMenu;
+    @Autowired
+    private Application application;
 
 
     void init(final Browser browser,
@@ -334,7 +336,7 @@ public class ConstraintPHInfo extends ServiceInfo {
                 }
                 getService().setNew(false);
                 getBrowser().removeFromServiceInfoHash(this);
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         getBrowser().getCrmGraph().killRemovedVertices();
@@ -372,7 +374,7 @@ public class ConstraintPHInfo extends ServiceInfo {
         }
         final String desc = Tools.getString("ConstraintPHInfo.confirmRemove.Description");
 
-        if (Tools.confirmDialog(Tools.getString("ConstraintPHInfo.confirmRemove.Title"),
+        if (application.confirmDialog(Tools.getString("ConstraintPHInfo.confirmRemove.Title"),
                                 desc,
                                 Tools.getString("ConstraintPHInfo.confirmRemove.Yes"),
                                 Tools.getString("ConstraintPHInfo.confirmRemove.No"))) {

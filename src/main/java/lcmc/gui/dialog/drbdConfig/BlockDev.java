@@ -66,6 +66,8 @@ final class BlockDev extends DrbdConfig {
     @Autowired
     private CreateMD createMDDialog;
     private GlobalInfo globalInfo;
+    @Autowired
+    private Application application;
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         init(previousDialog, dli);
@@ -77,7 +79,7 @@ final class BlockDev extends DrbdConfig {
 
     @Override
     protected void finishDialog() {
-        Tools.waitForSwing();
+        application.waitForSwing();
     }
 
     /** Calls drbdadm get-gi, to find out if there is meta-data area. */
@@ -109,7 +111,7 @@ final class BlockDev extends DrbdConfig {
                 final VolumeInfo dvi = getDrbdVolumeInfo();
                 globalInfo.apply(runMode);
                 final ResourceInfo dri = dvi.getDrbdResourceInfo();
-                Tools.invokeAndWait(new Runnable() {
+                application.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         dri.getInfoPanel();
@@ -118,7 +120,7 @@ final class BlockDev extends DrbdConfig {
                 dri.waitForInfoPanel();
                 dri.apply(runMode);
 
-                Tools.invokeAndWait(new Runnable() {
+                application.invokeAndWait(new Runnable() {
                     @Override
                     public void run() {
                         dvi.getInfoPanel();
@@ -163,7 +165,7 @@ final class BlockDev extends DrbdConfig {
     @Override
     protected void initDialogAfterVisible() {
         final String[] params = blockDevInfo.getParametersFromXML();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(
@@ -171,7 +173,7 @@ final class BlockDev extends DrbdConfig {
             }
         });
         enableComponents();
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -189,8 +191,8 @@ final class BlockDev extends DrbdConfig {
         blockDevInfo.addWizardParams(optionsPanel,
                                      params,
                                      buttonClass(nextButton()),
-                                     Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
-                                     Tools.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
+                                     application.getDefaultSize("Dialog.DrbdConfig.BlockDev.LabelWidth"),
+                                     application.getDefaultSize("Dialog.DrbdConfig.BlockDev.FieldWidth"),
                                      null);
 
         final JPanel p = new JPanel();

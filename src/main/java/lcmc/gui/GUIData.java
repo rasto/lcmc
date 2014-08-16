@@ -93,6 +93,8 @@ public class GUIData  {
     private MainMenu mainMenu;
 
     private static volatile int prevScrollingMenuIndex = -1;
+    @Autowired
+    private Application application;
 
     public Container getMainFrameContentPane() {
         return ((RootPaneContainer) LCMC.MAIN_FRAME).getContentPane();
@@ -118,13 +120,13 @@ public class GUIData  {
         }
         final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
-            Tools.invokeAndWaitIfNeeded(new Runnable() {
+            application.invokeAndWaitIfNeeded(new Runnable() {
                 @Override
                 public void run() {
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
                     if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
-                        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                             @Override
                             public void run() {
                                 expandTerminalSplitPane(1);
@@ -153,11 +155,11 @@ public class GUIData  {
         if (terminalSplitPane == null) {
             return;
         }
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 final int height = (int)
-                    terminalSplitPane.getBottomComponent().getSize().getHeight();
+                        terminalSplitPane.getBottomComponent().getSize().getHeight();
                 if ((buttonNo == 0 && height == 0) || (buttonNo == 1 && height > 0)) {
                     LOG.debug2("expandTerminalSplitPane:");
                     final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
@@ -178,7 +180,7 @@ public class GUIData  {
     }
 
     public void renameSelectedClusterTab(final String newName) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.renameSelectedTab(newName);
@@ -190,7 +192,7 @@ public class GUIData  {
      * This is used, if cluster was added, but than it was canceled.
      */
     public void removeSelectedClusterTab() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.removeTab();
@@ -200,7 +202,7 @@ public class GUIData  {
 
     /** Revalidates and repaints clusters panel. */
     public void refreshClustersPanel() {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clustersPanel.refreshView();
@@ -217,7 +219,7 @@ public class GUIData  {
         try {
             if (!addClusterButtonList.contains(addClusterButton)) {
                 addClusterButtonList.add(addClusterButton);
-                addClusterButton.setEnabled(Tools.getApplication().danglingHostsCount() >= 1);
+                addClusterButton.setEnabled(application.danglingHostsCount() >= 1);
             }
         } finally {
             mAddClusterButtonListWriteLock.unlock();
@@ -244,8 +246,8 @@ public class GUIData  {
      * are enough hosts to make cluster.
      */
     public void checkAddClusterButtons() {
-        Tools.isSwingThread();
-        final boolean enabled = Tools.getApplication().danglingHostsCount() >= 1;
+        application.isSwingThread();
+        final boolean enabled = application.danglingHostsCount() >= 1;
         mAddClusterButtonListReadLock.lock();
         try {
             for (final JComponent addClusterButton : addClusterButtonList) {
@@ -257,7 +259,7 @@ public class GUIData  {
     }
 
     public void enableAddClusterButtons(final boolean enable) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddClusterButtonListReadLock.lock();
@@ -273,7 +275,7 @@ public class GUIData  {
     }
 
     public void enableAddHostButtons(final boolean enable) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mAddHostButtonListReadLock.lock();
@@ -294,7 +296,7 @@ public class GUIData  {
      * mode.
      */
     void addToVisibleInAccessType(final JComponent c, final AccessMode accessMode) {
-        c.setVisible(Tools.getApplication().isAccessible(accessMode));
+        c.setVisible(application.isAccessible(accessMode));
         visibleInAccessType.put(c, accessMode);
     }
 
@@ -303,7 +305,7 @@ public class GUIData  {
      * mode.
      */
     void addToEnabledInAccessType(final JComponent c, final AccessMode accessMode) {
-        c.setEnabled(Tools.getApplication().isAccessible(accessMode));
+        c.setEnabled(application.isAccessible(accessMode));
         enabledInAccessType.put(c, accessMode);
     }
 
@@ -321,10 +323,10 @@ public class GUIData  {
     /** Updates access of the item according of their access type. */
     void updateGlobalItems() {
         for (final Map.Entry<JComponent, AccessMode> accessEntry : visibleInAccessType.entrySet()) {
-            accessEntry.getKey().setVisible(Tools.getApplication().isAccessible(accessEntry.getValue()));
+            accessEntry.getKey().setVisible(application.isAccessible(accessEntry.getValue()));
         }
         for (final Map.Entry<JComponent, AccessMode> enabledEntry : enabledInAccessType.entrySet()) {
-            enabledEntry.getKey().setEnabled(Tools.getApplication().isAccessible(enabledEntry.getValue()));
+            enabledEntry.getKey().setEnabled(application.isAccessible(enabledEntry.getValue()));
         }
     }
 
@@ -351,7 +353,7 @@ public class GUIData  {
         for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
         }
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 checkAddClusterButtons();
@@ -360,7 +362,7 @@ public class GUIData  {
     }
 
     public void setAccessible(final JComponent c, final Application.AccessType required) {
-        c.setEnabled(Tools.getApplication().getAccessType().compareTo(required) >= 0);
+        c.setEnabled(application.getAccessType().compareTo(required) >= 0);
     }
 
     private ServicesInfo getSelectedServicesInfo() {
@@ -540,25 +542,19 @@ public class GUIData  {
                         callbackHash.get(item).mouseOut(item);
                     }
                 }
-                final Thread thread = new Thread(new Runnable() {
+                final int index = list.locationToIndex(e.getPoint());
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        final int index = list.locationToIndex(e.getPoint());
-                        Tools.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                list.setSelectedIndex(index);
-                                //TODO: some submenus stay visible, during
-                                //ptest, but this breaks group popup menu
-                                //setMenuVisible(menu, false);
-                                menu.setSelected(false);
-                            }
-                        });
-                        final MyMenuItem item = dlm.getElementAt(index);
-                        item.action();
+                        list.setSelectedIndex(index);
+                        //TODO: some submenus stay visible, during
+                        //ptest, but this breaks group popup menu
+                        //setMenuVisible(menu, false);
+                        menu.setSelected(false);
                     }
                 });
-                thread.start();
+                final MyMenuItem item = dlm.getElementAt(index);
+                item.actionThread();
             }
         });
 
@@ -582,7 +578,7 @@ public class GUIData  {
                             return;
                         }
                         prevScrollingMenuIndex = index;
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 list.setSelectedIndex(index);
@@ -617,14 +613,14 @@ public class GUIData  {
             public void keyPressed(final KeyEvent e) {
                 final int ch = e.getKeyCode();
                 if (ch == KeyEvent.VK_UP && list.getSelectedIndex() == 0) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             typeToSearchField.requestFocus();
                         }
                     });
                 } else if (ch == KeyEvent.VK_ESCAPE) {
-                    Tools.invokeLater(new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             for (final JDialog otherP : popups) {
@@ -636,13 +632,7 @@ public class GUIData  {
                 } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
                     final MyMenuItem item = list.getSelectedValue();
                     if (item != null) {
-                        final Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                item.action();
-                            }
-                        });
-                        thread.start();
+                        item.actionThread();
                     }
                 }
             }
@@ -671,7 +661,7 @@ public class GUIData  {
                     @Override
                     public void run() {
                         if (ch == KeyEvent.VK_DOWN) {
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     list.requestFocus();
@@ -680,7 +670,7 @@ public class GUIData  {
                                 }
                             });
                         } else if (ch == KeyEvent.VK_ESCAPE) {
-                            Tools.invokeLater(new Runnable() {
+                            application.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
                                     for (final JDialog otherP : popups) {
@@ -692,7 +682,7 @@ public class GUIData  {
                         } else if (ch == KeyEvent.VK_SPACE || ch == KeyEvent.VK_ENTER) {
                             final MyMenuItem item = list.getModel().getElementAt(0);
                             if (item != null) {
-                                item.action();
+                                item.actionThread();
                             }
                         }
                     }
@@ -756,7 +746,7 @@ public class GUIData  {
         infoPane.setMinimumSize(DIALOG_PANEL_SIZE);
         infoPane.setMaximumSize(DIALOG_PANEL_SIZE);
         infoPane.setPreferredSize(DIALOG_PANEL_SIZE);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 JOptionPane.showMessageDialog(LCMC.MAIN_FRAME,

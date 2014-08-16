@@ -67,6 +67,8 @@ final class InstallationDisk extends VMConfig {
     private WizardDialog nextDialogObject = null;
     @Autowired
     private Storage storageDialog;
+    @Autowired
+    private Application application;
 
     @Override
     public WizardDialog nextDialog() {
@@ -110,7 +112,7 @@ final class InstallationDisk extends VMConfig {
     protected void initDialogAfterVisible() {
         enableComponents();
         final boolean enable = diskInfo.checkResourceFields(null, PARAMS).isCorrect();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 buttonClass(nextButton()).setEnabled(enable);
@@ -140,8 +142,8 @@ final class InstallationDisk extends VMConfig {
         diskInfo.addWizardParams(optionsPanel,
                                  PARAMS,
                                  buttonClass(nextButton()),
-                                 Tools.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
-                                 Tools.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
+                                 application.getDefaultSize("Dialog.vm.Resource.LabelWidth"),
+                                 application.getDefaultSize("Dialog.vm.Resource.FieldWidth"),
                                  null);
         diskInfo.setApplyButtons(null, diskInfo.getParametersFromXML());
         panel.add(optionsPanel);

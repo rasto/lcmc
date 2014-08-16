@@ -19,6 +19,7 @@
  */
 package lcmc.gui.widget;
 
+import java.awt.*;
 import java.util.Map;
 import lcmc.model.AccessMode;
 import lcmc.model.Value;
@@ -26,18 +27,40 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Unit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Provider;
+import javax.swing.*;
+
+@Component
 public final class WidgetFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(WidgetFactory.class);
+    private final Logger LOG = LoggerFactory.getLogger(WidgetFactory.class);
+    @Autowired
+    private Provider<Label> labelProvider;
+    @Autowired
+    private Provider<ComboBox> comboBoxProvider;
+    @Autowired @Qualifier("passwdfield")
+    private Provider<Passwdfield> passwdFieldProvider;
+    @Autowired @Qualifier("textfield")
+    private Provider<Textfield> textFieldProvider;
+    @Autowired
+    private Provider<TextfieldWithUnit> textFieldWithUnitProvider;
+    @Autowired
+    private Provider<RadioGroup> radioGroupProvider;
+    @Autowired
+    private Provider<Checkbox> checkboxProvider;
+
     /** Without units. */
-    public static Widget createInstance(final Widget.Type type,
-                                        final Value selectedValue,
-                                        final Value[] items,
-                                        final String regexp,
-                                        final int width,
-                                        final Map<String, String> abbreviations,
-                                        final AccessMode enableAccessMode,
-                                        final MyButton fieldButton) {
+    public Widget createInstance(final Widget.Type type,
+                                 final Value selectedValue,
+                                 final Value[] items,
+                                 final String regexp,
+                                 final int width,
+                                 final Map<String, String> abbreviations,
+                                 final AccessMode enableAccessMode,
+                                 final MyButton fieldButton) {
         return createInstance(type,
                               selectedValue,
                               items,
@@ -49,19 +72,19 @@ public final class WidgetFactory {
                               fieldButton);
     }
 
-    public static Widget createInstance(Widget.Type type,
-                                        final Value selectedValue,
-                                        final Value[] items,
-                                        final Unit[] units,
-                                        final String regexp,
-                                        final int width,
-                                        final Map<String, String> abbreviations,
-                                        final AccessMode enableAccessMode,
-                                        final MyButton fieldButton) {
+    public Widget createInstance(Widget.Type type,
+                                 final Value selectedValue,
+                                 final Value[] items,
+                                 final Unit[] units,
+                                 final String regexp,
+                                 final int width,
+                                 final Map<String, String> abbreviations,
+                                 final AccessMode enableAccessMode,
+                                 final MyButton fieldButton) {
         if (type != null && type != Widget.Type.TEXTFIELDWITHUNIT && units != null) {
             LOG.appError("createInstance: wrong type with units: " + type);
         }
-        if (type == null) {
+        if (type == null || type == Widget.GUESS_TYPE) {
             /* type detection */
             if (units != null) {
                 type = Widget.Type.TEXTFIELDWITHUNIT;
@@ -82,31 +105,62 @@ public final class WidgetFactory {
         }
         switch(type) {
             case LABELFIELD:
-                return new Label(selectedValue, regexp, width, enableAccessMode, fieldButton);
+                final Label label = labelProvider.get();
+                label.init(selectedValue, regexp, width, enableAccessMode, fieldButton);
+                return label;
             case COMBOBOX:
-                return new ComboBox(selectedValue, items, regexp, width, abbreviations, enableAccessMode, fieldButton);
+                final ComboBox comboBox = comboBoxProvider.get();
+                comboBox.init(selectedValue, items, regexp, width, abbreviations, enableAccessMode, fieldButton);
+                return comboBox;
             case PASSWDFIELD:
-                return new Passwdfield(selectedValue, regexp, width, enableAccessMode, fieldButton);
+                final Passwdfield passwdfield = passwdFieldProvider.get();
+                passwdfield.init(selectedValue, regexp, width, enableAccessMode, fieldButton);
+                return passwdfield;
             case TEXTFIELD:
-                return new Textfield(selectedValue, regexp, width, abbreviations, enableAccessMode, fieldButton);
+                final Textfield textfield = textFieldProvider.get();
+                textfield.init(selectedValue, regexp, width, abbreviations, enableAccessMode, fieldButton);
+                return textfield;
             case TEXTFIELDWITHUNIT:
-                return new TextfieldWithUnit(selectedValue,
-                                             units,
-                                             regexp,
-                                             width,
-                                             abbreviations,
-                                             enableAccessMode,
-                                             fieldButton);
+                final TextfieldWithUnit textfieldWithUnit = textFieldWithUnitProvider.get();
+                textfieldWithUnit.init(selectedValue,
+                        units,
+                        regexp,
+                        width,
+                        abbreviations,
+                        enableAccessMode,
+                        fieldButton);
+                return textfieldWithUnit;
             case RADIOGROUP:
-                return new RadioGroup(selectedValue, items, regexp, width, enableAccessMode, fieldButton);
+                final RadioGroup radioGroup = radioGroupProvider.get();
+                radioGroup.init(selectedValue, items, regexp, width, enableAccessMode, fieldButton);
+                return radioGroup;
             case CHECKBOX:
-                return new Checkbox(selectedValue, items, regexp, width, enableAccessMode, fieldButton);
+                final Checkbox checkbox = checkboxProvider.get();
+                checkbox.init(selectedValue, items, regexp, width, enableAccessMode, fieldButton);
+                return checkbox;
             default:
                 LOG.appError("createInstance: unknown type: " + type);
                 return null;
         }
     }
 
-    private WidgetFactory() {
+    public MyButton createButton() {
+        return new MyButton();
+    }
+
+    public MyButton createButton(final String text) {
+        return new MyButton(text);
+    }
+
+    public MyButton createButton(final String text, final Icon icon) {
+        return new MyButton(text, icon);
+    }
+
+    public MyButton createButton(final String text, final Icon icon, final String toolTipText) {
+        return new MyButton(text, icon, toolTipText);
+    }
+
+    public MyButton createButton(final Color c1, final Color c2) {
+        return new MyButton(c1, c2);
     }
 }

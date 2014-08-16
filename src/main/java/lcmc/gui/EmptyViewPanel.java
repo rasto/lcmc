@@ -28,12 +28,15 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import lcmc.AddClusterDialog;
 import lcmc.AddHostDialog;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
 import lcmc.utilities.AllHostsUpdatable;
@@ -56,13 +59,17 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     @Autowired
     private EmptyBrowser emptyBrowser;
     @Autowired
-    private AddClusterDialog addClusterDialog;
+    private Provider<AddClusterDialog> addClusterDialogProvider;
     @Autowired
-    private AddHostDialog addHostDialog;
+    private Provider<AddHostDialog> addHostDialogProvider;
     @Autowired
     private HostFactory hostFactory;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init() {
         emptyBrowser.init();
@@ -88,7 +95,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         smallButtonPanel.setLayout(new BoxLayout(smallButtonPanel, BoxLayout.PAGE_AXIS));
         buttonPanel.add(smallButtonPanel);
         /* add new host button */
-        final MyButton addHostButton = new MyButton(Tools.getString("ClusterTab.AddNewHost"), HOST_ICON);
+        final MyButton addHostButton = widgetFactory.createButton(Tools.getString("ClusterTab.AddNewHost"), HOST_ICON);
         addHostButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addHostButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addHostButton.addActionListener(new ActionListener() {
@@ -99,8 +106,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                         @Override
                         public void run() {
                             final Host host = hostFactory.createInstance();
-                            host.init();
-                            addHostDialog.showDialogs(host);
+                            addHostDialogProvider.get().showDialogs(host);
                         }
                     });
                 thread.start();
@@ -114,7 +120,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         guiData.allHostsUpdate();
 
         /* add new cluster button */
-        final MyButton addClusterButton = new MyButton(Tools.getString("ClusterTab.AddNewCluster"), CLUSTER_ICON);
+        final MyButton addClusterButton = widgetFactory.createButton(Tools.getString("ClusterTab.AddNewCluster"), CLUSTER_ICON);
         addClusterButton.setBackgroundColor(Browser.STATUS_BACKGROUND);
         addClusterButton.setPreferredSize(BIG_BUTTON_DIMENSION);
         addClusterButton.setMinimumSize(BIG_BUTTON_DIMENSION);
@@ -125,7 +131,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
                     new Runnable() {
                         @Override
                         public void run() {
-                            addClusterDialog.showDialogs();
+                            addClusterDialogProvider.get().showDialogs();
                         }
                     });
                 thread.start();
@@ -134,8 +140,8 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         guiData.registerAddClusterButton(addClusterButton);
         guiData.checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
-        if (!Tools.getApplication().getAutoHosts().isEmpty()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        if (!application.getAutoHosts().isEmpty()) {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     addHostButton.pressButton();

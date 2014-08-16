@@ -35,12 +35,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.configs.AppDefaults;
-import lcmc.model.HostFactory;
+import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.*;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.model.drbd.DrbdXml;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.drbd.GlobalInfo;
@@ -105,6 +103,10 @@ public final class Resource extends DrbdConfig {
     private Provider<NewProxyHostDialog> newProxyHostDialogProvider;
     @Autowired
     private Volume volumeDialog;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     private String getRandomSecret() {
         return Tools.getRandomSecret(SECRET_STRING_LENGTH);
@@ -117,7 +119,6 @@ public final class Resource extends DrbdConfig {
         if (proxyHostNextDialog) {
             proxyHostNextDialog = false;
             final Host proxyHost = hostFactory.createInstance();
-            proxyHost.init();
             proxyHost.setCluster(dri.getCluster());
             final NewProxyHostDialog newProxyHostDialog = newProxyHostDialogProvider.get();
             newProxyHostDialog.init(this, proxyHost, getDrbdVolumeInfo(), this, new DrbdInstallation());
@@ -176,13 +177,13 @@ public final class Resource extends DrbdConfig {
             /* don't enable */
             enableComponents(new JComponent[]{buttonClass(nextButton())});
         }
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 makeDefaultButton(buttonClass(nextButton()));
             }
         });
-        if (Tools.getApplication().getAutoOptionGlobal("autodrbd") != null) {
+        if (application.getAutoOptionGlobal("autodrbd") != null) {
             pressNextButton();
         }
     }
@@ -241,15 +242,15 @@ public final class Resource extends DrbdConfig {
 
         /* address combo boxes */
         dri.addHostAddresses(optionsPanel,
-                             ClusterBrowser.SERVICE_LABEL_WIDTH,
-                             ClusterBrowser.SERVICE_FIELD_WIDTH << 1,
+                             application.getServiceLabelWidth(),
+                             application.getServiceFieldWidth() << 1,
                              true,
                              buttonClass(nextButton()));
         dri.addWizardParams(optionsPanel,
                             PARAMS,
                             buttonClass(nextButton()),
-                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
-                            Tools.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth") << 1,
+                            application.getDefaultSize("Dialog.DrbdConfig.Resource.LabelWidth"),
+                            application.getDefaultSize("Dialog.DrbdConfig.Resource.FieldWidth") << 1,
                             null);
 
         inputPane.add(optionsPanel);
@@ -267,7 +268,7 @@ public final class Resource extends DrbdConfig {
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.setBorder(Tools.getBorder(Tools.getString("Dialog.DrbdConfig.Resource.ProxyHosts")));
 
-        final MyButton btn = new MyButton(Tools.getString("Dialog.DrbdConfig.Resource.AddHost"));
+        final MyButton btn = widgetFactory.createButton(Tools.getString("Dialog.DrbdConfig.Resource.AddHost"));
         btn.setBackgroundColor(AppDefaults.LIGHT_ORANGE);
         btn.addActionListener(new ActionListener() {
             @Override
@@ -275,7 +276,7 @@ public final class Resource extends DrbdConfig {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 btn.setEnabled(false);

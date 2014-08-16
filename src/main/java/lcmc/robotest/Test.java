@@ -21,15 +21,15 @@
 package lcmc.robotest;
 
 public class Test {
-    private final RoboTest.Type type;
+    private final StartTests.Type type;
     private final char index;
 
-    public Test(final RoboTest.Type type, final char index) {
+    public Test(final StartTests.Type type, final char index) {
         this.type = type;
         this.index = index;
     }
 
-    public RoboTest.Type getType() {
+    public StartTests.Type getType() {
         return type;
     }
 

@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Provider;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -92,18 +93,22 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
     @Autowired
-    private AddClusterDialog addClusterDialog;
+    private Provider<AddClusterDialog> addClusterDialogProvider;
     @Autowired
     private UserConfig userConfig;
     @Autowired
-    private AddHostDialog addHostDialog;
+    private Provider<AddHostDialog> addHostDialogProvider;
     @Autowired
     private HostFactory hostFactory;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private BugReport bugReport;
 
     public void init() {
-        if (Tools.getApplication().isUpgradeCheckEnabled()) {
+        if (application.isUpgradeCheckEnabled()) {
             upgradeCheck = Tools.getString("MainPanel.UpgradeCheck");
         } else {
             upgradeCheck = Tools.getString("MainPanel.UpgradeCheckDisabled");
@@ -239,7 +244,7 @@ public final class MainMenu extends JPanel implements ActionListener {
         opModePanel.setPreferredSize(new Dimension(300, 1));
 
         menuBar.add(opModePanel);
-        if (Tools.getApplication().isUpgradeCheckEnabled()) {
+        if (application.isUpgradeCheckEnabled()) {
             startUpgradeCheck();
         }
     }
@@ -262,7 +267,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         Tools.getApplication().disconnectAllHosts();
+                         application.disconnectAllHosts();
                          System.exit(0);
                      }
                  });
@@ -283,8 +288,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      @Override
                      public void run() {
                          final Host host = hostFactory.createInstance();
-                         host.init();
-                         addHostDialog.showDialogs(host);
+                         addHostDialogProvider.get().showDialogs(host);
                      }
                  });
                  t.start();
@@ -302,7 +306,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  }
                  LOG.debug1("actionPerformed: MENU ACTION: load");
                  final JFileChooser fc = new JFileChooser();
-                 fc.setSelectedFile(new File(Tools.getApplication().getDefaultSaveFile()));
+                 fc.setSelectedFile(new File(application.getDefaultSaveFile()));
                  final FileFilter filter = new FileFilter() {
                      @Override
                      public boolean accept(final File f) {
@@ -329,7 +333,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final int ret = fc.showOpenDialog(LCMC.MAIN_FRAME);
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
-                     Tools.getApplication().setDefaultSaveFile(name);
+                     application.setDefaultSaveFile(name);
                      loadConfigData(name);
                  }
              }
@@ -355,7 +359,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     new Runnable() {
                         @Override
                         public void run() {
-                            Tools.removeEverything(guiData);
+                            application.removeEverything();
                         }
                     }
                  );
@@ -376,7 +380,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread thread = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         Tools.save(guiData, userConfig, Tools.getApplication().getDefaultSaveFile(), true);
+                         application.saveConfig(application.getDefaultSaveFile(), true);
                      }
                  });
                  thread.start();
@@ -393,7 +397,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  }
                  LOG.debug1("actionPerformed: MENU ACTION: save as");
                  final JFileChooser fc = new JFileChooser();
-                 fc.setSelectedFile(new File(Tools.getApplication().getDefaultSaveFile()));
+                 fc.setSelectedFile(new File(application.getDefaultSaveFile()));
                  final FileFilter filter = new FileFilter() {
                      @Override
                      public boolean accept(final File f) {
@@ -420,10 +424,9 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final int ret = fc.showSaveDialog(LCMC.MAIN_FRAME);
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
-                     Tools.getApplication().setDefaultSaveFile(name);
-                     Tools.save(guiData, userConfig, Tools.getApplication().getDefaultSaveFile(), true);
+                     application.setDefaultSaveFile(name);
+                     application.saveConfig(application.getDefaultSaveFile(), true);
                  }
-
              }
         };
     }
@@ -439,7 +442,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                  final Thread t = new Thread(new Runnable() {
                      @Override
                      public void run() {
-                         addClusterDialog.showDialogs();
+                         addClusterDialogProvider.get().showDialogs();
                      }
                  });
                  t.start();
@@ -535,8 +538,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final BugReport br = new BugReport(BugReport.UNKNOWN_CLUSTER, BugReport.NO_ERROR_TEXT);
-                        br.showDialog();
+                        bugReport.init(BugReport.UNKNOWN_CLUSTER, BugReport.NO_ERROR_TEXT);
+                        bugReport.showDialog();
                     }
                 });
                 t.start();
@@ -592,17 +595,17 @@ public final class MainMenu extends JPanel implements ActionListener {
     /** Returns advanced mode check box. That hides advanced options. */
     private JCheckBox createAdvancedModeButton() {
         final JCheckBox emCb = new JCheckBox(Tools.getString("Browser.AdvancedMode"));
-        emCb.setSelected(Tools.getApplication().isAdvancedMode());
+        emCb.setSelected(application.isAdvancedMode());
         emCb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
                 final boolean selected = e.getStateChange() == ItemEvent.SELECTED;
-                if (selected != Tools.getApplication().isAdvancedMode()) {
+                if (selected != application.isAdvancedMode()) {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.getApplication().setAdvancedMode(selected);
-                            Tools.checkAccessOfEverything();
+                            application.setAdvancedMode(selected);
+                            application.checkAccessOfEverything();
                         }
                     });
                     thread.start();
@@ -614,10 +617,10 @@ public final class MainMenu extends JPanel implements ActionListener {
     }
 
     private JComboBox<String> createOperationModeCb() {
-        final String[] modes = Tools.getApplication().getOperatingModes();
+        final String[] modes = application.getOperatingModes();
         final JComboBox<String> opModeCB = new JComboBox<String>(modes);
 
-        final Application.AccessType accessType = Tools.getApplication().getAccessType();
+        final Application.AccessType accessType = application.getAccessType();
         opModeCB.setSelectedItem(Application.OP_MODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
             @Override
@@ -632,8 +635,8 @@ public final class MainMenu extends JPanel implements ActionListener {
                                 LOG.appError("run: unknown mode: " + opMode);
                                 type = Application.AccessType.RO;
                             }
-                            Tools.getApplication().setAccessType(type);
-                            Tools.checkAccessOfEverything();
+                            application.setAccessType(type);
+                            application.checkAccessOfEverything();
                         }
                     });
                     thread.start();
@@ -646,7 +649,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     /** Modify the operating modes combo box according to the godmode. */
     void resetOperatingModes(final boolean godMode) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (godMode) {
@@ -661,7 +664,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
     /** Sets operating mode. */
     public void setOperatingMode(final String opMode) {
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 operatingModesCB.setSelectedItem(opMode);
@@ -692,7 +695,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                     }
                 }
                 final String text = upgradeCheck;
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         upgradeTextField.setText(text);

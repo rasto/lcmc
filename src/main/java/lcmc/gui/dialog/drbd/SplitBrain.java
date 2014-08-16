@@ -44,6 +44,7 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -59,7 +60,9 @@ public final class SplitBrain extends DrbdConfig {
     private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
     private Widget hostWithBetterDataWidget;
-    private final MyButton resolveButton = new MyButton(Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private MyButton resolveButton;
 
     protected void resolve() {
         final Host h1 = getDrbdVolumeInfo().getFirstBlockDevInfo().getHost();
@@ -130,7 +133,7 @@ public final class SplitBrain extends DrbdConfig {
         final Set<Host> hosts = getDrbdVolumeInfo().getHosts();
         final JLabel hostLabel = new JLabel(Tools.getString("Dialog.Drbd.SplitBrain.ChooseHost"));
         final Host[] hostsArray = hosts.toArray(new Host[hosts.size()]);
-        hostWithBetterDataWidget = WidgetFactory.createInstance(
+        hostWithBetterDataWidget = widgetFactory.createInstance(
                                     Widget.Type.COMBOBOX,
                                     hostsArray[0],
                                     hostsArray,
@@ -141,6 +144,7 @@ public final class SplitBrain extends DrbdConfig {
                                     Widget.NO_BUTTON);
         inputPane.add(hostLabel);
         inputPane.add(hostWithBetterDataWidget.getComponent());
+        resolveButton = widgetFactory.createButton(Tools.getString("Dialog.Drbd.SplitBrain.ResolveButton"));
         resolveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

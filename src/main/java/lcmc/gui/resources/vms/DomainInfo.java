@@ -45,6 +45,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+import javax.inject.Provider;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -597,6 +598,30 @@ public class DomainInfo extends EditableInfo {
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private DomainMenu domainMenu;
+    @Autowired
+    private Provider<DiskInfo> diskInfoProvider;
+    @Autowired
+    private Provider<FilesystemInfo> filesystemInfoProvider;
+    @Autowired
+    private Provider<InterfaceInfo> interfaceInfoProvider;
+    @Autowired
+    private Provider<InputDevInfo> inputDevInfoProvider;
+    @Autowired
+    private Provider<GraphicsInfo> graphicsInfoProvider;
+    @Autowired
+    private Provider<SoundInfo> soundInfoProvider;
+    @Autowired
+    private Provider<SerialInfo> serialInfoProvider;
+    @Autowired
+    private Provider<ParallelInfo> parallelInfoProvider;
+    @Autowired
+    private Provider<VideoInfo> videoInfoProvider;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
@@ -681,7 +706,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -703,16 +728,16 @@ public class DomainInfo extends EditableInfo {
                 i++;
             }
             /* add new vm disk */
-            final DiskInfo vmsdi =
-                                new DiskInfo(disk, getBrowser(), this);
+            final DiskInfo diskInfo = diskInfoProvider.get();
+            diskInfo.init(disk, getBrowser(), this);
             mDiskToInfoLock.lock();
             try {
-                diskToInfo.put(disk, vmsdi);
+                diskToInfo.put(disk, diskInfo);
             } finally {
                 mDiskToInfoLock.unlock();
             }
-            vmsdi.updateParameters();
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsdi);
+            diskInfo.updateParameters();
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
             getBrowser().setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
@@ -770,7 +795,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -792,15 +817,16 @@ public class DomainInfo extends EditableInfo {
                 i++;
             }
             /* add new vm fs */
-            final FilesystemInfo vmsdi = new FilesystemInfo(filesystem, getBrowser(), this);
+            final FilesystemInfo filesystemInfo = filesystemInfoProvider.get();
+            filesystemInfo.init(filesystem, getBrowser(), this);
             mFilesystemToInfoLock.lock();
             try {
-                filesystemToInfo.put(filesystem, vmsdi);
+                filesystemToInfo.put(filesystem, filesystemInfo);
             } finally {
                 mFilesystemToInfoLock.unlock();
             }
-            vmsdi.updateParameters();
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsdi);
+            filesystemInfo.updateParameters();
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
             getBrowser().setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
@@ -855,13 +881,13 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
 
         for (final String interf : interfaceNames) {
-            final InterfaceInfo vmsii;
+            final InterfaceInfo interfaceInfo;
             if (emptySlot == null) {
                 @SuppressWarnings("unchecked")
                 final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
@@ -884,23 +910,24 @@ public class DomainInfo extends EditableInfo {
                     i++;
                 }
                 /* add new vm interface */
-                vmsii = new InterfaceInfo(interf, getBrowser(), this);
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsii);
+                interfaceInfo = interfaceInfoProvider.get();
+                interfaceInfo.init(interf, getBrowser(), this);
+                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
                 getBrowser().setNode(resource);
                 thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
-                vmsii = emptySlot;
-                vmsii.setName(interf);
+                interfaceInfo = emptySlot;
+                interfaceInfo.setName(interf);
                 emptySlot = null;
             }
             mInterfaceToInfoLock.lock();
             try {
-                interfaceToInfo.put(interf, vmsii);
+                interfaceToInfo.put(interf, interfaceInfo);
             } finally {
                 mInterfaceToInfoLock.unlock();
             }
-            vmsii.updateParameters();
+            interfaceInfo.updateParameters();
         }
         return nodeChanged;
     }
@@ -949,7 +976,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -976,18 +1003,19 @@ public class DomainInfo extends EditableInfo {
                 i++;
             }
             /* add new vm input device */
-            final InputDevInfo vmsid = new InputDevInfo(inputDev, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsid);
+            final InputDevInfo inputDevInfo = inputDevInfoProvider.get();
+            inputDevInfo.init(inputDev, getBrowser(), this);
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
             getBrowser().setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mInputDevToInfoLock.lock();
             try {
-                inputDevToInfo.put(inputDev, vmsid);
+                inputDevToInfo.put(inputDev, inputDevInfo);
             } finally {
                 mInputDevToInfoLock.unlock();
             }
-            vmsid.updateParameters();
+            inputDevInfo.updateParameters();
         }
         /* Sort it. */
         int i = 0;
@@ -1065,7 +1093,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1093,18 +1121,19 @@ public class DomainInfo extends EditableInfo {
                 i++;
             }
             /* add new vm graphics device */
-            final GraphicsInfo vmsgi = new GraphicsInfo(graphicDisplay, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsgi);
+            final GraphicsInfo graphicsInfo = graphicsInfoProvider.get();
+            graphicsInfo.init(graphicDisplay, getBrowser(), this);
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
             getBrowser().setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mGraphicsToInfoLock.lock();
             try {
-                graphicsToInfo.put(graphicDisplay, vmsgi);
+                graphicsToInfo.put(graphicDisplay, graphicsInfo);
             } finally {
                 mGraphicsToInfoLock.unlock();
             }
-            vmsgi.updateParameters();
+            graphicsInfo.updateParameters();
         }
         return nodeChanged;
     }
@@ -1160,7 +1189,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1189,18 +1218,19 @@ public class DomainInfo extends EditableInfo {
                 i++;
             }
             /* add new vm sound device */
-            final SoundInfo vmssi = new SoundInfo(sound, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmssi);
+            final SoundInfo soundInfo = soundInfoProvider.get();
+            soundInfo.init(sound, getBrowser(), this);
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
             getBrowser().setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mSoundToInfoLock.lock();
             try {
-                soundToInfo.put(sound, vmssi);
+                soundToInfo.put(sound, soundInfo);
             } finally {
                 mSoundToInfoLock.unlock();
             }
-            vmssi.updateParameters();
+            soundInfo.updateParameters();
         }
         return nodeChanged;
     }
@@ -1252,13 +1282,13 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
 
         for (final String serial : serialNames) {
-            final SerialInfo vmssi;
+            final SerialInfo serialInfo;
             if (emptySlot == null) {
                 @SuppressWarnings("unchecked")
                 final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
@@ -1284,23 +1314,24 @@ public class DomainInfo extends EditableInfo {
                     i++;
                 }
                 /* add new vm serial device */
-                vmssi = new SerialInfo(serial, getBrowser(), this);
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmssi);
+                serialInfo = serialInfoProvider.get();
+                serialInfo.init(serial, getBrowser(), this);
+                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
                 getBrowser().setNode(resource);
                 thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
-                vmssi = emptySlot;
-                vmssi.setName(serial);
+                serialInfo = emptySlot;
+                serialInfo.setName(serial);
                 emptySlot = null;
             }
             mSerialToInfoLock.lock();
             try {
-                serialToInfo.put(serial, vmssi);
+                serialToInfo.put(serial, serialInfo);
             } finally {
                 mSerialToInfoLock.unlock();
             }
-            vmssi.updateParameters();
+            serialInfo.updateParameters();
         }
         return nodeChanged;
     }
@@ -1352,13 +1383,13 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
 
         for (final String parallel : parallelNames) {
-            final ParallelInfo vmspi;
+            final ParallelInfo parallelInfo;
             if (emptySlot == null) {
                 @SuppressWarnings("unchecked")
                 final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
@@ -1385,23 +1416,24 @@ public class DomainInfo extends EditableInfo {
                     i++;
                 }
                 /* add new vm parallel device */
-                vmspi = new ParallelInfo(parallel, getBrowser(), this);
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmspi);
+                parallelInfo = parallelInfoProvider.get();
+                parallelInfo.init(parallel, getBrowser(), this);
+                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
                 getBrowser().setNode(resource);
                 thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
-                vmspi = emptySlot;
-                vmspi.setName(parallel);
+                parallelInfo = emptySlot;
+                parallelInfo.setName(parallel);
                 emptySlot = null;
             }
             mParallelToInfoLock.lock();
             try {
-                parallelToInfo.put(parallel, vmspi);
+                parallelToInfo.put(parallel, parallelInfo);
             } finally {
                 mParallelToInfoLock.unlock();
             }
-            vmspi.updateParameters();
+            parallelInfo.updateParameters();
         }
         return nodeChanged;
     }
@@ -1456,7 +1488,7 @@ public class DomainInfo extends EditableInfo {
         }
 
         /* remove nodes */
-        Tools.isSwingThread();
+        application.isSwingThread();
         for (final DefaultMutableTreeNode node : nodesToRemove) {
             node.removeFromParent();
         }
@@ -1488,28 +1520,29 @@ public class DomainInfo extends EditableInfo {
                 i++;
             }
             /* add new vm video device */
-            final VideoInfo vmspi = new VideoInfo(video, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmspi);
+            final VideoInfo videoInfo = videoInfoProvider.get();
+            videoInfo.init(video, getBrowser(), this);
+            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
             getBrowser().setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mVideoToInfoLock.lock();
             try {
-                videoToInfo.put(video, vmspi);
+                videoToInfo.put(video, videoInfo);
             } finally {
                 mVideoToInfoLock.unlock();
             }
-            vmspi.updateParameters();
+            videoInfo.updateParameters();
         }
         return nodeChanged;
     }
 
     /** Returns button for defined hosts. */
     private MyButton getHostButton(final Host host, final String prefix) {
-        final MyButton hostBtn = new MyButton("Start", null, "not defined on " + host.getName());
-        hostBtn.miniButton();
+        final MyButton hostBtn = widgetFactory.createButton("Start", null, "not defined on " + host.getName());
+        application.makeMiniButton(hostBtn);
         final MyButton hBtn = hostBtn;
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
@@ -1526,9 +1559,9 @@ public class DomainInfo extends EditableInfo {
                         if (vxml != null) {
                             if (hBtn.getIcon() == VNC_ICON) {
                                 final int remotePort = vxml.getRemotePort(getDomainName());
-                                Tools.startTightVncViewer(host, remotePort);
+                                application.startTightVncViewer(host, remotePort);
                             } else if (hBtn.getIcon() == HostBrowser.HOST_ON_ICON) {
-                                Tools.invokeLater(new Runnable() {
+                                application.invokeLater(new Runnable() {
                                     @Override
                                     public void run() {
                                         hBtn.setEnabled(false);
@@ -1704,7 +1737,7 @@ public class DomainInfo extends EditableInfo {
                 uuid = vmsXml.getValue(getDomainName(), VmsXml.VM_PARAM_UUID);
             }
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final boolean interfaceNodeChanged = updateInterfaceNodes();
@@ -1739,7 +1772,7 @@ public class DomainInfo extends EditableInfo {
         updateTable(SERIAL_TABLE);
         updateTable(PARALLEL_TABLE);
         updateTable(VIDEO_TABLE);
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, getParametersFromXML());
@@ -1770,11 +1803,11 @@ public class DomainInfo extends EditableInfo {
                 defaultValue = DEFINED_ON_HOST_FALSE;
             }
             final MyButton hostBtn = getHostButton(host, prefix);
-            final Widget wi = WidgetFactory.createInstance(Widget.Type.CHECKBOX,
+            final Widget wi = widgetFactory.createInstance(Widget.Type.CHECKBOX,
                                                            defaultValue,
                                                            Widget.NO_ITEMS,
                                                            Widget.NO_REGEXP,
-                                                           ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
+                                                           application.getServiceFieldWidth() * 2,
                                                            Widget.NO_ABBRV,
                                                            new AccessMode(Application.AccessType.ADMIN, false),
                                                            hostBtn);
@@ -1787,7 +1820,7 @@ public class DomainInfo extends EditableInfo {
             }
             final Widget realParamWi = rpwi;
             if (!host.isConnected()) {
-                Tools.invokeLater(new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         wi.setEnabled(false);
@@ -1810,8 +1843,8 @@ public class DomainInfo extends EditableInfo {
             addField(hostPanel,
                      label,
                      wi.getComponent(),
-                     ClusterBrowser.SERVICE_LABEL_WIDTH,
-                     ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
+                     application.getServiceLabelWidth(),
+                     application.getServiceFieldWidth() * 2,
                      0);
             rows++;
         }
@@ -1826,7 +1859,7 @@ public class DomainInfo extends EditableInfo {
 
     @Override
     public JComponent getInfoPanel() {
-        Tools.isSwingThread();
+        application.isSwingThread();
         if (infoPanel != null) {
             return infoPanel;
         }
@@ -1897,8 +1930,8 @@ public class DomainInfo extends EditableInfo {
         buttonPanel.add(extraButtonPanel);
         addApplyButton(buttonPanel);
         addRevertButton(extraButtonPanel);
-        final MyButton overviewButton = new MyButton("VMs Overview", BACK_ICON);
-        overviewButton.miniButton();
+        final MyButton overviewButton = widgetFactory.createButton("VMs Overview", BACK_ICON);
+        application.makeMiniButton(overviewButton);
         overviewButton.setPreferredSize(new Dimension(130, 50));
         overviewButton.addActionListener(new ActionListener() {
             @Override
@@ -1912,22 +1945,22 @@ public class DomainInfo extends EditableInfo {
         optionsPanel.add(getDefinedOnHostsPanel(null, getApplyButton()));
         addParams(optionsPanel,
                   params,
-                  ClusterBrowser.SERVICE_LABEL_WIDTH,
-                  ClusterBrowser.SERVICE_FIELD_WIDTH * 2,
+                  application.getServiceLabelWidth(),
+                  application.getServiceFieldWidth() * 2,
                   null);
         /* Actions */
         buttonPanel.add(getActionsButton(), BorderLayout.LINE_END);
         mainPanel.add(optionsPanel);
 
-        final MyButton newDiskBtn = DiskInfo.getNewBtn(this);
-        final MyButton newFilesystemBtn = FilesystemInfo.getNewBtn(this);
-        final MyButton newInterfaceBtn = InterfaceInfo.getNewBtn(this);
-        final MyButton newInputBtn = InputDevInfo.getNewBtn(this);
-        final MyButton newGraphicsBtn = GraphicsInfo.getNewBtn(this);
-        final MyButton newSoundBtn = SoundInfo.getNewBtn(this);
-        final MyButton newSerialBtn = SerialInfo.getNewBtn(this);
-        final MyButton newParallelBtn = ParallelInfo.getNewBtn(this);
-        final MyButton newVideoBtn = VideoInfo.getNewBtn(this);
+        final MyButton newDiskBtn = getNewDiskBtn();
+        final MyButton newFilesystemBtn = getNewFilesystemBtn();
+        final MyButton newInterfaceBtn = getNewInterfaceBtn();
+        final MyButton newInputBtn = getNewInputDevBtn();
+        final MyButton newGraphicsBtn = getNewGraphicsBtn();
+        final MyButton newSoundBtn = getNewSoundBtn();
+        final MyButton newSerialBtn = getNewSerialBtn();
+        final MyButton newParallelBtn = getNewParallelBtn();
+        final MyButton newVideoBtn = getNewVideoBtn();
         /* new video button */
         mainPanel.add(getTablePanel("Disks", DISK_TABLE, newDiskBtn));
         mainPanel.add(getTablePanel("Filesystems", FILESYSTEM_TABLE, newFilesystemBtn));
@@ -1950,10 +1983,10 @@ public class DomainInfo extends EditableInfo {
         newPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
-        newPanel.add(getMoreOptionsPanel(ClusterBrowser.SERVICE_LABEL_WIDTH
-                                         + ClusterBrowser.SERVICE_FIELD_WIDTH * 2 + 4));
+        newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
+                                         + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -2169,15 +2202,16 @@ public class DomainInfo extends EditableInfo {
     }
 
     public DiskInfo addDiskPanel() {
-        final DiskInfo vmsdi = new DiskInfo(null, getBrowser(), this);
-        vmsdi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsdi);
+        final DiskInfo diskInfo = diskInfoProvider.get();
+        diskInfo.init(null, getBrowser(), this);
+        diskInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmsdi;
+            return diskInfo;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2194,20 +2228,21 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmsdi.selectMyself();
-        return vmsdi;
+        diskInfo.selectMyself();
+        return diskInfo;
     }
 
     public FilesystemInfo addFilesystemPanel() {
-        final FilesystemInfo vmsdi = new FilesystemInfo(null, getBrowser(), this);
-        vmsdi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsdi);
+        final FilesystemInfo filesystemInfo = filesystemInfoProvider.get();
+        filesystemInfo.init(null, getBrowser(), this);
+        filesystemInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmsdi;
+            return filesystemInfo;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2224,21 +2259,22 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmsdi.selectMyself();
-        return vmsdi;
+        filesystemInfo.selectMyself();
+        return filesystemInfo;
     }
 
     /** Adds new virtual interface. */
     public InterfaceInfo addInterfacePanel() {
-        final InterfaceInfo vmsii = new InterfaceInfo(null, getBrowser(), this);
-        vmsii.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsii);
+        final InterfaceInfo interfaceInfo = interfaceInfoProvider.get();
+        interfaceInfo.init(null, getBrowser(), this);
+        interfaceInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmsii;
+            return interfaceInfo;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2258,21 +2294,22 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmsii.selectMyself();
-        return vmsii;
+        interfaceInfo.selectMyself();
+        return interfaceInfo;
     }
 
     /** Adds new virtual input device. */
     void addInputDevPanel() {
-        final InputDevInfo vmsidi = new InputDevInfo(null, getBrowser(), this);
-        vmsidi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsidi);
+        final InputDevInfo inputDevInfo = inputDevInfoProvider.get();
+        inputDevInfo.init(null, getBrowser(), this);
+        inputDevInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2293,20 +2330,21 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmsidi.selectMyself();
+        inputDevInfo.selectMyself();
     }
 
     /** Adds new graphics device. */
     public GraphicsInfo addGraphicsPanel() {
-        final GraphicsInfo vmsgi = new GraphicsInfo(null, getBrowser(), this);
-        vmsgi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsgi);
+        final GraphicsInfo graphicsInfo = graphicsInfoProvider.get();
+        graphicsInfo.init(null, getBrowser(), this);
+        graphicsInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
-            return vmsgi;
+            return graphicsInfo;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2327,20 +2365,21 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmsgi.selectMyself();
-        return vmsgi;
+        graphicsInfo.selectMyself();
+        return graphicsInfo;
     }
 
     void addSoundsPanel() {
-        final SoundInfo vmssi = new SoundInfo(null, getBrowser(), this);
-        vmssi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmssi);
+        final SoundInfo soundInfo = soundInfoProvider.get();
+        soundInfo.init(null, getBrowser(), this);
+        soundInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2363,19 +2402,20 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmssi.selectMyself();
+        soundInfo.selectMyself();
     }
 
     void addSerialsPanel() {
-        final SerialInfo vmssi = new SerialInfo(null, getBrowser(), this);
-        vmssi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmssi);
+        final SerialInfo serialInfo = serialInfoProvider.get();
+        serialInfo.init(null, getBrowser(), this);
+        serialInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2399,20 +2439,21 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmssi.selectMyself();
+        serialInfo.selectMyself();
     }
 
     /** Adds new parallel device. */
     void addParallelsPanel() {
-        final ParallelInfo vmspi = new ParallelInfo(null, getBrowser(), this);
-        vmspi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmspi);
+        final ParallelInfo parallelInfo = parallelInfoProvider.get();
+        parallelInfo.init(null, getBrowser(), this);
+        parallelInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
         getBrowser().setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 final Enumeration eee = thisNode.children();
@@ -2437,31 +2478,31 @@ public class DomainInfo extends EditableInfo {
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmspi.selectMyself();
+        parallelInfo.selectMyself();
     }
 
     void addVideosPanel() {
-        final VideoInfo vmsvi = new VideoInfo(null, getBrowser(), this);
-        vmsvi.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(vmsvi);
+        final VideoInfo videoInfo = videoInfoProvider.get();
+        videoInfo.init(null, getBrowser(), this);
+        videoInfo.getResource().setNew(true);
+        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
         getBrowser().setNode(resource);
         /* all the way till the end */
         final DefaultMutableTreeNode thisNode = getNode();
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 thisNode.add(resource);
             }
         });
         getBrowser().reloadNode(thisNode, true);
-        vmsvi.selectMyself();
+        videoInfo.selectMyself();
     }
 
     /** Returns list of menu items for VM. */
     @Override
     public List<UpdatableItem> createPopup() {
-        final DomainMenu domainMenu = new DomainMenu(this);
-        return domainMenu.getPulldownMenu();
+        return domainMenu.getPulldownMenu(this);
     }
 
     @Override
@@ -2730,7 +2771,7 @@ public class DomainInfo extends EditableInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -2767,7 +2808,7 @@ public class DomainInfo extends EditableInfo {
         guiData.startProgressIndicator(clusterName, "VM view update");
         for (final Host host : getBrowser().getClusterHosts()) {
             final Widget hostWi = definedOnHostComboBoxHash.get(host.getName());
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final Widget wizardHostWi = definedOnHostComboBoxHash.get(WIZARD_HOST_PREFIX + host.getName());
@@ -2835,7 +2876,7 @@ public class DomainInfo extends EditableInfo {
             hi.setApplyButtons(null, hi.getRealParametersFromXML());
         }
         if (getResource().isNew()) {
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final DefaultMutableTreeNode thisNode = getNode();
@@ -2867,7 +2908,7 @@ public class DomainInfo extends EditableInfo {
         updateParameters();
         guiData.stopProgressIndicator(clusterName, "VM view update");
         getBrowser().vmStatusUnlock();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final Host host : getBrowser().getClusterHosts()) {
@@ -2996,12 +3037,12 @@ public class DomainInfo extends EditableInfo {
         }
         rowColor = newColor;
         if (domainName != null) {
-            final MyButton domainNameLabel = new MyButton(domainName, hostIcon);
+            final MyButton domainNameLabel = widgetFactory.createButton(domainName, hostIcon);
             domainNameLabel.setOpaque(true);
-            final MyButton removeDomain = new MyButton("Remove",
+            final MyButton removeDomain = widgetFactory.createButton("Remove",
                                                        ClusterBrowser.REMOVE_ICON_SMALL,
                                                        "Remove " + domainName + " domain");
-            removeDomain.miniButton();
+            application.makeMiniButton(removeDomain);
             rows.add(new Object[]{domainNameLabel,
                                   getDefinedOnString(),
                                   getRunningOnString(),
@@ -3032,10 +3073,10 @@ public class DomainInfo extends EditableInfo {
         if (disks == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove",
+        final MyButton removeBtn = widgetFactory.createButton("Remove",
                                                 ClusterBrowser.REMOVE_ICON_SMALL,
                                                 "Remove " + targetDev);
-        removeBtn.miniButton();
+        application.makeMiniButton(removeBtn);
         final DiskData diskData = disks.get(targetDev);
         if (diskData == null) {
             return new Object[]{targetDev, "unknown", removeBtn};
@@ -3054,7 +3095,7 @@ public class DomainInfo extends EditableInfo {
             }
             dkti.put(target.toString(), vdi);
         }
-        final MyButton targetDevLabel = new MyButton(target.toString(), BlockDevInfo.HARDDISK_ICON_LARGE);
+        final MyButton targetDevLabel = widgetFactory.createButton(target.toString(), BlockDevInfo.HARDDISK_ICON_LARGE);
         targetDevLabel.setOpaque(opaque);
         final StringBuilder source = new StringBuilder(20);
         String s = diskData.getSourceDev();
@@ -3129,8 +3170,8 @@ public class DomainInfo extends EditableInfo {
         if (filesystems == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + targetDev);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + targetDev);
+        application.makeMiniButton(removeBtn);
         final FilesystemData filesystemData = filesystems.get(targetDev);
         if (filesystemData == null) {
             return new Object[]{targetDev, "unknown", removeBtn};
@@ -3147,7 +3188,7 @@ public class DomainInfo extends EditableInfo {
             }
             dkti.put(target.toString(), vdi);
         }
-        final MyButton targetDevLabel = new MyButton(target.toString(), BlockDevInfo.HARDDISK_ICON_LARGE);
+        final MyButton targetDevLabel = widgetFactory.createButton(target.toString(), BlockDevInfo.HARDDISK_ICON_LARGE);
         targetDevLabel.setOpaque(opaque);
         final StringBuilder source = new StringBuilder(20);
         String s = filesystemData.getSourceDir();
@@ -3189,10 +3230,10 @@ public class DomainInfo extends EditableInfo {
         if (interfaces == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove",
+        final MyButton removeBtn = widgetFactory.createButton("Remove",
                                                 ClusterBrowser.REMOVE_ICON_SMALL,
                                                 "Remove " + mac);
-        removeBtn.miniButton();
+        application.makeMiniButton(removeBtn);
         final InterfaceData interfaceData = interfaces.get(mac);
         if (interfaceData == null) {
             return new Object[]{mac, "unknown", removeBtn};
@@ -3208,7 +3249,7 @@ public class DomainInfo extends EditableInfo {
             final InterfaceInfo vii = interfaceToInfo.get(mac);
             iToInfo.put(interf.toString(), vii);
         }
-        final MyButton iLabel = new MyButton(interf.toString(), NetInfo.NET_INTERFACE_ICON_LARGE);
+        final MyButton iLabel = widgetFactory.createButton(interf.toString(), NetInfo.NET_INTERFACE_ICON_LARGE);
         iLabel.setOpaque(opaque);
         final StringBuilder source = new StringBuilder(20);
         final String type = interfaceData.getType();
@@ -3233,8 +3274,8 @@ public class DomainInfo extends EditableInfo {
         if (inputDevs == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
+        application.makeMiniButton(removeBtn);
         final InputDevData inputDevData = inputDevs.get(index);
         if (inputDevData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3243,7 +3284,7 @@ public class DomainInfo extends EditableInfo {
             final InputDevInfo vidi = inputDevToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(index, null);
+        final MyButton iLabel = widgetFactory.createButton(index, null);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, removeBtn};
     }
@@ -3255,8 +3296,8 @@ public class DomainInfo extends EditableInfo {
         if (graphicDisplays == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
+        application.makeMiniButton(removeBtn);
         final GraphicsData graphicsData = graphicDisplays.get(index);
         if (graphicsData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3265,7 +3306,7 @@ public class DomainInfo extends EditableInfo {
             final GraphicsInfo vidi = graphicsToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(index, VNC_ICON);
+        final MyButton iLabel = widgetFactory.createButton(index, VNC_ICON);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, removeBtn};
     }
@@ -3277,8 +3318,8 @@ public class DomainInfo extends EditableInfo {
         if (sounds == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
+        application.makeMiniButton(removeBtn);
         final SoundData soundData = sounds.get(index);
         if (soundData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3288,7 +3329,7 @@ public class DomainInfo extends EditableInfo {
             final SoundInfo vidi = soundToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(model, null);
+        final MyButton iLabel = widgetFactory.createButton(model, null);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, removeBtn};
     }
@@ -3300,8 +3341,8 @@ public class DomainInfo extends EditableInfo {
         if (serials == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
+        application.makeMiniButton(removeBtn);
         final SerialData serialData = serials.get(index);
         if (serialData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3310,7 +3351,7 @@ public class DomainInfo extends EditableInfo {
             final SerialInfo vidi = serialToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(index, null);
+        final MyButton iLabel = widgetFactory.createButton(index, null);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, removeBtn};
     }
@@ -3322,8 +3363,8 @@ public class DomainInfo extends EditableInfo {
         if (parallels == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
+        application.makeMiniButton(removeBtn);
         final ParallelData parallelData = parallels.get(index);
         if (parallelData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3332,7 +3373,7 @@ public class DomainInfo extends EditableInfo {
             final ParallelInfo vidi = parallelToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(index, null);
+        final MyButton iLabel = widgetFactory.createButton(index, null);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, removeBtn};
     }
@@ -3344,8 +3385,8 @@ public class DomainInfo extends EditableInfo {
         if (videos == null) {
             return new Object[0];
         }
-        final MyButton removeBtn = new MyButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
-        removeBtn.miniButton();
+        final MyButton removeBtn = widgetFactory.createButton("Remove", ClusterBrowser.REMOVE_ICON_SMALL, "Remove " + index);
+        application.makeMiniButton(removeBtn);
         final VideoData videoData = videos.get(index);
         if (videoData == null) {
             return new Object[]{index + ": unknown", "", removeBtn};
@@ -3355,7 +3396,7 @@ public class DomainInfo extends EditableInfo {
             final VideoInfo vidi = videoToInfo.get(index);
             iToInfo.put(index, vidi);
         }
-        final MyButton iLabel = new MyButton(modelType, null);
+        final MyButton iLabel = widgetFactory.createButton(modelType, null);
         iLabel.setOpaque(opaque);
         return new Object[]{iLabel, removeBtn};
     }
@@ -3990,7 +4031,7 @@ public class DomainInfo extends EditableInfo {
             dn = "";
         }
         desc  = desc.replaceAll("@DOMAIN@", Matcher.quoteReplacement(dn));
-        if (Tools.confirmDialog(Tools.getString("DomainInfo.confirmRemove.Title"),
+        if (application.confirmDialog(Tools.getString("DomainInfo.confirmRemove.Title"),
                                 desc,
                                 Tools.getString("DomainInfo.confirmRemove.Yes"),
                                 Tools.getString("DomainInfo.confirmRemove.No"))) {
@@ -4123,7 +4164,7 @@ public class DomainInfo extends EditableInfo {
                                   final boolean stopped) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable && stopped);
@@ -4139,7 +4180,7 @@ public class DomainInfo extends EditableInfo {
     private void setButtonToView(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable);
@@ -4154,7 +4195,7 @@ public class DomainInfo extends EditableInfo {
     /** Sets button next to host to the not defined button. */
     private void setButtonToNotDefined(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(false);
@@ -4269,5 +4310,158 @@ public class DomainInfo extends EditableInfo {
     /** Return whether domain type needs filesystem instead of disk device. */
     public boolean needFilesystem() {
         return NEED_FILESYSTEM.contains(getWidget(VmsXml.VM_PARAM_DOMAIN_TYPE, null).getStringValue());
+    }
+
+    MyButton getNewDiskBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Disk");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addDiskPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewFilesystemBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Filesystem");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addFilesystemPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewInterfaceBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Interface");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addInterfacePanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewGraphicsBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Graphics Display");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addGraphicsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewSoundBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Sound Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addSoundsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewSerialBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Serial Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addSerialsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewParallelBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Parallel Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addParallelsPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewVideoBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Video Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addVideosPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
+    }
+
+    MyButton getNewInputDevBtn() {
+        final MyButton newBtn = widgetFactory.createButton("Add Input Device");
+        newBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                final Thread t = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        addInputDevPanel();
+                    }
+                });
+                t.start();
+            }
+        });
+        return newBtn;
     }
 }

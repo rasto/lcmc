@@ -36,6 +36,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.Browser;
@@ -69,6 +70,10 @@ public class ProxyHostInfo extends Info {
                                     Tools.getString("ProxyHostInfo.NameInfo");
     /** Host data. */
     private Host host;
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -102,9 +107,7 @@ public class ProxyHostInfo extends Info {
     /** Returns the info panel. */
     @Override
     public JComponent getInfoPanel() {
-        final Font f = new Font("Monospaced",
-                                Font.PLAIN,
-                                Tools.getApplication().scaled(12));
+        final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(12));
         final JTextArea ta = new JTextArea();
         ta.setFont(f);
 
@@ -124,7 +127,7 @@ public class ProxyHostInfo extends Info {
 
             };
         // TODO: disable buttons if disconnected?
-        final MyButton procDrbdButton = new MyButton("Show Proxy Info");
+        final MyButton procDrbdButton = widgetFactory.createButton("Show Proxy Info");
         procDrbdButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -140,12 +143,9 @@ public class ProxyHostInfo extends Info {
 
         final JPanel buttonPanel = new JPanel(new BorderLayout());
         buttonPanel.setBackground(HostBrowser.BUTTON_PANEL_BACKGROUND);
-        buttonPanel.setMinimumSize(
-                        new Dimension(0, Tools.getApplication().scaled(50)));
-        buttonPanel.setPreferredSize(
-                        new Dimension(0, Tools.getApplication().scaled(50)));
-        buttonPanel.setMaximumSize(
-             new Dimension(Short.MAX_VALUE, Tools.getApplication().scaled(50)));
+        buttonPanel.setMinimumSize(new Dimension(0, application.scaled(50)));
+        buttonPanel.setPreferredSize(new Dimension(0, application.scaled(50)));
+        buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, application.scaled(50)));
         mainPanel.add(buttonPanel);
 
         /* Actions */
@@ -158,11 +158,11 @@ public class ProxyHostInfo extends Info {
                                            1, 1,  // initX, initY
                                            1, 1); // xPad, yPad
         mainPanel.setMinimumSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         mainPanel.setPreferredSize(new Dimension(
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                Tools.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         buttonPanel.add(p);
         mainPanel.add(new JScrollPane(ta));
         host.execCommand(new ExecCommandConfig().commandString("DRBD.showProxyInfo")

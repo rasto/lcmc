@@ -42,6 +42,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
+
+import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
@@ -52,26 +54,36 @@ import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.utilities.LVM;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class implements VG Remove dialog.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class VGRemove extends LV {
     private static final int REMOVE_TIMEOUT = 5000;
     private static final String VG_REMOVE_DESCRIPTION = "Remove a volume group.";
-    private final MyButton removeButton = new MyButton("Remove VG");
+    @Autowired
+    private WidgetFactory widgetFactory;
+    private final MyButton removeButton = widgetFactory.createButton("Remove VG");
     private final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    private final boolean multiSelection;
+    private boolean multiSelection;
+    @Autowired
+    private Application application;
 
-    public VGRemove(final BlockDevInfo bdi) {
-        super(null);
+    public void init(final BlockDevInfo bdi) {
+        super.init(null);
         blockDevInfos.add(bdi);
         multiSelection = false;
     }
 
-    public VGRemove(final Collection<BlockDevInfo> bdis) {
-        super(null);
+    public void init(final Collection<BlockDevInfo> bdis) {
+        super.init(null);
         blockDevInfos.addAll(bdis);
         multiSelection = true;
     }
@@ -218,7 +230,7 @@ public final class VGRemove extends LV {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Tools.invokeAndWait(new Runnable() {
+                    application.invokeAndWait(new Runnable() {
                         @Override
                         public void run() {
                             removeButton.setEnabled(false);
@@ -259,7 +271,7 @@ public final class VGRemove extends LV {
                     }
                     enableComponents();
                     if (oneFailed) {
-                        Tools.invokeLater(new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 removeButton.setEnabled(true);

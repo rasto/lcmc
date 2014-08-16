@@ -81,7 +81,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-public final class GlobalInfo extends AbstractDrbdInfo {
+public class GlobalInfo extends AbstractDrbdInfo {
     /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(GlobalInfo.class);
     /** Common proxy section. */
@@ -117,6 +117,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
     private Provider<ResourceInfo> resourceInfoProvider;
     @Autowired
     private Provider<DrbdXml> drbdXmlProvider;
+    @Autowired
+    private Application application;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
@@ -132,7 +134,6 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             final Host proxyHost = cluster.getProxyHostByName(hostName);
             if (proxyHost == null) {
                 final Host hp = hostFactory.createInstance();
-                hp.init();
                 hp.setHostname(hostName);
                 cluster.addProxyHost(hp);
                 addProxyHostNode(hp);
@@ -244,7 +245,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         if (Application.isLive(runMode)) {
             final String[] params = getParametersFromXML();
             storeComboBoxValues(params);
-            Tools.invokeLater(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final ResourceInfo dri : getDrbdResources()) {
@@ -378,8 +379,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         enableSection(SECTION_COMMON_PROXY, false, !WIZARD);
         addParams(optionsPanel,
                   params,
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
-                  Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth"),
+                  application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth"),
                   null);
 
         getApplyButton().addActionListener(
@@ -390,7 +391,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Tools.invokeAndWait(new Runnable() {
+                            application.invokeAndWait(new Runnable() {
                                 @Override
                                 public void run() {
                                     getApplyButton().setEnabled(false);
@@ -447,8 +448,8 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         newPanel.setLayout(new BoxLayout(newPanel, BoxLayout.PAGE_AXIS));
         newPanel.add(buttonPanel);
         newPanel.add(getMoreOptionsPanel(
-               Tools.getDefaultSize("ClusterBrowser.DrbdResLabelWidth")
-               + Tools.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
+               application.getDefaultSize("ClusterBrowser.DrbdResLabelWidth")
+               + application.getDefaultSize("ClusterBrowser.DrbdResFieldWidth") + 4));
         newPanel.add(new JScrollPane(mainPanel));
         infoPanel = newPanel;
         infoPanelDone();
@@ -614,7 +615,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                                            new DefaultMutableTreeNode(dri);
         getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 getBrowser().getDrbdNode().add(drbdResourceNode);
@@ -655,7 +656,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
                                            new DefaultMutableTreeNode(dvi);
         dvi.setNode(drbdVolumeNode);
 
-        Tools.isSwingThread();
+        application.isSwingThread();
         dvi.getDrbdResourceInfo().getNode().add(drbdVolumeNode);
 
         final DefaultMutableTreeNode drbdBDNode1 =
@@ -819,7 +820,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
         final DefaultMutableTreeNode proxyHostNode = new DefaultMutableTreeNode(proxyHostInfo);
         getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
         proxyHostInfo.setNode(proxyHostNode);
-        Tools.isSwingThread();
+        application.isSwingThread();
         getBrowser().getDrbdNode().add(proxyHostNode);
         getBrowser().reloadNode(proxyHostNode, true);
     }
@@ -940,8 +941,7 @@ public final class GlobalInfo extends AbstractDrbdInfo {
             }
             boolean bigDRBDConf = true;
             try {
-                bigDRBDConf = Tools.getApplication().getBigDRBDConf()
-                              || host.drbdVersionSmaller("8.3.7");
+                bigDRBDConf = application.getBigDRBDConf() || host.drbdVersionSmaller("8.3.7");
             } catch (final Exceptions.IllegalVersionException e) {
                 LOG.appWarning("createDrbdConfig: " + e.getMessage(), e);
             }

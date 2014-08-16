@@ -24,10 +24,12 @@ package lcmc.gui;
 import java.util.TreeSet;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+
+import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.resources.AllHostsInfo;
-import lcmc.utilities.Tools;
+import lcmc.model.Hosts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,6 +44,10 @@ public final class EmptyBrowser extends Browser {
     private DefaultMutableTreeNode allHostsNode;
     @Autowired
     private AllHostsInfo allHostsInfo;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Hosts allHosts;
 
     void init() {
         allHostsInfo.init(this);
@@ -68,8 +74,8 @@ public final class EmptyBrowser extends Browser {
 
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
-        final Iterable<Host> allHosts = new TreeSet<Host>(Tools.getApplication().getAllHosts().getHostSet());
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        final Iterable<Host> allHostsSorted = new TreeSet<Host>(allHosts.getHostSet());
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public String toString() {
                 return super.toString();
@@ -78,7 +84,7 @@ public final class EmptyBrowser extends Browser {
             @Override
             public void run() {
                 allHostsNode.removeAllChildren();
-                for (final Host host : allHosts) {
+                for (final Host host : allHostsSorted) {
                     final HostBrowser hostBrowser = host.getBrowser();
                     final MutableTreeNode resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
                     //setNode(resource);

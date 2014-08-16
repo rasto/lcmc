@@ -40,17 +40,24 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.text.Document;
 import lcmc.model.AccessMode;
+import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class RadioGroup extends GenericWidget<JComponent> {
     private Value radioGroupValue;
     /** Radio group hash, from string that is displayed to the object. */
@@ -60,14 +67,16 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
+    @Autowired
+    private Application application;
 
-    public RadioGroup(final Value selectedValue,
+    public void init(final Value selectedValue,
                       final Value[] items,
                       final String regexp,
                       final int width,
                       final AccessMode enableAccessMode,
                       final MyButton fieldButton) {
-        super(regexp, enableAccessMode, fieldButton);
+        super.init(regexp, enableAccessMode, fieldButton);
         addComponent(getRadioGroup(selectedValue, items), width);
     }
 
@@ -76,30 +85,32 @@ public final class RadioGroup extends GenericWidget<JComponent> {
         final JPanel radioPanel = new JPanel(new GridLayout(1, 1));
         mComponentsWriteLock.lock();
         componentsHash.clear();
-        for (final Value item : items) {
-            final JRadioButton rb = new JRadioButton(item.getValueForGui());
-            radioGroupHash.put(item.getValueForConfig(), item);
-            rb.setActionCommand(item.getValueForConfig());
-            group.add(rb);
-            radioPanel.add(rb);
+        if (items != null) {
+            for (final Value item : items) {
+                final JRadioButton rb = new JRadioButton(item.getValueForGui());
+                radioGroupHash.put(item.getValueForConfig(), item);
+                rb.setActionCommand(item.getValueForConfig());
+                group.add(rb);
+                radioPanel.add(rb);
 
-            componentsHash.put(item.getValueForConfig(), rb);
-            if (item.equals(selectedValue)) {
-                rb.setSelected(true);
-                radioGroupValue = selectedValue;
-            }
-
-            rb.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    mComponentsReadLock.lock();
-                    try {
-                        radioGroupValue = radioGroupHash.get(e.getActionCommand());
-                    } finally {
-                        mComponentsReadLock.unlock();
-                    }
+                componentsHash.put(item.getValueForConfig(), rb);
+                if (item.equals(selectedValue)) {
+                    rb.setSelected(true);
+                    radioGroupValue = selectedValue;
                 }
-            });
+
+                rb.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        mComponentsReadLock.lock();
+                        try {
+                            radioGroupValue = radioGroupHash.get(e.getActionCommand());
+                        } finally {
+                            mComponentsReadLock.unlock();
+                        }
+                    }
+                });
+            }
         }
         mComponentsWriteLock.unlock();
 
@@ -112,7 +123,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
      */
     @Override
     public void setEnabled(final String s, final boolean enabled) {
-        final boolean accessible = Tools.getApplication().isAccessible(getEnableAccessMode());
+        final boolean accessible = application.isAccessible(getEnableAccessMode());
         mComponentsReadLock.lock();
         final JComponent c;
         try {
@@ -121,7 +132,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
             mComponentsReadLock.unlock();
         }
         if (c != null) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     c.setEnabled(isEnablePredicate() && accessible);
@@ -178,7 +189,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     protected void setComponentsVisible(final boolean visible) {
         final JComponent comp = getInternalComponent();
         final JLabel label = getLabel();
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -255,7 +266,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getInternalComponent();
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -52,15 +52,19 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Disks.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class DiskInfo extends HardwareInfo {
-    /** Logger. */
-    private static final Logger LOG =
-                                  LoggerFactory.getLogger(DiskInfo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DiskInfo.class);
     /** Parameters. */
     private static final String[] PARAMETERS = {DiskData.TYPE,
                                                 DiskData.TARGET_BUS_TYPE,
@@ -349,23 +353,11 @@ public final class DiskInfo extends HardwareInfo {
                                            new StringValue("vde")});
     }
 
-    /** Returns "add new" button. */
-    static MyButton getNewBtn(final DomainInfo vdi) {
-        final MyButton newBtn = new MyButton("Add Disk");
-        newBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                final Thread t = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        vdi.addDiskPanel();
-                    }
-                });
-                t.start();
-            }
-        });
-        return newBtn;
-    }
+    @Autowired
+    private Application application;
+    @Autowired
+    private WidgetFactory widgetFactory;
+
     /** Source file combo box, so that it can be disabled, depending on type. */
     private final Map<String, Widget> sourceFileWi =
                                             new HashMap<String, Widget>();
@@ -414,10 +406,8 @@ public final class DiskInfo extends HardwareInfo {
     /** Table panel. */
     private JComponent tablePanel = null;
 
-    /** Creates the DiskInfo object. */
-    DiskInfo(final String name, final Browser browser,
-                       final DomainInfo vmsVirtualDomainInfo) {
-        super(name, browser, vmsVirtualDomainInfo);
+    void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
+        super.init(name, browser, vmsVirtualDomainInfo);
 
         checkFieldList.add(sourceNameWi);
         checkFieldList.add(sourceProtocolWi);
@@ -431,11 +421,9 @@ public final class DiskInfo extends HardwareInfo {
     /** Adds disk table with only this disk to the main panel. */
     @Override
     protected void addHardwareTable(final JPanel mainPanel) {
-        tablePanel = getTablePanel("Disk",
-                                   DomainInfo.DISK_TABLE,
-                                   getNewBtn(getVMSVirtualDomainInfo()));
+        tablePanel = getTablePanel("Disk", DomainInfo.DISK_TABLE, getVMSVirtualDomainInfo().getNewDiskBtn());
         if (getResource().isNew()) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -605,7 +593,7 @@ public final class DiskInfo extends HardwareInfo {
     /** Returns device parameters. */
     @Override
     protected Map<String, String> getHWParameters(final boolean allParams) {
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getInfoPanel();
@@ -708,7 +696,7 @@ public final class DiskInfo extends HardwareInfo {
         if (Application.isTest(runMode)) {
             return;
         }
-        Tools.invokeAndWait(new Runnable() {
+        application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setEnabled(false);
@@ -750,7 +738,7 @@ public final class DiskInfo extends HardwareInfo {
         getBrowser().reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        Tools.invokeLater(new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 tablePanel.setVisible(true);
@@ -806,7 +794,7 @@ public final class DiskInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (DiskData.TYPE.equals(param)) {
-            Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
                 @Override
                 public void run() {
                     final boolean file = FILE_TYPE.equals(newValue);
@@ -945,7 +933,7 @@ public final class DiskInfo extends HardwareInfo {
         updateTable(DomainInfo.HEADER_TABLE);
         updateTable(DomainInfo.DISK_TABLE);
         setApplyButtons(null, getRealParametersFromXML());
-        Tools.invokeLater(!Tools.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
             @Override
             public void run() {
                 if (tablePanel != null) {
@@ -968,10 +956,10 @@ public final class DiskInfo extends HardwareInfo {
         }
         if (DiskData.SOURCE_FILE.equals(param)) {
             final Value sourceFile = getParamSaved(DiskData.SOURCE_FILE);
-            final MyButton fileChooserBtn = new MyButton("Browse...");
-            fileChooserBtn.miniButton();
+            final MyButton fileChooserBtn = widgetFactory.createButton("Browse...");
+            application.makeMiniButton(fileChooserBtn);
             final String regexp = ".*[^/]$";
-            final Widget paramWi = WidgetFactory.createInstance(
+            final Widget paramWi = widgetFactory.createInstance(
                                      getFieldType(param),
                                      sourceFile,
                                      getParamPossibleChoices(param),
