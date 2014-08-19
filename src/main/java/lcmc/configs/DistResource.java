@@ -90,7 +90,7 @@ public final class DistResource extends ListResourceBundle {
         {"DrbdAvailVersionsSource",
          "/usr/bin/wget --no-check-certificate -q http://oss.linbit.com/drbd/"
          + " -O - |"
-         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-[89].*?\\.tar\\.gz)\"!"
+         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-8.*?\\.tar\\.gz)\"!"
          + " or goto LINE'"
          },
 
