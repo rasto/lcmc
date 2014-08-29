@@ -32,20 +32,15 @@ import javax.swing.table.TableCellRenderer;
 /**
  * Cells with jlabels, widths and colors.
  */
-public class MyButtonCellRenderer extends MyButton
-                                  implements TableCellRenderer {
-    /** Serial version uid. */
-    private static final long serialVersionUID = 1L;
-
+public class MyButtonCellRenderer extends MyButton implements TableCellRenderer {
     /** Sets background color and padding in jlabels for every cell. */
     @Override
-    public final Component getTableCellRendererComponent(
-                                                      final JTable table,
-                                                      final Object value,
-                                                      final boolean isSelected,
-                                                      final boolean hasFocus,
-                                                      final int row,
-                                                      final int column) {
+    public final Component getTableCellRendererComponent(final JTable table,
+                                                         final Object value,
+                                                         final boolean isSelected,
+                                                         final boolean hasFocus,
+                                                         final int row,
+                                                         final int column) {
         if (!(value instanceof MyButton)) {
             return this;
         }

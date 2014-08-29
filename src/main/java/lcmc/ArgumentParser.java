@@ -20,7 +20,11 @@
 
 package lcmc;
 
-import lcmc.model.*;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
+import lcmc.model.HostOptions;
+import lcmc.model.UserConfig;
 import lcmc.robotest.RoboTest;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
@@ -407,7 +411,7 @@ public class ArgumentParser {
         boolean global = false;
         for (final String arg : args) {
             final String[] pair = arg.split(":");
-            if (pair == null || pair.length != 2) {
+            if (pair.length != 2) {
                 LOG.appWarning("parseAutoArgs: cannot parse: " + line);
                 return;
             }

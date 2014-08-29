@@ -29,7 +29,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_redhat_5 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
@@ -127,7 +126,6 @@ public final class DistResource_redhat_5 extends ListResourceBundle {
          + " -x heartbeat-2.1* install pacemaker.@ARCH@ heartbeat.@ARCH@"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

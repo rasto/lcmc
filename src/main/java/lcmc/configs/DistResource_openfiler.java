@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_openfiler extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",                       "openfiler"},
         {"version:Openfiler NSA 2.3",     "2"},
@@ -54,7 +53,6 @@ public final class DistResource_openfiler extends ListResourceBundle {
          DistResource.SUDO + "/sbin/chkconfig --del openais"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

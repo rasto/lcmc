@@ -30,10 +30,6 @@ import lcmc.utilities.LoggerFactory;
 
 /**
  * This class holds data of a service.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public class Service extends Resource {
     private static final Logger LOG = LoggerFactory.getLogger(Service.class);

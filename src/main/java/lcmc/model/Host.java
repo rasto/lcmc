@@ -50,7 +50,13 @@ import lcmc.AppContext;
 import lcmc.Exceptions;
 import lcmc.LCMC;
 import lcmc.configs.DistResource;
-import lcmc.gui.*;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.GUIData;
+import lcmc.gui.HostBrowser;
+import lcmc.gui.ProgressBar;
+import lcmc.gui.ResourceGraph;
+import lcmc.gui.SSHGui;
+import lcmc.gui.TerminalPanel;
 import lcmc.model.drbd.DrbdHost;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.resources.BlockDevice;
@@ -58,7 +64,15 @@ import lcmc.model.resources.NetInterface;
 import lcmc.model.vm.VmsXml;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.robotest.RoboTest;
-import lcmc.utilities.*;
+import lcmc.utilities.ConnectionCallback;
+import lcmc.utilities.ConvertCmdCallback;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.ExecCallback;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.NewOutputCallback;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
@@ -782,7 +796,7 @@ public class Host implements Comparable<Host>, Value {
                         @Override
                         public String convert(String command) {
                             for (final String tag : replaceHash.keySet()) {
-                                if (tag != null && command.indexOf(tag) > -1) {
+                                if (tag != null && command.contains(tag)) {
                                     String s = replaceHash.get(tag);
                                     if (s == null) {
                                         s = "";
@@ -1526,7 +1540,7 @@ public class Host implements Comparable<Host>, Value {
      * @return command with replaced variables
      */
     public String replaceVars(String command, final boolean hidePassword) {
-        if (command.indexOf("@USER@") > -1) {
+        if (command.contains("@USER@")) {
             command = command.replaceAll("@USER@", application.getDownloadUser());
         }
         if (command.indexOf("@PASSWORD@") > -1) {
@@ -1541,25 +1555,25 @@ public class Host implements Comparable<Host>, Value {
             supportDir = "support/staging";
         }
         if (kernelVersion != null
-            && command.indexOf("@KERNELVERSIONDIR@") > -1) {
+            && command.contains("@KERNELVERSIONDIR@")) {
             command = command.replaceAll("@KERNELVERSIONDIR@", kernelVersion);
         }
         if (distributionVersion != null
-            && command.indexOf("@DISTRIBUTION@") > -1) {
+            && command.contains("@DISTRIBUTION@")) {
             command = command.replaceAll("@DISTRIBUTION@", distributionVersion);
         }
         if (arch != null
-            && command.indexOf("@ARCH@") > -1) {
+            && command.contains("@ARCH@")) {
             command = command.replaceAll("@ARCH@", arch);
         }
-        if (command.indexOf("@SUPPORTDIR@") > -1) {
+        if (command.contains("@SUPPORTDIR@")) {
             command = command.replaceAll("@SUPPORTDIR@", supportDir);
         }
-        if (command.indexOf("@DRBDDIR@") > -1) {
+        if (command.contains("@DRBDDIR@")) {
             final String drbdDir = "drbd";
             command = command.replaceAll("@DRBDDIR@", drbdDir);
         }
-        if (command.indexOf("@GUI-HELPER@") > -1) {
+        if (command.contains("@GUI-HELPER@")) {
             final StringBuilder helperProg = new StringBuilder("/usr/local/bin/lcmc-gui-helper-");
             helperProg.append(Tools.getRelease());
             if (application.isCmdLog()) {
@@ -1568,7 +1582,7 @@ public class Host implements Comparable<Host>, Value {
             }
             command = command.replaceAll("@GUI-HELPER@", helperProg.toString());
         }
-        if (command.indexOf("@GUI-HELPER-PROG@") > -1) {
+        if (command.contains("@GUI-HELPER-PROG@")) {
             command = command.replaceAll("@GUI-HELPER-PROG@", "/usr/local/bin/lcmc-gui-helper-" + Tools.getRelease());
         }
         return command;

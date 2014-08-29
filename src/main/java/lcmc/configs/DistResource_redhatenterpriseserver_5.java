@@ -31,7 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_redhatenterpriseserver_5
                                         extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* distribution name that is used in the download url */
         {"distributiondir", "rhel5"},
@@ -73,7 +72,6 @@ public final class DistResource_redhatenterpriseserver_5
          "echo '/etc/init.d/openais reload'|at now"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

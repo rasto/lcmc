@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class TextResource_it_IT extends ListResourceBundle {
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

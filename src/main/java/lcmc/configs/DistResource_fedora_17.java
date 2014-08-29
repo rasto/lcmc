@@ -29,7 +29,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_fedora_17 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support", "fedora-17"},
 
@@ -46,7 +45,6 @@ public final class DistResource_fedora_17 extends ListResourceBundle {
          + " fi"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

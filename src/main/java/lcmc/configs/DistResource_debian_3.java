@@ -30,12 +30,10 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_debian_3 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support", "debian-3"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

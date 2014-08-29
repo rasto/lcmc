@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_fedora_14 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support", "fedora-14"},
         /* Heartbeat/Pacemaker native */
@@ -91,7 +90,6 @@ public final class DistResource_fedora_14 extends ListResourceBundle {
          + DistResource.SUDO + "/etc/init.d/heartbeat start; fi"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

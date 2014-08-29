@@ -34,22 +34,14 @@ import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides LVM commands.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class LVM {
-    /** Size placeholder. */
-    private static final String SIZE_PH    = "@SIZE@";
-    /** Device placeholder. */
-    private static final String DEVICE_PH  = "@DEVICE@";
-    /** LV name placeholder. */
-    private static final String LV_NAME_PH = "@LVNAME@";
-    /** Volume group placeholder. */
-    private static final String VG_NAME_PH = "@VGNAME@";
+    private static final String SIZE_PLACE_HOLDER = "@SIZE@";
+    private static final String DEVICE_PLACE_HOLDER = "@DEVICE@";
+    private static final String LV_NAME_PLACE_HOLDER = "@LVNAME@";
+    private static final String VG_NAME_PLACE_HOLDER = "@VGNAME@";
     /** Physical volume names placeholder, delimited with space. */
-    private static final String PV_NAMES_PH = "@PVNAMES@";
+    private static final String PV_NAMES_PLACE_HOLDER = "@PVNAMES@";
 
     /**
      * Executes the specified LVM command on the specified host and calls the
@@ -64,85 +56,103 @@ public final class LVM {
     }
 
     /** Resize LVM device. */
-    public static boolean resize(final Host host, final String blockDevice, final String size, final Application.RunMode runMode) {
+    public static boolean resize(final Host host,
+                                 final String blockDevice,
+                                 final String size,
+                                 final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(SIZE_PH, size);
-        replaceHash.put(DEVICE_PH, blockDevice);
+        replaceHash.put(SIZE_PLACE_HOLDER, size);
+        replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getDistCommand("LVM.resize", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
     /** Initialize a physical volume. */
-    public static boolean pvCreate(final Host host, final String blockDevice, final Application.RunMode runMode) {
+    public static boolean pvCreate(final Host host,
+                                   final String blockDevice,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(DEVICE_PH, blockDevice);
+        replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getDistCommand("LVM.pvcreate", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
     /** Remove a physical volume. */
-    public static boolean pvRemove(final Host host, final String blockDevice, final Application.RunMode runMode) {
+    public static boolean pvRemove(final Host host,
+                                   final String blockDevice,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(DEVICE_PH, blockDevice);
+        replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getDistCommand("LVM.pvremove", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
     /** Remove a volume group. */
-    public static boolean vgRemove(final Host host, final String vgName, final Application.RunMode runMode) {
+    public static boolean vgRemove(final Host host,
+                                   final String vgName,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(VG_NAME_PH, vgName);
+        replaceHash.put(VG_NAME_PLACE_HOLDER, vgName);
         final String command = host.getDistCommand("LVM.vgremove", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
     /** Remove LVM device. */
-    public static boolean lvRemove(final Host host, final String blockDevice, final Application.RunMode runMode) {
+    public static boolean lvRemove(final Host host,
+                                   final String blockDevice,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(DEVICE_PH, blockDevice);
+        replaceHash.put(DEVICE_PLACE_HOLDER, blockDevice);
         final String command = host.getDistCommand("LVM.lvremove", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
     /** Create LVM device. */
-    public static boolean lvCreate(final Host host, final String lvName, final String vgName, final String size, final Application.RunMode runMode) {
+    public static boolean lvCreate(final Host host,
+                                   final String lvName,
+                                   final String vgName,
+                                   final String size,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(SIZE_PH, size);
-        replaceHash.put(LV_NAME_PH, lvName);
-        replaceHash.put(VG_NAME_PH, vgName);
+        replaceHash.put(SIZE_PLACE_HOLDER, size);
+        replaceHash.put(LV_NAME_PLACE_HOLDER, lvName);
+        replaceHash.put(VG_NAME_PLACE_HOLDER, vgName);
         final String command = host.getDistCommand("LVM.lvcreate", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
-    /** Create a volume group. */
-    public static boolean vgCreate(final Host host, final String vgName, final Collection<String> pvNames, final Application.RunMode runMode) {
+    public static boolean vgCreate(final Host host,
+                                   final String vgName,
+                                   final Collection<String> pvNames,
+                                   final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(PV_NAMES_PH, Tools.join(" ", pvNames));
-        replaceHash.put(VG_NAME_PH, vgName);
+        replaceHash.put(PV_NAMES_PLACE_HOLDER, Tools.join(" ", pvNames));
+        replaceHash.put(VG_NAME_PLACE_HOLDER, vgName);
         final String command = host.getDistCommand("LVM.vgcreate", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
-    /** Create an LVM snapshot. */
-    public static boolean lvSnapshot(final Host host, final String snapshotName, final String device, final String size, final Application.RunMode runMode) {
+    public static boolean createLVSnapshot(final Host host,
+                                           final String snapshotName,
+                                           final String device,
+                                           final String size,
+                                           final Application.RunMode runMode) {
         final Map<String, String> replaceHash = new HashMap<String, String>();
-        replaceHash.put(SIZE_PH, size);
-        replaceHash.put(DEVICE_PH, device);
-        replaceHash.put(LV_NAME_PH, snapshotName);
-        final String command = host.getDistCommand("LVM.lvsnapshot",
-                                                   replaceHash);
+        replaceHash.put(SIZE_PLACE_HOLDER, size);
+        replaceHash.put(DEVICE_PLACE_HOLDER, device);
+        replaceHash.put(LV_NAME_PLACE_HOLDER, snapshotName);
+        final String command = host.getDistCommand("LVM.lvsnapshot", replaceHash);
         final SshOutput ret = execCommand(host, command);
         return ret.getExitCode() == 0;
     }
 
-    /** Private constructor, cannot be instantiated. */
     private LVM() {
         /* Cannot be instantiated. */
     }

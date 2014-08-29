@@ -83,10 +83,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

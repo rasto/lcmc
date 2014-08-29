@@ -34,7 +34,6 @@ public final class DistResource extends ListResourceBundle {
     /** Sudo placeholder. */
     public static final String SUDO = "@DMCSUDO@";
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support", "no"},
         {"arch:i686", "i[3-6]86"}, // convert arch to arch in the drbd download file

@@ -24,10 +24,6 @@ package lcmc.model.crm;
 
 /**
  * This class holds data of host locations.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class HostLocation {
     private final String score;

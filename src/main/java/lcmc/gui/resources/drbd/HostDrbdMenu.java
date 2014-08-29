@@ -41,7 +41,17 @@ import lcmc.gui.dialog.drbd.DrbdsLog;
 import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.*;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Predicate;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.VisiblePredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -171,7 +181,7 @@ public class HostDrbdMenu {
         final UpdatableItem allProxyUpItem =
                 menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                         null,
-                        hostDrbdInfo.getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
+                        hostDrbdInfo.getMenuToolTip("DRBD.proxyUp", DRBD.ALL_DRBD_RESOURCES),
                         new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
                         new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
                         .visiblePredicate(new VisiblePredicate() {
@@ -183,7 +193,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.proxyUp(host, DRBD.ALL, null, runMode);
+                                DRBD.proxyUp(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                                 hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                             }
                         });
@@ -193,7 +203,7 @@ public class HostDrbdMenu {
         final UpdatableItem allProxyDownItem =
                 menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                         null,
-                        hostDrbdInfo.getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
+                        hostDrbdInfo.getMenuToolTip("DRBD.proxyDown", DRBD.ALL_DRBD_RESOURCES),
                         new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
                         new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
                         .visiblePredicate(new VisiblePredicate() {
@@ -205,7 +215,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.proxyDown(host, DRBD.ALL, null, runMode);
+                                DRBD.proxyDown(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                                 hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                             }
                         });
@@ -231,7 +241,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.adjust(host, DRBD.ALL, null, runMode);
+                                DRBD.adjust(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                                 hostDrbdInfo.getBrowser().getClusterBrowser().updateHWInfo(host, !Host.UPDATE_LVM);
                             }
                         });
@@ -242,7 +252,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.adjust(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.adjust(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(adjustAllItem, adjustAllItemCallback);
@@ -267,7 +277,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.up(host, DRBD.ALL, null, runMode);
+                                DRBD.up(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                             }
                         });
         items.add(upAllItem);
@@ -276,7 +286,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.up(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.up(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(upAllItem, upAllItemCallback);
@@ -348,7 +358,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
+                                DRBD.connect(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                             }
                         });
         items.add(connectAllItem);
@@ -357,7 +367,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.connect(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.connect(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(connectAllItem, connectAllItemCallback);
@@ -383,7 +393,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.disconnect(host, DRBD.ALL, null, runMode);
+                                DRBD.disconnect(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                             }
                         });
         items.add(disconnectAllItem);
@@ -392,7 +402,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.disconnect(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.disconnect(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(disconnectAllItem, disconnectAllItemCallback);
@@ -418,7 +428,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.attach(host, DRBD.ALL, null, runMode);
+                                DRBD.attach(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                             }
                         });
         items.add(attachAllItem);
@@ -427,7 +437,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.attach(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.attach(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(attachAllItem, attachAllItemCallback);
@@ -453,7 +463,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.detach(host, DRBD.ALL, null, runMode);
+                                DRBD.detach(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                             }
                         });
         items.add(detachAllItem);
@@ -462,7 +472,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.detach(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.detach(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(detachAllItem, detachAllItemCallback);
@@ -488,7 +498,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.setPrimary(host, DRBD.ALL, null, runMode);
+                                DRBD.setPrimary(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                             }
                         });
         items.add(setAllPrimaryItem);
@@ -497,7 +507,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.setPrimary(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.setPrimary(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(setAllPrimaryItem, setAllPrimaryItemCallback);
@@ -523,7 +533,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.setSecondary(host, DRBD.ALL, null, runMode);
+                                DRBD.setSecondary(host, DRBD.ALL_DRBD_RESOURCES, null, runMode);
                             }
                         });
         items.add(setAllSecondaryItem);
@@ -532,7 +542,7 @@ public class HostDrbdMenu {
                     .addAction(new CallbackAction() {
                         @Override
                         public void run(final Host host) {
-                            DRBD.setSecondary(host, DRBD.ALL, null, Application.RunMode.TEST);
+                            DRBD.setSecondary(host, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                         }
                     });
             hostDrbdInfo.addMouseOverListener(setAllSecondaryItem, setAllSecondaryItemCallback);

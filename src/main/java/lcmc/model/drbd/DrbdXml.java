@@ -37,10 +37,14 @@ import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
 import lcmc.gui.GUIData;
-import lcmc.model.*;
 import lcmc.gui.DrbdGraph;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.ProxyNetInfo;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
+import lcmc.model.XML;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

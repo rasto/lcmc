@@ -28,15 +28,12 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for openfiler NSA 2.
  */
-public final class DistResource_openfiler_2
-                                    extends ListResourceBundle {
+public final class DistResource_openfiler_2 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "openfiler-2"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

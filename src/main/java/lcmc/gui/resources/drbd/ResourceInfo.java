@@ -49,7 +49,11 @@ import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
-import lcmc.model.*;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdProxy;
 import lcmc.model.drbd.DrbdXml;
@@ -538,7 +542,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                         try {
                             globalInfo.createDrbdConfigLive();
                             for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
+                                DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
                             }
                             apply(Application.RunMode.LIVE);
                         } catch (final Exceptions.DrbdConfigException dce) {

@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_fedora extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support", "fedora"},
         {"distribution", "redhat"},
@@ -278,7 +277,6 @@ public final class DistResource_fedora extends ListResourceBundle {
          "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

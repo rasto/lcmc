@@ -31,7 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_redhatenterpriseserver_6
                                         extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* distribution name that is used in the download url */
         {"distributiondir", "rhel6"},
@@ -127,7 +126,6 @@ public final class DistResource_redhatenterpriseserver_6
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

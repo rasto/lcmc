@@ -29,7 +29,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.model.Host;
@@ -48,11 +47,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Rasto Levrinc
- * @version $Id$
- *
- */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class ProxyCheckInstallation extends DialogHost {

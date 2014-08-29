@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class TextResource extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"DrbdMC.Title",
          "Linux Cluster Management Console"},
@@ -2876,7 +2875,6 @@ public final class TextResource extends ListResourceBundle {
          + "100+ not finished (or interrupted)"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

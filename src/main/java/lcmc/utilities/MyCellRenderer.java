@@ -38,12 +38,9 @@ import javax.swing.table.TableCellRenderer;
  * Cells with jlabels, widths and colors.
  */
 public class MyCellRenderer extends JLabel implements TableCellRenderer {
-    /** Serial version uid. */
-    private static final long serialVersionUID = 1L;
     /** Border for jlabel so, that there is spacing in the table. Table spacing
      * cannot be used because of row colors. */
-    private static final Border EMPTY_BORDER =
-                                       new EmptyBorder(new Insets(0, 4, 0, 4));
+    private static final Border EMPTY_BORDER = new EmptyBorder(new Insets(0, 4, 0, 4));
     /** Creates a new MyCellRenderer object. */
     public MyCellRenderer() {
         super();
@@ -54,13 +51,12 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
      * Sets background color and padding in jlabels for every cell.
      */
     @Override
-    public final Component getTableCellRendererComponent(
-                                                      final JTable table,
-                                                      final Object value,
-                                                      final boolean isSelected,
-                                                      final boolean hasFocus,
-                                                      final int row,
-                                                      final int column) {
+    public final Component getTableCellRendererComponent(final JTable table,
+                                                         final Object value,
+                                                         final boolean isSelected,
+                                                         final boolean hasFocus,
+                                                         final int row,
+                                                         final int column) {
         final JComponent ret;
         final int al = getColumnAlignment(column);
         if (value instanceof JLabel) {
@@ -94,9 +90,7 @@ public class MyCellRenderer extends JLabel implements TableCellRenderer {
         return SwingConstants.LEFT;
     }
 
-    /** Retrurns color for some rows. */
     protected Color getRowColor(final String key) {
         return null;
     }
 }
-

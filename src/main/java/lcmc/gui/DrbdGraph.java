@@ -37,7 +37,10 @@ import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
-import lcmc.gui.resources.drbd.*;
+import lcmc.gui.resources.drbd.BlockDevInfo;
+import lcmc.gui.resources.drbd.HostDrbdInfo;
+import lcmc.gui.resources.drbd.MultiSelectionInfo;
+import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.model.Application;
 import lcmc.model.ColorText;
 import lcmc.model.Host;

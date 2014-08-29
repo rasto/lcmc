@@ -32,15 +32,9 @@ import lcmc.utilities.ssh.SshOutput;
 
 /**
  * This class provides virsh commands.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class VIRSH {
-    /** Virsh command map. */
-    private static final Map<String, String> VIRSH_COMMANDS =
-                                                 new HashMap<String, String>();
+    private static final Map<String, String> VIRSH_COMMANDS = new HashMap<String, String>();
     static {
         VIRSH_COMMANDS.put("autostart", "VIRSH.Autostart");
     }
@@ -75,7 +69,10 @@ public final class VIRSH {
     }
 
     /** Sets paramters with virsh command. */
-    public static void setParameters(final Host[] hosts, final String domainName, final Map<String, String> parameters, final String options) {
+    public static void setParameters(final Host[] hosts,
+                                     final String domainName,
+                                     final Map<String, String> parameters,
+                                     final String options) {
         final Map<Host, String> hostCommands = new HashMap<Host, String>();
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domainName);
@@ -83,8 +80,7 @@ public final class VIRSH {
         for (final Host host : hosts) {
             final StringBuilder commands = new StringBuilder(100);
             for (final Map.Entry<String, String> paramEntry : parameters.entrySet()) {
-                String command = host.getDistCommand(VIRSH_COMMANDS.get(paramEntry.getKey()),
-                                                     replaceHash);
+                String command = host.getDistCommand(VIRSH_COMMANDS.get(paramEntry.getKey()), replaceHash);
                 if (command == null) {
                     continue;
                 }
@@ -180,8 +176,7 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@CONFIG@", config);
         replaceHash.put("@OPTIONS@", options);
-        return host.getDistCommand("VIRSH.Define",
-                                   replaceHash);
+        return host.getDistCommand("VIRSH.Define", replaceHash);
     }
 
     /** Undefines virtual domain. It removes the config. */
@@ -189,12 +184,10 @@ public final class VIRSH {
         final Map<String, String> replaceHash = new HashMap<String, String>();
         replaceHash.put("@DOMAIN@", domain);
         replaceHash.put("@OPTIONS@", options);
-        final String command = host.getDistCommand("VIRSH.Undefine",
-                                                   replaceHash);
+        final String command = host.getDistCommand("VIRSH.Undefine", replaceHash);
         return execCommand(host, command);
     }
 
-    /** Private constructor, cannot be instantiated. */
     private VIRSH() {
         /* Cannot be instantiated. */
     }

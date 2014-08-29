@@ -35,8 +35,6 @@ import org.springframework.stereotype.Component;
 
 /**
  * This class is used to test the GUI.
- *
- * @author Rasto Levrinc
  */
 @Component
 final class PcmkTest1 {

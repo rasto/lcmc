@@ -25,8 +25,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.AppContext;
-import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;

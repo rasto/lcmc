@@ -44,7 +44,6 @@ import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -71,11 +70,11 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private Application application;
 
     public void init(final Value selectedValue,
-                      final Value[] items,
-                      final String regexp,
-                      final int width,
-                      final AccessMode enableAccessMode,
-                      final MyButton fieldButton) {
+                     final Value[] items,
+                     final String regexp,
+                     final int width,
+                     final AccessMode enableAccessMode,
+                     final MyButton fieldButton) {
         super.init(regexp, enableAccessMode, fieldButton);
         addComponent(getRadioGroup(selectedValue, items), width);
     }

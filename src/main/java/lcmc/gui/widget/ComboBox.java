@@ -78,12 +78,12 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     }
 
     void init(final Value selectedValue,
-                    final Value[] items,
-                    final String regexp,
-                    final int width,
-                    final Map<String, String> abbreviations,
-                    final AccessMode enableAccessMode,
-                    final MyButton fieldButton) {
+              final Value[] items,
+              final String regexp,
+              final int width,
+              final Map<String, String> abbreviations,
+              final AccessMode enableAccessMode,
+              final MyButton fieldButton) {
         super.init(regexp, enableAccessMode, fieldButton);
         addComponent(getComboBox(selectedValue, items, regexp, abbreviations), width);
     }

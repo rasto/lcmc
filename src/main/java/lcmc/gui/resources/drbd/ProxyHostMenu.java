@@ -31,7 +31,15 @@ import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.dialog.drbd.DrbdsLog;
-import lcmc.utilities.*;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Predicate;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.VisiblePredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -161,7 +169,7 @@ public class ProxyHostMenu {
         final UpdatableItem allProxyUpItem = menuFactory.createMenuItem(
                         Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                         null,
-                        getMenuToolTip("DRBD.proxyUp", DRBD.ALL),
+                        getMenuToolTip("DRBD.proxyUp", DRBD.ALL_DRBD_RESOURCES),
                         new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
                         new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
                         .visiblePredicate(new VisiblePredicate() {
@@ -173,7 +181,7 @@ public class ProxyHostMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.proxyUp(getHost(), DRBD.ALL, null, runMode);
+                                DRBD.proxyUp(getHost(), DRBD.ALL_DRBD_RESOURCES, null, runMode);
                                 getClusterBrowser().updateProxyHWInfo(getHost());
                             }
                         });
@@ -183,7 +191,7 @@ public class ProxyHostMenu {
         final UpdatableItem allProxyDownItem = menuFactory.createMenuItem(
                         Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                         null,
-                        getMenuToolTip("DRBD.proxyDown", DRBD.ALL),
+                        getMenuToolTip("DRBD.proxyDown", DRBD.ALL_DRBD_RESOURCES),
                         new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
                         new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
                         .visiblePredicate(new VisiblePredicate() {
@@ -195,7 +203,7 @@ public class ProxyHostMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                DRBD.proxyDown(getHost(), DRBD.ALL, null, runMode);
+                                DRBD.proxyDown(getHost(), DRBD.ALL_DRBD_RESOURCES, null, runMode);
                                 getClusterBrowser().updateProxyHWInfo(getHost());
                             }
                         });

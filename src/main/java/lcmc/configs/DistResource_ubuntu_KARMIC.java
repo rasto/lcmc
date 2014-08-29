@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for ubuntu karmic.
  */
-public final class DistResource_ubuntu_KARMIC
-                                        extends ListResourceBundle {
+public final class DistResource_ubuntu_KARMIC extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-KARMIC"},
         {"distributiondir",    "ubuntu-karmic-server"},
@@ -56,7 +54,6 @@ public final class DistResource_ubuntu_KARMIC
          + " mv /etc/corosync/corosync.conf /etc/corosync/corosync.conf.orig; fi"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

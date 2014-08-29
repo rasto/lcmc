@@ -107,7 +107,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         this.enableAccessMode = enableAccessMode;
         this.fieldButton = fieldButton;
         setLayout(new BorderLayout(0, 0));
-        if (regexp != null && regexp.indexOf("@NOTHING_SELECTED@") > -1) {
+        if (regexp != null && regexp.contains("@NOTHING_SELECTED@")) {
             this.regexp = regexp.replaceAll("@NOTHING_SELECTED@", NOTHING_SELECTED_DISPLAY);
         } else {
             this.regexp = regexp;
@@ -600,12 +600,10 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
     }
 
-    /** Returns its component. */
     final JComponent getJComponent() {
         return component;
     }
 
-    /** Sets background color. */
     @Override
     public void setBackgroundColor(final Color bg) {
         application.invokeLater(new Runnable() {
@@ -616,14 +614,12 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         });
     }
 
-    /** Sets label for this component. */
     @Override
     public final void setLabel(final JLabel label, final String labelToolTipText) {
         this.label = label;
         this.labelToolTipText = labelToolTipText;
     }
 
-    /** Returns label for this component. */
     @Override
     public final JLabel getLabel() {
         return label;
@@ -651,7 +647,6 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         widgetListeners.clear();
     }
 
-    /** Returns regexp of this field. */
     @Override
     public final String getRegexp() {
         return regexp;
@@ -670,8 +665,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
     }
 
-    /** Returns this widget, so that the interface Widget can be used in other
-     *  components. */
+    /** Returns this widget, so that the interface Widget can be used in other  components. */
     @Override
     public final java.awt.Component getComponent() {
         return this;

@@ -24,7 +24,6 @@ package lcmc.gui.dialog.vm;
 
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_suse extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support", "suse"},
         {"version:SUSE LINUX Enterprise Server 9 (i586)", "SLES9"}, // detected
@@ -156,7 +155,6 @@ public final class DistResource_suse extends ListResourceBundle {
          "rpm -q --queryformat='%{VERSION}' drbd-proxy-3.0"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

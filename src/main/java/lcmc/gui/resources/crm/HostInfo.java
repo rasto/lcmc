@@ -44,13 +44,19 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import lcmc.gui.SpringUtilities;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.CrmGraph;
+import lcmc.gui.HostBrowser;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.*;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.ColorText;
+import lcmc.model.Host;
 import lcmc.model.crm.ClusterStatus;
 import lcmc.model.crm.PtestData;
-import lcmc.model.ColorText;
-import lcmc.gui.*;
-import lcmc.gui.CrmGraph;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
@@ -341,8 +347,8 @@ public class HostInfo extends Info {
 
         p.add(new JLabel(""));
         SpringUtilities.makeCompactGrid(p, 1, 3,  // rows, cols
-                                           1, 1,  // initX, initY
-                                           1, 1); // xPad, yPad
+                1, 1,  // initX, initY
+                1, 1); // xPad, yPad
         mainPanel.setMinimumSize(new Dimension(application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
                                                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         mainPanel.setPreferredSize(new Dimension(application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),

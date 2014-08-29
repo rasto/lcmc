@@ -31,7 +31,6 @@ import java.util.ListResourceBundle;
 public final class DistResource_suse_OPENSUSE11_2
                                         extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
@@ -111,7 +110,6 @@ public final class DistResource_suse_OPENSUSE11_2
          "zypper -n install heartbeat pacemaker"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

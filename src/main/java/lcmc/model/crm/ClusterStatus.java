@@ -30,7 +30,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import lcmc.model.*;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.Value;
 import lcmc.model.crm.CrmXml.ResourceStatus;
 import lcmc.utilities.ConvertCmdCallback;
 import lcmc.utilities.Logger;

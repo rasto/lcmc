@@ -29,10 +29,13 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 
-import lcmc.model.*;
+import lcmc.model.Application;
+import lcmc.model.ColorText;
+import lcmc.model.Host;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
 import lcmc.model.crm.CrmXml;
 import lcmc.model.crm.ClusterStatus;
-import lcmc.model.ColorText;
 import lcmc.gui.Browser;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;

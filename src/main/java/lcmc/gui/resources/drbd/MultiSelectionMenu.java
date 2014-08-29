@@ -44,7 +44,15 @@ import lcmc.gui.dialog.lvm.LVCreate;
 import lcmc.gui.dialog.lvm.VGCreate;
 import lcmc.gui.dialog.lvm.VGRemove;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.*;
+import lcmc.utilities.ButtonCallback;
+import lcmc.utilities.DRBD;
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.VisiblePredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -153,7 +161,7 @@ public class MultiSelectionMenu {
                         @Override
                         public void run(final String text) {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, Application.RunMode.LIVE);
+                        DRBD.adjustApply(hi.getHost(), DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
                     }
                     for (final HostDrbdInfo hi : selectedHostInfos) {
                         getBrowser().updateHWInfo(hi.getHost(), !Host.UPDATE_LVM);
@@ -166,7 +174,7 @@ public class MultiSelectionMenu {
                            @Override
                            public void run(final Host host) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.adjustApply(hi.getHost(), DRBD.ALL, null, Application.RunMode.TEST);
+                    DRBD.adjustApply(hi.getHost(), DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                 }
             }});
         multiSelectionInfo.addMouseOverListener(adjustAllItem, adjustAllItemCallback);
@@ -192,7 +200,7 @@ public class MultiSelectionMenu {
                         @Override
                         public void run(final String text) {
                     for (final HostDrbdInfo hi : selectedHostInfos) {
-                        DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.LIVE);
+                        DRBD.up(hi.getHost(), DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
                     }
                 }});
         items.add(upAllItem);
@@ -202,7 +210,7 @@ public class MultiSelectionMenu {
                          @Override
                          public void run(final Host host) {
                 for (final HostDrbdInfo hi : selectedHostInfos) {
-                    DRBD.up(hi.getHost(), DRBD.ALL, null, Application.RunMode.TEST);
+                    DRBD.up(hi.getHost(), DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                 }
             }});
         multiSelectionInfo.addMouseOverListener(upAllItem, upAllItemCallback);

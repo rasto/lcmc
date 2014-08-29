@@ -42,11 +42,14 @@ import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
 import lcmc.gui.GUIData;
-import lcmc.model.*;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.gui.resources.crm.ServicesInfo;
-import lcmc.robotest.RoboTest;
+import lcmc.model.Application;
+import lcmc.model.Host;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
+import lcmc.model.XML;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
 import lcmc.utilities.ConvertCmdCallback;

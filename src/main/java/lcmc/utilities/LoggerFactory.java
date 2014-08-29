@@ -26,44 +26,31 @@ import org.apache.commons.collections15.Buffer;
 import org.apache.commons.collections15.BufferUtils;
 import org.apache.commons.collections15.buffer.CircularFifoBuffer;
 
-/**
- * @author Rasto Levrinc
- */
 public final class LoggerFactory {
-    private static final Map<String, Logger> LOGGER_MAP =
-                                              new HashMap<String, Logger>();
-    /** Debug level. */
+    private static final Map<String, Logger> LOGGER_MAP = new HashMap<String, Logger>();
     private static int debugLevel = -1;
-    /** Whether the warnings should be shown. */
-    private static boolean appWarning = false;
+    private static boolean showAppWarning = false;
     /** Whether application errors should show a dialog. */
-    private static boolean appError = false;
-    /** Size of circular log buffer. */
+    private static boolean showAppError = false;
     private static final int CIRCULAR_LOG_SIZE = 200;
     /** Synchronized, Circular log. */
     static final Buffer<String> LOG_BUFFER =
-              BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>(
-                                                        CIRCULAR_LOG_SIZE));
-    /** Increments the debug level. */
+                                  BufferUtils.synchronizedBuffer(new CircularFifoBuffer<String>(CIRCULAR_LOG_SIZE));
     public static void incrementDebugLevel() {
         debugLevel++;
         System.out.println("debug level: " + debugLevel);
     }
 
-    /** Decrements the debug level. */
     public static void decrementDebugLevel() {
         debugLevel--;
         System.out.println("debug level: " + debugLevel);
     }
 
-    /** Return debug level. */
     public static int getDebugLevel() {
         return debugLevel;
     }
 
     /**
-     * Sets debug level.
-     *
      * @param level
      *          debug level usually from 0 to 2. 0 means no debug output.
      */
@@ -71,20 +58,20 @@ public final class LoggerFactory {
         debugLevel = level;
     }
 
-    public static void setAppWarning(final boolean aw) {
-        appWarning = aw;
+    public static void setShowAppWarning(final boolean aw) {
+        showAppWarning = aw;
     }
 
-    public static void setAppError(final boolean ae) {
-        appError = ae;
+    public static void setShowAppError(final boolean ae) {
+        showAppError = ae;
     }
 
-    public static boolean getAppWarning() {
-        return appWarning;
+    public static boolean getShowAppWarning() {
+        return showAppWarning;
     }
 
-    public static boolean getAppError() {
-        return appError;
+    public static boolean getShowAppError() {
+        return showAppError;
     }
 
     public static Logger getLogger(final Class<?> clazz) {

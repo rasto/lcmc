@@ -44,21 +44,14 @@ import javax.swing.ListModel;
  * A Jlist with updatable tooltips.
  */
 public final class MyList<E> extends JList<E> implements ComponentWithTest {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(MyList.class);
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    /** Tools tip object. */
+                                         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     private JToolTip toolTip;
     /** Robot to move a mouse a little if a tooltip has changed. */
     private final Robot robot;
-    /** Tooltip background color. */
     private Color toolTipBackground = null;
 
-    /** Prepares a new {@code MyList} object. */
     public MyList(final ListModel<E> dataModel, final Color bg) {
         super(dataModel);
         toolTip = createToolTip();
@@ -72,7 +65,6 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         setBackground(bg);
     }
 
-    /** Creates tooltip. */
     @Override
     public JToolTip createToolTip() {
         if (toolTip != null) {
@@ -85,7 +77,6 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         return toolTip;
     }
 
-    /** Sets tooltip's background color. */
     @Override
     public void setToolTipBackground(final Color toolTipBackground) {
         this.toolTipBackground = toolTipBackground;
@@ -103,17 +94,13 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         super.setToolTipText(text);
         toolTip.setTipText(text);
         if (toolTip != null && toolTip.isShowing() && robot != null) {
-            final GraphicsDevice[] devices =
-                            GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                               .getScreenDevices();
+            final GraphicsDevice[] devices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
             int xOffset = 0;
             if (devices.length >= 2) {
                 /* workaround for dual monitors that are flipped. */
                 //TODO: not sure how is it with three monitors
-                final int x1 =
-                    devices[0].getDefaultConfiguration().getBounds().x;
-                final int x2 =
-                    devices[1].getDefaultConfiguration().getBounds().x;
+                final int x1 = devices[0].getDefaultConfiguration().getBounds().x;
+                final int x2 = devices[1].getDefaultConfiguration().getBounds().x;
                 if (x1 > x2) {
                     xOffset = -x1;
                 }
@@ -135,8 +122,7 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         final Rectangle sBounds = Tools.getScreenBounds(this);
         final Dimension size = toolTip.getPreferredSize();
         if (screenLocation.x + size.width + event.getX() + 5 > sBounds.width) {
-            return new Point(event.getX() - size.width - 5,
-                             event.getY() + 20);
+            return new Point(event.getX() - size.width - 5, event.getY() + 20);
         }
         return new Point(event.getX() + 5, /* to not cover the pointer. */
                          event.getY() + 20);
@@ -154,8 +140,7 @@ public final class MyList<E> extends JList<E> implements ComponentWithTest {
         for (final KeyListener kl : getKeyListeners()) {
             removeKeyListener(kl);
         }
-        for (final MouseMotionListener mml
-                                                : getMouseMotionListeners()) {
+        for (final MouseMotionListener mml : getMouseMotionListeners()) {
             removeMouseMotionListener(mml);
         }
         toolTip.setComponent(null);

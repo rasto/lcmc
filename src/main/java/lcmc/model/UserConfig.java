@@ -47,7 +47,6 @@ import javax.xml.transform.stream.StreamResult;
 import lcmc.view.ClusterTab;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
 import lcmc.view.ClustersPanel;
 import org.springframework.beans.factory.annotation.Autowired;

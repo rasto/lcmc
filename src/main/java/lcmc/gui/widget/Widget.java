@@ -82,11 +82,7 @@ public interface Widget {
      * It also disables, hides the component depending on the access type.
      * TODO: rename the function
      */
-    void setBackground(String defaultLabel,
-                       Value defaultValue,
-                       String savedLabel,
-                       Value savedValue,
-                       boolean required);
+    void setBackground(String defaultLabel, Value defaultValue, String savedLabel, Value savedValue, boolean required);
 
     void wrongValue();
 

@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for opensuse 11.3.
  */
-public final class DistResource_suse_OPENSUSE11_3
-                                    extends ListResourceBundle {
+public final class DistResource_suse_OPENSUSE11_3 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
@@ -92,7 +90,6 @@ public final class DistResource_suse_OPENSUSE11_3
          + "PATH=/sbin:$PATH " + DistResource.SUDO + "/etc/init.d/openais start; fi"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

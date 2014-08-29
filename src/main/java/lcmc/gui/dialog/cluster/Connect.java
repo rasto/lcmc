@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.model.Application;
-import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;

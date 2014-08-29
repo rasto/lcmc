@@ -28,16 +28,13 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for ubuntu lucid.
  */
-public final class DistResource_ubuntu_LUCID
-                                    extends ListResourceBundle {
+public final class DistResource_ubuntu_LUCID extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-LUCID"},
         {"distributiondir",    "ubuntu-lucid"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

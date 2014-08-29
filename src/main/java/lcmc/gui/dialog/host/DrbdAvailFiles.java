@@ -132,7 +132,9 @@ public class DrbdAvailFiles extends DialogHost {
                     application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailFiles.NoBuilds"), answer, errorCode);
+                            printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailFiles.NoBuilds"),
+                                               answer,
+                                               errorCode);
                         }
                     });
                 }

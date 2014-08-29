@@ -29,7 +29,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.gui.dialog.WizardDialog;
-import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.model.Application;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;

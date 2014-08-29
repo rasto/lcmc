@@ -61,8 +61,8 @@ public class LinbitLogin extends DialogHost {
     @Override
     protected final void finishDialog() {
         application.setDownloadLogin(downloadUserField.getStringValue().trim(),
-                                                downloadPasswordField.getStringValue().trim(),
-                                                saveCheckBox.isSelected());
+                                     downloadPasswordField.getStringValue().trim(),
+                                     saveCheckBox.isSelected());
     }
 
     @Override

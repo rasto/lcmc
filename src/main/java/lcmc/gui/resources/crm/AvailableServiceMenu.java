@@ -25,7 +25,11 @@ import java.util.List;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.*;
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.Tools;
+import lcmc.utilities.UpdatableItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -34,12 +38,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class AvailableServiceMenu {
-    private AvailableServiceInfo availableServiceInfo;
     @Autowired
     private MenuFactory menuFactory;
 
     public List<UpdatableItem> getPulldownMenu(final AvailableServiceInfo availableServiceInfo) {
-        this.availableServiceInfo = availableServiceInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
         final UpdatableItem addServiceMenu = menuFactory.createMenuItem(
                         Tools.getString("ClusterBrowser.AddServiceToCluster"),

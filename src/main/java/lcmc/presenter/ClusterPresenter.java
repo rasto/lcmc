@@ -22,7 +22,6 @@ package lcmc.presenter;
 
 import lcmc.gui.EmptyBrowser;
 import lcmc.model.Cluster;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;

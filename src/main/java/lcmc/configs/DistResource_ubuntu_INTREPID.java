@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for ubuntu intrepid.
  */
-public final class DistResource_ubuntu_INTREPID
-                                        extends ListResourceBundle {
+public final class DistResource_ubuntu_INTREPID extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-INTREPID"},
         {"distributiondir",    "ubuntu-inrepid-server"},
@@ -53,7 +51,6 @@ public final class DistResource_ubuntu_INTREPID
          "apt-get install: 8.2.x"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

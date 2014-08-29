@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_ubuntu extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",                       "ubuntu"},
         {"version:7.04",                  ""},
@@ -218,7 +217,6 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          + "|grep '^install ok installed:'|cut -d ':' -f 2"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

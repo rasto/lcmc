@@ -38,7 +38,6 @@ import lcmc.model.Application;
 import lcmc.model.crm.CrmXml;
 import lcmc.model.Host;
 import lcmc.gui.Browser;
-import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.CRM;

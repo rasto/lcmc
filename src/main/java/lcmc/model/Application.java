@@ -24,13 +24,18 @@ package lcmc.model;
 
 import ch.ethz.ssh2.KnownHosts;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Insets;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 import lcmc.gui.ClusterBrowser;
@@ -45,7 +50,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Provider;
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
 /**

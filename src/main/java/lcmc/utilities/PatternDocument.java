@@ -30,15 +30,8 @@ import javax.swing.text.DefaultStyledDocument;
 /**
  * An implementation of a document where user can specify a regexp, that
  * disables entering of characters, that do not match it.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class PatternDocument extends DefaultStyledDocument {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(PatternDocument.class);
     /** Abbreviations, from one character to the string, e.g. when user presses
      * i, the word infinity will be written. */
@@ -75,9 +68,7 @@ public final class PatternDocument extends DefaultStyledDocument {
             if (text.isEmpty()) {
                 texta = str;
             } else {
-                texta = ((offs >= 0) ? text.substring(0, offs) : "")
-                        + str
-                        + text.substring(offs);
+                texta = ((offs >= 0) ? text.substring(0, offs) : "") + str + text.substring(offs);
             }
             if (matches(texta)) {
                 super.insertString(offs, str, a);

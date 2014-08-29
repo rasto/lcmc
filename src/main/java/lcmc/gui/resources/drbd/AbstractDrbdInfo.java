@@ -29,7 +29,6 @@ import lcmc.model.drbd.DrbdProxy;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.Host;
 import lcmc.model.Value;
-import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.widget.Widget;

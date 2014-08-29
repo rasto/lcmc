@@ -30,23 +30,12 @@ import java.util.ListResourceBundle;
  * Here are default values for application.
  */
 public final class AppDefaults extends ListResourceBundle {
-    /** Darker background color. */
     public static final Color BACKGROUND_DARKER = new Color(63, 155, 241);
-
-    /** Dark background color. */
     public static final Color BACKGROUND_DARK = new Color(120, 120, 120);
-
-    /** Background color. */
     public static final Color BACKGROUND = new Color(168, 168, 168);
-
-    /** Light background color. */
     public static final Color BACKGROUND_LIGHT = new Color(227, 227, 227);
-    /** Light blue background color. */
     public static final Color BACKGROUND_LIGHT2 = new Color(210, 230, 251);
-
     public static final Color LIGHT_ORANGE = new Color(253, 180, 109);
-
-    /** Contents. */
     private static final Object[][] contents = {
         /*
          * defaults for development
@@ -85,7 +74,6 @@ public final class AppDefaults extends ListResourceBundle {
         {"DialogButton.Width",                   40}, //!!!!! doesn't work
         {"DialogButton.Height",                  20},
 
-        //{"ClusterBrowser.FieldWidth",            180}, // ??
         {"ClusterBrowser.ServiceLabelWidth",     150},
         {"ClusterBrowser.ServiceFieldWidth",     150},
 
@@ -110,16 +98,10 @@ public final class AppDefaults extends ListResourceBundle {
         {"Dialog.vm.Resource.FieldWidth", 350},
 
         {"MainMenu.DrbdGuiFiles.Extension",     "lcmc"},
-        {"MainMenu.DrbdGuiFiles.Default",       System.getProperty("user.home")
-                                                + '/'
-                                                + "lcmc-conf.lcmc"},
-        {"MainMenu.DrbdGuiFiles.Old",       System.getProperty("user.home")
-                                                + '/'
-                                                + "drbd-gui.drbdg"},
+        {"MainMenu.DrbdGuiFiles.Default",       System.getProperty("user.home") + '/' + "lcmc-conf.lcmc"},
+        {"MainMenu.DrbdGuiFiles.Old",       System.getProperty("user.home") + '/' + "drbd-gui.drbdg"},
 
-        /*
-         * Colors
-         */
+        /* Colors */
         {"DrbdMC.TableHeader",               BACKGROUND},
         {"DefaultButton.Background",         BACKGROUND },
         {"ViewPanel.Background",             BACKGROUND_LIGHT },
@@ -189,8 +171,7 @@ public final class AppDefaults extends ListResourceBundle {
         {"DrbdGraph.FillPaintUnknown",            Color.LIGHT_GRAY },
 
         {"DrbdGraph.EdgeDrawPaintDisconnected",   new Color(255, 50, 50) },
-        {"DrbdGraph.EdgeDrawPaintDisconnectedBrighter",
-                                                    new Color(200, 40, 40) },
+        {"DrbdGraph.EdgeDrawPaintDisconnectedBrighter", new Color(200, 40, 40) },
 
         {"DrbdGraph.DrawPaintNotAvailable",       new Color(153, 153, 153) },
         {"Host.DefaultColor",                     Color.GREEN },
@@ -208,19 +189,13 @@ public final class AppDefaults extends ListResourceBundle {
 
         {"EmptyBrowser.StartPanelTitleBorder",    BACKGROUND_DARK },
 
-        /*
-         * Images
-         */
+        /* Images */
         {"ConfigDialog.Icon",                     "teaser_drdb_boxes_01.png"},
 
-        {"Dialog.Cluster.ClusterHosts.HostCheckedIcon",
-         "Icons/32x32/Checked.gif"},
-        {"Dialog.Cluster.ClusterHosts.HostUncheckedIcon",
-         "Icons/32x32/Unchecked.gif"},
-        {"Dialog.Cluster.HbConfig.DopdCheckedIcon",
-         "Icons/32x32/Checked.gif"},
-        {"Dialog.Cluster.HbConfig.DopdUncheckedIcon",
-         "Icons/32x32/Unchecked.gif"},
+        {"Dialog.Cluster.ClusterHosts.HostCheckedIcon", "Icons/32x32/Checked.gif"},
+        {"Dialog.Cluster.ClusterHosts.HostUncheckedIcon", "Icons/32x32/Unchecked.gif"},
+        {"Dialog.Cluster.HbConfig.DopdCheckedIcon", "Icons/32x32/Checked.gif"},
+        {"Dialog.Cluster.HbConfig.DopdUncheckedIcon", "Icons/32x32/Unchecked.gif"},
         {"Dialog.Cluster.CoroConfig.DefaultMCastAddress", "226.94.1.1"},
         {"Dialog.Cluster.CoroConfig.DefaultMCastPort",    "5405"},
         {"Browser.CategoryIcon", "Icons/16x16/folder_16x16.png"},
@@ -231,95 +206,64 @@ public final class AppDefaults extends ListResourceBundle {
 
         {"HostBrowser.NetIntIcon", "Icons/16x16/netzwk_16x16.png"},
 
-        {"HostBrowser.NetIntIconLarge",
-         "Icons/32x32/netzwk_32x32.png"},
+        {"HostBrowser.NetIntIconLarge", "Icons/32x32/netzwk_32x32.png"},
 
         {"HostBrowser.FileSystemIcon", "Icons/16x16/filesys_16x16.png"},
         {"HostBrowser.RemoveIcon", "Icons/32x32/cancel_32x32.png"},
 
         {"ClusterBrowser.HostIcon", "Icons/16x16/host_16x16.png"},
-        {"CRMGraph.ServiceRunningIcon",
-                                "Icons/32x32/service_running_32x32.png"},
-        {"CRMGraph.ServiceRunningFailedIcon",
-                               "Icons/32x32/service_running_failed_32x32.png"},
-        {"CRMGraph.ServiceStartedIcon",
-                                "Icons/32x32/service_started_32x32.png"},
-        {"CRMGraph.ServiceStoppingIcon",
-                                "Icons/32x32/service_stopping_32x32.png"},
-        {"CRMGraph.ServiceStoppedIcon",
-                               "Icons/32x32/service_stopped_32x32.png"},
-        {"CRMGraph.ServiceStoppedFailedIcon",
-                               "Icons/32x32/service_stopped_failed_32x32.png"},
-        {"CRMGraph.ServiceMigratedIcon",
-                                "Icons/32x32/service_migrated_32x32.png"},
-        {"CRMGraph.HostStandbyIcon",
-                                "Icons/32x32/host_standby_32x32.png"},
-        {"CRMGraph.HostStandbyOffIcon",
-                                "Icons/32x32/host_standbyoff_32x32.png"},
-        {"CRMGraph.ServiceUnmanagedIcon",
-                               "Icons/32x32/service_unmanaged_32x32.png"},
+        {"CRMGraph.ServiceRunningIcon", "Icons/32x32/service_running_32x32.png"},
+        {"CRMGraph.ServiceRunningFailedIcon", "Icons/32x32/service_running_failed_32x32.png"},
+        {"CRMGraph.ServiceStartedIcon", "Icons/32x32/service_started_32x32.png"},
+        {"CRMGraph.ServiceStoppingIcon", "Icons/32x32/service_stopping_32x32.png"},
+        {"CRMGraph.ServiceStoppedIcon", "Icons/32x32/service_stopped_32x32.png"},
+        {"CRMGraph.ServiceStoppedFailedIcon", "Icons/32x32/service_stopped_failed_32x32.png"},
+        {"CRMGraph.ServiceMigratedIcon", "Icons/32x32/service_migrated_32x32.png"},
+        {"CRMGraph.HostStandbyIcon", "Icons/32x32/host_standby_32x32.png"},
+        {"CRMGraph.HostStandbyOffIcon", "Icons/32x32/host_standbyoff_32x32.png"},
+        {"CRMGraph.ServiceUnmanagedIcon", "Icons/32x32/service_unmanaged_32x32.png"},
 
-        {"CRMGraph.HostStopCommLayerIcon",
-                                       "Icons/32x32/shutdown_32x32.png"},
-        {"CRMGraph.HostStartCommLayerIcon",
-         "Icons/32x32/resume_32x32.png"},
-        {"ServiceInfo.ServiceRunningIconSmall",
-                                "Icons/16x16/service_running_16x16.png"},
-        {"ServiceInfo.ServiceStoppedIconSmall",
-                                      "Icons/16x16/service_stopped_16x16.png"},
+        {"CRMGraph.HostStopCommLayerIcon", "Icons/32x32/shutdown_32x32.png"},
+        {"CRMGraph.HostStartCommLayerIcon", "Icons/32x32/resume_32x32.png"},
+        {"ServiceInfo.ServiceRunningIconSmall", "Icons/16x16/service_running_16x16.png"},
+        {"ServiceInfo.ServiceStoppedIconSmall", "Icons/16x16/service_stopped_16x16.png"},
 
-        {"ServiceInfo.ServiceRunningFailedIconSmall",
-                               "Icons/16x16/service_running_failed_16x16.png"},
-        {"ServiceInfo.ServiceStartedIconSmall",
-                                "Icons/16x16/service_started_16x16.png"},
-        {"ServiceInfo.ServiceStoppingIconSmall",
-                                "Icons/16x16/service_stopping_16x16.png"},
-        {"ServiceInfo.ServiceStoppedFailedIconSmall",
-                               "Icons/16x16/service_stopped_failed_16x16.png"},
-        {"ServiceInfo.ServiceMigratedIconSmall",
-                                "Icons/16x16/service_migrated_16x16.png"},
-        {"ClusterBrowser.HostStandbyIconSmall",
-                                "Icons/16x16/host_standby_16x16.png"},
-        {"ClusterBrowser.HostStandbyOffIconSmall",
-                                "Icons/16x16/host_standbyoff_16x16.png"},
-        {"ClusterBrowser.ServiceUnmanagedIconSmall",
-                               "Icons/16x16/service_unmanaged_16x16.png"},
+        {"ServiceInfo.ServiceRunningFailedIconSmall", "Icons/16x16/service_running_failed_16x16.png"},
+        {"ServiceInfo.ServiceStartedIconSmall", "Icons/16x16/service_started_16x16.png"},
+        {"ServiceInfo.ServiceStoppingIconSmall", "Icons/16x16/service_stopping_16x16.png"},
+        {"ServiceInfo.ServiceStoppedFailedIconSmall", "Icons/16x16/service_stopped_failed_16x16.png"},
+        {"ServiceInfo.ServiceMigratedIconSmall", "Icons/16x16/service_migrated_16x16.png"},
+        {"ClusterBrowser.HostStandbyIconSmall", "Icons/16x16/host_standby_16x16.png"},
+        {"ClusterBrowser.HostStandbyOffIconSmall", "Icons/16x16/host_standbyoff_16x16.png"},
+        {"ClusterBrowser.ServiceUnmanagedIconSmall", "Icons/16x16/service_unmanaged_16x16.png"},
 
         {"ClusterBrowser.NetworkIcon", "Icons/16x16/netzwk_16x16.png"},
         {"ClusterBrowser.RemoveIcon",  "Icons/32x32/cancel_32x32.png"},
-        {"ClusterBrowser.RemoveIconSmall",
-         "Icons/16x16/cancel_16x16.png"},
+        {"ClusterBrowser.RemoveIconSmall", "Icons/16x16/cancel_16x16.png"},
 
-        {"ClusterBrowser.ClusterIconSmall",
-         "Icons/16x16/cluster_16x16.png"},
+        {"ClusterBrowser.ClusterIconSmall", "Icons/16x16/cluster_16x16.png"},
 
         {"ServiceInfo.ManageByCRMIcon", "Icons/32x32/pacemaker_32x32.png"},
         {"ServiceInfo.UnmanageByCRMIcon", "Icons/32x32/nopacemaker_32x32.png"},
 
-        {"ClusterBrowser.PacemakerIconSmall",
-         "Icons/16x16/pacemaker_16x16.png"},
-        {"ClusterBrowser.PacemakerIcon",
-         "Icons/32x32/pacemaker_32x32.png"},
+        {"ClusterBrowser.PacemakerIconSmall", "Icons/16x16/pacemaker_16x16.png"},
+        {"ClusterBrowser.PacemakerIcon", "Icons/32x32/pacemaker_32x32.png"},
 
-        {"ClusterBrowser.DRBDIconSmall",
-         "Icons/16x16/drbd_16x16.png"},
+        {"ClusterBrowser.DRBDIconSmall", "Icons/16x16/drbd_16x16.png"},
 
         {"HostViewPanel.HostIcon",     "Icons/32x32/host_32x32.png"},
         {"HostTab.HostIcon",           "Icons/32x32/host_32x32.png"},
         {"HostBrowser.HostIconSmall",    "Icons/16x16/host_16x16.png"},
         {"HostBrowser.HostOnIconSmall",  "Icons/16x16/host_on_16x16.png"},
-        {"HostBrowser.HostOffIconSmall",
-         "Icons/16x16/host_off_16x16.png"},
+        {"HostBrowser.HostOffIconSmall", "Icons/16x16/host_off_16x16.png"},
 
         {"HostBrowser.HostIcon",       "Icons/32x32/host_32x32.png"},
         {"HostBrowser.HostOnIcon",     "Icons/32x32/host_on_32x32.png"},
         {"HostBrowser.HostOffIcon",    "Icons/32x32/host_off_32x32.png"},
 
-        {"HostBrowser.HostInClusterIconRightSmall",
-         "Icons/16x16/host_in_cluster_right_16x16.png"},
+        {"HostBrowser.HostInClusterIconRightSmall", "Icons/16x16/host_in_cluster_right_16x16.png"},
 
-        {"HostBrowser.HostInClusterIconLeftSmall",
-         "Icons/16x16/host_in_cluster_left_16x16.png"},
+        {"HostBrowser.HostInClusterIconLeftSmall", "Icons/16x16/host_in_cluster_left_16x16.png"},
 
         {"EmptyBrowser.HostIcon",      "Icons/32x32/host_32x32.png"},
 
@@ -341,32 +285,25 @@ public final class AppDefaults extends ListResourceBundle {
 
         {"Info.LogIcon",     "Icons/32x32/logfile.png"},
 
-        {"BlockDevInfo.HarddiskIconLarge",
-         "Icons/32x32/blockdevice_32x32.png"},
+        {"BlockDevInfo.HarddiskIconLarge", "Icons/32x32/blockdevice_32x32.png"},
 
-        {"BlockDevInfo.HarddiskDRBDIconLarge",
-         "Icons/32x32/blockdevice_drbd_32x32.png"},
+        {"BlockDevInfo.HarddiskDRBDIconLarge", "Icons/32x32/blockdevice_drbd_32x32.png"},
 
-        {"BlockDevInfo.NoHarddiskIconLarge",
-         "Icons/32x32/noharddisk.png"},
+        {"BlockDevInfo.NoHarddiskIconLarge", "Icons/32x32/noharddisk.png"},
 
-        {"BlockDevInfo.HarddiskIcon",
-         "Icons/16x16/blockdevice_16x16.png"},
+        {"BlockDevInfo.HarddiskIcon", "Icons/16x16/blockdevice_16x16.png"},
 
         {"CRMGraph.StartIcon",     "Icons/32x32/ok_32x32.png"},
         //{"CRMGraph.StopIcon",     "Icons/32x32/cancel_32x32.png"},
-        {"CRMGraph.MigrateIcon",
-                                "Icons/32x32/service_migrated_32x32.png"},
-        {"CRMGraph.UnmigrateIcon",
-                              "Icons/32x32/service_unmigrate_32x32.png"},
+        {"CRMGraph.MigrateIcon", "Icons/32x32/service_migrated_32x32.png"},
+        {"CRMGraph.UnmigrateIcon", "Icons/32x32/service_unmigrate_32x32.png"},
         {"CRMGraph.GroupUp", "Icons/32x32/group_up_32x32.png"},
         {"CRMGraph.GroupDown", "Icons/32x32/group_down_32x32.png"},
 
         {"ClusterViewPanel.HostIcon",    "Icons/32x32/host_32x32.png"},
         {"ClusterTab.ClusterIcon",      "Icons/32x32/cluster_32x32.png"},
 
-        {"ProgressIndicatorPanel.CancelIcon",
-                                        "Icons/32x32/cancel_32x32.png"},
+        {"ProgressIndicatorPanel.CancelIcon", "Icons/32x32/cancel_32x32.png"},
         {"ProgressBar.CancelIcon", "Icons/16x16/cancel_16x16.png"},
 
         {"Dialog.Dialog.BackIcon",     "Icons/16x16/back2_16x16.png"},
@@ -383,23 +320,17 @@ public final class AppDefaults extends ListResourceBundle {
         {"VMS.Shutdown.IconLarge",     "Icons/32x32/shutdown_32x32.png"},
         {"VMS.Destroy.IconLarge",      "Icons/32x32/destroy_32x32.png"},
 
-        {"Dialog.Host.CheckInstallation.CheckingIcon",
-         "Icons/32x32/dialog-information.png"},
+        {"Dialog.Host.CheckInstallation.CheckingIcon", "Icons/32x32/dialog-information.png"},
 
-        {"Dialog.Host.CheckInstallation.NotInstalledIcon",
-         "Icons/32x32/software-update-urgent.png"},
+        {"Dialog.Host.CheckInstallation.NotInstalledIcon", "Icons/32x32/software-update-urgent.png"},
 
-        {"Dialog.Host.CheckInstallation.InstalledIcon",
-         "Icons/32x32/weather-clear.png"},
+        {"Dialog.Host.CheckInstallation.InstalledIcon", "Icons/32x32/weather-clear.png"},
 
-        {"Dialog.Host.CheckInstallation.UpgrAvailIcon",
-         "Icons/32x32/software-update-available.png"},
+        {"Dialog.Host.CheckInstallation.UpgrAvailIcon", "Icons/32x32/software-update-available.png"},
 
-        {"Dialog.Host.Finish.HostIcon",
-         "Icons/32x32/host_32x32.png"},
+        {"Dialog.Host.Finish.HostIcon", "Icons/32x32/host_32x32.png"},
 
-        {"Dialog.Host.Finish.ClusterIcon",
-         "Icons/32x32/cluster_32x32.png"},
+        {"Dialog.Host.Finish.ClusterIcon", "Icons/32x32/cluster_32x32.png"},
 
         /* ssh */
         {"SSH.User",                 "root"},
@@ -418,15 +349,10 @@ public final class AppDefaults extends ListResourceBundle {
         /* drbd */
        {"HostBrowser.DrbdNetInterfacePort",  7788},
 
-        /*
-         * other
-         */
+        /* other */
         {"MaxHops",                           20},
-
     };
 
-
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

@@ -35,9 +35,6 @@ import java.util.Map;
 
 /**
  * This class provides Http functions.
- *
- * @author Rasto Levrinc
- *
  */
 public final class Http {
     /** Logger. */
@@ -105,8 +102,7 @@ public final class Http {
 
         /* Response */
         try {
-            final BufferedReader input = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
+            final BufferedReader input = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String str;
             while (null != ((str = input.readLine()))) {
                 LOG.info("post: " + str);
@@ -121,8 +117,7 @@ public final class Http {
         String postParams = "";
         String delim = "";
         for (final Map.Entry<String, String> entry : params.entrySet()) {
-            postParams += delim + entry.getKey() + '='
-                          + URLEncoder.encode(entry.getValue(), ENCODING);
+            postParams += delim + entry.getKey() + '=' + URLEncoder.encode(entry.getValue(), ENCODING);
             delim = "&";
         }
         return postParams;

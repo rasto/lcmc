@@ -27,16 +27,7 @@ package lcmc.utilities;
  * Callback for buttons.
  */
 public interface ButtonCallback {
-    /**
-     * Whether it should be enabled.
-     */
     boolean isEnabled();
-    /**
-     * On mouse over.
-     */
     void mouseOver(final ComponentWithTest component);
-    /**
-     * On mouse out.
-     */
     void mouseOut(final ComponentWithTest component);
 }

@@ -61,7 +61,17 @@ import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
-import lcmc.utilities.*;
+import lcmc.utilities.ComponentWithTest;
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.Logger;
+import lcmc.utilities.LoggerFactory;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyButton;
+import lcmc.utilities.Predicate;
+import lcmc.utilities.Tools;
+import lcmc.utilities.Unit;
+import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 

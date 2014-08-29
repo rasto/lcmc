@@ -1041,15 +1041,15 @@ public class ClusterBrowser extends Browser {
                             final Host host,
                             final CountDownLatch firstTime,
                             final Application.RunMode runMode) {
-        final ClusterStatus clusterStatus = this.clusterStatus;
+        final ClusterStatus clusterStatus0 = this.clusterStatus;
         clStatusLock();
-        if (crmStatusCanceledByUser || clusterStatus == null) {
+        if (crmStatusCanceledByUser || clusterStatus0 == null) {
             clStatusUnlock();
             firstTime.countDown();
             return;
         }
         if (output == null || "".equals(output)) {
-            clusterStatus.setOnlineNode(host.getName(), "no");
+            clusterStatus0.setOnlineNode(host.getName(), "no");
             setCrmStatus(host, false);
             firstTime.countDown();
         } else {
@@ -1073,26 +1073,26 @@ public class ClusterBrowser extends Browser {
                             clusterStatusOutput.delete(0, clusterStatusOutput.length());
                             if (CLUSTER_STATUS_ERROR.equals(status)) {
                                 final boolean oldStatus = host.isCrmStatusOk();
-                                clusterStatus.setOnlineNode(host.getName(), "no");
+                                clusterStatus0.setOnlineNode(host.getName(), "no");
                                 setCrmStatus(host, false);
                                 if (oldStatus) {
                                    crmGraph.repaint();
                                 }
                             } else {
-                                if (clusterStatus.parseStatus(status)) {
+                                if (clusterStatus0.parseStatus(status)) {
                                     LOG.debug1("processClusterOutput: host: " + host.getName());
                                     final ServicesInfo ssi = servicesInfo;
-                                    rscDefaultsInfo.setParameters(clusterStatus.getRscDefaultsValuePairs());
-                                    ssi.setGlobalConfig(clusterStatus);
-                                    ssi.setAllResources(clusterStatus, runMode);
+                                    rscDefaultsInfo.setParameters(clusterStatus0.getRscDefaultsValuePairs());
+                                    ssi.setGlobalConfig(clusterStatus0);
+                                    ssi.setAllResources(clusterStatus0, runMode);
                                     if (firstTime.getCount() == 1) {
                                         /* one more time so that id-refs work.*/
-                                        ssi.setAllResources(clusterStatus, runMode);
+                                        ssi.setAllResources(clusterStatus0, runMode);
                                     }
                                     repaintMenuTree();
                                     clusterHostsInfo.updateTable(ClusterHostsInfo.MAIN_TABLE);
                                 }
-                                final String online = clusterStatus.isOnlineNode(host.getName());
+                                final String online = clusterStatus0.isOnlineNode(host.getName());
                                 if ("yes".equals(online)) {
                                     setCrmStatus(host, true);
                                     setCrmStatus();
@@ -1792,7 +1792,7 @@ public class ClusterBrowser extends Browser {
      * to it. */
     public String getFreeId(final String serviceName, final String id) {
         if (id == null) {
-            return id;
+            return null;
         }
         String newId = id;
         lockNameToServiceInfo();
@@ -1933,7 +1933,6 @@ public class ClusterBrowser extends Browser {
             i++;
         }
         cfs[i] = new StringValue("none");
-            i++;
         return cfs;
     }
     /**

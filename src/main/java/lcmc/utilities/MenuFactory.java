@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Provider;
-import javax.swing.*;
+import javax.swing.ImageIcon;
 
 @Component
 public class MenuFactory {

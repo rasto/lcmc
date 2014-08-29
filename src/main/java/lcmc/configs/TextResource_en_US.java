@@ -31,12 +31,10 @@ import java.util.ListResourceBundle;
  */
 public final class TextResource_en_US extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* here is nothing and it should be so */
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

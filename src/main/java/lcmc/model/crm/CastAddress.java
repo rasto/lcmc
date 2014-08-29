@@ -26,10 +26,6 @@ package lcmc.model.crm;
 /**
  * This class holds data for multicast and broadcast addresses for heartbeat
  * communication.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class CastAddress {
     /** Type of the cast address,  bcast, mcast or ucast */
@@ -51,6 +47,7 @@ public final class CastAddress {
     /** Convert the info to the line as it appears in the ha.cf. */
     private String convert(final String type, final String iface, final String address, final String serial) {
         if ("mcast".equals(type) || "ucast".equals(type)) {
+
             return type + ' ' + iface + ' ' + address;
         }
         if ("bcast".equals(type)) {

@@ -104,18 +104,18 @@ public class DrbdInstallation {
     public String replaceVarsInCommand(String command) {
         if (drbdVersions != null) {
             final String drbdVersionToInstall = drbdVersions.getModuleVersion();
-            if (drbdVersionToInstall != null && command.indexOf("@DRBDVERSION@") > -1) {
+            if (drbdVersionToInstall != null && command.contains("@DRBDVERSION@")) {
                 command = command.replaceAll("@DRBDVERSION@", drbdVersionToInstall);
             }
             final String utilVersionToInstall = drbdVersions.getUtilVersion();
-            if (utilVersionToInstall != null && command.indexOf("@DRBD-UTIL-VERSION@") > -1) {
+            if (utilVersionToInstall != null && command.contains("@DRBD-UTIL-VERSION@")) {
                 command = command.replaceAll("@DRBD-UTIL-VERSION@", utilVersionToInstall);
             }
         }
-        if (drbdBuildToInstall != null && command.indexOf("@BUILD@") > -1) {
+        if (drbdBuildToInstall != null && command.contains("@BUILD@")) {
             command = command.replaceAll("@BUILD@", drbdBuildToInstall);
         }
-        if (drbdPackagesToInstall != null && command.indexOf("@DRBDPACKAGES@") > -1) {
+        if (drbdPackagesToInstall != null && command.contains("@DRBDPACKAGES@")) {
             command = command.replaceAll("@DRBDPACKAGES@", drbdPackagesToInstall);
         }
         return command;

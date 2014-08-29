@@ -32,7 +32,6 @@ import javax.swing.JSplitPane;
 import lcmc.gui.GUIData;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
-import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

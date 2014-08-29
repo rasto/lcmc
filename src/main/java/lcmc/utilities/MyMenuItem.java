@@ -55,39 +55,26 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class MyMenuItem extends JMenuItem
 implements ActionListener, UpdatableItem, ComponentWithTest {
-    /** Logger. */
-    private static final Logger LOG =
-                                   LoggerFactory.getLogger(MyMenuItem.class);
-    /** Serial version UID. */
+    private static final Logger LOG = LoggerFactory.getLogger(MyMenuItem.class);
     private static final long serialVersionUID = 1L;
-    /** Screen device. */
     private static final GraphicsDevice SCREEN_DEVICE =
-     GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-    /** Text of the item. */
+                                         GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     private String text1;
-    /** Icon of the item. */
     private ImageIcon icon1;
     /** Short decription of the item for tool tip. */
     private String shortDesc1;
-    /** Alternate text of the item. */
     private String text2;
-    /** Alternate icon of the item. */
     private ImageIcon icon2;
     /** Alternate short decription of the item for tool tip. */
     private String shortDesc2;
-    /** Tools tip object. */
     private JToolTip toolTip = null;
     /** Pos of the click that can be used in the overriden action method. */
     private Point2D pos;
     /** Robot to move a mouse a little if a tooltip has changed. */
     private Robot robot;
-    /** Tooltip background color. */
     private Color toolTipBackground = null;
-    /** Access Type for this component to become enabled. */
     private AccessMode enableAccessMode;
-    /** Access Type for this component to become visible. */
     private AccessMode visibleAccessMode;
-    /** Original tool tip text. */
     private String origToolTipText = "";
     @Autowired
     private Application application;
@@ -134,29 +121,12 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         toolTip.setTipText(text);
         setNormalFont();
         addActionListener(this);
-        Robot robot = null;
-        try {
-            robot = new Robot(SCREEN_DEVICE);
-        } catch (final AWTException e) {
-            LOG.appError("MyMenuItem: robot error");
-        }
-        this.robot = robot;
+        this.robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
         application.isSwingThread();
     }
 
-
-    /**
-     * Prepares a new {@code MyMenuItem} object.
-     *
-     * @param text
-     *          text of the item
-     * @param icon
-     *          icon of the item
-     * @param shortDesc
-     *          short description for the tool tip of the item
-     */
     protected void init(final String text,
                         final ImageIcon icon,
                         final String shortDesc,
@@ -178,16 +148,19 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         this.enableAccessMode = enableAccessMode;
         this.visibleAccessMode = visibleAccessMode;
         addActionListener(this);
-        Robot r = null;
-        try {
-            r = new Robot(SCREEN_DEVICE);
-        } catch (final AWTException e) {
-            LOG.appError("MyMenuItem: robot error");
-        }
-        robot = r;
+        robot = createRobot();
         processAccessMode();
         setIconAndTooltip();
         application.isSwingThread();
+    }
+
+    private Robot createRobot() {
+        try {
+            return new Robot(SCREEN_DEVICE);
+        } catch (final AWTException e) {
+            LOG.appError("MyMenuItem: robot error");
+        }
+        return null;
     }
 
     /**

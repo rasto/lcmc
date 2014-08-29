@@ -28,10 +28,6 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 /**
  * This class provides openais commands. There are commands that
  * operate on /etc/init.d/openais script and commands etc.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Openais {
     /** Directory that contains ais config files. */
@@ -54,81 +50,60 @@ public final class Openais {
 
     /** Stops the heartbeat and starts the openais on the specified host. */
     public static void switchToOpenais(final Host host) {
-        final String command = host.getDistCommand(
-            "Heartbeat.deleteFromRc"
-                + ";;;Openais.addToRc"
-                + ";;;Openais.startOpenais",
-                                                (ConvertCmdCallback) null);
+        final String command = host.getDistCommand("Heartbeat.deleteFromRc"
+                                                   + ";;;Openais.addToRc"
+                                                   + ";;;Openais.startOpenais",
+                                                   (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
     /**
-     * Starts openais on host.
      * /etc/init.d/openais start
      */
     public static void startOpenais(final Host host) {
-        final String command = host.getDistCommand("Openais.startOpenais",
-                                                   (ConvertCmdCallback) null);
+        final String command = host.getDistCommand("Openais.startOpenais", (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
     /**
-     * Stops openais on host.
      * /etc/init.d/openais stop
      */
     public static void stopOpenais(final Host host) {
-        final String command = host.getDistCommand("Openais.stopOpenais",
-                                                   (ConvertCmdCallback) null);
+        final String command = host.getDistCommand("Openais.stopOpenais", (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
     /**
-     * Stops openais with pacemaker on host.
      * /etc/init.d/openais stop && /etc/init.d/pacemaker stop
      */
     public static void stopOpenaisWithPcmk(final Host host) {
-        final String command = host.getDistCommand(
-            "Openais.stopOpenaisWithPcmk",
-                                              (ConvertCmdCallback) null);
+        final String command = host.getDistCommand("Openais.stopOpenaisWithPcmk", (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
-    /** Starts openais on host and adds it to the rc. */
     public static void startOpenaisRc(final Host host) {
-        final String command = host.getDistCommand("Openais.startOpenais"
-            + ";;;Openais.addToRc",
+        final String command = host.getDistCommand("Openais.startOpenais" + ";;;Openais.addToRc",
                                                    (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
-    /** Adds openais to the rc. */
     public static void addOpenaisToRc(final Host host) {
-        final String command = host.getDistCommand("Openais.addToRc",
-                                                   (ConvertCmdCallback) null);
+        final String command = host.getDistCommand("Openais.addToRc", (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
     /**
-     * Reloads openais's configuration on host.
      * /etc/init.d/openais reload
      */
     public static void reloadOpenais(final Host host) {
-        final String command = host.getDistCommand("Openais.reloadOpenais",
-                                                   (ConvertCmdCallback) null);
+        final String command = host.getDistCommand("Openais.reloadOpenais", (ConvertCmdCallback) null);
         execCommand(host, command);
     }
 
-    /** Creates OpenAIS config on specified hosts. */
     public static void createAISConfig(final Host[] hosts, final StringBuilder config) {
         /* write heartbeat config on all hosts */
-        Tools.createConfigOnAllHosts(hosts,
-                                     config.toString(),
-                                     AIS_CONF_NAME,
-                                     AIS_CONF_DIR,
-                                     AIS_CONF_PERMS,
-                                     true);
-        final StringBuilder authkeys =
-            new StringBuilder(Tools.getRandomSecret(128));
+        Tools.createConfigOnAllHosts(hosts, config.toString(), AIS_CONF_NAME, AIS_CONF_DIR, AIS_CONF_PERMS, true);
+        final StringBuilder authkeys = new StringBuilder(Tools.getRandomSecret(128));
         Tools.createConfigOnAllHosts(hosts,
                                      authkeys.toString(),
                                      AUTHKEYS_CONF_NAME,
@@ -138,13 +113,11 @@ public final class Openais {
 
     }
 
-    /** Reloads openais daemons on all nodes. */
     public static void reloadOpenaises(final Host[] hosts) {
         for (final Host host : hosts) {
             reloadOpenais(host);
         }
     }
 
-    /** No instantiation. */
     private Openais() { }
 }

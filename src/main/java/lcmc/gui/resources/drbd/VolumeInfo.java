@@ -46,7 +46,12 @@ import javax.swing.JScrollPane;
 import lcmc.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
 import lcmc.gui.GUIData;
-import lcmc.gui.resources.crm.*;
+import lcmc.gui.resources.crm.CloneInfo;
+import lcmc.gui.resources.crm.DrbddiskInfo;
+import lcmc.gui.resources.crm.FilesystemRaInfo;
+import lcmc.gui.resources.crm.GroupInfo;
+import lcmc.gui.resources.crm.LinbitDrbdInfo;
+import lcmc.gui.resources.crm.ServiceInfo;
 import lcmc.model.Application;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
@@ -60,7 +65,6 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.cluster.DrbdLogs;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.EditableInfo;
-import lcmc.gui.resources.crm.FilesystemRaInfo;
 import lcmc.gui.widget.Check;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.ComponentWithTest;
@@ -296,7 +300,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                         try {
                             getBrowser().getGlobalInfo().createDrbdConfigLive();
                             for (final Host h : getHosts()) {
-                                DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
+                                DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
                             }
                             apply(Application.RunMode.LIVE);
                         } catch (final Exceptions.DrbdConfigException dce) {

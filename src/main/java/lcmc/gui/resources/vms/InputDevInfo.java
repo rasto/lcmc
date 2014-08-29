@@ -21,8 +21,6 @@
  */
 package lcmc.gui.resources.vms;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +38,6 @@ import lcmc.model.vm.InputDevData;
 import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
-import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;

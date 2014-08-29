@@ -28,10 +28,6 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 /**
  * This class provides corosync commands. There are commands that
  * operate on /etc/init.d/corosync script and commands etc.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Corosync {
     /** Directory that contains Corosync config files. */
@@ -134,10 +130,8 @@ public final class Corosync {
                                      COROSYNC_CONF_DIR,
                                      COROSYNC_CONF_PERMS,
                                      true);
-        final StringBuilder authkeys =
-            new StringBuilder(Tools.getRandomSecret(128));
         Tools.createConfigOnAllHosts(hosts,
-                                     authkeys.toString(),
+                                     Tools.getRandomSecret(128),
                                      AUTHKEYS_CONF_NAME,
                                      COROSYNC_CONF_DIR,
                                      AUTHKEYS_CONF_PERMS,

@@ -31,13 +31,11 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -60,7 +58,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -71,10 +68,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.FontUIResource;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -82,15 +77,10 @@ import javax.swing.text.html.HTMLDocument;
 
 import lcmc.Exceptions;
 import lcmc.configs.DistResource;
-import lcmc.model.Application;
 import lcmc.model.Cluster;
-import lcmc.model.Clusters;
 import lcmc.model.Host;
-import lcmc.model.UserConfig;
 import lcmc.model.Value;
-import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
-import lcmc.gui.dialog.ConfirmDialog;
 import lcmc.gui.resources.crm.ServiceInfo;
 
 /**
@@ -149,10 +139,10 @@ public final class Tools {
     public static void setDefaults() {
         LoggerFactory.setDebugLevel(getDefaultInt("DebugLevel"));
         if (getDefault("AppWarning").equals("y")) {
-            LoggerFactory.setAppWarning(true);
+            LoggerFactory.setShowAppWarning(true);
         }
         if (getDefault("AppError").equals("y")) {
-            LoggerFactory.setAppError(true);
+            LoggerFactory.setShowAppError(true);
         }
     }
 
@@ -655,7 +645,6 @@ public final class Tools {
     /**
      * Returns -1 if version1 is smaller that version2, 0 if version1 equals
      * version2 and 1 if version1 is bigger than version2.
-     * @Throws Exceptions.IllegalVersionException
      */
     public static int compareVersions(final String version1,
                                       final String version2) throws Exceptions.IllegalVersionException {

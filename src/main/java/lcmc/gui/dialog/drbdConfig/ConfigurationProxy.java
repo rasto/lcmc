@@ -35,10 +35,6 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)

@@ -50,7 +50,6 @@ import lcmc.model.resources.BlockDevice;
 import lcmc.gui.Browser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.LVM;

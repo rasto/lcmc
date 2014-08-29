@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for opensuse 11.4.
  */
-public final class DistResource_suse_OPENSUSE11_4
-                                    extends ListResourceBundle {
+public final class DistResource_suse_OPENSUSE11_4 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
 
         {"distributiondir", "sles11"},
@@ -43,7 +41,6 @@ public final class DistResource_suse_OPENSUSE11_4
          "zypper -n install heartbeat pacemaker"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

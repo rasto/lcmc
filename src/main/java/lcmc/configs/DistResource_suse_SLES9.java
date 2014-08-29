@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for suse sles 9.
  */
-public final class DistResource_suse_SLES9
-                                        extends ListResourceBundle {
+public final class DistResource_suse_SLES9 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
@@ -41,7 +39,6 @@ public final class DistResource_suse_SLES9
         {"Support", "suse-SLES9"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

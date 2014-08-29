@@ -27,10 +27,6 @@ package lcmc.model.resources;
  * This is an interface for cluster block devices.
  * It can be either a block device that is the same on
  * all the hosts, or it is a drbd device.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public interface ClusterBlockDeviceInterface {
     String getDeviceName();

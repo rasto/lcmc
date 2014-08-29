@@ -28,7 +28,6 @@ import lcmc.model.Host;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.NewHostDialog;
-import lcmc.utilities.Tools;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

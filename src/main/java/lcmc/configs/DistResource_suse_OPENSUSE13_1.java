@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for opensuse 13.1.
  */
-public final class DistResource_suse_OPENSUSE13_1
-                                    extends ListResourceBundle {
+public final class DistResource_suse_OPENSUSE13_1 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
 
         {"distributiondir", "sles11"},
@@ -63,7 +61,6 @@ public final class DistResource_suse_OPENSUSE13_1
 
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

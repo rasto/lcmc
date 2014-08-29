@@ -35,8 +35,6 @@ import javax.swing.event.DocumentListener;
  * A ListModel with filtered items.
  */
 public final class MyListModel<E> extends AbstractListModel<E> {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     private static final String START_TEXT = "type to search...";
 
     private final Collection<E> items = new ArrayList<E>();
@@ -81,8 +79,6 @@ public final class MyListModel<E> extends AbstractListModel<E> {
     }
 
     private class FilterField extends JTextField implements DocumentListener {
-        /** Serial version UID. */
-        private static final long serialVersionUID = 1L;
         FilterField(final String text) {
             super(text);
             getDocument().addDocumentListener(this);

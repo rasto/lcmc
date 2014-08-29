@@ -29,11 +29,15 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.GUIData;
-import lcmc.model.*;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.Clusters;
+import lcmc.model.StringValue;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
 import org.springframework.beans.factory.annotation.Autowired;

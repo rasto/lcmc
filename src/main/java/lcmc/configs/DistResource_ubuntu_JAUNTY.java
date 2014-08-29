@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for ubuntu jaunty.
  */
-public final class DistResource_ubuntu_JAUNTY
-                                        extends ListResourceBundle {
+public final class DistResource_ubuntu_JAUNTY extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-JAUNTY"},
         {"distributiondir",    "ubuntu-jaunty-server"},
@@ -49,7 +47,6 @@ public final class DistResource_ubuntu_JAUNTY
          ""},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

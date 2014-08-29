@@ -47,14 +47,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.sun.org.apache.bcel.internal.generic.DADD;
 import lcmc.AddDrbdConfigDialog;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.GUIData;
-import lcmc.gui.dialog.drbdConfig.Volume;
-import lcmc.model.*;
+import lcmc.model.Application;
 import lcmc.model.Application.RunMode;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
+import lcmc.model.HostFactory;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
 import lcmc.model.resources.Resource;
@@ -263,7 +266,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
             boolean allOk = true;
             for (final Host h : getCluster().getHostsArray()) {
                 int ret = DRBD.adjustApply(h,
-                                           DRBD.ALL,
+                                           DRBD.ALL_DRBD_RESOURCES,
                                            null,
                                            Application.RunMode.TEST);
                 final String output = DRBD.getDRBDtest();
@@ -403,7 +406,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                             try {
                                 createDrbdConfigLive();
                                 for (final Host h : getCluster().getHosts()) {
-                                    DRBD.adjustApply(h, DRBD.ALL, null, Application.RunMode.LIVE);
+                                    DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.LIVE);
                                 }
                                 apply(Application.RunMode.LIVE);
                             } catch (final Exceptions.DrbdConfigException dce) {

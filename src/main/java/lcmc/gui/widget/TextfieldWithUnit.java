@@ -62,7 +62,6 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
     private Application application;
     /** Text field in widget with units. */
     private JTextField textFieldPart;
-    /** Combo box with units. */
     private MComboBox<Unit> unitComboBox;
     private boolean unitEnabled = true;
 
@@ -95,9 +94,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
         unitComboBox = getComboBox(unit, units, regexp, abbreviations);
 
         newComp.add(unitComboBox);
-        SpringUtilities.makeCompactGrid(newComp, 1, 2,
-                                                 0, 0,
-                                                 0, 0);
+        SpringUtilities.makeCompactGrid(newComp, 1, 2, 0, 0, 0, 0);
         addComponent(newComp, width);
         textFieldPart.setPreferredSize(new Dimension(width / 3, WIDGET_HEIGHT));
         textFieldPart.setMinimumSize(textFieldPart.getPreferredSize());

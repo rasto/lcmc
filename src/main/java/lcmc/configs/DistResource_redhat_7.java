@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_redhat_7 extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
@@ -86,7 +85,6 @@ public final class DistResource_redhat_7 extends ListResourceBundle {
 
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

@@ -26,49 +26,32 @@ import lcmc.model.Value;
 
 /**
  * This class provides unit object with short and long name for combo boxes.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Unit implements Value {
-    /** Short name. */
     private final String shortName;
-    /** Name of the unit. */
     private final String name;
-    /** Plural name of the unit. */
     private final String pluralName;
-    /** Whether the unit should be in plural or not. */
     private boolean plural = true;
-    /** Whether the field to which this unit belongs is empty. */
     private boolean empty = false;
 
-    /** Prepares new {@code Unit} object. */
-    public Unit(final String shortName,
-                final String secShortName,
-                final String name,
-                final String pluralName) {
+    public Unit(final String shortName, final String secShortName, final String name, final String pluralName) {
         this.shortName    = shortName;
         this.name         = name;
         this.pluralName   = pluralName;
     }
 
-    /** Returns whether the unit should be in plural. */
     public boolean isPlural() {
         return plural;
     }
 
-    /** Sets that the unit should be in plural. */
     public void setPlural(final boolean plural) {
         this.plural = plural;
     }
 
-    /** Sets whether the field to which this unit belongs is empty. */
     public void setEmpty(final boolean empty) {
         this.empty = empty;
     }
 
-    /** Returns whether the field to which this unit belongs is empty. */
     public boolean isEmpty() {
         return empty;
     }

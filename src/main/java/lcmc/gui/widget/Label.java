@@ -28,7 +28,6 @@ import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;

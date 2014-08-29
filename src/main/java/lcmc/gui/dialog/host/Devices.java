@@ -37,7 +37,6 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -137,9 +136,7 @@ public class Devices extends DialogHost {
         final JPanel pane = new JPanel(new SpringLayout());
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(Tools.getString("Dialog.Host.Devices.Executing")));
-        SpringUtilities.makeCompactGrid(pane, 2, 1,  //rows, cols
-                                              0, 0,  //initX, initY
-                                              0, 0); //xPad, yPad
+        SpringUtilities.makeCompactGrid(pane, 2, 1, 0, 0, 0, 0);
 
         return pane;
     }

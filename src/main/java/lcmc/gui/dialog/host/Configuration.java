@@ -51,30 +51,17 @@ import org.springframework.stereotype.Component;
 /**
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class Configuration extends DialogHost {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(Configuration.class);
-    /** Maximum hops. */
+    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
-    /** Width of the combo boxes. */
     private static final int COMBO_BOX_WIDTH = 180;
-    /** DNS timeout. */
     private static final int DNS_TIMEOUT = 5000;
-    /** Hostname fields. */
     private final Widget[] hostnameField = new Widget[MAX_HOPS];
-    /** Ip fields. */
     private final Widget[] ipCombo = new Widget[MAX_HOPS];
-    /** Hostnames. */
     private String[] hostnames = new String[MAX_HOPS];
-    /** Whether the hostname was ok. */
     private volatile boolean hostnameOk = false;
     @Autowired
     private Devices devices;
@@ -124,8 +111,7 @@ public class Configuration extends DialogHost {
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         if (!hostnameOk) {
-            incorrect.add(
-                  Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
+            incorrect.add(Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
         }
         enableNextButtons(incorrect, changed);
     }
@@ -152,8 +138,7 @@ public class Configuration extends DialogHost {
      * Checks the dns entries for all the hosts.
      * This assumes that getHost().hostnameEntered was set.
      */
-    protected final boolean checkDNS(final int hop,
-                                     final String hostnameEntered) {
+    protected final boolean checkDNS(final int hop, final String hostnameEntered) {
         final InetAddress[] addresses;
         try {
             addresses = InetAddress.getAllByName(hostnameEntered);
@@ -219,8 +204,7 @@ public class Configuration extends DialogHost {
             getProgressBar().start(DNS_TIMEOUT);
             final CheckDNSThread[] checkDNSThread = new CheckDNSThread[MAX_HOPS];
             for (int i = 0; i < getHops(); i++) {
-                final String hostnameEntered =
-                                getHost().getEnteredHostOrIp().split(",")[i];
+                final String hostnameEntered = getHost().getEnteredHostOrIp().split(",")[i];
 
                 hostnameField[i].setEnabled(false);
                 if (Tools.isIp(hostnameEntered)) {
@@ -229,8 +213,7 @@ public class Configuration extends DialogHost {
                     getHost().setIps(i, new String[]{hostnameEntered});
                     final Value hostnameEnteredValue = new StringValue(hostnameEntered);
                     hostnameField[i].setValue(hostnameEnteredValue);
-                    ipCombo[i].reloadComboBox(hostnameEnteredValue,
-                                              new Value[]{hostnameEnteredValue});
+                    ipCombo[i].reloadComboBox(hostnameEnteredValue, new Value[]{hostnameEnteredValue});
                     hostnameOk = true;
                 } else {
                     checkDNSThread[i] = new CheckDNSThread(i, hostnameEntered);
@@ -253,8 +236,7 @@ public class Configuration extends DialogHost {
                             }
                         }
                         progressBarDone();
-                        getHost().setHostname(
-                                Tools.join(",", hostnames, getHops()));
+                        getHost().setHostname(Tools.join(",", hostnames, getHops()));
                         enableComponents();
                         makeDefaultAndRequestFocus(buttonClass(nextButton()));
                         checkFields(null);
@@ -269,8 +251,7 @@ public class Configuration extends DialogHost {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    getHost().setHostname(
-                                       Tools.join(",", hostnames, getHops()));
+                    getHost().setHostname(Tools.join(",", hostnames, getHops()));
                     application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
@@ -304,8 +285,7 @@ public class Configuration extends DialogHost {
         inputPane.setAlignmentX(java.awt.Component.LEFT_ALIGNMENT);
 
         /* Host/Hosts */
-        final JLabel hostnameLabel = new JLabel(
-                        Tools.getString("Dialog.Host.Configuration.Hostname"));
+        final JLabel hostnameLabel = new JLabel(Tools.getString("Dialog.Host.Configuration.Hostname"));
         inputPane.add(hostnameLabel);
         final String hostname = getHost().getHostname();
         if (hostname == null || Tools.charCount(hostname, ',') == 0) {
@@ -321,14 +301,12 @@ public class Configuration extends DialogHost {
                                       Widget.NO_REGEXP,
                                       COMBO_BOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO,
-                                                     !AccessMode.ADVANCED),
+                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                       Widget.NO_BUTTON);
             inputPane.add(hostnameField[i].getComponent());
         }
 
-        final JLabel ipLabel = new JLabel(
-                            Tools.getString("Dialog.Host.Configuration.Ip"));
+        final JLabel ipLabel = new JLabel(Tools.getString("Dialog.Host.Configuration.Ip"));
         inputPane.add(ipLabel);
 
         for (int i = 0; i < hops; i++) {
@@ -342,25 +320,20 @@ public class Configuration extends DialogHost {
                                 Widget.NO_REGEXP,
                                 COMBO_BOX_WIDTH,
                                 Widget.NO_ABBRV,
-                                new AccessMode(Application.AccessType.RO,
-                                               !AccessMode.ADVANCED),
+                                new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
                                 Widget.NO_BUTTON);
 
             inputPane.add(ipCombo[i].getComponent());
             ipCombo[i].setEnabled(false);
         }
 
-        SpringUtilities.makeCompactGrid(inputPane, 2, 1 + hops, // rows, cols
-                                                   0, 0,  // initX, initY
-                                                   0, 0); // xPad, yPad
+        SpringUtilities.makeCompactGrid(inputPane, 2, 1 + hops, 0, 0, 0, 0);
         final JPanel pane = new JPanel(new SpringLayout());
         pane.setBorder(null);
         pane.add(inputPane);
         pane.add(getProgressBarPane());
         pane.add(getAnswerPane(""));
-        SpringUtilities.makeCompactGrid(pane, 3, 1,  //rows, cols
-                                              0, 0,  //initX, initY
-                                              0, 0); //xPad, yPad
+        SpringUtilities.makeCompactGrid(pane, 3, 1, 0, 0, 0, 0);
         return pane;
     }
 
@@ -368,50 +341,45 @@ public class Configuration extends DialogHost {
      * Class that implements check dns thread.
      */
     private class CheckDNSThread extends Thread {
-        /** Number of hops. */
-        private final int hop;
-        /** Host names as entered by user. */
+        private final int numberOfHops;
         private final String hostnameEntered;
 
         /**
          * Prepares a new {@code CheckDNSThread} object, with number of
          * hops and host names delimited with commas.
          */
-        CheckDNSThread(final int hop, final String hostnameEntered) {
+        CheckDNSThread(final int numberOfHops, final String hostnameEntered) {
             super();
-            this.hop = hop;
+            this.numberOfHops = numberOfHops;
             this.hostnameEntered = hostnameEntered;
         }
 
         /** Runs the check dns thread. */
         @Override
         public void run() {
-            answerPaneSetText(
-                        Tools.getString("Dialog.Host.Configuration.DNSLookup"));
-            hostnameOk = checkDNS(hop, hostnameEntered);
+            answerPaneSetText(Tools.getString("Dialog.Host.Configuration.DNSLookup"));
+            hostnameOk = checkDNS(numberOfHops, hostnameEntered);
             if (hostnameOk) {
-                answerPaneSetText(
-                    Tools.getString("Dialog.Host.Configuration.DNSLookupOk"));
+                answerPaneSetText(Tools.getString("Dialog.Host.Configuration.DNSLookupOk"));
             } else {
-                printErrorAndRetry(
-                   Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
+                printErrorAndRetry(Tools.getString("Dialog.Host.Configuration.DNSLookupError"));
             }
-            final Value[] items = StringValue.getValues(getHost().getIps(hop));
+            final Value[] items = StringValue.getValues(getHost().getIps(numberOfHops));
             if (items != null) {
                 application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        final String savedIp = getHost().getIp(hop);
+                        final String savedIp = getHost().getIp(numberOfHops);
                         final Value defaultIp;
                         if (savedIp == null && items.length > 0) {
                             defaultIp = items[0];
                         } else {
                             defaultIp = new StringValue(savedIp);
                         }
-                        ipCombo[hop].reloadComboBox(defaultIp, items);
+                        ipCombo[numberOfHops].reloadComboBox(defaultIp, items);
 
                         if (items.length > 1) {
-                            ipCombo[hop].setEnabled(true);
+                            ipCombo[numberOfHops].setEnabled(true);
                         }
                     }
                 });

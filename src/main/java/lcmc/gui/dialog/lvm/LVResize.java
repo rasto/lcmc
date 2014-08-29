@@ -50,7 +50,6 @@ import lcmc.gui.Browser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.widget.TextfieldWithUnit;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.LVM;
 import lcmc.utilities.Logger;

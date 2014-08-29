@@ -213,5 +213,5 @@ public final class NetInterface extends Resource implements Value {
         return NOTHING_SELECTED;
     }
 
-    public enum AddressFamily {IPV4, IPV6, SSOCKS, SDP};
+    public enum AddressFamily {IPV4, IPV6, SSOCKS, SDP}
 }

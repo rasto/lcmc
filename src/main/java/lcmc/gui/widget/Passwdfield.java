@@ -41,10 +41,10 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class Passwdfield extends Textfield {
     public void init(final Value selectedValue,
-                       final String regexp,
-                       final int width,
-                       final AccessMode enableAccessMode,
-                       final MyButton fieldButton) {
+                     final String regexp,
+                     final int width,
+                     final AccessMode enableAccessMode,
+                     final MyButton fieldButton) {
         super.init(selectedValue, regexp, width, NO_ABBRV, enableAccessMode, fieldButton);
         addComponent(getPasswdField(selectedValue, regexp), width);
     }

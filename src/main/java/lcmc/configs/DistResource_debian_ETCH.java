@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for debian verson 4 (etch).
  */
-public final class DistResource_debian_ETCH
-                                    extends ListResourceBundle {
+public final class DistResource_debian_ETCH extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* distribution name that is used in the download url */
         {"distributiondir", "debian-etch"},
@@ -83,7 +81,6 @@ public final class DistResource_debian_ETCH
          ""},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

@@ -51,7 +51,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
-import lcmc.model.*;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ConstraintPHInfo;
 import lcmc.gui.resources.crm.GroupInfo;
@@ -59,6 +58,10 @@ import lcmc.gui.resources.crm.HbConnectionInfo;
 import lcmc.gui.resources.crm.HostInfo;
 import lcmc.gui.resources.crm.PcmkMultiSelectionInfo;
 import lcmc.gui.resources.crm.ServiceInfo;
+import lcmc.model.AccessMode;
+import lcmc.model.Application;
+import lcmc.model.ColorText;
+import lcmc.model.Host;
 import lcmc.utilities.MenuAction;
 import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyMenuItem;

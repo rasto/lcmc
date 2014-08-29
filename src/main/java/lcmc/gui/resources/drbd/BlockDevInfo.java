@@ -43,11 +43,18 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.Exceptions;
-import lcmc.gui.*;
-import lcmc.model.*;
+import lcmc.gui.Browser;
+import lcmc.gui.ClusterBrowser;
+import lcmc.gui.DrbdGraph;
+import lcmc.gui.GUIData;
+import lcmc.gui.HostBrowser;
+import lcmc.model.Application;
+import lcmc.model.ColorText;
+import lcmc.model.Host;
+import lcmc.model.StringValue;
+import lcmc.model.Value;
 import lcmc.model.drbd.DRBDtestData;
 import lcmc.model.drbd.DrbdXml;
-import lcmc.model.ColorText;
 import lcmc.model.resources.BlockDevice;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.resources.Info;
@@ -833,7 +840,7 @@ public class BlockDevInfo extends EditableInfo {
     /** Make snapshot. */
     public boolean lvSnapshot(final String snapshotName, final String size, final Application.RunMode runMode) {
         final String device = getBlockDevice().getName();
-        return LVM.lvSnapshot(getHost(), snapshotName, device, size, runMode);
+        return LVM.createLVSnapshot(getHost(), snapshotName, device, size, runMode);
     }
 
     /** Skip initial full sync. */
@@ -1064,7 +1071,7 @@ public class BlockDevInfo extends EditableInfo {
                                 for (final Host h
                                     : getHost().getCluster().getHostsArray()) {
                                     DRBD.adjustApply(h,
-                                        DRBD.ALL,
+                                        DRBD.ALL_DRBD_RESOURCES,
                                         null,
                                         Application.RunMode.LIVE);
                                 }

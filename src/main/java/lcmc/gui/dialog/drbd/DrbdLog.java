@@ -38,7 +38,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class DrbdLog extends HostLogs {
-    /** Drbd device name. */
     private String drbdDeviceName;
 
     public void init(final Host host, final String device) {

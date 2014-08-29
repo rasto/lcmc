@@ -123,8 +123,7 @@ public class InitCluster extends DialogCluster {
         useOpenaisButton = widgetFactory.createInstance(
                 Widget.Type.RADIOGROUP,
                 Widget.NO_DEFAULT,
-                new Value[]{new StringValue(COROSYNC_INIT_SCRIPT),
-                        new StringValue(OPENAIS_INIT_SCRIPT)},
+                new Value[]{new StringValue(COROSYNC_INIT_SCRIPT), new StringValue(OPENAIS_INIT_SCRIPT)},
                 Widget.NO_REGEXP,
                 0,
                 Widget.NO_ABBRV,

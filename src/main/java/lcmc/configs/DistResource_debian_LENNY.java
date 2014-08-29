@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for debian verson lenny.
  */
-public final class DistResource_debian_LENNY
-                        extends ListResourceBundle {
+public final class DistResource_debian_LENNY extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         /* Kernel versions and their counterpart in @KERNELVERSION@ variable in
          * the donwload url. Must begin with "kernel:" keyword. deprecated */
@@ -93,7 +91,6 @@ public final class DistResource_debian_LENNY
          + " -o 'DPkg::Options::force=--force-confnew' pacemaker heartbeat"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

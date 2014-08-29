@@ -32,7 +32,6 @@ import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
-import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -60,10 +59,7 @@ public class Textfield extends GenericWidget<JComponent> {
         addComponent(getTextField(selectedValue, regexp, abbreviations), width);
     }
 
-    private JComponent getTextField(final Value value,
-                                    final String regexp,
-                                    final Map<String, String> abbreviations) {
-
+    private JComponent getTextField(final Value value, final String regexp, final Map<String, String> abbreviations) {
         final String valueS;
         if (value == null) {
             valueS = null;

@@ -41,11 +41,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class MyMenu extends JMenu implements UpdatableItem {
-    /** Serial version UID. */
-    private static final long serialVersionUID = 1L;
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
-    /** Access Type for this component to become enabled. */
     private AccessMode enableAccessMode;
     @Autowired
     private Application application;
@@ -106,13 +103,11 @@ public class MyMenu extends JMenu implements UpdatableItem {
 
     /** Sets this item enabled and visible according to its access type. */
     public void processAccessMode() {
-        final boolean accessible =
-                   application.isAccessible(enableAccessMode);
+        final boolean accessible = application.isAccessible(enableAccessMode);
         final String disableTooltip = enablePredicate.check();
         setEnabled(disableTooltip == null && accessible);
         if (isVisible()) {
-            if (!accessible && enableAccessMode.getAccessType()
-                               != Application.AccessType.NEVER) {
+            if (!accessible && enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
                 String advanced = "";
                 if (enableAccessMode.isAdvancedMode()) {
                     advanced = "Advanced ";
@@ -121,20 +116,14 @@ public class MyMenu extends JMenu implements UpdatableItem {
                                + getText()
                                + " (disabled)</b><br>available in \""
                                + advanced
-                               + Application.OP_MODES_MAP.get(
-                                      enableAccessMode.getAccessType())
+                               + Application.OP_MODES_MAP.get(enableAccessMode.getAccessType())
                                + "\" mode</html>");
             } else if (disableTooltip != null) {
-                setToolTipText("<html><b>"
-                               + getText()
-                               + " (disabled)</b><br>"
-                               + disableTooltip
-                               + "</html>");
+                setToolTipText("<html><b>" + getText() + " (disabled)</b><br>" + disableTooltip + "</html>");
             }
         }
     }
 
-    /** Cleanup. */
     @Override
     public final void cleanup() {
         for (final java.awt.Component m : getMenuComponents()) {
@@ -146,7 +135,6 @@ public class MyMenu extends JMenu implements UpdatableItem {
         }
     }
 
-    /** Remove all items. */
     @Override
     public final void removeAll() {
         for (int i = 0; i < getItemCount(); i++) {

@@ -29,10 +29,8 @@ import java.util.ListResourceBundle;
  * Here are commands for ubuntu dapper.
  * TODO: It is not possible to install heartbeat-2 from here.
  */
-public final class DistResource_ubuntu_DAPPER
-                                        extends ListResourceBundle {
+public final class DistResource_ubuntu_DAPPER extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-DAPPER"},
         {"distributiondir",    "ubuntu-dapper-server"},
@@ -63,7 +61,6 @@ public final class DistResource_ubuntu_DAPPER
          + "/bin/rm -rf /tmp/drbdinst"},
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

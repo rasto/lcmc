@@ -28,7 +28,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import lcmc.LCMC;
 import lcmc.model.Cluster;
@@ -37,36 +40,20 @@ import lcmc.gui.dialog.BugReport;
 
 /**
  * This class provides tools for logging.
- *
- * @author Rasto Levrinc
- * @version $Id$
- *
  */
 public final class Logger {
-    /** String that starts error messages. */
     private static final String ERROR_STRING      = "ERROR   : ";
-    /** String that starts info messages. */
     private static final String INFO_STRING       = "INFO    : ";
-    /** String that starts debug messages. */
     private static final String DEBUG_STRING      = "DEBUG   : ";
-    /** String that starts debug messages. */
     private static final String DEBUG1_STRING     = "DEBUG(1): ";
-    /** String that starts debug messages. */
     private static final String DEBUG2_STRING     = "DEBUG(2): ";
-    /** String that starts trace messages. */
     private static final String TRACE_STRING      = "TRACE   : ";
-    /** string that starts application warnings. */
     private static final String APPWARNING_STRING = "WARN    : ";
-    /** String that starts application errors. */
     private static final String APPERROR_STRING   = "APPERROR: ";
-    /** Time when the application started in seconds. */
-    private static final long START_TIME = System.currentTimeMillis() / 1000;
-    /** Patterns that match exceptions that can be ignored. */
+    private static final long APP_START_TIME_SECONDS = System.currentTimeMillis() / 1000;
     public static final List<Pattern> IGNORE_EXCEPTION_PATTERNS =
         Collections.unmodifiableList(new ArrayList<Pattern>(Arrays.asList(
-            Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*",
-                            Pattern.DOTALL))));
-    /** Name of the class. */
+            Pattern.compile(".*:1.6.0_27:.*ToolTipManager\\.java.*", Pattern.DOTALL))));
     private final String className;
     /** Map with all warnings, so that they don't appear more than once. */
     private final Collection<String> appWarningHash = new HashSet<String>();
@@ -78,11 +65,10 @@ public final class Logger {
     }
 
     /** Returns seconds since start. */
-    private long seconds() {
-        return System.currentTimeMillis() / 1000 - START_TIME;
+    private long secondsSinceStart() {
+        return System.currentTimeMillis() / 1000 - APP_START_TIME_SECONDS;
     }
 
-    /** Prints info message to the STDOUT. */
     public void info(final String msg) {
         final String msg0 = INFO_STRING + msg;
         System.out.println(msg0);
@@ -119,7 +105,7 @@ public final class Logger {
             final String msg0 = new StringBuilder()
                                 .append(prefix)
                                 .append('[')
-                                .append(seconds())
+                                .append(secondsSinceStart())
                                 .append("s] ")
                                 .append(className)
                                 .append(": ")
@@ -145,11 +131,10 @@ public final class Logger {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(
-                        LCMC.MAIN_FRAME,
-                        new JScrollPane(new JTextArea(msg, 20, 60)),
-                        Tools.getString("Error.Title"),
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(LCMC.MAIN_FRAME,
+                                              new JScrollPane(new JTextArea(msg, 20, 60)),
+                                              Tools.getString("Error.Title"),
+                                              JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -182,15 +167,12 @@ public final class Logger {
     /**
      * Shows application warning message dialog if application warning messages
      * are enabled.
-     *
-     * @param msg
-     *          warning message
      */
     public void appWarning(final String msg) {
         if (!appWarningHash.contains(msg)) {
             appWarningHash.add(msg);
             final String msg0 = APPWARNING_STRING + msg;
-            if (LoggerFactory.getAppWarning()) {
+            if (LoggerFactory.getShowAppWarning()) {
                 System.out.println(msg0);
                 LoggerFactory.LOG_BUFFER.add(msg0);
             } else {
@@ -203,9 +185,8 @@ public final class Logger {
     public void appWarning(final String msg, final Exception e) {
         if (!appWarningHash.contains(msg)) {
             appWarningHash.add(msg);
-            final String msg0 = APPWARNING_STRING + msg + ": "
-                                + e.getMessage();
-            if (LoggerFactory.getAppWarning()) {
+            final String msg0 = APPWARNING_STRING + msg + ": " + e.getMessage();
+            if (LoggerFactory.getShowAppWarning()) {
                 System.out.println(msg0);
                 LoggerFactory.LOG_BUFFER.add(msg0);
             } else {
@@ -217,9 +198,6 @@ public final class Logger {
     /**
      * Shows application error message dialog if application error messages
      * are enabled.
-     *
-     * @param msg
-     *          error message
      */
     public void appError(final String msg) {
         appError(msg, "", null);
@@ -251,13 +229,8 @@ public final class Logger {
      *          error message
      * @param msg2
      *          second error message in a new line.
-     *
-     * @param e
-     *          Exception object.
      */
-    public void appError(final String msg,
-                         final String msg2,
-                         final Throwable e) {
+    public void appError(final String msg, final String msg2, final Throwable e) {
         if (appErrorHash.contains(msg + msg2)) {
             return;
         }
@@ -284,7 +257,7 @@ public final class Logger {
 
 
         System.out.println(APPERROR_STRING + errorString);
-        if (!LoggerFactory.getAppError()) {
+        if (!LoggerFactory.getShowAppError()) {
             return;
         }
         if (e != null && ignoreException(e)) {

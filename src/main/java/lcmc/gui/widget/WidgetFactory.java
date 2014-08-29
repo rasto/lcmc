@@ -19,7 +19,7 @@
  */
 package lcmc.gui.widget;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Map;
 import lcmc.model.AccessMode;
 import lcmc.model.Value;
@@ -32,7 +32,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Provider;
-import javax.swing.*;
+import javax.swing.Icon;
 
 @Component
 public final class WidgetFactory {
@@ -123,12 +123,12 @@ public final class WidgetFactory {
             case TEXTFIELDWITHUNIT:
                 final TextfieldWithUnit textfieldWithUnit = textFieldWithUnitProvider.get();
                 textfieldWithUnit.init(selectedValue,
-                        units,
-                        regexp,
-                        width,
-                        abbreviations,
-                        enableAccessMode,
-                        fieldButton);
+                                       units,
+                                       regexp,
+                                       width,
+                                       abbreviations,
+                                       enableAccessMode,
+                                       fieldButton);
                 return textfieldWithUnit;
             case RADIOGROUP:
                 final RadioGroup radioGroup = radioGroupProvider.get();

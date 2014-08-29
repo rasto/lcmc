@@ -28,10 +28,8 @@ import java.util.ListResourceBundle;
 /**
  * Here are commands for ubuntu hardy heron.
  */
-public final class DistResource_ubuntu_HARDY
-                                    extends ListResourceBundle {
+public final class DistResource_ubuntu_HARDY extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",            "ubuntu-HARDY"},
         {"distributiondir",    "ubuntu-hardy-server"},
@@ -99,7 +97,6 @@ public final class DistResource_ubuntu_HARDY
 
     };
 
-    /** Get contents. */
     @Override
     protected Object[][] getContents() {
         return Arrays.copyOf(contents, contents.length);

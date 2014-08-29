@@ -33,7 +33,6 @@ public interface UpdatableItem {
     void setPos(Point2D pos);
     /** Update (not in EDT). */
     void updateAndWait();
-    /** Cleanup the item. */
     void cleanup();
 
     void setEnabled(boolean enable);

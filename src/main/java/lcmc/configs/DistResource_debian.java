@@ -30,7 +30,6 @@ import java.util.ListResourceBundle;
  */
 public final class DistResource_debian extends ListResourceBundle {
 
-    /** Contents. */
     private static final Object[][] contents = {
         {"Support",             "debian"},
         //{"distribution",        "debian"},
