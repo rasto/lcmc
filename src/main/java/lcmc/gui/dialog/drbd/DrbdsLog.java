@@ -28,10 +28,15 @@ import java.util.Map;
 import java.util.Set;
 import lcmc.model.Host;
 import lcmc.gui.dialog.HostLogs;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an dialog with log files.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class DrbdsLog extends HostLogs {
 
     public void init(final Host host) {
@@ -46,7 +51,7 @@ public final class DrbdsLog extends HostLogs {
     @Override
     protected Set<String> getSelectedSet() {
         final Set<String> selected = new HashSet<String>();
-        selected.add("drbd");
+        selected.add("drbd\\d+");
         return selected;
     }
 

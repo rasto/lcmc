@@ -41,6 +41,7 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.dialog.ClusterLogs;
 import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -63,6 +64,8 @@ public class ServicesMenu {
     private MenuFactory menuFactory;
     @Autowired
     private Application application;
+    @Autowired @Qualifier("clusterLogs")
+    private Provider<ClusterLogs> clusterLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ServicesInfo servicesInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -597,8 +600,9 @@ public class ServicesMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                final ClusterLogs l = new ClusterLogs(servicesInfo.getBrowser().getCluster());
-                                l.showDialog();
+                                final ClusterLogs clusterLogs = clusterLogsProvider.get();
+                                clusterLogs.init(servicesInfo.getBrowser().getCluster());
+                                clusterLogs.showDialog();
                             }
                         });
         items.add(viewLogsItem);

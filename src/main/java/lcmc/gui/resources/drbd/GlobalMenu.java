@@ -52,6 +52,8 @@ public class GlobalMenu {
     private Provider<ProxyHostWizard> proxyHostWizardProvider;
     @Autowired
     private MenuFactory menuFactory;
+    @Autowired
+    private Provider<DrbdLogs> drbdLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -113,8 +115,9 @@ public class GlobalMenu {
                     @Override
                     public void run(final String text) {
                         globalInfo.hidePopup();
-                        final DrbdLogs l = new DrbdLogs(globalInfo.getCluster(), GlobalInfo.ALL_LOGS_PATTERN);
-                        l.showDialog();
+                        final DrbdLogs drbdLogs = drbdLogsProvider.get();
+                        drbdLogs.init(globalInfo.getCluster(), GlobalInfo.ALL_LOGS_PATTERN);
+                        drbdLogs.showDialog();
                     }
                 });
         items.add(viewLogMenu);

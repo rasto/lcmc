@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -64,6 +65,8 @@ public class ServiceMenu {
     private MenuFactory menuFactory;
     @Autowired
     private Application application;
+    @Autowired
+    private Provider<ServiceLogs> serviceLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -441,10 +444,11 @@ public class ServiceMenu {
                     @Override
                     public void run(final String text) {
                         serviceInfo.hidePopup();
-                        final ServiceLogs l = new ServiceLogs(serviceInfo.getBrowser().getCluster(),
-                                                              serviceInfo.getNameForLog(),
-                                                              serviceInfo.getService().getCrmId());
-                        l.showDialog();
+                        final ServiceLogs serviceLogs = serviceLogsProvider.get();
+                        serviceLogs.init(serviceInfo.getBrowser().getCluster(),
+                                serviceInfo.getNameForLog(),
+                                serviceInfo.getService().getCrmId());
+                        serviceLogs.showDialog();
                     }
                 });
         items.add(viewLogMenu);

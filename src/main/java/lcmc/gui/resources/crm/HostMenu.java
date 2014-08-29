@@ -38,6 +38,7 @@ import lcmc.gui.HostBrowser;
 import lcmc.gui.dialog.HostLogs;
 import lcmc.utilities.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -55,7 +56,7 @@ public class HostMenu {
     private MenuFactory menuFactory;
     @Autowired
     private Application application;
-    @Autowired
+    @Autowired @Qualifier("hostLogs")
     private Provider<HostLogs> hostLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final HostInfo hostInfo) {

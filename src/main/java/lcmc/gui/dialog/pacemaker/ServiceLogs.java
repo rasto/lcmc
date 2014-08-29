@@ -29,17 +29,22 @@ import java.util.Map;
 import java.util.Set;
 import lcmc.model.Cluster;
 import lcmc.gui.dialog.ClusterLogs;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an dialog with log files from many hosts.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ServiceLogs extends ClusterLogs {
     /** Service type. e.g. Filesystem. */
-    private final String serviceType;
-    private final String serviceCrmId;
+    private String serviceType;
+    private String serviceCrmId;
 
-    public ServiceLogs(final Cluster cluster, final String serviceType, final String serviceCrmId) {
-        super(cluster);
+    public void init(final Cluster cluster, final String serviceType, final String serviceCrmId) {
+        super.init(cluster);
         this.serviceType = serviceType;
         this.serviceCrmId = serviceCrmId;
     }

@@ -147,6 +147,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private Application application;
     @Autowired
     private VolumeMenu volumeMenu;
+    @Autowired
+    private Provider<DrbdLogs> drbdLogsProvider;
 
     void init(final String name,
               final String device,
@@ -1089,7 +1091,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     }
 
     public void startDrbdLogsDialog() {
-        final DrbdLogs drbdLogs = new DrbdLogs(getDrbdResourceInfo().getCluster(), getDevice());
+        final DrbdLogs drbdLogs = drbdLogsProvider.get();
+        drbdLogs.init(getDrbdResourceInfo().getCluster(), getDevice());
         drbdLogs.showDialog();
     }
 }
