@@ -201,6 +201,8 @@ final class HbConfig extends DialogCluster {
     @Autowired
     private WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
+    @Autowired
+    private InitCluster initCluster;
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
@@ -313,7 +315,7 @@ final class HbConfig extends DialogCluster {
 
     @Override
     public WizardDialog nextDialog() {
-        final DialogCluster nextDialog = new InitCluster();
+        final DialogCluster nextDialog = initCluster;
         nextDialog.init(this, getCluster());
         return nextDialog;
     }

@@ -93,15 +93,23 @@ public final class DistResource_ubuntu extends ListResourceBundle {
          + "cd drbd-@VERSION@ && "
          + "/usr/bin/apt-get update && "
          + "/usr/bin/apt-get -y install make flex linux-headers-`uname -r` && "
-         + "dpkg-divert --add --rename --package drbd8-module-`uname -r` "
-           + "/lib/modules/`uname -r`/kernel/ubuntu/drbd/drbd.ko && "
-         + "if [ -e configure ]; then"
-         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
-         + " --sysconfdir=/etc;"
-         + " fi && "
-         + "make && make install DESTDIR=/ && "
-         + "/bin/rm -rf /tmp/drbdinst"},
+         + "make && make install && "
 
+         + "if [[ @UTIL-VERSION@ ]]; then "
+         + "  /usr/bin/apt-get -y install xsltproc && "
+         + "  /usr/bin/wget --directory-prefix=/tmp/drbdinst/ http://oss.linbit.com/drbd/@UTIL-VERSIONSTRING@ && "
+         + "  cd /tmp/drbdinst && "
+         + "  /bin/tar xfzp drbd-utils-@UTIL-VERSION@.tar.gz && "
+         + "  cd drbd-utils-@UTIL-VERSION@ && "
+         + "  if [ -e configure ]; then"
+         + "    ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc;"
+         + "    make && make install ; "
+         + "    if ! grep -ql udevrulesdir configure; then"
+         + "        cp /lib/udev/65-drbd.rules /lib/udev/rules.d/;"
+         + "    fi; "
+         + "  fi; "
+         + "fi; "
+         + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"

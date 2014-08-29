@@ -747,7 +747,7 @@ public final class DRBD {
     }
 
     /** Return whether DRBD util and module versions are compatible. */
-    public static boolean compatibleVersions(final CharSequence utilV, final CharSequence moduleV) {
+    public static boolean compatibleVersions(final String utilV, final String moduleV) {
         if (utilV == null || moduleV == null) {
             return false;
         }
@@ -767,6 +767,9 @@ public final class DRBD {
             return false;
         }
         try {
+            if (Tools.compareVersions(uV, "8.9") >= 0) {
+                return Tools.compareVersions(moduleV, "8.4.5") >= 0;
+            }
             return Tools.compareVersions(mV, uV) == 0;
         } catch (final IllegalVersionException e) {
             return false;

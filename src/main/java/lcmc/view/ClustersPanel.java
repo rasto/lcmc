@@ -74,7 +74,6 @@ public final class ClustersPanel extends JPanel {
     /** Shows the tabbed pane. */
     public void init() {
         guiData.setClustersPanel(this);
-        clusterTabFactory.createClusterTab(null);
         tabbedPane = new JTabbedPane();
 
         setTabLook();

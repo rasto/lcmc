@@ -43,13 +43,6 @@ public final class DistResource_redhatenterpriseas_4_0
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/ -O - |perl -ple '($_) = /href=\"@DRBDDIR@-(\\d.*?)\\/\"/ or goto LINE'"
         },
 
-        {"DrbdAvailVersionsSource",
-         "/usr/bin/wget -q http://oss.linbit.com/drbd/"
-         + " -O - |"
-         + "perl -ple '($_) = m!href=\"(\\d\\.\\d/drbd-[89].*?\\.tar\\.gz)\"!"
-         + " or goto LINE'"
-         },
-
         {"DrbdAvailDistributions",
          "/usr/bin/wget -q http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/ -O - |perl -ple '($_) = m!href=\"([^\"/]+)/\"! or goto LINE'"
         },

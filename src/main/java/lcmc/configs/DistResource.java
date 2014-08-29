@@ -94,6 +94,13 @@ public final class DistResource extends ListResourceBundle {
          + " or goto LINE'"
          },
 
+        {"DrbdUtilAvailVersionsSource",
+         "/usr/bin/wget --no-check-certificate -q http://oss.linbit.com/drbd/"
+         + " -O - |"
+         + "perl -ple '($_) = m!href=\"(drbd-utils-\\d.*?\\.tar\\.gz)\"!"
+         + " or goto LINE'"
+         },
+
         {"DrbdAvailDistributions",
          "/usr/bin/wget --no-check-certificate -q"
          + " http://www.linbit.com/@SUPPORTDIR@/@DRBDDIR@-@DRBDVERSION@/ -O - "

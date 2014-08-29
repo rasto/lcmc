@@ -61,30 +61,6 @@ public final class DistResource_suse extends ListResourceBundle {
         {"PmInst.install.i486", "i586" },
         {"PmInst.install.i586", "i586" },
 
-        /* Drbd install method 2 */
-        {"DrbdInst.install.text.2",
-         "from the source tarball"},
-
-        {"DrbdInst.install.method.2",
-         "source"},
-
-        {"DrbdInst.install.2",
-         "/bin/mkdir -p /tmp/drbdinst && "
-         + "/usr/bin/wget --directory-prefix=/tmp/drbdinst/"
-         + " http://oss.linbit.com/drbd/@VERSIONSTRING@ && "
-         + "cd /tmp/drbdinst && "
-         + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
-         + "cd drbd-@VERSION@ && "
-         /* removing -pae etc. from uname -r */
-         + "/usr/bin/zypper -n in kernel-source=`uname -r"
-         + "|sed s/-[a-z].*//;` && "
-         + "/usr/bin/zypper -n in flex gcc && "
-         + "if [ -e configure ]; then"
-         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
-         + " --sysconfdir=/etc;"
-         + " fi && "
-         + "make && make install DESTDIR=/ && "
-         + "/bin/rm -rf /tmp/drbdinst"},
 
         {"HbCheck.version",
          DistResource.SUDO + "@GUI-HELPER@ get-cluster-versions;"
@@ -145,14 +121,25 @@ public final class DistResource_suse extends ListResourceBundle {
          + "/bin/tar xfzp drbd-@VERSION@.tar.gz && "
          + "cd drbd-@VERSION@ && "
          /* removing -pae etc. from uname -r */
-         + "/usr/bin/zypper -n in kernel-`uname -r|sed 's/.*-\\([a-z]\\)/\\1/'`"
-         + "-devel=`uname -r|sed s/-[a-z].*//;` && "
-         + "/usr/bin/zypper -n in make flex gcc && "
-         + "if [ -e configure ]; then"
-         + " ./configure --prefix=/usr --with-km --localstatedir=/var"
-         + " --sysconfdir=/etc;"
-         + " fi && "
-         + "make && make install DESTDIR=/ && "
+         + "/usr/bin/zypper -n in kernel-source=`uname -r"
+         + "|sed s/-[a-z].*//;` && "
+         + "/usr/bin/zypper -n in flex gcc make && "
+         + "make && make install && "
+
+         + "if [[ @UTIL-VERSION@ ]]; then "
+         + "  /usr/bin/zypper -n in libxslt && "
+         + "  /usr/bin/wget --directory-prefix=/tmp/drbdinst/ http://oss.linbit.com/drbd/@UTIL-VERSIONSTRING@ && "
+         + "  cd /tmp/drbdinst && "
+         + "  /bin/tar xfzp drbd-utils-@UTIL-VERSION@.tar.gz && "
+         + "  cd drbd-utils-@UTIL-VERSION@ && "
+         + "  if [ -e configure ]; then"
+         + "    ./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc;"
+         + "    make && make install ; "
+         + "    if ! grep -ql udevrulesdir configure; then"
+         + "        cp /lib/udev/65-drbd.rules /lib/udev/rules.d/;"
+         + "    fi; "
+         + "  fi; "
+         + "fi; "
          + "/bin/rm -rf /tmp/drbdinst"},
 
         {"libvirt.lxc.libpath.x86_64", "/usr/lib64/libvirt"},

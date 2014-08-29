@@ -97,7 +97,6 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                 /* all drbd versions are stored in form
                                  * {version1,version2,...}. This will be
                                  * later expanded by shell. */
-                        getDrbdInstallation().setDrbdVersionToInstall(Tools.shellList(items));
                         availDistributions();
                     }
 

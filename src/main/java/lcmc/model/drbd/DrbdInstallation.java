@@ -21,6 +21,7 @@
 package lcmc.model.drbd;
 
 import lcmc.Exceptions;
+import lcmc.gui.dialog.host.DrbdVersions;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
@@ -32,48 +33,23 @@ import java.util.List;
 public class DrbdInstallation {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdInstallation.class);
 
-    private String drbdVersionToInstall = null;
     /** Drbd version of the source tarball, that will be installed . */
-    private String drbdVersionUrlStringToInstall = null;
     private String drbdBuildToInstall = null;
     private String drbdPackagesToInstall = null;
     private boolean drbdWillBeUpgraded = false;
     private boolean drbdWasNewlyInstalled = false;
     private String drbdInstallMethodIndex;
     private String proxyInstallMethodIndex;
+    private DrbdVersions drbdVersions;
 
     private List<String> availableDrbdVersions = null;
 
-    /**
-     * Sets drbdVersionToInstall. This version is one that is to be installed.
-     * If drbd is already installed.
-     */
-    public void setDrbdVersionToInstall(final String drbdVersionToInstall) {
-        this.drbdVersionToInstall = drbdVersionToInstall;
+    public void setDrbdToInstall(final DrbdVersions drbdVersions) {
+        this.drbdVersions = drbdVersions;
     }
 
-    /**
-     * Sets the drbd version in the form that is in the source tarball on
-     * linbit website, like so: "8.3/drbd-8.3.1.tar.gz".
-     */
-    public void setDrbdVersionUrlStringToInstall(final String drbdVersionUrlStringToInstall) {
-        this.drbdVersionUrlStringToInstall = drbdVersionUrlStringToInstall;
-    }
-
-    /**
-     * Gets drbdVersionToInstall. This version is one that is to be installed.
-     * If drbd is already installed.
-     */
-    public String getDrbdVersionToInstall() {
-        return drbdVersionToInstall;
-    }
-
-    /**
-     * Gets drbd version of the source tarball in the form as it is on
-     * the linbit website: "8.3/drbd-8.3.1.tar.gz".
-     */
-    public String getDrbdVersionUrlStringToInstall() {
-        return drbdVersionUrlStringToInstall;
+    public DrbdVersions getDrbdToInstall() {
+        return drbdVersions;
     }
 
     /**
@@ -126,8 +102,15 @@ public class DrbdInstallation {
     }
 
     public String replaceVarsInCommand(String command) {
-        if (drbdVersionToInstall != null && command.indexOf("@DRBDVERSION@") > -1) {
-            command = command.replaceAll("@DRBDVERSION@", drbdVersionToInstall);
+        if (drbdVersions != null) {
+            final String drbdVersionToInstall = drbdVersions.getModuleVersion();
+            if (drbdVersionToInstall != null && command.indexOf("@DRBDVERSION@") > -1) {
+                command = command.replaceAll("@DRBDVERSION@", drbdVersionToInstall);
+            }
+            final String utilVersionToInstall = drbdVersions.getUtilVersion();
+            if (utilVersionToInstall != null && command.indexOf("@DRBD-UTIL-VERSION@") > -1) {
+                command = command.replaceAll("@DRBD-UTIL-VERSION@", utilVersionToInstall);
+            }
         }
         if (drbdBuildToInstall != null && command.indexOf("@BUILD@") > -1) {
             command = command.replaceAll("@BUILD@", drbdBuildToInstall);

@@ -27,7 +27,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.AppContext;
 import lcmc.model.Application;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.ClusterBrowser;
@@ -111,8 +110,24 @@ final class DrbdCommandInst extends DialogHost {
         if (installMethod != null) {
             installCommand = "DrbdInst.install." + installMethod;
         }
-        final String drbdVersion = drbdInstallation.getDrbdVersionToInstall();
-        final String drbdVersionUrlString = drbdInstallation.getDrbdVersionUrlStringToInstall();
+        final String drbdVersion;
+        final String drbdVersionUrlString;
+        final String utilVersion;
+        final String utilFileName;
+
+        final DrbdVersions drbdVersions = drbdInstallation.getDrbdToInstall();
+        if (drbdVersions == null) {
+            drbdVersion = null;
+            drbdVersionUrlString = null;
+            utilVersion = null;
+            utilFileName = null;
+        } else {
+            drbdVersion = drbdVersions.getModuleVersion();
+            drbdVersionUrlString = drbdVersions.getModuleFileName();
+            utilVersion = drbdVersions.getUtilVersion();
+            utilFileName = drbdVersions.getUtilFileName();
+        }
+
         application.setLastDrbdInstalledMethod(getHost().getDistString("DrbdInst.install.text." + installMethod));
         LOG.debug1("installDrbd: cmd: " + installCommand
                    + " arch: " + archString
@@ -139,9 +154,16 @@ final class DrbdCommandInst extends DialogHost {
                          .convertCmdCallback(new ConvertCmdCallback() {
                              @Override
                              public String convert(final String command) {
-                                 return command.replaceAll("@ARCH@", archString)
-                                               .replaceAll("@VERSIONSTRING@", drbdVersionUrlString)
-                                               .replaceAll("@VERSION@", drbdVersion);
+                                 String replaced = command.replaceAll("@ARCH@", archString);
+                                 replaced = replaced.replaceAll("@VERSIONSTRING@", drbdVersionUrlString);
+                                 replaced = replaced.replaceAll("@VERSION@", drbdVersion);
+                                 if (utilFileName != null) {
+                                     replaced = replaced.replaceAll("@UTIL-VERSIONSTRING@", utilFileName);
+                                 }
+                                 if (utilVersion != null) {
+                                     replaced = replaced.replaceAll("@UTIL-VERSION@", utilVersion);
+                                 }
+                                 return replaced;
                              }
                          })
                          .sshCommandTimeout(Ssh.DEFAULT_COMMAND_TIMEOUT_LONG));

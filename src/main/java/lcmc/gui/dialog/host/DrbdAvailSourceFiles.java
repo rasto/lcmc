@@ -29,19 +29,18 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
+import lcmc.Exceptions;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.model.drbd.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Tools;
-import lcmc.utilities.WidgetListener;
+import lcmc.utilities.*;
 import lcmc.utilities.ssh.ExecCommandConfig;
+import lcmc.utilities.ssh.SshOutput;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -54,6 +53,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class DrbdAvailSourceFiles extends DialogHost {
+    private static final String DRBD_VERSION_AFTER_UTIL_SPLIT = "8.4.5";
     @Autowired
     private DrbdCommandInst drbdCommandInst = null;
     private Widget drbdTarballCombo = null;
@@ -62,6 +62,7 @@ final class DrbdAvailSourceFiles extends DialogHost {
     private Application application;
     @Autowired
     private WidgetFactory widgetFactory;
+    private static final Logger drbdVersions = LoggerFactory.getLogger(DrbdAvailSourceFiles.class);
 
     /**
      * Inits the dialog and starts detecting the available drbd source
@@ -81,67 +82,115 @@ final class DrbdAvailSourceFiles extends DialogHost {
     }
 
     protected void findAvailTarballs() {
-        getHost().execCommand(new ExecCommandConfig()
+        final SshOutput ret = getHost().captureCommand(new ExecCommandConfig()
                                     .commandString("DrbdAvailVersionsSource")
-                                    .convertCmdCallback(getDrbdInstallationConvertCmdCallback())
-                                    .execCallback(new ExecCallback() {
-                @Override
-                public void done(final String answer) {
-                    if (answer == null || answer.isEmpty()) {
-                        doneError(null, 1);
-                        return;
-                    }
-                    final String[] versions = answer.split("\\r?\\n");
-                    if (versions.length == 0) {
-                        doneError(null, 1);
-                        return;
-                    }
-                    final List<Value> items = new ArrayList<Value>();
-                    for (final String versionString : versions) {
-                        if (versionString != null && versionString.length() > 16) {
-                            final String version = versionString.substring(9, versionString.length() - 7);
-                            items.add(new StringValue(versionString, version));
-                        }
-                    }
-                    drbdTarballCombo.clear();
-                    application.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (!items.isEmpty()) {
-                                drbdTarballCombo.reloadComboBox(items.get(0), items.toArray(new Value[items.size()]));
+                                    .convertCmdCallback(getDrbdInstallationConvertCmdCallback()).silentOutput());
+        final int exitCode = ret.getExitCode();
+        final String output = ret.getOutput();
+        if (exitCode == 0) {
+            if (output == null || output.isEmpty()) {
+                progressBarDoneError();
+                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
+                return;
+            }
+            final String[] moduleFileNames = output.split("\\r?\\n");
+            if (moduleFileNames.length == 0) {
+                progressBarDoneError();
+                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
+                return;
+            }
+            final List<DrbdVersions> items = new ArrayList<DrbdVersions>();
+            for (final String moduleFileName : moduleFileNames) {
+                if (moduleFileName != null && moduleFileName.length() > 16) {
+                    String moduleVersion = moduleFileName.substring(9, moduleFileName.length() - 7);
+                    String utilFileName = null;
+                    String utilVersion = null;
+                    try {
+                        if (Tools.compareVersions(moduleVersion, DRBD_VERSION_AFTER_UTIL_SPLIT) >= 0) {
+                            utilFileName = getLastDrbdUtilFileName();
+                            if (utilFileName != null) {
+                                utilVersion = getDrbdUtilVersion(utilFileName);
                             }
-                            final Value selectedItem = drbdTarballCombo.getValue();
-                            drbdTarballCombo.setEnabled(true);
-                            allDone(selectedItem);
                         }
-                    });
+                    } catch (Exceptions.IllegalVersionException e) {
+                        drbdVersions.appWarning("can't compare version: " + e);
+                    }
+                    items.add(new DrbdVersions(moduleFileName, moduleVersion, utilFileName, utilVersion));
                 }
-
+            }
+            drbdTarballCombo.clear();
+            application.invokeLater(new Runnable() {
                 @Override
-                public void doneError(final String answer, final int errorCode) {
-                    application.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBarDoneError();
-                            printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"),
-                                               answer,
-                                               errorCode);
-                        }
-                    });
+                public void run() {
+                    if (!items.isEmpty()) {
+                        drbdTarballCombo.reloadComboBox(items.get(0), items.toArray(new DrbdVersions[items.size()]));
+                    }
+                    final DrbdVersions selectedItem = (DrbdVersions) drbdTarballCombo.getValue();
+                    drbdTarballCombo.setEnabled(true);
+                    allDone(selectedItem);
                 }
-            }));
+            });
+
+        } else {
+            application.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    progressBarDoneError();
+                    printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
+                }
+            });
+        }
+    }
+
+    private String getLastDrbdUtilFileName() {
+        final SshOutput ret = getHost().captureCommand(new ExecCommandConfig()
+                .commandString("DrbdUtilAvailVersionsSource")
+                .convertCmdCallback(getDrbdInstallationConvertCmdCallback()).silentOutput());
+        final int exitCode = ret.getExitCode();
+        final String output = ret.getOutput();
+        if (exitCode == 0) {
+            if (output == null || output.isEmpty()) {
+                progressBarDoneError();
+                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
+                return null;
+            }
+            final String[] versions = output.split("\\r?\\n");
+            if (versions.length == 0) {
+                progressBarDoneError();
+                printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
+                return null;
+            }
+            return versions[0];
+        } else {
+            application.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    progressBarDoneError();
+                    printErrorAndRetry(Tools.getString("Dialog.Host.DrbdAvailSourceFiles.NoBuilds"), output, exitCode);
+                }
+            });
+            return null;
+        }
+    }
+
+    private String getDrbdUtilVersion(final String utilFileName) {
+        if (utilFileName != null && utilFileName.length() > 21) {
+            return utilFileName.substring(11, utilFileName.length() - 7);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Is called after everything is done. It adds listeners if called for the
      * first time.
      */
-    protected void allDone(final Value versionInfo) {
-        if (versionInfo != null) {
-            answerPaneSetText("http://oss.linbit.com/drbd/" + versionInfo.getValueForGui());
+    protected void allDone(final DrbdVersions drbdVersions) {
+        if (drbdVersions != null) {
+            answerPaneSetText("http://oss.linbit.com/drbd/" + drbdVersions.getModuleFileName());
             final DrbdInstallation drbdInstallation = getDrbdInstallation();
-            drbdInstallation.setDrbdVersionToInstall(versionInfo.toString());
-            drbdInstallation.setDrbdVersionUrlStringToInstall(versionInfo.getValueForConfig());
+
+            drbdInstallation.setDrbdToInstall(drbdVersions);
         }
         // TODO: do something different if we did not get any versions
         drbdTarballCombo.setEnabled(true);
@@ -201,8 +250,8 @@ final class DrbdAvailSourceFiles extends DialogHost {
         drbdTarballCombo.addListeners(new WidgetListener() {
             @Override
             public void check(final Value value) {
-                final Value item = drbdTarballCombo.getValue();
-                allDone(item);
+                final DrbdVersions drbdVersions = (DrbdVersions) drbdTarballCombo.getValue();
+                allDone(drbdVersions);
             }
         });
     }

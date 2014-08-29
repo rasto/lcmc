@@ -89,7 +89,6 @@ public class DrbdAvailFiles extends DialogHost {
         if (selectedItem == null) {
             allDone();
         } else {
-            getDrbdInstallation().setDrbdVersionToInstall(selectedItem);
             availBuilds();
         }
     }
@@ -266,7 +265,6 @@ public class DrbdAvailFiles extends DialogHost {
                     application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            getDrbdInstallation().setDrbdVersionToInstall(item);
                             availBuilds();
                         }
                 });
