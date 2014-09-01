@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import lcmc.AppContext;
 import lcmc.LCMC;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
@@ -270,7 +271,7 @@ public final class Logger {
         final Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                final BugReport bugReport = new BugReport();
+                final BugReport bugReport = AppContext.getBean(BugReport.class);
                 bugReport.init(BugReport.UNKNOWN_CLUSTER, errorString.toString());
                 bugReport.showDialog();
             }
