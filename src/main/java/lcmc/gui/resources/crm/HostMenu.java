@@ -539,7 +539,7 @@ public class HostMenu {
                             @Override
                             public void run(final String text) {
                                 final Color newColor = JColorChooser.showDialog(
-                                        LCMC.MAIN_FRAME,
+                                        guiData.getMainFrame(),
                                         "Choose " + hostInfo.getHost().getName() + " color",
                                         hostInfo.getHost().getPmColors()[0]);
                                 if (newColor != null) {

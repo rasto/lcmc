@@ -29,6 +29,7 @@ import javax.swing.JColorChooser;
 
 import lcmc.LCMC;
 import lcmc.gui.CallbackAction;
+import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.crm.ClusterStatus;
@@ -62,6 +63,8 @@ public class PcmkMultiSelectionMenu {
     private MenuFactory menuFactory;
     @Autowired
     private Application application;
+    @Autowired
+    private GUIData guiData;
 
     public List<UpdatableItem> getPulldownMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {
         this.pcmkMultiSelectionInfo = pcmkMultiSelectionInfo;
@@ -569,7 +572,7 @@ public class PcmkMultiSelectionMenu {
                             public void run(final String text) {
                                 final Host firstHost = selectedHostInfos.get(0).getHost();
                                 final Color newColor = JColorChooser.showDialog(
-                                        LCMC.MAIN_FRAME,
+                                        guiData.getMainFrame(),
                                         "Choose " + selectedHostInfos + " color",
                                         firstHost.getPmColors()[0]);
                                 for (final HostInfo hi : selectedHostInfos) {

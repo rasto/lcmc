@@ -46,6 +46,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
 import lcmc.LCMC;
+import lcmc.gui.GUIData;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
@@ -110,6 +111,8 @@ public abstract class HardwareInfo extends EditableInfo {
     private MenuFactory menuFactory;
     @Autowired
     private WidgetFactory widgetFactory;
+    @Autowired
+    private GUIData guiData;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser);
@@ -581,7 +584,7 @@ public abstract class HardwareInfo extends EditableInfo {
         fc.setDialogTitle(Tools.getString("DiskInfo.FileChooserTitle") + host.getName());
         fc.setApproveButtonToolTipText(Tools.getString("DiskInfo.Approve.ToolTip"));
         fc.putClientProperty("FileChooser.useShellFolder", Boolean.FALSE);
-        final int ret = fc.showDialog(LCMC.MAIN_FRAME, Tools.getString("DiskInfo.Approve"));
+        final int ret = fc.showDialog(guiData.getMainFrame(), Tools.getString("DiskInfo.Approve"));
         linuxFileCache.clear();
         if (ret == JFileChooser.APPROVE_OPTION && fc.getSelectedFile() != null) {
             final String name = fc.getSelectedFile().getAbsolutePath();

@@ -129,15 +129,17 @@ public class GUIData  {
     @Autowired
     private Application application;
 
+    private Container mainFrame;
+
     public Container getMainFrameContentPane() {
-        return ((RootPaneContainer) LCMC.MAIN_FRAME).getContentPane();
+        return ((RootPaneContainer) mainFrame).getContentPane();
     }
 
     public JRootPane getMainFrameRootPane() {
-        if (LCMC.MAIN_FRAME instanceof JFrame) {
-            return ((RootPaneContainer) LCMC.MAIN_FRAME).getRootPane();
-        } else if (LCMC.MAIN_FRAME instanceof JApplet) {
-            return ((RootPaneContainer) LCMC.MAIN_FRAME).getRootPane();
+        if (mainFrame instanceof JFrame) {
+            return ((RootPaneContainer) mainFrame).getRootPane();
+        } else if (mainFrame instanceof JApplet) {
+            return ((RootPaneContainer) mainFrame).getRootPane();
         }
         return null;
     }
@@ -464,7 +466,7 @@ public class GUIData  {
      * Return whether it is run as an applet.
      */
     public boolean isApplet() {
-        return LCMC.MAIN_FRAME instanceof JApplet;
+        return mainFrame instanceof JApplet;
     }
 
     public void startProgressIndicator(final String text) {
@@ -530,10 +532,10 @@ public class GUIData  {
         sp.setBorder(null);
         final JTextField typeToSearchField = dlm.getFilterField();
         final JDialog popup;
-        if (LCMC.MAIN_FRAME instanceof JApplet) {
+        if (mainFrame instanceof JApplet) {
             popup = new JDialog(new JFrame(), name, false);
         } else {
-            popup = new JDialog((Frame) LCMC.MAIN_FRAME, name, false);
+            popup = new JDialog((Frame) mainFrame, name, false);
         }
         popup.setUndecorated(true);
         popup.setAlwaysOnTop(true);
@@ -782,11 +784,19 @@ public class GUIData  {
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(LCMC.MAIN_FRAME,
+                JOptionPane.showMessageDialog(mainFrame,
                         new JScrollPane(infoPane),
                         title,
                         JOptionPane.ERROR_MESSAGE);
             }
         });
+    }
+
+    public Container getMainFrame() {
+        return mainFrame;
+    }
+
+    public void setMainFrame(final Container mainFrame) {
+        this.mainFrame = mainFrame;
     }
 }

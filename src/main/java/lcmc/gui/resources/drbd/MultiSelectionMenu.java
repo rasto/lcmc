@@ -286,7 +286,7 @@ public class MultiSelectionMenu {
                     public void run(final String text) {
                         final Host firstHost = selectedHostInfos.get(0).getHost();
                         final Color newColor = JColorChooser.showDialog(
-                                LCMC.MAIN_FRAME,
+                                guiData.getMainFrame(),
                                 "Choose " + selectedHostInfos + " color",
                                 firstHost.getPmColors()[0]);
                         for (final HostDrbdInfo hi : selectedHostInfos) {

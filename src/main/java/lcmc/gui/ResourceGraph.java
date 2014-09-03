@@ -869,7 +869,7 @@ public abstract class ResourceGraph {
         if (ctl != null) {
             return ctl;
         }
-        final Font font = LCMC.MAIN_FRAME.getFont();
+        final Font font = guiData.getMainFrame().getFont();
         final FontRenderContext context = g2d.getFontRenderContext();
         final TextLayout tl = new TextLayout(text,
                                              new Font(font.getName(),

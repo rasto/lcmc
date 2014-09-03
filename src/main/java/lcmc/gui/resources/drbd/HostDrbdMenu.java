@@ -302,7 +302,7 @@ public class HostDrbdMenu {
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
-                                final Color newColor = JColorChooser.showDialog(LCMC.MAIN_FRAME,
+                                final Color newColor = JColorChooser.showDialog(guiData.getMainFrame(),
                                         "Choose " + host.getName() + " color",
                                         host.getPmColors()[0]);
                                 if (newColor != null) {

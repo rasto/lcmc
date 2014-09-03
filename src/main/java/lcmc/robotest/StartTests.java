@@ -103,7 +103,7 @@ public class StartTests {
     public void startTest(final Test autoTest, final Cluster c) {
         final Type type = autoTest.getType();
         final char index = autoTest.getIndex();
-        LCMC.MAIN_FRAME.setSize(
+        guiData.getMainFrame().setSize(
                 Tools.getDefaultInt("DrbdMC.width"),
                 Tools.getDefaultInt("DrbdMC.height") + 50);
         cluster = c;

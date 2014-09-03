@@ -15,7 +15,6 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-
 @Category(IntegrationTest.class)
 public final class ClusterBrowserITest {
 

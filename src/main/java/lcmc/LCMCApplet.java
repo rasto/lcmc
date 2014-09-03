@@ -29,6 +29,7 @@ package lcmc;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 
+import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
@@ -55,21 +56,23 @@ public final class LCMCApplet extends JApplet {
         } else {
             params = paramsLine.split("\\s+");
         }
+        final LCMC lcmc = AppContext.getBean(LCMC.class);
+        final GUIData guiData = AppContext.getBean(GUIData.class);
 
-        LCMC.initApp(params);
+        lcmc.initApp(params);
 
         final Application application = AppContext.getBean(Application.class);
         if (application.isEmbedApplet()) {
-            LCMC.MAIN_FRAME = this;
-            setJMenuBar(LCMC.getMenuBar());
-            setContentPane(LCMC.getMainPanel());
-            setGlassPane(LCMC.getMainGlassPane());
-            LCMC.createAndShowGUI(this);
+            guiData.setMainFrame(this);
+            setJMenuBar(lcmc.getMenuBar());
+            setContentPane(lcmc.getMainPanel());
+            setGlassPane(lcmc.getMainGlassPane());
+            lcmc.createAndShowGUI(this);
         } else {
             final JFrame mainFrame = new JFrame();
-            LCMC.MAIN_FRAME = mainFrame;
-            LCMC.createMainFrame(mainFrame);
-            LCMC.createAndShowGUI(mainFrame);
+            guiData.setMainFrame(mainFrame);
+            lcmc.createMainFrame(mainFrame);
+            lcmc.createAndShowGUI(mainFrame);
         }
         //TODO: save on quit
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

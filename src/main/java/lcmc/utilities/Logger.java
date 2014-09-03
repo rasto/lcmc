@@ -35,6 +35,7 @@ import javax.swing.SwingUtilities;
 
 import lcmc.AppContext;
 import lcmc.LCMC;
+import lcmc.gui.GUIData;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.dialog.BugReport;
@@ -129,10 +130,11 @@ public final class Logger {
         final String msg0 = ERROR_STRING + msg;
         System.out.println(msg0);
         LoggerFactory.LOG_BUFFER.add(msg0);
+        final GUIData guiData = AppContext.getBean(GUIData.class);
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(LCMC.MAIN_FRAME,
+                JOptionPane.showMessageDialog(guiData.getMainFrame(),
                                               new JScrollPane(new JTextArea(msg, 20, 60)),
                                               Tools.getString("Error.Title"),
                                               JOptionPane.ERROR_MESSAGE);

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import lcmc.LCMC;
 import lcmc.configs.DistResource;
 import lcmc.gui.GUIData;
 import lcmc.model.Application;
@@ -44,6 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Provider;
 
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
@@ -104,7 +105,7 @@ public final class Ssh {
             LOG.debug1("reconnect: connecting: " + host.getName());
             this.connectionCallback = NO_CONNECTION_CALLBACK;
             this.progressBar = NO_PROGRESS_BAR;
-            this.sshGui = new SSHGui(LCMC.MAIN_FRAME, host, null);
+            this.sshGui = new SSHGui(guiData.getMainFrame(), host, null);
             authenticateAndConnect();
         }
         return true;

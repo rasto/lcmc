@@ -77,6 +77,6 @@ public final class AddVMConfigDialog {
         vmsVirtualDomainInfo.setDialogStarted(false);
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
         guiData.expandTerminalSplitPane(1);
-        LCMC.MAIN_FRAME.requestFocus();
+        guiData.getMainFrame().requestFocus();
     }
 }

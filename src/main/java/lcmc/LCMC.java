@@ -48,86 +48,71 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.MainMenu;
 import lcmc.model.Application;
-import lcmc.model.UserConfig;
 import lcmc.view.MainPanel;
 import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
  */
+@Component
 public final class LCMC extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(LCMC.class);
-    private static final long serialVersionUID = 1L;
     private static volatile boolean uncaughtExceptionFlag = false;
 
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
 
-    public static Container MAIN_FRAME;
+    @Autowired
+    private Application application;
+    @Autowired
+    private ArgumentParser argumentParser;
+    @Autowired
+    private MainPanel mainPanel;
+    @Autowired
+    private MainMenu menu;
+    @Autowired
+    private ProgressIndicatorPanel mainGlassPane;
+    @Autowired
+    private GUIData guiData;
 
-    protected static void createAndShowGUI(final Container mainFrame) {
+    protected void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
         displayMainFrame(mainFrame);
     }
 
-    protected static JPanel getMainPanel() {
-        final MainPanel mainPanel = AppContext.getBean(MainPanel.class);
+    protected JPanel getMainPanel() {
         mainPanel.init();
         mainPanel.setOpaque(true); //content panes must be opaque
         return mainPanel;
     }
 
-    protected static JMenuBar getMenuBar() {
+    protected JMenuBar getMenuBar() {
         /* glass pane is used for progress bar etc. */
-        final MainMenu menu = AppContext.getBean(MainMenu.class);
         menu.init();
         return menu.getMenuBar();
     }
 
-    protected static ProgressIndicatorPanel getMainGlassPane() {
-        final ProgressIndicatorPanel mainGlassPane = AppContext.getBean(ProgressIndicatorPanel.class);
+    protected ProgressIndicatorPanel getMainGlassPane() {
         mainGlassPane.init();
         return mainGlassPane;
     }
 
-    /** Cleanup before closing. */
-    private static void cleanupBeforeClosing() {
-        final Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO: don't try to reconnect when exiting
-                System.out.println("saving...");
-                for (int i = 0; i < 10; i++) {
-                    System.out.println(".");
-                    System.out.flush();
-                    Tools.sleep(2000);
-                }
-                System.out.println();
-                System.out.println("force exit.");
-                System.exit(5);
-            }
-        });
-        t.start();
-        MAIN_FRAME.setVisible(false);
-        final UserConfig userConfig = AppContext.getBean(UserConfig.class);
-        final GUIData guiData = AppContext.getBean(GUIData.class);
-        final Application application = AppContext.getBean(Application.class);
-        final String saveFile = application.getDefaultSaveFile();
-        application.saveConfig(saveFile, false);
-        application.disconnectAllHosts();
-    }
-
-    protected static void initApp(final String[] args) {
+    protected void initApp(final String[] args) {
         setupUiLookupFeelAndFeel();
         setupUncaughtExceptionHandler();
-        final ArgumentParser argumentParser = AppContext.getBean(ArgumentParser.class);
         argumentParser.parseOptionsAndReturnAutoArguments(args);
     }
-
     public static void main(final String[] args) {
+        final LCMC lcmc = AppContext.getBean(LCMC.class);
+        lcmc.launch(args);
+    }
+
+    public void launch(final String[] args) {
         Tools.init();
         final JFrame mainFrame = new JFrame(Tools.getString("DrbdMC.Title") + ' ' + Tools.getRelease());
         final List<Image> il = new ArrayList<Image>();
@@ -140,7 +125,6 @@ public final class LCMC extends JPanel {
         }
         mainFrame.setIconImages(il);
         initApp(args);
-        final Application application = AppContext.getBean(Application.class);
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -148,7 +132,7 @@ public final class LCMC extends JPanel {
                 createAndShowGUI(mainFrame);
             }
         });
-        MAIN_FRAME = mainFrame;
+        guiData.setMainFrame(mainFrame);
         //final Thread t = new Thread(new Runnable() {
         //    public void run() {
         //        drbd.utilities.RoboTest.startMover(600000, true);
@@ -157,7 +141,7 @@ public final class LCMC extends JPanel {
         //t.start();
     }
 
-    static void createMainFrame(final JFrame mainFrame) {
+    void createMainFrame(final JFrame mainFrame) {
         mainFrame.setGlassPane(getMainGlassPane());
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.addWindowListener(new ExitListener());
@@ -166,7 +150,7 @@ public final class LCMC extends JPanel {
     }
 
     /** Adds the exit listener and disconnects all hosts prior to exiting. */
-    public static class ExitListener extends WindowAdapter {
+    public class ExitListener extends WindowAdapter {
         /**
          * Called when window is closed.
          */
@@ -175,14 +159,39 @@ public final class LCMC extends JPanel {
             cleanupBeforeClosing();
             System.exit(0);
         }
+
+        /** Cleanup before closing. */
+        private void cleanupBeforeClosing() {
+            final Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // TODO: don't try to reconnect when exiting
+                    System.out.println("saving...");
+                    for (int i = 0; i < 10; i++) {
+                        System.out.println(".");
+                        System.out.flush();
+                        Tools.sleep(2000);
+                    }
+                    System.out.println();
+                    System.out.println("force exit.");
+                    System.exit(5);
+                }
+            });
+            t.start();
+            guiData.getMainFrame().setVisible(false);
+            final String saveFile = application.getDefaultSaveFile();
+            application.saveConfig(saveFile, false);
+            application.disconnectAllHosts();
+        }
+
     }
 
-    private static void displayMainFrame(Container mainFrame) {
+    private void displayMainFrame(Container mainFrame) {
         mainFrame.setSize(Tools.getDefaultInt("DrbdMC.width"), Tools.getDefaultInt("DrbdMC.height"));
         mainFrame.setVisible(true);
     }
 
-    private static void setupUiManager() {
+    private void setupUiManager() {
         final List<Object> buttonGradient = Arrays.asList(new Object[]{
                 0.5f,
                 1.0f,
@@ -219,7 +228,7 @@ public final class LCMC extends JPanel {
     }
 
 
-    private static void setupUiLookupFeelAndFeel() {
+    private void setupUiLookupFeelAndFeel() {
         try {
             /* Metal */
             UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
@@ -272,19 +281,18 @@ public final class LCMC extends JPanel {
         );
     }
 
-    private static void setupUncaughtExceptionHandler() {
+    private void setupUncaughtExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(
                 new Thread.UncaughtExceptionHandler() {
                     @Override
                     public void uncaughtException(final Thread t, final Throwable e) {
                         System.out.println(e);
                         System.out.println(Tools.getStackTrace(e));
-                        if (!uncaughtExceptionFlag && MAIN_FRAME != null) {
+                        if (!uncaughtExceptionFlag && guiData.getMainFrame() != null) {
                             uncaughtExceptionFlag = true;
                             LOG.appError("", e.toString(), e);
                         }
                     }
                 });
     }
-
 }

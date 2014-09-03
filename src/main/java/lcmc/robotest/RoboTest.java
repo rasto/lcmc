@@ -932,7 +932,7 @@ public final class RoboTest {
         do {
             final List<java.awt.Component> res = new ArrayList<java.awt.Component>();
             try {
-                findInside(LCMC.MAIN_FRAME,
+                findInside(guiData.getMainFrame(),
                            Class.forName("javax.swing.JScrollPane$ScrollBar"),
                            res);
             } catch (final ClassNotFoundException e) {
@@ -1020,7 +1020,7 @@ public final class RoboTest {
         if (aborted) {
             return;
         }
-        final JTree tree = (JTree) findInside(LCMC.MAIN_FRAME,
+        final JTree tree = (JTree) findInside(guiData.getMainFrame(),
                                               JTree.class,
                                               0);
         if (tree == null) {

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.gui.TerminalPanel;
@@ -76,8 +77,10 @@ public class TestUtils {
     private Provider<Cluster> clusterProvider;
     @Autowired
     private ProgressIndicatorPanel glassPane;
-    static {
-    }
+    @Autowired
+    private LCMC lcmc;
+    @Autowired
+    private ClusterTabFactory clusterTabFactory;
 
     /** Check that not even one value is null. */
     public static <T> boolean noValueIsNull(final List<T> list) {
@@ -116,7 +119,7 @@ public class TestUtils {
     }
 
     public synchronized void initMain() {
-        lcmc.LCMC.main(new String[]{"--no-upgrade-check"});
+        lcmc.launch(new String[]{"--no-upgrade-check"});
         guiData.setTerminalPanel(null);
         application.waitForSwing();
     }
@@ -156,7 +159,7 @@ public class TestUtils {
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = application.getDefaultSaveFile();
-//            application.saveConfig(saveFile, false);
+            application.saveConfig(saveFile, false);
         }
         for (final Host host : HOSTS) {
             host.disconnect();
@@ -178,7 +181,6 @@ public class TestUtils {
         application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                final ClusterTabFactory clusterTabFactory = new ClusterTabFactory();
                 clusterTabFactory.createClusterTab(cluster);
             }
         });

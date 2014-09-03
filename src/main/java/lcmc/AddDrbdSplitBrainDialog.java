@@ -71,6 +71,6 @@ public final class AddDrbdSplitBrainDialog {
             dialog = newdialog;
         }
         guiData.expandTerminalSplitPane(1);
-        LCMC.MAIN_FRAME.requestFocus();
+        guiData.getMainFrame().requestFocus();
     }
 }

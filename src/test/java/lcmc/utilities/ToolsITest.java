@@ -34,10 +34,13 @@ public final class ToolsITest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
 
-    private final GUIData guiData = new GUIData();
+    @Autowired
+    private GUIData guiData;
 
     @Autowired
     private TestUtils testSuite;
+    @Autowired
+    private Application application;
 
     @Before
     public void setUp() {
@@ -98,7 +101,6 @@ public final class ToolsITest {
         testSuite.initMain();
         assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
-        final Application application = new Application();
         application.saveConfig(testFile, false);
         final String file = Tools.loadFile(guiData, testFile, false);
         assertNotNull(file);

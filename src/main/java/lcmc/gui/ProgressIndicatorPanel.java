@@ -49,8 +49,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
+import javax.swing.*;
+
 import lcmc.configs.AppDefaults;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;

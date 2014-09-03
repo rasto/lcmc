@@ -47,8 +47,8 @@ public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatab
 
         clusterBrowser.init(cluster);
         cluster.setBrowser(clusterBrowser);
-        cluster.getBrowser().initClusterBrowser();
         getTree(clusterBrowser);
+        cluster.getBrowser().initClusterBrowser();
         cluster.getBrowser().setClusterViewPanel(this);
         add(Box.createVerticalStrut(4), BorderLayout.PAGE_START);
 

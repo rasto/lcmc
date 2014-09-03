@@ -100,6 +100,8 @@ public abstract class ConfigDialog {
     @Autowired
     private WidgetFactory widgetFactory;
     private final MyButton[] options = new MyButton[buttons().length];
+    @Autowired
+    private GUIData guiData;
 
     protected final JDialog getDialogPanel() {
         return dialogPanel;
@@ -450,7 +452,7 @@ public abstract class ConfigDialog {
                     optionPane.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
 
                     optionPane.setBackground(Tools.getDefaultColor( "ConfigDialog.Background.Dark"));
-                    final Container mainFrame = LCMC.MAIN_FRAME;
+                    final Container mainFrame = guiData.getMainFrame();
                     if (mainFrame instanceof JApplet) {
                         final JFrame noframe = new JFrame();
                         dialogPanel = new JDialog(noframe);
@@ -499,14 +501,14 @@ public abstract class ConfigDialog {
                 dialogPanel.setPreferredSize(new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMaximumSize(new Dimension(dialogWidth(), dialogHeight()));
                 dialogPanel.setMinimumSize(new Dimension(dialogWidth(), dialogHeight()));
-                dialogPanel.setLocationRelativeTo(LCMC.MAIN_FRAME);
+                dialogPanel.setLocationRelativeTo(guiData.getMainFrame());
                 dialogPanel.setVisible(true);
             }
         });
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
-                dialogPanel.setLocationRelativeTo(LCMC.MAIN_FRAME);
+                dialogPanel.setLocationRelativeTo(guiData.getMainFrame());
                 /* although the location was set before, it is set again as a
                  * workaround for gray dialogs with nothing in it, that appear
                  * in some comination of Java and compiz. */

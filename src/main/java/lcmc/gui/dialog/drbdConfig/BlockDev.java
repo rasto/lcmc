@@ -139,7 +139,7 @@ final class BlockDev extends DrbdConfig {
                 final ClusterBrowser browser = getDrbdVolumeInfo().getDrbdResourceInfo().getBrowser();
                 browser.reloadAllComboBoxes(null);
                 guiData.expandTerminalSplitPane(1);
-                LCMC.MAIN_FRAME.requestFocus();
+                guiData.getMainFrame().requestFocus();
             } catch (final Exceptions.DrbdConfigException dce) {
                 LOG.appError("nextDialog: config failed", dce);
             } catch (final UnknownHostException e) {

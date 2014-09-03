@@ -334,7 +334,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      }
                  };
                  fc.setFileFilter(filter);
-                 final int ret = fc.showOpenDialog(LCMC.MAIN_FRAME);
+                 final int ret = fc.showOpenDialog(guiData.getMainFrame());
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      application.setDefaultSaveFile(name);
@@ -425,7 +425,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                      }
                  };
                  fc.setFileFilter(filter);
-                 final int ret = fc.showSaveDialog(LCMC.MAIN_FRAME);
+                 final int ret = fc.showSaveDialog(guiData.getMainFrame());
                  if (ret == JFileChooser.APPROVE_OPTION) {
                      final String name = fc.getSelectedFile().getAbsolutePath();
                      application.setDefaultSaveFile(name);

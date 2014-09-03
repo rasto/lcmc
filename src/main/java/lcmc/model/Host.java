@@ -1130,7 +1130,7 @@ public class Host implements Comparable<Host>, Value {
      */
     public void connect(SSHGui sshGui, final ConnectionCallback callback) {
         if (sshGui == null) {
-            sshGui = new SSHGui(LCMC.MAIN_FRAME, this, null);
+            sshGui = new SSHGui(guiData.getMainFrame(), this, null);
         }
         ssh.connect(sshGui, callback, this);
     }
@@ -1210,7 +1210,7 @@ public class Host implements Comparable<Host>, Value {
                                                Tools.getString("Dialog.Host.SSH.Connecting") + " (" + index + ')');
             }
             if (sshGui == null) {
-                sshGui = new SSHGui(LCMC.MAIN_FRAME, this, null);
+                sshGui = new SSHGui(guiData.getMainFrame(), this, null);
             }
 
             connect(sshGui,
