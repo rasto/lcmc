@@ -12,29 +12,36 @@ import lcmc.testutils.annotation.type.IntegrationTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import static org.junit.Assert.*;
 
 @Category(IntegrationTest.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public final class ToolsITest {
-    private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
 
-    private final TestUtils testSuite = new TestUtils();
-
-    private final GUIData guiData = new GUIData();
-    @Before
-    public void setUp() {
-        testSuite.initStdout();
-        testSuite.initTestCluster();
+    @Configuration
+    @ComponentScan(basePackages = "lcmc")
+    static class TestConfig {
     }
 
-    @Test
-    public void testSSHError() {
-        for (final Host host : testSuite.getHosts()) {
-            LOG.sshError(host, "cmd a", "ans a", "stack trace a", 2);
-            assertTrue(testSuite.getStdout().indexOf("returned exit code 2") >= 0);
-            testSuite.clearStdout();
-        }
+    private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
+
+    private final GUIData guiData = new GUIData();
+
+    @Autowired
+    private TestUtils testSuite;
+
+    @Before
+    public void setUp() {
+        testSuite.initTestCluster();
     }
 
     @Test
@@ -95,7 +102,6 @@ public final class ToolsITest {
         application.saveConfig(testFile, false);
         final String file = Tools.loadFile(guiData, testFile, false);
         assertNotNull(file);
-        testSuite.clearStdout();
         assertFalse("".equals(file));
     }
 
@@ -136,7 +142,6 @@ public final class ToolsITest {
         guiData.progressIndicatorFailed(null);
 
         guiData.progressIndicatorFailed("fail two seconds", 2);
-        testSuite.clearStdout();
     }
 
     @Test

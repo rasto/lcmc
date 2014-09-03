@@ -49,65 +49,18 @@ public final class ToolsTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        testSuite.initStdout();
         Tools.init();
     }
 
     @Test
     public void testCreateImageIcon() {
         assertNull("not existing", Tools.createImageIcon("notexisting"));
-        assertFalse("".equals(testSuite.getStdout()));
-        testSuite.clearStdout();
         assertNotNull("existing", Tools.createImageIcon("startpage_head.jpg"));
-    }
-
-    @Test
-    public void testInfo() {
-        LOG.info("info a");
-        assertEquals(TestUtils.INFO_STRING + "info a\n", testSuite.getStdout());
-        testSuite.clearStdout();
     }
 
     @Test
     public void testSetDefaults() {
         Tools.setDefaults();
-    }
-
-    @Test
-    public void testDebug() {
-        LoggerFactory.setDebugLevel(1);
-        LOG.debug("test a");
-        assertTrue(testSuite.getStdout().indexOf("test a") > 0);
-        testSuite.clearStdout();
-        LoggerFactory.setDebugLevel(0);
-        LoggerFactory.decrementDebugLevel(); /* -1 */
-        testSuite.clearStdout();
-        LOG.debug("test b");
-        assertEquals("", testSuite.getStdout());
-        LoggerFactory.incrementDebugLevel(); /* 0 */
-        testSuite.clearStdout();
-        LOG.debug("test c");
-        assertTrue(testSuite.getStdout().indexOf("test c") > 0);
-        testSuite.clearStdout();
-        LoggerFactory.setDebugLevel(1); /* 1 */
-        testSuite.clearStdout();
-        LOG.debug2("test d2");
-        LOG.debug1("test d1");
-        LOG.debug("test d0");
-        assertFalse(testSuite.getStdout().contains("test d2"));
-        assertTrue(testSuite.getStdout().contains("test d1"));
-        assertTrue(testSuite.getStdout().contains("test d0"));
-        testSuite.clearStdout();
-        LoggerFactory.setDebugLevel(-1);
-    }
-
-    @Test
-    public void testAppWarning() {
-        LOG.appWarning("warning a");
-        if (Tools.getDefault("AppWarning").equals("y")) {
-            assertEquals(TestUtils.APPWARNING_STRING + "warning a\n", testSuite.getStdout());
-        }
-        testSuite.clearStdout();
     }
 
     @Test
@@ -143,11 +96,7 @@ public final class ToolsTest {
     @Test
     public void testPrintStackTrace() {
         Tools.printStackTrace();
-        assertFalse("".equals(testSuite.getStdout()));
-        testSuite.clearStdout();
         Tools.printStackTrace("stack trace test");
-        assertTrue(testSuite.getStdout().startsWith("stack trace test"));
-        testSuite.clearStdout();
         assertFalse("".equals(Tools.getStackTrace()));
     }
 
@@ -228,10 +177,6 @@ public final class ToolsTest {
                                           null,
                                           false,
                                           false));
-        assertEquals(TestUtils.APPWARNING_STRING
-                     + "getDistCommand: unknown command: undefined\n",
-                     testSuite.getStdout());
-        testSuite.clearStdout();
     }
 
     @Test
@@ -244,12 +189,6 @@ public final class ToolsTest {
                                           null,
                                           false,
                                           false));
-        assertEquals(TestUtils.APPWARNING_STRING
-                     + "getDistCommand: unknown command: undefined2\n"
-                     + TestUtils.APPWARNING_STRING
-                     + "getDistCommand: unknown command: undefined3\n",
-                     testSuite.getStdout());
-        testSuite.clearStdout();
     }
 
     private ConvertCmdCallback getConvertCallback() {
@@ -309,9 +248,6 @@ public final class ToolsTest {
                                           getConvertCallback(),
                                           false,
                                           false));
-        assertEquals(TestUtils.APPWARNING_STRING + "getDistCommand: unknown command: undefined4\n",
-                     testSuite.getStdout());
-        testSuite.clearStdout();
     }
 
     @Test

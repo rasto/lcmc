@@ -37,19 +37,7 @@ public final class NetInterfaceTest {
 
     @Before
     public void initStdout() {
-        testSuite.initStdout();
         Tools.init();
-    }
-
-    @After
-    public void clearStdout() {
-        testSuite.clearStdout();
-    }
-
-    @Test
-    public void emptyLineShouldWriteMessageToStdout() throws UnknownHostException {
-        new NetInterface("");
-        assertTrue("stdount does not contain " + CANNOT_PARSE_MSG, testSuite.getStdout().contains(CANNOT_PARSE_MSG));
     }
 
     @Test

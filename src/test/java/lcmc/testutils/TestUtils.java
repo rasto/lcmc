@@ -22,11 +22,6 @@
 
 package lcmc.testutils;
 
-import java.io.FileDescriptor;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -36,54 +31,52 @@ import java.util.Map;
 import java.util.Set;
 
 import lcmc.gui.GUIData;
-import lcmc.model.*;
+import lcmc.gui.ProgressIndicatorPanel;
+import lcmc.gui.TerminalPanel;
+import lcmc.model.Application;
+import lcmc.model.Cluster;
+import lcmc.model.Host;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import javax.inject.Provider;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * This class provides tools for testing.
  */
+@Component
 public class TestUtils {
     /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
-    public static final String PASSWORD;
-    public static final String ID_DSA_KEY;
-    public static final String ID_RSA_KEY;
+    public static final String PASSWORD = "rastislav";
+    public static final String ID_DSA_KEY = "rastislav";
+    public static final String ID_RSA_KEY = "rastislav";
 
     public static final String INFO_STRING       = "INFO    : ";
     public static final String APPWARNING_STRING = "WARN    : ";
     public static final int NUMBER_OF_HOSTS = 2;
     public static final List<Host> HOSTS = new ArrayList<Host>();
-    public static final String TEST_HOSTNAME = System.getenv("LCMC_TEST_HOSTNAME");
-    public static final String TEST_USERNAME = System.getenv("LCMC_TEST_USERNAME");
+    public static final String TEST_USERNAME = "root";
 
     private static volatile boolean clusterLoaded = false;
 
-    private final GUIData guiData = new GUIData();
-    private final Application application = new Application();
-
+    @Autowired
+    private GUIData guiData;
+    @Autowired
+    private Application application;
+    @Autowired
+    private Provider<Host> hostProvider;
+    @Autowired
+    private TerminalPanel terminalPanel;
+    @Autowired
+    private Provider<Cluster> clusterProvider;
+    @Autowired
+    private ProgressIndicatorPanel glassPane;
     static {
-        if (System.getProperty("test.password") == null) {
-            PASSWORD = "rastislav";
-        } else {
-            PASSWORD = System.getProperty("test.password");
-        }
-    }
-    static {
-        if (System.getProperty("test.dsa") == null) {
-            ID_DSA_KEY = "rastislav";
-        } else {
-            ID_DSA_KEY = System.getProperty("test.dsa");
-        }
-    }
-    static {
-        if (System.getProperty("test.rsa") == null) {
-            ID_RSA_KEY = "rastislav";
-        } else {
-            ID_RSA_KEY = System.getProperty("test.rsa");
-        }
     }
 
     /** Check that not even one value is null. */
@@ -116,51 +109,10 @@ public class TestUtils {
         return true;
     }
 
-    private final PrintStream realOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
-
-    private StringBuilder stdout = new StringBuilder();
-
-    private final OutputStream out = new OutputStream() {
-         @Override
-         public void write(final int b) throws IOException {
-             stdout.append(String.valueOf((char) b));
-         }
-
-         @Override
-         public void write(final byte[] b, final int off, final int len) throws IOException {
-             stdout.append(new String(b, off, len));
-         }
-
-         @Override
-         public void write(final byte[] b) throws IOException {
-             write(b, 0, b.length);
-         }
-    };
-
-    /** Clears stdout. Call it, if something writes to stdout. */
-    public void clearStdout() {
-        realPrint(stdout.toString());
-        stdout.delete(0, stdout.length());
-    }
-
-    /** Returns stdout as string. */
-    public String getStdout() {
-        return stdout.toString();
-    }
-
-    public void realPrintln(final String s) {
-        realOut.println(s);
-    }
-
-    public void realPrint(final String s) {
-        realOut.print(s);
-    }
-
     /** Print error and exit. */
     public void error(final String s) {
         System.out.println(s);
         System.exit(10);
-        clearStdout();
     }
 
     public synchronized void initMain() {
@@ -169,16 +121,9 @@ public class TestUtils {
         application.waitForSwing();
     }
     
-    public void initStdout() {
-        System.setOut(new PrintStream(out, true));
-        System.setErr(new PrintStream(out, true));
-    }
-
     public void initTestCluster() {
         initCluster();
-        initStdout();
         application.waitForSwing();
-        clearStdout();
     }
 
     /** Adds test cluster to the GUI. */
@@ -188,7 +133,7 @@ public class TestUtils {
         }
         initMain();
         application.waitForSwing();
-        
+
         LoggerFactory.setDebugLevel(-1);
         String username;
         boolean useSudo;
@@ -199,21 +144,19 @@ public class TestUtils {
             username = TEST_USERNAME;
             useSudo = true;
         }
-        final Cluster cluster = new Cluster();
+        final Cluster cluster = clusterProvider.get();
         cluster.setName("test");
         for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
-            String hostName;
-            if (TEST_HOSTNAME == null) {
-                hostName = "test" + i;
-            } else {
-                hostName = TEST_HOSTNAME + "-" + ('a' - 1 + i);
-            }
-            final Host host = initHost(hostName, username, useSudo);
+            final String hostName = "test" + i;
+            final Host host = hostProvider.get();
+            host.init();
+
+            initHost(host, hostName, username, useSudo);
             HOSTS.add(host);
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
+//            application.saveConfig(saveFile, false);
         }
         for (final Host host : HOSTS) {
             host.disconnect();
@@ -255,9 +198,7 @@ public class TestUtils {
         clusterLoaded = true;
     }
 
-    private Host initHost(final String hostName, final String username, final boolean useSudo) {
-        final HostFactory hostFactory = new HostFactory();
-        final Host host = hostFactory.createInstance();
+    private Host initHost(final Host host, final String hostName, final String username, final boolean useSudo) {
         host.setEnteredHostOrIp(hostName);
         host.setUsername(username);
         host.setSSHPort("22");

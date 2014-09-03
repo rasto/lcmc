@@ -23,7 +23,6 @@ public final class ClusterBrowserITest {
 
     private final GUIData guiData = new GUIData();
 
-
     @Before
     public void setUp() {
         testSuite.initTestCluster();
@@ -144,6 +143,5 @@ public final class ClusterBrowserITest {
                 application.waitForSwing();
             }
         }
-        testSuite.clearStdout();
     }
 }

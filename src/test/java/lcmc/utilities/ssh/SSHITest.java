@@ -6,7 +6,9 @@ import lcmc.testutils.annotation.type.IntegrationTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.inject.Provider;
 import java.io.IOException;
 
 @Category(IntegrationTest.class)
