@@ -28,9 +28,17 @@ import lcmc.model.Host;
 import lcmc.model.resources.Resource;
 import lcmc.model.resources.Service;
 import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.*;
 
 import static org.junit.Assert.assertEquals;
+
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Predicate;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +53,7 @@ import static org.mockito.Mockito.times;
 
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GroupMenuTest {

@@ -1,25 +1,20 @@
 package lcmc.gui.widget;
 
+import lcmc.AppContext;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.StringValue;
 import lcmc.model.Value;
-import lcmc.testutils.TestUtils;
-import lcmc.testutils.annotation.type.GuiTest;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
-@Category(GuiTest.class)
-public final class WidgetITest {
-    private final TestUtils testSuite = new TestUtils();
-    private final WidgetFactory widgetFactory = new WidgetFactory();
+public final class WidgetTest {
+    private final WidgetFactory widgetFactory = AppContext.getBean(WidgetFactory.class);
 
     private Widget widget;
     @Before
     public void setUp() {
-        testSuite.initMain();
         for (int i = 0; i < 10; i++) {
             widget = widgetFactory.createInstance(Widget.GUESS_TYPE,
                                                   Widget.NO_DEFAULT,

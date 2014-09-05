@@ -21,25 +21,10 @@
 package lcmc.model.resources;
 
 import java.net.UnknownHostException;
-import lcmc.testutils.TestUtils;
-import lcmc.utilities.Tools;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public final class NetInterfaceTest {
-    private static final String CANNOT_PARSE_MSG = "cannot parse";
-
-    private final TestUtils testSuite = new TestUtils();
-
-    @Before
-    public void initStdout() {
-        Tools.init();
-    }
-
     @Test
     public void bridgeIpv6WithCidr64ShouldSetNetworkIp() throws UnknownHostException {
         final NetInterface ni = new NetInterface("eth0 ipv6 2001:db8:0:f101::1 64");

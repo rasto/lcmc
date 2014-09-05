@@ -160,31 +160,32 @@ public final class LCMC extends JPanel {
             System.exit(0);
         }
 
-        /** Cleanup before closing. */
-        private void cleanupBeforeClosing() {
-            final Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    // TODO: don't try to reconnect when exiting
-                    System.out.println("saving...");
-                    for (int i = 0; i < 10; i++) {
-                        System.out.println(".");
-                        System.out.flush();
-                        Tools.sleep(2000);
-                    }
-                    System.out.println();
-                    System.out.println("force exit.");
-                    System.exit(5);
-                }
-            });
-            t.start();
-            guiData.getMainFrame().setVisible(false);
-            final String saveFile = application.getDefaultSaveFile();
-            application.saveConfig(saveFile, false);
-            application.disconnectAllHosts();
-        }
-
     }
+
+    /** Cleanup before closing. */
+    private void cleanupBeforeClosing() {
+        final Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // TODO: don't try to reconnect when exiting
+                System.out.println("saving...");
+                for (int i = 0; i < 10; i++) {
+                    System.out.println(".");
+                    System.out.flush();
+                    Tools.sleep(2000);
+                }
+                System.out.println();
+                System.out.println("force exit.");
+                System.exit(5);
+            }
+        });
+        t.start();
+        guiData.getMainFrame().setVisible(false);
+        final String saveFile = application.getDefaultSaveFile();
+        application.saveConfig(saveFile, false);
+        application.disconnectAllHosts();
+    }
+
 
     private void displayMainFrame(Container mainFrame) {
         mainFrame.setSize(Tools.getDefaultInt("DrbdMC.width"), Tools.getDefaultInt("DrbdMC.height"));

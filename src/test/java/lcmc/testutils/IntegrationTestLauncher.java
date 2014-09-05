@@ -27,20 +27,16 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.gui.ProgressIndicatorPanel;
-import lcmc.gui.TerminalPanel;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.inject.Provider;
@@ -51,19 +47,16 @@ import static org.junit.Assert.assertEquals;
  * This class provides tools for testing.
  */
 @Component
-public class TestUtils {
-    /** Whether to connect to test1,test2... clusters. ant -Dcluster=true. */
-    public static final String PASSWORD = "rastislav";
-    public static final String ID_DSA_KEY = "rastislav";
-    public static final String ID_RSA_KEY = "rastislav";
+public class IntegrationTestLauncher {
+    private static final String PASSWORD = "rastislav";
+    private static final String ID_DSA_KEY = "rastislav";
+    private static final String ID_RSA_KEY = "rastislav";
 
-    public static final String INFO_STRING       = "INFO    : ";
-    public static final String APPWARNING_STRING = "WARN    : ";
-    public static final int NUMBER_OF_HOSTS = 2;
-    public static final List<Host> HOSTS = new ArrayList<Host>();
-    public static final String TEST_USERNAME = "root";
+    private static final int NUMBER_OF_HOSTS = 2;
+    private static final String TEST_USERNAME = "root";
 
-    private static volatile boolean clusterLoaded = false;
+    private final List<Host> hosts = new ArrayList<Host>();
+    private volatile boolean clusterLoaded = false;
 
     @Autowired
     private GUIData guiData;
@@ -71,8 +64,6 @@ public class TestUtils {
     private Application application;
     @Autowired
     private Provider<Host> hostProvider;
-    @Autowired
-    private TerminalPanel terminalPanel;
     @Autowired
     private Provider<Cluster> clusterProvider;
     @Autowired
@@ -82,50 +73,28 @@ public class TestUtils {
     @Autowired
     private ClusterTabFactory clusterTabFactory;
 
-    /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final List<T> list) {
-        for (final T o : list) {
-            if (o == null) {
-                return false;
-            }
-        }
-        return true;
+    public void initTestCluster() {
+        initCluster();
+        application.waitForSwing();
     }
 
-    /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final Set<T> list) {
-        for (final T o : list) {
-            if (o == null) {
-                return false;
-            }
-        }
-        return true;
+    /** Returns test hosts. */
+    public List<Host> getHosts() {
+        return Collections.unmodifiableList(this.hosts);
     }
 
-    /** Check that not even one value is null. */
-    public static <T> boolean noValueIsNull(final T[] strings) {
-        for (final T s : strings) {
-            if (s == null) {
-                return false;
-            }
-        }
-        return true;
+    public boolean isClusterLoaded() {
+        return clusterLoaded;
     }
 
     /** Print error and exit. */
-    public void error(final String s) {
+    private void error(final String s) {
         System.out.println(s);
         System.exit(10);
     }
 
-    public synchronized void initMain() {
+    private synchronized void initMain() {
         lcmc.launch(new String[]{"--no-upgrade-check"});
-        guiData.setTerminalPanel(null);
-        application.waitForSwing();
-    }
-    
-    public void initTestCluster() {
-        initCluster();
         application.waitForSwing();
     }
 
@@ -138,15 +107,8 @@ public class TestUtils {
         application.waitForSwing();
 
         LoggerFactory.setDebugLevel(-1);
-        String username;
-        boolean useSudo;
-        if (TEST_USERNAME == null) {
-            username = "root";
-            useSudo = false;
-        } else {
-            username = TEST_USERNAME;
-            useSudo = true;
-        }
+        final String username = TEST_USERNAME;
+        final boolean useSudo = false;
         final Cluster cluster = clusterProvider.get();
         cluster.setName("test");
         for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
@@ -155,17 +117,17 @@ public class TestUtils {
             host.init();
 
             initHost(host, hostName, username, useSudo);
-            HOSTS.add(host);
+            hosts.add(host);
             host.setCluster(cluster);
             cluster.addHost(host);
             final String saveFile = application.getDefaultSaveFile();
             application.saveConfig(saveFile, false);
         }
-        for (final Host host : HOSTS) {
+        for (final Host host : hosts) {
             host.disconnect();
         }
         cluster.connect(null, true, 0);
-        for (final Host host : HOSTS) {
+        for (final Host host : hosts) {
             final boolean r = waitForCondition(
                 new Condition() {
                     @Override
@@ -194,7 +156,7 @@ public class TestUtils {
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();
         guiData.checkAddClusterButtons();
-        for (final Host host : HOSTS) {
+        for (final Host host : hosts) {
             host.waitForServerStatusLatch();
         }
         clusterLoaded = true;
@@ -227,18 +189,11 @@ public class TestUtils {
         return host;
     }
 
-    /** Returns test hosts. */
-    public List<Host> getHosts() {
-        final List<Host> hosts = Collections.unmodifiableList(HOSTS);
-        assertEquals(NUMBER_OF_HOSTS, hosts.size());
-        return hosts;
-    }
-
     /**
      * Wait for condition 'timeout' seconds, check every 'interval' second.
      * Return false if it ran to the timeout.
      */
-    public boolean waitForCondition(final Condition condition, final int interval, final int timeout) {
+    private boolean waitForCondition(final Condition condition, final int interval, final int timeout) {
         int timeoutLeft = timeout;
         while (!condition.passed() && timeout >= 0) {
             Tools.sleep(interval);
@@ -247,21 +202,8 @@ public class TestUtils {
         return timeoutLeft >= 0;
     }
 
-    /** Check that not even one value is null. */
-    public <T, K> boolean noValueIsNull(final Map<T, K> map) {
-        for (final T key : map.keySet()) {
-            if (key == null) {
-                return false;
-            }
-            if (map.get(key) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     /** Specify a condition to be passed to the waitForCondition function. */
-    public interface Condition {
+    private interface Condition {
         /** returns true if condition is true. */
         boolean passed();
     }

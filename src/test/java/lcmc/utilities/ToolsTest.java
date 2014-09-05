@@ -17,8 +17,6 @@ import lcmc.gui.TerminalPanel;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.model.Host;
 import lcmc.model.drbd.DrbdHost;
-import lcmc.testutils.TestUtils;
-import lcmc.utilities.ssh.Ssh;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,16 +32,12 @@ import org.mockito.MockitoAnnotations;
 
 @RunWith(JUnitParamsRunner.class)
 public final class ToolsTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ToolsTest.class);
-
-    private final TestUtils testSuite = new TestUtils();
     @Mock
     private DrbdHost drbdHostStub;
     @Mock
     private TerminalPanel terminalPanelStub;
 
     private final GUIData guiData = new GUIData();
-    private final Ssh ssh = new Ssh();
 
 
     @Before
@@ -95,8 +89,6 @@ public final class ToolsTest {
 
     @Test
     public void testPrintStackTrace() {
-        Tools.printStackTrace();
-        Tools.printStackTrace("stack trace test");
         assertFalse("".equals(Tools.getStackTrace()));
     }
 

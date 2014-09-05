@@ -24,9 +24,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lcmc.model.AccessMode;
-import lcmc.utilities.*;
 
 import static org.junit.Assert.assertEquals;
+
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenu;
+import lcmc.utilities.UpdatableItem;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

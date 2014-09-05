@@ -23,6 +23,7 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import java.net.UnknownHostException;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -66,6 +67,8 @@ final class BlockDev extends DrbdConfig {
     private GlobalInfo globalInfo;
     @Autowired
     private Application application;
+    @Autowired
+    private Provider<BlockDev> blockDevProvider;
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {
         init(previousDialog, dli);
@@ -97,7 +100,7 @@ final class BlockDev extends DrbdConfig {
     public WizardDialog nextDialog() {
         if (getDrbdVolumeInfo().isFirstBlockDevInfo(blockDevInfo)) {
             final BlockDevInfo oBdi = getDrbdVolumeInfo().getOtherBlockDevInfo(blockDevInfo);
-            final BlockDev nextBlockDev = AppContext.getBean(BlockDev.class);
+            final BlockDev nextBlockDev = blockDevProvider.get();
             nextBlockDev.init(this, getDrbdVolumeInfo(), oBdi);
             return nextBlockDev;
         } else {

@@ -24,7 +24,13 @@ import lcmc.model.AccessMode;
 
 import static org.junit.Assert.assertEquals;
 
-import lcmc.utilities.*;
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Predicate;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,7 +45,7 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)

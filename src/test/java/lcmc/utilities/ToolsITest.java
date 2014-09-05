@@ -3,48 +3,33 @@ package lcmc.utilities;
 import java.util.Map;
 import javax.swing.JCheckBox;
 
+import lcmc.AppContext;
 import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.Host;
-import lcmc.testutils.TestUtils;
+import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.GuiTest;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import static org.junit.Assert.*;
 
 @Category(IntegrationTest.class)
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public final class ToolsITest {
-
-    @Configuration
-    @ComponentScan(basePackages = "lcmc")
-    static class TestConfig {
-    }
-
-    private static final Logger LOG = LoggerFactory.getLogger(ToolsITest.class);
-
-    @Autowired
+    private IntegrationTestLauncher testSuite;
     private GUIData guiData;
-
-    @Autowired
-    private TestUtils testSuite;
-    @Autowired
     private Application application;
 
     @Before
     public void setUp() {
+        testSuite = AppContext.getBean(IntegrationTestLauncher.class);
         testSuite.initTestCluster();
+        application = AppContext.getBean(Application.class);
+        guiData = AppContext.getBean(GUIData.class);
     }
 
     @Test
@@ -98,7 +83,6 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testLoadFile() {
-        testSuite.initMain();
         assertNull(Tools.loadFile(guiData, "JUNIT_TEST_FILE_CLICK_OK", false));
         final String testFile = "/tmp/lcmc-test-file";
         application.saveConfig(testFile, false);
@@ -110,7 +94,6 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testStartProgressIndicator() {
-        testSuite.initMain();
         for (int i = 0; i < 10; i++) {
             guiData.startProgressIndicator(null);
             guiData.startProgressIndicator("test");
@@ -136,7 +119,6 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testProgressIndicatorFailed() {
-        testSuite.initMain();
         guiData.progressIndicatorFailed(null, "fail3");
         guiData.progressIndicatorFailed("name", "fail2");
         guiData.progressIndicatorFailed("name", null);
@@ -149,13 +131,10 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testIsLinux() {
-        testSuite.initMain();
-        if (System.getProperty("os.name").indexOf("Windows") >= 0
-            || System.getProperty("os.name").indexOf("windows") >= 0) {
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             assertFalse(Tools.isLinux());
         }
-        if (System.getProperty("os.name").indexOf("Linux") >= 0
-            || System.getProperty("os.name").indexOf("linux") >= 0) {
+        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
             assertTrue(Tools.isLinux());
         }
     }
@@ -163,13 +142,10 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testIsWindows() {
-        testSuite.initMain();
-        if (System.getProperty("os.name").indexOf("Windows") >= 0
-            || System.getProperty("os.name").indexOf("windows") >= 0) {
+        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
             assertTrue(Tools.isWindows());
         }
-        if (System.getProperty("os.name").indexOf("Linux") >= 0
-            || System.getProperty("os.name").indexOf("linux") >= 0) {
+        if (System.getProperty("os.name").toLowerCase().contains("linux")) {
             assertFalse(Tools.isWindows());
         }
     }
@@ -177,10 +153,14 @@ public final class ToolsITest {
     @Test
     @Category(GuiTest.class)
     public void testGetUnixPath() {
-        testSuite.initMain();
         assertEquals("/bin", Tools.getUnixPath("/bin"));
         if (Tools.isWindows()) {
             assertEquals("/bin/dir/file", Tools.getUnixPath("d:\\bin\\dir\\file"));
         }
+    }
+
+    @Configuration
+    @ComponentScan(basePackages = "lcmc")
+    static class TestConfig {
     }
 }

@@ -261,6 +261,8 @@ public class Host implements Comparable<Host>, Value {
     private Hosts allHosts;
     @Autowired
     private Application application;
+    @Autowired
+    private RoboTest roboTest;
 
     public void init() {
         if (allHosts.size() == 1) {
@@ -2337,7 +2339,6 @@ public class Host implements Comparable<Host>, Value {
         command.append(" 2>&1");
         int i = 0;
         SshOutput out;
-        final RoboTest roboTest = AppContext.getBean(RoboTest.class);
         do {
             out = getSSH().execCommandAndWait(new ExecCommandConfig().command(command.toString())
                                                                      .sshCommandTimeout(60000));

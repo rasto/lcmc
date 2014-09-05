@@ -26,9 +26,16 @@ import java.util.List;
 import lcmc.model.AccessMode;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
-import lcmc.utilities.*;
 
 import static org.junit.Assert.assertEquals;
+
+import lcmc.utilities.EnablePredicate;
+import lcmc.utilities.MenuAction;
+import lcmc.utilities.MenuFactory;
+import lcmc.utilities.MyMenuItem;
+import lcmc.utilities.Predicate;
+import lcmc.utilities.UpdatableItem;
+import lcmc.utilities.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +52,7 @@ import static org.mockito.Mockito.never;
 
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MultiSelectionMenuITest {
