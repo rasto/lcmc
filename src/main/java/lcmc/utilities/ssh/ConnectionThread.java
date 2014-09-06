@@ -49,7 +49,7 @@ public class ConnectionThread extends Thread {
     private ConnectionCallback connectionCallback;
     private Authentication authentication;
 
-    private SshConnection sshConnection = null;
+    private volatile SshConnection sshConnection = null;
 
     private volatile boolean connectionFailed;
     private volatile boolean connectionEstablished = false;
@@ -114,6 +114,7 @@ public class ConnectionThread extends Thread {
     }
 
     public void setConnectionFailed(final boolean connectionFailed) {
+        closeConnection();
         this.connectionFailed = connectionFailed;
     }
 

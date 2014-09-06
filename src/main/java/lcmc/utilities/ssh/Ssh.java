@@ -67,6 +67,7 @@ public final class Ssh {
     private ConnectionCallback connectionCallback;
     private Host host;
     @Autowired
+    private Provider<ConnectionThread> connectionThreadProvider;
     private ConnectionThread connectionThread;
     private ProgressBar progressBar = null;
 
@@ -79,7 +80,7 @@ public final class Ssh {
     @Autowired
     private Application application;
     @Autowired
-    private Authentication authentication;
+    private Provider<Authentication> authenticationProvider;
 
     boolean reconnect() {
         application.isNotSwingThread();
@@ -332,14 +333,7 @@ public final class Ssh {
      * execCallback.doneError is called.
      */
     public ExecCommandThread execCommand(final ExecCommandConfig execCommandConfig) {
-        if (host == null) {
-            return null;
-        }
-
-        if (!reconnect()) {
-            return null;
-        }
-
+        reconnect();
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
@@ -347,14 +341,7 @@ public final class Ssh {
     }
 
     public SshOutput captureCommand(final ExecCommandConfig execCommandConfig) {
-        if (host == null) {
-            return null;
-        }
-
-        if (!reconnect()) {
-            return null;
-        }
-
+        reconnect();
         return execCommandConfig.host(host)
                                 .connectionThread(connectionThread)
                                 .sshGui(sshGui)
@@ -508,7 +495,7 @@ public final class Ssh {
     }
 
     public boolean isConnectionCanceled() {
-        return connectionThread.isDisconnectedForGood();
+        return connectionThread != null && connectionThread.isDisconnectedForGood();
     }
 
     private void scpCommandFailed(final String ans) {
@@ -529,9 +516,12 @@ public final class Ssh {
 
     private void authenticateAndConnect() {
         host.getTerminalPanel().addCommand("ssh " + host.getUserAtHost());
+        final Authentication authentication = authenticationProvider.get();
         authentication.init(lastSuccessfulPassword, host, sshGui);
-        connectionThread.init(host, sshGui, progressBar, connectionCallback, authentication);
-        connectionThread.start();
+        final ConnectionThread newConnectionThread = connectionThreadProvider.get();
+        newConnectionThread.init(host, sshGui, progressBar, connectionCallback, authentication);
+        newConnectionThread.start();
+        connectionThread = newConnectionThread;
     }
 
     private String buildScpCommand(final String remoteFilename, final boolean makeBackup, final String preCommand) {
