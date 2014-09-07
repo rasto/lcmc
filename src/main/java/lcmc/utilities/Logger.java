@@ -36,6 +36,8 @@ import javax.swing.SwingUtilities;
 import lcmc.AppContext;
 import lcmc.LCMC;
 import lcmc.gui.GUIData;
+import lcmc.gui.MainMenu;
+import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.dialog.BugReport;
@@ -268,7 +270,7 @@ public final class Logger {
             return;
         }
 
-        //Tools.getGUIData().getMainMenu().setOperatingMode(Application.OP_MODE_RO);
+        AppContext.getBean(MainMenu.class).setOperatingMode(Application.OP_MODE_READONLY);
 
         final Thread t = new Thread(new Runnable() {
             @Override
