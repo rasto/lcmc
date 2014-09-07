@@ -62,18 +62,24 @@ public final class LCMCApplet extends JApplet {
         lcmc.initApp(params);
 
         final Application application = AppContext.getBean(Application.class);
-        if (application.isEmbedApplet()) {
-            guiData.setMainFrame(this);
-            setJMenuBar(lcmc.getMenuBar());
-            setContentPane(lcmc.getMainPanel());
-            setGlassPane(lcmc.getMainGlassPane());
-            lcmc.createAndShowGUI(this);
-        } else {
-            final JFrame mainFrame = new JFrame();
-            guiData.setMainFrame(mainFrame);
-            lcmc.createMainFrame(mainFrame);
-            lcmc.createAndShowGUI(mainFrame);
-        }
+        final LCMCApplet thisObject = this;
+        application.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if (!application.isEmbedApplet()) {
+                    guiData.setMainFrame(thisObject);
+                    setJMenuBar(lcmc.getMenuBar());
+                    setContentPane(lcmc.getMainPanel());
+                    setGlassPane(lcmc.getMainGlassPane());
+                    lcmc.createAndShowGUI(thisObject);
+                } else {
+                    final JFrame mainFrame = new JFrame();
+                    guiData.setMainFrame(mainFrame);
+                    lcmc.createMainFrame(mainFrame);
+                    lcmc.createAndShowGUI(mainFrame);
+                }
+            }
+        });
         //TODO: save on quit
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //addWindowListener(new ExitListener());
