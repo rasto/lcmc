@@ -79,8 +79,6 @@ public class ServiceMenu {
     private Application application;
     @Autowired
     private Provider<ServiceLogs> serviceLogsProvider;
-    @Autowired
-    private Provider<GroupMenu> groupMenuProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -1081,7 +1079,7 @@ public class ServiceMenu {
                                                popups,
                                                runMode);
                     if (otherService.getResourceAgent() != null && otherService.getResourceAgent().isGroup()) {
-                        final GroupMenu groupMenu = groupMenuProvider.get();
+                        final GroupMenu groupMenu = AppContext.getBean(GroupMenu.class);
                         groupMenu.addExistingGroupServiceMenuItems(serviceInfo,
                                                                    otherService,
                                                                    dlm,
