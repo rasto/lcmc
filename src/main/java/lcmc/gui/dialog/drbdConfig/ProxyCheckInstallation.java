@@ -194,7 +194,7 @@ final class ProxyCheckInstallation extends DialogHost {
     protected void finishDialog() {
         if (isPressedButton(finishButton())
             || isPressedButton(nextButton())) {
-            if (nextDialogObject == null) {
+            if (nextDialogObject == null && volumeInfo != null) {
                 volumeInfo.getBrowser().getGlobalInfo().addProxyHostNode(getHost());
             }
             if (nextDialogObject == null && origDialog != null) {
