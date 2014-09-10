@@ -1609,8 +1609,7 @@ public abstract class ResourceGraph {
                         y -= (oldShapeHeight - getVertexHeight((Vertex) v)) / 2;
                     }
                     pos.setLocation(x, y);
-                    application.invokeLater(!Application.CHECK_SWING_THREAD,
-                                      new Runnable() {
+                    application.invokeLater(new Runnable() {
                                           @Override
                                           public void run() {
                                               scale();

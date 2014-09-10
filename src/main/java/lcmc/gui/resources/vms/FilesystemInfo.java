@@ -148,7 +148,7 @@ public final class FilesystemInfo extends HardwareInfo {
                                    DomainInfo.FILESYSTEM_TABLE,
                                    getVMSVirtualDomainInfo().getNewFilesystemBtn());
         if (getResource().isNew()) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -391,7 +391,7 @@ public final class FilesystemInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (FilesystemData.TYPE.equals(param)) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final Map.Entry<String, Widget> entry : sourceDirWi.entrySet()) {

@@ -688,7 +688,7 @@ public abstract class EditableInfo extends Info {
     /** Enables and disabled apply and revert button. */
     public final void setApplyButtons(final String param, final String[] params) {
         final Check check = checkResourceFields(param, params);
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final MyButton ab = getApplyButton();

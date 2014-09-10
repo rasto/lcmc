@@ -220,7 +220,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         final String name = font.getFontName();
         final int style   = Font.PLAIN;
         final int size    = font.getSize();
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setFont(new Font(name, style, size));

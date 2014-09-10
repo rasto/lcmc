@@ -136,7 +136,7 @@ public class Checkbox extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

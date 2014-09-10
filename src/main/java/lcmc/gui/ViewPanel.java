@@ -169,14 +169,13 @@ public class ViewPanel extends JPanel {
                     final Object[] path = e.getPath();
                     if (!disabledDuringLoad) {
                         final TreePath tp = new TreePath(path);
-                        application.invokeLater(!Application.CHECK_SWING_THREAD,
-                                          new Runnable() {
-                                              @Override
-                                              public void run() {
-                                                  tree.expandPath(tp);
-                                                  tree.setSelectionPath(tp);
-                                              }
-                        });
+                        application.invokeLater(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        tree.expandPath(tp);
+                                                        tree.setSelectionPath(tp);
+                                                    }
+                                                });
                     }
                 }
             }
@@ -210,7 +209,7 @@ public class ViewPanel extends JPanel {
             lastSelectedInfo = (Info) nodeInfo;
         }
         if (nodeInfo != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {
@@ -231,7 +230,7 @@ public class ViewPanel extends JPanel {
     /** Sets the right component in the view. */
     final void setRightComponentInView(final Browser browser, final Info nodeInfo) {
         if (viewSP != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {

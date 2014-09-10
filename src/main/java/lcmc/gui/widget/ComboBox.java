@@ -143,7 +143,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     /** Reloads combo box with items and selects supplied value. */
     @Override
     public void reloadComboBox(final Value selectedValue, final Value[] items) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final MComboBox<Value> cb = getInternalComponent();
@@ -194,7 +194,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     public void setEditable(final boolean editable) {
         super.setEditable(editable);
         final JComponent comp = getInternalComponent();
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final Value v = getValue();
@@ -334,7 +334,7 @@ public final class ComboBox extends GenericWidget<MComboBox<Value>> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

@@ -182,7 +182,7 @@ public abstract class WizardDialog extends ConfigDialog {
     @Override
     protected final void enableComponents(final JComponent[] componentsToDisable) {
         super.enableComponents(componentsToDisable);
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (buttonClass(retryButton()) != null
@@ -430,7 +430,7 @@ public abstract class WizardDialog extends ConfigDialog {
     public final void pressNextButton() {
         final MyButton nextButton = buttonClass(nextButton());
         if (nextButton != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     if (nextButton.isVisible() && nextButton.isEnabled()) {

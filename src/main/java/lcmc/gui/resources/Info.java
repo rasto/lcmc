@@ -376,7 +376,7 @@ public class Info implements Comparable<Info>, Value {
         // this fires an event in ViewPanel.
         final DefaultMutableTreeNode n = node;
         if (n != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     getBrowser().reloadAndWait(n, true);
@@ -489,7 +489,7 @@ public class Info implements Comparable<Info>, Value {
         pm.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuCanceled(final PopupMenuEvent e) {
-                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -498,7 +498,7 @@ public class Info implements Comparable<Info>, Value {
             }
             @Override
             public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         b.setSelected(false);
@@ -971,7 +971,7 @@ public class Info implements Comparable<Info>, Value {
         if (tableModel != null) {
             final String[] colNames = getColumnNames(tableName);
             if (colNames != null && colNames.length > 0) {
-                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         final Object[][] data = getTableData(tableName);
@@ -1043,7 +1043,7 @@ public class Info implements Comparable<Info>, Value {
     }
 
     protected final void removeNode() {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 removeNodeAndWait();

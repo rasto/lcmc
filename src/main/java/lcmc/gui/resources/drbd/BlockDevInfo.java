@@ -477,7 +477,7 @@ public class BlockDevInfo extends EditableInfo {
         } else {
             final Widget gwi = super.createWidget(param, prefix, width);
             paramWi = gwi;
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     gwi.setEditable(false);
@@ -506,16 +506,14 @@ public class BlockDevInfo extends EditableInfo {
                             indW.setValue(DRBD_MD_TYPE_FLEXIBLE);
                         }
                     }
-                    application.invokeLater(!Application.CHECK_SWING_THREAD,
-                    new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             ind.setEnabled(!internal);
                         }
                     });
                     if (indW != null) {
-                        application.invokeLater(!Application.CHECK_SWING_THREAD,
-                        new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 indW.setEnabled(!internal);

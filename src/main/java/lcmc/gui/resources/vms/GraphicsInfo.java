@@ -160,7 +160,7 @@ public final class GraphicsInfo extends HardwareInfo {
                                    DomainInfo.GRAPHICS_TABLE,
                                    getVMSVirtualDomainInfo().getNewGraphicsBtn());
         if (getResource().isNew()) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -466,7 +466,7 @@ public final class GraphicsInfo extends HardwareInfo {
         if (GraphicsData.TYPE.equals(param)) {
             final boolean vnc = TYPE_VNC.equals(newValue);
             final boolean sdl = TYPE_SDL.equals(newValue);
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     for (final Map.Entry<String, Widget> entry : listenWi.entrySet()) {

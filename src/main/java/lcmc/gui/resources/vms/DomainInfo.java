@@ -1546,7 +1546,7 @@ public class DomainInfo extends EditableInfo {
         final MyButton hostBtn = widgetFactory.createButton("Start", null, "not defined on " + host.getName());
         application.makeMiniButton(hostBtn);
         final MyButton hBtn = hostBtn;
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 hBtn.setBackgroundColor(Browser.PANEL_BACKGROUND);
@@ -1990,7 +1990,7 @@ public class DomainInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
                                          + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setApplyButtons(null, params);
@@ -4168,7 +4168,7 @@ public class DomainInfo extends EditableInfo {
                                   final boolean stopped) {
         if (hostWi != null) {
             final boolean enable = host.isConnected();
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(enable && stopped);
@@ -4199,7 +4199,7 @@ public class DomainInfo extends EditableInfo {
     /** Sets button next to host to the not defined button. */
     private void setButtonToNotDefined(final Host host, final Widget hostWi, final MyButton hostBtn) {
         if (hostWi != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     hostWi.setTFButtonEnabled(false);

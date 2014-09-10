@@ -138,7 +138,7 @@ public abstract class ConfigDialog {
     }
 
     protected final void answerPaneSetText(final String text) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final int l = answerPaneText.length();
@@ -576,7 +576,7 @@ public abstract class ConfigDialog {
      */
     protected void enableComponents(final JComponent[] componentsToDisable) {
         final Collection<java.awt.Component> ctdHash = new HashSet<java.awt.Component>(Arrays.asList(componentsToDisable));
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 for (final java.awt.Component dc : disabledComponents) {

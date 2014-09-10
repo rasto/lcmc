@@ -155,13 +155,13 @@ public class GUIData  {
         }
         final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
         if (!terminalPanel.equals(oldTerminalPanel)) {
-            application.invokeAndWaitIfNeeded(new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final int loc = terminalSplitPane.getDividerLocation();
                     terminalSplitPane.setBottomComponent(terminalPanel);
                     if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
-                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 expandTerminalSplitPane(1);
@@ -190,7 +190,7 @@ public class GUIData  {
         if (terminalSplitPane == null) {
             return;
         }
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final int height = (int)
@@ -388,7 +388,7 @@ public class GUIData  {
         for (final AllHostsUpdatable component : allHostsUpdateList) {
             component.allHostsUpdate();
         }
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 checkAddClusterButtons();

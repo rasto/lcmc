@@ -220,7 +220,7 @@ public abstract class HardwareInfo extends EditableInfo {
         newPanel.add(getMoreOptionsPanel(application.getServiceLabelWidth()
                                          + application.getServiceFieldWidth() * 2 + 4));
         newPanel.add(new JScrollPane(mainPanel));
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getApplyButton().setVisible(!getVMSVirtualDomainInfo().getResource().isNew());

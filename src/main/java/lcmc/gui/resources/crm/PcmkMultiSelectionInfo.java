@@ -320,7 +320,7 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
         final String[] params = getParametersFromXML();
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */

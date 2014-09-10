@@ -75,7 +75,7 @@ public final class EmptyBrowser extends Browser {
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
         final Iterable<Host> allHostsSorted = new TreeSet<Host>(allHosts.getHostSet());
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public String toString() {
                 return super.toString();

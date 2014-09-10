@@ -207,7 +207,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                 if (!unit.isEmpty()) {
                     unit.setEmpty(true);
                     unitEnabled = false;
-                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             unitComboBox.repaint();
@@ -220,7 +220,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
                     unit.setEmpty(false);
                     if (textFieldPart.isEnabled()) {
                         unitEnabled = true;
-                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 unitComboBox.repaint();
@@ -302,7 +302,7 @@ public final class TextfieldWithUnit extends GenericWidget<JComponent> {
 
     @Override
     public void setBackgroundColor(final Color bg) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

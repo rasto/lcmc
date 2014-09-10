@@ -447,7 +447,7 @@ public class TerminalPanel extends JScrollPane {
      * and scrolls the text up.
      */
     public void nextCommand() {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(prompt(), promptColor);
@@ -459,7 +459,7 @@ public class TerminalPanel extends JScrollPane {
     public void addCommand(final String command) {
         final String[] lines = command.split("\\r?\\n");
 
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(lines[0], commandColor);
@@ -473,7 +473,7 @@ public class TerminalPanel extends JScrollPane {
 
     /** Adds command output to the terminal textarea and scrolls up. */
     public void addCommandOutput(final String output) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 append(output, outputColor);

@@ -132,7 +132,7 @@ public class Browser {
             oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
         }
         final DefaultMutableTreeNode oldNode = oldN;
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (node != null) {
@@ -141,7 +141,7 @@ public class Browser {
             }
         });
         if (!select && t != null && oldNode != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     /* if don't want to select, we reselect the old path. */
@@ -157,7 +157,7 @@ public class Browser {
 
     public final void nodeChanged(final DefaultMutableTreeNode node) {
         final String stacktrace = Tools.getStackTrace();
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -240,7 +240,7 @@ public class Browser {
     }
 
     protected void selectPath(final Object[] path) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 final TreePath tp = new TreePath(path);
@@ -251,7 +251,7 @@ public class Browser {
     }
 
     public final void addNode(final DefaultMutableTreeNode node, final MutableTreeNode child) {
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
               node.add(child);

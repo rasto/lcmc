@@ -65,7 +65,6 @@ import javax.swing.plaf.FontUIResource;
 public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
-    public static final boolean CHECK_SWING_THREAD = true;
     private static final String OP_MODE_OPERATOR = Tools.getString("Application.OpMode.OP");
     private static final String OP_MODE_ADMIN = Tools.getString("Application.OpMode.ADMIN");
     public static final String OP_MODE_GOD = Tools.getString("Application.OpMode.GOD");
@@ -834,33 +833,29 @@ public class Application {
      * Convenience invoke and wait function if not already in an event
      * dispatch thread.
      */
-    public void invokeAndWaitIfNeeded(final Runnable runnable) {
+    public void invokeAndWait(final Runnable runnable) {
         if (SwingUtilities.isEventDispatchThread()) {
             runnable.run();
         } else {
-            invokeAndWait(runnable);
+            try {
+                SwingUtilities.invokeAndWait(runnable);
+            } catch (final InterruptedException ix) {
+                Thread.currentThread().interrupt();
+            } catch (final InvocationTargetException x) {
+                LOG.appError("invokeAndWait: exception", x);
+            }
         }
     }
 
-    public void invokeAndWait(final Runnable runnable) {
-        isNotSwingThread();
-        try {
-            SwingUtilities.invokeAndWait(runnable);
-        } catch (final InterruptedException ix) {
-            Thread.currentThread().interrupt();
-        } catch (final InvocationTargetException x) {
-            LOG.appError("invokeAndWait: exception", x);
+    public void invokeInEdt(final Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
         }
     }
 
     public void invokeLater(final Runnable runnable) {
-        invokeLater(CHECK_SWING_THREAD, runnable);
-    }
-
-    public void invokeLater(final boolean checkSwingThread, final Runnable runnable) {
-        if (checkSwingThread) {
-            isNotSwingThread();
-        }
         SwingUtilities.invokeLater(runnable);
     }
 

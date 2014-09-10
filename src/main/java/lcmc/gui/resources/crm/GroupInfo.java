@@ -408,7 +408,7 @@ public class GroupInfo extends ServiceInfo {
         } finally {
             mGroupServiceWriteLock.unlock();
         }
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 gn.add(newServiceNode);

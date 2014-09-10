@@ -1165,7 +1165,7 @@ public class Host implements Comparable<Host>, Value {
         if (!enableOnConnectElements.contains(c)) {
             enableOnConnectElements.add(c);
         }
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 c.setEnabled(isConnected());

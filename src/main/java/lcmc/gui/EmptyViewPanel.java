@@ -141,7 +141,7 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
         guiData.checkAddClusterButtons();
         buttonPanel.add(addClusterButton);
         if (!application.getAutoHosts().isEmpty()) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     addHostButton.pressButton();

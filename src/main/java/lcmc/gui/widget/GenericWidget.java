@@ -271,7 +271,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         }
         final JComponent comp = c;
         super.setVisible(visible);
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (label != null) {
@@ -369,7 +369,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         if (Tools.areEqual(item, getValue())) {
             return;
         }
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 mValueWriteLock.lock();

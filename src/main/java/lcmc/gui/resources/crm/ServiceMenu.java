@@ -493,7 +493,7 @@ public class ServiceMenu {
             @Override
             public void run() {
                 application.isSwingThread();
-                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         filesSubmenu.removeAll();

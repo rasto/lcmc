@@ -423,7 +423,7 @@ public final class DiskInfo extends HardwareInfo {
     protected void addHardwareTable(final JPanel mainPanel) {
         tablePanel = getTablePanel("Disk", DomainInfo.DISK_TABLE, getVMSVirtualDomainInfo().getNewDiskBtn());
         if (getResource().isNew()) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     tablePanel.setVisible(false);
@@ -794,7 +794,7 @@ public final class DiskInfo extends HardwareInfo {
     @Override
     protected boolean checkParam(final String param, final Value newValue) {
         if (DiskData.TYPE.equals(param)) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final boolean file = FILE_TYPE.equals(newValue);
@@ -933,7 +933,7 @@ public final class DiskInfo extends HardwareInfo {
         updateTable(DomainInfo.HEADER_TABLE);
         updateTable(DomainInfo.DISK_TABLE);
         setApplyButtons(null, getRealParametersFromXML());
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (tablePanel != null) {

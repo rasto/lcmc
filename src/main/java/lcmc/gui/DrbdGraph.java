@@ -170,7 +170,7 @@ public class DrbdGraph extends ResourceGraph {
                         removeDrbdVolume(dvi);
                         dvi.getDrbdResourceInfo().removeDrbdVolumeFromHashes(dvi);
                     }
-                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             lockGraph();
@@ -329,7 +329,7 @@ public class DrbdGraph extends ResourceGraph {
                 if (sourceBDI.isWFConnection(runMode)
                     && !destBDI.isWFConnection(runMode)) {
                     edge.setDirection(dest, source);
-                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             repaint();
@@ -339,7 +339,7 @@ public class DrbdGraph extends ResourceGraph {
                 }
             } else if (!sourceBD.isPrimary() && destBD.isPrimary()) {
                 edge.setDirection(dest, source);
-                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         repaint();

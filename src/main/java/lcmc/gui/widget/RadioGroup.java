@@ -131,7 +131,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
             mComponentsReadLock.unlock();
         }
         if (c != null) {
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     c.setEnabled(isEnablePredicate() && accessible);
@@ -265,7 +265,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     @Override
     public void setBackgroundColor(final Color bg) {
         final JComponent comp = getInternalComponent();
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 setBackground(bg);

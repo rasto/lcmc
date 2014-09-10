@@ -618,7 +618,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                                            new DefaultMutableTreeNode(dri);
         getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getBrowser().getDrbdNode().add(drbdResourceNode);

@@ -338,14 +338,14 @@ public class ServiceInfo extends EditableInfo {
             if (savedMetaAttrInfoRef == null
                 && defaultValues != allMetaAttrsAreDefaultValues) {
                 if (allMetaAttrsAreDefaultValues) {
-                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             sameAsMetaAttrsWi.setValueNoListeners(META_ATTRS_DEFAULT_VALUES);
                         }
                     });
                 } else {
-                    application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                    application.invokeLater(new Runnable() {
                         @Override
                         public void run() {
                             sameAsMetaAttrsWi.setValueNoListeners(null);
@@ -1154,14 +1154,14 @@ public class ServiceInfo extends EditableInfo {
                 }
                 if (savedOperationIdRef == null && defaultValues != allAreDefaultValues) {
                     if (allAreDefaultValues) {
-                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(OPERATIONS_DEFAULT_VALUES);
                             }
                         });
                     } else {
-                        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                        application.invokeLater(new Runnable() {
                             @Override
                             public void run() {
                                 sameAsOperationsWi.setValueNoListeners(null);
@@ -1819,7 +1819,7 @@ public class ServiceInfo extends EditableInfo {
                     normalRows++;
                 }
                 addField(panel, wiLabel, wi.getComponent(), leftWidth, rightWidth, 0);
-                application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+                application.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         wiLabel.setToolTipText(labelText);
@@ -2532,7 +2532,7 @@ public class ServiceInfo extends EditableInfo {
         /* apply button */
         addApplyButton(buttonPanel);
         addRevertButton(buttonPanel);
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 /* invoke later on purpose  */
@@ -4059,7 +4059,7 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
         final CloneInfo ci = cloneInfo;
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 removeNodeAndWait();
@@ -4349,7 +4349,7 @@ public class ServiceInfo extends EditableInfo {
     public void reloadComboBoxes() {
         if (sameAsOperationsWi != null) {
             final Value savedOpIdRef = sameAsOperationsWiValue();
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sameAsOperationsWi.reloadComboBox(savedOpIdRef, getSameServicesOperations());
@@ -4358,7 +4358,7 @@ public class ServiceInfo extends EditableInfo {
         }
         if (sameAsMetaAttrsWi != null) {
             final Value savedMAIdRef = sameAsMetaAttrsWiValue();
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     sameAsMetaAttrsWi.reloadComboBox(savedMAIdRef, getSameServicesMetaAttrs());

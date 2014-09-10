@@ -533,7 +533,7 @@ public class ClusterBrowser extends Browser {
         this.commonMountPoints = commonMountPoints.clone();
 
         /* cluster hosts */
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 clusterHostsNode.removeAllChildren();
@@ -554,7 +554,7 @@ public class ClusterBrowser extends Browser {
 
         /* networks */
         updateNetworks();
-        application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+        application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 crmGraph.scale();
@@ -1207,7 +1207,7 @@ public class ClusterBrowser extends Browser {
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     final List<String> bd = cluster.getCommonBlockDevices();
@@ -1481,7 +1481,7 @@ public class ClusterBrowser extends Browser {
     private void updateNetworks() {
         if (networksNode != null) {
             final Network[] networks = cluster.getCommonNetworks();
-            application.invokeLater(!Application.CHECK_SWING_THREAD, new Runnable() {
+            application.invokeLater(new Runnable() {
                 @Override
                 public void run() {
                     networksNode.removeAllChildren();
