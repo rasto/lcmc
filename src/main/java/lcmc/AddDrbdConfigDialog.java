@@ -90,14 +90,14 @@ public final class AddDrbdConfigDialog {
             resourceDialog.init(null, dvi);
             dialog = resourceDialog;
         }
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final WizardDialog newdialog = (WizardDialog) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
                 wizardCanceled = true;
-                guiData.expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;

@@ -52,12 +52,12 @@ public final class EditClusterDialog {
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newdialog = (DialogCluster) dialog.showDialog();
             if (dialog.isPressedButton(CANCEL_BTN)) {
-                guiData.expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -69,7 +69,7 @@ public final class EditClusterDialog {
             }
             dialog = newdialog;
         }
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         cluster.setClusterTabClosable(true);
     }
 }

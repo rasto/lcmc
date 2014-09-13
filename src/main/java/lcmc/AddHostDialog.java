@@ -55,7 +55,7 @@ public final class AddHostDialog {
         guiData.enableAddHostButtons(false);
         DialogHost dialog = newHostDialog;
         dialog.init(null, host, new DrbdInstallation());
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
@@ -65,7 +65,7 @@ public final class AddHostDialog {
                 application.removeHostFromHosts(host);
                 dialog.cancelDialog();
                 guiData.enableAddHostButtons(true);
-                guiData.expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
@@ -83,7 +83,7 @@ public final class AddHostDialog {
             }
             dialog = newdialog;
         }
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         guiData.enableAddHostButtons(true);
     }
 }

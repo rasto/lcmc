@@ -113,7 +113,7 @@ final class DrbdTest3 {
         roboTest.press(KeyEvent.VK_DOWN);
         roboTest.press(KeyEvent.VK_DOWN); /* select dopd */
         roboTest.press(KeyEvent.VK_ENTER);
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
 
         roboTest.moveTo("Wfc timeout", MTextField.class);
         roboTest.leftClick();

@@ -62,7 +62,6 @@ import javax.swing.event.MenuListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import lcmc.LCMC;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
@@ -76,7 +75,6 @@ import lcmc.utilities.MyList;
 import lcmc.utilities.MyListModel;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Tools;
 import lcmc.view.ClusterTab;
 import lcmc.view.ClustersPanel;
 import lcmc.view.MainPanel;
@@ -130,10 +128,13 @@ public class GUIData  {
     private Application application;
 
     private Container mainFrame;
+    private int lastDividerLocation = -1;
+    private boolean terminalAreaExpanded = true;
 
     public Container getMainFrameContentPane() {
         return ((RootPaneContainer) mainFrame).getContentPane();
     }
+
 
     public JRootPane getMainFrameRootPane() {
         if (mainFrame instanceof JFrame) {
@@ -153,24 +154,17 @@ public class GUIData  {
         if (terminalPanel == null) {
             return;
         }
-        final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
-        if (!terminalPanel.equals(oldTerminalPanel)) {
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    final int loc = terminalSplitPane.getDividerLocation();
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                final java.awt.Component oldTerminalPanel = terminalSplitPane.getBottomComponent();
+                if (!terminalPanel.equals(oldTerminalPanel)) {
+                    expandTerminalSplitPane(TerminalSize.EXPAND);
                     terminalSplitPane.setBottomComponent(terminalPanel);
-                    if (loc > Tools.getDefaultInt("DrbdMC.height") - 100) {
-                        application.invokeLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                expandTerminalSplitPane(1);
-                            }
-                        });
-                    }
+                    expandTerminalSplitPane(TerminalSize.COLLAPSE);
                 }
-            });
-        }
+            }
+        });
     }
 
     /** Returns the position of the terminal panel. */
@@ -186,22 +180,40 @@ public class GUIData  {
         return terminalSplitPane.getBottomComponent().getSize().getHeight() != 0;
     }
 
-    public void expandTerminalSplitPane(final int buttonNo) {
+    public void expandTerminalSplitPane(final TerminalSize terminalSize) {
         if (terminalSplitPane == null) {
             return;
         }
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
-                final int height = (int)
-                        terminalSplitPane.getBottomComponent().getSize().getHeight();
-                if ((buttonNo == 0 && height == 0) || (buttonNo == 1 && height > 0)) {
-                    LOG.debug2("expandTerminalSplitPane:");
-                    final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
-                    final BasicSplitPaneDivider divider = ui.getDivider();
-                    final JButton button = (JButton) divider.getComponent(buttonNo);
-                    button.doClick();
+                final int height = terminalSplitPane.getHeight() - terminalSplitPane.getDividerLocation() - 11;
+                if (!terminalAreaExpanded && terminalSize == TerminalSize.EXPAND) {
+                    terminalAreaExpanded = true;
+                    lastDividerLocation = terminalSplitPane.getDividerLocation();
+                    if (height < 10) {
+                        terminalSplitPane.setDividerLocation(terminalSplitPane.getHeight() - 150);
+                    }
+                } else if (terminalAreaExpanded && terminalSize == TerminalSize.COLLAPSE) {
+                    terminalAreaExpanded = false;
+                    if (lastDividerLocation < 0) {
+                        terminalSplitPane.setDividerLocation(1.0);
+                    } else {
+                        terminalSplitPane.setDividerLocation(lastDividerLocation);
+                    }
                 }
+            }
+        });
+    }
+
+    public void initTerminalSplitPane() {
+        application.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                final BasicSplitPaneUI ui = (BasicSplitPaneUI) terminalSplitPane.getUI();
+                final BasicSplitPaneDivider divider = ui.getDivider();
+                final JButton button = (JButton) divider.getComponent(1);
+                button.doClick();
             }
         });
     }
@@ -798,5 +810,10 @@ public class GUIData  {
 
     public void setMainFrame(final Container mainFrame) {
         this.mainFrame = mainFrame;
+    }
+
+    public enum TerminalSize {
+        EXPAND,
+        COLLAPSE
     }
 }

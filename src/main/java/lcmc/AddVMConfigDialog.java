@@ -55,7 +55,7 @@ public final class AddVMConfigDialog {
         vmsVirtualDomainInfo.setDialogStarted(true);
         VMConfig dialog = domainDialog;
         dialog.init(null, vmsVirtualDomainInfo);
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final VMConfig newdialog = (VMConfig) dialog.showDialog();
@@ -76,7 +76,7 @@ public final class AddVMConfigDialog {
         }
         vmsVirtualDomainInfo.setDialogStarted(false);
         vmsVirtualDomainInfo.getBrowser().reloadAllComboBoxes(null);
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         guiData.getMainFrame().requestFocus();
     }
 }

@@ -325,7 +325,7 @@ final class VMTest1 {
                 roboTest.moveTo("Apply"); /* apply */
                 roboTest.leftClick();
                 roboTest.checkVMTest(vmTest, 3.1, name);
-                guiData.expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 roboTest.moveTo("Readonly", JCheckBox.class);
                 roboTest.leftClick();
 

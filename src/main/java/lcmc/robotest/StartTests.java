@@ -152,7 +152,7 @@ public class StartTests {
                 } else if (type == Type.DRBD) {
                     roboTest.moveToMenu(Tools.getString("Dialog.vm.Storage.Title"));
                     roboTest.leftClick();
-                    guiData.expandTerminalSplitPane(1);
+                    guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                     if (index == '0') {
                         /* all DRBD tests */
                         int i = 1;

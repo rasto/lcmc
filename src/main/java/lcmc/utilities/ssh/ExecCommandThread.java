@@ -99,7 +99,13 @@ public final class ExecCommandThread extends Thread {
                 execCallback.doneError("not connected", 139);
             }
         } else {
+            if (commandVisible || outputVisible) {
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
+            }
             exec();
+            if (commandVisible || outputVisible) {
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
+            }
         }
     }
 
@@ -172,7 +178,7 @@ public final class ExecCommandThread extends Thread {
             final int exitCode) {
         if (execCallback != null) {
             if (commandVisible || outputVisible) {
-                guiData.expandTerminalSplitPane(0);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
             }
             execCallback.doneError(ans.toString(), exitCode);
         }

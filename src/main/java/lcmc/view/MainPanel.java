@@ -22,14 +22,11 @@
 package lcmc.view;
 
 import java.awt.BorderLayout;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import lcmc.gui.GUIData;
+import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,17 +38,14 @@ import org.springframework.stereotype.Component;
 @Component
 public final class MainPanel extends JPanel {
 
-    /** Whether the terminal was already expanded at least once. */
-    private boolean expandingDone = false;
-    /** Expanding flag mutex. */
-    private final transient Lock mExpanding = new ReentrantLock();
-
     @Autowired
     private ClustersPanel clustersPanel;
     @Autowired
     private HostFactory hostFactory;
     @Autowired
     private GUIData guiData;
+    @Autowired
+    private Application application;
 
     public void init() {
         setLayout(new BorderLayout());
@@ -65,20 +59,7 @@ public final class MainPanel extends JPanel {
         splitPane.setResizeWeight(1.0);
         splitPane.setOneTouchExpandable(true);
 
-        splitPane.addHierarchyListener(new HierarchyListener() {
-            @Override
-            public void hierarchyChanged(final HierarchyEvent e) {
-                mExpanding.lock();
-                if (!expandingDone
-                    && (e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) {
-                    expandingDone = true;
-                    mExpanding.unlock();
-                    guiData.expandTerminalSplitPane(1);
-                } else {
-                    mExpanding.unlock();
-                }
-            }
-        });
         add(splitPane, BorderLayout.CENTER);
+        guiData.initTerminalSplitPane();
     }
 }

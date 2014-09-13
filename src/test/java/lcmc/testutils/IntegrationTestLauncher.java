@@ -152,7 +152,7 @@ public class IntegrationTestLauncher {
         application.saveConfig(saveFile, false);
         guiData.refreshClustersPanel();
         
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         cluster.getClusterTab().addClusterView();
         cluster.getClusterTab().requestFocus();
         guiData.checkAddClusterButtons();

@@ -62,7 +62,7 @@ public final class AddClusterDialog {
         cluster.setClusterTabClosable(false);
         DialogCluster dialog = nameDialog;
         dialog.init(null, cluster);
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogCluster newDialog = (DialogCluster) dialog.showDialog();
@@ -77,7 +77,7 @@ public final class AddClusterDialog {
                         guiData.checkAddClusterButtons();
                     }
                 });
-                guiData.expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 if (newDialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     cluster.setClusterTabClosable(true);
@@ -91,7 +91,7 @@ public final class AddClusterDialog {
                 dialog = newDialog;
             }
         }
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         application.invokeLater(new Runnable() {
             @Override
             public void run() {

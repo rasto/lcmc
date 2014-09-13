@@ -52,13 +52,13 @@ public final class EditHostDialog {
         DialogHost dialog = sshDialog;
         dialog.init(null, host, new DrbdInstallation());
         final boolean expanded = guiData.isTerminalPanelExpanded();
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DialogHost newdialog = (DialogHost) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 if (!expanded) {
-                    guiData.expandTerminalSplitPane(1);
+                    guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 }
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
@@ -71,7 +71,7 @@ public final class EditHostDialog {
             dialog = newdialog;
         }
         if (!expanded) {
-            guiData.expandTerminalSplitPane(1);
+            guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         }
     }
 }

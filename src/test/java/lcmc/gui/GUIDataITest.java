@@ -31,13 +31,13 @@ public final class GUIDataITest {
         float count = 200;
         float errors = 0;
         for (int i = 0; i < count; i++) {
-            guiData.expandTerminalSplitPane(1);
+            guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
             for (final Host host : integrationTestLauncher.getHosts()) {
                 guiData.setTerminalPanel(host.getTerminalPanel());
-                guiData.expandTerminalSplitPane(0);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
             }
             application.waitForSwing();
-            if (guiData.getTerminalPanelPos() < 100) {
+            if (i > 0 && guiData.getTerminalPanelPos() < 100) {
                 errors++;
             }
         }

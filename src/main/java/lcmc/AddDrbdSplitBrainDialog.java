@@ -53,13 +53,13 @@ public final class AddDrbdSplitBrainDialog {
     public void showDialogs() {
         splitBrainDialog.init(null, volumeInfo);
         DrbdConfig dialog = splitBrainDialog;
-        guiData.expandTerminalSplitPane(0);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.EXPAND);
         while (true) {
             LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName());
             final DrbdConfig newdialog = (DrbdConfig) dialog.showDialog();
             if (dialog.isPressedCancelButton()) {
                 dialog.cancelDialog();
-                guiData.expandTerminalSplitPane(1);
+                guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
                 if (newdialog == null) {
                     LOG.debug1("showDialogs: dialog: " + dialog.getClass().getName() + " canceled");
                     return;
@@ -70,7 +70,7 @@ public final class AddDrbdSplitBrainDialog {
             }
             dialog = newdialog;
         }
-        guiData.expandTerminalSplitPane(1);
+        guiData.expandTerminalSplitPane(GUIData.TerminalSize.COLLAPSE);
         guiData.getMainFrame().requestFocus();
     }
 }
