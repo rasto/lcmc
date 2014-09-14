@@ -479,7 +479,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
         }
         super.removeMyself(runMode);
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 clusterBrowser.reloadNode(clusterBrowser.getDrbdNode(), true);
@@ -518,9 +518,14 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                 }
             }
             clusterBrowser.setDrbdXml(dxml);
-            clusterBrowser.updateDrbdResources();
+            application.invokeInEdt(new Runnable() {
+                @Override
+                public void run() {
+                    clusterBrowser.updateDrbdResources();
+                }
+            });
             if (Application.isLive(runMode)) {
-                application.invokeLater(new Runnable() {
+                application.invokeInEdt(new Runnable() {
                     @Override
                     public void run() {
                         clusterBrowser.getDrbdGraph().updatePopupMenus();
@@ -737,7 +742,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         di.getWidget("1", null).setValueAndWait(new StringValue(getDrbdResourceInfo().getName()));
         di.apply(dcHost, runMode);
         di.getResource().setNew(false);
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 di.setApplyButtons(null, di.getParametersFromXML());
@@ -781,7 +786,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
         application.waitForSwing();
         ldi.apply(dcHost, runMode);
         ldi.getResource().setNew(false);
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 ldi.setApplyButtons(null, ldi.getParametersFromXML());
