@@ -37,7 +37,6 @@ import java.util.Map;
  * This class provides Http functions.
  */
 public final class Http {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(Http.class);
     static final String URL_STRING = "http://lcmc.sourceforge.net/cgi-bin/exc";
     static final String ENCODING = "UTF-8";
@@ -89,10 +88,10 @@ public final class Http {
         final Map<String, String> params = new HashMap<String, String>();
         params.put("f", from);
         params.put("e", exception);
-        
-        
+
         try {
             output.writeBytes(getPostParams(params));
+
             output.flush();
             output.close();
         } catch (final IOException ex) {

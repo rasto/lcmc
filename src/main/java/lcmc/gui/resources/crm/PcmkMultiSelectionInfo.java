@@ -61,10 +61,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class PcmkMultiSelectionInfo extends EditableInfo {
-    /** Logger. */
-    private static final Logger LOG =
-                        LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
-    /** All selected objects. */
+    private static final Logger LOG = LoggerFactory.getLogger(PcmkMultiSelectionInfo.class);
     private List<Info> selectedInfos;
     @Autowired
     private PcmkMultiSelectionMenu pcmkMultiSelectionMenu;
@@ -228,26 +225,22 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = true;
-                component.setToolTipText(
-                                        ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                component.setToolTipBackground(Tools.getDefaultColor(
-                                   "ClusterBrowser.Test.Tooltip.Background"));
+                component.setToolTipText(ClusterBrowser.STARTING_PTEST_TOOLTIP);
+                component.setToolTipBackground(Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
                     return;
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCrmGraph().startTestAnimation((JComponent) component,
-                                                              startTestLatch);
+                getBrowser().getCrmGraph().startTestAnimation((JComponent) component, startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
                 try {
                     final ClusterStatus cs = getBrowser().getClusterStatus();
                     cs.setPtestResult(null);
                     apply(dcHost, Application.RunMode.TEST);
-                    final PtestData ptestData =
-                                        new PtestData(CRM.getPtest(dcHost));
+                    final PtestData ptestData = new PtestData(CRM.getPtest(dcHost));
                     component.setToolTipText(ptestData.getToolTip());
                     cs.setPtestResult(ptestData);
                 } finally {

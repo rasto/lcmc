@@ -52,8 +52,7 @@ final class IPaddrInfo extends ServiceInfo {
      * one value is changed and we don't want to check everything.
      */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         final Check check = new Check(incorrect, changed);
@@ -80,9 +79,7 @@ final class IPaddrInfo extends ServiceInfo {
 
     /** Returns combo box for parameter. */
     @Override
-    protected Widget createWidget(final String param,
-                                  final String prefix,
-                                  final int width) {
+    protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget paramWi;
         if ("ip".equals(param)) {
             /* get networks */
@@ -92,17 +89,15 @@ final class IPaddrInfo extends ServiceInfo {
             }
             final Value defaultValue;
             if (ip.isNothingSelected()) {
-                defaultValue = new StringValue(
-                        ip.getValueForConfig(),
-                        Tools.getString("ClusterBrowser.SelectNetInterface"));
+                defaultValue = new StringValue(ip.getValueForConfig(),
+                                               Tools.getString("ClusterBrowser.SelectNetInterface"));
             } else {
                 defaultValue = new StringValue(ip.getValueForConfig());
             }
             @SuppressWarnings("unchecked")
-            final Value[] networks = enumToInfoArray(
-                                    defaultValue,
-                                    getName(),
-                                    getBrowser().getNetworksNode().children());
+            final Value[] networks = enumToInfoArray(defaultValue,
+                                                     getName(),
+                                                     getBrowser().getNetworksNode().children());
 
             final String regexp = "^[\\d.*]*|Select\\.\\.\\.$";
             paramWi = widgetFactory.createInstance(
@@ -138,8 +133,7 @@ final class IPaddrInfo extends ServiceInfo {
         final String inside = id + " / ";
         Value ip = getParamSaved("ip");
         if (ip == null || ip.isNothingSelected()) {
-            ip = new StringValue(
-                          Tools.getString("ClusterBrowser.Ip.Unconfigured"));
+            ip = new StringValue(Tools.getString("ClusterBrowser.Ip.Unconfigured"));
         }
         s.append(" (");
         s.append(inside);

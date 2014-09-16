@@ -82,8 +82,7 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HostInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
-    static final ImageIcon HOST_STANDBY_ICON =
-     Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
+    static final ImageIcon HOST_STANDBY_ICON = Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
     static final ImageIcon HOST_STANDBY_OFF_ICON =
                                      Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyOffIcon"));
     static final ImageIcon HOST_STOP_COMM_LAYER_ICON =

@@ -41,7 +41,6 @@ final class DrbdTest3 {
     private RoboTest roboTest;
     @Autowired
     private DrbdTest1 drbdTest1;
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest3.class);
     @Autowired
     private GUIData guiData;

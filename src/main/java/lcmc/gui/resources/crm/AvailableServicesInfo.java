@@ -59,8 +59,7 @@ public final class AvailableServicesInfo extends HbCategoryInfo {
 
     @Override
     protected void rowClicked(final String tableName, final String key, final int column) {
-        final ResourceAgentClassInfo resourceAgentClassInfo =
-                                                        getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
+        final ResourceAgentClassInfo resourceAgentClassInfo = getBrowser().getClassInfoMap(key.toLowerCase(Locale.US));
         if (resourceAgentClassInfo != null) {
             resourceAgentClassInfo.selectMyself();
         }

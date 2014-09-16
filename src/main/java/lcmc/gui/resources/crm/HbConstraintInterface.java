@@ -51,9 +51,7 @@ public interface HbConstraintInterface {
     /**
      * Check which fields are correct and return true if all are.
      */
-    Check checkResourceFields(final String param,
-                              final String[] params,
-                              final boolean fromUp);
+    Check checkResourceFields(final String param, final String[] params, final boolean fromUp);
 
     /** Applies the changes after apply button was pressed. */
     void apply(final Host dcHost, final Application.RunMode runMode);

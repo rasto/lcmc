@@ -45,12 +45,9 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class VirtualDomainInfo extends ServiceInfo {
     /** Pattern that captures a name from xml file name. */
-    static final Pattern LIBVIRT_CONF_PATTERN =
-                                            Pattern.compile(".*?([^/]+).xml$");
-    /** Parameters. */
+    static final Pattern LIBVIRT_CONF_PATTERN = Pattern.compile(".*?([^/]+).xml$");
     private static final String CONFIG_PARAM = "config";
     private static final String HYPERVISOR_PARAM = "hypervisor";
-    /** Hypervisor choices. */
     private static final Value[] HYPERVISORS = {new StringValue("qemu:///system"),
                                                 new StringValue("xen:///"),
                                                 new StringValue("lxc:///"),
@@ -61,19 +58,15 @@ public class VirtualDomainInfo extends ServiceInfo {
     /** VirtualDomain in the VMs menu. */
     private DomainInfo domainInfo = null;
 
-    /** Returns object with vm data. */
     VmsXml getVMSXML(final Host host) {
         return getBrowser().getVmsXml(host);
     }
 
-    /** Removes the service without confirmation dialog. */
     @Override
-    protected void removeMyselfNoConfirm(final Host dcHost,
-                                         final Application.RunMode runMode) {
+    protected void removeMyselfNoConfirm(final Host dcHost, final Application.RunMode runMode) {
         super.removeMyselfNoConfirm(dcHost, runMode);
     }
 
-    /** Sets service parameters with values from resourceNode hash. */
     @Override
     protected void setParameters(final Map<String, String> resourceNode) {
         super.setParameters(resourceNode);
@@ -104,7 +97,6 @@ public class VirtualDomainInfo extends ServiceInfo {
         return domainInfo;
     }
 
-    /** Returns the possible values for the pulldown menus, if applicable. */
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         if (CONFIG_PARAM.equals(param)) {
@@ -163,13 +155,11 @@ public class VirtualDomainInfo extends ServiceInfo {
         return s.toString();
     }
 
-    /** Applies the changes to the service parameters. */
     @Override
     public void apply(final Host dcHost, final Application.RunMode runMode) {
         super.apply(dcHost, runMode);
     }
 
-    /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
         return !PARAM_ALLOW_MIGRATE.equals(param) && super.isAdvanced(param);

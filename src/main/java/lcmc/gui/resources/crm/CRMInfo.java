@@ -38,8 +38,7 @@ import org.springframework.stereotype.Component;
 public final class CRMInfo extends HbCategoryInfo {
     /** Cluster manager icon. */
     private static final ImageIcon CRM_ICON =
-        Tools.createImageIcon(
-                Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
+                                      Tools.createImageIcon(Tools.getDefault("ClusterBrowser.PacemakerIconSmall"));
     /** Returns icon for the heartbeat menu item. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {

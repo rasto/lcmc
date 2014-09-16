@@ -62,13 +62,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class ProxyHostInfo extends Info {
-    /** Logger. */
-    private static final Logger LOG =
-                                 LoggerFactory.getLogger(ProxyHostInfo.class);
-    /** Name prefix that appears in the menu. */
-    private static final String NAME_PREFIX =
-                                    Tools.getString("ProxyHostInfo.NameInfo");
-    /** Host data. */
+    private static final Logger LOG = LoggerFactory.getLogger(ProxyHostInfo.class);
+    private static final String NAME_PREFIX = Tools.getString("ProxyHostInfo.NameInfo");
     private Host host;
     @Autowired
     private Application application;
@@ -80,13 +75,11 @@ public class ProxyHostInfo extends Info {
         this.host = host;
     }
 
-    /** Returns browser object of this info. */
     @Override
     public HostBrowser getBrowser() {
         return (HostBrowser) super.getBrowser();
     }
 
-    /** Returns a host icon for the menu. */
     @Override
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
@@ -98,13 +91,11 @@ public class ProxyHostInfo extends Info {
         return host.getName();
     }
 
-    /** Returns a host icon for the category in the menu. */
     @Override
     public ImageIcon getCategoryIcon(final Application.RunMode runMode) {
         return HostBrowser.HOST_ICON;
     }
 
-    /** Returns the info panel. */
     @Override
     public JComponent getInfoPanel() {
         final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(12));
@@ -175,14 +166,6 @@ public class ProxyHostInfo extends Info {
         return host;
     }
 
-
-    /**
-     * Compares this host info name with specified ProxyHostInfo's name.
-     *
-     * @param otherHI
-     *              other host info
-     * @return true if they are equal
-     */
     boolean equals(final ProxyHostInfo otherHI) {
         if (otherHI == null) {
             return false;
@@ -202,14 +185,12 @@ public class ProxyHostInfo extends Info {
         return host.getName();
     }
 
-    /** Creates the popup for the host. */
     @Override
     public List<UpdatableItem> createPopup() {
         final ProxyHostMenu proxyHostMenu = new ProxyHostMenu();
         return proxyHostMenu.getPulldownMenu(this);
     }
 
-    /** Returns grahical view if there is any. */
     @Override
     public JPanel getGraphicalView() {
         final DrbdGraph dg = getBrowser().getDrbdGraph();

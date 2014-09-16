@@ -47,25 +47,20 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public abstract class AbstractDrbdInfo extends EditableInfo {
-    /** Name of the drbd after parameter. */
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
-    /** Name of the drbd after parameter. Before 8.4 */
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
     @Autowired
     private WidgetFactory widgetFactory;
 
-    /** Returns browser object of this info. */
     @Override
     public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-    /** Returns cluster object to resource belongs. */
     public final Cluster getCluster() {
         return getBrowser().getCluster();
     }
 
-    /** Returns the regexp of the parameter. */
     @Override
     protected String getParamRegexp(final String param) {
         return null;
@@ -80,125 +75,95 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
         return getBrowser().getDrbdXml().checkParam(param, newValue);
     }
 
-    /** Returns default value of the parameter. */
     @Override
     public Value getParamDefault(final String param) {
         return getBrowser().getDrbdXml().getParamDefault(param);
     }
 
-    /** Whether the parameter should be enabled. */
     @Override
     protected String isEnabled(final String param) {
         return null;
     }
 
-
-    /** Returns the preferred value for the drbd parameter. */
     @Override
     protected final Value getParamPreferred(final String param) {
         return getBrowser().getDrbdXml().getParamPreferred(param);
     }
 
-    /** Returns the possible values for the pulldown menus, if applicable. */
     @Override
     protected final Value[] getParamPossibleChoices(final String param) {
         return getBrowser().getDrbdXml().getPossibleChoices(param);
     }
 
-    /**
-     * Returns the short description of the drbd parameter that is used as
-     * a label.
-     */
     @Override
     protected final String getParamShortDesc(final String param) {
         return getBrowser().getDrbdXml().getParamShortDesc(param);
     }
 
-    /**
-     * Returns a long description of the parameter that is used for tool tip.
-     */
     @Override
     protected final String getParamLongDesc(final String param) {
         return getBrowser().getDrbdXml().getParamLongDesc(param);
     }
 
-    /** Returns whether this drbd parameter is required parameter. */
     @Override
     protected final boolean isRequired(final String param) {
         return getBrowser().getDrbdXml().isRequired(param);
     }
 
-    /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
-        if (!Tools.areEqual(getParamDefault(param),
-                            getParamSaved(param))) {
+        if (!Tools.areEqual(getParamDefault(param), getParamSaved(param))) {
             /* it changed, show it */
             return false;
         }
         return getBrowser().getDrbdXml().isAdvanced(param);
     }
 
-    /** Returns access type of this parameter. */
     @Override
     protected final Application.AccessType getAccessType(final String param) {
         return getBrowser().getDrbdXml().getAccessType(param);
     }
 
-    /** Whether the parameter should be enabled only in advanced mode. */
     @Override
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
         return false;
     }
 
-    /** Returns whether this drbd parameter is of integer type. */
     @Override
     protected final boolean isInteger(final String param) {
         return getBrowser().getDrbdXml().isInteger(param);
     }
 
-    /** Returns whether this drbd parameter is of label type. */
     @Override
     protected final boolean isLabel(final String param) {
         return getBrowser().getDrbdXml().isLabel(param);
     }
 
-    /** Returns whether this drbd parameter is of time type. */
     @Override
     protected final boolean isTimeType(final String param) {
         /* not required */
         return false;
     }
 
-    /** Returns whether this parameter has a unit prefix. */
     @Override
     protected final boolean hasUnitPrefix(final String param) {
         return getBrowser().getDrbdXml().hasUnitPrefix(param);
     }
 
-    /** Returns the long unit name. */
     protected final String getUnitLong(final String param) {
         return getBrowser().getDrbdXml().getUnitLong(param);
     }
 
-    /**
-     * Returns the default unit for the parameter.
-     */
     protected final String getDefaultUnit(final String param) {
         return getBrowser().getDrbdXml().getDefaultUnit(param);
     }
 
-    /**
-     * Returns whether the parameter is of the boolean type and needs the
-     * checkbox.
-     */
     @Override
     protected final boolean isCheckBox(final String param) {
         final String type = getBrowser().getDrbdXml().getParamType(param);
         return type != null && ClusterBrowser.DRBD_RESOURCE_BOOL_TYPE_NAME.equals(type);
     }
 
-    /** Returns the type of the parameter (like boolean). */
     @Override
     protected final String getParamType(final String param) {
         return getBrowser().getDrbdXml().getParamType(param);
@@ -208,9 +173,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
      * Returns the widget that is used to edit this parameter.
      */
     @Override
-    protected Widget createWidget(final String param,
-                                  final String prefix,
-                                  final int width) {
+    protected Widget createWidget(final String param, final String prefix, final int width) {
         final Value[] possibleChoices = getParamPossibleChoices(param);
         getResource().setPossibleChoices(param, possibleChoices);
         final Widget paramWi;
@@ -231,9 +194,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                                  Widget.NO_REGEXP,
                                  width,
                                  Widget.NO_ABBRV,
-                                 new AccessMode(
-                                      getAccessType(param),
-                                      isEnabledOnlyInAdvancedMode(param)),
+                                 new AccessMode(getAccessType(param), isEnabledOnlyInAdvancedMode(param)),
                                  Widget.NO_BUTTON);
 
             widgetAdd(param, prefix, paramWi);
@@ -251,8 +212,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
      * Creates drbd config for sections and returns it. Removes 'drbd: '
      * from the 'after' parameter.
      */
-    protected String drbdSectionsConfig(final Host host)
-                     throws Exceptions.DrbdConfigException {
+    protected String drbdSectionsConfig(final Host host) throws Exceptions.DrbdConfigException {
         final StringBuilder config = new StringBuilder("");
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final String[] sections = dxml.getSections();
@@ -263,8 +223,7 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
             }
             /* remove -options */
             final String section = sectionString.replaceAll("-options$", "");
-            if ("resource".equals(section)
-                || DrbdXml.GLOBAL_SECTION.equals(section)) {
+            if ("resource".equals(section) || DrbdXml.GLOBAL_SECTION.equals(section)) {
                 continue;
             }
             final String[] params = dxml.getSectionParams(sectionString);
@@ -284,44 +243,37 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
                                 inPlugin = true;
                             }
                             sectionConfig.append("\t\t\t");
-                            sectionConfig.append(param.substring(
-                                               DrbdProxy.PLUGIN_PARAM_PREFIX.length(),
-                                               param.length()));
+                            sectionConfig.append(param.substring(DrbdProxy.PLUGIN_PARAM_PREFIX.length(),
+                                                                 param.length()));
                             if (value.equals(DrbdXml.CONFIG_YES)) {
                                 /* boolean parameter */
                                 /* also >= DRBD 8.4 */
                                 sectionConfig.append(";\n");
                             } else {
                                 sectionConfig.append(' ');
-                                sectionConfig.append(
-                                        Tools.escapeConfig(value.getValueForConfig()));
+                                sectionConfig.append(Tools.escapeConfig(value.getValueForConfig()));
                                 sectionConfig.append(";\n");
                             }
                         } else if (!volumesAvailable
-                            && (isCheckBox(param)
-                                || "booleanhandler".equals(
-                                                        getParamType(param)))) {
+                            && (isCheckBox(param) || "booleanhandler".equals(getParamType(param)))) {
                             if (value.equals(DrbdXml.CONFIG_YES)) {
                                 /* boolean parameter */
                                 sectionConfig.append("\t\t").append(param).append(";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER.equals(param)) {
                             /* resync-after parameter > 8.4 */
-                            if (!value.getValueForConfig().equals(Tools.getString(
-                                                "ClusterBrowser.None"))) {
+                            if (!value.getValueForConfig().equals(Tools.getString("ClusterBrowser.None"))) {
                                 sectionConfig.append("\t\t");
                                 sectionConfig.append(param);
                                 sectionConfig.append('\t');
-                                sectionConfig.append(
-                                        Tools.escapeConfig(value.getValueForConfigWithUnit()));
+                                sectionConfig.append(Tools.escapeConfig(value.getValueForConfigWithUnit()));
                                 sectionConfig.append(";\n");
                             }
                         } else if (DRBD_RES_PARAM_AFTER_8_3.equals(param)) {
                             /* after parameter < 8.4 */
                             /* we get drbd device here, so it is converted
                              * to the resource. */
-                            if (!value.getValueForConfig().equals(Tools.getString(
-                                                "ClusterBrowser.None"))) {
+                            if (!value.getValueForConfig().equals(Tools.getString("ClusterBrowser.None"))) {
                                 final ResourceInfo v0 =
                                      getBrowser().getDrbdResourceNameHash().get(value.getValueForConfig());
                                 getBrowser().putDrbdResHash();

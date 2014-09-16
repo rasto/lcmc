@@ -85,24 +85,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class GlobalInfo extends AbstractDrbdInfo {
-    /** Logger. */
     private static final Logger LOG = LoggerFactory.getLogger(GlobalInfo.class);
-    /** Common proxy section. */
     private static final String SECTION_COMMON_PROXY = "proxy";
 
-    /** DRBD icon. */
-    private static final ImageIcon DRBD_ICON = Tools.createImageIcon(
-                             Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
-    /** Device that matches all drbd devices in the log. */
+    private static final ImageIcon DRBD_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.DRBDIconSmall"));
     static final String ALL_LOGS_PATTERN = "/dev/drbd[0-9]*";
-    /** Icon of the cluster. */
-    static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(
-                                Tools.getDefault("ClustersPanel.ClusterIcon"));
-    /** Selected block device. */
-    private BlockDevInfo selectedBD = null;
-    /** Cache for the info panel. */
+    static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
+    private BlockDevInfo selectedBlockDevice = null;
     private JComponent infoPanel = null;
-
     @Autowired
     private GlobalMenu globalMenu;
     @Autowired
@@ -128,12 +118,10 @@ public class GlobalInfo extends AbstractDrbdInfo {
         setResource(new Resource(name));
     }
 
-    /** Sets stored parameters. */
     public void setParameters() {
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final Cluster cluster = getCluster();
         for (final String hostName : dxml.getProxyHostNames()) {
-
             final Host proxyHost = cluster.getProxyHostByName(hostName);
             if (proxyHost == null) {
                 final Host hp = hostFactory.createInstance();
@@ -183,7 +171,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     /** Sets selected block device. */
     public void setSelectedNode(final BlockDevInfo bdi) {
-        selectedBD = bdi;
+        selectedBlockDevice = bdi;
     }
 
     /**
@@ -191,9 +179,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
      * disabled.
      */
     @Override
-    protected Widget createWidget(final String param,
-                                  final String prefix,
-                                  final int width) {
+    protected Widget createWidget(final String param, final String prefix, final int width) {
         final Widget wi = super.createWidget(param, prefix, width);
         if ("usage-count".equals(param)) {
             wi.setEnabled(false);
@@ -202,10 +188,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     }
 
     /** Creates drbd config. */
-    public void createDrbdConfigLive()
-               throws Exceptions.DrbdConfigException, UnknownHostException {
-        final Map<Host, String> testOutput =
-                                          new LinkedHashMap<Host, String>();
+    public void createDrbdConfigLive() throws Exceptions.DrbdConfigException, UnknownHostException {
+        final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
         if (!createConfigDryRun(testOutput)) {
             createConfigError(testOutput);
             return;
@@ -229,8 +213,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
         if (DrbdXml.GLOBAL_SECTION.equals(section)) {
             return super.getSectionDisplayName(section);
         } else {
-            return Tools.getString("GlobalInfo.CommonSection")
-                   + super.getSectionDisplayName(section);
+            return Tools.getString("GlobalInfo.CommonSection") + super.getSectionDisplayName(section);
         }
     }
 
@@ -265,10 +248,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
             createDrbdConfig(Application.RunMode.TEST);
             boolean allOk = true;
             for (final Host h : getCluster().getHostsArray()) {
-                int ret = DRBD.adjustApply(h,
-                                           DRBD.ALL_DRBD_RESOURCES,
-                                           null,
-                                           Application.RunMode.TEST);
+                int ret = DRBD.adjustApply(h, DRBD.ALL_DRBD_RESOURCES, null, Application.RunMode.TEST);
                 final String output = DRBD.getDRBDtest();
                 testOutput.put(h, output);
                 if (ret != 0) {
@@ -290,8 +270,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
      */
     @Override
     public JComponent getInfoPanel() {
-        if (selectedBD != null) { /* block device is not in drbd */
-            final JComponent c = selectedBD.getInfoPanel();
+        if (selectedBlockDevice != null) { /* block device is not in drbd */
+            final JComponent c = selectedBlockDevice.getInfoPanel();
             infoPanelDone();
             return c;
         }
@@ -331,23 +311,19 @@ public class GlobalInfo extends AbstractDrbdInfo {
                     return;
                 }
                 mouseStillOver = true;
-                component.setToolTipText(
-                       Tools.getString("ClusterBrowser.StartingDRBDtest"));
-                component.setToolTipBackground(Tools.getDefaultColor(
-                                "ClusterBrowser.Test.Tooltip.Background"));
+                component.setToolTipText(Tools.getString("ClusterBrowser.StartingDRBDtest"));
+                component.setToolTipBackground(Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
                     return;
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getDrbdGraph().startTestAnimation((JComponent) component,
-                                                               startTestLatch);
+                getBrowser().getDrbdGraph().startTestAnimation((JComponent) component, startTestLatch);
                 getBrowser().drbdtestLockAcquire();
                 try {
                     getBrowser().setDRBDtestData(null);
-                    final Map<Host, String> testOutput =
-                                           new LinkedHashMap<Host, String>();
+                    final Map<Host, String> testOutput = new LinkedHashMap<Host, String>();
                     createConfigDryRun(testOutput);
                     final DRBDtestData dtd = new DRBDtestData(testOutput);
                     component.setToolTipText(dtd.getToolTip());
@@ -471,8 +447,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     /** Returns drbd graph in a panel. */
     @Override
     public JPanel getGraphicalView() {
-        if (selectedBD != null) {
-            getBrowser().getDrbdGraph().pickBlockDevice(selectedBD);
+        if (selectedBlockDevice != null) {
+            getBrowser().getDrbdGraph().pickBlockDevice(selectedBlockDevice);
         }
         return getBrowser().getDrbdGraph().getGraphPanel();
     }
@@ -484,19 +460,18 @@ public class GlobalInfo extends AbstractDrbdInfo {
      */
     @Override
     public void selectMyself() {
-        if (selectedBD == null || !selectedBD.getBlockDevice().isDrbd()) {
+        if (selectedBlockDevice == null || !selectedBlockDevice.getBlockDevice().isDrbd()) {
             getBrowser().reloadNode(getNode(), true);
             getBrowser().nodeChanged(getNode());
         } else {
-            getBrowser().reloadNode(selectedBD.getNode(), true);
-            getBrowser().nodeChanged(selectedBD.getNode());
+            getBrowser().reloadNode(selectedBlockDevice.getNode(), true);
+            getBrowser().nodeChanged(selectedBlockDevice.getNode());
         }
     }
 
     /** Returns new drbd resource index, the one that is not used . */
     private int getNewDrbdResourceIndex() {
-        final Iterator<String> it =
-                         getBrowser().getDrbdResourceNameHash().keySet().iterator();
+        final Iterator<String> it = getBrowser().getDrbdResourceNameHash().keySet().iterator();
         int index = -1;
 
         while (it.hasNext()) {
@@ -518,10 +493,10 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     /** Adds existing drbd volume to the GUI. */
     public VolumeInfo addDrbdVolume(final ResourceInfo dri,
-                                        final String volumeNr,
-                                        final String drbdDevStr,
-                                        final List<BlockDevInfo> blockDevInfos,
-                                        final Application.RunMode runMode) {
+                                    final String volumeNr,
+                                    final String drbdDevStr,
+                                    final List<BlockDevInfo> blockDevInfos,
+                                    final Application.RunMode runMode) {
         final VolumeInfo volumeInfo = volumeInfoProvider.get();
         volumeInfo.init(volumeNr, drbdDevStr, dri, blockDevInfos, getBrowser());
         dri.addDrbdVolume(volumeInfo);
@@ -586,11 +561,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     }
 
     /** Return new DRBD volume info object. */
-    public VolumeInfo getNewDrbdVolume(
-                                    final ResourceInfo dri,
-                                    final List<BlockDevInfo> blockDevInfos) {
-        final Map<String, VolumeInfo> drbdDevHash =
-                                                getBrowser().getDrbdDeviceHash();
+    public VolumeInfo getNewDrbdVolume(final ResourceInfo dri, final List<BlockDevInfo> blockDevInfos) {
+        final Map<String, VolumeInfo> drbdDevHash = getBrowser().getDrbdDeviceHash();
         int index = 0;
         String drbdDevStr = "/dev/drbd" + Integer.toString(index);
 
@@ -608,14 +580,11 @@ public class GlobalInfo extends AbstractDrbdInfo {
     /** Add DRBD resource. */
     public void addDrbdResource(final ResourceInfo dri) {
         final String name = dri.getName();
-        dri.getDrbdResource().setDefaultValue(
-                                        ResourceInfo.DRBD_RES_PARAM_NAME,
-                                        new StringValue(name));
+        dri.getDrbdResource().setDefaultValue(ResourceInfo.DRBD_RES_PARAM_NAME, new StringValue(name));
         getBrowser().getDrbdResourceNameHash().put(name, dri);
         getBrowser().putDrbdResHash();
 
-        final DefaultMutableTreeNode drbdResourceNode =
-                                           new DefaultMutableTreeNode(dri);
+        final DefaultMutableTreeNode drbdResourceNode = new DefaultMutableTreeNode(dri);
         getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
         application.invokeLater(new Runnable() {
@@ -637,8 +606,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi1.setDrbd(true);
         bdi1.setDrbdVolumeInfo(dvi);
-        bdi1.getBlockDevice().setDrbdBlockDevice(
-                bdi1.getHost().getDrbdBlockDevice(device));
+        bdi1.getBlockDevice().setDrbdBlockDevice(bdi1.getHost().getDrbdBlockDevice(device));
         bdi1.cleanup();
         bdi1.resetInfoPanel();
         bdi1.setInfoPanel(null); /* reload panel */
@@ -647,26 +615,22 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi2.setDrbd(true);
         bdi2.setDrbdVolumeInfo(dvi);
-        bdi2.getBlockDevice().setDrbdBlockDevice(
-                bdi2.getHost().getDrbdBlockDevice(device));
+        bdi2.getBlockDevice().setDrbdBlockDevice(bdi2.getHost().getDrbdBlockDevice(device));
         bdi2.cleanup();
         bdi2.resetInfoPanel();
         bdi2.setInfoPanel(null); /* reload panel */
 
         bdi2.getInfoPanel();
 
-        final DefaultMutableTreeNode drbdVolumeNode =
-                                           new DefaultMutableTreeNode(dvi);
+        final DefaultMutableTreeNode drbdVolumeNode = new DefaultMutableTreeNode(dvi);
         dvi.setNode(drbdVolumeNode);
 
         application.isSwingThread();
         dvi.getDrbdResourceInfo().getNode().add(drbdVolumeNode);
 
-        final DefaultMutableTreeNode drbdBDNode1 =
-                                           new DefaultMutableTreeNode(bdi1);
+        final DefaultMutableTreeNode drbdBDNode1 = new DefaultMutableTreeNode(bdi1);
         bdi1.setNode(drbdBDNode1);
-        final DefaultMutableTreeNode drbdBDNode2 =
-                                           new DefaultMutableTreeNode(bdi2);
+        final DefaultMutableTreeNode drbdBDNode2 = new DefaultMutableTreeNode(bdi2);
         bdi2.setNode(drbdBDNode2);
         drbdVolumeNode.add(drbdBDNode1);
         drbdVolumeNode.add(drbdBDNode2);
@@ -677,9 +641,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
     }
 
     /** Adds existing drbd resource to the GUI. */
-    public ResourceInfo addDrbdResource(final String name,
-                                            final Set<Host> hosts,
-                                            final Application.RunMode runMode) {
+    public ResourceInfo addDrbdResource(final String name, final Set<Host> hosts, final Application.RunMode runMode) {
         final DrbdXml dxml = getBrowser().getDrbdXml();
         final ResourceInfo resourceInfo = resourceInfoProvider.get();
         resourceInfo.init(name, hosts, getBrowser());
@@ -708,15 +670,12 @@ public class GlobalInfo extends AbstractDrbdInfo {
      * otherwise all parameters will be checked.
      */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         final Check check = new Check(incorrect, changed);
         for (final ResourceInfo dri : getDrbdResources()) {
-            check.addCheck(dri.checkResourceFields(param,
-                                                   dri.getParametersFromXML(),
-                                                   true));
+            check.addCheck(dri.checkResourceFields(param, dri.getParametersFromXML(), true));
         }
         if (getBrowser().getDrbdResourceNameHash().isEmpty()) {
             getBrowser().putDrbdResHash();
@@ -753,8 +712,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
     /** Returns all drbd resources in this cluster. */
     public Collection<ResourceInfo> getDrbdResources() {
-        final Collection<ResourceInfo> resources =
-                                        new LinkedHashSet<ResourceInfo>();
+        final Collection<ResourceInfo> resources = new LinkedHashSet<ResourceInfo>();
         final Host[] hosts = getCluster().getHostsArray();
         for (final ResourceInfo dri : getBrowser().getDrbdResHashValues()) {
             for (final Host host : hosts) {
@@ -886,8 +844,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
             final StringBuilder global = new StringBuilder(80);
             final DrbdXml dxml = getBrowser().getDrbdXml();
             /* global options */
-            final String[] params =
-                                dxml.getSectionParams(DrbdXml.GLOBAL_SECTION);
+            final String[] params = dxml.getSectionParams(DrbdXml.GLOBAL_SECTION);
             global.append("global {\n");
             final boolean volumesAvailable = host.hasVolumes();
             for (final String param : params) {
@@ -901,10 +858,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 }
                 if (!value.equals(dxml.getParamDefault(param))) {
                     if ("disable-ip-verification".equals(param)
-                        || (!volumesAvailable
-                            && (isCheckBox(param)
-                                || "booleanhandler".equals(
-                                                       getParamType(param))))) {
+                        || (!volumesAvailable && (isCheckBox(param) || "booleanhandler".equals(getParamType(param))))) {
                         if (value.equals(DrbdXml.CONFIG_YES)) {
                             /* boolean parameter */
                             global.append("\t\t").append(param).append(";\n");
@@ -932,11 +886,9 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 commonSectionConfig = "\ncommon {\n" + common + '}';
             }
 
-            final Map<String, String> resConfigs =
-                                           new LinkedHashMap<String, String>();
+            final Map<String, String> resConfigs = new LinkedHashMap<String, String>();
             final Set<Host> proxyHosts = getCluster().getProxyHosts();
-            for (final ResourceInfo dri
-                                       : getBrowser().getDrbdResHashValues()) {
+            for (final ResourceInfo dri : getBrowser().getDrbdResHashValues()) {
                 if (dri.resourceInHost(host) || proxyHosts.contains(host)) {
                     final String rConf = dri.drbdResourceConfig(host);
                     resConfigs.put(dri.getName(), rConf);
@@ -963,11 +915,9 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 configName = "drbd.conf";
                 makeBackup = true;
                 if (bigDRBDConf) {
-                    preCommand =
-                        "mv /etc/drbd.d{,.bak.`date +'%s'`} 2>/dev/null";
+                    preCommand = "mv /etc/drbd.d{,.bak.`date +'%s'`} 2>/dev/null";
                 } else {
-                    preCommand =
-                        "cp -r /etc/drbd.d{,.bak.`date +'%s'`} 2>/dev/null";
+                    preCommand = "cp -r /etc/drbd.d{,.bak.`date +'%s'`} 2>/dev/null";
                 }
             }
             if (bigDRBDConf) {
@@ -975,8 +925,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 host.getSSH().createConfig(globalConfig
                                            + commonSectionConfig
                                            + "\n\n"
-                                           + Tools.join("\n",
-                                                        resConfigs.values()),
+                                           + Tools.join("\n", resConfigs.values()),
                                            configName,
                                            dir,
                                            "0600",
@@ -985,8 +934,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                                            null);
             } else {
                 /* global */
-                host.getSSH().createConfig(globalConfig
-                                           + commonSectionConfig,
+                host.getSSH().createConfig(globalConfig + commonSectionConfig,
                                            "global_common.conf",
                                            dir + "drbd.d.temp/",
                                            "0600",
@@ -1020,8 +968,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
                 final StringBuilder drbdConf = new StringBuilder(200);
                 /* drbd.conf -> drbd.d.temp/ (new config) */
                 drbdConf.append("## generated by drbd-gui\n\n");
-                drbdConf.append(
-                            "include \"drbd.d.temp/global_common.conf\";\n");
+                drbdConf.append("include \"drbd.d.temp/global_common.conf\";\n");
                 drbdConf.append("include \"drbd.d.temp/*.res\";");
                 host.getSSH().createConfig(
                                drbdConf.toString(),
@@ -1038,5 +985,4 @@ public class GlobalInfo extends AbstractDrbdInfo {
             }
         }
     }
-
 }

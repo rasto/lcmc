@@ -49,13 +49,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-final class HbColocationInfo extends EditableInfo
-                             implements HbConstraintInterface {
-    /** Resource 1 in colocation constraint. */
+final class HbColocationInfo extends EditableInfo implements HbConstraintInterface {
     private ServiceInfo serviceInfoRsc;
-    /** Resource 2 in colocation constraint. */
     private ServiceInfo serviceInfoWithRsc;
-    /** Connection that keeps this constraint. */
     private HbConnectionInfo connectionInfo;
 
     void init(final HbConnectionInfo connectionInfo,
@@ -69,34 +65,27 @@ final class HbColocationInfo extends EditableInfo
         this.serviceInfoWithRsc = serviceInfoWithRsc;
     }
 
-    /** Sets service info of the resource. */
     void setServiceInfoRsc(final ServiceInfo serviceInfoRsc) {
         this.serviceInfoRsc = serviceInfoRsc;
     }
 
-    /** Sets service info of the with-resource. */
     void setServiceInfoWithRsc(final ServiceInfo serviceInfoWithRsc) {
         this.serviceInfoWithRsc = serviceInfoWithRsc;
     }
 
-    /** Returns browser object of this info. */
     @Override
     public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
     }
 
-
-    /** Sets the colocation's parameters. */
     void setParameters() {
         final ClusterStatus clStatus = getBrowser().getClusterStatus();
         final String colId = getService().getCrmId();
         final Map<String, Value> resourceNode = new HashMap<String, Value>();
 
-        if (serviceInfoRsc == null
-            || serviceInfoWithRsc == null) {
+        if (serviceInfoRsc == null || serviceInfoWithRsc == null) {
             /* rsc set placeholder */
-            final CrmXml.ColocationData colocationData =
-                            clStatus.getColocationData(colId);
+            final CrmXml.ColocationData colocationData = clStatus.getColocationData(colId);
             final String score = colocationData.getScore();
             resourceNode.put(CrmXml.SCORE_CONSTRAINT_PARAM, new StringValue(score));
         } else if (serviceInfoRsc.isConstraintPlaceholder()
@@ -114,8 +103,7 @@ final class HbColocationInfo extends EditableInfo
             resourceNode.put("sequential", new StringValue(rscSet.getSequential()));
             resourceNode.put("role", new StringValue(rscSet.getColocationRole()));
         } else {
-            final CrmXml.ColocationData colocationData =
-                            clStatus.getColocationData(colId);
+            final CrmXml.ColocationData colocationData = clStatus.getColocationData(colId);
             if (colocationData != null) {
                 final String score = colocationData.getScore();
                 final String rscRole = colocationData.getRscRole();
@@ -126,7 +114,6 @@ final class HbColocationInfo extends EditableInfo
                 resourceNode.put("with-rsc-role", new StringValue(withRscRole));
             }
         }
-
 
         final String[] params = getParametersFromXML();
         if (params != null) {
@@ -147,7 +134,6 @@ final class HbColocationInfo extends EditableInfo
         }
     }
 
-    /** Returns that this is order constraint. */
     @Override
     public boolean isOrder() {
         return false;
@@ -159,16 +145,10 @@ final class HbColocationInfo extends EditableInfo
      */
     @Override
     protected String getParamLongDesc(final String param) {
-
-        final String text =
-                    getBrowser().getCrmXml().getColocationParamLongDesc(param);
+        final String text = getBrowser().getCrmXml().getColocationParamLongDesc(param);
         if (serviceInfoRsc != null && serviceInfoWithRsc != null) {
-            return text.replaceAll("@RSC@",
-                                   Matcher.quoteReplacement(
-                                            serviceInfoRsc.toString()))
-                       .replaceAll("@WITH-RSC@",
-                                   Matcher.quoteReplacement(
-                                            serviceInfoWithRsc.toString()));
+            return text.replaceAll("@RSC@", Matcher.quoteReplacement(serviceInfoRsc.toString()))
+                       .replaceAll("@WITH-RSC@", Matcher.quoteReplacement(serviceInfoWithRsc.toString()));
         }
         return text;
     }
@@ -188,27 +168,22 @@ final class HbColocationInfo extends EditableInfo
         return getBrowser().getCrmXml().checkColocationParam(param, newValue);
     }
 
-    /** Returns default for this parameter. */
     @Override
     protected Value getParamDefault(final String param) {
         return getBrowser().getCrmXml().getColocationParamDefault(param);
     }
 
-    /** Returns preferred value for this parameter. */
     @Override
     protected Value getParamPreferred(final String param) {
         return getBrowser().getCrmXml().getColocationParamPreferred(param);
     }
 
-    /** Returns lsit of all parameters as an array. */
     @Override
     public String[] getParametersFromXML() {
-        if (serviceInfoRsc == null
-            || serviceInfoWithRsc == null) {
+        if (serviceInfoRsc == null || serviceInfoWithRsc == null) {
             /* rsc set colocation */
             return getBrowser().getCrmXml().getResourceSetColocationParameters();
-        } else if (serviceInfoRsc.isConstraintPlaceholder()
-                   || serviceInfoWithRsc.isConstraintPlaceholder()) {
+        } else if (serviceInfoRsc.isConstraintPlaceholder() || serviceInfoWithRsc.isConstraintPlaceholder()) {
             /* when rsc set edges are clicked */
             return getBrowser().getCrmXml().getResourceSetColConnectionParameters();
         } else {
@@ -230,7 +205,6 @@ final class HbColocationInfo extends EditableInfo
         return rscSet != null && getBrowser().isOneMaster(rscSet.getRscIds());
     }
 
-
     /**
      * Possible choices for pulldown menus, or null if it is not a pull
      * down menu.
@@ -238,21 +212,15 @@ final class HbColocationInfo extends EditableInfo
     @Override
     protected Value[] getParamPossibleChoices(final String param) {
         if ("role".equals(param)) {
-            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
-                    param,
-                    isRscSetMaster());
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(param, isRscSetMaster());
         } else if ("with-rsc-role".equals(param)) {
-            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
-                    param,
-                    serviceInfoWithRsc.getService().isMaster());
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(param,
+                                                                        serviceInfoWithRsc.getService().isMaster());
         } else if ("rsc-role".equals(param)) {
-            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
-                    param,
-                    serviceInfoRsc.getService().isMaster());
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(param,
+                                                                              serviceInfoRsc.getService().isMaster());
         } else {
-            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(
-                    param,
-                    false);
+            return getBrowser().getCrmXml().getColocationParamComboBoxChoices(param, false);
         }
     }
 
@@ -339,16 +307,11 @@ final class HbColocationInfo extends EditableInfo
                               false,
                               null,
                               false,
-                              prsi.getAllAttributes(dcHost,
-                                                    null,
-                                                    null,
-                                                    true,
-                                                    runMode),
+                              prsi.getAllAttributes(dcHost, null, null, true, runMode),
                               null,
                               attrs,
                               runMode);
-            } else if (serviceInfoRsc.isConstraintPlaceholder()
-                       || serviceInfoWithRsc.isConstraintPlaceholder()) {
+            } else if (serviceInfoRsc.isConstraintPlaceholder() || serviceInfoWithRsc.isConstraintPlaceholder()) {
                 /* edge */
                 final ConstraintPHInfo cphi;
                 final CrmXml.RscSet rscSet;
@@ -366,11 +329,7 @@ final class HbColocationInfo extends EditableInfo
                               false,
                               null,
                               false,
-                              prsi.getAllAttributes(dcHost,
-                                                    rscSet,
-                                                    attrs,
-                                                    true,
-                                                    runMode),
+                              prsi.getAllAttributes(dcHost, rscSet, attrs, true, runMode),
                               null,
                               prsi.getColocationAttributes(colId),
                               runMode);
@@ -453,47 +412,33 @@ final class HbColocationInfo extends EditableInfo
         return Integer.parseInt(score);
     }
 
-    /** Returns whether this parameter is advanced. */
     @Override
     protected boolean isAdvanced(final String param) {
         return true;
     }
 
-    /** Whether the parameter should be enabled. */
     @Override
     protected String isEnabled(final String param) {
         return null;
     }
 
-    /** Returns access type of this parameter. */
     @Override
     protected Application.AccessType getAccessType(final String param) {
         return Application.AccessType.ADMIN;
     }
 
-    /** Whether the parameter should be enabled only in advanced mode. */
     @Override
     protected boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
     }
 
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
     @Override
     public Check checkResourceFields(final String param, final String[] params) {
         return checkResourceFields(param, params, false);
     }
 
-    /**
-     * Checks resource fields of all constraints that are in this
-     * connection with this constraint.
-     */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params,
-                                     final boolean fromUp) {
+    public Check checkResourceFields(final String param, final String[] params, final boolean fromUp) {
         if (fromUp) {
             return super.checkResourceFields(param, params);
         } else {

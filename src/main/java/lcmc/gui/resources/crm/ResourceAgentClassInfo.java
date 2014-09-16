@@ -52,9 +52,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ResourceAgentClassInfo extends HbCategoryInfo {
-    /** Back to overview icon. */
-    private static final ImageIcon BACK_ICON = Tools.createImageIcon(
-                                            Tools.getDefault("BackIcon"));
+    private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     /** Map from ResourceAgent name to its object. It is possible only within
      * a class. */
     private final Map<String, ResourceAgent> raMap = new HashMap<String, ResourceAgent>();
@@ -70,7 +68,6 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
         }
     }
 
-    /** Returns columns for the table. */
     @Override
     protected String[] getColumnNames(final String tableName) {
         return new String[]{"Name", "Provider"};
@@ -81,11 +78,9 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
     protected Object[][] getTableData(final String tableName) {
         final List<Object[]> rows = new ArrayList<Object[]>();
         /** Get classes */
-        for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(
-                                                                  getName())) {
+        for (final ResourceAgent ra : getBrowser().getCrmXml().getServices(getName())) {
             final MyButton nameLabel = widgetFactory.createButton(ra.getServiceName());
-            rows.add(new Object[]{nameLabel,
-                                  ra.getProvider()});
+            rows.add(new Object[]{nameLabel, ra.getProvider()});
         }
         return rows.toArray(new Object[rows.size()][]);
     }
@@ -98,32 +93,26 @@ public final class ResourceAgentClassInfo extends HbCategoryInfo {
 
     /** Execute when row in the table was clicked. */
     @Override
-    protected void rowClicked(final String tableName,
-                              final String key,
-                              final int column) {
+    protected void rowClicked(final String tableName, final String key, final int column) {
         final ResourceAgent ra = raMap.get(key);
         if (ra != null) {
-            final AvailableServiceInfo asi =
-                                  getBrowser().getAvailableServiceInfoMap(ra);
+            final AvailableServiceInfo asi = getBrowser().getAvailableServiceInfoMap(ra);
             if (asi != null) {
                 asi.selectMyself();
             }
         }
     }
 
-    /** Returns back button. */
     @Override
     protected JComponent getBackButton() {
-        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING,
-                                                             0,
-                                                             0));
+        final JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
         buttonPanel.setBackground(ClusterBrowser.BUTTON_PANEL_BACKGROUND);
         buttonPanel.setMinimumSize(new Dimension(0, 50));
         buttonPanel.setPreferredSize(new Dimension(0, 50));
         buttonPanel.setMaximumSize(new Dimension(Short.MAX_VALUE, 50));
         final MyButton overviewButton = widgetFactory.createButton(
-                     Tools.getString("ClusterBrowser.ClassesOverviewButton"),
-                     BACK_ICON);
+                                                            Tools.getString("ClusterBrowser.ClassesOverviewButton"),
+                                                            BACK_TO_OVERVIEW_ICON);
         overviewButton.setPreferredSize(new Dimension(application.scaled(180), 50));
         overviewButton.addActionListener(new ActionListener() {
             @Override

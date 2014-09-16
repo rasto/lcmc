@@ -63,84 +63,24 @@ import javax.inject.Provider;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class BlockDevMenu {
-    /**
-     * Logger.
-     */
-    private static final Logger LOG =
-            LoggerFactory.getLogger(BlockDevMenu.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BlockDevMenu.class);
 
-    /**
-     * Name of the create PV menu item.
-     */
     private static final String PV_CREATE_MENU_ITEM = "Create PV";
-    /**
-     * Description.
-     */
-    private static final String PV_CREATE_MENU_DESCRIPTION =
-            "Initialize a disk or partition for use by LVM.";
-    /**
-     * Name of the remove PV menu item.
-     */
+    private static final String PV_CREATE_MENU_DESCRIPTION = "Initialize a disk or partition for use by LVM.";
     private static final String PV_REMOVE_MENU_ITEM = "Remove PV";
-    /**
-     * Description.
-     */
-    private static final String PV_REMOVE_MENU_DESCRIPTION =
-            "Remove a physical volume.";
-    /**
-     * Name of the create VG menu item.
-     */
+    private static final String PV_REMOVE_MENU_DESCRIPTION = "Remove a physical volume.";
     private static final String VG_CREATE_MENU_ITEM = "Create VG";
-    /**
-     * Description create VG.
-     */
-    private static final String VG_CREATE_MENU_DESCRIPTION =
-            "Create a volume group.";
-    /**
-     * Name of the remove VG menu item.
-     */
+    private static final String VG_CREATE_MENU_DESCRIPTION = "Create a volume group.";
     private static final String VG_REMOVE_MENU_ITEM = "Remove VG";
-    /**
-     * Description.
-     */
-    private static final String VG_REMOVE_MENU_DESCRIPTION =
-            "Remove a volume group.";
-    /**
-     * Name of the create menu item.
-     */
+    private static final String VG_REMOVE_MENU_DESCRIPTION = "Remove a volume group.";
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
-    /**
-     * Description create LV.
-     */
-    private static final String LV_CREATE_MENU_DESCRIPTION =
-            "Create a logical volume.";
-    /**
-     * Name of the LV remove menu item.
-     */
+    private static final String LV_CREATE_MENU_DESCRIPTION = "Create a logical volume.";
     private static final String LV_REMOVE_MENU_ITEM = "Remove LV";
-    /**
-     * Description for LV remove.
-     */
-    private static final String LV_REMOVE_MENU_DESCRIPTION =
-            "Remove the logical volume";
-    /**
-     * Name of the resize menu item.
-     */
+    private static final String LV_REMOVE_MENU_DESCRIPTION = "Remove the logical volume";
     private static final String LV_RESIZE_MENU_ITEM = "Resize LV";
-    /**
-     * Description LVM resize.
-     */
-    private static final String LV_RESIZE_MENU_DESCRIPTION =
-            "Resize the logical volume";
-    /**
-     * Name of the snapshot menu item.
-     */
+    private static final String LV_RESIZE_MENU_DESCRIPTION = "Resize the logical volume";
     private static final String LV_SNAPSHOT_MENU_ITEM = "Create LV Snapshot ";
-    /**
-     * Description LV snapshot.
-     */
-    private static final String LV_SNAPSHOT_MENU_DESCRIPTION =
-            "Create a snapshot of the logical volume.";
+    private static final String LV_SNAPSHOT_MENU_DESCRIPTION = "Create a snapshot of the logical volume.";
 
     private BlockDevInfo blockDevInfo;
     @Autowired
@@ -266,23 +206,14 @@ public class BlockDevMenu {
             }
         });
         items.add(repMenuItem);
-        /* PV Create */
         items.add(getPVCreateItem());
-        /* PV Remove */
         items.add(getPVRemoveItem());
-        /* VG Create */
         items.add(getVGCreateItem());
-        /* VG Remove */
         items.add(getVGRemoveItem());
-        /* LV Create */
         items.add(getLVCreateItem());
-        /* LV Remove */
         items.add(getLVRemoveItem());
-        /* LV Resize */
         items.add(getLVResizeItem());
-        /* LV Snapshot */
         items.add(getLVSnapshotItem());
-        /* attach / detach */
         final MyMenuItem attachMenu =
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.Detach"),
                         BlockDevInfo.NO_HARDDISK_ICON_LARGE,
@@ -312,8 +243,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode()
-                                        && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (getBlockDevice().isSyncing()) {
@@ -381,10 +311,10 @@ public class BlockDevMenu {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 if (!getBlockDevice().isSyncing()
-                                        || ((getBlockDevice().isPrimary()
-                                        && getBlockDevice().isSyncSource())
-                                        || (blockDevInfo.getOtherBlockDevInfo().getBlockDevice().isPrimary()
-                                        && getBlockDevice().isSyncTarget()))) {
+                                    || ((getBlockDevice().isPrimary()
+                                         && getBlockDevice().isSyncSource())
+                                         || (blockDevInfo.getOtherBlockDevInfo().getBlockDevice().isPrimary()
+                                         && getBlockDevice().isSyncTarget()))) {
                                     return null;
                                 } else {
                                     return VolumeInfo.IS_SYNCING_STRING;
@@ -530,8 +460,7 @@ public class BlockDevMenu {
                                 if (!getBlockDevice().isDrbd()) {
                                     return BlockDevInfo.NO_DRBD_RESOURCE_STRING;
                                 }
-                                if (!application.isAdvancedMode()
-                                        && getDrbdResourceInfo().isUsedByCRM()) {
+                                if (!application.isAdvancedMode() && getDrbdResourceInfo().isUsedByCRM()) {
                                     return VolumeInfo.IS_USED_BY_CRM_STRING;
                                 }
                                 return null;
@@ -839,8 +768,7 @@ public class BlockDevMenu {
     /**
      * Returns 'add drbd resource' menu item.
      */
-    private MyMenuItem addDrbdResourceMenuItem(final BlockDevInfo oBdi,
-                                               final Application.RunMode runMode) {
+    private MyMenuItem addDrbdResourceMenuItem(final BlockDevInfo oBdi, final Application.RunMode runMode) {
         final MyMenuItem drbdResourceMenuItem = menuFactory.createMenuItem(oBdi.toString(),
                 null,
                 null,
@@ -861,9 +789,6 @@ public class BlockDevMenu {
         return drbdResourceMenuItem;
     }
 
-    /**
-     * Returns 'PV create' menu item.
-     */
     private UpdatableItem getPVCreateItem() {
         return menuFactory.createMenuItem(PV_CREATE_MENU_ITEM,
                 null,
@@ -898,9 +823,6 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Returns 'PV remove' menu item.
-     */
     private UpdatableItem getPVRemoveItem() {
         return menuFactory.createMenuItem(PV_REMOVE_MENU_ITEM,
                 null,
@@ -936,9 +858,6 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Returns 'vg create' menu item.
-     */
     private UpdatableItem getVGCreateItem() {
         return menuFactory.createMenuItem(
                 VG_CREATE_MENU_ITEM,
@@ -988,9 +907,6 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Returns 'VG remove' menu item.
-     */
     private UpdatableItem getVGRemoveItem() {
         return menuFactory.createMenuItem(VG_REMOVE_MENU_ITEM,
                 null,
@@ -1050,9 +966,6 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Returns 'lv create' menu item.
-     */
     private UpdatableItem getLVCreateItem() {
         String name = LV_CREATE_MENU_ITEM;
         final String vgName = blockDevInfo.getVGName();
@@ -1105,9 +1018,6 @@ public class BlockDevMenu {
         return mi;
     }
 
-    /**
-     * Returns 'LV remove' menu item.
-     */
     private UpdatableItem getLVRemoveItem() {
         return menuFactory.createMenuItem(LV_REMOVE_MENU_ITEM,
                 null,
@@ -1153,9 +1063,6 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Returns 'LV remove' menu item.
-     */
     private UpdatableItem getLVResizeItem() {
         return menuFactory.createMenuItem(LV_RESIZE_MENU_ITEM,
                 null,
@@ -1192,9 +1099,6 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Returns 'LV snapshot' menu item.
-     */
     private UpdatableItem getLVSnapshotItem() {
         return menuFactory.createMenuItem(LV_SNAPSHOT_MENU_ITEM,
                 null,
@@ -1231,16 +1135,12 @@ public class BlockDevMenu {
                 });
     }
 
-    /**
-     * Tool tip for menu items.
-     */
     private String getMenuToolTip(final String cmd) {
         if (getBlockDevice().isDrbd()) {
-            return DRBD.getDistCommand(
-                    cmd,
-                    getHost(),
-                    getDrbdResourceInfo().getName(),
-                    getDrbdVolumeInfo().getName()).replaceAll("@.*?@", "");
+            return DRBD.getDistCommand(cmd,
+                                       getHost(),
+                                       getDrbdResourceInfo().getName(),
+                                       getDrbdVolumeInfo().getName()).replaceAll("@.*?@", "");
         } else {
             return null;
         }

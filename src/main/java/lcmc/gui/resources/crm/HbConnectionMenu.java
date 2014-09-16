@@ -217,9 +217,9 @@ public class HbConnectionMenu {
                             if (getBrowser().getCrmGraph().isColocation(hbConnectionInfo)) {
                                 getBrowser().getCrmGraph().removeColocation(hbConnectionInfo, dcHost, Application.RunMode.TEST);
                             } else {
-                        /* add colocation */
-                        /* there is order constraint so let's get the endpoints
-                         * from it. */
+                                /* add colocation */
+                                /* there is order constraint so let's get the endpoints
+                                 * from it. */
                                 hbConnectionInfo.addColocation(null,
                                         hbConnectionInfo.getLastServiceInfoParent(),
                                         hbConnectionInfo.getLastServiceInfoChild());

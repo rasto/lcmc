@@ -55,10 +55,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 final class PcmkRscSetsInfo extends HbConnectionInfo {
-    /** Placeholders. */
-    private final Collection<ConstraintPHInfo> constraintPHInfos =
-                                          new LinkedHashSet<ConstraintPHInfo>();
-    /** constraints lock. */
+    private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
     private final Lock mConstraintPHLock = new ReentrantLock();
     @Autowired
     private Application application;
@@ -74,8 +71,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
     }
 
     /** Adds a new rsc set colocation. */
-    void addColocation(final String colId,
-                                 final ConstraintPHInfo cphi) {
+    void addColocation(final String colId, final ConstraintPHInfo cphi) {
         mConstraintPHLock.lock();
         try {
             constraintPHInfos.add(cphi);
@@ -96,12 +92,11 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         addOrder(ordId, null, null);
     }
 
-    /** Returns info panel. */
     JComponent getInfoPanel(final ConstraintPHInfo constraintPHInfo) {
         return super.getInfoPanel();
     }
 
-    /** Returns panal with user visible info. */
+    /** Returns panel with user visible info. */
     @Override
     protected JPanel getLabels(final HbConstraintInterface c) {
         final JPanel panel = getParamPanel(c.getName());
@@ -129,7 +124,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                                         final boolean isColocation,
                                         final Application.RunMode runMode) {
         final Map<CrmXml.RscSet, Map<String, String>> rscSetsAttrs =
-                       new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+                                                           new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
         if (isColocation) {
             for (final ConstraintPHInfo cphi : allCphis) {
@@ -140,9 +135,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         } else {
             for (int i = allCphis.size() - 1; i >= 0; i--) {
                 for (final Boolean first : new Boolean[]{true, false}) {
-                    allCphis.get(i).getAttributes(isColocation,
-                                                  first,
-                                                  rscSetsAttrs);
+                    allCphis.get(i).getAttributes(isColocation, first, rscSetsAttrs);
                 }
             }
         }
@@ -150,33 +143,26 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         return rscSetsAttrs;
     }
 
-    /** Returns copy of all constraint placeholders. */
     private List<ConstraintPHInfo> getAllConstrainPHInfos() {
-        final Map<String, ServiceInfo> idToInfoHash =
-             getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
-        final List<ConstraintPHInfo> allCphis =
-                                            new ArrayList<ConstraintPHInfo>();
+        final Map<String, ServiceInfo> idToInfoHash = getBrowser().getNameToServiceInfoHash(ConstraintPHInfo.NAME);
+        final List<ConstraintPHInfo> allCphis = new ArrayList<ConstraintPHInfo>();
         if (idToInfoHash != null) {
             for (final Map.Entry<String, ServiceInfo> phEntry : idToInfoHash.entrySet()) {
-                final ConstraintPHInfo cphi =
-                                   (ConstraintPHInfo) phEntry.getValue();
+                final ConstraintPHInfo cphi = (ConstraintPHInfo) phEntry.getValue();
                 allCphis.add(cphi);
             }
         }
         return allCphis;
     }
 
-    /** Applies changes to the placeholders. */
     @Override
     void apply(final Host dcHost, final Application.RunMode runMode) {
         super.apply(dcHost, runMode);
         final List<ConstraintPHInfo> allCphis = getAllConstrainPHInfos();
         mConstraintPHLock.lock();
-        final Map<ServiceInfo, ServiceInfo> parentToChild =
-                            new HashMap<ServiceInfo, ServiceInfo>();
+        final Map<ServiceInfo, ServiceInfo> parentToChild = new HashMap<ServiceInfo, ServiceInfo>();
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
-            final Set<ServiceInfo> cphiParents =
-                                    getBrowser().getCrmGraph().getParents(cphi);
+            final Set<ServiceInfo> cphiParents = getBrowser().getCrmGraph().getParents(cphi);
             boolean startComparing = false;
             for (final ConstraintPHInfo withCphi : allCphis) {
                 if (cphi == withCphi) {
@@ -186,10 +172,8 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
                 if (!startComparing) {
                     continue;
                 }
-                final Set<ServiceInfo> withCphiChildren =
-                             getBrowser().getCrmGraph().getChildren(withCphi);
-                if (Tools.serviceInfoListEquals(cphiParents,
-                                                withCphiChildren)) {
+                final Set<ServiceInfo> withCphiChildren = getBrowser().getCrmGraph().getChildren(withCphi);
+                if (Tools.serviceInfoListEquals(cphiParents, withCphiChildren)) {
                     parentToChild.put(cphi, withCphi);
                     break;
                 }
@@ -200,29 +184,26 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         for (final ConstraintPHInfo cphi : constraintPHInfos) {
             if (cphi.getService().isNew()) {
                 //cphi.apply(dcHost, runMode);
-                final List<CrmXml.RscSet> sets =
-                 cphi.addConstraintWithPlaceholder(
-                        getBrowser().getCrmGraph().getChildrenAndParents(cphi),
-                        getBrowser().getCrmGraph().getParents(cphi),
-                        true, /* colocation */
-                        true, /* order */
-                        dcHost,
-                        false,
-                        runMode);
+                final List<CrmXml.RscSet> sets = cphi.addConstraintWithPlaceholder(
+                                    getBrowser().getCrmGraph().getChildrenAndParents(cphi),
+                                    getBrowser().getCrmGraph().getParents(cphi),
+                                    true, /* colocation */
+                                    true, /* order */
+                                    dcHost,
+                                    false,
+                                    runMode);
                 rscSetsCol.add(sets.get(0)); /* col1 */
                 rscSetsOrd.add(0, sets.get(3)); /* ord2 */
                 ConstraintPHInfo parent = cphi;
                 if (parentToChild.containsKey(parent)) {
                     List<CrmXml.RscSet> childSets = null;
                     while (parentToChild.containsKey(parent)) {
-                        final ConstraintPHInfo child =
-                            (ConstraintPHInfo) parentToChild.get(parent);
+                        final ConstraintPHInfo child = (ConstraintPHInfo) parentToChild.get(parent);
                         if (child.getService().isNew()) {
                             //child.apply(dcHost, runMode);
                             childSets =
                              child.addConstraintWithPlaceholder(
-                                  getBrowser().getCrmGraph()
-                                              .getChildrenAndParents(child),
+                                  getBrowser().getCrmGraph().getChildrenAndParents(child),
                                   getBrowser().getCrmGraph().getParents(child),
                                   true, /* colocation */
                                   true, /* order */
@@ -248,12 +229,11 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
             }
         }
         mConstraintPHLock.unlock();
-        final Map<String, String> attrs =
-                                      new LinkedHashMap<String, String>();
+        final Map<String, String> attrs = new LinkedHashMap<String, String>();
         attrs.put(CrmXml.SCORE_CONSTRAINT_PARAM, CrmXml.INFINITY_VALUE.getValueForConfig());
         String colId = null;
         final Map<CrmXml.RscSet, Map<String, String>> rscSetsColAttrs =
-                       new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+                                                         new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
         for (final CrmXml.RscSet colSet : rscSetsCol) {
             if (colId == null && colSet != null) {
                 colId = colSet.getId();
@@ -261,7 +241,7 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
             rscSetsColAttrs.put(colSet, null);
         }
         final Map<CrmXml.RscSet, Map<String, String>> rscSetsOrdAttrs =
-                       new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
+                                                         new LinkedHashMap<CrmXml.RscSet, Map<String, String>>();
         String ordId = null;
         for (final CrmXml.RscSet ordSet : rscSetsOrd) {
             if (ordId == null && ordSet != null) {
@@ -271,29 +251,18 @@ final class PcmkRscSetsInfo extends HbConnectionInfo {
         }
         final boolean createCol = true;
         final boolean createOrd = true;
-        CRM.setRscSet(dcHost,
-                      colId,
-                      createCol,
-                      ordId,
-                      createOrd,
-                      rscSetsColAttrs,
-                      rscSetsOrdAttrs,
-                      attrs,
-                      runMode);
+        CRM.setRscSet(dcHost, colId, createCol, ordId, createOrd, rscSetsColAttrs, rscSetsOrdAttrs, attrs, runMode);
     }
 
-    /** Check order and colocation constraints. */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         final List<String> incorrect = new ArrayList<String>();
         final List<String> changed = new ArrayList<String>();
         mConstraintPHLock.lock();
         try {
             for (final ConstraintPHInfo cphi : constraintPHInfos) {
                 if (cphi.getService().isNew()
-                    && !getBrowser().getCrmGraph().getChildrenAndParents(
-                                                            cphi).isEmpty()) {
+                    && !getBrowser().getCrmGraph().getChildrenAndParents(cphi).isEmpty()) {
                     changed.add("new placeholder");
                 }
             }

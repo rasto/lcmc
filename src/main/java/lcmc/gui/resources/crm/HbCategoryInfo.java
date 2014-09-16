@@ -37,7 +37,6 @@ import org.springframework.stereotype.Component;
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HbCategoryInfo extends CategoryInfo {
 
-    /** Returns browser object of this info. */
     @Override
     public ClusterBrowser getBrowser() {
         return (ClusterBrowser) super.getBrowser();
@@ -50,7 +49,6 @@ public class HbCategoryInfo extends CategoryInfo {
         return GUIData.MIME_TYPE_TEXT_HTML;
     }
 
-    /** Returns heartbeat graph. */
     @Override
     public final JPanel getGraphicalView() {
         return getBrowser().getCrmGraph().getGraphPanel();

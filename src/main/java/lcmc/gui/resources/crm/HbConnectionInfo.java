@@ -69,29 +69,18 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class HbConnectionInfo extends EditableInfo {
-    /** Cache for the info panel. */
     private JComponent infoPanel = null;
     /** Constraints. */
-    private final Collection<HbConstraintInterface> constraints =
-                                   new ArrayList<HbConstraintInterface>();
-    /** constraints lock. */
+    private final Collection<HbConstraintInterface> constraints = new ArrayList<HbConstraintInterface>();
     private final ReadWriteLock mConstraintsLock = new ReentrantReadWriteLock();
     private final Lock mConstraintsReadLock = mConstraintsLock.readLock();
     private final Lock mConstraintsWriteLock = mConstraintsLock.writeLock();
-    /** Resource 1 in colocation constraint (the last one). */
     private ServiceInfo lastServiceInfoRsc = null;
-    /** Resource 2 in colocation constraint (the last one). */
     private ServiceInfo lastServiceInfoWithRsc = null;
-    /** Parent resource in order constraint (the last one). */
     private ServiceInfo lastServiceInfoParent = null;
-    /** Child resource in order constraint (the last one). */
     private ServiceInfo lastServiceInfoChild = null;
-    /** List of colocation ids. */
-    private final Map<String, HbColocationInfo> colocationIds =
-                                 new LinkedHashMap<String, HbColocationInfo>();
-    /** List of order ids. */
-    private final Map<String, HbOrderInfo> orderIds =
-                                      new LinkedHashMap<String, HbOrderInfo>();
+    private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<String, HbColocationInfo>();
+    private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<String, HbOrderInfo>();
     @Autowired
     private Provider<HbColocationInfo> colocationInfoProvider;
     @Autowired
@@ -113,140 +102,103 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Returns whether one of the services are newly added. */
     public final boolean isNew() {
-        return (lastServiceInfoRsc != null
-                && lastServiceInfoRsc.getService().isNew())
-                || (lastServiceInfoWithRsc != null
-                    && lastServiceInfoWithRsc.getService().isNew())
-                || (lastServiceInfoParent != null
-                    && lastServiceInfoParent.getService().isNew())
-                || (lastServiceInfoChild != null
-                    && lastServiceInfoChild.getService().isNew());
+        return (lastServiceInfoRsc != null && lastServiceInfoRsc.getService().isNew())
+                || (lastServiceInfoWithRsc != null && lastServiceInfoWithRsc.getService().isNew())
+                || (lastServiceInfoParent != null && lastServiceInfoParent.getService().isNew())
+                || (lastServiceInfoChild != null && lastServiceInfoChild.getService().isNew());
     }
 
-    /**
-     * Returns long description of the parameter, that is used for
-     * tool tips.
-     */
     @Override
     protected final String getParamLongDesc(final String param) {
         return null;
     }
 
-    /** Returns short description of the parameter, that is used as * label. */
     @Override
     protected final String getParamShortDesc(final String param) {
         return null;
     }
 
-    /**
-     * Checks if the new value is correct for the parameter type and
-     * constraints.
-     */
     @Override
-    protected final boolean checkParam(final String param,
-                                       final Value newValue) {
+    protected final boolean checkParam(final String param, final Value newValue) {
         return false;
     }
 
-    /** Returns default for this parameter. */
     @Override
     protected final Value getParamDefault(final String param) {
         return null;
     }
 
-    /** Returns preferred value for this parameter. */
     @Override
     protected final Value getParamPreferred(final String param) {
         return null;
     }
 
-    /** Returns lsit of all parameters as an array. */
     @Override
     public final String[] getParametersFromXML() {
         return null;
     }
 
-    /**
-     * Possible choices for pulldown menus, or null if it is not a pull
-     * down menu.
-     */
     @Override
     protected final Value[] getParamPossibleChoices(final String param) {
         return null;
     }
 
-    /** Returns parameter type, boolean etc. */
     @Override
     protected final String getParamType(final String param) {
         return null;
     }
 
-    /** Returns section to which the global belongs. */
     @Override
     protected final String getSection(final String param) {
         return null;
     }
 
-    /**
-     * Returns whether the parameter is of the boolean type and needs the
-     * checkbox.
-     */
     @Override
     protected final boolean isCheckBox(final String param) {
         return false;
     }
 
-    /** Returns true if the specified parameter is of time type. */
     @Override
     protected final boolean isTimeType(final String param) {
         return false;
     }
 
-    /** Returns true if the specified parameter is integer. */
     @Override
     protected final boolean isInteger(final String param) {
         return false;
     }
 
-    /** Returns true if the specified parameter is label. */
     @Override
     protected final boolean isLabel(final String param) {
         return false;
     }
 
-    /** Returns true if the specified parameter is required. */
     @Override
     protected final boolean isRequired(final String param) {
         return true;
     }
 
-    /** Returns parent resource in order constraint. */
     public final ServiceInfo getLastServiceInfoParent() {
         return lastServiceInfoParent;
     }
 
-    /** Returns child resource in order constraint. */
     public final ServiceInfo getLastServiceInfoChild() {
         return lastServiceInfoChild;
     }
 
-    /** Returns resource 1 in colocation constraint. */
     public final ServiceInfo getLastServiceInfoRsc() {
         return lastServiceInfoRsc;
     }
 
-    /** Returns resource 2 in colocation constraint. */
     public final ServiceInfo getLastServiceInfoWithRsc() {
         return lastServiceInfoWithRsc;
     }
 
-    /** Returns heartbeat graphical view. */
     @Override
     public final JPanel getGraphicalView() {
         return getBrowser().getCrmGraph().getGraphPanel();
     }
 
-    /** Applies the changes to the constraints. */
     void apply(final Host dcHost, final Application.RunMode runMode) {
         if (Application.isLive(runMode)) {
             application.invokeAndWait(new Runnable() {
@@ -258,8 +210,7 @@ public class HbConnectionInfo extends EditableInfo {
                 }
             });
         }
-        final Collection<HbConstraintInterface> constraintsCopy
-                                    = new ArrayList<HbConstraintInterface>();
+        final Collection<HbConstraintInterface> constraintsCopy = new ArrayList<HbConstraintInterface>();
         mConstraintsReadLock.lock();
         try {
             for (final HbConstraintInterface c : constraints) {
@@ -277,18 +228,13 @@ public class HbConnectionInfo extends EditableInfo {
         }
     }
 
-    /** Check order and colocation constraints. */
     @Override
-    public Check checkResourceFields(final String param,
-                                     final String[] params) {
+    public Check checkResourceFields(final String param, final String[] params) {
         mConstraintsReadLock.lock();
-        final Check check = new Check(new ArrayList<String>(), 
-                                      new ArrayList<String>());
+        final Check check = new Check(new ArrayList<String>(), new ArrayList<String>());
         try {
             for (final HbConstraintInterface c : constraints) {
-                check.addCheck(c.checkResourceFields(param,
-                                                     c.getParametersFromXML(),
-                                                     true));
+                check.addCheck(c.checkResourceFields(param, c.getParametersFromXML(), true));
             }
         } finally {
             mConstraintsReadLock.unlock();
@@ -362,18 +308,15 @@ public class HbConnectionInfo extends EditableInfo {
                     return;
                 }
                 mouseStillOver = true;
-                component.setToolTipText(
-                                        ClusterBrowser.STARTING_PTEST_TOOLTIP);
-                component.setToolTipBackground(Tools.getDefaultColor(
-                                    "ClusterBrowser.Test.Tooltip.Background"));
+                component.setToolTipText(ClusterBrowser.STARTING_PTEST_TOOLTIP);
+                component.setToolTipBackground(Tools.getDefaultColor("ClusterBrowser.Test.Tooltip.Background"));
                 Tools.sleep(250);
                 if (!mouseStillOver) {
                     return;
                 }
                 mouseStillOver = false;
                 final CountDownLatch startTestLatch = new CountDownLatch(1);
-                getBrowser().getCrmGraph().startTestAnimation((JComponent) component,
-                                                              startTestLatch);
+                getBrowser().getCrmGraph().startTestAnimation((JComponent) component, startTestLatch);
                 final Host dcHost = getBrowser().getDCHost();
                 getBrowser().ptestLockAcquire();
                 try {
@@ -493,11 +436,11 @@ public class HbConnectionInfo extends EditableInfo {
         }
         newPanel.add(new JScrollPane(mainPanel));
         newPanel.setMinimumSize(new Dimension(
-                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         newPanel.setPreferredSize(new Dimension(
-                application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
-                application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
+                                  application.getDefaultSize("HostBrowser.ResourceInfoArea.Width"),
+                                  application.getDefaultSize("HostBrowser.ResourceInfoArea.Height")));
         infoPanel = newPanel;
         infoPanelDone();
         return infoPanel;
@@ -514,8 +457,7 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Removes colocations or orders. */
     private void removeOrdersOrColocations(final boolean isOrder) {
-        final Collection<HbConstraintInterface> constraintsToRemove =
-                                    new ArrayList<HbConstraintInterface>();
+        final Collection<HbConstraintInterface> constraintsToRemove = new ArrayList<HbConstraintInterface>();
         mConstraintsWriteLock.lock();
         boolean changed = false;
         try {
@@ -542,20 +484,17 @@ public class HbConnectionInfo extends EditableInfo {
         }
     }
 
-    /** Removes all orders. */
     public final void removeOrders() {
         removeOrdersOrColocations(true);
     }
 
-    /** Removes all colocations. */
     public final void removeColocations() {
         removeOrdersOrColocations(false);
     }
 
-    /** Adds a new order. */
     public final void addOrder(final String ordId,
-                         final ServiceInfo serviceInfoParent,
-                         final ServiceInfo serviceInfoChild) {
+                               final ServiceInfo serviceInfoParent,
+                               final ServiceInfo serviceInfoChild) {
         lastServiceInfoParent = serviceInfoParent;
         lastServiceInfoChild = serviceInfoChild;
         if (ordId == null) {
@@ -588,8 +527,8 @@ public class HbConnectionInfo extends EditableInfo {
 
     /** Adds a new colocation. */
     public final void addColocation(final String colId,
-                              final ServiceInfo serviceInfoRsc,
-                              final ServiceInfo serviceInfoWithRsc) {
+                                    final ServiceInfo serviceInfoRsc,
+                                    final ServiceInfo serviceInfoWithRsc) {
         lastServiceInfoRsc = serviceInfoRsc;
         lastServiceInfoWithRsc = serviceInfoWithRsc;
         if (colId == null) {
@@ -624,8 +563,7 @@ public class HbConnectionInfo extends EditableInfo {
      * Returns whether the colocation score is negative. Order of rsc1 rsc2 is
      * not important.
      */
-    public final ColScoreType getColocationScoreType(final ServiceInfo rsc1,
-                                               final ServiceInfo rsc2) {
+    public final ColScoreType getColocationScoreType(final ServiceInfo rsc1, final ServiceInfo rsc2) {
         int score = 0;
         boolean plusInf = false;
         boolean minusInf = false;
@@ -664,8 +602,7 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     /** Returns whether the order score is negative. */
-    public final boolean isOrdScoreNull(final ServiceInfo first,
-                                  final ServiceInfo then) {
+    public final boolean isOrdScoreNull(final ServiceInfo first, final ServiceInfo then) {
         if (isNew() || orderIds.isEmpty()) {
             return false;
         }
@@ -694,8 +631,8 @@ public class HbConnectionInfo extends EditableInfo {
     @Override
     public final void selectMyself() {
         super.selectMyself();
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                        getBrowser().getMenuTree().getLastSelectedPathComponent();
+        final DefaultMutableTreeNode node =
+                                (DefaultMutableTreeNode) getBrowser().getMenuTree().getLastSelectedPathComponent();
         if (node != null) {
             // TODO: do this differently, don't need to select it, only reload
             final Info prev = (Info) node.getUserObject();
@@ -704,31 +641,26 @@ public class HbConnectionInfo extends EditableInfo {
         }
     }
 
-    /** Returns whether this parameter is advanced. */
     @Override
     protected final boolean isAdvanced(final String param) {
         return false;
     }
 
-    /** Returns access type of this parameter. */
     @Override
     protected final Application.AccessType getAccessType(final String param) {
         return Application.AccessType.ADMIN;
     }
 
-    /** Whether the parameter should be enabled. */
     @Override
     protected final String isEnabled(final String param) {
         return null;
     }
 
-    /** Whether the parameter should be enabled only in advanced mode. */
     @Override
     protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
          return false;
     }
 
-    /** Hide/Show advanced panels. */
     @Override
     public final void updateAdvancedPanels() {
         super.updateAdvancedPanels();
@@ -848,12 +780,10 @@ public class HbConnectionInfo extends EditableInfo {
         return null;
     }
 
-    /** Revert all values. */
     @Override
     public final void revert() {
         super.revert();
-        final Collection<HbConstraintInterface> constraintsCopy
-                                    = new ArrayList<HbConstraintInterface>();
+        final Collection<HbConstraintInterface> constraintsCopy = new ArrayList<HbConstraintInterface>();
         mConstraintsReadLock.lock();
         try {
             for (final HbConstraintInterface c : constraints) {
@@ -866,11 +796,13 @@ public class HbConnectionInfo extends EditableInfo {
             c.revert();
         }
     }
-    /** Colocation Score type. */
-    public enum ColScoreType { MIXED,
-                               INFINITY,
-                               MINUS_INFINITY,
-                               IS_NULL,
-                               NEGATIVE,
-                               POSITIVE }
+
+    public enum ColScoreType {
+        MIXED,
+        INFINITY,
+        MINUS_INFINITY,
+        IS_NULL,
+        NEGATIVE,
+        POSITIVE
+    }
 }
