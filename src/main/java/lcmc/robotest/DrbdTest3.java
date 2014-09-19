@@ -119,11 +119,11 @@ final class DrbdTest3 {
         roboTest.press(KeyEvent.VK_BACK_SPACE);
         roboTest.press(KeyEvent.VK_9);
 
-        roboTest.moveTo("Max buffers", MTextField.class);
+        roboTest.moveTo("Max epoch size", MTextField.class);
         roboTest.leftClick();
         roboTest.press(KeyEvent.VK_BACK_SPACE);
         roboTest.press(KeyEvent.VK_5);
-        roboTest.moveTo("Max buffers", MComboBox.class); /* Unit */
+        roboTest.moveTo("Max epoch size", MComboBox.class); /* Unit */
         roboTest.leftClick();
         roboTest.press(KeyEvent.VK_DOWN);
         roboTest.press(KeyEvent.VK_ENTER);
@@ -194,7 +194,7 @@ final class DrbdTest3 {
         roboTest.press(KeyEvent.VK_BACK_SPACE);
         roboTest.press(KeyEvent.VK_5);
 
-        roboTest.moveTo("Max buffers", MTextField.class);
+        roboTest.moveTo("Max epoch size", MTextField.class);
         roboTest.leftClick();
         roboTest.leftClick();
         roboTest.press(KeyEvent.VK_BACK_SPACE);
@@ -202,7 +202,7 @@ final class DrbdTest3 {
         roboTest.press(KeyEvent.VK_0);
         roboTest.press(KeyEvent.VK_4);
         roboTest.press(KeyEvent.VK_8);
-        roboTest.moveTo("Max buffers", MComboBox.class); /* Unit */
+        roboTest.moveTo("Max epoch size", MComboBox.class); /* Unit */
         roboTest.leftClick();
         roboTest.press(KeyEvent.VK_UP);
         roboTest.press(KeyEvent.VK_ENTER);

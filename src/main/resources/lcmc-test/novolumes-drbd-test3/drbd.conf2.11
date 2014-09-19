@@ -39,7 +39,7 @@ resource r0 {
 	}
 
 	net {
-		max-buffers	5k;
+		max-epoch-size	5k;
 	}
 
 	syncer {
