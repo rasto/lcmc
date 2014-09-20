@@ -114,8 +114,10 @@ public class ConnectionThread extends Thread {
     }
 
     public void setConnectionFailed(final boolean connectionFailed) {
-        closeConnection();
         this.connectionFailed = connectionFailed;
+        if (connectionFailed) {
+            closeConnection();
+        }
     }
 
     public SshConnection getConnection() throws IOException {
