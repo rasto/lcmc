@@ -69,7 +69,7 @@ public final class VGRemove extends LV {
     private static final String VG_REMOVE_DESCRIPTION = "Remove a volume group.";
     @Autowired
     private WidgetFactory widgetFactory;
-    private final MyButton removeButton = widgetFactory.createButton("Remove VG");
+    private MyButton removeButton;
     private final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private boolean multiSelection;
@@ -134,6 +134,7 @@ public final class VGRemove extends LV {
 
     @Override
     protected JComponent getInputPane() {
+        removeButton = widgetFactory.createButton("Remove VG");
         removeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());

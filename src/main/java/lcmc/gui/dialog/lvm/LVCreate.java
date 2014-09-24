@@ -78,7 +78,7 @@ public final class LVCreate extends LV {
     private Application application;
     @Autowired
     private WidgetFactory widgetFactory;
-    private final MyButton createButton = widgetFactory.createButton("Create");
+    private MyButton createButton;
 
     public void init(final Host host, final String volumeGroup, final BlockDevice selectedBlockDevice) {
         super.init(null);
@@ -168,6 +168,7 @@ public final class LVCreate extends LV {
 
     @Override
     protected JComponent getInputPane() {
+        createButton = widgetFactory.createButton("Create");
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         /* name, size etc. */
@@ -221,6 +222,7 @@ public final class LVCreate extends LV {
         lvSizeWidget = widgetFactory.createInstance(
                                        Widget.Type.TEXTFIELDWITHUNIT,
                                        VmsXml.convertKilobytes(newBlockSize),
+                                       Widget.NO_ITEMS,
                                        getUnits(),
                                        Widget.NO_REGEXP,
                                        250,
@@ -277,6 +279,7 @@ public final class LVCreate extends LV {
         maxSizeWidget = widgetFactory.createInstance(
                                       Widget.Type.TEXTFIELDWITHUNIT,
                                       VmsXml.convertKilobytes(maxBlockSize),
+                                      Widget.NO_ITEMS,
                                       getUnits(),
                                       Widget.NO_REGEXP,
                                       250,

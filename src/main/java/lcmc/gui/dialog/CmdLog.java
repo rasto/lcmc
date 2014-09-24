@@ -104,6 +104,7 @@ public final class CmdLog extends HostLogs {
         logTimeInMinutes = widgetFactory.createInstance(
                                    Widget.Type.TEXTFIELDWITHUNIT,
                                    DEFAULT_TIME,
+                                   Widget.NO_ITEMS,
                                    getUnits(),
                                    Widget.NO_REGEXP,
                                    150,

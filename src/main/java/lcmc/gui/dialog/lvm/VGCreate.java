@@ -75,7 +75,7 @@ public final class VGCreate extends LV {
     private Application application;
     @Autowired
     private WidgetFactory widgetFactory;
-    private final MyButton createButton = widgetFactory.createButton("Create VG");
+    private MyButton createButton;
 
     public void init(final Host host) {
         super.init(null);
@@ -189,6 +189,7 @@ public final class VGCreate extends LV {
 
     @Override
     protected JComponent getInputPane() {
+        createButton = widgetFactory.createButton("Create VG");
         createButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         /* vg name */

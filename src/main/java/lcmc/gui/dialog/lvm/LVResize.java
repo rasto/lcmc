@@ -86,7 +86,7 @@ public final class LVResize extends LV {
     private Application application;
     @Autowired
     private WidgetFactory widgetFactory;
-    private final MyButton resizeButton = widgetFactory.createButton("Resize");
+    private MyButton resizeButton;
 
     public void init(final BlockDevInfo blockDevInfo) {
         super.init(null);
@@ -186,6 +186,7 @@ public final class LVResize extends LV {
 
     @Override
     protected JComponent getInputPane() {
+        resizeButton = widgetFactory.createButton("Resize");
         resizeButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -198,6 +199,7 @@ public final class LVResize extends LV {
         oldSizeWidget = widgetFactory.createInstance(
                                           Widget.Type.TEXTFIELDWITHUNIT,
                                           VmsXml.convertKilobytes(oldBlockSize),
+                                          Widget.NO_ITEMS,
                                           getUnits(),
                                           Widget.NO_REGEXP,
                                           250,
@@ -217,6 +219,7 @@ public final class LVResize extends LV {
         sizeWidget =  widgetFactory.createInstance(
                        Widget.Type.TEXTFIELDWITHUNIT,
                        VmsXml.convertKilobytes(newBlockSize),
+                       Widget.NO_ITEMS,
                        getUnits(),
                        Widget.NO_REGEXP,
                        250,
@@ -264,6 +267,7 @@ public final class LVResize extends LV {
         maxSizeWidget = widgetFactory.createInstance(
                                          Widget.Type.TEXTFIELDWITHUNIT,
                                          VmsXml.convertKilobytes(maxBlockSize),
+                                         Widget.NO_ITEMS,
                                          getUnits(),
                                          Widget.NO_REGEXP,
                                          250,

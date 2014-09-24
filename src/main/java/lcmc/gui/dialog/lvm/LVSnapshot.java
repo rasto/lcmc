@@ -63,7 +63,7 @@ public final class LVSnapshot extends LV {
     private Application application;
     @Autowired
     private WidgetFactory widgetFactory;
-    private final MyButton snapshotButton = widgetFactory.createButton("Create Snapshot");
+    private MyButton snapshotButton;
 
     public void init(final BlockDevInfo blockDevInfo) {
         super.init(null);
@@ -104,6 +104,7 @@ public final class LVSnapshot extends LV {
 
     @Override
     protected JComponent getInputPane() {
+        snapshotButton = widgetFactory.createButton("Create Snapshot");
         snapshotButton.setEnabled(false);
         final JPanel pane = new JPanel(new SpringLayout());
         final JPanel inputPane = new JPanel(new SpringLayout());
@@ -151,6 +152,7 @@ public final class LVSnapshot extends LV {
         sizeWi =  widgetFactory.createInstance(
                        Widget.Type.TEXTFIELDWITHUNIT,
                        VmsXml.convertKilobytes(newBlockSize),
+                       Widget.NO_ITEMS,
                        getUnits(),
                        Widget.NO_REGEXP,
                        250,
@@ -192,6 +194,7 @@ public final class LVSnapshot extends LV {
         maxSizeWi =  widgetFactory.createInstance(
                         Widget.Type.TEXTFIELDWITHUNIT,
                         VmsXml.convertKilobytes(maxBlockSize),
+                        Widget.NO_ITEMS,
                         getUnits(),
                         Widget.NO_REGEXP,
                         250,
