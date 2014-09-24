@@ -215,6 +215,8 @@ public class ClusterBrowser extends Browser {
     private Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
     @Autowired
     private AvailableServicesInfo availableServicesInfo;
+    @Autowired
+    private Provider<NetworkInfo> networkInfoProvider;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -1488,9 +1490,9 @@ public class ClusterBrowser extends Browser {
                 }
             });
             for (final Network network : networks) {
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(new NetworkInfo(network.getName(),
-                                                                                                   network,
-                                                                                                   this));
+                final NetworkInfo networkInfo = networkInfoProvider.get();
+                networkInfo.init(network.getName(), network, this);
+                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(networkInfo);
                 setNode(resource);
                 addNode(networksNode, resource);
             }

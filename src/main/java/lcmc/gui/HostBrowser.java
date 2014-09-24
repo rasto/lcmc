@@ -138,6 +138,11 @@ public class HostBrowser extends Browser {
     @Autowired @Qualifier("categoryInfo")
     private CategoryInfo fileSystemsCategory;
 
+    @Autowired @Qualifier("netInfo")
+    private Provider<NetInfo> netInfoProvider;
+    @Autowired
+    private Provider<FSInfo> fsInfoProvider;
+
     public void init(final Host host) {
         this.host = host;
         hostInfo.init(host, this);
@@ -191,7 +196,10 @@ public class HostBrowser extends Browser {
         return c.getBrowser();
     }
 
-    public void updateHWResources(final NetInterface[] nis, final BlockDevice[] bds, final String[] fss) {
+    public void updateHWResources(
+            final NetInterface[] netInterfaces,
+            final BlockDevice[] blockDevices,
+            final String[] fileSystems) {
         /* net interfaces */
         final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
         final HostBrowser thisClass = this;
@@ -201,14 +209,15 @@ public class HostBrowser extends Browser {
                 mNetInfosWriteLock.lock();
                 try {
                     netInterfacesNode.removeAllChildren();
-                    for (final NetInterface ni : nis) {
-                        final NetInfo nii;
-                        if (oldNetInterfaces.containsKey(ni)) {
-                            nii = oldNetInterfaces.get(ni);
+                    for (final NetInterface netInterface : netInterfaces) {
+                        final NetInfo netInfo;
+                        if (oldNetInterfaces.containsKey(netInterface)) {
+                            netInfo = oldNetInterfaces.get(netInterface);
                         } else {
-                            nii = new NetInfo(ni.getName(), ni, thisClass);
+                            netInfo = netInfoProvider.get();
+                            netInfo.init(netInterface.getName(), netInterface, thisClass);
                         }
-                        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(nii);
+                        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(netInfo);
                         setNode(resource);
                         netInterfacesNode.add(resource);
                     }
@@ -229,7 +238,7 @@ public class HostBrowser extends Browser {
                 changed = true;
             }
             blockDevInfos.clear();
-            for (final BlockDevice bd : bds) {
+            for (final BlockDevice bd : blockDevices) {
                 final BlockDevInfo blockDevInfo;
                 if (oldBlockDevices.containsKey(bd)) {
                     blockDevInfo = oldBlockDevices.get(bd);
@@ -272,12 +281,13 @@ public class HostBrowser extends Browser {
                 mFileSystemsWriteLock.lock();
                 try {
                     fileSystemsNode.removeAllChildren();
-                    for (final String fs : fss) {
+                    for (final String fs : fileSystems) {
                         final FSInfo fsi;
                         if (oldFilesystems.containsKey(fs)) {
                             fsi = oldFilesystems.get(fs);
                         } else {
-                            fsi = new FSInfo();
+
+                            fsi = fsInfoProvider.get();
                             fsi.init(fs, thisClass);
                         }
                         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(fsi);

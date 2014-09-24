@@ -25,10 +25,15 @@ import lcmc.model.Host;
 import lcmc.model.resources.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class ProxyNetInfo extends NetInfo {
     /** Prefix in the host address field indicating a proxy address. */
     public static final String PROXY_PREFIX = "proxy: ";
@@ -45,35 +50,29 @@ public final class ProxyNetInfo extends NetInfo {
         }
         return s.toString();
     }
-    /** Proxy host. */
-    private final Host proxyHost;
 
-    /** Prepares a new {@code NetProxyInfo} object. */
-    public ProxyNetInfo(final NetInfo netInfo, final Browser browser, final Host proxyHost) {
-        super(netInfo.getName(), netInfo.getNetInterface(), browser);
+    private Host proxyHost;
+
+    public void init(final NetInfo netInfo, final Browser browser, final Host proxyHost) {
+        super.init(netInfo.getName(), netInfo.getNetInterface(), browser);
         this.proxyHost = proxyHost;
     }
 
-    /** Prepares a new {@code NetProxyInfo} object. */
-        public ProxyNetInfo(final String name, final NetInterface netInterface, final Browser browser, final Host proxyHost) {
-            super(name, netInterface, browser);
-            this.proxyHost = proxyHost;
-        }
+    public void init(final String name, final NetInterface netInterface, final Browser browser, final Host proxyHost) {
+        super.init(name, netInterface, browser);
+        this.proxyHost = proxyHost;
+    }
 
-    /** Returns string representation of the net interface. */
-        @Override
+    @Override
     public String toString() {
         final String ip = super.getInternalValue();
         String proxyHostName = null;
         if (proxyHost != null) {
             proxyHostName = proxyHost.getName();
         }
-        return displayString(ip,
-                             getBrowser().getHost().getName(),
-                             proxyHostName);
+        return displayString(ip, getBrowser().getHost().getName(), proxyHostName);
     }
 
-    /** Return proxy host. */
     public Host getProxyHost() {
         return proxyHost;
     }

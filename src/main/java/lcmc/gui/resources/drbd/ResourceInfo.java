@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -148,6 +149,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private ResourceMenu resourceMenu;
     @Autowired
     private WidgetFactory widgetFactory;
+    @Autowired
+    private Provider<ProxyNetInfo> proxyNetInfoProvider;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
@@ -262,14 +265,13 @@ public class ResourceInfo extends AbstractDrbdInfo {
                             final String proxyIp = drbdpM.group(1);
                             final String hostName = drbdpM.group(3);
                             final Host proxyHost = getCluster().getProxyHostByName(hostName);
-                            config.append(proxyConfig(new ProxyNetInfo("",
-                                                                       new NetInterface("",
-                                                                                        proxyIp,
-                                                                                        null,
-                                                                                        false,
-                                                                                        NetInterface.AddressFamily.IPV4),
-                                                                       getBrowser(),
-                                                                       proxyHost)));
+                            final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
+                            proxyNetInfo.init(
+                                    "",
+                                    new NetInterface("", proxyIp, null, false, NetInterface.AddressFamily.IPV4),
+                                    getBrowser(),
+                                    proxyHost);
+                            config.append(proxyConfig(proxyNetInfo));
                         }
                     }
                 }
@@ -1457,8 +1459,10 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final Enumeration<DefaultMutableTreeNode> np = hostBrowser.getNetInterfacesNode().children();
 
         while (np.hasMoreElements()) {
-            final NetInfo i = (NetInfo) np.nextElement().getUserObject();
-            list.add(new ProxyNetInfo(i, hostBrowser, hostBrowser.getHost()));
+            final NetInfo netInfo = (NetInfo) np.nextElement().getUserObject();
+            final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
+            proxyNetInfo.init(netInfo, hostBrowser, hostBrowser.getHost());
+            list.add(proxyNetInfo);
         }
 
         /* other nodes */
@@ -1470,11 +1474,13 @@ public class ResourceInfo extends AbstractDrbdInfo {
             final Enumeration<DefaultMutableTreeNode> nph = hostBrowser.getNetInterfacesNode().children();
             if (nph.hasMoreElements()) {
                 while (nph.hasMoreElements()) {
-                    final NetInfo i = (NetInfo) nph.nextElement().getUserObject();
-                    if (i.isLocalHost()) {
+                    final NetInfo netInfo = (NetInfo) nph.nextElement().getUserObject();
+                    if (netInfo.isLocalHost()) {
                         continue;
                     }
-                    list.add(new ProxyNetInfo(i, hostBrowser, h));
+                    final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
+                    proxyNetInfo.init(netInfo, hostBrowser, h);
+                    list.add(proxyNetInfo);
                 }
             }
         }

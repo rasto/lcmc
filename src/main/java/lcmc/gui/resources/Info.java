@@ -287,6 +287,9 @@ public class Info implements Comparable<Info>, Value {
             panel.setBackground(Browser.PANEL_BACKGROUND);
             return panel;
         } else {
+            if (application == null) {
+                LOG.info("spring error: class: " + getClass());
+            }
             final Font f = new Font("Monospaced", Font.PLAIN, application.scaled(12));
             resourceInfoArea = new JEditorPane(getInfoMimeType(), info);
             resourceInfoArea.setMinimumSize(new Dimension(

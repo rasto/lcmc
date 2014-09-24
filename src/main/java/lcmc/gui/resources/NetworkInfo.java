@@ -26,14 +26,19 @@ import lcmc.model.Application;
 import lcmc.model.resources.Network;
 import lcmc.gui.Browser;
 import lcmc.utilities.Tools;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a network.
  */
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public final class NetworkInfo extends Info {
     private static final ImageIcon NETWORK_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.NetworkIcon"));
 
-    public NetworkInfo(final String name, final Network network, final Browser browser) {
+    public void init(final String name, final Network network, final Browser browser) {
         super.init(name, browser);
         setResource(network);
     }

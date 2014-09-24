@@ -34,11 +34,15 @@ import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a net interface.
  */
-@SuppressWarnings("SingleCharacterStringConcatenation")
+@Component
+@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 public class NetInfo extends Info {
     public static final ImageIcon NET_INTERFACE_ICON =
                                                     Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIcon"));
@@ -46,7 +50,7 @@ public class NetInfo extends Info {
                                                Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIconLarge"));
     public static final String IP_PLACEHOLDER = "--.--.--.--";
 
-    public NetInfo(final String name, final NetInterface netInterface, final Browser browser) {
+    public void init(final String name, final NetInterface netInterface, final Browser browser) {
         super.init(name, browser);
         setResource(netInterface);
     }
