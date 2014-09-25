@@ -57,7 +57,6 @@ import javax.swing.filechooser.FileFilter;
 import lcmc.AddClusterDialog;
 import lcmc.AddHostDialog;
 import lcmc.Exceptions;
-import lcmc.LCMC;
 import lcmc.gui.dialog.About;
 import lcmc.gui.dialog.BugReport;
 import lcmc.model.AccessMode;
@@ -110,6 +109,8 @@ public final class MainMenu extends JPanel implements ActionListener {
     private Application application;
     @Autowired
     private BugReport bugReport;
+    @Autowired
+    private About aboutDialog;
 
     public void init() {
         if (application.isUpgradeCheckEnabled()) {
@@ -524,8 +525,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                 final Thread t = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        final About a = new About();
-                        a.showDialog();
+                        aboutDialog.showDialog();
                     }
                 });
                 t.start();

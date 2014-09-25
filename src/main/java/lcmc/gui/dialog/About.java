@@ -28,10 +28,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.Tools;
+import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an About dialog.
  */
+@Component
 public final class About extends ConfigDialog {
     @Override
     protected void initDialogBeforeVisible() {
