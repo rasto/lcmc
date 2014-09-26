@@ -33,6 +33,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -56,14 +58,9 @@ import lcmc.utilities.LVM;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /** Create LV dialog. */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class LVCreate extends LV {
     private static final String LV_CREATE_DESCRIPTION = "Create a logical volume in an existing volume group.";
     private static final int LV_CREATE_TIMEOUT = 5000;
@@ -74,9 +71,9 @@ public final class LVCreate extends LV {
     private String volumeGroup;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private final Collection<BlockDevice> selectedBlockDevices = new LinkedHashSet<BlockDevice>();
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton createButton;
 

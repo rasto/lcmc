@@ -49,6 +49,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.*;
 
 import lcmc.configs.AppDefaults;
@@ -58,8 +61,6 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * An infinite progress panel displays a rotating figure and
@@ -91,7 +92,8 @@ import org.springframework.stereotype.Component;
  * {@code setForeground()}.
  */
 
-@Component
+@Named
+@Singleton
 public final class ProgressIndicatorPanel extends JComponent implements MouseListener, KeyListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressIndicatorPanel.class);
     private static final int RAMP_DELAY_STOP  = 1000;
@@ -121,7 +123,7 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private RenderingHints hints = null;
     private final Lock mAnimatorLock = new ReentrantLock();
     private final Lock mTextsLock = new ReentrantLock();
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     /** Cancel button. TODO: not used. */
     private MyButton cancelButton;
@@ -134,11 +136,11 @@ public final class ProgressIndicatorPanel extends JComponent implements MouseLis
     private int oldHeight = getHeight();
     /** Beginning position of the bar. */
     private double barPos = -1;
-    @Autowired
+    @Inject
     private MainMenu mainMenu;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init() {

@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -61,23 +63,18 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ServiceMenu {
-    @Autowired
+    @Inject
     private GUIData drbdGui;
-    @Autowired
+    @Inject
     private EditConfig editDialog;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<ServiceLogs> serviceLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {

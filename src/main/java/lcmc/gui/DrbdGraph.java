@@ -34,6 +34,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
 
@@ -47,17 +49,12 @@ import lcmc.model.Host;
 import lcmc.model.resources.BlockDevice;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class creates graph and provides methods to add new block device
  * vertices and drbd volume edges, remove or modify them.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DrbdGraph extends ResourceGraph {
     /** Horizontal step in pixels by which the block devices are drawn in the graph. */
     private static final int BD_STEP_Y = 60;
@@ -96,14 +93,14 @@ public class DrbdGraph extends ResourceGraph {
     /** Map from drbd volume info object to the graph edge. */
     private final Map<VolumeInfo, Edge> drbdVolumeToEdgeMap = new LinkedHashMap<VolumeInfo, Edge>();
 
-    @Autowired
+    @Inject
     private MultiSelectionInfo multiSelectionInfo = null;
 
     /** The first X position of the host. */
     private int hostDefaultXPos = 10;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

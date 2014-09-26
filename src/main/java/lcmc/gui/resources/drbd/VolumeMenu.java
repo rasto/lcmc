@@ -37,18 +37,16 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@Named
 public class VolumeMenu {
     private VolumeInfo volumeInfo;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
 
     public List<UpdatableItem> getPulldownMenu(final VolumeInfo volumeInfo) {

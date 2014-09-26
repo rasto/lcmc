@@ -25,16 +25,14 @@ import java.util.Map;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.resources.drbd.ResourceInfo;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * DrbddiskInfo class is used for drbddisk heartbeat service that is
  * treated in special way.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class DrbddiskInfo extends ServiceInfo {
     /** Returns string representation of the drbddisk service. */
     @Override

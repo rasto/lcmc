@@ -28,22 +28,20 @@ import lcmc.gui.dialog.drbdConfig.DrbdConfig;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Show step by step dialogs that resolve a drbd split-brain.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class AddDrbdSplitBrainDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdSplitBrainDialog.class);
     private VolumeInfo volumeInfo;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private SplitBrain splitBrainDialog;
 
     public void init(final VolumeInfo volumeInfo) {

@@ -19,14 +19,18 @@
  */
 package lcmc;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
 
 public final class AppContext {
-	private static ApplicationContext context;
+	private static AnnotationConfigApplicationContext context;
 
 	static {
-		context = new AnnotationConfigApplicationContext("lcmc");
+		final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
+        ctx.setScopeMetadataResolver(new Jsr330ScopeMetadataResolver());
+        ctx.scan("lcmc");
+        ctx.refresh();
+        context = ctx;
 	}
 
 	private AppContext() {

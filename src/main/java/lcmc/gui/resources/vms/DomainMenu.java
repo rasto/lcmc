@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 
 import lcmc.model.AccessMode;
@@ -45,22 +47,17 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DomainMenu {
     private static final ImageIcon RESUME_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Resume.IconLarge"));
     private static final ImageIcon SHUTDOWN_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Shutdown.IconLarge"));
     private static final ImageIcon REBOOT_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Reboot.IconLarge"));
     private static final ImageIcon DESTROY_ICON = Tools.createImageIcon(Tools.getDefault("VMS.Destroy.IconLarge"));
     private DomainInfo domainInfo;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
 
     public List<UpdatableItem> getPulldownMenu(final DomainInfo domainInfo) {

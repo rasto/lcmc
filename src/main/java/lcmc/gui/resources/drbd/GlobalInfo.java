@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -72,18 +74,13 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class provides drbd info. For one it shows the editable global
  * drbd config, but if a drbd block device is selected it forwards to the
  * block device info, which is defined in HostBrowser.java.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class GlobalInfo extends AbstractDrbdInfo {
     private static final Logger LOG = LoggerFactory.getLogger(GlobalInfo.class);
     private static final String SECTION_COMMON_PROXY = "proxy";
@@ -93,24 +90,24 @@ public class GlobalInfo extends AbstractDrbdInfo {
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     private BlockDevInfo selectedBlockDevice = null;
     private JComponent infoPanel = null;
-    @Autowired
+    @Inject
     private GlobalMenu globalMenu;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private Provider<VolumeInfo> volumeInfoProvider;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Provider<AddDrbdConfigDialog> addDrbdConfigDialogProvider;
     private ProxyHostInfo proxyHostInfo = null;
-    @Autowired
+    @Inject
     private Provider<ProxyHostInfo> proxyHostInfoProvider;
-    @Autowired
+    @Inject
     private Provider<ResourceInfo> resourceInfoProvider;
-    @Autowired
+    @Inject
     private Provider<DrbdXml> drbdXmlProvider;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final String name, final Browser browser) {

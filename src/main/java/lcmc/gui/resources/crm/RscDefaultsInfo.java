@@ -23,6 +23,7 @@ package lcmc.gui.resources.crm;
 
 import java.util.Collection;
 import java.util.Map;
+import javax.inject.Named;
 import javax.swing.JPanel;
 import lcmc.model.Application;
 import lcmc.model.crm.CrmXml;
@@ -38,15 +39,11 @@ import lcmc.gui.widget.Widget;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class is for resource defaults or rsc_defaults.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class RscDefaultsInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(RscDefaultsInfo.class);
     public void init(final String name, final Browser browser) {

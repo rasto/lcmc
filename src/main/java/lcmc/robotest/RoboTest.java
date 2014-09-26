@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -45,7 +46,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 
-import lcmc.LCMC;
 import lcmc.configs.AppDefaults;
 import lcmc.gui.GUIData;
 import lcmc.model.Application;
@@ -59,13 +59,14 @@ import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 public final class RoboTest {
     private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
     private static final GraphicsDevice SCREEN_DEVICE =
@@ -89,9 +90,9 @@ public final class RoboTest {
     private Cluster cluster;
 
     static final boolean PROXY = true;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     public void initRobot(final Cluster cluster) {

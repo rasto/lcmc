@@ -42,6 +42,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -96,11 +99,6 @@ import lcmc.utilities.Tools;
 import org.apache.commons.collections15.keyvalue.MultiKey;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 
 /**
@@ -108,15 +106,14 @@ import org.springframework.stereotype.Component;
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ClusterBrowser extends Browser {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterBrowser.class);
     public static final ImageIcon REMOVE_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.RemoveIcon"));
     public static final ImageIcon REMOVE_ICON_SMALL = Tools.createImageIcon(
                                                                 Tools.getDefault("ClusterBrowser.RemoveIconSmall"));
 
-    @Autowired
+    @Inject
     private Application application;
     public static final Color SERVICE_STOPPED_FILL_PAINT = Tools.getDefaultColor("CRMGraph.FillPaintStopped");
     public static final String IDENT_4 = "    ";
@@ -199,23 +196,23 @@ public class ClusterBrowser extends Browser {
         CRM_OPERATIONS_WITH_IGNORED_DEFAULT.add(CRM_VALIDATE_ALL_OPERATOR);
     }
 
-    @Autowired
+    @Inject
     private Provider<DomainInfo> domainInfoProvider;
-    @Autowired @Qualifier("hbConnectionInfo")
+    @Inject @Named("hbConnectionInfo")
     private Provider<HbConnectionInfo> connectionInfoProvider;
-    @Autowired
+    @Inject
     private Provider<AvailableServiceInfo> availableServiceInfoProvider;
-    @Autowired
+    @Inject
     private Provider<DrbdXml> drbdXmlProvider;
-    @Autowired
+    @Inject
     private Provider<ClusterStatus> clusterStatusProvider;
-    @Autowired @Qualifier("categoryInfo")
+    @Resource(name="categoryInfo")
     private CategoryInfo networksCategory;
-    @Autowired
+    @Inject
     private Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
-    @Autowired
+    @Inject
     private AvailableServicesInfo availableServicesInfo;
-    @Autowired
+    @Inject
     private Provider<NetworkInfo> networkInfoProvider;
 
     public static String getClassMenuName(final String cl) {
@@ -250,12 +247,12 @@ public class ClusterBrowser extends Browser {
     private final Lock mHeartbeatIdToService = new ReentrantLock();
     /** Heartbeat id to service info hash. */
     private final Map<String, ServiceInfo> heartbeatIdToServiceInfo = new HashMap<String, ServiceInfo>();
-    @Autowired
+    @Inject
     private CrmGraph crmGraph;
-    @Autowired
+    @Inject
     private DrbdGraph drbdGraph;
     private ClusterStatus clusterStatus;
-    @Autowired
+    @Inject
     private CrmXml crmXml;
     private DrbdXml drbdXml;
     private final ReadWriteLock mVmsLock = new ReentrantReadWriteLock();
@@ -279,12 +276,12 @@ public class ClusterBrowser extends Browser {
     /** Map from ResourceAgent to AvailableServicesInfo. */
     private final Map<ResourceAgent, AvailableServiceInfo> availableServiceMap =
                                                                new HashMap<ResourceAgent, AvailableServiceInfo>();
-    @Autowired
+    @Inject
     private ClusterHostsInfo clusterHostsInfo;
-    @Autowired
+    @Inject
     private ServicesInfo servicesInfo;
     private RscDefaultsInfo rscDefaultsInfo = null;
-    @Autowired
+    @Inject
     private Provider<RscDefaultsInfo> rscDefaultsInfoProvider;
     private final Lock mCrmStatusLock = new ReentrantLock();
     private final Map<String, List<String>> crmOperationParams = new LinkedHashMap<String, List<String>>();
@@ -292,12 +289,12 @@ public class ClusterBrowser extends Browser {
     private final MultiKeyMap<String, Integer> notAdvancedOperations = MultiKeyMap.decorate(
                                                                      new LinkedMap<MultiKey<String>, Integer>());
     private final Map<Host, String> hostDrbdParameters = new HashMap<Host, String>();
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private GlobalInfo globalInfo;
 
-    @Autowired
+    @Inject
     private VMListInfo vmListInfo;
 
     public void init(final Cluster cluster) {

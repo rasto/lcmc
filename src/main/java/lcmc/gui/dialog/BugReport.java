@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -51,16 +53,11 @@ import lcmc.utilities.Http;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a bug report dialog.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class BugReport extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(BugReport.class);
 
@@ -79,9 +76,9 @@ public final class BugReport extends ConfigDialog {
     private final Map<String, JCheckBox> configCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Map<Cluster, JCheckBox> clusterCheckBoxMap = new HashMap<Cluster, JCheckBox>();
     private String logBuffer;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Clusters allClusters;
 
     public void init(final Cluster selectedCluster, final String errorText) {

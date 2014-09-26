@@ -34,6 +34,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -61,19 +64,13 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds host resource data in a tree. It shows panels that allow
  * to edit data of resources, services etc., hosts and clusters.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class HostBrowser extends Browser {
     public static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.HostIconSmall"));
     public static final ImageIcon HOST_ON_ICON = Tools.createImageIcon(
@@ -101,12 +98,12 @@ public class HostBrowser extends Browser {
     private final Collection<String> usedPorts = new HashSet<String>();
     private final Collection<String> usedProxyPorts = new HashSet<String>();
     public Host host;
-    @Autowired
+    @Inject
     private HostInfo hostInfo;
     /**
      * Host info object of the host in drbd view of this browser.
      */
-    @Autowired
+    @Inject
     private HostDrbdInfo hostDrbdInfo;
     /**
      * Map of block devices and their info objects.
@@ -121,26 +118,26 @@ public class HostBrowser extends Browser {
     private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
     private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Provider<BlockDevInfo> blockDevInfoFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Provider<CmdLog> cmdLogProvider;
-    @Autowired @Qualifier("categoryInfo")
+    @Resource(name="categoryInfo")
     private CategoryInfo netInterfacesCategory;
-    @Autowired @Qualifier("categoryInfo")
+    @Resource(name="categoryInfo")
     private CategoryInfo blockDevicesCategory;
-    @Autowired @Qualifier("categoryInfo")
+    @Resource(name="categoryInfo")
     private CategoryInfo fileSystemsCategory;
 
-    @Autowired @Qualifier("netInfo")
+    @Inject @Named("netInfo")
     private Provider<NetInfo> netInfoProvider;
-    @Autowired
+    @Inject
     private Provider<FSInfo> fsInfoProvider;
 
     public void init(final Host host) {

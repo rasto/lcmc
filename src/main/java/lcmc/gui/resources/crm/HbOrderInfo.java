@@ -43,15 +43,13 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * Object that holds an order constraint information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     private static final Logger LOG = LoggerFactory.getLogger(HbOrderInfo.class);
     public static final String NOT_AVAIL_FOR_PCMK_VERSION = Tools.getString("HbOrderInfo.NotAvailableForThisVersion");

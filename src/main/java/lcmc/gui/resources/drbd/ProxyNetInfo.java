@@ -25,15 +25,13 @@ import lcmc.model.Host;
 import lcmc.model.resources.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * This class holds info data for a net interface on a drbd proxy host.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ProxyNetInfo extends NetInfo {
     /** Prefix in the host address field indicating a proxy address. */
     public static final String PROXY_PREFIX = "proxy: ";

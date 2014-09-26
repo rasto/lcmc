@@ -37,10 +37,11 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -51,7 +52,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
+@Named
+@Singleton
 public class ArgumentParser {
     private static final Logger LOG = LoggerFactory.getLogger(ArgumentParser.class);
 
@@ -102,13 +104,13 @@ public class ArgumentParser {
     /** The --cmd-log. /var/log/lcmc.log on the servers. */
     private static final String CMD_LOG_OP = "cmd-log";
     private static final String CHECK_SWING_OP = "check-swing";
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private RoboTest roboTest;
-    @Autowired
+    @Inject
     private Provider<Cluster> clusterProvider;
-    @Autowired
+    @Inject
     private Application application;
 
     public void parseOptionsAndReturnAutoArguments(String[] args) {

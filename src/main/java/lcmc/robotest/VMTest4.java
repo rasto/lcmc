@@ -24,15 +24,18 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import lcmc.gui.widget.GenericWidget.MTextField;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class VMTest4 {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
 
     /** Cluster wizard locked until focus is lost. */

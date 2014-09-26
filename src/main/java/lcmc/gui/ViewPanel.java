@@ -27,6 +27,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -42,17 +44,12 @@ import javax.swing.tree.TreeSelectionModel;
 import lcmc.gui.resources.Info;
 import lcmc.model.Application;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
  * in the host tab as well in the cluster tab.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ViewPanel extends JPanel {
     private static final Dimension MENU_TREE_MIN_SIZE = new Dimension(200, 200);
     private static final Dimension INFO_PANEL_MIN_SIZE = new Dimension(200, 200);
@@ -67,7 +64,7 @@ public class ViewPanel extends JPanel {
     private final Lock mSetPanelLock = new ReentrantLock();
     /** Last selected info object in the right pane. */
     private Info lastSelectedInfo = null;
-    @Autowired
+    @Inject
     private Application application;
 
     ViewPanel() {

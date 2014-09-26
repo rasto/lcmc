@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -42,17 +44,12 @@ import lcmc.gui.Browser;
 import lcmc.gui.resources.NetInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Interfaces.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class InterfaceInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {InterfaceData.TYPE,
@@ -136,9 +133,9 @@ public final class InterfaceInfo extends HardwareInfo {
                                         new StringValue("/etc/xen/scripts/vif-bridge")});
     }
 
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /** Source network combo box, so that it can be disabled, depending on

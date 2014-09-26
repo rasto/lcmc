@@ -25,6 +25,9 @@ package lcmc.gui.dialog.host;
 import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,18 +44,12 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class NewHostDialog extends DialogHost {
     private static final int FIELD_WIDTH = 120;
     private static final int BIG_FIELD_WIDTH = 400;
@@ -67,13 +64,13 @@ public class NewHostDialog extends DialogHost {
     private boolean bigFields = false;
     /** Enable hostname after it was enabled at least once. */
     private boolean enableHostname = false;
-    @Autowired
+    @Resource(name="configuration")
     private Configuration configuration;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /** Finishes the dialog, stores the values and adds the host tab. */

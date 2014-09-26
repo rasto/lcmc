@@ -19,6 +19,7 @@
  */
 package lcmc.gui.widget;
 
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import javax.swing.text.Document;
@@ -28,17 +29,13 @@ import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class Passwdfield extends Textfield {
     public void init(final Value selectedValue,
                      final String regexp,

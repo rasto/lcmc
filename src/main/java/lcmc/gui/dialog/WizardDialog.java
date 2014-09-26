@@ -30,6 +30,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -41,7 +42,6 @@ import lcmc.model.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * An implementation of a wizard dialog with next, back, finish and cancel
@@ -57,9 +57,9 @@ public abstract class WizardDialog extends ConfigDialog {
     /** Previous dialog object. A dialog that will be displayed after clicking on the back button */
     private WizardDialog previousDialog;
     private ProgressBar progressBar = null;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<ProgressBar> progressBarProvider;
 
     /**

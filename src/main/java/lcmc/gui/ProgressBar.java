@@ -24,6 +24,8 @@ package lcmc.gui;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
@@ -37,17 +39,12 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class creates titled pane with progress bar and functions that update
  * the progress bar.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ProgressBar implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(ProgressBar.class);
     private static final int DEFAULT_TIMEOUT = 50 * 1000;
@@ -60,7 +57,7 @@ public final class ProgressBar implements ActionListener {
     private JProgressBar progressBar;
     /** Progress bar panel. */
     private JPanel pbPanel;
-    @Autowired
+    @Inject
     private Application application;
     private volatile boolean stopNow = false;
     /** Whether to hold the progress bar. */
@@ -76,7 +73,7 @@ public final class ProgressBar implements ActionListener {
     private MyButton cancelButton = null;
     /** Cancel callback function that will be called, when cancel was pressed.  */
     private CancelCallback cancelCallback;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     void init(final String title, final CancelCallback cancelCallback, final int width, final int height) {

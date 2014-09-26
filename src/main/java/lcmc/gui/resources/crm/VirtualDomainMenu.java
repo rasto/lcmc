@@ -31,21 +31,19 @@ import lcmc.utilities.EnablePredicate;
 import lcmc.utilities.MenuAction;
 import lcmc.utilities.MenuFactory;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@Named
 public class VirtualDomainMenu extends ServiceMenu {
     
     private VirtualDomainInfo virtualDomainInfo;
 
     private DomainInfo domainInfo;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
 
     @Override

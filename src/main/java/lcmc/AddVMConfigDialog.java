@@ -29,22 +29,20 @@ import lcmc.gui.dialog.vm.VMConfig;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Show step by step dialogs that add and configure new virtual domain.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class AddVMConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddVMConfigDialog.class);
     private DomainInfo vmsVirtualDomainInfo;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Domain domainDialog;
 
     public void init(final DomainInfo vmsVirtualDomainInfo) {

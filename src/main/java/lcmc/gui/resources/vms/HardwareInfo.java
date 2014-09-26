@@ -35,6 +35,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -45,7 +47,6 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileSystemView;
 
-import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
@@ -76,17 +77,12 @@ import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Hardware.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class HardwareInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(HardwareInfo.class);
     /**
@@ -105,13 +101,13 @@ public abstract class HardwareInfo extends EditableInfo {
     private JComponent infoPanel = null;
     private DomainInfo vmsVirtualDomainInfo;
     private final Map<String, LinuxFile> linuxFileCache = new HashMap<String, LinuxFile>();
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {

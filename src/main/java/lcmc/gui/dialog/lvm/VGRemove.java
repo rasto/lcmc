@@ -36,6 +36,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -54,26 +56,21 @@ import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.utilities.LVM;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class implements VG Remove dialog.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class VGRemove extends LV {
     private static final int REMOVE_TIMEOUT = 5000;
     private static final String VG_REMOVE_DESCRIPTION = "Remove a volume group.";
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton removeButton;
     private final List<BlockDevInfo> blockDevInfos = new ArrayList<BlockDevInfo>();
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private boolean multiSelection;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final BlockDevInfo bdi) {

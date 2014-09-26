@@ -22,18 +22,20 @@
 
 package lcmc.gui.dialog;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import lcmc.gui.SpringUtilities;
 import lcmc.utilities.Tools;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an About dialog.
  */
-@Component
+@Named
+@Singleton
 public final class About extends ConfigDialog {
     @Override
     protected void initDialogBeforeVisible() {

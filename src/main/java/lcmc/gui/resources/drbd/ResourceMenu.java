@@ -23,6 +23,8 @@ package lcmc.gui.resources.drbd;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JMenuItem;
 
 import lcmc.model.AccessMode;
@@ -30,18 +32,13 @@ import lcmc.model.Application;
 import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ResourceMenu {
     private ResourceInfo resourceInfo;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
 
     public List<UpdatableItem> getPulldownMenu(final ResourceInfo resourceInfo) {

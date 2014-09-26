@@ -26,16 +26,14 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.resources.drbd.ResourceInfo;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * linbit::drbd info class is used for drbd pacemaker service that is
  * treated in special way.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class LinbitDrbdInfo extends ServiceInfo {
     /** Returns string representation of the linbit::drbd service. */
     @Override

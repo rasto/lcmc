@@ -22,15 +22,18 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.CLONE_RADIO_Y;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class PcmkTestD {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
 
     /** Pacemaker Leak tests. */

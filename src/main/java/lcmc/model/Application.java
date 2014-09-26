@@ -46,10 +46,11 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -61,7 +62,8 @@ import javax.swing.plaf.FontUIResource;
  * Holds data, that are used globaly in the application and provides some
  * functions for this data.
  */
-@Component
+@Named
+@Singleton
 public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
@@ -138,15 +140,15 @@ public class Application {
     private boolean cmdLog = false;
     private Test autoTest = null;
     private boolean checkSwing = false;
-    @Autowired
+    @Inject
     private Hosts allHosts;
-    @Autowired
+    @Inject
     private Clusters allClusters;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private Provider<ConfirmDialog> confirmDialogProvider;
 
     public int danglingHostsCount() {

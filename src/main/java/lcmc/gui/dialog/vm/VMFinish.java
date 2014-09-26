@@ -26,6 +26,8 @@ package lcmc.gui.dialog.vm;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -38,21 +40,16 @@ import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class VMFinish extends VMConfig {
     private JComponent inputPane = null;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

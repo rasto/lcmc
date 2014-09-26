@@ -23,6 +23,8 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import java.net.UnknownHostException;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -44,26 +46,21 @@ import lcmc.utilities.DRBD;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter drbd block device
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class BlockDev extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDev.class);
     private BlockDevInfo blockDevInfo;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private CreateMD createMDDialog;
     private GlobalInfo globalInfo;
-    @Autowired
+    @Inject
     private Application application;
 
     void init(final WizardDialog previousDialog, final VolumeInfo dli, final BlockDevInfo blockDevInfo) {

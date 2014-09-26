@@ -26,6 +26,8 @@ package lcmc.gui.dialog.drbdConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,28 +50,23 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class CreateMD extends DrbdConfig {
     private static final int COMBOBOX_WIDTH = 250;
     private static final int CREATE_MD_FS_ALREADY_THERE_RC = 40;
     private Widget metadataWidget;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private CreateFS createFSDialog;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeMetaDataButton;
 

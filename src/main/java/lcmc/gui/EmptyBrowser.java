@@ -22,6 +22,9 @@
 package lcmc.gui;
 
 import java.util.TreeSet;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
@@ -30,23 +33,22 @@ import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.gui.resources.AllHostsInfo;
 import lcmc.model.Hosts;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow
  * to edit data of services etc.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@Component
+@Named
+@Singleton
 public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
-    @Autowired
+    @Inject
     private AllHostsInfo allHostsInfo;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Hosts allHosts;
 
     void init() {

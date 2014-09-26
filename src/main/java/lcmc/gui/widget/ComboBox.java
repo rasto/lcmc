@@ -28,6 +28,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -43,21 +45,16 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ComboBox extends GenericWidget<MComboBox<Value>> {
     private static final int CB_SCROLLBAR_MAX_ROWS = 10;
-    @Autowired
+    @Inject
     private Application application;
 
     protected static Value addItems(final Collection<Value> comboList, final Value selectedValue, final Value[] items) {

@@ -21,17 +21,19 @@
 package lcmc.utilities;
 
 import lcmc.model.AccessMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.swing.ImageIcon;
 
-@Component
+@Named
+@Singleton
 public class MenuFactory {
-    @Autowired
+    @Inject
     private Provider<MyMenuItem> menuItemProvider;
-    @Autowired
+    @Inject
     private Provider<MyMenu> menuProvider;
 
     public MyMenu createMenu(final String text,

@@ -26,6 +26,8 @@ package lcmc.gui.dialog.drbd;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,23 +45,18 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class SplitBrain extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SplitBrain.class);
     private static final int COMBOBOX_WIDTH = 160;
     /** Combo box with host that has more recent data. */
     private Widget hostWithBetterDataWidget;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton resolveButton;
 

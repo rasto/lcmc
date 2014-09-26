@@ -21,16 +21,18 @@
 package lcmc.view;
 
 import lcmc.model.Cluster;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
-@Component
+@Named
+@Singleton
 public class ClusterTabFactory {
-    @Autowired
+    @Inject
     private ClustersPanel clustersPanel;
-    @Autowired
+    @Inject
     private Provider<ClusterTab> clusterTabProvider;
 
     public ClusterTab createClusterTab(final Cluster cluster) {

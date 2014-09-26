@@ -40,15 +40,12 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ProxyHostMenu {
     /**
      * Not connectable.
@@ -56,15 +53,15 @@ public class ProxyHostMenu {
     private static final String NOT_CONNECTABLE_STRING = Tools.getString("ProxyHostInfo.NotConnectable");
 
     private ProxyHostInfo proxyHostInfo;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private ProxyHostWizard proxyHostWizard;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<DrbdsLog> drbdsLogProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ProxyHostInfo proxyHostInfo) {

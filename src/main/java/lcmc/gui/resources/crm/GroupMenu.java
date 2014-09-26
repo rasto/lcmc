@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -44,23 +46,17 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class GroupMenu extends ServiceMenu {
 
-    @Autowired
+    @Inject
     private GUIData drbdGui;
-    @Autowired @Qualifier("serviceMenu")
+    @Inject @Named("serviceMenu")
     private Provider<ServiceMenu> serviceMenuProvider;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

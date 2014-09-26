@@ -56,13 +56,12 @@ import lcmc.utilities.ssh.SshOutput;
 import org.apache.commons.collections15.keyvalue.MultiKey;
 import org.apache.commons.collections15.map.LinkedMap;
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class parses xml from drbdsetup and drbdadm, stores the
@@ -70,8 +69,7 @@ import org.w3c.dom.NodeList;
  * information.
  * The xml is obtained with drbdsetp xml command and drbdadm dump-xml.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DrbdXml extends XML {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdXml.class);
     public static final String[] EMPTY_STRING = new String[0];
@@ -101,7 +99,7 @@ public class DrbdXml extends XML {
         it from the drbdsetup. */
     static final Map<String, Value> HARDCODED_DEFAULTS = new HashMap<String, Value>();
 
-    @Autowired
+    @Inject
     private Application application;
 
     static {
@@ -334,7 +332,7 @@ public class DrbdXml extends XML {
     private final Map<String, Boolean> hostDrbdLoadedMap = new HashMap<String, Boolean>();
     private boolean unknownSections = false;
     private String oldConfig = null;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     public void init(final Host[] hosts, final Map<Host, String> drbdParameters) {

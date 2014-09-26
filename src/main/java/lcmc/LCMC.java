@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -53,13 +56,12 @@ import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.
  */
-@Component
+@Named
+@Singleton
 public final class LCMC extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(LCMC.class);
     private static volatile boolean uncaughtExceptionFlag = false;
@@ -67,17 +69,17 @@ public final class LCMC extends JPanel {
     private static final int TOOLTIP_INITIAL_DELAY_MILLIS = 200;
     private static final int TOOLTIP_DISMISS_DELAY_MILLIS = 100000;
 
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private ArgumentParser argumentParser;
-    @Autowired
+    @Inject
     private MainPanel mainPanel;
-    @Autowired
+    @Inject
     private MainMenu menu;
-    @Autowired
+    @Inject
     private ProgressIndicatorPanel mainGlassPane;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     protected void createAndShowGUI(final Container mainFrame) {

@@ -35,6 +35,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.event.CaretEvent;
@@ -59,17 +61,12 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a terminal panel that show commands and output from
  * remote host. It is also possible to write commands and execute them.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class TerminalPanel extends JScrollPane {
     private static final Logger LOG = LoggerFactory.getLogger(TerminalPanel.class);
     /** Command to list all the cheats. */
@@ -113,7 +110,7 @@ public class TerminalPanel extends JScrollPane {
     private static final String REGISTER_MOVEMENT = "registermovement";
     /** List of cheats, with positions while typing them. */
     private static final Map<String, Integer> CHEATS_MAP = new LinkedHashMap<String, Integer>();
-    @Autowired
+    @Inject
     private RoboTest roboTest;
     private static final Map<String, Test> TEST_CHEATS = new HashMap<String, Test>();
     static {
@@ -172,11 +169,11 @@ public class TerminalPanel extends JScrollPane {
     /** Terminal output colors. */
     private final Map<String, Color> terminalColor = new HashMap<String, Color>();
     private Color defaultOutputColor;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private StartTests srartTests;
 
     public void initWithHost(final Host host0) {

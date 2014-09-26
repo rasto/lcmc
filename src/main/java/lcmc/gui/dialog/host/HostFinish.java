@@ -25,6 +25,8 @@ package lcmc.gui.dialog.host;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -40,18 +42,12 @@ import lcmc.model.UserConfig;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Host finish dialog with buttons to configure next host or configure the
  * clsuter.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class HostFinish extends DialogHost {
     /** Host icon for add another host button. */
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("Dialog.Host.Finish.HostIcon"));
@@ -62,19 +58,19 @@ final class HostFinish extends DialogHost {
     private MyButton configureClusterButton;
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Host.Finish.Save"), true);
     private NewHostDialog newHostDialog;
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private AddClusterDialog addClusterDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired @Qualifier("newHostDialog")
+    @Inject @Named("newHostDialog")
     private Provider<NewHostDialog> newHostDialogFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

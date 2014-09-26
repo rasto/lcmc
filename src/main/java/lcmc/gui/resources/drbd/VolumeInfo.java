@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -73,16 +75,11 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data of a DRBD volume.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private static final Logger LOG = LoggerFactory.getLogger(VolumeInfo.class);
     static final String DRBD_VOL_PARAM_DEV = "device";
@@ -141,17 +138,17 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private String createdFs = null;
     private JComponent infoPanel = null;
     private Set<Host> hosts;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private AddDrbdSplitBrainDialog addDrbdSplitBrainDialog;
-    @Autowired
+    @Inject
     private Provider<DrbdXml> drbdXmlProvider;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private VolumeMenu volumeMenu;
-    @Autowired
+    @Inject
     private Provider<DrbdLogs> drbdLogsProvider;
 
     void init(final String name,

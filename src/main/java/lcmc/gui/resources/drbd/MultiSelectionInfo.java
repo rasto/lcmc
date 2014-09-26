@@ -26,6 +26,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -48,22 +50,17 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class provides menus for block device and host multi selection.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class MultiSelectionInfo extends EditableInfo {
     /** All selected objects. */
     private List<Info> selectedInfos;
-    @Autowired
+    @Inject
     private MultiSelectionMenu multiSelectionMenu;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final List<Info> selectedInfos, final Browser browser) {

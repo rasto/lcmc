@@ -27,6 +27,8 @@ import java.awt.FlowLayout;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -51,17 +53,12 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can choose a distribution of the
  * host.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DrbdLinbitAvailPackages extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdLinbitAvailPackages.class);
     private static final String NO_MATCH_STRING = "No Match";
@@ -75,13 +72,13 @@ public class DrbdLinbitAvailPackages extends DialogHost {
     private List<String> drbdKernelDirItems = null;
     private List<String> drbdArchItems = null;
 
-    @Autowired
+    @Inject
     private DrbdAvailFiles drbdAvailFilesDialog;
-    @Autowired
+    @Inject
     private Provider<CheckInstallation> checkInstallationFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     protected final void availDrbdVersions() {

@@ -44,6 +44,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -61,26 +63,19 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.Application;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 
 /**
  * An implementation of a dialog with buttons. Ok button is predefined.
  * The dialogs should extend this class and overwrite at least
  * getDialogTitle(), getDescription(), getInputPane() and nextDialog() methods.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class ConfigDialog {
     private static final int INPUT_PANE_HEIGHT = 200;
     private volatile JOptionPane optionPane;
@@ -95,12 +90,12 @@ public abstract class ConfigDialog {
     private volatile Object optionPaneAnswer;
     private boolean skipButtonShouldBeEnabled = true;
     private final List<JComponent> additionalOptions = new ArrayList<JComponent>();
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private final MyButton[] options = new MyButton[buttons().length];
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     protected final JDialog getDialogPanel() {

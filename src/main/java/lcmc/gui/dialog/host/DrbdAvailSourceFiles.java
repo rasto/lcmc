@@ -25,6 +25,8 @@ package lcmc.gui.dialog.host;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -44,26 +46,21 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
  * determined.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class DrbdAvailSourceFiles extends DialogHost {
     private static final String DRBD_VERSION_AFTER_UTIL_SPLIT = "8.4.5";
-    @Autowired
+    @Inject
     private DrbdCommandInst drbdCommandInst = null;
     private Widget drbdTarballCombo = null;
     private boolean listenersAdded = false;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private static final Logger drbdVersions = LoggerFactory.getLogger(DrbdAvailSourceFiles.class);
 

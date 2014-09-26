@@ -30,6 +30,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -62,16 +64,11 @@ import lcmc.utilities.Openais;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where cluster is initialized on all hosts.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class InitCluster extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(InitCluster.class);
     private static final int CHECK_INTERVAL = 1000;
@@ -106,16 +103,16 @@ public class InitCluster extends DialogCluster {
      * override this one and use different finish/next button.
      */
     private String otherFinishButton = null;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     /** Whether to use openais init script instead of corosync. It applies only
      * if both of them are present. */
     private Widget useOpenaisButton;
-    @Autowired
+    @Inject
     private Finish finishDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {

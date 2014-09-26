@@ -21,6 +21,8 @@ package lcmc.gui.widget;
 
 import java.awt.Color;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
@@ -33,20 +35,15 @@ import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.PatternDocument;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Textfield extends GenericWidget<JComponent> {
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final Value selectedValue,

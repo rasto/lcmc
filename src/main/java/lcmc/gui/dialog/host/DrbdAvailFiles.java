@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -42,27 +44,22 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where available versions of drbd will be
  * determined.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DrbdAvailFiles extends DialogHost {
-    @Autowired
+    @Inject
     private LinbitLogin linbitLogin;
     private Widget drbdVersionCombo = null;
     /** Combo box with drbd builds. (kernel, arch) */
     private Widget drbdBuildCombo = null;
     private boolean listenersAdded = false;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

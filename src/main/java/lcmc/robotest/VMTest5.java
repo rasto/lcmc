@@ -21,15 +21,18 @@
 package lcmc.robotest;
 
 import lcmc.model.Cluster;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class VMTest5 {
-    @Autowired
+    @Inject
     private VMTest1 vmTest1;
 
     void start(final Cluster cluster, final String vmTest, final int count) {

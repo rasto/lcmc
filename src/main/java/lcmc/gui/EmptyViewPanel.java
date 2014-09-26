@@ -28,7 +28,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -42,13 +45,12 @@ import lcmc.model.HostFactory;
 import lcmc.utilities.AllHostsUpdatable;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an empty tab panel with new cluster and host button.
  */
-@Component
+@Named
+@Singleton
 public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
@@ -56,19 +58,19 @@ public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable
     private static final ImageIcon HOST_ICON = Tools.createImageIcon(Tools.getDefault("HostTab.HostIcon"));
     private static final Dimension BIG_BUTTON_DIMENSION = new Dimension(300, 100);
     private static final String LOGO_PANEL_STRING = "LOGO-STRING";
-    @Autowired
+    @Inject
     private EmptyBrowser emptyBrowser;
-    @Autowired
+    @Inject
     private Provider<AddClusterDialog> addClusterDialogProvider;
-    @Autowired
+    @Inject
     private Provider<AddHostDialog> addHostDialogProvider;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init() {

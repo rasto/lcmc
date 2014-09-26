@@ -34,15 +34,13 @@ import lcmc.model.vm.VmsXml;
 import lcmc.model.Value;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * This class holds info about VirtualDomain service in the cluster menu.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class VirtualDomainInfo extends ServiceInfo {
     /** Pattern that captures a name from xml file name. */
     static final Pattern LIBVIRT_CONF_PATTERN = Pattern.compile(".*?([^/]+).xml$");

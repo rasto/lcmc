@@ -40,7 +40,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -73,14 +76,13 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds all hosts that are added to the GUI as opposite to all
  * hosts in a cluster.
  */
-@Component
+@Named
+@Singleton
 public final class AllHostsInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(AllHostsInfo.class);
     private static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClusterTab.ClusterIcon"));
@@ -94,28 +96,28 @@ public final class AllHostsInfo extends Info {
     private final Map<Cluster, JPanel> clusterBoxBackgrounds = new HashMap<Cluster, JPanel>();
     private final JPanel mainPanel = new JPanel(new GridBagLayout());
     private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton loadMarkedClustersButton;
     /** Stop marked clusters button. */
     private MyButton unloadMarkedClustersButton;
     /** Remove marked clusters button. */
     private MyButton removeMarkedClustersButton;
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private Provider<AddHostDialog> addHostDialogProvider;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Provider<Cluster> clusterProvider;
-    @Autowired
+    @Inject
     private Clusters allClusters;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
 
     public void init(final Browser browser) {

@@ -22,6 +22,7 @@
 
 package lcmc.gui.resources;
 
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
@@ -34,15 +35,11 @@ import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a net interface.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class NetInfo extends Info {
     public static final ImageIcon NET_INTERFACE_ICON =
                                                     Tools.createImageIcon(Tools.getDefault("HostBrowser.NetIntIcon"));

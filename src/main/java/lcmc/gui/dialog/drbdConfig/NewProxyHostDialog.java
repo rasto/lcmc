@@ -27,22 +27,20 @@ import lcmc.gui.dialog.host.NewHostDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * An implementation of a dialog where user can enter either ip or hostname of
  * the host and user name.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class NewProxyHostDialog extends NewHostDialog {
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Autowired
+    @Inject
     private ConfigurationProxy configurationProxy;
 
     public void init(final WizardDialog previousDialog,

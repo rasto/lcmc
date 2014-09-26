@@ -27,22 +27,20 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.Configuration;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.MyButton;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class ConfigurationProxy extends Configuration {
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Autowired
+    @Inject
     private SSHProxy sshProxyDialog;
 
     void init(final WizardDialog previousDialog,

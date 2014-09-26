@@ -23,6 +23,8 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -33,26 +35,21 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.model.Application;
 import lcmc.model.UserConfig;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish
  * button.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class Finish extends DialogCluster {
     private final JCheckBox saveCheckBox = new JCheckBox(Tools.getString("Dialog.Cluster.Finish.Save"), true);
-    @Autowired
+    @Inject
     private EmptyBrowser emptyBrowser;
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

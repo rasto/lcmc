@@ -24,6 +24,8 @@
 package lcmc.gui.dialog.vm;
 
 import java.awt.Dimension;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -34,16 +36,11 @@ import lcmc.model.vm.GraphicsData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.GraphicsInfo;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class Display extends VMConfig {
     private static final String[] PARAMS = {GraphicsData.TYPE,
                                             GraphicsData.PORT,
@@ -55,9 +52,9 @@ final class Display extends VMConfig {
     private JComponent inputPane = null;
     private GraphicsInfo graphicsInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Autowired
+    @Inject
     private VMFinish vmFinishDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

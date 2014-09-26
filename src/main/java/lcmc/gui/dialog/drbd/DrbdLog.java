@@ -28,15 +28,13 @@ import java.util.Map;
 import java.util.Set;
 import lcmc.model.Host;
 import lcmc.gui.dialog.HostLogs;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * An implementation of an dialog with log files.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class DrbdLog extends HostLogs {
     private String drbdDeviceName;
 

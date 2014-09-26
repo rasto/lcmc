@@ -44,6 +44,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -89,18 +91,12 @@ import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.WidgetListener;
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for one hearteat service and allows to enter
  * its arguments and execute operations on it.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ServiceInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ServiceInfo.class);
 
@@ -201,29 +197,29 @@ public class ServiceInfo extends EditableInfo {
     private ResourceAgent resourceAgent;
     /** Radio buttons for clone/master/slave primitive resources. */
     private Widget typeRadioGroup;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private ServiceMenu serviceMenu;
-    @Autowired
+    @Inject
     private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Autowired
+    @Inject
     private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Autowired
+    @Inject
     private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Autowired
+    @Inject
     private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Autowired
+    @Inject
     private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Autowired
+    @Inject
     private Provider<GroupInfo> groupInfoProvider;
-    @Autowired
+    @Inject
     private Provider<CloneInfo> cloneInfoProvider;
-    @Autowired @Qualifier("serviceInfo")
+    @Inject @Named("serviceInfo")
     private Provider<ServiceInfo> serviceInfoProvider;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     protected void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {

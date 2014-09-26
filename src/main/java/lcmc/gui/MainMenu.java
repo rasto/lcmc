@@ -32,7 +32,10 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -67,13 +70,12 @@ import lcmc.model.UserConfig;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a menu panel.
  */
-@Component
+@Named
+@Singleton
 public final class MainMenu extends JPanel implements ActionListener {
     private static final Logger LOG = LoggerFactory.getLogger(MainMenu.class);
     /** Look and feel map. */
@@ -95,21 +97,21 @@ public final class MainMenu extends JPanel implements ActionListener {
     private String upgradeCheck = "";
     private String infoText = null;
     private final JPanel infoTextPanel = new JPanel();
-    @Autowired
+    @Inject
     private Provider<AddClusterDialog> addClusterDialogProvider;
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private Provider<AddHostDialog> addHostDialogProvider;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private BugReport bugReport;
-    @Autowired
+    @Inject
     private About aboutDialog;
 
     public void init() {

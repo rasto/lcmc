@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -69,17 +71,12 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class HostInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(HostInfo.class);
     static final ImageIcon HOST_STANDBY_ICON = Tools.createImageIcon(Tools.getDefault("CRMGraph.HostStandbyIcon"));
@@ -104,11 +101,11 @@ public class HostInfo extends Info {
     private Host host;
     private volatile boolean crmInfoShowing = false;
     private volatile boolean crmShowInProgress = true;
-    @Autowired
+    @Inject
     private HostMenu hostMenu;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {

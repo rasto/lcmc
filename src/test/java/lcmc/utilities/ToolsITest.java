@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
 
 import static org.junit.Assert.*;
 
@@ -160,7 +161,7 @@ public final class ToolsITest {
     }
 
     @Configuration
-    @ComponentScan(basePackages = "lcmc")
+    @ComponentScan(basePackages = "lcmc", scopeResolver = Jsr330ScopeMetadataResolver.class)
     static class TestConfig {
     }
 }

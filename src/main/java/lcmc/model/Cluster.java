@@ -40,17 +40,15 @@ import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class holds cluster data and implementation of cluster related
  * methods.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Cluster implements Comparable<Cluster> {
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
     private String name = null;
@@ -67,13 +65,13 @@ public class Cluster implements Comparable<Cluster> {
     private boolean clusterTabClosable = true;
 
     private ClusterBrowser clusterBrowser;
-    @Autowired
+    @Inject
     private GUIData guiData;
     /**
      * Proxy hosts. More can be added in the DRBD config
      * wizard. */
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
-    @Autowired
+    @Inject
     private Application application;
 
     public void setName(final String name) {

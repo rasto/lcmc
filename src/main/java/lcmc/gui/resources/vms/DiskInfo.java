@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -52,17 +54,12 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about Virtual Disks.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class DiskInfo extends HardwareInfo {
     private static final Logger LOG = LoggerFactory.getLogger(DiskInfo.class);
     /** Parameters. */
@@ -353,9 +350,9 @@ public final class DiskInfo extends HardwareInfo {
                                            new StringValue("vde")});
     }
 
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /** Source file combo box, so that it can be disabled, depending on type. */

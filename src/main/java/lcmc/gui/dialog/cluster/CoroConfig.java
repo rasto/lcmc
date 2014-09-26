@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -73,17 +75,12 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all
  * hosts.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class CoroConfig extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(CoroConfig.class);
     private static final Value MCAST_TYPE = new StringValue("mcast");
@@ -120,13 +117,13 @@ final class CoroConfig extends DialogCluster {
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
 
-    @Autowired
+    @Inject
     private InitCluster initClusterDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
 

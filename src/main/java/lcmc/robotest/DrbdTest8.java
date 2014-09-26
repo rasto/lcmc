@@ -29,20 +29,23 @@ import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class DrbdTest8 {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
-    @Autowired
+    @Inject
     private DrbdTest1 drbdTest1;
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest8.class);
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     /** DRBD Test 8 / proxy. */

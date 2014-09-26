@@ -26,6 +26,8 @@ package lcmc.gui.dialog.drbdConfig;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,31 +45,26 @@ import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class Start extends WizardDialog {
     private static final int COMBOBOX_WIDTH = 250;
     private Widget drbdResourceWidget;
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
     private ResourceInfo resourceInfo;
-    @Autowired
+    @Inject
     private Resource resourceDialog;
-    @Autowired
+    @Inject
     private Volume volumeDialog;
     private GlobalInfo globalInfo;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final WizardDialog previousDialog,

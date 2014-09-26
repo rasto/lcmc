@@ -27,6 +27,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,18 +45,12 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where entered ip or the host is looked up
  * with dns.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Configuration extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
     private static final int MAX_HOPS = Tools.getDefaultInt("MaxHops");
@@ -63,13 +60,13 @@ public class Configuration extends DialogHost {
     private final Widget[] ipCombo = new Widget[MAX_HOPS];
     private String[] hostnames = new String[MAX_HOPS];
     private volatile boolean hostnameOk = false;
-    @Autowired
+    @Inject
     private Devices devices;
-    @Autowired @Qualifier("SSH")
+    @Resource(name="SSH")
     private SSH sshDialog;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /** Finishes the dialog and stores the values. */

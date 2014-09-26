@@ -23,11 +23,12 @@ package lcmc.gui.resources.drbd;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
 import lcmc.EditHostDialog;
-import lcmc.LCMC;
 import lcmc.ProxyHostWizard;
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
@@ -52,34 +53,29 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class HostDrbdMenu {
     private static final String LVM_MENU = "LVM";
     private static final String VG_CREATE_MENU_ITEM = "Create VG";
     private static final String VG_CREATE_MENU_DESCRIPTION = "Create a volume group.";
     private static final String LV_CREATE_MENU_ITEM = "Create LV in VG ";
     private static final String LV_CREATE_MENU_DESCRIPTION = "Create a logical volume.";
-    @Autowired
+    @Inject
     private EditHostDialog editHostDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private ProxyHostWizard proxyHostWizard;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<VGCreate> vgCreateProvider;
-    @Autowired
+    @Inject
     private Provider<LVCreate> lvCreateProvider;
-    @Autowired
+    @Inject
     private Provider<DrbdsLog> drbdsLogProvider;
 
     public List<UpdatableItem> getPulldownMenu(final Host host, final HostDrbdInfo hostDrbdInfo) {

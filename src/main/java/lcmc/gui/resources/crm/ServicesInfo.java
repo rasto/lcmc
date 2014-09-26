@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -69,49 +71,43 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for services view and global heartbeat
  * config.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ServicesInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
     static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
     /** Cache for the info panel. */
     private JComponent infoPanel = null;
 
-    @Autowired
+    @Inject
     private ServicesMenu servicesMenu;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Autowired
+    @Inject
     private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Autowired
+    @Inject
     private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Autowired
+    @Inject
     private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Autowired
+    @Inject
     private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Autowired @Qualifier("serviceInfo")
+    @Inject @Named("serviceInfo")
     private Provider<ServiceInfo> serviceInfoProvider;
-    @Autowired
+    @Inject
     private Provider<GroupInfo> groupInfoProvider;
-    @Autowired
+    @Inject
     private Provider<CloneInfo> cloneInfoProvider;
-    @Autowired
+    @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Autowired
+    @Inject
     private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

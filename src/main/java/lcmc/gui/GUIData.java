@@ -42,6 +42,9 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.BoxLayout;
 import javax.swing.JApplet;
 import javax.swing.JButton;
@@ -78,14 +81,13 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.view.ClusterTab;
 import lcmc.view.ClustersPanel;
 import lcmc.view.MainPanel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Holds global GUI data, so that they can be retrieved easily throughout
  * the application and some functions that use this data.
  */
-@Component
+@Named
+@Singleton
 public class GUIData  {
     private static final Logger LOG = LoggerFactory.getLogger(GUIData.class);
 
@@ -94,12 +96,12 @@ public class GUIData  {
     private static final Dimension DIALOG_PANEL_SIZE = new Dimension(DIALOG_PANEL_WIDTH, DIALOG_PANEL_HEIGHT);
     public static final String MIME_TYPE_TEXT_HTML = "text/html";
     public static final String MIME_TYPE_TEXT_PLAIN = "text/plain";
-    @Autowired
+    @Inject
     private MainPanel mainPanel;
     private JSplitPane terminalSplitPane;
     private ClustersPanel clustersPanel;
     /** Invisible panel with progress indicator. */
-    @Autowired
+    @Inject
     private ProgressIndicatorPanel mainGlassPane;
     private final ReadWriteLock mAddClusterButtonListLock = new ReentrantReadWriteLock();
     private final Lock mAddClusterButtonListReadLock = mAddClusterButtonListLock.readLock();
@@ -120,11 +122,11 @@ public class GUIData  {
     private final Collection<AllHostsUpdatable> allHostsUpdateList = new ArrayList<AllHostsUpdatable>();
     /** Selected components for copy/paste. */
     private List<Info> selectedComponents = null;
-    @Autowired
+    @Inject
     private MainMenu mainMenu;
 
     private static volatile int prevScrollingMenuIndex = -1;
-    @Autowired
+    @Inject
     private Application application;
 
     private Container mainFrame;

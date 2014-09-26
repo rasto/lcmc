@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
@@ -45,18 +47,13 @@ import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class RadioGroup extends GenericWidget<JComponent> {
     private Value radioGroupValue;
     /** Radio group hash, from string that is displayed to the object. */
@@ -66,7 +63,7 @@ public final class RadioGroup extends GenericWidget<JComponent> {
     private final ReadWriteLock mComponentsLock = new ReentrantReadWriteLock();
     private final Lock mComponentsReadLock = mComponentsLock.readLock();
     private final Lock mComponentsWriteLock = mComponentsLock.writeLock();
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final Value selectedValue,

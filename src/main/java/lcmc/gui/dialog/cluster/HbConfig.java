@@ -42,6 +42,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -76,16 +78,11 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where heartbeat is initialized on all hosts.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class HbConfig extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(HbConfig.class);
     private static final String KEEPALIVE_OPTION = "keepalive";
@@ -190,14 +187,14 @@ final class HbConfig extends DialogCluster {
     private volatile JScrollPane configScrollPane = null;
     private volatile boolean configAlreadyScrolled = false;
     private CountDownLatch fieldCheckLatch = new CountDownLatch(1);
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
-    @Autowired
+    @Inject
     private InitCluster initCluster;
 
     @Override

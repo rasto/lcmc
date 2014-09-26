@@ -25,6 +25,8 @@ package lcmc.gui.dialog.lvm;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -42,16 +44,11 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class implements LVM snapshot dialog.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class LVSnapshot extends LV {
     private static final int SNAPSHOT_TIMEOUT = 5000;
     private static final String SNAPSHOT_DESCRIPTION = "Create a snapshot of the logical volume.";
@@ -59,9 +56,9 @@ public final class LVSnapshot extends LV {
     private Widget lvNameWi;
     private Widget sizeWi;
     private Widget maxSizeWi;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton snapshotButton;
 

@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -48,17 +50,12 @@ import lcmc.model.Host;
 import lcmc.model.Hosts;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to
  * the cluster.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class ClusterHosts extends DialogCluster {
     private static final ImageIcon HOST_CHECKED_ICON = Tools.createImageIcon(
                                                Tools.getDefault("Dialog.Cluster.ClusterHosts.HostCheckedIcon"));
@@ -67,15 +64,15 @@ final class ClusterHosts extends DialogCluster {
     /** Map from checkboxes to the host, which they choose. */
     private final Map<JCheckBox, Host> checkBoxToHost = new LinkedHashMap<JCheckBox, Host>();
 
-    @Autowired
+    @Inject
     private CommStack commStackDialog;
-    @Autowired
+    @Inject
     private Connect connectDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Hosts allHosts;
 
     /** It is executed after the dialog is applied. */

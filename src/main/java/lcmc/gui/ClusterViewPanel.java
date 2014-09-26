@@ -21,25 +21,22 @@
  */
 package lcmc.gui;
 import java.awt.BorderLayout;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.Box;
 import lcmc.model.Cluster;
 import lcmc.utilities.AllHostsUpdatable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a custer view with tree of services.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ClusterViewPanel extends ViewPanel implements AllHostsUpdatable {
     private Cluster cluster;
 
-    @Autowired
+    @Inject
     private ClusterBrowser clusterBrowser;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     public void init(final Cluster cluster) {

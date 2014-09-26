@@ -31,7 +31,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,8 +52,6 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.view.ClusterTabFactory;
 import lcmc.view.ClustersPanel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -60,7 +61,8 @@ import org.w3c.dom.NodeList;
  * This class parses xml from user configs and creates data objects,
  * that describe the hosts and clusters.
  */
-@Component
+@Named
+@Singleton
 public final class UserConfig extends XML {
     private static final Logger LOG = LoggerFactory.getLogger(XML.class);
     private static final String HOST_NAME_ATTR = "name";
@@ -75,19 +77,19 @@ public final class UserConfig extends XML {
     private static final String ENCODING = "UTF-8";
     public static final boolean PROXY_HOST = true;
 
-    @Autowired
+    @Inject
     private ClusterTabFactory clusterTabFactory;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private ClustersPanel clustersPanel;
-    @Autowired
+    @Inject
     private Provider<Cluster> clusterProvider;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Hosts allHosts;
-    @Autowired
+    @Inject
     private Clusters allClusters;
 
     /** Saves data about clusters and hosts to the supplied output stream. */

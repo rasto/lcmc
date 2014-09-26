@@ -26,6 +26,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -44,11 +47,6 @@ import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds host and cluster resource data in a tree. It shows
@@ -56,8 +54,7 @@ import org.springframework.stereotype.Component;
  * clusters.
  * Every resource has its Info object, that accessible through the tree view.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Browser {
     private static final Logger LOG = LoggerFactory.getLogger(Browser.class);
     public static final ImageIcon CATEGORY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
@@ -70,9 +67,9 @@ public class Browser {
     private DefaultTreeModel treeModel;
     private DefaultMutableTreeNode treeTop;
     private JTree tree;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired @Qualifier("categoryInfo")
+    @Resource(name="categoryInfo")
     private CategoryInfo resourcesCategory;
 
     private JSplitPane infoPanelSplitPane;
@@ -254,7 +251,7 @@ public class Browser {
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
-              node.add(child);
+                node.add(child);
             }
         });
     }

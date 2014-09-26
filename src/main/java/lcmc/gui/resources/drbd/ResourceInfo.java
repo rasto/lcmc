@@ -40,6 +40,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -80,17 +82,12 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ResourceInfo extends AbstractDrbdInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceInfo.class);
     static final String DRBD_RES_PARAM_NAME = "name";
@@ -143,13 +140,13 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private Set<Host> hosts;
     private final Collection<Host> selectedProxyHosts = new HashSet<Host>();
     private GlobalInfo globalInfo;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private ResourceMenu resourceMenu;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
-    @Autowired
+    @Inject
     private Provider<ProxyNetInfo> proxyNetInfoProvider;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {

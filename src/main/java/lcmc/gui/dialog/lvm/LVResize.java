@@ -30,6 +30,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -57,16 +59,11 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class implements LVM resize dialog.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class LVResize extends LV {
     private static final Logger LOG = LoggerFactory.getLogger(LVResize.class);
     private static final String DESCRIPTION =
@@ -82,9 +79,9 @@ public final class LVResize extends LV {
     private Widget oldSizeWidget;
     private Widget maxSizeWidget;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton resizeButton;
 

@@ -22,15 +22,13 @@ package lcmc.presenter;
 
 import lcmc.gui.EmptyBrowser;
 import lcmc.model.Cluster;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+import javax.inject.Inject;
+import javax.inject.Named;
+
+@Named
 public class ClusterPresenter {
-    @Autowired
+    @Inject
     private EmptyBrowser emptyBrowser;
 
     public void onCloseCluster(final Cluster cluster) {

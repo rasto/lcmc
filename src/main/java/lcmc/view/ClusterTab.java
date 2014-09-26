@@ -28,6 +28,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,29 +42,24 @@ import lcmc.gui.EmptyViewPanel;
 import lcmc.presenter.ClusterPresenter;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,
  * that are in the cluster.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ClusterTab extends JPanel {
     private Cluster cluster;
     private JLabel labelTitle;
-    @Autowired
+    @Inject
     private EmptyViewPanel emptyViewPanel;
-    @Autowired
+    @Inject
     private ClusterPresenter clusterPresenter;
-    @Autowired
+    @Inject
     private ClusterViewPanel clusterViewPanel;
 
     public static final ImageIcon CLUSTER_ICON = Tools.createImageIcon(Tools.getDefault("ClustersPanel.ClusterIcon"));
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void initWithCluster(final Cluster cluster0) {

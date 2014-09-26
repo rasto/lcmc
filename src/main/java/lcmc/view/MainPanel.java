@@ -22,6 +22,9 @@
 package lcmc.view;
 
 import java.awt.BorderLayout;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
@@ -29,22 +32,21 @@ import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.model.HostFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * The very main panel, where everything is inside.
  */
-@Component
+@Named
+@Singleton
 public final class MainPanel extends JPanel {
 
-    @Autowired
+    @Inject
     private ClustersPanel clustersPanel;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init() {

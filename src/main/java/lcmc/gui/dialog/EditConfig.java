@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -50,16 +52,11 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an edit config dialog.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class EditConfig extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditConfig.class);
     private String fileToEdit;
@@ -73,9 +70,9 @@ public final class EditConfig extends ConfigDialog {
     /** Whether config area is being filled so that save button,
         doesn't get enabled. */
     private volatile boolean configInProgress = true;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final String fileToEdit, final Set<Host> hosts) {

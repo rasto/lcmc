@@ -30,6 +30,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -48,21 +50,16 @@ import lcmc.gui.widget.Check;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds clone service info object.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class CloneInfo extends ServiceInfo {
     private ServiceInfo containedService = null;
-    @Autowired
+    @Inject
     private CloneMenu cloneMenu;
-    @Autowired
+    @Inject
     private Application application;
 
     void init(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {

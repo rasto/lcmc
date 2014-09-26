@@ -34,7 +34,6 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import lcmc.AppContext;
-import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.gui.MainMenu;
 import lcmc.model.Application;

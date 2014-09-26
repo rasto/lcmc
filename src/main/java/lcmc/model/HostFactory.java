@@ -20,14 +20,15 @@
 
 package lcmc.model;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
-@Component
+@Named
+@Singleton
 public class HostFactory {
-    @Autowired
+    @Inject
     private Provider<Host> hostProvider;
 
     public Host createInstance() {

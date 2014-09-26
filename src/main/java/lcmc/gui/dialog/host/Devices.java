@@ -25,6 +25,8 @@ package lcmc.gui.dialog.host;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -36,20 +38,15 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where hardware information is collected.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Devices extends DialogHost {
-    @Autowired
+    @Inject
     private DistDetection distDetection;
-    @Autowired
+    @Inject
     private Application application;
 
     /** Checks the answer and makes it visible to the user. */

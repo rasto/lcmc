@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -40,25 +42,20 @@ import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds the information about resource agent class and its
  * services.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ResourceAgentClassInfo extends HbCategoryInfo {
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     /** Map from ResourceAgent name to its object. It is possible only within
      * a class. */
     private final Map<String, ResourceAgent> raMap = new HashMap<String, ResourceAgent>();
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final String name, final Browser browser) {

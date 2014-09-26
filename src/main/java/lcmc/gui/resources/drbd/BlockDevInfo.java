@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -68,16 +70,11 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a block device.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class BlockDevInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDevInfo.class);
     private static final Value DRBD_MD_TYPE_FLEXIBLE = new StringValue("Flexible");
@@ -102,11 +99,11 @@ public class BlockDevInfo extends EditableInfo {
     private static final String PROXY_DOWN = "Proxy Down";
 
     private static final String BY_UUID_PATH = "/dev/disk/by-uuid/";
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private BlockDevMenu blockDevMenu;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {

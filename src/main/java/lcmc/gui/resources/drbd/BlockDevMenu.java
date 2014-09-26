@@ -53,15 +53,12 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class BlockDevMenu {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDevMenu.class);
 
@@ -83,23 +80,23 @@ public class BlockDevMenu {
     private static final String LV_SNAPSHOT_MENU_DESCRIPTION = "Create a snapshot of the logical volume.";
 
     private BlockDevInfo blockDevInfo;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<VGCreate> vgCreateProvide;
-    @Autowired
+    @Inject
     private Provider<VGRemove> vgRemoveProvider;
-    @Autowired
+    @Inject
     private Provider<LVCreate> lvCreateProvider;
-    @Autowired
+    @Inject
     private Provider<LVResize> lvResizeProvder;
-    @Autowired
+    @Inject
     private Provider<LVSnapshot> lvSnapshotProvider;
-    @Autowired
+    @Inject
     private Provider<DrbdLog> drbdLogProvider;
 
     public List<UpdatableItem> getPulldownMenu(final BlockDevInfo blockDevInfo) {

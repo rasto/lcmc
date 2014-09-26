@@ -35,21 +35,19 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * this class holds info data, menus and configuration
  * for a drbd resource.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class AbstractDrbdInfo extends EditableInfo {
     protected static final String DRBD_RES_PARAM_AFTER = "resync-after";
     protected static final String DRBD_RES_PARAM_AFTER_8_3 = "after";
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

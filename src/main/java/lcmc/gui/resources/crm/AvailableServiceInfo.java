@@ -26,6 +26,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -39,27 +41,22 @@ import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds the information about heartbeat service from the ocfs,
  * to show it to the user.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class AvailableServiceInfo extends HbCategoryInfo {
     private static final ImageIcon AVAIL_SERVICES_ICON =
                                     Tools.createImageIcon(Tools.getDefault("ServiceInfo.ServiceStartedIconSmall"));
     private static final ImageIcon BACK_TO_OVERVIEW_ICON = Tools.createImageIcon(Tools.getDefault("BackIcon"));
     private ResourceAgent resourceAgent;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private AvailableServiceMenu availableServiceInfo;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final ResourceAgent resourceAgent, final Browser browser) {

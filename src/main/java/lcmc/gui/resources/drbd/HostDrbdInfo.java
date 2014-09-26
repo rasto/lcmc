@@ -31,6 +31,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -54,26 +56,21 @@ import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a host.
  * It shows host view, just like in the host tab.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class HostDrbdInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(HostDrbdInfo.class);
     static final String NO_DRBD_STATUS_TOOLTIP = "drbd status is not available";
-    @Autowired
+    @Inject
     private HostDrbdMenu hostDrbdMenu;
     private Host host;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final Host host, final Browser browser) {

@@ -23,17 +23,20 @@ package lcmc.robotest;
 import lcmc.model.Cluster;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class DrbdTest5 {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
-    @Autowired
+    @Inject
     private DrbdTest1 drbdTest1;
 
     private static final Logger LOG = LoggerFactory.getLogger(DrbdTest5.class);

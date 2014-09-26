@@ -21,6 +21,7 @@
  */
 package lcmc.gui.resources;
 
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
@@ -31,15 +32,11 @@ import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a filesystem.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class FSInfo extends Info {
     private static final ImageIcon FS_ICON = Tools.createImageIcon(Tools.getDefault("HostBrowser.FileSystemIcon"));
     private String cachedModinfoOutput = null;

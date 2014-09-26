@@ -23,6 +23,8 @@ import java.awt.Color;
 import java.awt.ItemSelectable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -33,18 +35,13 @@ import lcmc.model.StringValue;
 import lcmc.model.Value;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Checkbox extends GenericWidget<JComponent> {
     static final String CHECKBOX_TRUE = "True";
     static final String CHECKBOX_FALSE = "False";
@@ -52,7 +49,7 @@ public class Checkbox extends GenericWidget<JComponent> {
     private Value checkBoxTrue = new StringValue(CHECKBOX_TRUE);
     /** Name for the 'false' value. */
     private Value checkBoxFalse = new StringValue(CHECKBOX_FALSE);
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final Value selectedValue,

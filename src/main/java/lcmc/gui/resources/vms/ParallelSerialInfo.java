@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.model.AccessMode;
@@ -43,17 +45,12 @@ import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual parallel or serial device.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class ParallelSerialInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {
@@ -181,9 +178,9 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     }
     /** Table panel. */
     private JComponent tablePanel = null;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {

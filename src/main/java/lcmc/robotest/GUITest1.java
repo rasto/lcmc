@@ -23,15 +23,18 @@ package lcmc.robotest;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class GUITest1 {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
 
     /** Host wizard locked until focus is lost. */

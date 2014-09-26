@@ -27,6 +27,8 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 
 import lcmc.model.Application;
@@ -42,16 +44,11 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Object that holds an order constraint information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ConstraintPHInfo extends ServiceInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ConstraintPHInfo.class);
     static final String NAME = "Placeholder";
@@ -74,9 +71,9 @@ public class ConstraintPHInfo extends ServiceInfo {
     private volatile PcmkRscSetsInfo pcmkRscSetsInfo = null;
     /** Whether the all resources are required to be started. */
     private Preference preference;
-    @Autowired
+    @Inject
     private ConstraintPHMenu constraintPHMenu;
-    @Autowired
+    @Inject
     private Application application;
 
 

@@ -23,6 +23,8 @@
 package lcmc.gui.dialog.cluster;
 
 import java.awt.BorderLayout;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,31 +42,26 @@ import lcmc.model.Clusters;
 import lcmc.model.StringValue;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter the name of the cluster.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class Name extends DialogCluster {
     private static final int NAME_FIELD_WIDTH = 120;
     private Widget nameField;
 
-    @Autowired
+    @Inject
     private ClusterHosts clusterHostsDialog;
-    @Autowired
+    @Inject
     private ClusterTabFactory clusterTabFactory;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Clusters allClusters;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

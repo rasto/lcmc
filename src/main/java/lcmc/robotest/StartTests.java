@@ -20,7 +20,6 @@
 
 package lcmc.robotest;
 
-import lcmc.LCMC;
 import lcmc.gui.GUIData;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
@@ -28,74 +27,76 @@ import lcmc.model.Host;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.IOException;
 
-@Component
+@Named
+@Singleton
 public class StartTests {
     private static final Logger LOG = LoggerFactory.getLogger(RoboTest.class);
 
-    @Autowired
+    @Inject
     private PcmkTest1 pcmkTest1;
-    @Autowired
+    @Inject
     private PcmkTest2 pcmkTest2;
-    @Autowired
+    @Inject
     private PcmkTest3 pcmkTest3;
-    @Autowired
+    @Inject
     private PcmkTest4 pcmkTest4;
-    @Autowired
+    @Inject
     private PcmkTest5 pcmkTest5;
-    @Autowired
+    @Inject
     private PcmkTest6 pcmkTest6;
-    @Autowired
+    @Inject
     private PcmkTest7 pcmkTest7;
-    @Autowired
+    @Inject
     private PcmkTest8 pcmkTest8;
-    @Autowired
+    @Inject
     private PcmkTestA pcmkTestA;
-    @Autowired
+    @Inject
     private PcmkTestB pcmkTestB;
-    @Autowired
+    @Inject
     private PcmkTestC pcmkTestC;
-    @Autowired
+    @Inject
     private PcmkTestD pcmkTestD;
-    @Autowired
+    @Inject
     private PcmkTestE pcmkTestE;
-    @Autowired
+    @Inject
     private PcmkTestF pcmkTestF;
-    @Autowired
+    @Inject
     private PcmkTestG pcmkTestG;
-    @Autowired
+    @Inject
     private PcmkTestH pcmkTestH;
-    @Autowired
+    @Inject
     private RoboTest roboTest;
-    @Autowired
+    @Inject
     private DrbdTest1 drbdTest1;
-    @Autowired
+    @Inject
     private DrbdTest2 drbdTest2;
-    @Autowired
+    @Inject
     private DrbdTest3 drbdTest3;
-    @Autowired
+    @Inject
     private DrbdTest4 drbdTest4;
-    @Autowired
+    @Inject
     private DrbdTest5 drbdTest5;
-    @Autowired
+    @Inject
     private DrbdTest8 drbdTest8;
-    @Autowired
+    @Inject
     private GUITest1 guiTest1;
-    @Autowired
+    @Inject
     private GUITest2 guiTest2;
-    @Autowired
+    @Inject
     private VMTest1 vmTest1;
-    @Autowired
+    @Inject
     private VMTest4 vmTest4;
-    @Autowired
+    @Inject
     private VMTest5 vmTest5;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     private Cluster cluster;

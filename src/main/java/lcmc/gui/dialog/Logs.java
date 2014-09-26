@@ -43,6 +43,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -65,25 +67,20 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of an dialog with log files from many hosts.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 class Logs extends ConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(Logs.class);
     private final JTextPane logTextArea = new JTextPane();
     private final Map<String, JCheckBox> patternToCheckBoxMap = new HashMap<String, JCheckBox>();
     private final Lock mRefreshLock = new ReentrantLock();
     private final Collection<JComponent> additionalComponents = new ArrayList<JComponent>();
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /**

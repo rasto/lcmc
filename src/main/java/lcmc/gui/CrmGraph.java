@@ -46,6 +46,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -66,17 +68,12 @@ import lcmc.utilities.MenuAction;
 import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class creates graph and provides methods to add new nodes, edges,
  * remove or modify them.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class CrmGraph extends ResourceGraph {
     /** X position of a new block device. */
 
@@ -147,13 +144,13 @@ public class CrmGraph extends ResourceGraph {
 
     private int hostDefaultXPos = 10;
     private PcmkMultiSelectionInfo multiSelectionInfo = null;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Provider<PcmkMultiSelectionInfo> pcmkMultiSelectionInfoProvider;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
 
     @Override

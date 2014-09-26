@@ -30,15 +30,12 @@ import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ConnectionThread extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectionThread.class);
     private String hostname;
@@ -53,9 +50,9 @@ public class ConnectionThread extends Thread {
 
     private volatile boolean connectionFailed;
     private volatile boolean connectionEstablished = false;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
     void init(final Host host,

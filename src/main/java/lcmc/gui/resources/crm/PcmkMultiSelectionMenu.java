@@ -25,9 +25,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JColorChooser;
 
-import lcmc.LCMC;
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
@@ -50,20 +51,15 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class PcmkMultiSelectionMenu {
     private PcmkMultiSelectionInfo pcmkMultiSelectionInfo;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     public List<UpdatableItem> getPulldownMenu(final PcmkMultiSelectionInfo pcmkMultiSelectionInfo) {

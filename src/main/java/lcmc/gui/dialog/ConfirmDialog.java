@@ -23,16 +23,14 @@
 
 package lcmc.gui.dialog;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import lcmc.model.Application;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * Creates confirm dialog with yes and no options.
@@ -41,14 +39,13 @@ import org.springframework.stereotype.Component;
  * this dialog.
  *
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ConfirmDialog extends ConfigDialog {
     private String description;
     private String title;
     private String yesButton;
     private String noButton;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final String title, final String description, final String yesButton, final String noButton) {

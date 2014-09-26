@@ -22,6 +22,8 @@
 package lcmc.gui.dialog.host;
 
 import java.awt.BorderLayout;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -35,27 +37,22 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**.
  * An implementation of a dialog where user can enter the name and password
  * for the linbit website.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class LinbitLogin extends DialogHost {
     private static final int CHECKBOX_WIDTH = 120;
     private Widget downloadUserField;
     private Widget downloadPasswordField;
     private JCheckBox saveCheckBox;
-    @Autowired
+    @Inject
     private DrbdLinbitInst drbdLinbitInst;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

@@ -29,15 +29,12 @@ import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Authentication {
     private static final Logger LOG = LoggerFactory.getLogger(Authentication.class);
 
@@ -53,9 +50,9 @@ public class Authentication {
     private boolean authenticated = false;
     private int passwdTry = 3;
     private boolean enableKeyboardInteractive = true;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<PopupHostKeyVerifier> popupHostKeyVerifierProvider;
 
     public void init(final LastSuccessfulPassword lastSuccessfulPassword, final Host host, final SSHGui sshGui) {

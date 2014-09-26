@@ -40,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -82,18 +84,13 @@ import lcmc.utilities.MyMenu;
 import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for resources, services, hosts, clusters
  * etc. It provides methods to show this info and graphical view if
  * available.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Info implements Comparable<Info>, Value {
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Amount of frames per second. */
@@ -129,7 +126,7 @@ public class Info implements Comparable<Info>, Value {
                                                                 new HashMap<JTextComponent, AccessMode>();
     /** Hash from component to the enable access mode. */
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final String name, final Browser browser) {

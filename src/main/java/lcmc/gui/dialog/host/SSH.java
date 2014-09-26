@@ -24,6 +24,8 @@ package lcmc.gui.dialog.host;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -36,21 +38,16 @@ import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class SSH extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(SSH.class);
-    @Autowired
+    @Inject
     private Devices devices;
-    @Autowired
+    @Inject
     private Application application;
 
     private String connectHost() {

@@ -43,12 +43,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JComponent;
 
-import lcmc.AppContext;
 import lcmc.Exceptions;
-import lcmc.LCMC;
 import lcmc.configs.DistResource;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
@@ -77,16 +77,11 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.ssh.SshOutput;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds host data and implementation of host related methods.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class Host implements Comparable<Host>, Value {
     private static final Logger LOG = LoggerFactory.getLogger(Host.class);
     public static final String NOT_CONNECTED_MENU_TOOLTIP_TEXT = "not connected to the host";
@@ -245,23 +240,23 @@ public class Host implements Comparable<Host>, Value {
 
     private boolean drbdStatusOk = false;
 
-    @Autowired
+    @Inject
     private DrbdHost drbdHost;
-    @Autowired
+    @Inject
     private TerminalPanel terminalPanel;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Ssh ssh;
-    @Autowired
+    @Inject
     private HostBrowser hostBrowser;
-    @Autowired
+    @Inject
     private Provider<DrbdXml> drbdXmlProvider;
-    @Autowired
+    @Inject
     private Hosts allHosts;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private RoboTest roboTest;
 
     public void init() {

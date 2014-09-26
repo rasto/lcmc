@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
@@ -57,16 +59,11 @@ import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class shows a list of virtual machines.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class VMListInfo extends CategoryInfo {
     /**
      * Default widths for columns.
@@ -89,15 +86,15 @@ public final class VMListInfo extends CategoryInfo {
      */
     private volatile Map<String, Color> domainToColor =
             new HashMap<String, Color>();
-    @Autowired
+    @Inject
     private Provider<AddVMConfigDialog> addVMConfigDialogProvider;
-    @Autowired
+    @Inject
     private Provider<DomainInfo> domainInfoProvider;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /**

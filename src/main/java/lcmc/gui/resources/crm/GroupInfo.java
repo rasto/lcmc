@@ -35,6 +35,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -54,18 +56,12 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * GroupInfo class holds data for heartbeat group, that is in some ways
  * like normal service, but it can contain other services.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class GroupInfo extends ServiceInfo {
     private static final Logger LOG = LoggerFactory.getLogger(GroupInfo.class);
     private final List<ServiceInfo> groupServices = new ArrayList<ServiceInfo>();
@@ -73,21 +69,21 @@ public class GroupInfo extends ServiceInfo {
     private final ReadWriteLock mGroupServiceLock = new ReentrantReadWriteLock();
     private final Lock mGroupServiceReadLock = mGroupServiceLock.readLock();
     private final Lock mGroupServiceWriteLock = mGroupServiceLock.writeLock();
-    @Autowired
+    @Inject
     private GroupMenu groupMenu;
-    @Autowired @Qualifier("serviceInfo")
+    @Inject @Named("serviceInfo")
     private Provider<ServiceInfo> serviceInfoProvider;
-    @Autowired
+    @Inject
     private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Autowired
+    @Inject
     private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Autowired
+    @Inject
     private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Autowired
+    @Inject
     private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Autowired
+    @Inject
     private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Autowired
+    @Inject
     private Application application;
 
     void init(final ResourceAgent ra, final Browser browser) {

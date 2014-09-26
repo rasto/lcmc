@@ -24,6 +24,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JDialog;
 
@@ -54,31 +56,25 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class ServicesMenu {
 
     private static final Logger LOG = LoggerFactory.getLogger(ServicesInfo.class);
 
-    @Autowired
+    @Inject
     private EditClusterDialog editClusterDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
-    @Autowired
+    @Inject
     private Provider<PcmkRscSetsInfo> rscSetsInfoProvider;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired @Qualifier("clusterLogs")
+    @Inject @Named("clusterLogs")
     private Provider<ClusterLogs> clusterLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final ServicesInfo servicesInfo) {

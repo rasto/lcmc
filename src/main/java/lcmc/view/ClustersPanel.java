@@ -27,6 +27,9 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.Insets;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -45,15 +48,13 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 /**
  * An implementation of a panel that holds cluster tabs. Clicking on the tab,
  * changes also host that is shown in the terminal panel, to the host, that
  * is active in the cluster.
  */
-@Component
+@Named
+@Singleton
 public final class ClustersPanel extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(ClustersPanel.class);
     private static final ImageIcon ALL_CLUSTERS_ICON = Tools.createImageIcon(
@@ -61,14 +62,14 @@ public final class ClustersPanel extends JPanel {
     private static final String ALL_CLUSTERS_LABEL = Tools.getString("ClustersPanel.ClustersTab");
     private static final int TAB_BORDER_WIDTH = 3;
     private JTabbedPane tabbedPane;
-    @Autowired
+    @Inject
     private ClusterTabFactory clusterTabFactory;
     private ClusterTab previouslySelectedTab = null;
-    @Autowired
+    @Inject
     private UserConfig userConfig;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
 
     /** Shows the tabbed pane. */

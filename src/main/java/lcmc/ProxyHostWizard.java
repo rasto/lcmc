@@ -28,23 +28,21 @@ import lcmc.gui.dialog.drbdConfig.NewProxyHostDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Show step by step dialogs that add and configure new proxy host.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ProxyHostWizard {
     private static final Logger LOG = LoggerFactory.getLogger(ProxyHostWizard.class);
     private VolumeInfo volumeInfo;
     private Host host;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private NewProxyHostDialog newProxyHostDialog;
 
     public void init(final Host host, final VolumeInfo volumeInfo) {

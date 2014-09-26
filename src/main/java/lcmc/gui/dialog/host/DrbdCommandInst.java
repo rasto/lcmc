@@ -22,6 +22,8 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -40,22 +42,17 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd is installed.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class DrbdCommandInst extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(DrbdCommandInst.class);
-    @Autowired
+    @Inject
     private Provider<CheckInstallation> checkInstallationProvider;
     private CheckInstallation checkInstallation;
-    @Autowired
+    @Inject
     private Application application;
 
     /**

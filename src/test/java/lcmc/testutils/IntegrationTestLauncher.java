@@ -37,16 +37,17 @@ import lcmc.model.Host;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
 import lcmc.view.ClusterTabFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import javax.inject.Provider;
 
-import static org.junit.Assert.assertEquals;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * This class provides tools for testing.
  */
-@Component
+@Named
+@Singleton
 public class IntegrationTestLauncher {
     private static final String PASSWORD = "rastislav";
     private static final String ID_DSA_KEY = "rastislav";
@@ -58,19 +59,19 @@ public class IntegrationTestLauncher {
     private final List<Host> hosts = new ArrayList<Host>();
     private volatile boolean clusterLoaded = false;
 
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<Host> hostProvider;
-    @Autowired
+    @Inject
     private Provider<Cluster> clusterProvider;
-    @Autowired
+    @Inject
     private ProgressIndicatorPanel glassPane;
-    @Autowired
+    @Inject
     private LCMC lcmc;
-    @Autowired
+    @Inject
     private ClusterTabFactory clusterTabFactory;
 
     public void initTestCluster() {

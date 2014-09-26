@@ -28,22 +28,20 @@ import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This ServerHostKeyVerifier asks the user on how to proceed if a key
  * cannot be found in the in-memory database.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class PopupHostKeyVerifier implements ServerHostKeyVerifier {
     private static final Logger LOG = LoggerFactory.getLogger(PopupHostKeyVerifier.class);
 
     private SSHGui sshGui;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final SSHGui sshGui) {

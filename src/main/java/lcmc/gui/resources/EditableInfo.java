@@ -37,6 +37,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,16 +63,11 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class provides textfields, combo boxes etc. for editable info objects.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class EditableInfo extends Info {
     private static final Logger LOG = LoggerFactory.getLogger(EditableInfo.class);
     /** Whether is's a wizard element. */
@@ -91,9 +88,9 @@ public abstract class EditableInfo extends Info {
     private boolean dialogStarted = false;
     /** Disabled section, not visible. */
     private final Collection<String> disabledSections = new HashSet<String>();
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     protected abstract String getSection(String param);

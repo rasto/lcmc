@@ -24,6 +24,8 @@ package lcmc.gui.dialog.cluster;
 
 import java.awt.Color;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -45,28 +47,23 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.ExecCommandThread;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can
  * be Corosync or Heartbeat.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class CommStack extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(CommStack.class);
     private Widget chooseStackCombo;
 
-    @Autowired
+    @Inject
     private HbConfig hbConfigDialog;
-    @Autowired
+    @Inject
     private CoroConfig coroConfigDialog;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

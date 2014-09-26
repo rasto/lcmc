@@ -61,13 +61,12 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class parses ocf crm xml, stores information like
@@ -75,8 +74,7 @@ import org.w3c.dom.NodeList;
  * of services in the hashes and provides methods to get this
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class CrmXml extends XML {
     private static final Logger LOG = LoggerFactory.getLogger(CrmXml.class);
     private static final MultiKeyMap<String, String> RA_NON_ADVANCED_PARAM = new MultiKeyMap<String, String>();
@@ -338,11 +336,11 @@ public final class CrmXml extends XML {
     }
 
     private static final Application.AccessType DEFAULT_ACCESS_TYPE = Application.AccessType.ADMIN;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private StartTests startTests;
 
     public static Unit getUnitMilliSec() {

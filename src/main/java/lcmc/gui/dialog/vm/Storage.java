@@ -24,6 +24,8 @@
 package lcmc.gui.dialog.vm;
 
 import java.awt.Dimension;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -36,16 +38,11 @@ import lcmc.model.vm.DiskData;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.resources.vms.DiskInfo;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter a new domain.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class Storage extends VMConfig {
     private static final String[] PARAMS = {DiskData.TYPE,
                                             DiskData.TARGET_BUS_TYPE,
@@ -67,9 +64,9 @@ final class Storage extends VMConfig {
     private JComponent inputPane = null;
     private DiskInfo diskInfo = null;
     private WizardDialog nextDialogObject = null;
-    @Autowired
+    @Inject
     private Network networkDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

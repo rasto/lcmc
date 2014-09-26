@@ -39,15 +39,12 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class Ssh {
     private static final Logger LOG = LoggerFactory.getLogger(Ssh.class);
     public static final int DEFAULT_COMMAND_TIMEOUT = Tools.getDefaultInt("SSH.Command.Timeout");
@@ -66,7 +63,7 @@ public final class Ssh {
     /** Callback when connection is failed or properly closed. */
     private ConnectionCallback connectionCallback;
     private Host host;
-    @Autowired
+    @Inject
     private Provider<ConnectionThread> connectionThreadProvider;
     private ConnectionThread connectionThread;
     private ProgressBar progressBar = null;
@@ -75,11 +72,11 @@ public final class Ssh {
     private final Lock mConnectionLock = new ReentrantLock();
     private final Lock mConnectionThreadLock = new ReentrantLock();
     private LocalPortForwarder localPortForwarder = null;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<Authentication> authenticationProvider;
 
     boolean reconnect() {

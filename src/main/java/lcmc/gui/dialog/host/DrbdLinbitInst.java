@@ -23,6 +23,8 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -38,21 +40,16 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd will be installed.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DrbdLinbitInst extends DialogHost {
     private CheckInstallation checkInstallationDialog;
-    @Autowired
+    @Inject
     private Provider<CheckInstallation> checkInstallationFactory;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

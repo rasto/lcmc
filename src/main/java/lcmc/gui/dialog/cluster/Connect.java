@@ -23,6 +23,8 @@
 
 package lcmc.gui.dialog.cluster;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -34,23 +36,18 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where connection to every host will be checked
  * and established if there isn't one.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class Connect extends DialogCluster {
     private static final Logger LOG = LoggerFactory.getLogger(Connect.class);
 
-    @Autowired
+    @Inject
     private CommStack commStackDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

@@ -22,6 +22,8 @@
 
 package lcmc.gui.dialog.host;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -35,21 +37,16 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.Ssh;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where openais with pacemaker is installed.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class PacemakerInst extends DialogHost {
-    @Autowired
+    @Inject
     private Provider<CheckInstallation> checkInstallationProvider;
     private CheckInstallation checkInstallationDialog = null;
-    @Autowired
+    @Inject
     private Application application;
 
     /**

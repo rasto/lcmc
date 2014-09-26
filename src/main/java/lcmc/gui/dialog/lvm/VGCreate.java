@@ -35,6 +35,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -55,14 +57,9 @@ import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.LVM;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /** Create VG dialog. */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class VGCreate extends LV {
     private static final String VG_CREATE_DESCRIPTION = "Create a volume group.";
     private static final int CREATE_TIMEOUT = 5000;
@@ -71,9 +68,9 @@ public final class VGCreate extends LV {
     private Widget vgNameWi;
     private Map<Host, JCheckBox> hostCheckBoxes = null;
     private Map<String, JCheckBox> pvCheckBoxes = null;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton createButton;
 

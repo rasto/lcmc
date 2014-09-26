@@ -29,10 +29,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
-import lcmc.LCMC;
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
@@ -53,13 +54,8 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class MultiSelectionMenu {
     private static final String LV_CREATE_MENU_ITEM = Tools.getString("MultiSelectionInfo.LVCreate");
     
@@ -67,17 +63,17 @@ public class MultiSelectionMenu {
 
     private List<Info> selectedInfos;
 
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private Provider<VGCreate> vgCreateProvider;
-    @Autowired
+    @Inject
     private Provider<VGRemove> vgRemoveProvider;
-    @Autowired
+    @Inject
     private Provider<LVCreate> lvCreateProvider;
 
     public List<UpdatableItem> getPulldownMenu(final MultiSelectionInfo multiSelectionInfo,

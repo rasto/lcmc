@@ -36,6 +36,8 @@ import java.util.EventObject;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -59,18 +61,13 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a field where user can enter new value. The
  * field can be Textfield or combo box, depending if there are values
  * too choose from.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class GenericWidget<T extends JComponent> extends JPanel implements Widget {
     private static final Logger LOG = LoggerFactory.getLogger(GenericWidget.class);
     private T component;
@@ -96,7 +93,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private final Collection<WidgetListener> widgetListeners = new ArrayList<WidgetListener>();
     /** Whether the combobox was never set. */
     private boolean newFlag = true;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final String regexp, final AccessMode enableAccessMode) {

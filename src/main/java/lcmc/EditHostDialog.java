@@ -29,23 +29,21 @@ import lcmc.gui.dialog.host.DialogHost;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Show step by step dialogs that configure a host.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class EditHostDialog {
     private static final Logger LOG = LoggerFactory.getLogger(EditHostDialog.class);
     private Host host;
-    @Autowired @Qualifier("SSH")
+    @Resource(name="SSH")
     private SSH sshDialog;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     public void showDialogs(final Host host) {

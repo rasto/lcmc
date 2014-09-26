@@ -27,18 +27,16 @@ import java.util.Locale;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.MyButton;
-import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class holds the information about available resource agent classes.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class AvailableServicesInfo extends HbCategoryInfo {
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     @Override

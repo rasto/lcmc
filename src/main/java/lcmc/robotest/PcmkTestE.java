@@ -22,15 +22,18 @@ package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.HOST_Y;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class PcmkTestE {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
 
     /** Host wizard deadlock. */

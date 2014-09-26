@@ -21,20 +21,17 @@
  */
 package lcmc.gui.resources;
 
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import lcmc.model.Application;
 import lcmc.model.resources.Network;
 import lcmc.gui.Browser;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds info data for a network.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class NetworkInfo extends Info {
     private static final ImageIcon NETWORK_ICON = Tools.createImageIcon(Tools.getDefault("ClusterBrowser.NetworkIcon"));
 

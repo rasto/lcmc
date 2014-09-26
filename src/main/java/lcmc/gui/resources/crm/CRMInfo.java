@@ -22,19 +22,16 @@
 
 package lcmc.gui.resources.crm;
 
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import lcmc.model.Application;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class holds data that describe the crm as whole.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class CRMInfo extends HbCategoryInfo {
     /** Cluster manager icon. */
     private static final ImageIcon CRM_ICON =

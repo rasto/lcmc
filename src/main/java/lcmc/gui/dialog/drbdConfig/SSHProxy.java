@@ -26,21 +26,19 @@ import lcmc.gui.dialog.WizardDialog;
 import lcmc.gui.dialog.host.SSH;
 import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.utilities.MyButton;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * An implementation of a dialog where ssh connection will be established.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class SSHProxy extends SSH {
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
     private WizardDialog nextDialogObject = null;
-    @Autowired
+    @Inject
     private DevicesProxy devicesProxyDialog;
 
     public void init(final WizardDialog previousDialog,

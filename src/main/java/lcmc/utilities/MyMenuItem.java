@@ -37,22 +37,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JToolTip;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()
  * method and be enabled/disabled depending on the enablePredicate() method.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class MyMenuItem extends JMenuItem
 implements ActionListener, UpdatableItem, ComponentWithTest {
     private static final Logger LOG = LoggerFactory.getLogger(MyMenuItem.class);
@@ -76,7 +73,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
     private AccessMode enableAccessMode;
     private AccessMode visibleAccessMode;
     private String origToolTipText = "";
-    @Autowired
+    @Inject
     private Application application;
 
     private MenuAction menuAction;

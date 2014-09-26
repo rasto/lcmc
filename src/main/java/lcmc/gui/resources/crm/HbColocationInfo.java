@@ -40,15 +40,13 @@ import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Named;
 
 /**
  * Object that holds a colocation constraint information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class HbColocationInfo extends EditableInfo implements HbConstraintInterface {
     private ServiceInfo serviceInfoRsc;
     private ServiceInfo serviceInfoWithRsc;

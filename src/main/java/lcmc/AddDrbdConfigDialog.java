@@ -37,29 +37,27 @@ import lcmc.gui.resources.drbd.VolumeInfo;
 import lcmc.model.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * Show step by step dialogs that add and configure new host.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class AddDrbdConfigDialog {
     private static final Logger LOG = LoggerFactory.getLogger(AddDrbdConfigDialog.class);
     private boolean wizardCanceled = false;
     private GlobalInfo globalInfo;
     private BlockDevInfo blockDevInfo1;
     private BlockDevInfo blockDevInfo2;
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Start startDialog;
-    @Autowired
+    @Inject
     private Resource resourceDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     public void init(final GlobalInfo globalInfo, final BlockDevInfo blockDevInfo1, final BlockDevInfo blockDevInfo2) {

@@ -28,6 +28,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -47,17 +49,12 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where
  * drbd/heartbeat/pacemaker/openais/corosync etc. installation is checked.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class CheckInstallation extends DialogHost {
     private static final Logger LOG = LoggerFactory.getLogger(CheckInstallation.class);
 
@@ -86,7 +83,7 @@ final class CheckInstallation extends DialogHost {
                                   new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingPm"));
     private final JLabel checkingHeartbeatPacemakerLabel =
                                   new JLabel(": " + Tools.getString("Dialog.Host.CheckInstallation.CheckingHbPm"));
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton installDrbdButton;
     private MyButton installPacemakerButton;
@@ -105,21 +102,21 @@ final class CheckInstallation extends DialogHost {
     private final JLabel heartbeatPacemakerLabel = new JLabel("Pcmk/Heartbeat");
 
     private final JLabel pacemakerLabel = new JLabel("Pcmk/Corosync");
-    @Autowired
+    @Inject
     private HostFinish hostFinishDialog;
-    @Autowired
+    @Inject
     private DrbdLinbitAvailPackages drbdLinbitAvailPackagesDialog;
-    @Autowired
+    @Inject
     private DrbdAvailSourceFiles drbdAvailSourceFilesDialog;
-    @Autowired
+    @Inject
     private DrbdCommandInst drbdCommandInstDialog;
-    @Autowired
+    @Inject
     private LinbitLogin linbitLoginDialog;
-    @Autowired
+    @Inject
     private HeartbeatInst heartbeatInstDialog;
-    @Autowired
+    @Inject
     private PacemakerInst pacemakerInstDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

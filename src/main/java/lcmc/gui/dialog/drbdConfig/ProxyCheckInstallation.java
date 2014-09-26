@@ -23,6 +23,8 @@ package lcmc.gui.dialog.drbdConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -42,13 +44,8 @@ import lcmc.utilities.ExecCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class ProxyCheckInstallation extends DialogHost {
     private static final ImageIcon CHECKING_ICON =
                                Tools.createImageIcon(Tools.getDefault("Dialog.Host.CheckInstallation.CheckingIcon"));
@@ -65,7 +62,7 @@ final class ProxyCheckInstallation extends DialogHost {
     private final JLabel checkingProxyLabel = new JLabel(": "
                                                          + Tools.getString("ProxyCheckInstallation.CheckingProxy"));
 
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton installProxyButton;
     private Widget proxyInstallationMethodWidget;
@@ -74,9 +71,9 @@ final class ProxyCheckInstallation extends DialogHost {
     private Host proxyHost;
     private VolumeInfo volumeInfo;
     private WizardDialog origDialog;
-    @Autowired
+    @Inject
     private ProxyInst proxyInstDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     void init(final WizardDialog previousDialog,

@@ -45,6 +45,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -95,18 +97,13 @@ import lcmc.utilities.Unit;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VIRSH;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about VirtualDomain service in the VMs category,
  * but not in the cluster view.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DomainInfo extends EditableInfo {
     private static final Logger LOG = LoggerFactory.getLogger(DomainInfo.class);
     /** Timeout of starting, shutting down, etc. actions in seconds. */
@@ -600,31 +597,31 @@ public class DomainInfo extends EditableInfo {
     private Value[] autostartPossibleValues;
     /** This is a map from host to the check box. */
     private final Map<String, Widget> definedOnHostComboBoxHash = new HashMap<String, Widget>();
-    @Autowired
+    @Inject
     private GUIData guiData;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private DomainMenu domainMenu;
-    @Autowired
+    @Inject
     private Provider<DiskInfo> diskInfoProvider;
-    @Autowired
+    @Inject
     private Provider<FilesystemInfo> filesystemInfoProvider;
-    @Autowired
+    @Inject
     private Provider<InterfaceInfo> interfaceInfoProvider;
-    @Autowired
+    @Inject
     private Provider<InputDevInfo> inputDevInfoProvider;
-    @Autowired
+    @Inject
     private Provider<GraphicsInfo> graphicsInfoProvider;
-    @Autowired
+    @Inject
     private Provider<SoundInfo> soundInfoProvider;
-    @Autowired
+    @Inject
     private Provider<SerialInfo> serialInfoProvider;
-    @Autowired
+    @Inject
     private Provider<ParallelInfo> parallelInfoProvider;
-    @Autowired
+    @Inject
     private Provider<VideoInfo> videoInfoProvider;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final String name, final Browser browser) {

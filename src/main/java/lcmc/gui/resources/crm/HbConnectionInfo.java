@@ -34,6 +34,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -57,17 +59,12 @@ import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named("hbConnectionInfo")
 public class HbConnectionInfo extends EditableInfo {
     private JComponent infoPanel = null;
     /** Constraints. */
@@ -81,13 +78,13 @@ public class HbConnectionInfo extends EditableInfo {
     private ServiceInfo lastServiceInfoChild = null;
     private final Map<String, HbColocationInfo> colocationIds = new LinkedHashMap<String, HbColocationInfo>();
     private final Map<String, HbOrderInfo> orderIds = new LinkedHashMap<String, HbOrderInfo>();
-    @Autowired
+    @Inject
     private Provider<HbColocationInfo> colocationInfoProvider;
-    @Autowired
+    @Inject
     private Provider<HbOrderInfo> orderInfoProvider;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private HbConnectionMenu hbConnectionMenu;
 
     public void init(final Browser browser) {

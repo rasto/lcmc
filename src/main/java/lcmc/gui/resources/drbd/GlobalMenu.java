@@ -34,25 +34,22 @@ import lcmc.utilities.MenuAction;
 import lcmc.utilities.MenuFactory;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class GlobalMenu {
-    @Autowired
+    @Inject
     private Provider<EditClusterDialog> editClusterDialogProvider;
-    @Autowired
+    @Inject
     private HostFactory hostFactory;
-    @Autowired
+    @Inject
     private Provider<ProxyHostWizard> proxyHostWizardProvider;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Provider<DrbdLogs> drbdLogsProvider;
 
     public List<UpdatableItem> getPulldownMenu(final GlobalInfo globalInfo) {

@@ -25,26 +25,23 @@ package lcmc.utilities;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This is a menu object that holds MyMenuItems.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class MyMenu extends JMenu implements UpdatableItem {
     /** Position of the menu that can be stored and retrieved. */
     private Point2D pos = null;
     private AccessMode enableAccessMode;
-    @Autowired
+    @Inject
     private Application application;
 
     private EnablePredicate enablePredicate = new EnablePredicate() {

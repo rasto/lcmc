@@ -78,13 +78,14 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 
-import lcmc.LCMC;
 import lcmc.model.Application;
 import lcmc.model.ColorText;
 import lcmc.model.Host;
@@ -95,17 +96,12 @@ import lcmc.utilities.MyMenuItem;
 import lcmc.utilities.Tools;
 import org.apache.commons.collections15.Transformer;
 import org.apache.commons.collections15.TransformerUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class creates graph and provides methods for scaling etc.,
  * that are used in all graphs.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class ResourceGraph {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceGraph.class);
     /** Empty shape for arrows. (to not show an arrow). */
@@ -162,13 +158,13 @@ public abstract class ResourceGraph {
     /** List of edges that are being tested during test. */
     private volatile Edge existingTestEdge = null;
     private final Lock mTestEdgeLock = new ReentrantLock();
-    @Autowired
+    @Inject
     private Application application;
     private final Map<String, TextLayout> textLayoutCache = new HashMap<String, TextLayout>();
     private double scaledSoFar = 1.0;
 
     private ClusterBrowser clusterBrowser;
-    @Autowired
+    @Inject
     private GUIData guiData;
 
     /** Starts the animation if vertex is being updated. */

@@ -24,6 +24,8 @@
 package lcmc.gui.dialog.drbdConfig;
 
 import java.awt.Dimension;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -31,24 +33,19 @@ import javax.swing.JScrollPane;
 import lcmc.gui.dialog.WizardDialog;
 import lcmc.model.Application;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where user can enter drbd volume
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class Volume extends DrbdConfig {
 
     /** Configuration options of the drbd volume. */
     private static final String[] PARAMS = {"number", "device"};
-    @Autowired
+    @Inject
     private BlockDev blockDevDialog;
-    @Autowired
+    @Inject
     private Application application;
 
     /** Applies the changes and returns next dialog (BlockDev). */

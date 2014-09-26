@@ -22,6 +22,8 @@ package lcmc.gui.resources.crm;
 
 import java.util.List;
 import java.util.Locale;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JMenuItem;
 
 import lcmc.gui.CallbackAction;
@@ -38,18 +40,13 @@ import lcmc.utilities.Predicate;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
 import lcmc.utilities.VisiblePredicate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class CloneMenu extends ServiceMenu {
     private CloneInfo cloneInfo;
-    @Autowired
+    @Inject
     private MenuFactory menuFactory;
-    @Autowired
+    @Inject
     private Application application;
 
     @Override

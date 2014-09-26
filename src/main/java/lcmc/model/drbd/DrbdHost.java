@@ -20,12 +20,9 @@
 
 package lcmc.model.drbd;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import javax.inject.Named;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public class DrbdHost {
     private String drbdUtilVersion = null;
     private String drbdModuleVersion = null;

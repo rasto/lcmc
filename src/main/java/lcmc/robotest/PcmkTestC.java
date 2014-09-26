@@ -23,15 +23,18 @@ package lcmc.robotest;
 import java.awt.event.KeyEvent;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * This class is used to test the GUI.
  */
-@Component
+@Named
+@Singleton
 final class PcmkTestC {
-    @Autowired
+    @Inject
     private RoboTest roboTest;
 
     void start(final int count) {

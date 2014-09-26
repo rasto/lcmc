@@ -26,6 +26,8 @@ package lcmc.gui.dialog.host;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JPanel;
 
 import lcmc.model.AccessMode;
@@ -45,21 +47,16 @@ import lcmc.utilities.Tools;
 import lcmc.utilities.Unit;
 import lcmc.utilities.WidgetListener;
 import lcmc.utilities.ssh.ExecCommandThread;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public abstract class DialogHost extends WizardDialog {
     private Host host;
     private ExecCommandThread commandThread = null;
 
     private DrbdInstallation drbdInstallation;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     public void init(final WizardDialog previousDialog, final Host host, final DrbdInstallation drbdInstallation) {

@@ -30,19 +30,17 @@ import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class holds info about IPaddr/IPaddr2 heartbeat service. It adds a
  * better ip entering capabilities.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class IPaddrInfo extends ServiceInfo {
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /**

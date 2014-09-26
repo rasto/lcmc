@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -39,17 +41,12 @@ import lcmc.model.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
 
 /**
  * This class holds info about virtual sound device.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class SoundInfo extends HardwareInfo {
     /** Parameters. */
     private static final String[] PARAMETERS = {SoundData.MODEL};
@@ -80,9 +77,9 @@ final class SoundInfo extends HardwareInfo {
                                         new StringValue("sb16")});
     }
 
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     /** Table panel. */

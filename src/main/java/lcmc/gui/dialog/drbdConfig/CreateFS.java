@@ -25,6 +25,8 @@ package lcmc.gui.dialog.drbdConfig;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -45,17 +47,12 @@ import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 import lcmc.utilities.WidgetListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.
  * information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class CreateFS extends DrbdConfig {
     private static final Logger LOG = LoggerFactory.getLogger(CreateFS.class);
     /** No host string. (none) */
@@ -73,9 +70,9 @@ final class CreateFS extends DrbdConfig {
     private Widget filesystemWidget;
     private Widget skipInitialSyncWidget;
     private JLabel skipInitialSyncLabel;
-    @Autowired
+    @Inject
     private Application application;
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
     private MyButton makeFileSystemButton;
 

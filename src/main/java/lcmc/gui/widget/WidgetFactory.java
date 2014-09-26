@@ -27,29 +27,30 @@ import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Unit;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.swing.Icon;
 
-@Component
+@Named
+@Singleton
 public final class WidgetFactory {
     private final Logger LOG = LoggerFactory.getLogger(WidgetFactory.class);
-    @Autowired
+    @Inject
     private Provider<Label> labelProvider;
-    @Autowired
+    @Inject
     private Provider<ComboBox> comboBoxProvider;
-    @Autowired @Qualifier("passwdfield")
+    @Inject @Named("passwdfield")
     private Provider<Passwdfield> passwdFieldProvider;
-    @Autowired @Qualifier("textfield")
-    private Provider<Textfield> textFieldProvider;
-    @Autowired
+    @Inject @Named("textfield")
+    private Provider<Textfield> textfieldInstance;
+    @Inject
     private Provider<TextfieldWithUnit> textFieldWithUnitProvider;
-    @Autowired
+    @Inject
     private Provider<RadioGroup> radioGroupProvider;
-    @Autowired
+    @Inject
     private Provider<Checkbox> checkboxProvider;
 
     /** Without units. */
@@ -117,7 +118,7 @@ public final class WidgetFactory {
                 passwdfield.init(selectedValue, regexp, width, enableAccessMode, fieldButton);
                 return passwdfield;
             case TEXTFIELD:
-                final Textfield textfield = textFieldProvider.get();
+                final Textfield textfield = textfieldInstance.get();
                 textfield.init(selectedValue, regexp, width, abbreviations, enableAccessMode, fieldButton);
                 return textfield;
             case TEXTFIELDWITHUNIT:

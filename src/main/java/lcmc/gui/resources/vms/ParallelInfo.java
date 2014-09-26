@@ -34,19 +34,17 @@ import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Node;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class holds info about virtual parallel device.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class ParallelInfo extends ParallelSerialInfo {
-    @Autowired
+    @Inject
     private WidgetFactory widgetFactory;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {

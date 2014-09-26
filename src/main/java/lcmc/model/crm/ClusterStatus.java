@@ -42,17 +42,15 @@ import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * This class parses pacemaker/heartbeat status, stores information
  * in the hashes and provides methods to get this information.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 public final class ClusterStatus {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterStatus.class);
     private volatile CibQuery cibQuery = new CibQuery();
@@ -65,7 +63,7 @@ public final class ClusterStatus {
     private String oldCib = null;
     private boolean oldAdvancedMode = false;
     private Host host;
-    @Autowired
+    @Inject
     private Application application;
 
     /**

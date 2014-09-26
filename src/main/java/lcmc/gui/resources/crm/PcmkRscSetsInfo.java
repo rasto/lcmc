@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
@@ -43,21 +45,16 @@ import lcmc.gui.widget.Check;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Tools;
 import lcmc.utilities.UpdatableItem;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 /**
  * This class describes a connection between two heartbeat services.
  * It can be order, colocation or both.
  */
-@Component
-@Scope(BeanDefinition.SCOPE_PROTOTYPE)
+@Named
 final class PcmkRscSetsInfo extends HbConnectionInfo {
     private final Collection<ConstraintPHInfo> constraintPHInfos = new LinkedHashSet<ConstraintPHInfo>();
     private final Lock mConstraintPHLock = new ReentrantLock();
-    @Autowired
+    @Inject
     private Application application;
 
     void init(final Browser browser, final ConstraintPHInfo cphi) {
