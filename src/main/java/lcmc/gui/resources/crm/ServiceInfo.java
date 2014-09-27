@@ -3410,11 +3410,12 @@ public class ServiceInfo extends EditableInfo {
     final String getHeartbeatId(final Application.RunMode runMode) {
         String heartbeatId = getService().getCrmId();
         if (heartbeatId == null && Application.isTest(runMode)) {
-            final String guiId = getComboBoxValue(GUI_ID).getValueForConfig();
-            if (guiId == null) {
+            final Value guiIdV = getComboBoxValue(GUI_ID);
+            if (guiIdV == null) {
                 LOG.appWarning("getHearbeatId: RA meta-data not loaded: " + getName());
                 return null;
             }
+            final String guiId = guiIdV.getValueForConfig();
             heartbeatId = getService().getCrmIdFromId(guiId);
         }
         return heartbeatId;
