@@ -50,7 +50,6 @@ import lcmc.utilities.Tools;
  * An implementation of an empty tab panel with new cluster and host button.
  */
 @Named
-@Singleton
 public final class EmptyViewPanel extends ViewPanel implements AllHostsUpdatable {
     /** Background color of the status panel. */
     private static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
