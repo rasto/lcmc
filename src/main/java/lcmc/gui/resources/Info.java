@@ -461,6 +461,7 @@ public class Info implements Comparable<Info>, Value {
      * items.
      */
     public final JPopupMenu getPopup() {
+        LOG.debug1("ACTION: getPopup: " + getClass());
         mPopupLock.lock();
         try {
             application.invokeAndWait(new Runnable() {

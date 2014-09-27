@@ -214,6 +214,8 @@ public class ClusterBrowser extends Browser {
     private AvailableServicesInfo availableServicesInfo;
     @Inject
     private Provider<NetworkInfo> networkInfoProvider;
+    @Inject
+    private Provider<CRMInfo> crmInfoProvider;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -483,7 +485,7 @@ public class ClusterBrowser extends Browser {
         topLevelAdd(drbdNode);
 
         /* CRM */
-        final CRMInfo crmInfo = new CRMInfo();
+        final CRMInfo crmInfo = crmInfoProvider.get();
         crmInfo.init(Tools.getString("ClusterBrowser.ClusterManager"), this);
         crmNode = new DefaultMutableTreeNode(crmInfo);
         setNode(crmNode);
