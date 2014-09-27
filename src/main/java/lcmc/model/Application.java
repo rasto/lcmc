@@ -40,7 +40,7 @@ import java.util.regex.Matcher;
 
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
-import lcmc.gui.dialog.ConfirmDialog;
+import lcmc.common.ui.ConfirmDialog;
 import lcmc.robotest.Test;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

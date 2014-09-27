@@ -49,7 +49,7 @@ import lcmc.model.Cluster;
 import lcmc.model.Host;
 import lcmc.model.resources.BlockDevice;
 import lcmc.model.resources.NetInterface;
-import lcmc.gui.dialog.CmdLog;
+import lcmc.common.ui.CmdLog;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.FSInfo;
 import lcmc.gui.resources.Info;

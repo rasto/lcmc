@@ -29,7 +29,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JDialog;
 
-import lcmc.EditClusterDialog;
+import lcmc.cluster.ui.EditClusterDialog;
 import lcmc.Exceptions;
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
@@ -40,7 +40,7 @@ import lcmc.model.Host;
 import lcmc.model.crm.ResourceAgent;
 import lcmc.gui.CrmGraph;
 import lcmc.gui.ClusterBrowser;
-import lcmc.gui.dialog.ClusterLogs;
+import lcmc.crm.ui.ClusterLogs;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.ComponentWithTest;

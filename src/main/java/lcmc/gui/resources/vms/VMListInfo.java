@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import lcmc.AddVMConfigDialog;
+import lcmc.vm.ui.AddVMConfigDialog;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;

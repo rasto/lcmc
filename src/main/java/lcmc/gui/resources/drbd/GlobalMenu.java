@@ -23,12 +23,12 @@ package lcmc.gui.resources.drbd;
 import java.util.ArrayList;
 import java.util.List;
 
-import lcmc.EditClusterDialog;
-import lcmc.ProxyHostWizard;
+import lcmc.cluster.ui.EditClusterDialog;
+import lcmc.drbd.ui.ProxyHostWizard;
 import lcmc.model.AccessMode;
 import lcmc.model.Application;
 import lcmc.model.Host;
-import lcmc.gui.dialog.cluster.DrbdLogs;
+import lcmc.cluster.ui.DrbdLogs;
 import lcmc.model.HostFactory;
 import lcmc.utilities.MenuAction;
 import lcmc.utilities.MenuFactory;

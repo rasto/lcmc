@@ -28,7 +28,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JColorChooser;
 
-import lcmc.EditHostDialog;
+import lcmc.host.ui.EditHostDialog;
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
 import lcmc.model.AccessMode;
@@ -36,7 +36,7 @@ import lcmc.model.Application;
 import lcmc.model.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
-import lcmc.gui.dialog.HostLogs;
+import lcmc.common.ui.HostLogs;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.CRM;
 import lcmc.utilities.Corosync;

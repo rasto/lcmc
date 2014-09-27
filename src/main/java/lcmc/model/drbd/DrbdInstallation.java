@@ -21,7 +21,7 @@
 package lcmc.model.drbd;
 
 import lcmc.Exceptions;
-import lcmc.gui.dialog.host.DrbdVersions;
+import lcmc.host.ui.DrbdVersions;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;

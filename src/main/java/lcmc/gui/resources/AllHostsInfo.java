@@ -56,7 +56,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import lcmc.AddHostDialog;
+import lcmc.host.ui.AddHostDialog;
 import lcmc.gui.GUIData;
 import lcmc.gui.widget.WidgetFactory;
 import lcmc.gui.Browser;

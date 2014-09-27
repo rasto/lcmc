@@ -39,7 +39,7 @@ import lcmc.gui.MainMenu;
 import lcmc.model.Application;
 import lcmc.model.Cluster;
 import lcmc.model.Host;
-import lcmc.gui.dialog.BugReport;
+import lcmc.common.ui.BugReport;
 
 /**
  * This class provides tools for logging.

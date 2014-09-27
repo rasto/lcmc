@@ -39,7 +39,7 @@ import lcmc.model.Cluster;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterViewPanel;
 import lcmc.gui.EmptyViewPanel;
-import lcmc.presenter.ClusterPresenter;
+import lcmc.cluster.ui.ClusterPresenter;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 
