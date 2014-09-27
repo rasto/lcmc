@@ -19,17 +19,19 @@
  */
 package lcmc;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Jsr330ScopeMetadataResolver;
 
 public final class AppContext {
-	private static AnnotationConfigApplicationContext context;
+	private static Injector context;
 
 	static {
-		final AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext();
-        ctx.setScopeMetadataResolver(new Jsr330ScopeMetadataResolver());
-        ctx.scan("lcmc");
-        ctx.refresh();
+        Set<Module> modules = ModuleScanner.scanForModules();
+        final Injector ctx = Guice.createInjector(modules);
+//        ctx.scan("lcmc");
+//        ctx.refresh();
         context = ctx;
 	}
 
@@ -37,10 +39,10 @@ public final class AppContext {
 	}
 
 	public static <T> T getBean(Class<T> beanClass) {
-		return context.getBean(beanClass);
+		return context.getInstance(beanClass);
 	}
 
     public static <T> T getBean(final String name, Class<T> beanClass) {
-        return context.getBean(name, beanClass);
+        return context.getInstance(/* name, */ beanClass);
     }
 }
