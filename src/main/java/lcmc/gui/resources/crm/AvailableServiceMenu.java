@@ -22,8 +22,8 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.EnablePredicate;
 import lcmc.utilities.MenuAction;

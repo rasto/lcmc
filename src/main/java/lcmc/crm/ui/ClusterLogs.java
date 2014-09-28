@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Set;
 
 import lcmc.common.ui.Logs;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
 
 import javax.inject.Named;
 

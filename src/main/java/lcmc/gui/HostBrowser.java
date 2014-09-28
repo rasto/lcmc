@@ -43,12 +43,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.model.resources.BlockDevice;
-import lcmc.model.resources.NetInterface;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.NetInterface;
 import lcmc.common.ui.CmdLog;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.FSInfo;

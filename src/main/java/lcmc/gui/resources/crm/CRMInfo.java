@@ -25,7 +25,7 @@ package lcmc.gui.resources.crm;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Tools;
 
 /**

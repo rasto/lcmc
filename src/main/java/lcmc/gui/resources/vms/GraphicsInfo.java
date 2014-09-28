@@ -36,12 +36,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.GraphicsData;
-import lcmc.model.Value;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.StringValue;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.domain.GraphicsData;
+import lcmc.common.domain.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.Tools;

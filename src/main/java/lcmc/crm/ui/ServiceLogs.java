@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.model.Cluster;
+import lcmc.cluster.domain.Cluster;
 
 import javax.inject.Named;
 

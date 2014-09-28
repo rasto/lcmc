@@ -56,7 +56,7 @@ import javax.swing.*;
 
 import lcmc.configs.AppDefaults;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;

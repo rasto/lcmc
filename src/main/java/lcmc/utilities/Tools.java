@@ -77,9 +77,9 @@ import javax.swing.text.html.HTMLDocument;
 
 import lcmc.Exceptions;
 import lcmc.configs.DistResource;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.model.Value;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.Value;
 import lcmc.gui.GUIData;
 import lcmc.gui.resources.crm.ServiceInfo;
 

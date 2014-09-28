@@ -23,8 +23,8 @@ package lcmc.utilities.ssh;
 import java.io.File;
 import java.io.IOException;
 
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

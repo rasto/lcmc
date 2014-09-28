@@ -42,7 +42,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import lcmc.gui.resources.Info;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Tools;
 
 /**

@@ -42,8 +42,8 @@ import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JToolTip;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 
 /**
  * A menu item that can have an alternate text depending on the predicate()

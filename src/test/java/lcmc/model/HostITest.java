@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 import lcmc.AppContext;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.utilities.Tools;
@@ -119,7 +121,7 @@ public final class HostITest {
         for (final Host host : integrationTestLauncher.getHosts()) {
             assertTrue(host.isInCluster());
             assertTrue(host.isInCluster(null));
-            assertTrue(host.isInCluster(new lcmc.model.Cluster()));
+            assertTrue(host.isInCluster(new Cluster()));
         }
     }
 

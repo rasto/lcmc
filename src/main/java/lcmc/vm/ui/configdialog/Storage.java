@@ -31,10 +31,10 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import lcmc.model.Application;
-import lcmc.model.StringValue;
-import lcmc.model.vm.VmsXml;
-import lcmc.model.vm.DiskData;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.vm.domain.VmsXml;
+import lcmc.vm.domain.DiskData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.gui.resources.vms.DiskInfo;
 import lcmc.utilities.Tools;

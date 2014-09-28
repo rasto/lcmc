@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JMenuItem;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
 import lcmc.utilities.MenuFactory;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.UpdatableItem;

@@ -33,9 +33,9 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
-import lcmc.model.crm.CrmXml;
-import lcmc.model.crm.ResourceAgent;
+import lcmc.common.domain.Application;
+import lcmc.crm.domain.CrmXml;
+import lcmc.crm.domain.ResourceAgent;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.MyButton;

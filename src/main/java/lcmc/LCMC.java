@@ -50,7 +50,7 @@ import lcmc.configs.AppDefaults;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.GUIData;
 import lcmc.gui.MainMenu;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.view.MainPanel;
 import lcmc.gui.ProgressIndicatorPanel;
 import lcmc.utilities.Logger;

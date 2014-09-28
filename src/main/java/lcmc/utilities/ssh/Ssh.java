@@ -30,8 +30,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import lcmc.configs.DistResource;
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ConnectionCallback;

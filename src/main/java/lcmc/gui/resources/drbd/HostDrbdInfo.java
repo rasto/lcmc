@@ -42,9 +42,9 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
-import lcmc.model.ColorText;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.host.domain.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.SpringUtilities;

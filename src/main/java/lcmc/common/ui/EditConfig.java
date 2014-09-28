@@ -44,8 +44,8 @@ import javax.swing.text.Document;
 
 import lcmc.configs.DistResource;
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

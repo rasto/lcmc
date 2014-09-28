@@ -21,9 +21,9 @@
 package lcmc.robotest;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;

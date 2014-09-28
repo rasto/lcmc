@@ -29,11 +29,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.ImageIcon;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.vm.VmsXml;
-import lcmc.model.resources.Resource;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.vm.domain.VmsXml;
+import lcmc.common.domain.Resource;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;
 import lcmc.gui.resources.NetInfo;

@@ -22,9 +22,9 @@
 package lcmc.gui.resources;
 
 import javax.swing.ImageIcon;
-import lcmc.model.Application;
-import lcmc.model.resources.BlockDevice;
-import lcmc.model.resources.CommonBlockDevice;
+import lcmc.common.domain.Application;
+import lcmc.drbd.domain.BlockDevice;
+import lcmc.drbd.domain.CommonBlockDevice;
 import lcmc.gui.Browser;
 import lcmc.gui.resources.crm.HbCategoryInfo;
 import lcmc.gui.resources.crm.ServiceInfo;

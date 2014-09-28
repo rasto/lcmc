@@ -22,7 +22,7 @@ package lcmc.gui.resources.drbd;
 
 import java.util.List;
 
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyObject;

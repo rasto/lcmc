@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.common.ui.HostLogs;
 
 import javax.inject.Named;

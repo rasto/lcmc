@@ -22,8 +22,8 @@ package lcmc.gui.resources.crm;
 
 import java.util.List;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Host;
+import lcmc.common.domain.AccessMode;
+import lcmc.host.domain.Host;
 import lcmc.gui.ClusterBrowser;
 
 import static org.junit.Assert.assertEquals;

@@ -36,9 +36,9 @@ import javax.swing.SwingUtilities;
 import lcmc.AppContext;
 import lcmc.gui.GUIData;
 import lcmc.gui.MainMenu;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
 import lcmc.common.ui.BugReport;
 
 /**

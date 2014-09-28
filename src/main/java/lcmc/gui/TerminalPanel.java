@@ -51,8 +51,8 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.robotest.RoboTest;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;

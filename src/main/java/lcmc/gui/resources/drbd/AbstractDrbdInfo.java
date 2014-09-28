@@ -22,13 +22,13 @@
 package lcmc.gui.resources.drbd;
 
 import lcmc.Exceptions;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.drbd.DrbdProxy;
-import lcmc.model.drbd.DrbdXml;
-import lcmc.model.Host;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.drbd.domain.DrbdProxy;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.Value;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;
 import lcmc.gui.widget.Widget;

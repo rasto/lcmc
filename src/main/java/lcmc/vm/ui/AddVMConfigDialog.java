@@ -23,7 +23,7 @@
 package lcmc.vm.ui;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.vm.ui.configdialog.Domain;
 import lcmc.vm.ui.configdialog.VMConfig;
 import lcmc.gui.resources.vms.DomainInfo;

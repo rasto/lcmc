@@ -86,9 +86,9 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 
-import lcmc.model.Application;
-import lcmc.model.ColorText;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.host.domain.Host;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

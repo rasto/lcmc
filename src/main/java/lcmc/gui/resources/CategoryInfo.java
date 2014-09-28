@@ -27,7 +27,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.gui.Browser;
 
 /**

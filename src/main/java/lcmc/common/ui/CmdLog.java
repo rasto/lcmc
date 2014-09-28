@@ -30,11 +30,11 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.gui.widget.Widget;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;

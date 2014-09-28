@@ -40,10 +40,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 
+import lcmc.cluster.ui.ClusterTab;
+import lcmc.cluster.ui.ClusterTabFactory;
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.UserConfig;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.common.domain.UserConfig;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;

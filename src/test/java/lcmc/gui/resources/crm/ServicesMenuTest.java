@@ -22,7 +22,7 @@ package lcmc.gui.resources.crm;
 
 import java.util.List;
 
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 import lcmc.gui.ClusterBrowser;
 
 import static org.junit.Assert.assertEquals;

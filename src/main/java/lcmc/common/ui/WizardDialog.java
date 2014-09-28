@@ -38,7 +38,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.widget.Check;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lcmc.configs.DistResource;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 

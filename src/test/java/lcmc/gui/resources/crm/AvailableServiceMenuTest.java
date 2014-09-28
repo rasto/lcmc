@@ -20,7 +20,7 @@
 
 package lcmc.gui.resources.crm;
 
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 
 import static org.junit.Assert.assertEquals;
 

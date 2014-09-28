@@ -22,7 +22,8 @@ package lcmc.model;
 
 import static org.junit.Assert.assertEquals;
 
-import lcmc.model.vm.VmsXml;
+import lcmc.common.domain.StringValue;
+import lcmc.vm.domain.VmsXml;
 import org.junit.Test;
 
 

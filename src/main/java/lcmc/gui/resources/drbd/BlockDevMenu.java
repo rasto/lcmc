@@ -27,12 +27,12 @@ import java.util.Set;
 
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.drbd.DrbdXml;
-import lcmc.model.Host;
-import lcmc.model.resources.BlockDevice;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.drbd.domain.DrbdXml;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.gui.ClusterBrowser;
 import lcmc.drbd.ui.DrbdLog;
 import lcmc.lvm.ui.LVCreate;

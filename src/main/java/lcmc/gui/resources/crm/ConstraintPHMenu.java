@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lcmc.gui.CallbackAction;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.EnablePredicate;

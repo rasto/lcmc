@@ -21,8 +21,8 @@
 package lcmc.drbd.ui;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
 import lcmc.drbd.ui.configdialog.NewProxyHostDialog;
 import lcmc.gui.resources.drbd.VolumeInfo;

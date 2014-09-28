@@ -29,7 +29,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import lcmc.configs.DistResource;
 import lcmc.gui.GUIData;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;

@@ -32,10 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Value;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.Value;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.gui.widget.Widget;

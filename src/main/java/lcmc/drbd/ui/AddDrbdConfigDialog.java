@@ -34,7 +34,7 @@ import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.GlobalInfo;
 import lcmc.gui.resources.drbd.ResourceInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

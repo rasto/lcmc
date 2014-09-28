@@ -20,7 +20,7 @@
 
 package lcmc.gui;
 
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 
 public interface CallbackAction {
     void run(Host host);

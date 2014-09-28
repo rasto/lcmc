@@ -1,10 +1,10 @@
 package lcmc.gui.widget;
 
 import lcmc.AppContext;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;

@@ -23,9 +23,9 @@
 package lcmc.host.ui;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 

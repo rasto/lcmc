@@ -32,9 +32,9 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.crm.ResourceAgent;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.crm.domain.ResourceAgent;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.EnablePredicate;

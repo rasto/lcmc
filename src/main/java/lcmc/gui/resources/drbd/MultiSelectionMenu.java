@@ -36,10 +36,10 @@ import javax.swing.JColorChooser;
 
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.resources.BlockDevice;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.gui.ClusterBrowser;
 import lcmc.lvm.ui.LVCreate;
 import lcmc.lvm.ui.VGCreate;

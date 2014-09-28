@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lcmc.configs.DistResource;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.gui.resources.CommonDeviceInterface;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.drbd.VolumeInfo;

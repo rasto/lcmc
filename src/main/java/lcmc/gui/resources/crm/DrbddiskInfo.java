@@ -22,8 +22,8 @@
 package lcmc.gui.resources.crm;
 
 import java.util.Map;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.resources.drbd.ResourceInfo;
 
 import javax.inject.Named;

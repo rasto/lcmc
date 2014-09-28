@@ -34,10 +34,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 
 import lcmc.configs.DistResource;
-import lcmc.model.Application;
-import lcmc.model.crm.CrmXml;
-import lcmc.model.Host;
-import lcmc.model.crm.HostLocation;
+import lcmc.common.domain.Application;
+import lcmc.crm.domain.CrmXml;
+import lcmc.host.domain.Host;
+import lcmc.crm.domain.HostLocation;
 import lcmc.utilities.ssh.ExecCommandConfig;
 import lcmc.utilities.ssh.SshOutput;
 

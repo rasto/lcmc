@@ -22,6 +22,8 @@ package lcmc.model.resources;
 
 import java.net.UnknownHostException;
 import static org.junit.Assert.assertEquals;
+
+import lcmc.drbd.domain.NetInterface;
 import org.junit.Test;
 
 public final class NetInterfaceTest {

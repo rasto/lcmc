@@ -20,7 +20,7 @@
 
 package lcmc.utilities;
 
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 
 import javax.inject.Inject;
 import javax.inject.Named;

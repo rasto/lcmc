@@ -20,7 +20,7 @@
 
 package lcmc.host.ui;
 
-import lcmc.model.Value;
+import lcmc.common.domain.Value;
 import lcmc.utilities.Unit;
 
 public class DrbdVersions implements Value {

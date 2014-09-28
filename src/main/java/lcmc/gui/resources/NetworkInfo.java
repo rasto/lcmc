@@ -23,8 +23,8 @@ package lcmc.gui.resources;
 
 import javax.inject.Named;
 import javax.swing.ImageIcon;
-import lcmc.model.Application;
-import lcmc.model.resources.Network;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Network;
 import lcmc.gui.Browser;
 import lcmc.utilities.Tools;
 

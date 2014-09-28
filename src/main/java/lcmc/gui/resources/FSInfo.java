@@ -26,8 +26,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;
 import lcmc.utilities.ssh.ExecCommandConfig;

@@ -22,9 +22,9 @@ package lcmc.gui.resources.vms;
 
 import java.util.List;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.ClusterBrowser;
 
 import static org.junit.Assert.assertEquals;

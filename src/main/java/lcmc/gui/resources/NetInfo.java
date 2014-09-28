@@ -26,10 +26,10 @@ import javax.inject.Named;
 import javax.swing.ImageIcon;
 import javax.swing.JEditorPane;
 
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.Value;
-import lcmc.model.resources.NetInterface;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.Value;
+import lcmc.drbd.domain.NetInterface;
 import lcmc.gui.Browser;
 import lcmc.gui.HostBrowser;
 import lcmc.utilities.Tools;

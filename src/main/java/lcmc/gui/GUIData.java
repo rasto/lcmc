@@ -65,9 +65,9 @@ import javax.swing.event.MenuListener;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
 import lcmc.gui.resources.Info;
 import lcmc.gui.resources.crm.ServicesInfo;
 import lcmc.utilities.AllHostsUpdatable;
@@ -78,7 +78,7 @@ import lcmc.utilities.MyList;
 import lcmc.utilities.MyListModel;
 import lcmc.utilities.MyMenu;
 import lcmc.utilities.MyMenuItem;
-import lcmc.view.ClusterTab;
+import lcmc.cluster.ui.ClusterTab;
 import lcmc.view.ClustersPanel;
 import lcmc.view.MainPanel;
 

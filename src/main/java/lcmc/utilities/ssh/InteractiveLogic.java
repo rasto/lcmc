@@ -21,7 +21,7 @@ package lcmc.utilities.ssh;
 
 import ch.ethz.ssh2.InteractiveCallback;
 import java.io.IOException;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.gui.SSHGui;
 
 /**

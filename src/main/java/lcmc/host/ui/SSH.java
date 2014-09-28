@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 
 import lcmc.gui.SSHGui;
 import lcmc.common.ui.WizardDialog;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.ConnectionCallback;
 import lcmc.utilities.Logger;

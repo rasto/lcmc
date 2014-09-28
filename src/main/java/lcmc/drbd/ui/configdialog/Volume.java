@@ -31,7 +31,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.common.ui.WizardDialog;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Tools;
 
 /**

@@ -66,7 +66,7 @@ import javax.swing.event.DocumentListener;
 import lcmc.gui.GUIData;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.MyButton;
 import lcmc.utilities.Tools;
 

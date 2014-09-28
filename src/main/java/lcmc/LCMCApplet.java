@@ -30,7 +30,7 @@ import javax.swing.JApplet;
 import javax.swing.JFrame;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;

@@ -41,7 +41,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.gui.resources.CategoryInfo;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Logger;

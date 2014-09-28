@@ -35,7 +35,7 @@ import lcmc.AppContext;
 import lcmc.Exceptions;
 import lcmc.gui.GUIData;
 import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;

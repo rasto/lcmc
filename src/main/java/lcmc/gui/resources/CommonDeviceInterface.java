@@ -21,7 +21,7 @@
  */
 package lcmc.gui.resources;
 
-import lcmc.model.Value;
+import lcmc.common.domain.Value;
 import lcmc.gui.resources.crm.ServiceInfo;
 
 /**

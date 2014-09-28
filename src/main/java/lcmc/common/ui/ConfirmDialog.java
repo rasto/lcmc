@@ -29,7 +29,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Tools;
 
 /**

@@ -20,11 +20,11 @@
 
 package lcmc;
 
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.model.HostOptions;
-import lcmc.model.UserConfig;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostOptions;
+import lcmc.common.domain.UserConfig;
 import lcmc.robotest.RoboTest;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;

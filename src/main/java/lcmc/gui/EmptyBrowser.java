@@ -28,11 +28,11 @@ import javax.inject.Singleton;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
 import lcmc.gui.resources.AllHostsInfo;
-import lcmc.model.Hosts;
+import lcmc.host.domain.Hosts;
 
 /**
  * This class holds cluster resource data in a tree. It shows panels that allow

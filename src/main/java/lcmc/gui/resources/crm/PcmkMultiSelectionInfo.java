@@ -36,11 +36,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.crm.ClusterStatus;
-import lcmc.model.Host;
-import lcmc.model.crm.PtestData;
-import lcmc.model.Value;
+import lcmc.common.domain.Application;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.host.domain.Host;
+import lcmc.crm.domain.PtestData;
+import lcmc.common.domain.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.EditableInfo;

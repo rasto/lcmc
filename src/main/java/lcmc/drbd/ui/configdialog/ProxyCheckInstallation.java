@@ -32,9 +32,9 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.gui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.DialogHost;

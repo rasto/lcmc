@@ -23,9 +23,9 @@ package lcmc.gui.resources.crm;
 
 import java.util.ArrayList;
 import java.util.List;
-import lcmc.model.AccessMode;
-import lcmc.model.StringValue;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.StringValue;
+import lcmc.common.domain.Value;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;
 import lcmc.gui.widget.WidgetFactory;

@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 import javax.swing.JCheckBox;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Cluster;
+import lcmc.cluster.domain.Cluster;
 import lcmc.gui.widget.GenericWidget.MTextField;
 import lcmc.gui.widget.MComboBox;
 import lcmc.utilities.Tools;

@@ -21,7 +21,7 @@
 package lcmc.utilities.ssh;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.gui.ProgressBar;
 import lcmc.gui.SSHGui;
 import lcmc.utilities.ConvertCmdCallback;

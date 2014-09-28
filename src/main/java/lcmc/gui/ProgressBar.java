@@ -33,7 +33,7 @@ import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.CancelCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

@@ -30,11 +30,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.JPanel;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.Value;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.Value;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
 import lcmc.gui.widget.Check;
 import lcmc.gui.widget.Widget;

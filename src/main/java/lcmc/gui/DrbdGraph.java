@@ -43,10 +43,10 @@ import lcmc.gui.resources.drbd.BlockDevInfo;
 import lcmc.gui.resources.drbd.HostDrbdInfo;
 import lcmc.gui.resources.drbd.MultiSelectionInfo;
 import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.model.Application;
-import lcmc.model.ColorText;
-import lcmc.model.Host;
-import lcmc.model.resources.BlockDevice;
+import lcmc.common.domain.Application;
+import lcmc.common.domain.ColorText;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.Tools;
 

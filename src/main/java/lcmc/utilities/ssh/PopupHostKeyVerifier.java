@@ -24,7 +24,7 @@ import ch.ethz.ssh2.ServerHostKeyVerifier;
 import java.io.File;
 import java.io.IOException;
 import lcmc.gui.SSHGui;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.Tools;

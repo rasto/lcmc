@@ -29,9 +29,9 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
 import lcmc.gui.GUIData;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.HostFactory;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.host.domain.HostFactory;
 
 /**
  * The very main panel, where everything is inside.

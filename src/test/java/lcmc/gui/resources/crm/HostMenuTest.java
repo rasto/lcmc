@@ -23,7 +23,7 @@ package lcmc.gui.resources.crm;
 import java.util.List;
 
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 import lcmc.gui.HostBrowser;
 
 import static org.junit.Assert.assertEquals;

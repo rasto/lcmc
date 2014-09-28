@@ -22,10 +22,10 @@ package lcmc.gui.resources.crm;
 
 import java.util.List;
 
-import lcmc.model.AccessMode;
-import lcmc.model.Host;
-import lcmc.model.resources.Resource;
-import lcmc.model.resources.Service;
+import lcmc.common.domain.AccessMode;
+import lcmc.host.domain.Host;
+import lcmc.common.domain.Resource;
+import lcmc.crm.domain.Service;
 import lcmc.gui.ClusterBrowser;
 
 import static org.junit.Assert.assertEquals;

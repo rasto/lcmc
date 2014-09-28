@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import lcmc.AppContext;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.gui.ClusterBrowser;
-import lcmc.model.HostFactory;
+import lcmc.host.domain.HostFactory;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import static org.junit.Assert.assertFalse;

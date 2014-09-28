@@ -21,8 +21,8 @@ package lcmc.gui.widget;
 
 import java.awt.Color;
 import java.util.Map;
-import lcmc.model.AccessMode;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Value;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;
 import lcmc.utilities.MyButton;

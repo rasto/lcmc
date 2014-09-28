@@ -37,12 +37,12 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.gui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.gui.widget.Widget;
-import lcmc.model.Host;
-import lcmc.model.drbd.DrbdInstallation;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.utilities.ExecCallback;
 import lcmc.utilities.Logger;
 import lcmc.utilities.LoggerFactory;

@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import lcmc.gui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.utilities.Tools;
 
 /**

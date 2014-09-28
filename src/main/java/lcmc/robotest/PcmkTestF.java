@@ -21,7 +21,7 @@
 package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
-import lcmc.model.Cluster;
+import lcmc.cluster.domain.Cluster;
 import lcmc.gui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
 import lcmc.utilities.Tools;

@@ -27,9 +27,9 @@ import javax.inject.Named;
 import javax.swing.JMenuItem;
 
 import lcmc.gui.CallbackAction;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.utilities.ButtonCallback;
 import lcmc.utilities.MenuAction;

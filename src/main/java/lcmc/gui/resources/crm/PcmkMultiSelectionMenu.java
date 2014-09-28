@@ -31,10 +31,10 @@ import javax.swing.JColorChooser;
 
 import lcmc.gui.CallbackAction;
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.crm.ClusterStatus;
-import lcmc.model.Host;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.crm.domain.ClusterStatus;
+import lcmc.host.domain.Host;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
 import lcmc.utilities.ButtonCallback;

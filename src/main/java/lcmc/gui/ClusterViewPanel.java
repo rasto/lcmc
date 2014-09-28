@@ -24,7 +24,7 @@ import java.awt.BorderLayout;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.Box;
-import lcmc.model.Cluster;
+import lcmc.cluster.domain.Cluster;
 import lcmc.utilities.AllHostsUpdatable;
 
 /**

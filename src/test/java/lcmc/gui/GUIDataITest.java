@@ -1,8 +1,8 @@
 package lcmc.gui;
 
 import lcmc.AppContext;
-import lcmc.model.Application;
-import lcmc.model.Host;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import static org.junit.Assert.assertTrue;

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 
 import static org.junit.Assert.assertEquals;
 

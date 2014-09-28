@@ -46,10 +46,10 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
-import lcmc.model.Cluster;
-import lcmc.model.Host;
-import lcmc.model.resources.BlockDevice;
+import lcmc.common.domain.Application;
+import lcmc.cluster.domain.Cluster;
+import lcmc.host.domain.Host;
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.gui.Browser;
 import lcmc.gui.SpringUtilities;
 import lcmc.gui.resources.drbd.BlockDevInfo;

@@ -21,6 +21,8 @@
 package lcmc.model;
 
 import static org.junit.Assert.assertEquals;
+
+import lcmc.common.domain.StringValue;
 import org.junit.Test;
 
 public final class StringValueTest {

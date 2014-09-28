@@ -2,8 +2,8 @@ package lcmc.gui.resources.drbd;
 
 import java.util.List;
 
-import lcmc.model.AccessMode;
-import lcmc.model.resources.BlockDevice;
+import lcmc.common.domain.AccessMode;
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.gui.HostBrowser;
 
 import static org.junit.Assert.assertEquals;

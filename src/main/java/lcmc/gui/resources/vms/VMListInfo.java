@@ -44,11 +44,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.vm.ui.AddVMConfigDialog;
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.AccessMode;
-import lcmc.model.Application;
-import lcmc.model.Host;
-import lcmc.model.vm.VmsXml;
-import lcmc.model.Value;
+import lcmc.common.domain.AccessMode;
+import lcmc.common.domain.Application;
+import lcmc.host.domain.Host;
+import lcmc.vm.domain.VmsXml;
+import lcmc.common.domain.Value;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;

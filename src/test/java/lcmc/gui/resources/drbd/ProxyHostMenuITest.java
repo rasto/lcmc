@@ -23,8 +23,8 @@ package lcmc.gui.resources.drbd;
 import java.util.List;
 
 import lcmc.gui.GUIData;
-import lcmc.model.AccessMode;
-import lcmc.model.Host;
+import lcmc.common.domain.AccessMode;
+import lcmc.host.domain.Host;
 
 import static org.junit.Assert.assertEquals;
 

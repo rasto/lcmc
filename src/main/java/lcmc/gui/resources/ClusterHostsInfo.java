@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Host;
+import lcmc.host.domain.Host;
 import lcmc.gui.Browser;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.HostBrowser;

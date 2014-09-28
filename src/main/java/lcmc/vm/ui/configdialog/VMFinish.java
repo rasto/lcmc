@@ -34,7 +34,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.gui.widget.WidgetFactory;
-import lcmc.model.Application;
+import lcmc.common.domain.Application;
 import lcmc.common.ui.WizardDialog;
 import lcmc.gui.resources.vms.DomainInfo;
 import lcmc.gui.widget.Widget;

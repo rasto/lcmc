@@ -23,7 +23,7 @@ package lcmc.gui.resources.drbd;
 import java.util.Arrays;
 import java.util.List;
 
-import lcmc.model.AccessMode;
+import lcmc.common.domain.AccessMode;
 import lcmc.gui.ClusterBrowser;
 import lcmc.gui.resources.Info;
 
