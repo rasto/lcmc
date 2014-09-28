@@ -24,12 +24,12 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
-import lcmc.gui.widget.GenericWidget.MTextField;
-import lcmc.gui.widget.MComboBox;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.MComboBox;
 import static lcmc.robotest.RoboTest.CONFIRM_REMOVE;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;

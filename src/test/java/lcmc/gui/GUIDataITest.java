@@ -2,6 +2,7 @@ package lcmc.gui;
 
 import lcmc.AppContext;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.GUIData;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;

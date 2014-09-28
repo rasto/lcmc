@@ -29,9 +29,9 @@ import java.net.UnknownHostException;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Unit;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.Unit;
 
 /**
  * This class holds data of one network interface.

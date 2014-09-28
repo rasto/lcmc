@@ -47,15 +47,15 @@ import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 import lcmc.configs.AppDefaults;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GUIData;
-import lcmc.gui.MainMenu;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.GUIData;
+import lcmc.common.ui.MainMenu;
 import lcmc.common.domain.Application;
-import lcmc.view.MainPanel;
-import lcmc.gui.ProgressIndicatorPanel;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.MainPanel;
+import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This is the central class with main function. It starts the LCMC GUI.

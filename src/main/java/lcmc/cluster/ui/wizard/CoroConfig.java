@@ -51,7 +51,7 @@ import javax.swing.JTextArea;
 import javax.swing.SpringLayout;
 
 import lcmc.Exceptions.IllegalVersionException;
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.crm.domain.AisCastAddress;
 import lcmc.common.domain.Application;
@@ -60,21 +60,21 @@ import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.NetInterface;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.widget.Check;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Openais;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
-import lcmc.utilities.WidgetListener;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.crm.service.Corosync;
+import lcmc.common.domain.ExecCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.crm.service.Openais;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.utils.WidgetListener;
 
 /**
  * An implementation of a dialog where corosync/openais is initialized on all

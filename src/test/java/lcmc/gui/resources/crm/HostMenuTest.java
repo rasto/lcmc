@@ -22,20 +22,22 @@ package lcmc.gui.resources.crm;
 
 import java.util.List;
 
-import lcmc.gui.GUIData;
+import lcmc.crm.ui.resource.HostInfo;
+import lcmc.crm.ui.resource.HostMenu;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
-import lcmc.gui.HostBrowser;
+import lcmc.host.ui.HostBrowser;
 
 import static org.junit.Assert.assertEquals;
 
-import lcmc.utilities.EnablePredicate;
-import lcmc.utilities.MenuAction;
-import lcmc.utilities.MenuFactory;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Predicate;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.VisiblePredicate;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.domain.Predicate;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

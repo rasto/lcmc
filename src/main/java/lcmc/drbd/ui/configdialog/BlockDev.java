@@ -33,19 +33,19 @@ import javax.swing.SpringLayout;
 
 import lcmc.AppContext;
 import lcmc.Exceptions;
-import lcmc.gui.GUIData;
-import lcmc.gui.resources.drbd.GlobalInfo;
+import lcmc.common.ui.GUIData;
+import lcmc.drbd.ui.resource.GlobalInfo;
 import lcmc.common.domain.Application;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.SpringUtilities;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.drbd.service.DRBD;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd block device

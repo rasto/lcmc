@@ -22,13 +22,13 @@
 
 package lcmc.vm.ui;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.vm.ui.configdialog.Domain;
 import lcmc.vm.ui.configdialog.VMConfig;
-import lcmc.gui.resources.vms.DomainInfo;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.vm.ui.resource.DomainInfo;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;

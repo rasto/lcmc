@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.host.domain.Host;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**

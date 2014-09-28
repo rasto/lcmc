@@ -20,7 +20,7 @@
 
 package lcmc.cluster.ui.wizard;
 
-import lcmc.gui.EmptyBrowser;
+import lcmc.cluster.ui.EmptyBrowser;
 import lcmc.cluster.domain.Cluster;
 
 import javax.inject.Inject;

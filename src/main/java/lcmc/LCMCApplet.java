@@ -29,11 +29,11 @@ package lcmc;
 import javax.swing.JApplet;
 import javax.swing.JFrame;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 
 /**

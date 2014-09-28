@@ -57,16 +57,15 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
-import lcmc.gui.resources.Info;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
+import lcmc.common.domain.ExecCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * An implementation of an dialog with log files from many hosts.

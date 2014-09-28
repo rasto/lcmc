@@ -29,12 +29,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import lcmc.gui.EmptyBrowser;
-import lcmc.gui.GUIData;
+import lcmc.cluster.ui.EmptyBrowser;
+import lcmc.common.ui.GUIData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.UserConfig;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 /**
  * Cluster finish dialog. Shows some text and let's the user press the finish

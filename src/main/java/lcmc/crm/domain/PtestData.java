@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lcmc.utilities.CRM;
-import lcmc.utilities.Tools;
+import lcmc.crm.service.CRM;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class holds data that were retrieved from ptest command.

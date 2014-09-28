@@ -23,7 +23,7 @@
 package lcmc.common.ui;
 
 import lcmc.host.domain.Host;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Named;
 

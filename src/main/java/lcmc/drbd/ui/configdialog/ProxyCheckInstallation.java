@@ -31,19 +31,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.DialogHost;
-import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 @Named
 final class ProxyCheckInstallation extends DialogHost {

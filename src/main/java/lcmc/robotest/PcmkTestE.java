@@ -21,7 +21,7 @@
 package lcmc.robotest;
 
 import static lcmc.robotest.RoboTest.HOST_Y;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;

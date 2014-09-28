@@ -28,11 +28,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.swing.JCheckBox;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.cluster.domain.Cluster;
-import lcmc.gui.widget.GenericWidget.MTextField;
-import lcmc.gui.widget.MComboBox;
-import lcmc.utilities.Tools;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class is used to test the GUI.

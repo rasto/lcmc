@@ -48,11 +48,11 @@ import lcmc.crm.domain.ClusterStatus;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
-import lcmc.gui.ClusterBrowser;
-import lcmc.utilities.Http;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.domain.Http;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a bug report dialog.

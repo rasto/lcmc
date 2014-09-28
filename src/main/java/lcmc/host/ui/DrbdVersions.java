@@ -21,7 +21,7 @@
 package lcmc.host.ui;
 
 import lcmc.common.domain.Value;
-import lcmc.utilities.Unit;
+import lcmc.common.domain.Unit;
 
 public class DrbdVersions implements Value {
     private final String moduleFileName;

@@ -36,15 +36,15 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.Tools;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.GlobalInfo;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user start to configure the DRBD.

@@ -31,17 +31,17 @@ import javax.swing.SpringLayout;
 
 import lcmc.common.domain.Application;
 import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.SpringUtilities;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
+import lcmc.drbd.ui.resource.GlobalInfo;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.ExecCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.Ssh;
 
 /**
  * An implementation of a dialog where drbd is installed.

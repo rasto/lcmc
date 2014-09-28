@@ -27,10 +27,10 @@ import javax.inject.Named;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.common.domain.Application;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog that shows which distribution was detected.

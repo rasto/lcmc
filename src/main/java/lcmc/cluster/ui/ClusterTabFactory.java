@@ -21,7 +21,6 @@
 package lcmc.cluster.ui;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.view.ClustersPanel;
 
 import javax.inject.Inject;
 import javax.inject.Named;

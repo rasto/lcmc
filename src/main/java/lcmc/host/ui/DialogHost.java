@@ -36,17 +36,17 @@ import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.widget.Check;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.CancelCallback;
-import lcmc.utilities.ComponentWithTest;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
-import lcmc.utilities.WidgetListener;
-import lcmc.utilities.ssh.ExecCommandThread;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.CancelCallback;
+import lcmc.common.ui.utils.ComponentWithTest;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.domain.Unit;
+import lcmc.common.ui.utils.WidgetListener;
+import lcmc.cluster.service.ssh.ExecCommandThread;
 
 @Named
 public abstract class DialogHost extends WizardDialog {

@@ -44,12 +44,12 @@ import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.common.ui.WizardDialog;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can choose which hosts belong to

@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import lcmc.Exceptions;
 import lcmc.common.domain.Value;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * DRBD Proxy functions.

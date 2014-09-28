@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import lcmc.AppContext;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.GUIData;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

@@ -43,15 +43,14 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import lcmc.configs.DistResource;
-import lcmc.gui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.ExecCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of an edit config dialog.

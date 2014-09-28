@@ -21,8 +21,7 @@
 
 package lcmc.common.domain;
 
-import lcmc.utilities.Tools;
-import lcmc.utilities.Unit;
+import lcmc.common.domain.util.Tools;
 
 /**
  */

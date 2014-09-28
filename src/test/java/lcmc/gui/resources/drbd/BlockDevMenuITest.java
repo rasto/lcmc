@@ -4,19 +4,21 @@ import java.util.List;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.drbd.domain.BlockDevice;
-import lcmc.gui.HostBrowser;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.BlockDevMenu;
+import lcmc.host.ui.HostBrowser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import lcmc.utilities.EnablePredicate;
-import lcmc.utilities.MenuAction;
-import lcmc.utilities.MenuFactory;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Predicate;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.VisiblePredicate;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.domain.Predicate;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

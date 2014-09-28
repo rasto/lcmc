@@ -26,8 +26,8 @@ package lcmc.crm.domain;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Resource;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 /**
  * This class holds data of a service.

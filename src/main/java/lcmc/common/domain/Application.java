@@ -40,15 +40,15 @@ import java.util.regex.Matcher;
 
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.GUIData;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.GUIData;
 import lcmc.common.ui.ConfirmDialog;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.Hosts;
 import lcmc.robotest.Test;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 import javax.inject.Inject;

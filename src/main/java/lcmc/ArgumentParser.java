@@ -28,8 +28,8 @@ import lcmc.common.domain.UserConfig;
 import lcmc.robotest.RoboTest;
 import lcmc.robotest.StartTests;
 import lcmc.robotest.Test;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -180,7 +180,7 @@ public class ArgumentParser {
             }
             if (cmd.hasOption(DEBUG_OP)) {
                 final String level = cmd.getOptionValue(DEBUG_OP);
-                if (level != null && lcmc.utilities.Tools.isNumber(level)) {
+                if (level != null && lcmc.common.domain.util.Tools.isNumber(level)) {
                     LoggerFactory.setDebugLevel(Integer.parseInt(level));
                 } else {
                     throw new ParseException("cannot parse debug level: " + level);
@@ -190,7 +190,7 @@ public class ArgumentParser {
             boolean ultravnc = cmd.hasOption(ULTRAVNC_OP);
             final boolean realvnc = cmd.hasOption(REALVNC_OP);
             if (!tightvnc && !ultravnc && !realvnc) {
-                if (lcmc.utilities.Tools.isLinux()) {
+                if (lcmc.common.domain.util.Tools.isLinux()) {
                     tightvnc = true;
                 } else {
                     tightvnc = true;
@@ -248,7 +248,7 @@ public class ArgumentParser {
                 System.exit(0);
             }
             if (cmd.hasOption(VERSION_OP)) {
-                System.out.println("LINUX CLUSTER MANAGEMENT CONSOLE " + lcmc.utilities.Tools.getRelease() + " by Rasto Levrinc");
+                System.out.println("LINUX CLUSTER MANAGEMENT CONSOLE " + lcmc.common.domain.util.Tools.getRelease() + " by Rasto Levrinc");
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
@@ -273,7 +273,7 @@ public class ArgumentParser {
                 roboTest.restoreMouse();
             }
             final String vncPortOffsetString = cmd.getOptionValue(VNC_PORT_OFFSET_OP);
-            if (vncPortOffsetString != null && lcmc.utilities.Tools.isNumber(vncPortOffsetString)) {
+            if (vncPortOffsetString != null && lcmc.common.domain.util.Tools.isNumber(vncPortOffsetString)) {
                 application.setVncPortOffset(Integer.parseInt(vncPortOffsetString));
             }
             application.setAnimFPS(fps);
@@ -320,7 +320,7 @@ public class ArgumentParser {
                         final String[] he = hostNameEntered.split(":");
                         hostName = he[0];
                         port = he[1];
-                        if (port != null && port.isEmpty() || !lcmc.utilities.Tools.isNumber(port)) {
+                        if (port != null && port.isEmpty() || !lcmc.common.domain.util.Tools.isNumber(port)) {
                             throw new ParseException("could not parse " + HOST_OP + " option");
                         }
                     } else {

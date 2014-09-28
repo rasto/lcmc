@@ -27,7 +27,7 @@ import lcmc.drbd.domain.NetInterface;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
-import lcmc.utilities.Unit;
+import lcmc.common.domain.Unit;
 
 /**
  * This class holds data of one ucast link for heartbeat.

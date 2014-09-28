@@ -37,16 +37,16 @@ import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.ExecCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can choose cluster stack, that can

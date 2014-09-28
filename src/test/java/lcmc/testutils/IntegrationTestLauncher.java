@@ -29,13 +29,13 @@ import java.util.Collections;
 import java.util.List;
 
 import lcmc.LCMC;
-import lcmc.gui.GUIData;
-import lcmc.gui.ProgressIndicatorPanel;
+import lcmc.common.ui.GUIData;
+import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
 
 import javax.inject.Inject;

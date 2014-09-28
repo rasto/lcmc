@@ -33,15 +33,15 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.cluster.ui.wizard.AddClusterDialog;
-import lcmc.gui.GUIData;
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.common.ui.GUIData;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.common.domain.UserConfig;
 import lcmc.common.ui.WizardDialog;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /**
  * Host finish dialog with buttons to configure next host or configure the

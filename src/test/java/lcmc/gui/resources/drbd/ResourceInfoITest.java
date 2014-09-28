@@ -4,8 +4,9 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import lcmc.AppContext;
+import lcmc.drbd.ui.resource.ResourceInfo;
 import lcmc.host.domain.Host;
-import lcmc.gui.ClusterBrowser;
+import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.host.domain.HostFactory;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;

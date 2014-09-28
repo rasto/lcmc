@@ -36,9 +36,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.common.domain.Resource;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class holds data of one block device.

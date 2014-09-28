@@ -37,7 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.configs.AppDefaults;
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
@@ -46,13 +46,13 @@ import lcmc.common.domain.Value;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.drbd.ui.resource.GlobalInfo;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter drbd resource

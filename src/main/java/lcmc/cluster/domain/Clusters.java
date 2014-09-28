@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

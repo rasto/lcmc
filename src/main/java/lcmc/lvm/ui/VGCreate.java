@@ -49,14 +49,14 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.drbd.domain.BlockDevice;
-import lcmc.gui.Browser;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.LVM;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.lvm.service.LVM;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /** Create VG dialog. */
 @Named

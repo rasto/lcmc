@@ -22,8 +22,8 @@ package lcmc.robotest;
 
 import java.awt.event.KeyEvent;
 import lcmc.cluster.domain.Cluster;
-import lcmc.gui.widget.MComboBox;
-import lcmc.utilities.Tools;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;

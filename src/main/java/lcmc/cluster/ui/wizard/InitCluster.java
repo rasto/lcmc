@@ -41,29 +41,29 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.widget.Check;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.Corosync;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Heartbeat;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Openais;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.ExecCommandThread;
-import lcmc.utilities.Tools;
+import lcmc.cluster.ui.widget.Check;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.crm.service.Corosync;
+import lcmc.drbd.service.DRBD;
+import lcmc.common.domain.ExecCallback;
+import lcmc.crm.service.Heartbeat;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.crm.service.Openais;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.ExecCommandThread;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where cluster is initialized on all hosts.

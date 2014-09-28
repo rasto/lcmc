@@ -35,16 +35,16 @@ import javax.swing.SpringLayout;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
 import lcmc.drbd.ui.configdialog.DrbdConfig;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
-import lcmc.utilities.DRBD;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.drbd.service.DRBD;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where drbd block devices are initialized.

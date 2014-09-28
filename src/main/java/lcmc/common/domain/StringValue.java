@@ -20,8 +20,6 @@
 
 package lcmc.common.domain;
 
-import lcmc.utilities.Unit;
-
 public class StringValue implements Value, Comparable<Value> {
 
     private static final String NOTHING_VALUE = null;

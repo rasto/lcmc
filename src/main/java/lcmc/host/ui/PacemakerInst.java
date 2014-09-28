@@ -30,13 +30,13 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
 import lcmc.common.domain.Application;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.Ssh;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.common.domain.ExecCallback;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.Ssh;
 
 /**
  * An implementation of a dialog where openais with pacemaker is installed.

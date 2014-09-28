@@ -34,14 +34,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.cluster.domain.Cluster;
-import lcmc.gui.Browser;
-import lcmc.gui.ClusterViewPanel;
-import lcmc.gui.EmptyViewPanel;
+import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.wizard.ClusterPresenter;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a cluster tab, that contains host views of the hosts,

@@ -30,17 +30,17 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.gui.GUIData;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.GUIData;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
 import lcmc.common.domain.StringValue;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
 
 /**

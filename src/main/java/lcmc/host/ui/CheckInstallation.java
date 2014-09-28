@@ -36,19 +36,19 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.gui.SpringUtilities;
+import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.widget.Widget;
+import lcmc.cluster.ui.widget.Widget;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.utilities.ExecCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
+import lcmc.common.domain.ExecCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
 
 /**
  * An implementation of a dialog where

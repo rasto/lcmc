@@ -27,10 +27,13 @@ import lcmc.common.domain.AccessMode;
 
 import static org.junit.Assert.assertEquals;
 
-import lcmc.utilities.EnablePredicate;
-import lcmc.utilities.MenuFactory;
-import lcmc.utilities.MyMenu;
-import lcmc.utilities.UpdatableItem;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.drbd.ui.resource.ResourceMenu;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenu;
+import lcmc.common.ui.utils.UpdatableItem;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

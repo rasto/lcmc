@@ -22,9 +22,9 @@ package lcmc.drbd.domain;
 
 import lcmc.Exceptions;
 import lcmc.host.ui.DrbdVersions;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 import java.util.ArrayList;
 import java.util.Arrays;

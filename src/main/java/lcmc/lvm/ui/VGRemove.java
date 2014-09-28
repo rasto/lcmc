@@ -45,17 +45,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
-import lcmc.gui.Browser;
-import lcmc.gui.SpringUtilities;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.utilities.LVM;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.Browser;
+import lcmc.common.ui.SpringUtilities;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.lvm.service.LVM;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class implements VG Remove dialog.

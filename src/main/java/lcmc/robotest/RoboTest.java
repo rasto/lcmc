@@ -47,18 +47,18 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 
 import lcmc.configs.AppDefaults;
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
-import lcmc.gui.CrmGraph;
-import lcmc.gui.DrbdGraph;
-import lcmc.gui.resources.Info;
-import lcmc.gui.widget.GenericWidget.MTextField;
-import lcmc.gui.widget.MComboBox;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.crm.ui.CrmGraph;
+import lcmc.drbd.ui.DrbdGraph;
+import lcmc.common.ui.Info;
+import lcmc.cluster.ui.widget.GenericWidget.MTextField;
+import lcmc.cluster.ui.widget.MComboBox;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 import javax.inject.Inject;
 import javax.inject.Named;
 

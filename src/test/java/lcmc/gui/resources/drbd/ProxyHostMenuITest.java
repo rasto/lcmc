@@ -22,19 +22,21 @@ package lcmc.gui.resources.drbd;
 
 import java.util.List;
 
-import lcmc.gui.GUIData;
+import lcmc.drbd.ui.resource.ProxyHostInfo;
+import lcmc.drbd.ui.resource.ProxyHostMenu;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.host.domain.Host;
 
 import static org.junit.Assert.assertEquals;
 
-import lcmc.utilities.EnablePredicate;
-import lcmc.utilities.MenuAction;
-import lcmc.utilities.MenuFactory;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Predicate;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.VisiblePredicate;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.domain.Predicate;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

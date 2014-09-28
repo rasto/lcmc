@@ -3,8 +3,10 @@ package lcmc.gui.resources.vms;
 import java.util.HashMap;
 import java.util.Map;
 import lcmc.vm.domain.DiskData;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 import static org.junit.Assert.assertEquals;
+
+import lcmc.vm.ui.resource.DiskInfo;
 import org.junit.Before;
 import org.junit.Test;
 

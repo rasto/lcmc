@@ -33,12 +33,12 @@ import java.util.Set;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.Value;
-import lcmc.utilities.ConvertCmdCallback;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.SshOutput;
+import lcmc.common.domain.ConvertCmdCallback;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
 
 import org.apache.commons.collections15.map.MultiKeyMap;
 

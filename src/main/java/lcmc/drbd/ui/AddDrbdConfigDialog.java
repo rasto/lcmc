@@ -26,17 +26,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.ui.WizardDialog;
 import lcmc.drbd.ui.configdialog.Resource;
 import lcmc.drbd.ui.configdialog.Start;
-import lcmc.gui.resources.drbd.BlockDevInfo;
-import lcmc.gui.resources.drbd.GlobalInfo;
-import lcmc.gui.resources.drbd.ResourceInfo;
-import lcmc.gui.resources.drbd.VolumeInfo;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.GlobalInfo;
+import lcmc.drbd.ui.resource.ResourceInfo;
+import lcmc.drbd.ui.resource.VolumeInfo;
 import lcmc.common.domain.Application;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;

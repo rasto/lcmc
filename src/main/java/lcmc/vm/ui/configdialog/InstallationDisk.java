@@ -34,8 +34,8 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.DiskData;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.vms.DiskInfo;
-import lcmc.utilities.Tools;
+import lcmc.vm.ui.resource.DiskInfo;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.

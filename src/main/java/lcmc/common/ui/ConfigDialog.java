@@ -63,12 +63,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lcmc.gui.GUIData;
-import lcmc.gui.widget.Widget;
-import lcmc.gui.widget.WidgetFactory;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog with buttons. Ok button is predefined.

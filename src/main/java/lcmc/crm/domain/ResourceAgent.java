@@ -33,11 +33,11 @@ import java.util.Map;
 
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.crm.ServiceInfo;
-import lcmc.gui.widget.Widget;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.crm.ui.resource.ServiceInfo;
+import lcmc.cluster.ui.widget.Widget;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 import org.apache.commons.collections15.map.MultiKeyMap;
 
 /**

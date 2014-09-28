@@ -24,18 +24,22 @@ import java.util.Arrays;
 import java.util.List;
 
 import lcmc.common.domain.AccessMode;
-import lcmc.gui.ClusterBrowser;
-import lcmc.gui.resources.Info;
+import lcmc.drbd.ui.resource.BlockDevInfo;
+import lcmc.drbd.ui.resource.HostDrbdInfo;
+import lcmc.drbd.ui.resource.MultiSelectionInfo;
+import lcmc.drbd.ui.resource.MultiSelectionMenu;
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.Info;
 
 import static org.junit.Assert.assertEquals;
 
-import lcmc.utilities.EnablePredicate;
-import lcmc.utilities.MenuAction;
-import lcmc.utilities.MenuFactory;
-import lcmc.utilities.MyMenuItem;
-import lcmc.utilities.Predicate;
-import lcmc.utilities.UpdatableItem;
-import lcmc.utilities.VisiblePredicate;
+import lcmc.common.domain.EnablePredicate;
+import lcmc.common.ui.utils.MenuAction;
+import lcmc.common.ui.utils.MenuFactory;
+import lcmc.common.ui.utils.MyMenuItem;
+import lcmc.common.domain.Predicate;
+import lcmc.common.ui.utils.UpdatableItem;
+import lcmc.common.domain.VisiblePredicate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

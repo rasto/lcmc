@@ -22,12 +22,12 @@
 
 package lcmc.host.ui;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;

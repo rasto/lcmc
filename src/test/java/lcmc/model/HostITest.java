@@ -32,7 +32,7 @@ import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

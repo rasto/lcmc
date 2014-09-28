@@ -24,9 +24,9 @@ import lcmc.host.domain.Host;
 import lcmc.drbd.domain.DrbdInstallation;
 import lcmc.common.ui.WizardDialog;
 import lcmc.host.ui.NewHostDialog;
-import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.utilities.MyButton;
-import lcmc.utilities.Tools;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.common.ui.utils.MyButton;
+import lcmc.common.domain.util.Tools;
 
 import javax.inject.Inject;
 import javax.inject.Named;

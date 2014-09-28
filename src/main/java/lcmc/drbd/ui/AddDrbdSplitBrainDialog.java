@@ -22,11 +22,11 @@
 
 package lcmc.drbd.ui;
 
-import lcmc.gui.GUIData;
+import lcmc.common.ui.GUIData;
 import lcmc.drbd.ui.configdialog.DrbdConfig;
-import lcmc.gui.resources.drbd.VolumeInfo;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.drbd.ui.resource.VolumeInfo;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;

@@ -26,9 +26,9 @@ package lcmc.cluster.domain;
 import lcmc.common.domain.Resource;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
-import lcmc.utilities.Tools;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+import lcmc.common.domain.util.Tools;
 
 /**
  * This class holds data of one cluster network.

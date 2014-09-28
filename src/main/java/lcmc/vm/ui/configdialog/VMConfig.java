@@ -23,7 +23,7 @@
 package lcmc.vm.ui.configdialog;
 
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.vms.DomainInfo;
+import lcmc.vm.ui.resource.DomainInfo;
 
 import javax.inject.Named;
 

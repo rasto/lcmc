@@ -30,7 +30,7 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 
 import lcmc.common.domain.Application;
-import lcmc.utilities.Tools;
+import lcmc.common.domain.util.Tools;
 
 /**
  * Creates confirm dialog with yes and no options.

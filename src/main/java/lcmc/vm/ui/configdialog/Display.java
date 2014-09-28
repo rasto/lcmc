@@ -34,8 +34,8 @@ import javax.swing.JScrollPane;
 import lcmc.common.domain.Application;
 import lcmc.vm.domain.GraphicsData;
 import lcmc.common.ui.WizardDialog;
-import lcmc.gui.resources.vms.GraphicsInfo;
-import lcmc.utilities.Tools;
+import lcmc.vm.ui.resource.GraphicsInfo;
+import lcmc.common.domain.util.Tools;
 
 /**
  * An implementation of a dialog where user can enter a new domain.

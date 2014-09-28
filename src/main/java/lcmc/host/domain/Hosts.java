@@ -27,8 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import lcmc.cluster.domain.Cluster;
-import lcmc.utilities.Logger;
-import lcmc.utilities.LoggerFactory;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

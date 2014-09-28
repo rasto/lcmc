@@ -26,11 +26,11 @@ import java.io.File;
 import java.io.IOException;
 
 import lcmc.configs.DistResource;
-import lcmc.gui.resources.vms.HardwareInfo;
+import lcmc.vm.ui.resource.HardwareInfo;
 import lcmc.host.domain.Host;
-import lcmc.utilities.Tools;
-import lcmc.utilities.ssh.ExecCommandConfig;
-import lcmc.utilities.ssh.SshOutput;
+import lcmc.common.domain.util.Tools;
+import lcmc.cluster.service.ssh.ExecCommandConfig;
+import lcmc.cluster.service.ssh.SshOutput;
 
 /**
  * This class holds info about file in a linux file system. It should overwrite
