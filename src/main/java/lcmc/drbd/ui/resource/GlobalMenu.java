@@ -60,8 +60,8 @@ public class GlobalMenu {
                 Tools.getString("GlobalInfo.AddProxyHost"),
                 null,
                 Tools.getString("GlobalInfo.AddProxyHost"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {
@@ -75,8 +75,8 @@ public class GlobalMenu {
                 Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
                 GlobalInfo.CLUSTER_ICON,
                 null,
-                new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
-                new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED))
+                new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {
@@ -91,8 +91,8 @@ public class GlobalMenu {
                 Tools.getString("GlobalInfo.RescanLvm"),
                 null, /* icon */
                 null,
-                new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
-                new AccessMode(Application.AccessType.OP, AccessMode.ADVANCED))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.ADVANCED))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {
@@ -106,8 +106,8 @@ public class GlobalMenu {
                 Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
                 GlobalInfo.LOGFILE_ICON,
                 null,
-                new AccessMode(Application.AccessType.RO, false),
-                new AccessMode(Application.AccessType.RO, false))
+                new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {

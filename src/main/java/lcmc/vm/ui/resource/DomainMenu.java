@@ -98,8 +98,8 @@ public class DomainMenu {
         /* advanced options */
         final MyMenu advancedSubmenu = menuFactory.createMenu(
                 Tools.getString("DomainInfo.MoreOptions"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -128,8 +128,8 @@ public class DomainMenu {
                 ClusterBrowser.REMOVE_ICON,
                 Tools.getString("DomainInfo.CancelDomain"),
 
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .predicate(new Predicate() {
                     @Override
                     public boolean check() {
@@ -169,9 +169,10 @@ public class DomainMenu {
      * Add new hardware.
      */
     private UpdatableItem getAddNewHardwareMenu(final String name) {
-        final MyMenu newHardwareMenu = menuFactory.createMenu(name,
-                                                              new AccessMode(Application.AccessType.ADMIN, false),
-                                                              new AccessMode(Application.AccessType.OP, false));
+        final MyMenu newHardwareMenu = menuFactory.createMenu(
+                name,
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL));
         newHardwareMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
@@ -181,8 +182,8 @@ public class DomainMenu {
                 final MyMenuItem newDiskMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewDisk"),
                         BlockDevInfo.HARDDISK_ICON_LARGE,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -197,8 +198,8 @@ public class DomainMenu {
                 final MyMenuItem newFilesystemMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewFilesystem"),
                         BlockDevInfo.HARDDISK_ICON_LARGE,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -213,8 +214,8 @@ public class DomainMenu {
                 final MyMenuItem newInterfaceMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewInterface"),
                         NetInfo.NET_INTERFACE_ICON_LARGE,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -229,8 +230,8 @@ public class DomainMenu {
                 final MyMenuItem newGraphicsMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewGraphics"),
                         DomainInfo.VNC_ICON,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -245,8 +246,8 @@ public class DomainMenu {
                 final MyMenuItem newInputDevMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewInputDev"),
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -261,8 +262,8 @@ public class DomainMenu {
                 final MyMenuItem newSoundsMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewSound"),
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -277,8 +278,8 @@ public class DomainMenu {
                 final MyMenuItem newSerialsMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewSerial"),
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -293,8 +294,8 @@ public class DomainMenu {
                 final MyMenuItem newParallelsMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewParallel"),
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -309,8 +310,8 @@ public class DomainMenu {
                 final MyMenuItem newVideosMenuItem = menuFactory.createMenuItem(
                         Tools.getString("DomainInfo.AddNewVideo"),
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -335,8 +336,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.StartOn") + host.getName(),
                 HostBrowser.HOST_ON_ICON_LARGE,
                 Tools.getString("DomainInfo.StartOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -376,8 +377,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.ShutdownOn") + host.getName(),
                 SHUTDOWN_ICON,
                 Tools.getString("DomainInfo.ShutdownOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -417,8 +418,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.RebootOn") + host.getName(),
                 REBOOT_ICON,
                 Tools.getString("DomainInfo.RebootOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -458,8 +459,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.ResumeOn") + host.getName(),
                 RESUME_ICON,
                 Tools.getString("DomainInfo.ResumeOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -506,8 +507,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.DestroyOn") + host.getName(),
                 DESTROY_ICON,
                 Tools.getString("DomainInfo.DestroyOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -548,8 +549,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.SuspendOn") + host.getName(),
                 DomainInfo.PAUSE_ICON,
                 Tools.getString("DomainInfo.SuspendOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -590,8 +591,8 @@ public class DomainMenu {
                 Tools.getString("DomainInfo.ResumeOn") + host.getName(),
                 RESUME_ICON,
                 Tools.getString("DomainInfo.ResumeOn") + host.getName(),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -631,8 +632,8 @@ public class DomainMenu {
                     getVNCMenuString("TIGHT", host),
                     DomainInfo.VNC_ICON,
                     getVNCMenuString("TIGHT", host),
-                    new AccessMode(Application.AccessType.RO, false),
-                    new AccessMode(Application.AccessType.RO, false))
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                         @Override
                         public String check() {
@@ -671,8 +672,8 @@ public class DomainMenu {
                     getVNCMenuString("ULTRA", host),
                     DomainInfo.VNC_ICON,
                     getVNCMenuString("ULTRA", host),
-                    new AccessMode(Application.AccessType.RO, false),
-                    new AccessMode(Application.AccessType.RO, false))
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                         @Override
                         public String check() {
@@ -711,8 +712,8 @@ public class DomainMenu {
                     getVNCMenuString("REAL", host),
                     DomainInfo.VNC_ICON,
                     getVNCMenuString("REAL", host),
-                    new AccessMode(Application.AccessType.RO, false),
-                    new AccessMode(Application.AccessType.RO, false))
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                         @Override
                         public String check() {

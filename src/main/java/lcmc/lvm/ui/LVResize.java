@@ -201,7 +201,7 @@ public final class LVResize extends LV {
                                           Widget.NO_REGEXP,
                                           250,
                                           Widget.NO_ABBRV,
-                                          new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                                          new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                                           Widget.NO_BUTTON);
         oldSizeWidget.setEnabled(false);
         inputPane.add(oldSizeLabel);
@@ -221,7 +221,7 @@ public final class LVResize extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                       new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWidget.getComponent());
@@ -269,7 +269,7 @@ public final class LVResize extends LV {
                                          Widget.NO_REGEXP,
                                          250,
                                          Widget.NO_ABBRV,
-                                         new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                                         new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                                          Widget.NO_BUTTON);
         maxSizeWidget.setEnabled(false);
         inputPane.add(maxSizeLabel);

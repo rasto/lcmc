@@ -58,8 +58,8 @@ public class CloneMenu extends ServiceMenu {
             return items;
         }
         final MyMenu csMenu = menuFactory.createMenu(cs.toString(),
-                                                     new AccessMode(Application.AccessType.RO, false),
-                                                     new AccessMode(Application.AccessType.RO, false));
+                                                     new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                                                     new AccessMode(AccessMode.RO, AccessMode.NORMAL));
         csMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
@@ -99,8 +99,8 @@ public class CloneMenu extends ServiceMenu {
                                             + ' ' + hostName + " (stop) (offline)",
                             ServiceInfo.MIGRATE_ICON,
                             ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                            new AccessMode(Application.AccessType.OP, false),
-                            new AccessMode(Application.AccessType.OP, false))
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                             .predicate(new Predicate() {
                                 @Override
                                 public boolean check() {

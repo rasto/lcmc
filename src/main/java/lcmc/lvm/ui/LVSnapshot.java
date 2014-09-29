@@ -129,7 +129,7 @@ public final class LVSnapshot extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("LV Name"));
         inputPane.add(lvNameWi.getComponent());
@@ -154,7 +154,7 @@ public final class LVSnapshot extends LV {
                        Widget.NO_REGEXP,
                        250,
                        Widget.NO_ABBRV,
-                       new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                       new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                        Widget.NO_BUTTON);
         inputPane.add(sizeLabel);
         inputPane.add(sizeWi.getComponent());
@@ -196,7 +196,7 @@ public final class LVSnapshot extends LV {
                         Widget.NO_REGEXP,
                         250,
                         Widget.NO_ABBRV,
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                         Widget.NO_BUTTON);
         maxSizeWi.setEnabled(false);
         inputPane.add(maxSizeLabel);

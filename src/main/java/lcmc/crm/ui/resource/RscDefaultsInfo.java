@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Map;
 import javax.inject.Named;
 import javax.swing.JPanel;
+
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
@@ -181,7 +183,7 @@ public final class RscDefaultsInfo extends EditableInfo {
     }
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
+    protected AccessMode.Type getAccessType(final String param) {
         return getBrowser().getCrmXml().getRscDefaultsMetaAttrAccessType(param);
     }
 
@@ -191,8 +193,8 @@ public final class RscDefaultsInfo extends EditableInfo {
     }
 
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-        return false;
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+        return AccessMode.NORMAL;
     }
 
     @Override

@@ -239,7 +239,7 @@ final class CommStack extends DialogCluster {
                                           Widget.NO_REGEXP,
                                           500,
                                           Widget.NO_ABBRV,
-                                          new AccessMode(Application.AccessType.ADMIN, false), /* only adv. mode */
+                                          new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                           Widget.NO_BUTTON);
         chooseStackCombo.setEnabled(Application.COROSYNC_NAME, false);
         chooseStackCombo.setEnabled(Application.HEARTBEAT_NAME, false);

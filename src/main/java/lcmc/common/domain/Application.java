@@ -31,11 +31,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 
 import lcmc.cluster.domain.Cluster;
@@ -70,30 +67,12 @@ import javax.swing.plaf.FontUIResource;
 @Singleton
 public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-    public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
-    private static final String OP_MODE_OPERATOR = Tools.getString("Application.OpMode.OP");
-    private static final String OP_MODE_ADMIN = Tools.getString("Application.OpMode.ADMIN");
-    public static final String OP_MODE_GOD = Tools.getString("Application.OpMode.GOD");
-    public static final Map<AccessType, String> OP_MODES_MAP = new EnumMap<AccessType, String>(AccessType.class);
-    public static final Map<String, AccessType> ACCESS_TYPE_MAP = new LinkedHashMap<String, AccessType>();
     public static final String HEARTBEAT_NAME = "Heartbeat";
     public static final String COROSYNC_NAME = "Corosync/OpenAIS";
     public static final String PM_CLONE_SET_NAME = "Clone Set";
     public static final String PM_MASTER_SLAVE_SET_NAME = "Master/Slave Set";
     public static final String PACEMAKER_GROUP_NAME = "Group";
     public static final float DEFAULT_ANIM_FPS = 20.0f;
-    static {
-        OP_MODES_MAP.put(AccessType.RO, OP_MODE_READONLY);
-        OP_MODES_MAP.put(AccessType.OP, OP_MODE_OPERATOR);
-        OP_MODES_MAP.put(AccessType.ADMIN, OP_MODE_ADMIN);
-        OP_MODES_MAP.put(AccessType.GOD, OP_MODE_GOD);
-
-        ACCESS_TYPE_MAP.put(OP_MODE_READONLY, AccessType.RO);
-        ACCESS_TYPE_MAP.put(OP_MODE_OPERATOR, AccessType.OP);
-        ACCESS_TYPE_MAP.put(OP_MODE_ADMIN, AccessType.ADMIN);
-        ACCESS_TYPE_MAP.put(OP_MODE_GOD, AccessType.GOD);
-    }
-
     public static boolean isLive(final RunMode runMode) {
         return RunMode.LIVE == runMode;
     }
@@ -133,8 +112,8 @@ public class Application {
     private boolean stagingPacemaker = false;
     private boolean hideLRM = false;
     private float animFPS = DEFAULT_ANIM_FPS;
-    private AccessType accessType = AccessType.ADMIN;
-    private AccessType maxAccessType = AccessType.ADMIN;
+    private AccessMode.Type accessType = AccessMode.ADMIN;
+    private AccessMode.Type maxAccessType = AccessMode.ADMIN;
     private boolean upgradeCheckEnabled = true;
     private boolean bigDRBDConf = false;
     private boolean oneHostCluster = false;
@@ -543,15 +522,15 @@ public class Application {
         this.animFPS = animFPS;
     }
 
-    public void setAccessType(final AccessType accessType) {
+    public void setAccessType(final AccessMode.Type accessType) {
         this.accessType = accessType;
     }
 
-    public AccessType getAccessType() {
+    public AccessMode.Type getAccessType() {
         return accessType;
     }
 
-    AccessType getMaxAccessType() {
+    AccessMode.Type getMaxAccessType() {
         return maxAccessType;
     }
 
@@ -560,15 +539,15 @@ public class Application {
      * required and advanced mode is required and we are not in advanced mode.
      */
     public boolean isAccessible(final AccessMode required) {
-        return getAccessType().compareTo(required.getAccessType()) > 0
-               || (getAccessType().compareTo(required.getAccessType()) == 0
+        return getAccessType().compareTo(required.getType()) > 0
+               || (getAccessType().compareTo(required.getType()) == 0
                    && (advancedMode || !required.isAdvancedMode()));
     }
 
     public String[] getOperatingModes() {
         final List<String> modes = new ArrayList<String>();
-        for (final AccessType at : Application.OP_MODES_MAP.keySet()) {
-            modes.add(OP_MODES_MAP.get(at));
+        for (final AccessMode.Type at : AccessMode.OP_MODES_MAP.keySet()) {
+            modes.add(AccessMode.OP_MODES_MAP.get(at));
             if (at.equals(maxAccessType)) {
                 break;
             }
@@ -786,7 +765,7 @@ public class Application {
         }
     }
 
-    public void setMaxAccessType(final Application.AccessType maxAccessType) {
+    public void setMaxAccessType(final AccessMode.Type maxAccessType) {
         this.maxAccessType = maxAccessType;
         setAccessType(maxAccessType);
         checkAccessOfEverything();
@@ -881,15 +860,6 @@ public class Application {
         confirmDialog.init(title, desc, yesButton, noButton);
         confirmDialog.showDialog();
         return confirmDialog.isPressedYesButton();
-    }
-
-
-    public enum AccessType {
-        RO,
-        OP,
-        ADMIN,
-        GOD,
-        NEVER
     }
 
     /**

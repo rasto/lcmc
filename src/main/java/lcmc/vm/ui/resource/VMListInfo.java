@@ -335,8 +335,8 @@ public final class VMListInfo extends CategoryInfo {
         final UpdatableItem newDomainMenuItem = menuFactory.createMenuItem(
                 Tools.getString("VMListInfo.AddNewDomain"),
                 HostBrowser.HOST_OFF_ICON_LARGE,
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .addAction(new MenuAction() {
                 @Override
                 public void run(final String text) {

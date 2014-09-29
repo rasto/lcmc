@@ -74,8 +74,8 @@ public class HostMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.HostWizard"),
                         HostBrowser.HOST_ICON_LARGE,
                         "",
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -94,8 +94,8 @@ public class HostMenu {
                         Tools.getString("HostBrowser.CRM.StandByOff"),
                         HostInfo.HOST_STANDBY_OFF_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -144,8 +144,8 @@ public class HostMenu {
                 menuFactory.createMenuItem(Tools.getString("HostInfo.CRM.AllMigrateFrom"),
                         HostInfo.HOST_STANDBY_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -200,8 +200,8 @@ public class HostMenu {
                         HostInfo.HOST_STOP_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -272,8 +272,8 @@ public class HostMenu {
                         HostInfo.HOST_STOP_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -322,8 +322,8 @@ public class HostMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -379,8 +379,8 @@ public class HostMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -431,8 +431,8 @@ public class HostMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -482,8 +482,8 @@ public class HostMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -528,8 +528,8 @@ public class HostMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                         null,
                         "",
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -549,8 +549,8 @@ public class HostMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                         HostInfo.LOGFILE_ICON,
                         "",
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -571,8 +571,8 @@ public class HostMenu {
         items.add(viewLogsItem);
         /* advacend options */
         final MyMenu hostAdvancedSubmenu = menuFactory.createMenu(Tools.getString("HostBrowser.AdvancedSubmenu"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -596,8 +596,8 @@ public class HostMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                         HostBrowser.HOST_REMOVE_ICON,
                         Tools.getString("HostBrowser.RemoveHost"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {

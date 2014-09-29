@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -447,14 +448,14 @@ public final class GraphicsInfo extends HardwareInfo {
 
     /** Whether the parameter should be enabled only in advanced mode. */
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param) ? AccessMode.ADVANCED : AccessMode.NORMAL;
     }
 
     /** Returns access type of this parameter. */
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */

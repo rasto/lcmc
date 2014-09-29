@@ -1347,7 +1347,7 @@ public class ServiceInfo extends EditableInfo {
 
                                   rightWidth,
                                   abbreviations,
-                                  new AccessMode(Application.AccessType.ADMIN, false),
+                                  new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                   Widget.NO_BUTTON);
             wi.setEditable(true);
             final Widget prevWi = scoreComboBoxHash.get(hi);
@@ -1436,16 +1436,15 @@ public class ServiceInfo extends EditableInfo {
         } else {
             savedPO = prevWi.getValue();
         }
-        final Widget pingWi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
-                                                           savedPO,
-                                                           new Value[]{NOTHING_SELECTED_VALUE,
-                                                                       PING_ATTRIBUTES.get("defined"),
-                                                                       PING_ATTRIBUTES.get("eq0")},
-                                                           Widget.NO_REGEXP,
-                                                           rightWidth,
-                                                           Widget.NO_ABBRV,
-                                                           new AccessMode(Application.AccessType.ADMIN, false),
-                                                           Widget.NO_BUTTON);
+        final Widget pingWi = widgetFactory.createInstance(
+                Widget.Type.COMBOBOX,
+                savedPO,
+                new Value[]{NOTHING_SELECTED_VALUE, PING_ATTRIBUTES.get("defined"), PING_ATTRIBUTES.get("eq0")},
+                Widget.NO_REGEXP,
+                rightWidth,
+                Widget.NO_ABBRV,
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                Widget.NO_BUTTON);
         addField(panel, pingLabel, pingWi.getComponent(), leftWidth, rightWidth, 0);
         pingWi.setLabel(pingLabel, Tools.getString("ServiceInfo.PingdToolTip"));
         if (resourceAgent.isPingService()
@@ -1697,14 +1696,15 @@ public class ServiceInfo extends EditableInfo {
     protected void addOperations(final JPanel optionsPanel, final int leftWidth, final int rightWidth) {
         final JPanel sectionPanel = getParamPanel(Tools.getString("ClusterBrowser.Operations"));
         final Info savedOpIdRef = getSameServiceOpIdRef();
-        sameAsOperationsWi = widgetFactory.createInstance(Widget.Type.COMBOBOX,
-                                                          savedOpIdRef,
-                                                          getSameServicesOperations(),
-                                                          Widget.NO_REGEXP,
-                                                          rightWidth,
-                                                          Widget.NO_ABBRV,
-                                                          new AccessMode(Application.AccessType.ADMIN, false),
-                                                          Widget.NO_BUTTON);
+        sameAsOperationsWi = widgetFactory.createInstance(
+                Widget.Type.COMBOBOX,
+                savedOpIdRef,
+                getSameServicesOperations(),
+                Widget.NO_REGEXP,
+                rightWidth,
+                Widget.NO_ABBRV,
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                Widget.NO_BUTTON);
         final String toolTip;
         if (savedOpIdRef == null) {
             toolTip = "";
@@ -1780,7 +1780,7 @@ public class ServiceInfo extends EditableInfo {
                                                       "^\\d*$",
                                                       rightWidth,
                                                       Widget.NO_ABBRV,
-                                                      new AccessMode(Application.AccessType.ADMIN, false),
+                                                      new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                       Widget.NO_BUTTON);
                 } else {
                     final String regexp = "^-?\\d*$";
@@ -1792,7 +1792,7 @@ public class ServiceInfo extends EditableInfo {
                                                regexp,
                                                rightWidth,
                                                Widget.NO_ABBRV,
-                                               new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                                               new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                Widget.NO_BUTTON);
                 }
                 wi.setEnabled(savedOpIdRef == null);
@@ -2022,12 +2022,12 @@ public class ServiceInfo extends EditableInfo {
     }
 
     @Override
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-        return false;
+    protected final AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+        return AccessMode.NORMAL;
     }
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
+    protected AccessMode.Type getAccessType(final String param) {
         final CrmXml crmXML = getBrowser().getCrmXml();
         return crmXML.getAccessType(resourceAgent, param);
     }
@@ -2259,7 +2259,7 @@ public class ServiceInfo extends EditableInfo {
                                                          Widget.NO_REGEXP,
                                                          application.getServiceFieldWidth(),
                                                          Widget.NO_ABBRV,
-                                                         new AccessMode(Application.AccessType.ADMIN, false),
+                                                         new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                          Widget.NO_BUTTON);
         final String toolTip;
         if (savedMAIdRef == null) {
@@ -2460,7 +2460,7 @@ public class ServiceInfo extends EditableInfo {
                                                           application.getServiceLabelWidth()
                                                           + application.getServiceFieldWidth(),
                                                           Widget.NO_ABBRV,
-                                                          new AccessMode(Application.AccessType.ADMIN, false),
+                                                          new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                           Widget.NO_BUTTON);
 
             if (!getService().isNew()) {

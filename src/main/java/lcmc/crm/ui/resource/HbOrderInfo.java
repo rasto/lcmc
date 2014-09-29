@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import lcmc.Exceptions;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
@@ -394,8 +395,8 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     }
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     int getScore() {
@@ -418,8 +419,8 @@ final class HbOrderInfo extends EditableInfo implements HbConstraintInterface {
     }
 
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return false;
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return AccessMode.NORMAL;
     }
 
     @Override

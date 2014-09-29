@@ -105,7 +105,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
         final String disableTooltip = enablePredicate.check();
         setEnabled(disableTooltip == null && accessible);
         if (isVisible()) {
-            if (!accessible && enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
+            if (!accessible && enableAccessMode.getType() != AccessMode.NEVER) {
                 String advanced = "";
                 if (enableAccessMode.isAdvancedMode()) {
                     advanced = "Advanced ";
@@ -114,7 +114,7 @@ public class MyMenu extends JMenu implements UpdatableItem {
                                + getText()
                                + " (disabled)</b><br>available in \""
                                + advanced
-                               + Application.OP_MODES_MAP.get(enableAccessMode.getAccessType())
+                               + AccessMode.OP_MODES_MAP.get(enableAccessMode.getType())
                                + "\" mode</html>");
             } else if (disableTooltip != null) {
                 setToolTipText("<html><b>" + getText() + " (disabled)</b><br>" + disableTooltip + "</html>");

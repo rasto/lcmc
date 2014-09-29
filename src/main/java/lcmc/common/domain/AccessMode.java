@@ -23,24 +23,72 @@
 
 package lcmc.common.domain;
 
+import lcmc.common.domain.util.Tools;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * This class holds access type and mode (advanced or not advanced).
  */
-public final class AccessMode {
-    public static final boolean ADVANCED = true;
-    private final Application.AccessType accessType;
-    private final boolean advancedMode;
+public class AccessMode {
 
-    public AccessMode(final Application.AccessType accessType, final boolean advancedMode) {
-        this.accessType = accessType;
+    public static final Map<Type, String> OP_MODES_MAP = new LinkedHashMap<Type, String>();
+    public static final Map<String, AccessMode.Type> ACCESS_TYPE_MAP = new LinkedHashMap<String, Type>();
+    public static final String OP_MODE_READONLY = Tools.getString("Application.OpMode.RO");
+    private static final String OP_MODE_OPERATOR = Tools.getString("Application.OpMode.OP");
+    private static final String OP_MODE_ADMIN = Tools.getString("Application.OpMode.ADMIN");
+    public static final String OP_MODE_GOD = Tools.getString("Application.OpMode.GOD");
+
+    public static final Mode ADVANCED = Mode.Advanced;
+    public static final Mode NORMAL = Mode.Normal;
+    public static final Type RO = Type.RO;
+    public static final Type OP = Type.OP;
+    public static final Type ADMIN = Type.ADMIN;
+    public static final Type GOD = Type.GOD;
+    public static final Type NEVER = Type.NEVER;
+
+    static {
+        OP_MODES_MAP.put(RO, OP_MODE_READONLY);
+        OP_MODES_MAP.put(OP, OP_MODE_OPERATOR);
+        OP_MODES_MAP.put(ADMIN, OP_MODE_ADMIN);
+        OP_MODES_MAP.put(GOD, OP_MODE_GOD);
+
+        ACCESS_TYPE_MAP.put(OP_MODE_READONLY, RO);
+        ACCESS_TYPE_MAP.put(OP_MODE_OPERATOR, OP);
+        ACCESS_TYPE_MAP.put(OP_MODE_ADMIN, ADMIN);
+        ACCESS_TYPE_MAP.put(OP_MODE_GOD, GOD);
+    }
+
+    private final Type type;
+    private final Mode advancedMode;
+
+    public AccessMode(final Type accessType, final Mode advancedMode) {
+        this.type = accessType;
         this.advancedMode = advancedMode;
     }
 
-    public Application.AccessType getAccessType() {
-        return accessType;
+    public Type getType() {
+        return type;
     }
 
     public boolean isAdvancedMode() {
         return advancedMode == ADVANCED;
+    }
+
+    public enum Mode {
+        Advanced,
+        Normal
+    }
+
+    public enum Type {
+        RO,
+        OP,
+        ADMIN,
+        GOD,
+        NEVER
     }
 }

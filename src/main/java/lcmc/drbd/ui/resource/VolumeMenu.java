@@ -62,8 +62,8 @@ public class VolumeMenu {
                 Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect") + ' ' + getResourceInfo().getName(),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.ResourceDisconnect.ToolTip"),
-                new AccessMode(Application.AccessType.OP, true),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .predicate(new Predicate() {
                     @Override
                     public boolean check() {
@@ -135,8 +135,8 @@ public class VolumeMenu {
                 Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.ResourcePauseSync.ToolTip"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .predicate(new Predicate() {
                     @Override
                     public boolean check() {
@@ -177,8 +177,8 @@ public class VolumeMenu {
                 Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.ResolveSplitBrain.ToolTip"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -202,8 +202,8 @@ public class VolumeMenu {
                 Tools.getString("ClusterBrowser.Drbd.Verify"),
                 null,
                 Tools.getString("ClusterBrowser.Drbd.Verify.ToolTip"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -231,8 +231,8 @@ public class VolumeMenu {
                 Tools.getString("ClusterBrowser.Drbd.RemoveEdge"),
                 ClusterBrowser.REMOVE_ICON,
                 Tools.getString("ClusterBrowser.Drbd.RemoveEdge.ToolTip"),
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {
@@ -261,8 +261,8 @@ public class VolumeMenu {
                 Tools.getString("ClusterBrowser.Drbd.ViewLogs"),
                 VolumeInfo.LOGFILE_ICON,
                 null,
-                new AccessMode(Application.AccessType.RO, false),
-                new AccessMode(Application.AccessType.RO, false))
+                new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {

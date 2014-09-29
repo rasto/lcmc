@@ -57,8 +57,8 @@ public class HbConnectionMenu {
                 Tools.getString("ClusterBrowser.Hb.RemoveEdge"),
                 ClusterBrowser.REMOVE_ICON,
                 Tools.getString("ClusterBrowser.Hb.RemoveEdge.ToolTip"),
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -100,8 +100,8 @@ public class HbConnectionMenu {
                         Tools.getString("ClusterBrowser.Hb.AddOrder"),
                         null,
                         Tools.getString("ClusterBrowser.Hb.AddOrder.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -169,8 +169,8 @@ public class HbConnectionMenu {
                         Tools.getString("ClusterBrowser.Hb.AddColocation"),
                         null,
                         Tools.getString("ClusterBrowser.Hb.AddColocation.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {

@@ -101,9 +101,9 @@ public abstract class EditableInfo extends Info {
     a reason that appears in the tooltip. */
     protected abstract String isEnabled(String param);
 
-    protected abstract Application.AccessType getAccessType(String param);
+    protected abstract AccessMode.Type getAccessType(String param);
 
-    protected abstract boolean isEnabledOnlyInAdvancedMode(String param);
+    protected abstract AccessMode.Mode isEnabledOnlyInAdvancedMode(String param);
 
     protected abstract boolean isLabel(String param);
 
@@ -264,7 +264,7 @@ public abstract class EditableInfo extends Info {
             /* sub panel */
             final String section = getSection(param);
             final JPanel panel;
-            final Application.AccessType accessType = getAccessType(param);
+            final AccessMode.Type accessType = getAccessType(param);
             final String accessTypeString = accessType.toString();
             final Boolean advanced = isAdvanced(param);
             final String advancedString = advanced.toString();
@@ -340,7 +340,7 @@ public abstract class EditableInfo extends Info {
         final Collection<JPanel> advancedSections = new HashSet<JPanel>();
         for (final PanelPart panelPart : panelPartsList) {
             final String section = panelPart.getSection();
-            final Application.AccessType accessType = panelPart.getAccessType();
+            final AccessMode.Type accessType = panelPart.getType();
             final String accessTypeString = accessType.toString();
             final Boolean advanced = panelPart.isAdvanced();
             final String advancedString = advanced.toString();
@@ -975,12 +975,12 @@ public abstract class EditableInfo extends Info {
     private static class PanelPart {
         /** Section of this panel part. */
         private final String section;
-        private final Application.AccessType accessType;
+        private final AccessMode.Type type;
         private final boolean advanced;
 
-        PanelPart(final String section, final Application.AccessType accessType, final boolean advanced) {
+        PanelPart(final String section, final AccessMode.Type type, final boolean advanced) {
             this.section = section;
-            this.accessType = accessType;
+            this.type = type;
             this.advanced = advanced;
         }
 
@@ -988,8 +988,8 @@ public abstract class EditableInfo extends Info {
             return section;
         }
 
-        public final Application.AccessType getAccessType() {
-            return accessType;
+        public final AccessMode.Type getType() {
+            return type;
         }
 
         public final boolean isAdvanced() {

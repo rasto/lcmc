@@ -63,8 +63,8 @@ public class VirtualDomainMenu extends ServiceMenu {
                             "start TIGHT VNC viewer",
                             null,
                             null,
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false))
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                         @Override
                         public String check() {
@@ -102,8 +102,8 @@ public class VirtualDomainMenu extends ServiceMenu {
                             "start ULTRA VNC viewer",
                             null,
                             null,
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false))
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -140,8 +140,8 @@ public class VirtualDomainMenu extends ServiceMenu {
                             "start REAL VNC test",
                             null,
                             null,
-                            new AccessMode(Application.AccessType.RO, false),
-                            new AccessMode(Application.AccessType.RO, false))
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {

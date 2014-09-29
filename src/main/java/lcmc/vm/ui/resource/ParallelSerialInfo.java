@@ -400,14 +400,14 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
 
     /** Whether the parameter should be enabled only in advanced mode. */
     @Override
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return false;
+    protected final AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return AccessMode.NORMAL;
     }
 
     /** Returns access type of this parameter. */
     @Override
-    protected final Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected final AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */
@@ -455,7 +455,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
                                   width,
                                   Widget.NO_ABBRV,
                                   new AccessMode(getAccessType(param),
-                                                 false), /* only adv. mode */
+                                                 AccessMode.NORMAL),
                                   fileChooserBtn);
             if (Tools.isWindows()) {
                 /* does not work on windows and I tries, ultimatly because

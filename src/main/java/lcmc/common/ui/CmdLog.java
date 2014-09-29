@@ -106,7 +106,7 @@ public final class CmdLog extends HostLogs {
                                    Widget.NO_REGEXP,
                                    150,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                                   new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                    Widget.NO_BUTTON);
         return new JComponent[]{processed,
                                 raw,

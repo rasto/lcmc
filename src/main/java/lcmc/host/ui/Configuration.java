@@ -298,7 +298,7 @@ public class Configuration extends DialogHost {
                                       Widget.NO_REGEXP,
                                       COMBO_BOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
             inputPane.add(hostnameField[i].getComponent());
         }
@@ -317,7 +317,7 @@ public class Configuration extends DialogHost {
                                 Widget.NO_REGEXP,
                                 COMBO_BOX_WIDTH,
                                 Widget.NO_ABBRV,
-                                new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                 Widget.NO_BUTTON);
 
             inputPane.add(ipCombo[i].getComponent());

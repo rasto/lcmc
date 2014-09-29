@@ -784,8 +784,8 @@ public final class DiskInfo extends HardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
     /** Returns true if the value of the parameter is ok. */
     @Override
@@ -890,8 +890,8 @@ public final class DiskInfo extends HardwareInfo {
 
     /** Whether the parameter should be enabled only in advanced mode. */
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param) ? AccessMode.ADVANCED : AccessMode.NORMAL;
     }
 
     /** Updates parameters. */
@@ -964,7 +964,7 @@ public final class DiskInfo extends HardwareInfo {
                                      width,
                                      Widget.NO_ABBRV,
                                      new AccessMode(getAccessType(param),
-                                                    false), /* only adv. mode */
+                                                    AccessMode.NORMAL),
                                      fileChooserBtn);
             paramWi.setAlwaysEditable(true);
             sourceFileWi.put(prefixS, paramWi);

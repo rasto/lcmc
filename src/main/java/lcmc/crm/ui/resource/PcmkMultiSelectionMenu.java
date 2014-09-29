@@ -91,8 +91,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_STANDBY_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -148,8 +148,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_STANDBY_OFF_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -209,8 +209,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_STOP_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -285,8 +285,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_STOP_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -340,8 +340,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -407,8 +407,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -467,8 +467,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -517,8 +517,8 @@ public class PcmkMultiSelectionMenu {
                         HostInfo.HOST_START_COMM_LAYER_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -561,8 +561,8 @@ public class PcmkMultiSelectionMenu {
                         Tools.getString("PcmkMultiSelectionInfo.ChangeHostColor"),
                         null,
                         "",
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -591,8 +591,8 @@ public class PcmkMultiSelectionMenu {
                 menuFactory.createMenuItem(Tools.getString("PcmkMultiSelectionInfo.StartSelectedResources"),
                         ServiceInfo.START_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -650,8 +650,8 @@ public class PcmkMultiSelectionMenu {
                 menuFactory.createMenuItem(Tools.getString("PcmkMultiSelectionInfo.StopSelectedResources"),
                         ServiceInfo.STOP_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -715,8 +715,8 @@ public class PcmkMultiSelectionMenu {
                         Tools.getString("PcmkMultiSelectionInfo.CleanUpResource"),
                         ServiceInfo.SERVICE_RUNNING_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -780,8 +780,8 @@ public class PcmkMultiSelectionMenu {
                         Tools.getString("PcmkMultiSelectionInfo.ManageResource"),
                         ServiceInfo.MANAGE_BY_CRM_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -848,8 +848,8 @@ public class PcmkMultiSelectionMenu {
                         ServiceInfo.UNMANAGE_BY_CRM_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
 
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -922,8 +922,8 @@ public class PcmkMultiSelectionMenu {
                                     + ' ' + hostName + " (offline)",
                             ServiceInfo.MIGRATE_ICON,
                             ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                            new AccessMode(Application.AccessType.OP, false),
-                            new AccessMode(Application.AccessType.OP, false))
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                             .predicate(new Predicate() {
                                 @Override
                                 public boolean check() {
@@ -997,8 +997,8 @@ public class PcmkMultiSelectionMenu {
                         Tools.getString("PcmkMultiSelectionInfo.UnmigrateResource"),
                         ServiceInfo.UNMIGRATE_ICON,
                         ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -1049,8 +1049,8 @@ public class PcmkMultiSelectionMenu {
                 Tools.getString("PcmkMultiSelectionInfo.RemoveService"),
                 ClusterBrowser.REMOVE_ICON,
                 ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {

@@ -712,7 +712,7 @@ final class HbConfig extends DialogCluster {
                     if (castAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
+                        guiData.setAccessible(makeConfigButton, AccessMode.ADMIN);
                     }
                     if (!application.getAutoClusters().isEmpty() && !castAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -910,7 +910,7 @@ final class HbConfig extends DialogCluster {
                                       Widget.NO_REGEXP,
                                       TYPE_COMBOBOX_WIDTH,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
 
         final NetInterface[] ni = hosts[0].getNetInterfacesWithBridges();
@@ -931,7 +931,7 @@ final class HbConfig extends DialogCluster {
                                                    Widget.NO_REGEXP,
                                                    INTERFACE_COMBOBOX_WIDTH,
                                                    Widget.NO_ABBRV,
-                                                   new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                                   new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                                    Widget.NO_BUTTON);
 
         /* ucast links */
@@ -951,7 +951,7 @@ final class HbConfig extends DialogCluster {
                                              Widget.NO_REGEXP,
                                              LINK_COMBOBOX_WIDTH,
                                              Widget.NO_ABBRV,
-                                             new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                             new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                              Widget.NO_BUTTON);
         ucastLink2Widget = widgetFactory.createInstance(
                                              Widget.GUESS_TYPE,
@@ -960,7 +960,7 @@ final class HbConfig extends DialogCluster {
                                              Widget.NO_REGEXP,
                                              LINK_COMBOBOX_WIDTH,
                                              Widget.NO_ABBRV,
-                                             new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                             new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                              Widget.NO_BUTTON);
 
         /* serial links */
@@ -976,7 +976,7 @@ final class HbConfig extends DialogCluster {
                                              Widget.NO_REGEXP,
                                              LINK_COMBOBOX_WIDTH,
                                              Widget.NO_ABBRV,
-                                             new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                             new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                              Widget.NO_BUTTON);
 
         /* this matches something like this: 225.0.0.43 694 1 0
@@ -994,7 +994,7 @@ final class HbConfig extends DialogCluster {
                                      regexp,
                                      ADDR_COMBOBOX_WIDTH,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                     new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                      Widget.NO_BUTTON);
 
         typeWidget.addListeners(
@@ -1100,7 +1100,7 @@ final class HbConfig extends DialogCluster {
         statusPanel.add(configStatus);
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
-        guiData.setAccessible(configCheckbox, Application.AccessType.ADMIN);
+        guiData.setAccessible(configCheckbox, AccessMode.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -1167,7 +1167,7 @@ final class HbConfig extends DialogCluster {
                     '^' + OPTION_REGEXPS.get(option) + "\\s*$",
                     size,
                     Widget.NO_ABBRV,
-                    new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                     Widget.NO_BUTTON);
             optionsWidgets.put(option, w);
             w.setAlwaysEditable(true);
@@ -1236,7 +1236,7 @@ final class HbConfig extends DialogCluster {
                         }
                     }
                 }
-                guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
+                guiData.setAccessible(makeConfigButton, AccessMode.ADMIN);
             }
         };
     }

@@ -107,8 +107,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.LoadDrbd"),
                            null,
                            Tools.getString("MultiSelectionInfo.LoadDrbd"),
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -141,8 +141,8 @@ public class MultiSelectionMenu {
                    Tools.getString("MultiSelectionInfo.AdjustAllDrbd"),
                    null,
                    Tools.getString("MultiSelectionInfo.AdjustAllDrbd"),
-                           new AccessMode(Application.AccessType.OP, false),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -180,8 +180,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.UpAll"),
                            null,
                            Tools.getString("MultiSelectionInfo.UpAll"),
-                           new AccessMode(Application.AccessType.ADMIN, false),
-                           new AccessMode(Application.AccessType.ADMIN, false))
+                           new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                           new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                     .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -217,8 +217,8 @@ public class MultiSelectionMenu {
                         Tools.getString("MultiSelectionInfo.HostStopProxy"),
                         null,
                         Tools.getString("MultiSelectionInfo.HostStopProxy"),
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -246,8 +246,8 @@ public class MultiSelectionMenu {
                       Tools.getString("MultiSelectionInfo.HostStartProxy"),
                       null,
                       Tools.getString("MultiSelectionInfo.HostStartProxy"),
-                      new AccessMode(Application.AccessType.OP, false),
-                      new AccessMode(Application.AccessType.OP, false))
+                      new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                      new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -275,8 +275,8 @@ public class MultiSelectionMenu {
                     Tools.getString("MultiSelectionInfo.ChangeHostColor"),
                     null,
                     "",
-                    new AccessMode(Application.AccessType.RO, false),
-                    new AccessMode(Application.AccessType.RO, false))
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {
@@ -301,8 +301,8 @@ public class MultiSelectionMenu {
                     Tools.getString("MultiSelectionInfo.PVCreate"),
                     null,
                     Tools.getString("MultiSelectionInfo.PVCreate.ToolTip"),
-                    new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false))
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .visiblePredicate(new VisiblePredicate() {
                 @Override
                 public boolean check() {
@@ -343,8 +343,8 @@ public class MultiSelectionMenu {
                     Tools.getString("MultiSelectionInfo.PVRemove"),
                     null,
                     Tools.getString("MultiSelectionInfo.PVRemove.ToolTip"),
-                    new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false))
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .visiblePredicate(new VisiblePredicate() {
                 @Override
                 public boolean check() {
@@ -386,8 +386,8 @@ public class MultiSelectionMenu {
                   Tools.getString("MultiSelectionInfo.VGCreate"),
                   null,
                   Tools.getString("MultiSelectionInfo.VGCreate.ToolTip"),
-                  new AccessMode(Application.AccessType.OP, false),
-                  new AccessMode(Application.AccessType.OP, false))
+                  new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                  new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .visiblePredicate(new VisiblePredicate() {
                 @Override
                 public boolean check() {
@@ -441,8 +441,8 @@ public class MultiSelectionMenu {
                   Tools.getString("MultiSelectionInfo.VGRemove"),
                   null,
                   Tools.getString("MultiSelectionInfo.VGRemove.ToolTip"),
-                  new AccessMode(Application.AccessType.OP, false),
-                  new AccessMode(Application.AccessType.OP, false))
+                  new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                  new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .visiblePredicate(new VisiblePredicate() {
                 @Override
                 public boolean check() {
@@ -509,8 +509,8 @@ public class MultiSelectionMenu {
                     name,
                     null,
                     Tools.getString("MultiSelectionInfo.LVCreate.ToolTip"),
-                    new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false))
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -557,8 +557,8 @@ public class MultiSelectionMenu {
                     Tools.getString("MultiSelectionInfo.LVRemove"),
                     null,
                     Tools.getString("MultiSelectionInfo.LVRemove.ToolTip"),
-                    new AccessMode(Application.AccessType.OP, false),
-                    new AccessMode(Application.AccessType.OP, false))
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -601,8 +601,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Detach"),
                            BlockDevInfo.NO_HARDDISK_ICON_LARGE,
                            Tools.getString("MultiSelectionInfo.Detach"),
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -675,8 +675,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Attach"),
                            BlockDevInfo.HARDDISK_DRBD_ICON_LARGE,
                            Tools.getString("MultiSelectionInfo.Attach"),
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -747,8 +747,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Connect"),
                            null,
                            Tools.getString("MultiSelectionInfo.Connect"),
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -817,8 +817,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Disconnect"),
                            null,
                            Tools.getString("MultiSelectionInfo.Disconnect"),
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -901,8 +901,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.SetPrimary"),
                            null,
                            Tools.getString("MultiSelectionInfo.SetPrimary"),
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -962,8 +962,8 @@ public class MultiSelectionMenu {
                         Tools.getString("MultiSelectionInfo.SetSecondary"),
                         null,
                         Tools.getString("MultiSelectionInfo.SetSecondary"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1013,8 +1013,8 @@ public class MultiSelectionMenu {
                         Tools.getString("MultiSelectionInfo.ForcePrimary"),
                         null,
                         Tools.getString("MultiSelectionInfo.ForcePrimary"),
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1073,8 +1073,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Invalidate"),
                            null,
                            Tools.getString("MultiSelectionInfo.Invalidate"),
-                           new AccessMode(Application.AccessType.ADMIN, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1134,8 +1134,8 @@ public class MultiSelectionMenu {
                            null,
                            Tools.getString("MultiSelectionInfo.ResumeSync"),
 
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1186,8 +1186,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.PauseSync"),
                            null,
                            Tools.getString("MultiSelectionInfo.PauseSync"),
-                           new AccessMode(Application.AccessType.OP, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1233,8 +1233,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.Resize"),
                            null,
                            Tools.getString("MultiSelectionInfo.Resize"),
-                           new AccessMode(Application.AccessType.ADMIN, true),
-                           new AccessMode(Application.AccessType.OP, false))
+                           new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1286,8 +1286,8 @@ public class MultiSelectionMenu {
                          Tools.getString("MultiSelectionInfo.DiscardData"),
                          null,
                          Tools.getString("MultiSelectionInfo.DiscardData"),
-                         new AccessMode(Application.AccessType.ADMIN, true),
-                         new AccessMode(Application.AccessType.OP, false))
+                         new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                         new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1346,8 +1346,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.ProxyDown"),
                            null,
                            Tools.getString("MultiSelectionInfo.ProxyDown"),
-                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                           new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {
@@ -1413,8 +1413,8 @@ public class MultiSelectionMenu {
             menuFactory.createMenuItem(Tools.getString("MultiSelectionInfo.ProxyUp"),
                            null,
                            Tools.getString("MultiSelectionInfo.ProxyUp"),
-                           new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                           new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                           new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                           new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                         @Override
                         public boolean check() {

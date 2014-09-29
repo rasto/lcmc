@@ -408,7 +408,7 @@ public class GUIData  {
         });
     }
 
-    public void setAccessible(final JComponent c, final Application.AccessType required) {
+    public void setAccessible(final JComponent c, final AccessMode.Type required) {
         c.setEnabled(application.getAccessType().compareTo(required) >= 0);
     }
 

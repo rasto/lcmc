@@ -264,7 +264,7 @@ final class CreateMD extends DrbdConfig {
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                         Widget.NO_BUTTON);
         } else {
             final Value[] choices = {new StringValue(useExistingMetadata),
@@ -284,7 +284,7 @@ final class CreateMD extends DrbdConfig {
                                         Widget.NO_REGEXP,
                                         COMBOBOX_WIDTH,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                         Widget.NO_BUTTON);
         }
 

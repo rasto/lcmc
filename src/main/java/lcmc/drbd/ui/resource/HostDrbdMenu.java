@@ -86,8 +86,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.HostWizard"),
                         HostBrowser.HOST_ICON_LARGE,
                         Tools.getString("HostBrowser.HostWizard"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -102,8 +102,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.ProxyHostWizard"),
                         HostBrowser.HOST_ICON_LARGE,
                         Tools.getString("HostBrowser.ProxyHostWizard"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -119,8 +119,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.LoadDrbd"),
                         null,
                         Tools.getString("HostBrowser.Drbd.LoadDrbd"),
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -152,8 +152,8 @@ public class HostDrbdMenu {
                         Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                         null,
                         hostDrbdInfo.getMenuToolTip("DRBD.startProxy", ""),
-                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -178,8 +178,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                         null,
                         hostDrbdInfo.getMenuToolTip("DRBD.proxyUp", DRBD.ALL_DRBD_RESOURCES),
-                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -200,8 +200,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                         null,
                         hostDrbdInfo.getMenuToolTip("DRBD.proxyDown", DRBD.ALL_DRBD_RESOURCES),
-                        new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -222,8 +222,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.AdjustAllDrbd"),
                         null,
                         Tools.getString("HostBrowser.Drbd.AdjustAllDrbd.ToolTip"),
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -259,8 +259,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.UpAll"),
                         null,
                         Tools.getString("HostBrowser.Drbd.UpAll"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -293,8 +293,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
                         null,
                         Tools.getString("HostBrowser.Drbd.ChangeHostColor"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -313,8 +313,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ViewLogs"),
                         Info.LOGFILE_ICON,
                         Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -339,8 +339,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ConnectAll"),
                         null,
                         Tools.getString("HostBrowser.Drbd.ConnectAll"),
-                        new AccessMode(Application.AccessType.OP, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -374,8 +374,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.DisconnectAll"),
                         null,
                         Tools.getString("HostBrowser.Drbd.DisconnectAll"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -409,8 +409,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.AttachAll"),
                         null,
                         Tools.getString("HostBrowser.Drbd.AttachAll"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -444,8 +444,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.DetachAll"),
                         null,
                         Tools.getString("HostBrowser.Drbd.DetachAll"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -479,8 +479,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
                         null,
                         Tools.getString("HostBrowser.Drbd.SetAllPrimary"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -514,8 +514,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
                         null,
                         Tools.getString("HostBrowser.Drbd.SetAllSecondary"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.ADMIN, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -549,8 +549,8 @@ public class HostDrbdMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.RemoveHost"),
                         HostBrowser.HOST_REMOVE_ICON,
                         Tools.getString("HostBrowser.RemoveHost"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -573,8 +573,8 @@ public class HostDrbdMenu {
         /* advanced options */
         final MyMenu hostAdvancedSubmenu = menuFactory.createMenu(
                 Tools.getString("HostBrowser.AdvancedSubmenu"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -602,8 +602,8 @@ public class HostDrbdMenu {
      */
     private UpdatableItem getLVMMenu(final Host host) {
         final MyMenu lvmMenu = menuFactory.createMenu(LVM_MENU,
-                new AccessMode(Application.AccessType.OP, true),
-                new AccessMode(Application.AccessType.OP, true));
+                new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                new AccessMode(AccessMode.OP, AccessMode.ADVANCED));
         lvmMenu.onUpdate(new Runnable() {
             @Override
             public void run() {
@@ -636,8 +636,8 @@ public class HostDrbdMenu {
         final MyMenuItem mi = menuFactory.createMenuItem(VG_CREATE_MENU_ITEM,
                 null,
                 VG_CREATE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {
@@ -666,8 +666,8 @@ public class HostDrbdMenu {
         final MyMenuItem mi = menuFactory.createMenuItem(name,
                 null,
                 LV_CREATE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {

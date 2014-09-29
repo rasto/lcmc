@@ -86,8 +86,8 @@ public class ServicesMenu {
                 menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.AddGroup"),
                         null,
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -116,8 +116,8 @@ public class ServicesMenu {
         /* add service */
         final MyMenu addServiceMenuItem = menuFactory.createMenu(
                 Tools.getString("ClusterBrowser.Hb.AddService"),
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -149,8 +149,8 @@ public class ServicesMenu {
                             Tools.getString("ClusterBrowser.linbitDrbdMenuName"),
                             null,
                             null,
-                            new AccessMode(Application.AccessType.ADMIN, false),
-                            new AccessMode(Application.AccessType.OP, false))
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                             .addAction(new MenuAction() {
                                 @Override
                                 public void run(final String text) {
@@ -186,8 +186,8 @@ public class ServicesMenu {
                             menuFactory.createMenuItem(ipService.getPullDownMenuName(),
                                     null,
                                     null,
-                                    new AccessMode(Application.AccessType.ADMIN, false),
-                                    new AccessMode(Application.AccessType.OP, false))
+                                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                                    new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                                     .addAction(new MenuAction() {
                                         @Override
                                         public void run(final String text) {
@@ -212,8 +212,8 @@ public class ServicesMenu {
                             Tools.getString("ClusterBrowser.DrbddiskMenuName"),
                             null,
                             null,
-                            new AccessMode(Application.AccessType.ADMIN, false),
-                            new AccessMode(Application.AccessType.OP, false))
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                             .addAction(new MenuAction() {
                                 @Override
                                 public void run(final String text) {
@@ -243,7 +243,7 @@ public class ServicesMenu {
                         /* no services, don't show */
                         continue;
                     }
-                    boolean mode = !AccessMode.ADVANCED;
+                    AccessMode.Mode mode = AccessMode.NORMAL;
                     if (ResourceAgent.UPSTART_CLASS_NAME.equals(cl) || ResourceAgent.SYSTEMD_CLASS_NAME.equals(cl)) {
                         mode = AccessMode.ADVANCED;
                     }
@@ -253,16 +253,16 @@ public class ServicesMenu {
                     }
                     final MyMenu classItem =
                             menuFactory.createMenu(ClusterBrowser.getClassMenuName(cl),
-                                    new AccessMode(Application.AccessType.ADMIN, mode),
-                                    new AccessMode(Application.AccessType.OP, mode));
+                                    new AccessMode(AccessMode.ADMIN, mode),
+                                    new AccessMode(AccessMode.OP, mode));
                     final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : services) {
                         final MyMenuItem mmi = menuFactory.createMenuItem(
                                 ra.getPullDownMenuName(),
                                 null,
                                 null,
-                                new AccessMode(Application.AccessType.ADMIN, false),
-                                new AccessMode(Application.AccessType.OP, false))
+                                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                                 .addAction(new MenuAction() {
                                     @Override
                                     public void run(final String text) {
@@ -317,8 +317,8 @@ public class ServicesMenu {
                 menuFactory.createMenuItem(Tools.getString("ServicesInfo.AddConstraintPlaceholderAnd"),
                         null,
                         Tools.getString("ServicesInfo.AddConstraintPlaceholderAnd.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -356,8 +356,8 @@ public class ServicesMenu {
                 menuFactory.createMenuItem(Tools.getString("ServicesInfo.AddConstraintPlaceholderOr"),
                         null,
                         Tools.getString("ServicesInfo.AddConstraintPlaceholderOr.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -404,8 +404,8 @@ public class ServicesMenu {
         final ComponentWithTest stopAllMenuItem = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Hb.StopAllServices"),
                 ServiceInfo.STOP_ICON,
-                new AccessMode(Application.AccessType.ADMIN, true),
-                new AccessMode(Application.AccessType.ADMIN, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -462,8 +462,8 @@ public class ServicesMenu {
         final ComponentWithTest unmigrateAllMenuItem = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Hb.UnmigrateAllServices"),
                 ServiceInfo.UNMIGRATE_ICON,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -513,8 +513,8 @@ public class ServicesMenu {
         final ComponentWithTest removeMenuItem = menuFactory.createMenuItem(
                 Tools.getString("ClusterBrowser.Hb.RemoveAllServices"),
                 ClusterBrowser.REMOVE_ICON,
-                new AccessMode(Application.AccessType.ADMIN, true),
-                new AccessMode(Application.AccessType.ADMIN, true))
+                new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -590,8 +590,8 @@ public class ServicesMenu {
                 menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.ClusterWizard"),
                         ServicesInfo.CLUSTER_ICON,
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -605,8 +605,8 @@ public class ServicesMenu {
                 menuFactory.createMenuItem(Tools.getString("ClusterBrowser.Hb.ViewLogs"),
                         ServicesInfo.LOGFILE_ICON,
                         null,
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {

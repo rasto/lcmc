@@ -156,7 +156,7 @@ public class HostInfo extends Info {
         final MyButton crmConfigureCommitButton =
                       widgetFactory.createButton(Tools.getString("HostInfo.crmShellCommitButton"), Browser.APPLY_ICON);
         registerComponentEnableAccessMode(crmConfigureCommitButton,
-                                          new AccessMode(Application.AccessType.ADMIN, false));
+                                          new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL));
         final MyButton hostInfoButton = widgetFactory.createButton(Tools.getString("HostInfo.crmShellStatusButton"));
         application.makeMiniButton(hostInfoButton);
 
@@ -195,7 +195,7 @@ public class HostInfo extends Info {
         hostInfoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(ta, new AccessMode(Application.AccessType.GOD, false));
+                registerComponentEditAccessMode(ta, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
                 crmInfoShowing = true;
                 hostInfoButton.setEnabled(false);
                 crmConfigureCommitButton.setEnabled(false);
@@ -215,7 +215,7 @@ public class HostInfo extends Info {
         crmConfigureShowButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                registerComponentEditAccessMode(ta, new AccessMode(Application.AccessType.ADMIN, false));
+                registerComponentEditAccessMode(ta, new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL));
                 updateAdvancedPanels();
                 crmShowInProgress = true;
                 crmInfoShowing = false;

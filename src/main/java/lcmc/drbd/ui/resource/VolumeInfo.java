@@ -45,6 +45,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+
+import lcmc.common.domain.AccessMode;
 import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
 import lcmc.common.ui.GUIData;
@@ -985,13 +987,13 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     }
 
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-        return false;
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+        return AccessMode.NORMAL;
     }
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     @Override

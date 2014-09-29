@@ -34,6 +34,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import lcmc.AppContext;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.MainMenu;
 import lcmc.common.domain.Application;
@@ -270,7 +271,7 @@ public final class Logger {
             return;
         }
 
-        AppContext.getBean(MainMenu.class).setOperatingMode(Application.OP_MODE_READONLY);
+        AppContext.getBean(MainMenu.class).setOperatingMode(AccessMode.OP_MODE_READONLY);
 
         final Thread t = new Thread(new Runnable() {
             @Override

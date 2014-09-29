@@ -32,6 +32,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
@@ -294,14 +295,14 @@ final class SoundInfo extends HardwareInfo {
 
     /** Whether the parameter should be enabled. */
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return false;
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return AccessMode.NORMAL;
     }
 
     /** Returns access type of this parameter. */
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     /** Returns true if the value of the parameter is ok. */

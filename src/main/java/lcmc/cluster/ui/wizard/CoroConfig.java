@@ -608,7 +608,7 @@ final class CoroConfig extends DialogCluster {
                     if (aisCastAddresses.isEmpty()) {
                         makeConfigButton.setEnabled(false);
                     } else {
-                        guiData.setAccessible(makeConfigButton, Application.AccessType.ADMIN);
+                        guiData.setAccessible(makeConfigButton, AccessMode.ADMIN);
                     }
                     if (!application.getAutoClusters().isEmpty() && !aisCastAddresses.isEmpty()) {
                         Tools.sleep(1000);
@@ -858,7 +858,7 @@ final class CoroConfig extends DialogCluster {
                                                   Widget.NO_REGEXP,
                                                   TYPE_COMBOBOX_WIDTH,
                                                   Widget.NO_ABBRV,
-                                                  new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                                  new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                                   Widget.NO_BUTTON);
         typeWidget.setEnabled(false);
 
@@ -881,7 +881,7 @@ final class CoroConfig extends DialogCluster {
                                           Widget.NO_REGEXP,
                                           INTERFACE_COMBOBOX_WIDTH,
                                           Widget.NO_ABBRV,
-                                          new AccessMode(Application.AccessType.RO, false), /* only adv. mode */
+                                          new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                           Widget.NO_BUTTON);
 
         /* this matches something like this: 225.0.0.43 694 1 0
@@ -896,7 +896,7 @@ final class CoroConfig extends DialogCluster {
                               regexp,
                               ADDR_COMBOBOX_WIDTH,
                               Widget.NO_ABBRV,
-                              new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                              new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                               Widget.NO_BUTTON);
 
         typeWidget.addListeners(new WidgetListener() {
@@ -921,7 +921,7 @@ final class CoroConfig extends DialogCluster {
                 portRegexp,
                 PORT_COMBOBOX_WIDTH,
                 Widget.NO_ABBRV,
-                new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                 Widget.NO_BUTTON);
         portWidget.addListeners(new WidgetListener() {
             @Override
@@ -963,7 +963,7 @@ final class CoroConfig extends DialogCluster {
         configCheckbox = new JCheckBox("-----", true);
         configCheckbox.setBackground(Tools.getDefaultColor("ConfigDialog.Background.Light"));
 
-        guiData.setAccessible(configCheckbox, Application.AccessType.ADMIN);
+        guiData.setAccessible(configCheckbox, AccessMode.ADMIN);
         configCheckbox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {

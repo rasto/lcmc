@@ -361,7 +361,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                        Widget.NO_BUTTON);
 
         drbdDistributionWidget.setEnabled(false);
@@ -373,7 +373,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                        Widget.NO_BUTTON);
 
         drbdKernelDirWidget.setEnabled(false);
@@ -385,7 +385,7 @@ public class DrbdLinbitAvailPackages extends DialogHost {
                                        Widget.NO_REGEXP,
                                        0,    /* width */
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                        Widget.NO_BUTTON);
 
         drbdArchWidget.setEnabled(false);

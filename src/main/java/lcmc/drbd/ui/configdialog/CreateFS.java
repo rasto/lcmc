@@ -256,7 +256,7 @@ final class CreateFS extends DrbdConfig {
                                                         Widget.NO_REGEXP,
                                                         COMBOBOX_WIDTH,
                                                         Widget.NO_ABBRV,
-                                                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                                         Widget.NO_BUTTON);
         hostChoiceWidget.addListeners(new WidgetListener() {
             @Override
@@ -279,7 +279,7 @@ final class CreateFS extends DrbdConfig {
                                                         Widget.NO_REGEXP,
                                                         COMBOBOX_WIDTH,
                                                         Widget.NO_ABBRV,
-                                                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                                         Widget.NO_BUTTON);
         if (application.getAutoOptionGlobal("autodrbd") != null) {
             filesystemWidget.setValueAndWait(new StringValue("ext3"));
@@ -314,8 +314,7 @@ final class CreateFS extends DrbdConfig {
                                                              Widget.NO_REGEXP,
                                                              COMBOBOX_WIDTH,
                                                              Widget.NO_ABBRV,
-                                                             new AccessMode(Application.AccessType.RO,
-                                                                            !AccessMode.ADVANCED),
+                                                             new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                                              Widget.NO_BUTTON);
         skipInitialSyncWidget.setEnabled(false);
         skipInitialSyncWidget.setBackgroundColor(Tools.getDefaultColor("ConfigDialog.Background.Light"));

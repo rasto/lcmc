@@ -47,8 +47,8 @@ public class ResourceMenu {
         for (final VolumeInfo dvi : resourceInfo.getDrbdVolumes()) {
             final MyMenu volumesMenu = menuFactory.createMenu(
                     dvi.toString(),
-                    new AccessMode(Application.AccessType.RO, false),
-                    new AccessMode(Application.AccessType.RO, false));
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                    new AccessMode(AccessMode.RO, AccessMode.NORMAL));
             volumesMenu.onUpdate(new Runnable() {
                 @Override
                 public void run() {

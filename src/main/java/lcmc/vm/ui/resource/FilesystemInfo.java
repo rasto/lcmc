@@ -381,8 +381,8 @@ public final class FilesystemInfo extends HardwareInfo {
 
     /** Returns access type of this parameter. */
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
     /** Returns true if the value of the parameter is ok. */
     @Override
@@ -414,8 +414,8 @@ public final class FilesystemInfo extends HardwareInfo {
 
     /** Whether the parameter should be enabled only in advanced mode. */
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param);
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return IS_ENABLED_ONLY_IN_ADVANCED.contains(param) ? AccessMode.ADVANCED : AccessMode.NORMAL;
     }
 
     /** Updates parameters. */
@@ -526,8 +526,7 @@ public final class FilesystemInfo extends HardwareInfo {
                                      regexp,
                                      width,
                                      Widget.NO_ABBRV,
-                                     new AccessMode(getAccessType(param),
-                                         false), /* only adv. mode */
+                                     new AccessMode(getAccessType(param), AccessMode.NORMAL),
                                      fileChooserBtn);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {
@@ -570,8 +569,7 @@ public final class FilesystemInfo extends HardwareInfo {
                                     Widget.NO_REGEXP,
                                     width,
                                     Widget.NO_ABBRV,
-                                    new AccessMode(getAccessType(param),
-                                        false), /* only adv. mode */
+                                    new AccessMode(getAccessType(param), AccessMode.NORMAL),
                                     Widget.NO_BUTTON);
             paramWi.setAlwaysEditable(true);
             if (prefix == null) {

@@ -358,8 +358,8 @@ public class HostBrowser extends Browser {
                 Tools.getString("HostBrowser.CmdLog"),
                 Info.LOGFILE_ICON,
                 "",
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.ADMIN, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
 
                 .enablePredicate(new EnablePredicate() {
                     @Override
@@ -385,8 +385,8 @@ public class HostBrowser extends Browser {
         final MyMenuItem panicMenuItem = menuFactory.createMenuItem(
                 Tools.getString("HostBrowser.MakeKernelPanic") + host.getName(),
                 null,
-                new AccessMode(Application.AccessType.GOD, false),
-                new AccessMode(Application.AccessType.ADMIN, false))
+                new AccessMode(AccessMode.GOD, AccessMode.NORMAL),
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -412,8 +412,8 @@ public class HostBrowser extends Browser {
         final MyMenuItem rebootMenuItem = menuFactory.createMenuItem(
                 Tools.getString("HostBrowser.MakeKernelReboot") + host.getName(),
                 null,
-                new AccessMode(Application.AccessType.GOD, false),
-                new AccessMode(Application.AccessType.ADMIN, false))
+                new AccessMode(AccessMode.GOD, AccessMode.NORMAL),
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {

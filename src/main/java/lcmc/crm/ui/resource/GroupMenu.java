@@ -66,8 +66,8 @@ public class GroupMenu extends ServiceMenu {
         /* add group service */
         final MyMenu addGroupServiceMenuItem = menuFactory.createMenu(
                         Tools.getString("ClusterBrowser.Hb.AddGroupService"),
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -87,16 +87,16 @@ public class GroupMenu extends ServiceMenu {
                 for (final String cl : ClusterBrowser.CRM_CLASSES) {
                     final MyMenu classItem = menuFactory.createMenu(
                                                         ClusterBrowser.CRM_CLASS_MENU.get(cl),
-                                                        new AccessMode(Application.AccessType.ADMIN, false),
-                                                        new AccessMode(Application.AccessType.OP, false));
+                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                                                        new AccessMode(AccessMode.OP, AccessMode.NORMAL));
                     final MyListModel<MyMenuItem> dlm = new MyListModel<MyMenuItem>();
                     for (final ResourceAgent ra : groupInfo.getAddGroupServiceList(cl)) {
                         final MyMenuItem mmi = menuFactory.createMenuItem(
                                         ra.getPullDownMenuName(),
                                         null,
                                         null,
-                                        new AccessMode(Application.AccessType.ADMIN, false),
-                                        new AccessMode(Application.AccessType.OP, false));
+                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                                        new AccessMode(AccessMode.OP, AccessMode.NORMAL));
                         mmi.addAction(new MenuAction() {
                                 @Override
                                 public void run(final String text) {
@@ -151,8 +151,8 @@ public class GroupMenu extends ServiceMenu {
             for (final ServiceInfo child : groupInfo.getGroupServices()) {
                 final MyMenu groupServicesMenu = menuFactory.createMenu(
                         child.toString(),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false));
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL));
                 groupServicesMenu.onUpdate(new Runnable() {
                     @Override
                     public void run() {

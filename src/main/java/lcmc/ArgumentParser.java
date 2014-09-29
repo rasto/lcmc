@@ -20,6 +20,7 @@
 
 package lcmc;
 
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
@@ -252,14 +253,14 @@ public class ArgumentParser {
                 System.exit(0);
             }
             if (cmd.hasOption("ro") || "ro".equals(opMode)) {
-                application.setAccessType(Application.AccessType.RO);
-                application.setMaxAccessType(Application.AccessType.RO);
+                application.setAccessType(AccessMode.RO);
+                application.setMaxAccessType(AccessMode.RO);
             } else if (cmd.hasOption("op") || "op".equals(opMode)) {
-                application.setAccessType(Application.AccessType.OP);
-                application.setMaxAccessType(Application.AccessType.OP);
+                application.setAccessType(AccessMode.OP);
+                application.setMaxAccessType(AccessMode.OP);
             } else if (cmd.hasOption("admin") || "admin".equals(opMode)) {
-                application.setAccessType(Application.AccessType.ADMIN);
-                application.setMaxAccessType(Application.AccessType.ADMIN);
+                application.setAccessType(AccessMode.ADMIN);
+                application.setMaxAccessType(AccessMode.ADMIN);
             } else if (opMode != null) {
                 LOG.appWarning("initApp: unknown operating mode: " + opMode);
             }

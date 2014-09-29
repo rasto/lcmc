@@ -151,7 +151,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                                KeyEvent.VK_L,
                                                loadActionListener(),
                                                null);
-        guiData.addToEnabledInAccessType(loadItem, new AccessMode(Application.AccessType.GOD, false));
+        guiData.addToEnabledInAccessType(loadItem, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
 
         final JMenuItem item = addMenuItem(Tools.getString("MainMenu.RemoveEverything"),
                                            submenu,
@@ -159,7 +159,7 @@ public final class MainMenu extends JPanel implements ActionListener {
                                            0,
                                            removeEverythingActionListener(),
                                            null);
-        guiData.addToVisibleInAccessType(item, new AccessMode(Application.AccessType.GOD, false));
+        guiData.addToVisibleInAccessType(item, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
 
         addMenuItem(Tools.getString("MainMenu.Save"),
                     submenu,
@@ -188,7 +188,7 @@ public final class MainMenu extends JPanel implements ActionListener {
 
         /* settings */
         submenu = addMenu(Tools.getString("MainMenu.Settings"), 0);
-        guiData.addToVisibleInAccessType(submenu, new AccessMode(Application.AccessType.GOD, false));
+        guiData.addToVisibleInAccessType(submenu, new AccessMode(AccessMode.GOD, AccessMode.NORMAL));
         final JMenu menuLookAndFeel = addMenu(Tools.getString("MainMenu.LookAndFeel"), 0);
         final UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
         for (final UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
@@ -625,8 +625,8 @@ public final class MainMenu extends JPanel implements ActionListener {
         final String[] modes = application.getOperatingModes();
         final JComboBox<String> opModeCB = new JComboBox<String>(modes);
 
-        final Application.AccessType accessType = application.getAccessType();
-        opModeCB.setSelectedItem(Application.OP_MODES_MAP.get(accessType));
+        final AccessMode.Type accessType = application.getAccessType();
+        opModeCB.setSelectedItem(AccessMode.OP_MODES_MAP.get(accessType));
         opModeCB.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -635,10 +635,10 @@ public final class MainMenu extends JPanel implements ActionListener {
                     final Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Application.AccessType type = Application.ACCESS_TYPE_MAP.get(opMode);
+                            AccessMode.Type type = AccessMode.ACCESS_TYPE_MAP.get(opMode);
                             if (type == null) {
                                 LOG.appError("run: unknown mode: " + opMode);
-                                type = Application.AccessType.RO;
+                                type = AccessMode.RO;
                             }
                             application.setAccessType(type);
                             application.checkAccessOfEverything();
@@ -658,10 +658,10 @@ public final class MainMenu extends JPanel implements ActionListener {
             @Override
             public void run() {
                 if (godMode) {
-                    operatingModesCB.addItem(Application.OP_MODE_GOD);
-                    operatingModesCB.setSelectedItem(Application.OP_MODE_GOD);
+                    operatingModesCB.addItem(AccessMode.OP_MODE_GOD);
+                    operatingModesCB.setSelectedItem(AccessMode.OP_MODE_GOD);
                 } else {
-                    operatingModesCB.removeItem(Application.OP_MODE_GOD);
+                    operatingModesCB.removeItem(AccessMode.OP_MODE_GOD);
                 }
             }
         });

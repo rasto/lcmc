@@ -759,8 +759,8 @@ public final class AllHostsInfo extends Info {
             menuFactory.createMenuItem(Tools.getString("EmptyBrowser.NewHostWizard"),
                            HOST_ICON,
                            null,
-                           new AccessMode(Application.AccessType.RO, false),
-                           new AccessMode(Application.AccessType.RO, false))
+                           new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                           new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                         @Override
                         public void run(final String text) {

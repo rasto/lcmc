@@ -45,8 +45,8 @@ public class AvailableServiceMenu {
                         Tools.getString("ClusterBrowser.AddServiceToCluster"),
                         null,
                         null,
-                        new AccessMode(Application.AccessType.ADMIN, false),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
             .enablePredicate(new EnablePredicate() {
                         @Override
                         public String check() {

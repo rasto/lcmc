@@ -64,6 +64,9 @@ public class ProxyHostMenu {
     @Inject
     private Provider<DrbdsLog> drbdsLogProvider;
 
+    public ProxyHostMenu() {
+    }
+
     public List<UpdatableItem> getPulldownMenu(final ProxyHostInfo proxyHostInfo) {
         this.proxyHostInfo = proxyHostInfo;
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -76,8 +79,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostDrbdInfo.Disconnect"),
                         null,
                         Tools.getString("HostDrbdInfo.Disconnect"),
-                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -111,8 +114,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostBrowser.ProxyHostWizard"),
                         HostBrowser.HOST_ICON_LARGE,
                         Tools.getString("HostBrowser.ProxyHostWizard"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .addAction(new MenuAction() {
                             @Override
                             public void run(final String text) {
@@ -132,8 +135,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostDrbdInfo.Drbd.StartProxy"),
                         null,
                         getMenuToolTip("DRBD.startProxy", ""),
-                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -167,8 +170,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostDrbdInfo.Drbd.AllProxyUp"),
                         null,
                         getMenuToolTip("DRBD.proxyUp", DRBD.ALL_DRBD_RESOURCES),
-                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -189,8 +192,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostDrbdInfo.Drbd.AllProxyDown"),
                         null,
                         getMenuToolTip("DRBD.proxyDown", DRBD.ALL_DRBD_RESOURCES),
-                        new AccessMode(Application.AccessType.ADMIN, AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -211,8 +214,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostBrowser.Drbd.ViewLogs"),
                         ProxyHostInfo.LOGFILE_ICON,
                         Tools.getString("HostBrowser.Drbd.ViewLogs"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {
@@ -237,8 +240,8 @@ public class ProxyHostMenu {
                         Tools.getString("HostBrowser.RemoveHost"),
                         HostBrowser.HOST_REMOVE_ICON,
                         Tools.getString("HostBrowser.RemoveHost"),
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .enablePredicate(new EnablePredicate() {
                             @Override
                             public String check() {

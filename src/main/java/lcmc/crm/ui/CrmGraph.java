@@ -713,8 +713,8 @@ public class CrmGraph extends ResourceGraph {
             final MyMenuItem mmi = menuFactory.createMenuItem(asi.toString(),
                                                   null,
                                                   null,
-                                                  new AccessMode(Application.AccessType.ADMIN, false),
-                                                  new AccessMode(Application.AccessType.OP, false))
+                                                  new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                                                  new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .addAction(new MenuAction() {
                     @Override
                     public void run(final String text) {

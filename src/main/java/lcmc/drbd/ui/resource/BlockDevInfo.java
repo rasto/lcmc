@@ -45,6 +45,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import lcmc.Exceptions;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.drbd.ui.DrbdGraph;
@@ -498,8 +499,8 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     @Override
@@ -508,8 +509,8 @@ public class BlockDevInfo extends EditableInfo {
     }
 
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-        return false;
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+        return AccessMode.NORMAL;
     }
 
     @Override

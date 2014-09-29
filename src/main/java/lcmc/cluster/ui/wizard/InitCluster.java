@@ -124,7 +124,7 @@ public class InitCluster extends DialogCluster {
                 Widget.NO_REGEXP,
                 0,
                 Widget.NO_ABBRV,
-                new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                 Widget.NO_BUTTON);
         setOtherFinishButton(finishButton());
         finishDialog.init(this, getCluster());
@@ -433,7 +433,7 @@ public class InitCluster extends DialogCluster {
                                 if (heartbeatIsRunning) {
                                     csAisStartButton.setEnabled(false);
                                 } else {
-                                    guiData.setAccessible(csAisStartButton, Application.AccessType.OP);
+                                    guiData.setAccessible(csAisStartButton, AccessMode.OP);
                                 }
                             }
                             csAisStartButton.setVisible(true);
@@ -489,7 +489,7 @@ public class InitCluster extends DialogCluster {
                                 if (csAisRunning) {
                                     hbStartButton.setEnabled(false);
                                 } else {
-                                    guiData.setAccessible(hbStartButton, Application.AccessType.OP);
+                                    guiData.setAccessible(hbStartButton, AccessMode.OP);
                                 }
                             }
                             hbStartButton.setVisible(true);

@@ -192,7 +192,7 @@ public abstract class DialogHost extends WizardDialog {
                        Widget.NO_REGEXP,
                        0,    /* width */
                        Widget.NO_ABBRV,
-                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                        Widget.NO_BUTTON);
         if (application.getAutoOptionHost(autoOption) != null) {
             application.invokeLater(new Runnable() {

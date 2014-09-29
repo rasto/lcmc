@@ -81,7 +81,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
     private boolean enablePredicate = true;
     /** Whether the extra text field button should be enabled. */
     private boolean tfButtonEnabled = true;
-    private AccessMode enableAccessMode = new AccessMode(Application.AccessType.RO, false);
+    private AccessMode enableAccessMode = new AccessMode(AccessMode.RO, AccessMode.NORMAL);
     private String toolTipText = null;
     private String labelToolTipText = null;
     private final ReadWriteLock mValueLock = new ReentrantReadWriteLock();
@@ -154,7 +154,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         if (disabledReason0 != null) {
             text = text + "<br>" + disabledReason0;
         }
-        if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
+        if (enableAccessMode.getType() != AccessMode.NEVER) {
             final boolean accessible = application.isAccessible(enableAccessMode);
             if (!accessible) {
                 text = text + "<br>" + getDisabledTooltip();
@@ -173,7 +173,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
             return;
         }
         String disabledTooltip = null;
-        if (enableAccessMode.getAccessType() != Application.AccessType.NEVER) {
+        if (enableAccessMode.getType() != AccessMode.NEVER) {
             final boolean accessible = application.isAccessible(enableAccessMode);
             if (!accessible) {
                 disabledTooltip = getDisabledTooltip();
@@ -206,7 +206,7 @@ public abstract class GenericWidget<T extends JComponent> extends JPanel impleme
         final StringBuilder sb = new StringBuilder(100);
         sb.append("editable in \"");
         sb.append(advanced);
-        sb.append(Application.OP_MODES_MAP.get(enableAccessMode.getAccessType()));
+        sb.append(AccessMode.OP_MODES_MAP.get(enableAccessMode.getType()));
         sb.append("\" mode");
 
         if (disabledReason != null) {

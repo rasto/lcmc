@@ -228,7 +228,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
         pane.add(drbdVersionCombo.getComponent());
 
@@ -240,7 +240,7 @@ public class DrbdAvailFiles extends DialogHost {
                                       Widget.NO_REGEXP,
                                       0,    /* width */
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
 
         pane.add(drbdBuildCombo.getComponent());

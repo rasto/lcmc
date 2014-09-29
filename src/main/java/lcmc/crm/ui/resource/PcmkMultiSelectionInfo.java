@@ -35,6 +35,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.ClusterStatus;
@@ -103,12 +104,12 @@ public class PcmkMultiSelectionInfo extends EditableInfo {
     }
 
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-        return false;
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+        return AccessMode.NORMAL;
     }
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
+    protected AccessMode.Type getAccessType(final String param) {
         return null;
     }
 

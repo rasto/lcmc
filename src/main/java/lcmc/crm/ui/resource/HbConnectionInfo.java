@@ -43,6 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -644,8 +646,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     @Override
-    protected final Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected final AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     @Override
@@ -654,8 +656,8 @@ public class HbConnectionInfo extends EditableInfo {
     }
 
     @Override
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return false;
+    protected final AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return AccessMode.NORMAL;
     }
 
     @Override

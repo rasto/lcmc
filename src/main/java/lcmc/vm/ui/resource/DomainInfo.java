@@ -1804,14 +1804,15 @@ public class DomainInfo extends EditableInfo {
                 defaultValue = DEFINED_ON_HOST_FALSE;
             }
             final MyButton hostBtn = getHostButton(host, prefix);
-            final Widget wi = widgetFactory.createInstance(Widget.Type.CHECKBOX,
-                                                           defaultValue,
-                                                           Widget.NO_ITEMS,
-                                                           Widget.NO_REGEXP,
-                                                           application.getServiceFieldWidth() * 2,
-                                                           Widget.NO_ABBRV,
-                                                           new AccessMode(Application.AccessType.ADMIN, false),
-                                                           hostBtn);
+            final Widget wi = widgetFactory.createInstance(
+                    Widget.Type.CHECKBOX,
+                    defaultValue,
+                    Widget.NO_ITEMS,
+                    Widget.NO_REGEXP,
+                    application.getServiceFieldWidth() * 2,
+                    Widget.NO_ABBRV,
+                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                    hostBtn);
             Widget rpwi = null;
             if (prefix == null) {
                 definedOnHostComboBoxHash.put(host.getName(), wi);
@@ -3922,14 +3923,14 @@ public class DomainInfo extends EditableInfo {
     }
 
     @Override
-    protected boolean isEnabledOnlyInAdvancedMode(final String param) {
-         return VmsXml.VM_PARAM_MEMORY.equals(param);
+    protected AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+         return VmsXml.VM_PARAM_MEMORY.equals(param) ? AccessMode.ADVANCED : AccessMode.NORMAL;
     }
 
 
     @Override
-    protected Application.AccessType getAccessType(final String param) {
-        return Application.AccessType.ADMIN;
+    protected AccessMode.Type getAccessType(final String param) {
+        return AccessMode.ADMIN;
     }
 
     @Override

@@ -211,7 +211,7 @@ public final class VGCreate extends LV {
                                       Widget.NO_REGEXP,
                                       250,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.OP, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
         inputPane.add(new JLabel("VG Name"));
         inputPane.add(vgNameWi.getComponent());

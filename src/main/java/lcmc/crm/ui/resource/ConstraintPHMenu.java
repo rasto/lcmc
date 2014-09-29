@@ -57,8 +57,8 @@ public class ConstraintPHMenu extends ServiceMenu {
                 Tools.getString("ConstraintPHInfo.Remove"),
                 ClusterBrowser.REMOVE_ICON,
                 ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {

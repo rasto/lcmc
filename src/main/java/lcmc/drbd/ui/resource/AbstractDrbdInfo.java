@@ -23,7 +23,6 @@ package lcmc.drbd.ui.resource;
 
 import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.drbd.domain.DrbdProxy;
 import lcmc.drbd.domain.DrbdXml;
@@ -118,13 +117,13 @@ public abstract class AbstractDrbdInfo extends EditableInfo {
     }
 
     @Override
-    protected final Application.AccessType getAccessType(final String param) {
+    protected final AccessMode.Type getAccessType(final String param) {
         return getBrowser().getDrbdXml().getAccessType(param);
     }
 
     @Override
-    protected final boolean isEnabledOnlyInAdvancedMode(final String param) {
-        return false;
+    protected final AccessMode.Mode isEnabledOnlyInAdvancedMode(final String param) {
+        return AccessMode.NORMAL;
     }
 
     @Override

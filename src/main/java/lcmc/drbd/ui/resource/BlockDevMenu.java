@@ -105,8 +105,8 @@ public class BlockDevMenu {
         final Application.RunMode runMode = Application.RunMode.LIVE;
         final MyMenu repMenuItem = menuFactory.createMenu(
                 Tools.getString("HostBrowser.Drbd.AddDrbdResource"),
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .enablePredicate(new EnablePredicate() {
                     @Override
                     public String check() {
@@ -146,8 +146,8 @@ public class BlockDevMenu {
                         continue;
                     }
                     final MyMenu hostMenu = menuFactory.createMenu(oHost.getName(),
-                            new AccessMode(Application.AccessType.ADMIN, false),
-                            new AccessMode(Application.AccessType.OP, false))
+                            new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                            new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                             .enablePredicate(new EnablePredicate() {
                                 @Override
                                 public String check() {
@@ -219,8 +219,8 @@ public class BlockDevMenu {
                         Tools.getString("HostBrowser.Drbd.Attach"),
                         BlockDevInfo.HARDDISK_DRBD_ICON_LARGE,
                         Tools.getString("HostBrowser.Drbd.Attach.ToolTip"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -284,8 +284,8 @@ public class BlockDevMenu {
                         Tools.getString("HostBrowser.Drbd.Connect"),
                         null,
                         Tools.getString("HostBrowser.Drbd.Connect"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -354,8 +354,8 @@ public class BlockDevMenu {
                         Tools.getString("HostBrowser.Drbd.SetPrimary"),
                         null,
                         Tools.getString("HostBrowser.Drbd.SetPrimary"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -407,8 +407,8 @@ public class BlockDevMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.SetSecondary"),
                         null,
                         Tools.getString("HostBrowser.Drbd.SetSecondary.ToolTip"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -443,8 +443,8 @@ public class BlockDevMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ForcePrimary"),
                         null,
                         Tools.getString("HostBrowser.Drbd.ForcePrimary"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -477,8 +477,8 @@ public class BlockDevMenu {
                         Tools.getString("HostBrowser.Drbd.Invalidate"),
                         null,
                         Tools.getString("HostBrowser.Drbd.Invalidate.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -521,8 +521,8 @@ public class BlockDevMenu {
                         Tools.getString("HostBrowser.Drbd.PauseSync"),
                         null,
                         Tools.getString("HostBrowser.Drbd.PauseSync.ToolTip"),
-                        new AccessMode(Application.AccessType.OP, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.OP, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .predicate(new Predicate() {
                             @Override
                             public boolean check() {
@@ -567,8 +567,8 @@ public class BlockDevMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.Resize"),
                         null,
                         Tools.getString("HostBrowser.Drbd.Resize.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -603,8 +603,8 @@ public class BlockDevMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.DiscardData"),
                         null,
                         Tools.getString("HostBrowser.Drbd.DiscardData.ToolTip"),
-                        new AccessMode(Application.AccessType.ADMIN, true),
-                        new AccessMode(Application.AccessType.OP, false))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -645,8 +645,8 @@ public class BlockDevMenu {
                         Tools.getString("BlockDevInfo.Drbd.ProxyUp"),
                         null,
                         getMenuToolTip("DRBD.proxyUp"),
-                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
-                        new AccessMode(Application.AccessType.OP, !AccessMode.ADVANCED))
+                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -714,8 +714,8 @@ public class BlockDevMenu {
                 menuFactory.createMenuItem(Tools.getString("HostBrowser.Drbd.ViewDrbdLog"),
                         BlockDevInfo.LOGFILE_ICON,
                         null,
-                        new AccessMode(Application.AccessType.RO, false),
-                        new AccessMode(Application.AccessType.RO, false))
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL),
+                        new AccessMode(AccessMode.RO, AccessMode.NORMAL))
                         .visiblePredicate(new VisiblePredicate() {
                             @Override
                             public boolean check() {
@@ -769,8 +769,8 @@ public class BlockDevMenu {
         final MyMenuItem drbdResourceMenuItem = menuFactory.createMenuItem(oBdi.toString(),
                 null,
                 null,
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false));
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL));
         drbdResourceMenuItem.addAction(new MenuAction() {
             @Override
             public void run(final String text) {
@@ -790,8 +790,8 @@ public class BlockDevMenu {
         return menuFactory.createMenuItem(PV_CREATE_MENU_ITEM,
                 null,
                 PV_CREATE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -824,8 +824,8 @@ public class BlockDevMenu {
         return menuFactory.createMenuItem(PV_REMOVE_MENU_ITEM,
                 null,
                 PV_REMOVE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -860,8 +860,8 @@ public class BlockDevMenu {
                 VG_CREATE_MENU_ITEM,
                 null,
                 VG_CREATE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -908,8 +908,8 @@ public class BlockDevMenu {
         return menuFactory.createMenuItem(VG_REMOVE_MENU_ITEM,
                 null,
                 VG_REMOVE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -974,8 +974,8 @@ public class BlockDevMenu {
                 name,
                 null,
                 LV_CREATE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -1019,8 +1019,8 @@ public class BlockDevMenu {
         return menuFactory.createMenuItem(LV_REMOVE_MENU_ITEM,
                 null,
                 LV_REMOVE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .predicate(new Predicate() {
                     @Override
                     public boolean check() {
@@ -1064,8 +1064,8 @@ public class BlockDevMenu {
         return menuFactory.createMenuItem(LV_RESIZE_MENU_ITEM,
                 null,
                 LV_RESIZE_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {
@@ -1100,8 +1100,8 @@ public class BlockDevMenu {
         return menuFactory.createMenuItem(LV_SNAPSHOT_MENU_ITEM,
                 null,
                 LV_SNAPSHOT_MENU_DESCRIPTION,
-                new AccessMode(Application.AccessType.OP, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .visiblePredicate(new VisiblePredicate() {
                     @Override
                     public boolean check() {

@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lcmc.Exceptions;
+import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.drbd.ui.resource.BlockDevInfo;
@@ -87,7 +88,7 @@ public class DrbdXml extends XML {
     static final Collection<String> NOT_ADVANCED_PARAMS = new ArrayList<String>();
 
     static final Collection<String> IGNORE_CONFIG_ERRORS = new HashSet<String>();
-    static final Map<String, Application.AccessType> PARAM_ACCESS_TYPE = new HashMap<String, Application.AccessType>();
+    static final Map<String, AccessMode.Type> PARAM_ACCESS_TYPE = new HashMap<String, AccessMode.Type>();
 
     private static final Map<String, Value> PREFERRED_VALUES_MAP = new HashMap<String, Value>();
 
@@ -126,7 +127,7 @@ public class DrbdXml extends XML {
             "Can not open '/etc/drbd.conf': No such file or directory");
     }
     static {
-        PARAM_ACCESS_TYPE.put("rate", Application.AccessType.OP);
+        PARAM_ACCESS_TYPE.put("rate", AccessMode.OP);
     }
     static {
         PREFERRED_VALUES_MAP.put(PROTOCOL_PARAM, PROTOCOL_C);
@@ -613,10 +614,10 @@ public class DrbdXml extends XML {
         return !isRequired(param) && !NOT_ADVANCED_PARAMS.contains(param);
     }
 
-    public Application.AccessType getAccessType(final String param) {
-        final Application.AccessType at = PARAM_ACCESS_TYPE.get(param);
+    public AccessMode.Type getAccessType(final String param) {
+        final AccessMode.Type at = PARAM_ACCESS_TYPE.get(param);
         if (at == null) {
-          return Application.AccessType.ADMIN;
+          return AccessMode.Type.ADMIN;
         }
         return at;
     }

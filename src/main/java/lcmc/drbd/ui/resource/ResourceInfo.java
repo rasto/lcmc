@@ -1180,7 +1180,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                                            Widget.NO_REGEXP,
                                                            rightWidth,
                                                            Widget.NO_ABBRV,
-                                                           new AccessMode(Application.AccessType.ADMIN, false),
+                                                           new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                            Widget.NO_BUTTON);
             newAddressComboBoxHash.put(host, wi);
 
@@ -1215,7 +1215,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                                         "^\\d*$",
                                                         leftWidth,
                                                         Widget.NO_ABBRV,
-                                                        new AccessMode(Application.AccessType.ADMIN, false),
+                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                         Widget.NO_BUTTON);
         pwi.setAlwaysEditable(true);
         final String port = Tools.getString("ResourceInfo.NetInterfacePort");
@@ -1282,7 +1282,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                                         "^\\d*$",
                                                         leftWidth,
                                                         Widget.NO_ABBRV,
-                                                        new AccessMode(Application.AccessType.ADMIN, false),
+                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                         Widget.NO_BUTTON);
         insidePortWi.setAlwaysEditable(true);
 
@@ -1317,7 +1317,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                                         "^\\d*$",
                                                         leftWidth,
                                                         Widget.NO_ABBRV,
-                                                        new AccessMode(Application.AccessType.ADMIN, false),
+                                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                         Widget.NO_BUTTON);
         outsidePortWi.setAlwaysEditable(true);
 
@@ -1363,7 +1363,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                         Widget.NO_REGEXP,
                                         rightWidth,
                                         Widget.NO_ABBRV,
-                                        new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                                        new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                         Widget.NO_BUTTON);
             iIpWi.setAlwaysEditable(!pHost.isConnected());
             newInsideIpComboBoxHash.put(pHost, iIpWi);
@@ -1384,7 +1384,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                                                     Widget.NO_REGEXP,
                                                     rightWidth,
                                                     Widget.NO_ABBRV,
-                                                    new AccessMode(Application.AccessType.ADMIN, !AccessMode.ADVANCED),
+                                                    new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
                                                     Widget.NO_BUTTON);
             oIpWi.setAlwaysEditable(!pHost.isConnected());
             newOutsideIpComboBoxHash.put(pHost, oIpWi);

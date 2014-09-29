@@ -2,7 +2,6 @@ package lcmc.cluster.ui.widget;
 
 import lcmc.AppContext;
 import lcmc.common.domain.AccessMode;
-import lcmc.common.domain.Application;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
 import static org.junit.Assert.assertEquals;
@@ -24,8 +23,7 @@ public final class WidgetTest {
                                                   Widget.NO_REGEXP,
                                                   100, /* width */
                                                   Widget.NO_ABBRV,
-                                                  new AccessMode(Application.AccessType.ADMIN,
-                                                                 AccessMode.ADVANCED),
+                                                  new AccessMode(AccessMode.ADMIN, AccessMode.ADVANCED),
                                                   Widget.NO_BUTTON);
         }
     }

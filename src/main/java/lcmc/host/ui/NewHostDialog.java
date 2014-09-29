@@ -257,7 +257,7 @@ public class NewHostDialog extends DialogHost {
                                        regexp,
                                        FIELD_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                        Widget.NO_BUTTON);
         if (hostname == null || Host.DEFAULT_HOSTNAME.equals(hostname)) {
             /* so that hostname is not disabled after going back in the wizard*/
@@ -293,7 +293,7 @@ public class NewHostDialog extends DialogHost {
                                       "^\\d+$",
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
         addCheckField(sshPortField);
         sshPortLabel.setLabelFor(sshPortField.getComponent());
@@ -327,7 +327,7 @@ public class NewHostDialog extends DialogHost {
                                    regexp,
                                    FIELD_WIDTH,
                                    Widget.NO_ABBRV,
-                                   new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                   new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                    Widget.NO_BUTTON);
         usernameField.setEditable(true);
         addCheckField(usernameField);
@@ -355,7 +355,7 @@ public class NewHostDialog extends DialogHost {
                                       Widget.NO_REGEXP,
                                       50,
                                       Widget.NO_ABBRV,
-                                      new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                      new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
         useSudoLabel.setLabelFor(useSudoField.getComponent());
         inputPane.add(useSudoField.getComponent());

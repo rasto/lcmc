@@ -143,7 +143,7 @@ public class LinbitLogin extends DialogHost {
                                        "^[,\\w.-]+$",
                                        CHECKBOX_WIDTH,
                                        Widget.NO_ABBRV,
-                                       new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                        Widget.NO_BUTTON);
 
         addCheckField(downloadUserField);
@@ -161,7 +161,7 @@ public class LinbitLogin extends DialogHost {
                                   Widget.NO_REGEXP,
                                   CHECKBOX_WIDTH,
                                   Widget.NO_ABBRV,
-                                  new AccessMode(Application.AccessType.RO, !AccessMode.ADVANCED),
+                                  new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                   Widget.NO_BUTTON);
 
         addCheckField(downloadPasswordField);

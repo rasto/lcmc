@@ -312,8 +312,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
         setEnabled(disableTooltip == null && accessible);
         setVisible(visible && application.isAccessible(visibleAccessMode));
         if (toolTip != null && isVisible()) {
-            if (!accessible && enableAccessMode.getAccessType()
-                               != Application.AccessType.NEVER) {
+            if (!accessible && enableAccessMode.getType() != AccessMode.NEVER) {
                 String advanced = "";
                 if (enableAccessMode.isAdvancedMode()) {
                     advanced = "Advanced ";
@@ -322,8 +321,7 @@ implements ActionListener, UpdatableItem, ComponentWithTest {
                                 + getText()
                                 + " (disabled)</b><br>available in \""
                                 + advanced
-                                + Application.OP_MODES_MAP.get(
-                                      enableAccessMode.getAccessType())
+                                + AccessMode.OP_MODES_MAP.get(enableAccessMode.getType())
                                 + "\" mode</html>");
             } else if (disableTooltip != null) {
                 setToolTipText0("<html><b>"

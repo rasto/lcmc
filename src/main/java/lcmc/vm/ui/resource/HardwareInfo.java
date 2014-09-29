@@ -337,8 +337,8 @@ public abstract class HardwareInfo extends EditableInfo {
                 Tools.getString("HardwareInfo.Menu.Cancel"),
                 ClusterBrowser.REMOVE_ICON,
                 ClusterBrowser.STARTING_PTEST_TOOLTIP,
-                new AccessMode(Application.AccessType.ADMIN, false),
-                new AccessMode(Application.AccessType.OP, false))
+                new AccessMode(AccessMode.ADMIN, AccessMode.NORMAL),
+                new AccessMode(AccessMode.OP, AccessMode.NORMAL))
                 .predicate(new Predicate() {
                     @Override
                     public boolean check() {
