@@ -70,8 +70,8 @@ public final class ClusterTab extends JPanel {
         setLayout(new BorderLayout());
         setBackground(Tools.getDefaultColor("ViewPanel.Status.Background"));
         if (cluster == null) {
-            emptyViewPanel.init();
             emptyViewPanel.setDisabledDuringLoad(false);
+            emptyViewPanel.init();
             add(emptyViewPanel);
         }
     }

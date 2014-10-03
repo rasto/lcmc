@@ -46,6 +46,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
@@ -88,6 +89,8 @@ public class HbConnectionInfo extends EditableInfo {
     private Application application;
     @Inject
     private HbConnectionMenu hbConnectionMenu;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final Browser browser) {
         super.init("HbConnectionInfo", browser);
@@ -630,8 +633,7 @@ public class HbConnectionInfo extends EditableInfo {
     @Override
     public final void selectMyself() {
         super.selectMyself();
-        final DefaultMutableTreeNode node =
-                                (DefaultMutableTreeNode) getBrowser().getMenuTree().getLastSelectedPathComponent();
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) treeMenuController.getMenuTree().getLastSelectedPathComponent();
         if (node != null) {
             // TODO: do this differently, don't need to select it, only reload
             final Info prev = (Info) node.getUserObject();

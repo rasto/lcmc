@@ -49,6 +49,7 @@ import javax.swing.text.Document;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.ui.CrmGraph;
 import lcmc.host.ui.HostBrowser;
 import lcmc.cluster.ui.widget.WidgetFactory;
@@ -107,6 +108,8 @@ public class HostInfo extends Info {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -465,13 +468,6 @@ public class HostInfo extends Info {
             }
         }
         return null;
-    }
-
-    /** Selects the node in the menu and reloads everything underneath. */
-    @Override
-    public void selectMyself() {
-        super.selectMyself();
-        getBrowser().nodeChanged(getNode());
     }
 
     @Override

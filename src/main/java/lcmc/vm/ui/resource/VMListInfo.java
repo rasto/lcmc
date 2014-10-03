@@ -42,6 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.vm.ui.AddVMConfigDialog;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
@@ -96,6 +97,8 @@ public final class VMListInfo extends CategoryInfo {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     /**
      * Returns browser object of this info.
@@ -213,15 +216,6 @@ public final class VMListInfo extends CategoryInfo {
     }
 
     /**
-     * Selects the node in the menu.
-     */
-    @Override
-    public void selectMyself() {
-        super.selectMyself();
-        getBrowser().nodeChanged(getNode());
-    }
-
-    /**
      * Returns comparator for column.
      */
     @Override
@@ -304,12 +298,12 @@ public final class VMListInfo extends CategoryInfo {
         domainInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource =
                 new DefaultMutableTreeNode(domainInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
                 getNode().add(resource);
-                getBrowser().reloadAndWait(getNode(), true);
+                treeMenuController.reloadNode(getNode(), true);
                 domainInfo.getInfoPanel();
                 domainInfo.selectMyself();
                 final Thread t = new Thread(new Runnable() {

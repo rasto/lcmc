@@ -48,6 +48,7 @@ import lcmc.Exceptions;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.common.ui.GUIData;
 import lcmc.host.ui.HostBrowser;
@@ -106,6 +107,8 @@ public class BlockDevInfo extends EditableInfo {
     private BlockDevMenu blockDevMenu;
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final String name, final BlockDevice blockDevice, final Browser browser) {
         super.init(name, browser);
@@ -168,7 +171,7 @@ public class BlockDevInfo extends EditableInfo {
         getBlockDevice().setValue(DRBD_MD_INDEX_PARAM, null);
         super.removeMyself(runMode);
         if (Application.isLive(runMode)) {
-            removeNode();
+            treeMenuController.removeNode(getNode());
         }
         infoPanel = null;
     }

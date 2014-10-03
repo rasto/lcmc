@@ -594,7 +594,6 @@ public class DrbdGraph extends ResourceGraph {
     public void pickBlockDevice(final BlockDevInfo bdi) {
         final Vertex v = bdiToVertexMap.get(bdi);
         pickVertex(v);
-        bdi.selectMyself();
     }
 
     /** Is called of a host is picked. Its terminal panel is set to view. */

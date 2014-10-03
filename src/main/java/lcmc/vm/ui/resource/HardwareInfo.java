@@ -51,6 +51,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.LinuxFile;
 import lcmc.common.domain.StringValue;
@@ -109,6 +110,8 @@ public abstract class HardwareInfo extends EditableInfo {
     private WidgetFactory widgetFactory;
     @Inject
     private GUIData guiData;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser);
@@ -374,7 +377,7 @@ public abstract class HardwareInfo extends EditableInfo {
         if (getResource().isNew()) {
             super.removeMyself(runMode);
             getResource().setNew(false);
-            removeNode();
+            treeMenuController.removeNode(getNode());
             return;
         }
         String desc = Tools.getString("HardwareInfo.confirmRemove.Description");

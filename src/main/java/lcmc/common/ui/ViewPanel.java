@@ -23,8 +23,6 @@ package lcmc.common.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Inject;
@@ -40,10 +38,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
-
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.treemenu.TreeMenuController;
 
 /**
  * An implementation of a host view with tree of resources. This view is used
@@ -66,6 +63,8 @@ public class ViewPanel extends JPanel {
     private Info lastSelectedInfo = null;
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public ViewPanel() {
         super(new BorderLayout());
@@ -74,51 +73,8 @@ public class ViewPanel extends JPanel {
 
     /** Returns the menu tree. */
     public final JTree getTree(final Browser browser) {
-        final JTree tree = new JTree(browser.getTreeModel());
-        browser.setMenuTree(tree);
-        tree.setOpaque(true);
-        tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
-        tree.setToggleClickCount(2);
-        tree.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                /* do nothing */
-            }
-
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                /* do nothing */
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                /* do nothing */
-            }
-
-            @Override
-            public void mousePressed(final MouseEvent e) {
-                final int selRow = tree.getRowForLocation(e.getX(), e.getY());
-                final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-                if (selRow != -1 && e.getButton() > 1) {
-                    final Info nodeInfo =
-                            (Info) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
-                    if (nodeInfo != null) {
-                        nodeInfo.showPopup(tree, e.getX(), e.getY());
-                        tree.setSelectionPath(selPath);
-                    }
-                }
-            }
-
-            @Override
-            public void mouseReleased(final MouseEvent e) {
-                /* do nothing */
-            }
-        });
-        tree.setRootVisible(false);
-        tree.setShowsRootHandles(true);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        tree.setCellRenderer(browser.getCellRenderer());
-
+        treeMenuController.init();
+        final JTree tree = treeMenuController.getMenuTree();
         final JScrollPane resourcesTreePane = new JScrollPane(tree);
 
         final JPanel resourceInfo = new JPanel();
@@ -146,7 +102,9 @@ public class ViewPanel extends JPanel {
                         final Object[] selected = e.getChildren();
                         if (selected != null && selected.length > 0) {
                             final Object o = ((DefaultMutableTreeNode) selected[0]).getUserObject();
-                            setRightComponentInView(browser, (Info) o);
+                            if (lastSelectedInfo != o) {
+                                setRightComponentInView(browser, (Info) o);
+                            }
                         }
                     }
                 }
@@ -166,13 +124,16 @@ public class ViewPanel extends JPanel {
                     final Object[] path = e.getPath();
                     if (!disabledDuringLoad) {
                         final TreePath tp = new TreePath(path);
-                        application.invokeLater(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        tree.expandPath(tp);
-                                                        tree.setSelectionPath(tp);
-                                                    }
-                                                });
+                        final Info info = (Info) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
+                        if (info instanceof EditableInfo) {
+                           application.invokeInEdt(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            tree.expandPath(tp);
+                                                            tree.setSelectionPath(tp);
+                                                        }
+                                                    });
+                        }
                     }
                 }
             }
@@ -206,7 +167,7 @@ public class ViewPanel extends JPanel {
             lastSelectedInfo = (Info) nodeInfo;
         }
         if (nodeInfo != null) {
-            application.invokeLater(new Runnable() {
+            application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {
@@ -227,7 +188,7 @@ public class ViewPanel extends JPanel {
     /** Sets the right component in the view. */
     public final void setRightComponentInView(final Browser browser, final Info nodeInfo) {
         if (viewSP != null) {
-            application.invokeLater(new Runnable() {
+            application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     if (!mSetPanelLock.tryLock()) {
@@ -249,7 +210,7 @@ public class ViewPanel extends JPanel {
     public final void reloadRightComponent() {
         final Info lsi = lastSelectedInfo;
         if (lsi != null) {
-            lsi.selectMyself();
+            setRightComponentInView(lsi.getBrowser(), lsi);
         }
     }
 

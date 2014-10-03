@@ -38,7 +38,7 @@ import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-import javax.swing.ImageIcon;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -49,6 +49,7 @@ import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -122,6 +123,7 @@ public class HostBrowser extends Browser {
     private final ReadWriteLock mFileSystemsLock = new ReentrantReadWriteLock();
     private final Lock mFileSystemsReadLock = mFileSystemsLock.readLock();
     private final Lock mFileSystemsWriteLock = mFileSystemsLock.writeLock();
+    private DefaultMutableTreeNode treeTop;
     @Inject
     private GUIData guiData;
     @Inject
@@ -143,13 +145,15 @@ public class HostBrowser extends Browser {
     private Provider<NetInfo> netInfoProvider;
     @Inject
     private Provider<FSInfo> fsInfoProvider;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final Host host) {
         this.host = host;
         hostInfo.init(host, this);
         hostDrbdInfo.init(host, this);
-        setMenuTreeTop(hostInfo);
-        application.invokeLater(new Runnable() {
+        treeTop = treeMenuController.createMenuTreeTop(hostInfo);
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 initHostResources();
@@ -165,6 +169,10 @@ public class HostBrowser extends Browser {
         return host;
     }
 
+    public DefaultMutableTreeNode getTreeTop() {
+        return treeTop;
+    }
+
     public HostDrbdInfo getHostDrbdInfo() {
         return hostDrbdInfo;
     }
@@ -173,20 +181,20 @@ public class HostBrowser extends Browser {
         netInterfacesCategory.init(Tools.getString("HostBrowser.NetInterfaces"), this);
 
         netInterfacesNode = new DefaultMutableTreeNode(netInterfacesCategory);
-        setNode(netInterfacesNode);
-        topLevelAdd(netInterfacesNode);
+        treeMenuController.setNode(netInterfacesNode);
+        treeMenuController.topLevelAdd(treeTop, netInterfacesNode);
 
         /* block devices */
         blockDevicesCategory.init(Tools.getString("HostBrowser.BlockDevices"), this);
         blockDevicesNode = new DefaultMutableTreeNode(blockDevicesCategory);
-        setNode(blockDevicesNode);
-        topLevelAdd(blockDevicesNode);
+        treeMenuController.setNode(blockDevicesNode);
+        treeMenuController.topLevelAdd(treeTop, blockDevicesNode);
 
         /* file systems */
         fileSystemsCategory.init(Tools.getString("HostBrowser.FileSystems"), this);
         fileSystemsNode = new DefaultMutableTreeNode(fileSystemsCategory);
-        setNode(fileSystemsNode);
-        topLevelAdd(fileSystemsNode);
+        treeMenuController.setNode(fileSystemsNode);
+        treeMenuController.topLevelAdd(treeTop, fileSystemsNode);
     }
 
     public ClusterBrowser getClusterBrowser() {
@@ -204,7 +212,7 @@ public class HostBrowser extends Browser {
         /* net interfaces */
         final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
         final HostBrowser thisClass = this;
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 mNetInfosWriteLock.lock();
@@ -219,10 +227,10 @@ public class HostBrowser extends Browser {
                             netInfo.init(netInterface.getName(), netInterface, thisClass);
                         }
                         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(netInfo);
-                        setNode(resource);
+                        treeMenuController.setNode(resource);
                         netInterfacesNode.add(resource);
                     }
-                    reloadAndWait(netInterfacesNode, false);
+                    treeMenuController.reloadNode(netInterfacesNode, false);
                 } finally {
                     mNetInfosWriteLock.unlock();
                 }
@@ -255,7 +263,7 @@ public class HostBrowser extends Browser {
             mBlockDevInfosWriteLock.unlock();
         }
         if (changed) {
-            application.invokeLater(new Runnable() {
+            application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     mBlockDevInfosWriteLock.lock();
@@ -266,7 +274,7 @@ public class HostBrowser extends Browser {
                             final MutableTreeNode resource = new DefaultMutableTreeNode(bdi);
                             blockDevicesNode.add(resource);
                         }
-                        reloadAndWait(blockDevicesNode, false);
+                        treeMenuController.reloadNode(blockDevicesNode, false);
                     } finally {
                         mBlockDevInfosWriteLock.unlock();
                     }
@@ -276,7 +284,7 @@ public class HostBrowser extends Browser {
 
         /* file systems */
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 mFileSystemsWriteLock.lock();
@@ -292,10 +300,10 @@ public class HostBrowser extends Browser {
                             fsi.init(fs, thisClass);
                         }
                         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(fsi);
-                        setNode(resource);
+                        treeMenuController.setNode(resource);
                         fileSystemsNode.add(resource);
                     }
-                    reloadAndWait(fileSystemsNode, false);
+                    treeMenuController.reloadNode(fileSystemsNode, false);
                 } finally {
                     mFileSystemsWriteLock.unlock();
                 }

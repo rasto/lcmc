@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -149,6 +150,8 @@ public final class InterfaceInfo extends HardwareInfo {
                                             new HashMap<String, Widget>();
     /** Table panel. */
     private JComponent tablePanel = null;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -392,7 +395,7 @@ public final class InterfaceInfo extends HardwareInfo {
             }
             getResource().setNew(false);
         }
-        getBrowser().reloadNode(getNode(), false);
+        treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         application.invokeLater(new Runnable() {
@@ -581,7 +584,7 @@ public final class InterfaceInfo extends HardwareInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        removeNode();
+        treeMenuController.removeNode(getNode());
     }
 
     /**

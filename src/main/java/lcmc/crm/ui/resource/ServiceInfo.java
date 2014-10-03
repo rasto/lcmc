@@ -62,6 +62,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -221,6 +222,8 @@ public class ServiceInfo extends EditableInfo {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     protected void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, browser);
@@ -2106,7 +2109,7 @@ public class ServiceInfo extends EditableInfo {
                 cloneInfo.getScoreComboBoxHash().put(hostInfoWidgetEntry.getKey(), hostInfoWidgetEntry.getValue());
             }
         } else {
-            oldCI.removeNodeAndWait();
+            treeMenuController.removeNode(oldCI.getNode());
             cloneInfo.getService().setId(oldCI.getWidget(GUI_ID, null).getStringValue());
             getBrowser().addNameToServiceInfoHash(cloneInfo);
             getBrowser().addToHeartbeatIdList(cloneInfo);
@@ -2145,13 +2148,13 @@ public class ServiceInfo extends EditableInfo {
         }
         final DefaultMutableTreeNode node = getNode();
         final DefaultMutableTreeNode ciNode = ci.getNode();
-        removeNodeAndWait();
-        ci.removeNodeAndWait();
+        treeMenuController.removeNode(getNode());
+        treeMenuController.removeNode(ci.getNode());
         cleanup();
         ci.cleanup();
         setNode(node);
         getBrowser().getServicesNode().add(node);
-        getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);
+        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
         getBrowser().getCrmGraph().exchangeObjectInTheVertex(this, ci);
         getBrowser().mHeartbeatIdToServiceLock();
         getBrowser().getHeartbeatIdToServiceInfo().remove(ci.getService().getCrmId());
@@ -2160,8 +2163,8 @@ public class ServiceInfo extends EditableInfo {
         resetInfoPanel();
         infoPanel = null;
         getInfoPanel();
-        getBrowser().reloadAndWait(node, true);
-        getBrowser().nodeChangedAndWait(node);
+        treeMenuController.reloadNode(node, true);
+        treeMenuController.nodeChanged(node);
         ciNode.setUserObject(null); /* would leak without it */
     }
 
@@ -3301,10 +3304,10 @@ public class ServiceInfo extends EditableInfo {
                     final DefaultMutableTreeNode node = getNode();
                     if (node != null) {
                         if (clInfo == null) {
-                            getBrowser().reloadNode(node, false);
+                            treeMenuController.reloadNode(node, false);
                         } else {
-                            getBrowser().reloadNode(clInfo.getNode(), false);
-                            getBrowser().reloadNode(node, false);
+                            treeMenuController.reloadNode(clInfo.getNode(), false);
+                            treeMenuController.reloadNode(node, false);
                         }
                         getBrowser().getCrmGraph().repaint();
                     }
@@ -3769,8 +3772,8 @@ public class ServiceInfo extends EditableInfo {
 
                     getBrowser().getServicesNode().add(newServiceNode);
                     if (reloadNode) {
-                        getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);
-                        getBrowser().reloadAndWait(newServiceNode, false);
+                        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+                        treeMenuController.reloadNode(newServiceNode, false);
                     }
                 }
             });
@@ -4059,9 +4062,9 @@ public class ServiceInfo extends EditableInfo {
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
-                removeNodeAndWait();
+                treeMenuController.removeNode(getNode());
                 if (ci != null) {
-                    ci.removeNodeAndWait();
+                    treeMenuController.removeNode(ci.getNode());
                 }
             }
         });

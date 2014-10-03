@@ -71,6 +71,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
 import lcmc.common.domain.Resource;
 import lcmc.cluster.ui.widget.Widget;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.common.ui.utils.ButtonCallback;
 import lcmc.common.ui.utils.ComponentWithTest;
 import lcmc.logger.Logger;
@@ -126,6 +127,8 @@ public class Info implements Comparable<Info>, Value {
     private final Map<JComponent, AccessMode> componentToEnableAccessMode = new HashMap<JComponent, AccessMode>();
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final String name, final Browser browser) {
         this.name = name;
@@ -374,13 +377,8 @@ public class Info implements Comparable<Info>, Value {
         // this fires an event in ViewPanel.
         final DefaultMutableTreeNode n = node;
         if (n != null) {
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getBrowser().reloadAndWait(n, true);
-                }
-            });
-            getBrowser().nodeChanged(n);
+            treeMenuController.reloadNode(n, true);
+            treeMenuController.nodeChanged(n);
         }
     }
 
@@ -1024,30 +1022,6 @@ public class Info implements Comparable<Info>, Value {
             return ((AbstractButton) object).getText();
         }
         return object.toString();
-    }
-
-    /** Remove node in tree menu. Call it from swing thread. */
-    protected final void removeNodeAndWait() {
-        application.isSwingThread();
-        final DefaultMutableTreeNode n = node;
-        node = null;
-        if (n == null) {
-            return;
-        }
-        final MutableTreeNode p = (MutableTreeNode) n.getParent();
-        if (p != null) {
-            p.remove(n);
-            getBrowser().reloadAndWait(p, true);
-        }
-    }
-
-    protected final void removeNode() {
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                removeNodeAndWait();
-            }
-        });
     }
 
     /** Returns the main text that appears in the graph. */

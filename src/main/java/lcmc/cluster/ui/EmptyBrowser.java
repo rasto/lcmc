@@ -31,6 +31,7 @@ import javax.swing.tree.MutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.common.ui.Browser;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
 import lcmc.host.ui.AllHostsInfo;
@@ -46,16 +47,19 @@ import lcmc.host.domain.Hosts;
 public final class EmptyBrowser extends Browser {
     /** Menu's all hosts node. */
     private DefaultMutableTreeNode allHostsNode;
+    private DefaultMutableTreeNode treeTop;
     @Inject
     private AllHostsInfo allHostsInfo;
     @Inject
     private Application application;
     @Inject
     private Hosts allHosts;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init() {
         allHostsInfo.init(this);
-        setMenuTreeTop();
+        treeTop = treeMenuController.createMenuTreeTop();
     }
 
     /** Adds small box with cluster possibility to load it and remove it. */
@@ -72,8 +76,8 @@ public final class EmptyBrowser extends Browser {
     /** Initializes hosts tree for the empty view. */
     void initHosts() {
         allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
-        setNode(allHostsNode);
-        topLevelAdd(allHostsNode);
+        treeMenuController.setNode(allHostsNode);
+        treeMenuController.topLevelAdd(treeTop, allHostsNode);
     }
 
     /** Updates resources of a cluster in the tree. */
@@ -96,8 +100,8 @@ public final class EmptyBrowser extends Browser {
                 }
             }
         });
-        reloadNode(allHostsNode, false);
-        selectPath(new Object[]{getTreeTop(), allHostsNode});
+        treeMenuController.reloadNode(allHostsNode, false);
+        treeMenuController.selectPath(new Object[]{treeTop, allHostsNode});
     }
 }
 

@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -61,6 +62,8 @@ public class CloneInfo extends ServiceInfo {
     private CloneMenu cloneMenu;
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final ResourceAgent ra, final String name, final boolean master, final Browser browser) {
         super.init(name, ra, browser);
@@ -85,10 +88,10 @@ public class CloneInfo extends ServiceInfo {
             public void run() {
                 final DefaultMutableTreeNode node = getNode();
                 if (node != null) {
-                    getBrowser().reloadAndWait(node, false);
+                    treeMenuController.reloadNode(node, false);
                     node.add(newServiceNode);
                 }
-                getBrowser().reloadAndWait(newServiceNode, true);
+                treeMenuController.reloadNode(newServiceNode, true);
             }
         });
     }
@@ -105,8 +108,8 @@ public class CloneInfo extends ServiceInfo {
         application.isSwingThread();
         getBrowser().getServicesNode().add(node);
         node.add(newServiceInfo.getNode());
-        getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);
-        getBrowser().reloadAndWait(node, true);
+        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+        treeMenuController.reloadNode(node, true);
     }
 
     @Override

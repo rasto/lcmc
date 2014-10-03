@@ -35,6 +35,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -182,6 +183,8 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -336,7 +339,7 @@ public abstract class ParallelSerialInfo extends HardwareInfo {
             }
             getResource().setNew(false);
         }
-        getBrowser().reloadNode(getNode(), false);
+        treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         application.invokeLater(new Runnable() {

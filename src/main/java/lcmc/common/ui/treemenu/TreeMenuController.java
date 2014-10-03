@@ -1,0 +1,242 @@
+/*
+ * This file is part of LCMC written by Rasto Levrinc.
+ *
+ * Copyright (C) 2014, Rastislav Levrinc.
+ *
+ * The LCMC is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * The LCMC is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with LCMC; see the file COPYING.  If not, write to
+ * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+package lcmc.common.ui.treemenu;
+
+import lcmc.common.domain.Application;
+import lcmc.common.domain.util.Tools;
+import lcmc.common.ui.CategoryInfo;
+import lcmc.common.ui.Info;
+import lcmc.logger.Logger;
+import lcmc.logger.LoggerFactory;
+
+import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+@Named
+@Singleton
+public class TreeMenuController {
+    private static final Logger LOG = LoggerFactory.getLogger(TreeMenuController.class);
+    private DefaultTreeModel treeModel;
+    private JTree tree;
+    @Inject
+    private Application application;
+    @Resource(name="categoryInfo")
+    private CategoryInfo resourcesCategory;
+
+    public final DefaultMutableTreeNode createMenuTreeTop() {
+        resourcesCategory.init(Tools.getString("Browser.Resources"), null);
+        final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(resourcesCategory);
+        treeModel = new DefaultTreeModel(treeTop);
+        return treeTop;
+    }
+
+    public final DefaultMutableTreeNode createMenuTreeTop(final Info info) {
+        final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(info);
+        treeModel = new DefaultTreeModel(treeTop);
+        return treeTop;
+    }
+
+    public final JTree getMenuTree() {
+        return tree;
+    }
+
+    public final void repaintMenuTree() {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                final JTree t = tree;
+                if (t != null) {
+                    t.repaint();
+                }
+            }
+        });
+    }
+
+    public final void reloadNode(final TreeNode node, final boolean select) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                final DefaultMutableTreeNode oldNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                if (node != null) {
+                    treeModel.reload(node);
+                }
+                if (!select && oldNode != null) {
+                    /* if don't want to select, we reselect the old path. */
+                    treeModel.reload(oldNode);
+                }
+            }
+        });
+    }
+
+    public final void nodeChanged(final DefaultMutableTreeNode node) {
+        final String stacktrace = Tools.getStackTrace();
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    treeModel.nodeChanged(node);
+                } catch (final RuntimeException e) {
+                    LOG.appError("nodeChangedAndWait: " + node.getUserObject()
+                            + " node changed error:\n"
+                            + stacktrace + "\n\n", e);
+                }
+            }
+        });
+    }
+
+    public final void topLevelAdd(final DefaultMutableTreeNode treeTop, final MutableTreeNode node) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                treeTop.add(node);
+            }
+        });
+    }
+
+    /** Sets node variable in the info object that this tree node points to. */
+    public final void setNode(final DefaultMutableTreeNode node) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                ((Info) node.getUserObject()).setNode(node);
+            }
+        });
+    }
+
+    public final DefaultTreeModel getTreeModel() {
+        return treeModel;
+    }
+
+    public void selectPath(final Object[] path) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                final TreePath tp = new TreePath(path);
+                tree.expandPath(tp);
+                tree.setSelectionPath(tp);
+            }
+        });
+    }
+
+    public final void addNode(final DefaultMutableTreeNode node, final MutableTreeNode child) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                node.add(child);
+            }
+        });
+    }
+
+    public final TreeCellRenderer createCellRenderer() {
+        return new CellRenderer();
+    }
+
+    public void moveNodeToPosition(final DefaultMutableTreeNode node, final int position) {
+        application.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                final MutableTreeNode parent = (MutableTreeNode) node.getParent();
+                if (parent != null) {
+                    final int i = parent.getIndex(node);
+                    if (i > position) {
+                        parent.remove(node);
+                        parent.insert(node, position);
+                        reloadNode(parent, false);
+                    }
+                }
+            }
+        });
+    }
+
+    public void init() {
+        tree = new JTree(getTreeModel());
+        tree.setOpaque(true);
+        tree.setBackground(Tools.getDefaultColor("ViewPanel.Background"));
+        tree.setToggleClickCount(2);
+        tree.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                    /* do nothing */
+            }
+
+            @Override
+            public void mouseEntered(final MouseEvent e) {
+                    /* do nothing */
+            }
+
+            @Override
+            public void mouseExited(final MouseEvent e) {
+                    /* do nothing */
+            }
+
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                final int selRow = tree.getRowForLocation(e.getX(), e.getY());
+                final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+                if (selRow != -1 && e.getButton() > 1) {
+                    final Info nodeInfo =
+                            (Info) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
+                    if (nodeInfo != null) {
+                        nodeInfo.showPopup(tree, e.getX(), e.getY());
+                        tree.setSelectionPath(selPath);
+                    }
+                }
+            }
+
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                    /* do nothing */
+            }
+        });
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setCellRenderer(createCellRenderer());
+    }
+
+    public final void removeNode(final DefaultMutableTreeNode node) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                if (node == null) {
+                    return;
+                }
+                final MutableTreeNode parent = (MutableTreeNode) node.getParent();
+                if (parent != null) {
+                    parent.remove(node);
+                    reloadNode(parent, true);
+                }
+            }
+        });
+    }
+}

@@ -47,6 +47,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import lcmc.common.domain.AccessMode;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.AddDrbdSplitBrainDialog;
 import lcmc.Exceptions;
 import lcmc.common.ui.GUIData;
@@ -152,6 +153,8 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
     private VolumeMenu volumeMenu;
     @Inject
     private Provider<DrbdLogs> drbdLogsProvider;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name,
               final String device,
@@ -478,12 +481,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
         }
         super.removeMyself(runMode);
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                clusterBrowser.reloadNode(clusterBrowser.getDrbdNode(), true);
-            }
-        });
+        treeMenuController.reloadNode(clusterBrowser.getDrbdNode(), true);
 
         clusterBrowser.getDrbdDeviceHash().remove(getDevice());
         clusterBrowser.putDrbdDevHash();
@@ -528,7 +526,7 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
                     @Override
                     public void run() {
                         clusterBrowser.getDrbdGraph().updatePopupMenus();
-                        removeNode();
+                        treeMenuController.removeNode(getNode());
                         clusterBrowser.getDrbdGraph().scale();
                     }
                 });

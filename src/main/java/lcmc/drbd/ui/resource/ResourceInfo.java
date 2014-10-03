@@ -51,6 +51,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.Exceptions;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.configs.AppDefaults;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -148,6 +149,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private WidgetFactory widgetFactory;
     @Inject
     private Provider<ProxyNetInfo> proxyNetInfoProvider;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
@@ -1836,7 +1839,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
             dri.setName(null);
         }
         if (Application.isLive(runMode)) {
-            removeNode();
+            treeMenuController.removeNode(getNode());
         }
         globalInfo.reloadDRBDResourceComboBoxes();
     }

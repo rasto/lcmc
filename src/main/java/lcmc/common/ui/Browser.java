@@ -33,17 +33,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import lcmc.common.domain.Application;
-import lcmc.logger.Logger;
-import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 
 /**
@@ -54,137 +44,17 @@ import lcmc.common.domain.util.Tools;
  */
 @Named
 public class Browser {
-    private static final Logger LOG = LoggerFactory.getLogger(Browser.class);
-    public static final ImageIcon CATEGORY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.CategoryIcon"));
     public static final ImageIcon APPLY_ICON = Tools.createImageIcon(Tools.getDefault("Browser.ApplyIcon"));
     public static final ImageIcon REVERT_ICON = Tools.createImageIcon(Tools.getDefault("Browser.RevertIcon"));
     public static final ImageIcon ACTIONS_MENU_ICON = Tools.createImageIcon(Tools.getDefault("Browser.MenuIcon"));
     public static final Color PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.Background");
     public static final Color BUTTON_PANEL_BACKGROUND = Tools.getDefaultColor("ViewPanel.ButtonPanel.Background");
     public static final Color STATUS_BACKGROUND = Tools.getDefaultColor("ViewPanel.Status.Background");
-    private DefaultTreeModel treeModel;
-    private DefaultMutableTreeNode treeTop;
-    private JTree tree;
     @Inject
     private Application application;
-    @Resource(name="categoryInfo")
-    private CategoryInfo resourcesCategory;
 
     private JSplitPane infoPanelSplitPane;
     private final Lock mDRBDtestLock = new ReentrantLock();
-
-    protected final void setMenuTreeTop() {
-        resourcesCategory.init(Tools.getString("Browser.Resources"), this);
-        treeTop = new DefaultMutableTreeNode(resourcesCategory);
-        treeModel = new DefaultTreeModel(treeTop);
-    }
-
-    protected final void setMenuTreeTop(final Info info) {
-        treeTop = new DefaultMutableTreeNode(info);
-        treeModel = new DefaultTreeModel(treeTop);
-    }
-
-    protected final void setMenuTree(final JTree tree) {
-        this.tree = tree;
-    }
-
-    public final JTree getMenuTree() {
-        return tree;
-    }
-
-    public final void repaintMenuTree() {
-        final JTree t = tree;
-        if (t != null) {
-            t.repaint();
-        }
-    }
-
-    public final DefaultMutableTreeNode getTreeTop() {
-        return treeTop;
-    }
-
-    public final void reloadAndWait(final TreeNode node, final boolean select) {
-        final JTree t = tree;
-        DefaultMutableTreeNode oldN = null;
-        if (t != null) {
-            oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
-        }
-        final DefaultMutableTreeNode oldNode = oldN;
-        if (node != null) {
-            treeModel.reload(node);
-        }
-        if (!select && t != null && oldNode != null) {
-            /* if don't want to select, we reselect the old path. */
-            //t.setSelectionPath(path);
-            treeModel.reload(oldNode);
-        }
-    }
-
-    public final void reloadNode(final TreeNode node, final boolean select) {
-        final JTree t = tree;
-        DefaultMutableTreeNode oldN = null;
-        if (t != null) {
-            oldN = (DefaultMutableTreeNode) t.getLastSelectedPathComponent();
-        }
-        final DefaultMutableTreeNode oldNode = oldN;
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if (node != null) {
-                    treeModel.reload(node);
-                }
-            }
-        });
-        if (!select && t != null && oldNode != null) {
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    /* if don't want to select, we reselect the old path. */
-                    //t.setSelectionPath(path);
-                    treeModel.reload(oldNode);
-                }
-            });
-        }
-    }
-    public final void nodeChangedAndWait(final TreeNode node) {
-        treeModel.nodeChanged(node);
-    }
-
-    public final void nodeChanged(final DefaultMutableTreeNode node) {
-        final String stacktrace = Tools.getStackTrace();
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    treeModel.nodeChanged(node);
-                } catch (final RuntimeException e) {
-                    LOG.appError("nodeChangedAndWait: " + node.getUserObject()
-                                 + " node changed error:\n"
-                                 + stacktrace + "\n\n", e);
-                }
-            }
-        });
-    }
-
-    protected final void topLevelAdd(final MutableTreeNode node) {
-        application.isSwingThread();
-        treeTop.add(node);
-    }
-
-    protected final void repaintSplitPane() {
-        if (infoPanelSplitPane != null) {
-            infoPanelSplitPane.repaint();
-        }
-    }
-
-    /** Sets node variable in the info object that this tree node points to. */
-    public final void setNode(final DefaultMutableTreeNode node) {
-        ((Info) node.getUserObject()).setNode(node);
-    }
-
-    final DefaultTreeModel getTreeModel() {
-        return treeModel;
-    }
 
     /**
      * Returns panel with info of some resource from Info object. The info is
@@ -222,10 +92,6 @@ public class Browser {
         }
     }
 
-    final TreeCellRenderer getCellRenderer() {
-        return new CellRenderer();
-    }
-
     public final void drbdtestLockAcquire() {
         mDRBDtestLock.lock();
     }
@@ -234,70 +100,11 @@ public class Browser {
         mDRBDtestLock.unlock();
     }
 
-    protected void selectPath(final Object[] path) {
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final TreePath tp = new TreePath(path);
-                getMenuTree().expandPath(tp);
-                getMenuTree().setSelectionPath(tp);
-            }
-        });
-    }
 
-    public final void addNode(final DefaultMutableTreeNode node, final MutableTreeNode child) {
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                node.add(child);
-            }
-        });
-    }
-
-    /** Renders the cells for the menu. */
-    private static class CellRenderer extends DefaultTreeCellRenderer {
-        private static final long serialVersionUID = 1L;
-
-        CellRenderer() {
-            super();
-            setBackgroundNonSelectionColor(PANEL_BACKGROUND);
-            setBackgroundSelectionColor(Tools.getDefaultColor("ViewPanel.Status.Background"));
-            setTextNonSelectionColor(Tools.getDefaultColor("ViewPanel.Foreground"));
-            setTextSelectionColor(Tools.getDefaultColor("ViewPanel.Status.Foreground"));
-        }
-
-        /**
-         * Returns the CellRenderer component, setting up the icons and
-         * tooltips.
-         */
-        @Override
-        public java.awt.Component getTreeCellRendererComponent(final JTree tree,
-                                                      final Object value,
-                                                      final boolean sel,
-                                                      final boolean expanded,
-                                                      final boolean leaf,
-                                                      final int row,
-                                                      final boolean hasFocus) {
-            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-            final Info info = (Info) ((DefaultMutableTreeNode) value).getUserObject();
-            if (info == null) {
-                return this;
-            }
-            if (leaf) {
-                final ImageIcon icon = info.getMenuIcon(Application.RunMode.LIVE);
-                if (icon != null) {
-                    setIcon(icon);
-                }
-                setToolTipText("");
-            } else {
-                setToolTipText("");
-                ImageIcon icon = info.getCategoryIcon(Application.RunMode.LIVE);
-                if (icon == null) {
-                    icon = CATEGORY_ICON;
-                }
-                setIcon(icon);
-            }
-            return this;
+    protected final void repaintSplitPane() {
+        if (infoPanelSplitPane != null) {
+            infoPanelSplitPane.repaint();
         }
     }
+
 }

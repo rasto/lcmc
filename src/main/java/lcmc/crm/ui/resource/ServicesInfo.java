@@ -45,11 +45,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
 
 import lcmc.common.domain.AccessMode;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -110,6 +110,8 @@ public class ServicesInfo extends EditableInfo {
     private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     @Override
     public void init(final String name, final Browser browser) {
@@ -494,23 +496,9 @@ public class ServicesInfo extends EditableInfo {
                     groupServiceIsPresent.add(newSi);
                 }
             }
-            final DefaultMutableTreeNode n = newSi.getNode();
-            if (n != null) {
-                final int p = pos;
-                application.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        final MutableTreeNode parent = (MutableTreeNode) n.getParent();
-                        if (parent != null) {
-                            final int i = parent.getIndex(n);
-                            if (i > p) {
-                                parent.remove(n);
-                                parent.insert(n, p);
-                                getBrowser().reloadAndWait(parent, false);
-                            }
-                        }
-                    }
-                });
+            final DefaultMutableTreeNode node = newSi.getNode();
+            if (node != null) {
+                treeMenuController.moveNodeToPosition(node, pos);
                 pos++;
             }
         }
@@ -522,12 +510,7 @@ public class ServicesInfo extends EditableInfo {
             }
         }
         if (newService) {
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getBrowser().reloadAndWait(getBrowser().getServicesNode(), false);
-                }
-            });
+            treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
         }
         hg.repaint();
     }
@@ -1084,8 +1067,8 @@ public class ServicesInfo extends EditableInfo {
             }
             if (reloadNode) {
                 /* show it */
-                getBrowser().reloadNode(getBrowser().getServicesNode(), false);
-                getBrowser().reloadNode(newServiceNode, true);
+                treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+                treeMenuController.reloadNode(newServiceNode, true);
             }
             getBrowser().reloadAllComboBoxes(newServiceInfo);
             application.invokeLater(new Runnable() {
@@ -1277,7 +1260,7 @@ public class ServicesInfo extends EditableInfo {
                                 newChild.getInfoPanel();
                                 copyPasteFields(oldChild, newChild);
                             }
-                            getBrowser().reloadNode(newGi.getNode(), false);
+                            treeMenuController.reloadNode(newGi.getNode(), false);
                         }
                     });
                 }

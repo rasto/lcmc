@@ -63,6 +63,7 @@ import lcmc.Exceptions;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.domain.AccessMode;
@@ -623,6 +624,8 @@ public class DomainInfo extends EditableInfo {
     private Provider<VideoInfo> videoInfoProvider;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
@@ -739,7 +742,7 @@ public class DomainInfo extends EditableInfo {
             }
             diskInfo.updateParameters();
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
-            getBrowser().setNode(resource);
+            treeMenuController.setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
         }
@@ -828,7 +831,7 @@ public class DomainInfo extends EditableInfo {
             }
             filesystemInfo.updateParameters();
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
-            getBrowser().setNode(resource);
+            treeMenuController.setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
         }
@@ -914,7 +917,7 @@ public class DomainInfo extends EditableInfo {
                 interfaceInfo = interfaceInfoProvider.get();
                 interfaceInfo.init(interf, getBrowser(), this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
-                getBrowser().setNode(resource);
+                treeMenuController.setNode(resource);
                 thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
@@ -1007,7 +1010,7 @@ public class DomainInfo extends EditableInfo {
             final InputDevInfo inputDevInfo = inputDevInfoProvider.get();
             inputDevInfo.init(inputDev, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
-            getBrowser().setNode(resource);
+            treeMenuController.setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mInputDevToInfoLock.lock();
@@ -1125,7 +1128,7 @@ public class DomainInfo extends EditableInfo {
             final GraphicsInfo graphicsInfo = graphicsInfoProvider.get();
             graphicsInfo.init(graphicDisplay, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
-            getBrowser().setNode(resource);
+            treeMenuController.setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mGraphicsToInfoLock.lock();
@@ -1222,7 +1225,7 @@ public class DomainInfo extends EditableInfo {
             final SoundInfo soundInfo = soundInfoProvider.get();
             soundInfo.init(sound, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
-            getBrowser().setNode(resource);
+            treeMenuController.setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mSoundToInfoLock.lock();
@@ -1318,7 +1321,7 @@ public class DomainInfo extends EditableInfo {
                 serialInfo = serialInfoProvider.get();
                 serialInfo.init(serial, getBrowser(), this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
-                getBrowser().setNode(resource);
+                treeMenuController.setNode(resource);
                 thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
@@ -1420,7 +1423,7 @@ public class DomainInfo extends EditableInfo {
                 parallelInfo = parallelInfoProvider.get();
                 parallelInfo.init(parallel, getBrowser(), this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
-                getBrowser().setNode(resource);
+                treeMenuController.setNode(resource);
                 thisNode.insert(resource, i);
                 nodeChanged = true;
             } else {
@@ -1524,7 +1527,7 @@ public class DomainInfo extends EditableInfo {
             final VideoInfo videoInfo = videoInfoProvider.get();
             videoInfo.init(video, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
-            getBrowser().setNode(resource);
+            treeMenuController.setNode(resource);
             thisNode.insert(resource, i);
             nodeChanged = true;
             mVideoToInfoLock.lock();
@@ -1759,7 +1762,7 @@ public class DomainInfo extends EditableInfo {
                     || serialNodeChanged
                     || parallelNodeChanged
                     || videoNodeChanged) {
-                    getBrowser().reloadNode(thisNode, false);
+                    treeMenuController.reloadNode(thisNode, false);
                 }
             }
         });
@@ -1777,7 +1780,7 @@ public class DomainInfo extends EditableInfo {
             @Override
             public void run() {
                 setApplyButtons(null, getParametersFromXML());
-                getBrowser().repaintMenuTree();
+                treeMenuController.repaintMenuTree();
             }
         });
     }
@@ -2208,7 +2211,7 @@ public class DomainInfo extends EditableInfo {
         diskInfo.init(null, getBrowser(), this);
         diskInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return diskInfo;
@@ -2229,7 +2232,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         diskInfo.selectMyself();
         return diskInfo;
     }
@@ -2239,7 +2242,7 @@ public class DomainInfo extends EditableInfo {
         filesystemInfo.init(null, getBrowser(), this);
         filesystemInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return filesystemInfo;
@@ -2260,7 +2263,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         filesystemInfo.selectMyself();
         return filesystemInfo;
     }
@@ -2271,7 +2274,7 @@ public class DomainInfo extends EditableInfo {
         interfaceInfo.init(null, getBrowser(), this);
         interfaceInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return interfaceInfo;
@@ -2295,7 +2298,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         interfaceInfo.selectMyself();
         return interfaceInfo;
     }
@@ -2306,7 +2309,7 @@ public class DomainInfo extends EditableInfo {
         inputDevInfo.init(null, getBrowser(), this);
         inputDevInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2331,7 +2334,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         inputDevInfo.selectMyself();
     }
 
@@ -2341,7 +2344,7 @@ public class DomainInfo extends EditableInfo {
         graphicsInfo.init(null, getBrowser(), this);
         graphicsInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return graphicsInfo;
@@ -2366,7 +2369,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         graphicsInfo.selectMyself();
         return graphicsInfo;
     }
@@ -2376,7 +2379,7 @@ public class DomainInfo extends EditableInfo {
         soundInfo.init(null, getBrowser(), this);
         soundInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2403,7 +2406,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         soundInfo.selectMyself();
     }
 
@@ -2412,7 +2415,7 @@ public class DomainInfo extends EditableInfo {
         serialInfo.init(null, getBrowser(), this);
         serialInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2440,7 +2443,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         serialInfo.selectMyself();
     }
 
@@ -2450,7 +2453,7 @@ public class DomainInfo extends EditableInfo {
         parallelInfo.init(null, getBrowser(), this);
         parallelInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2479,7 +2482,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.insert(resource, i);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         parallelInfo.selectMyself();
     }
 
@@ -2488,7 +2491,7 @@ public class DomainInfo extends EditableInfo {
         videoInfo.init(null, getBrowser(), this);
         videoInfo.getResource().setNew(true);
         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
-        getBrowser().setNode(resource);
+        treeMenuController.setNode(resource);
         /* all the way till the end */
         final DefaultMutableTreeNode thisNode = getNode();
         application.invokeAndWait(new Runnable() {
@@ -2497,7 +2500,7 @@ public class DomainInfo extends EditableInfo {
                 thisNode.add(resource);
             }
         });
-        getBrowser().reloadNode(thisNode, true);
+        treeMenuController.reloadNode(thisNode, true);
         videoInfo.selectMyself();
     }
 
@@ -4023,7 +4026,7 @@ public class DomainInfo extends EditableInfo {
         if (getResource().isNew()) {
             super.removeMyself(runMode);
             getResource().setNew(false);
-            removeNode();
+            treeMenuController.removeNode(getNode());
             return;
         }
         String desc = Tools.getString("DomainInfo.confirmRemove.Description");
@@ -4051,7 +4054,7 @@ public class DomainInfo extends EditableInfo {
             }
         }
         getBrowser().periodicalVmsUpdate(getBrowser().getClusterHosts());
-        removeNode();
+        treeMenuController.removeNode(getNode());
     }
 
     /** Returns whether the column is a button, 0 column is always a button. */

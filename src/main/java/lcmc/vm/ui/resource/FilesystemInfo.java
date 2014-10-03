@@ -36,6 +36,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -124,6 +125,8 @@ public final class FilesystemInfo extends HardwareInfo {
     private Value[] sourceDirs;
     /** Table panel. */
     private JComponent tablePanel = null;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo domainInfo) {
         super.init(name, browser, domainInfo);
@@ -328,7 +331,7 @@ public final class FilesystemInfo extends HardwareInfo {
             }
         }
         getResource().setNew(false);
-        getBrowser().reloadNode(getNode(), false);
+        treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         application.invokeLater(new Runnable() {
@@ -474,7 +477,7 @@ public final class FilesystemInfo extends HardwareInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        removeNode();
+        treeMenuController.removeNode(getNode());
     }
 
     /** Returns string representation. */

@@ -42,6 +42,7 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.ColorText;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -85,6 +86,8 @@ public class GroupInfo extends ServiceInfo {
     private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final ResourceAgent ra, final Browser browser) {
         super.init(Application.PACEMAKER_GROUP_NAME, ra, browser);
@@ -215,7 +218,7 @@ public class GroupInfo extends ServiceInfo {
                          runMode);
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            getBrowser().reloadNode(getNode(), false);
+            treeMenuController.reloadNode(getNode(), false);
         }
         getBrowser().getCrmGraph().repaint();
     }
@@ -358,7 +361,7 @@ public class GroupInfo extends ServiceInfo {
         }
         if (Application.isLive(runMode)) {
             storeComboBoxValues(params);
-            getBrowser().reloadNode(getNode(), false);
+            treeMenuController.reloadNode(getNode(), false);
         }
         for (final ServiceInfo child : getGroupServices()) {
             final Check childCheck = child.checkResourceFields(null,
@@ -409,8 +412,8 @@ public class GroupInfo extends ServiceInfo {
             public void run() {
                 gn.add(newServiceNode);
                 if (reloadNode) {
-                    getBrowser().reloadAndWait(gn, false);
-                    getBrowser().reloadAndWait(newServiceNode, true);
+                    treeMenuController.reloadNode(gn, false);
+                    treeMenuController.reloadNode(newServiceNode, true);
                 }
             }
         });

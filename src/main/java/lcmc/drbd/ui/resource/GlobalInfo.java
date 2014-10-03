@@ -49,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.AddDrbdConfigDialog;
 import lcmc.Exceptions;
 import lcmc.configs.AppDefaults;
@@ -109,6 +110,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     private Provider<DrbdXml> drbdXmlProvider;
     @Inject
     private Application application;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final String name, final Browser browser) {
         super.init(name, browser);
@@ -458,11 +461,11 @@ public class GlobalInfo extends AbstractDrbdInfo {
     @Override
     public void selectMyself() {
         if (selectedBlockDevice == null || !selectedBlockDevice.getBlockDevice().isDrbd()) {
-            getBrowser().reloadNode(getNode(), true);
-            getBrowser().nodeChanged(getNode());
+            treeMenuController.reloadNode(getNode(), true);
+            treeMenuController.nodeChanged(getNode());
         } else {
-            getBrowser().reloadNode(selectedBlockDevice.getNode(), true);
-            getBrowser().nodeChanged(selectedBlockDevice.getNode());
+            treeMenuController.reloadNode(selectedBlockDevice.getNode(), true);
+            treeMenuController.nodeChanged(selectedBlockDevice.getNode());
         }
     }
 
@@ -582,15 +585,10 @@ public class GlobalInfo extends AbstractDrbdInfo {
         getBrowser().putDrbdResHash();
 
         final DefaultMutableTreeNode drbdResourceNode = new DefaultMutableTreeNode(dri);
-        getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
+        treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                getBrowser().getDrbdNode().add(drbdResourceNode);
-                getBrowser().reloadAndWait(drbdResourceNode, true);
-            }
-        });
+        treeMenuController.addNode(getBrowser().getDrbdNode(), drbdResourceNode);
+        treeMenuController.reloadNode(drbdResourceNode, true);
     }
 
     /** Add DRBD volume. */
@@ -633,7 +631,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
         drbdVolumeNode.add(drbdBDNode2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
-        getBrowser().reloadNode(drbdVolumeNode, true);
+        treeMenuController.reloadNode(drbdVolumeNode, true);
         getBrowser().resetFilesystems();
     }
 
@@ -776,11 +774,11 @@ public class GlobalInfo extends AbstractDrbdInfo {
         proxyHostInfo = proxyHostInfoProvider.get();
         proxyHostInfo.init(host, host.getBrowser());
         final DefaultMutableTreeNode proxyHostNode = new DefaultMutableTreeNode(proxyHostInfo);
-        getBrowser().reloadNode(getBrowser().getDrbdNode(), true);
+        treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
         proxyHostInfo.setNode(proxyHostNode);
         application.isSwingThread();
         getBrowser().getDrbdNode().add(proxyHostNode);
-        getBrowser().reloadNode(proxyHostNode, true);
+        treeMenuController.reloadNode(proxyHostNode, true);
     }
 
     /**

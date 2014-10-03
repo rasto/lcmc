@@ -66,6 +66,7 @@ import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.cluster.domain.Clusters;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostFactory;
 import lcmc.common.domain.UserConfig;
@@ -120,6 +121,8 @@ public final class AllHostsInfo extends Info {
     private Application application;
     @Inject
     private MenuFactory menuFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public void init(final Browser browser) {
         super.init(Tools.getString("ClusterBrowser.AllHosts"), browser);
@@ -188,8 +191,8 @@ public final class AllHostsInfo extends Info {
                                 allClusterCheckboxes.remove(cluster);
                                 allLoadButtons.remove(cluster);
                                 mainPanel.remove(p);
-                                getBrowser().reloadNode(getNode(), false);
-                                getBrowser().repaintMenuTree();
+                                treeMenuController.reloadNode(getNode(), false);
+                                treeMenuController.repaintMenuTree();
                             }
                         }
                     }

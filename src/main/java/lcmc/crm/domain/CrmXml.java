@@ -733,8 +733,8 @@ public final class CrmXml extends XML {
                 final String text = Tools.getString("CRMXML.GetRAMetaData.Done");
                 guiData.startProgressIndicator(hn, text);
                 allServicesInfo.setAllResources(allServicesInfo.getBrowser().getClusterStatus(), Application.RunMode.LIVE);
-                final Info li = allServicesInfo.getBrowser().getClusterViewPanel().getLastSelectedInfo();
-                if (li instanceof ServiceInfo) {
+                final Info lastSelectedInfo = allServicesInfo.getBrowser().getClusterViewPanel().getLastSelectedInfo();
+                if (lastSelectedInfo instanceof ServiceInfo || lastSelectedInfo instanceof ServicesInfo) {
                     allServicesInfo.getBrowser().getClusterViewPanel().reloadRightComponent();
                 }
                 guiData.stopProgressIndicator(hn, text);

@@ -26,6 +26,7 @@ import java.util.Map;
 
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.SerialData;
@@ -46,6 +47,8 @@ import javax.inject.Named;
 final class SerialInfo extends ParallelSerialInfo {
     @Inject
     private static WidgetFactory widgetFactory;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -142,7 +145,7 @@ final class SerialInfo extends ParallelSerialInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        removeNode();
+        treeMenuController.removeNode(getNode());
     }
 
     /** Returns "add new" button. */

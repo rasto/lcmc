@@ -34,6 +34,7 @@ import javax.swing.JPanel;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
 import lcmc.vm.domain.VmsXml;
@@ -85,6 +86,8 @@ final class SoundInfo extends HardwareInfo {
 
     /** Table panel. */
     private JComponent tablePanel = null;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -239,7 +242,7 @@ final class SoundInfo extends HardwareInfo {
             }
         }
         getResource().setNew(false);
-        getBrowser().reloadNode(getNode(), false);
+        treeMenuController.reloadNode(getNode(), false);
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
         application.invokeLater(new Runnable() {
@@ -383,7 +386,7 @@ final class SoundInfo extends HardwareInfo {
         }
         getBrowser().periodicalVmsUpdate(
                 getVMSVirtualDomainInfo().getDefinedOnHosts());
-        removeNode();
+        treeMenuController.removeNode(getNode());
     }
 
     /**
