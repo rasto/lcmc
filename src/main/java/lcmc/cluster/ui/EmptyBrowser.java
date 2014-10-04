@@ -83,23 +83,13 @@ public final class EmptyBrowser extends Browser {
     /** Updates resources of a cluster in the tree. */
     void updateHosts() {
         final Iterable<Host> allHostsSorted = new TreeSet<Host>(allHosts.getHostSet());
-        application.invokeLater(new Runnable() {
-            @Override
-            public String toString() {
-                return super.toString();
-            }
-
-            @Override
-            public void run() {
-                allHostsNode.removeAllChildren();
-                for (final Host host : allHostsSorted) {
-                    final HostBrowser hostBrowser = host.getBrowser();
-                    final MutableTreeNode resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
-                    //setNode(resource);
-                    allHostsNode.add(resource);
-                }
-            }
-        });
+        treeMenuController.removeChildren(allHostsNode);
+        for (final Host host : allHostsSorted) {
+            final HostBrowser hostBrowser = host.getBrowser();
+            final MutableTreeNode resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
+            //setNode(resource);
+            treeMenuController.addChild(allHostsNode, resource);
+        }
         treeMenuController.reloadNode(allHostsNode, false);
         treeMenuController.selectPath(new Object[]{treeTop, allHostsNode});
     }

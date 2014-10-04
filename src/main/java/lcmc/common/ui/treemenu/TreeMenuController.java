@@ -41,6 +41,10 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.List;
 
 @Named
 @Singleton
@@ -125,12 +129,7 @@ public class TreeMenuController {
 
     /** Sets node variable in the info object that this tree node points to. */
     public final void setNode(final DefaultMutableTreeNode node) {
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                ((Info) node.getUserObject()).setNode(node);
-            }
-        });
+        ((Info) node.getUserObject()).setNode(node);
     }
 
     public final DefaultTreeModel getTreeModel() {
@@ -144,15 +143,6 @@ public class TreeMenuController {
                 final TreePath tp = new TreePath(path);
                 tree.expandPath(tp);
                 tree.setSelectionPath(tp);
-            }
-        });
-    }
-
-    public final void addNode(final DefaultMutableTreeNode node, final MutableTreeNode child) {
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                node.add(child);
             }
         });
     }
@@ -238,5 +228,121 @@ public class TreeMenuController {
                 }
             }
         });
+    }
+
+//    @Deprecated TODO
+    public List<Info> nodesToInfos(final Enumeration<DefaultMutableTreeNode> e) {
+        final List<Info> list = new ArrayList<Info>();
+        application.invokeAndWait(new Runnable() {
+            public void run() {
+                while (e.hasMoreElements()) {
+                    final DefaultMutableTreeNode n = e.nextElement();
+                    list.add((Info) n.getUserObject());
+                }
+            }
+        });
+        return list;
+    }
+
+    public void addChild(final DefaultMutableTreeNode parent, final MutableTreeNode child) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                parent.add(child);
+            }
+        });
+    }
+
+    public int getIndex(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child) {
+        final IntResult intResult = new IntResult();
+        application.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                intResult.set(parent.getIndex(child));
+            }
+        });
+        return intResult.get();
+    }
+
+    public int getChildCount(final DefaultMutableTreeNode parent) {
+        final IntResult intResult = new IntResult();
+        application.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                intResult.set(parent.getChildCount());
+            }
+        });
+        return intResult.get();
+    }
+
+    public void removeFromParent(final Collection<DefaultMutableTreeNode> nodes) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                for (final DefaultMutableTreeNode node : nodes) {
+                    node.removeFromParent();
+                }
+            }
+        });
+    }
+
+    public void insertNode(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child, final int i) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                parent.insert(child, i);
+            }
+        });
+    }
+
+    public void sortChildrenWithNewUp(final DefaultMutableTreeNode parent) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                int i = 0;
+                for (int j = 0; j < parent.getChildCount(); j++) {
+                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) parent.getChildAt(j);
+                    final Info info = (Info) node.getUserObject();
+                    final String name = info.getName();
+                    if (i > 0) {
+                        final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) parent.getChildAt(j - 1);
+                        final Info prevI = (Info) prev.getUserObject();
+                        if (prevI.getClass().getName().equals(info.getClass().getName())) {
+                            final String prevN = prevI.getName();
+                            if (!prevI.getResource().isNew()
+                                && !info.getResource().isNew()
+                                && (prevN != null && prevN.compareTo(name) > 0)) {
+                                parent.remove(j);
+                                parent.insert(node, j - 1);
+                            }
+                        } else {
+                            i = 0;
+                        }
+                    }
+                    i++;
+                }
+            }
+        });
+    }
+
+    public void removeChildren(final DefaultMutableTreeNode parent) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                parent.removeAllChildren();
+            }
+        });
+    }
+
+    private class IntResult {
+        volatile int result = 0;
+
+        void set(final int result) {
+            this.result = result;
+        }
+
+        int get() {
+            return result;
+        }
     }
 }

@@ -26,7 +26,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -506,7 +505,7 @@ public class ClusterBrowser extends Browser {
         availableServicesInfo.init(Tools.getString("ClusterBrowser.availableServices"), this);
         availableServicesNode = new DefaultMutableTreeNode(availableServicesInfo);
         treeMenuController.setNode(availableServicesNode);
-        treeMenuController.addNode(crmNode, availableServicesNode);
+        treeMenuController.addChild(crmNode, availableServicesNode);
 
         /* block devices / shared disks, TODO: */
         final HbCategoryInfo hbCategoryInfo = new HbCategoryInfo();
@@ -521,7 +520,7 @@ public class ClusterBrowser extends Browser {
         servicesInfo.init(Tools.getString("ClusterBrowser.Services"), this);
         servicesNode = new DefaultMutableTreeNode(servicesInfo);
         treeMenuController.setNode(servicesNode);
-        treeMenuController.addNode(crmNode, servicesNode);
+        treeMenuController.addChild(crmNode, servicesNode);
         addVmsNode();
         treeMenuController.selectPath(new Object[]{treeTop, crmNode});
         addDrbdProxyNodes();
@@ -545,17 +544,12 @@ public class ClusterBrowser extends Browser {
         this.commonMountPoints = commonMountPoints.clone();
 
         /* cluster hosts */
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                clusterHostsNode.removeAllChildren();
-            }
-        });
+        treeMenuController.removeChildren(clusterHostsNode);
         for (final Host clusterHost : clusterHosts) {
             final HostBrowser hostBrowser = clusterHost.getBrowser();
             final DefaultMutableTreeNode resource = hostBrowser.getTreeTop();
             treeMenuController.setNode(resource);
-            treeMenuController.addNode(clusterHostsNode, resource);
+            treeMenuController.addChild(clusterHostsNode, resource);
             crmGraph.addHost(hostBrowser.getHostInfo());
         }
 
@@ -1219,31 +1213,25 @@ public class ClusterBrowser extends Browser {
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;
-            application.invokeLater(new Runnable() {
+            application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     final List<String> bd = cluster.getCommonBlockDevices();
-                    @SuppressWarnings("unchecked")
-                    final Enumeration<DefaultMutableTreeNode> e = commonBlockDevicesNode.children();
                     final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-                    while (e.hasMoreElements()) {
-                        final DefaultMutableTreeNode node = e.nextElement();
-                        final Info cbdi = (Info) node.getUserObject();
-                        if (bd.contains(cbdi.getName())) {
+                    for (final Info info : treeMenuController.nodesToInfos(commonBlockDevicesNode.children())) {
+                        final Info commonBlockDevices = (Info) info;
+                        if (bd.contains(commonBlockDevices.getName())) {
                             /* keeping */
-                            bd.remove(bd.indexOf(cbdi.getName()));
+                            bd.remove(bd.indexOf(commonBlockDevices.getName()));
                         } else {
 
                             /* remove not existing block devices */
-                            cbdi.setNode(null);
-                            nodesToRemove.add(node);
+                            nodesToRemove.add(commonBlockDevices.getNode());
+                            commonBlockDevices.setNode(null);
                         }
                     }
 
-                    /* remove nodes */
-                    for (final DefaultMutableTreeNode node : nodesToRemove) {
-                        node.removeFromParent();
-                    }
+                    treeMenuController.removeFromParent(nodesToRemove);
                     /* block devices */
                     for (final String device : bd) {
                         /* add new block devices */
@@ -1252,7 +1240,7 @@ public class ClusterBrowser extends Browser {
                                                                               cluster.getHostBlockDevices(device),
                                                                               thisBrowser));
                         treeMenuController.setNode(resource);
-                        treeMenuController.addNode(commonBlockDevicesNode, resource);
+                        treeMenuController.addChild(commonBlockDevicesNode, resource);
                     }
                     if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
                         treeMenuController.reloadNode(commonBlockDevicesNode, false);
@@ -1266,12 +1254,7 @@ public class ClusterBrowser extends Browser {
     /** Updates available services. */
     private void updateAvailableServices() {
         LOG.debug("updateAvailableServices: start");
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                availableServicesNode.removeAllChildren();
-            }
-        });
+        treeMenuController.removeChildren(availableServicesNode);
         for (final String crmClass : CRM_CLASSES) {
             final ResourceAgentClassInfo raci = resourceAgentClassInfoProvider.get();
             raci.init(crmClass, this);
@@ -1283,10 +1266,10 @@ public class ClusterBrowser extends Browser {
                 availableServiceMap.put(resourceAgent, availableService);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(availableService);
                 treeMenuController.setNode(resource);
-                treeMenuController.addNode(classNode, resource);
+                treeMenuController.addChild(classNode, resource);
             }
             treeMenuController.setNode(classNode);
-            treeMenuController.addNode(availableServicesNode, classNode);
+            treeMenuController.addChild(availableServicesNode, classNode);
         }
     }
 
@@ -1306,50 +1289,35 @@ public class ClusterBrowser extends Browser {
         mVmsUpdateLock.lock();
         boolean nodeChanged = false;
         if (vmsNode != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> ee = vmsNode.children();
-            while (ee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = ee.nextElement();
-                final DomainInfo vmsvdi = (DomainInfo) node.getUserObject();
-                if (domainNames.contains(vmsvdi.toString())) {
+            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+                final DomainInfo domainInfo = (DomainInfo) info;
+                if (domainNames.contains(domainInfo.toString())) {
                     /* keeping */
-                    currentVMSVDIs.add(vmsvdi);
-                    domainNames.remove(vmsvdi.toString());
-                    vmsvdi.updateParameters(); /* update old */
+                    currentVMSVDIs.add(domainInfo);
+                    domainNames.remove(domainInfo.toString());
+                    domainInfo.updateParameters(); /* update old */
                 } else {
-                    if (!vmsvdi.getResource().isNew()) {
+                    if (!domainInfo.getResource().isNew()) {
                         /* remove not existing vms */
-                        vmsvdi.setNode(null);
-                        nodesToRemove.add(node);
+                        nodesToRemove.add(domainInfo.getNode());
+                        domainInfo.setNode(null);
                         nodeChanged = true;
                     }
                 }
             }
         }
 
-        /* remove nodes */
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                for (final DefaultMutableTreeNode node : nodesToRemove) {
-                    node.removeFromParent();
-                }
-            }
-        });
-
+        treeMenuController.removeFromParent(nodesToRemove);
         if (vmsNode == null) {
             mVmsUpdateLock.unlock();
             return;
         }
         for (final String domainName : domainNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
             int i = 0;
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node = e.nextElement();
-                final DomainInfo vmsvdi = (DomainInfo) node.getUserObject();
-                final String name = vmsvdi.getName();
-                if (domainName != null && name != null && domainName.compareTo(vmsvdi.getName()) < 0) {
+            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+                final DomainInfo domainInfo = (DomainInfo) info;
+                final String name = domainInfo.getName();
+                if (domainName != null && name != null && domainName.compareTo(domainInfo.getName()) < 0) {
                     break;
                 }
                 i++;
@@ -1362,12 +1330,7 @@ public class ClusterBrowser extends Browser {
             treeMenuController.setNode(resource);
             domainInfo.updateParameters();
             final int index = i;
-            application.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    vmsNode.insert(resource, index);
-                }
-            });
+            treeMenuController.insertNode(vmsNode, resource, index);
             nodeChanged = true;
         }
         mVmsUpdateLock.unlock();
@@ -1494,18 +1457,13 @@ public class ClusterBrowser extends Browser {
     private void updateNetworks() {
         if (networksNode != null) {
             final Network[] networks = cluster.getCommonNetworks();
-            application.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    networksNode.removeAllChildren();
-                }
-            });
+            treeMenuController.removeChildren(networksNode);
             for (final Network network : networks) {
                 final NetworkInfo networkInfo = networkInfoProvider.get();
                 networkInfo.init(network.getName(), network, this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(networkInfo);
                 treeMenuController.setNode(resource);
-                treeMenuController.addNode(networksNode, resource);
+                treeMenuController.addChild(networksNode, resource);
             }
             treeMenuController.reloadNode(networksNode, false);
         }
@@ -2086,17 +2044,22 @@ public class ClusterBrowser extends Browser {
     }
 
     public void reloadAllComboBoxes(final ServiceInfo exceptThisOne) {
-        lockNameToServiceInfo();
-        for (final String name : nameToServiceInfoHash.keySet()) {
-            final Map<String, ServiceInfo> idToInfoHash = nameToServiceInfoHash.get(name);
-            for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
-                final ServiceInfo si = serviceEntry.getValue();
-                if (si != exceptThisOne) {
-                    si.reloadComboBoxes();
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                lockNameToServiceInfo();
+                for (final String name : nameToServiceInfoHash.keySet()) {
+                    final Map<String, ServiceInfo> idToInfoHash = nameToServiceInfoHash.get(name);
+                    for (final Map.Entry<String, ServiceInfo> serviceEntry : idToInfoHash.entrySet()) {
+                        final ServiceInfo si = serviceEntry.getValue();
+                        if (si != exceptThisOne) {
+                            si.reloadComboBoxes();
+                        }
+                    }
                 }
+                unlockNameToServiceInfo();
             }
-        }
-        unlockNameToServiceInfo();
+        });
     }
 
     /** Returns object that holds data of all VMs. */
@@ -2115,13 +2078,10 @@ public class ClusterBrowser extends Browser {
      */
     public DomainInfo findVMSVirtualDomainInfo(final String name) {
         if (vmsNode != null && name != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node = e.nextElement();
-                final DomainInfo vmsvdi = (DomainInfo) node.getUserObject();
-                if (name.equals(vmsvdi.getName())) {
-                    return vmsvdi;
+            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+                final DomainInfo domainInfo = (DomainInfo) info;
+                if (name.equals(domainInfo.getName())) {
+                    return domainInfo;
                 }
             }
         }
@@ -2167,20 +2127,14 @@ public class ClusterBrowser extends Browser {
         }
 
         if (vmsNode != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = vmsNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode node = e.nextElement();
-                final DomainInfo vmsvdi = (DomainInfo) node.getUserObject();
-                vmsvdi.checkResourceFields(null, vmsvdi.getParametersFromXML());
-                vmsvdi.updateAdvancedPanels();
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> ce = node.children();
-                while (ce.hasMoreElements()) {
-                    final DefaultMutableTreeNode cnode = ce.nextElement();
-                    final HardwareInfo vmshi = (HardwareInfo) cnode.getUserObject();
-                    vmshi.checkResourceFields(null, vmshi.getParametersFromXML());
-                    vmshi.updateAdvancedPanels();
+            for (final Info info : treeMenuController.nodesToInfos(vmsNode.children())) {
+                final DomainInfo domainInfo = (DomainInfo) info;
+                domainInfo.checkResourceFields(null, domainInfo.getParametersFromXML());
+                domainInfo.updateAdvancedPanels();
+                for (final Info grandChild : treeMenuController.nodesToInfos(domainInfo.getNode().children())) {
+                    final HardwareInfo hardwareInfo = (HardwareInfo) grandChild;
+                    hardwareInfo.checkResourceFields(null, hardwareInfo.getParametersFromXML());
+                    hardwareInfo.updateAdvancedPanels();
                 }
             }
         }

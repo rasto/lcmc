@@ -83,17 +83,12 @@ public class CloneInfo extends ServiceInfo {
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
         newServiceInfo.setNode(newServiceNode);
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final DefaultMutableTreeNode node = getNode();
-                if (node != null) {
-                    treeMenuController.reloadNode(node, false);
-                    node.add(newServiceNode);
-                }
-                treeMenuController.reloadNode(newServiceNode, true);
-            }
-        });
+        final DefaultMutableTreeNode node = getNode();
+        if (node != null) {
+            treeMenuController.reloadNode(node, false);
+            treeMenuController.addChild(node, newServiceNode);
+        }
+        treeMenuController.reloadNode(newServiceNode, true);
     }
 
     /**
@@ -105,9 +100,8 @@ public class CloneInfo extends ServiceInfo {
         newServiceInfo.setCloneInfo(this);
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(this);
         setNode(node);
-        application.isSwingThread();
-        getBrowser().getServicesNode().add(node);
-        node.add(newServiceInfo.getNode());
+        treeMenuController.addChild(getBrowser().getServicesNode(), node);
+        treeMenuController.addChild(node, newServiceInfo.getNode());
         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
         treeMenuController.reloadNode(node, true);
     }

@@ -41,6 +41,7 @@ import lcmc.common.ui.CallbackAction;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
+import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.crm.domain.CrmXml;
 import lcmc.crm.domain.ClusterStatus;
 import lcmc.host.domain.Host;
@@ -76,6 +77,8 @@ public class ServiceMenu {
     private Application application;
     @Inject
     private Provider<ServiceLogs> serviceLogsProvider;
+    @Inject
+    private TreeMenuController treeMenuController;
 
     public List<UpdatableItem> getPulldownMenu(final ServiceInfo serviceInfo) {
         final List<UpdatableItem> items = new ArrayList<UpdatableItem>();
@@ -190,7 +193,7 @@ public class ServiceMenu {
                                 if (node == null) {
                                     return "no";
                                 }
-                                final int index = giNode.getIndex(node);
+                                final int index = treeMenuController.getIndex(giNode, node);
                                 if (index == 0) {
                                     return "already up";
                                 }
@@ -250,8 +253,9 @@ public class ServiceMenu {
                                 if (node == null) {
                                     return "no";
                                 }
-                                final int index = giNode.getIndex(node);
-                                if (index >= giNode.getChildCount() - 1) {
+                                final int index = treeMenuController.getIndex(giNode, node);
+                                final int groupChildCount = treeMenuController.getChildCount(giNode);
+                                if (index >= groupChildCount - 1) {
                                     return "already down";
                                 }
                                 return null;

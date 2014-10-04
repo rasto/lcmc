@@ -522,7 +522,6 @@ public class GlobalInfo extends AbstractDrbdInfo {
             final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    //getBrowser().reload(drbdResourceNode, true);
                     addDrbdConfigDialog.init(thisClass, bd1, bd2);
                     addDrbdConfigDialog.showDialogs();
                     /* remove wizard parameters from hashes. */
@@ -587,7 +586,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
         final DefaultMutableTreeNode drbdResourceNode = new DefaultMutableTreeNode(dri);
         treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
         dri.setNode(drbdResourceNode);
-        treeMenuController.addNode(getBrowser().getDrbdNode(), drbdResourceNode);
+        treeMenuController.addChild(getBrowser().getDrbdNode(), drbdResourceNode);
         treeMenuController.reloadNode(drbdResourceNode, true);
     }
 
@@ -621,14 +620,14 @@ public class GlobalInfo extends AbstractDrbdInfo {
         dvi.setNode(drbdVolumeNode);
 
         application.isSwingThread();
-        dvi.getDrbdResourceInfo().getNode().add(drbdVolumeNode);
+        treeMenuController.addChild(dvi.getDrbdResourceInfo().getNode(), drbdVolumeNode);
 
         final DefaultMutableTreeNode drbdBDNode1 = new DefaultMutableTreeNode(bdi1);
         bdi1.setNode(drbdBDNode1);
         final DefaultMutableTreeNode drbdBDNode2 = new DefaultMutableTreeNode(bdi2);
         bdi2.setNode(drbdBDNode2);
-        drbdVolumeNode.add(drbdBDNode1);
-        drbdVolumeNode.add(drbdBDNode2);
+        treeMenuController.addChild(drbdVolumeNode, drbdBDNode1);
+        treeMenuController.addChild(drbdVolumeNode, drbdBDNode2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
         treeMenuController.reloadNode(drbdVolumeNode, true);
@@ -776,8 +775,7 @@ public class GlobalInfo extends AbstractDrbdInfo {
         final DefaultMutableTreeNode proxyHostNode = new DefaultMutableTreeNode(proxyHostInfo);
         treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
         proxyHostInfo.setNode(proxyHostNode);
-        application.isSwingThread();
-        getBrowser().getDrbdNode().add(proxyHostNode);
+        treeMenuController.addChild(getBrowser().getDrbdNode(), proxyHostNode);
         treeMenuController.reloadNode(proxyHostNode, true);
     }
 

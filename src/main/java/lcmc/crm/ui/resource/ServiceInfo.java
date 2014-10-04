@@ -1049,25 +1049,18 @@ public class ServiceInfo extends EditableInfo {
         }
     }
 
-    /**
-     * TODO: wrong doku
-     * Converts enumeration to the info array, get objects from
-     * hash if they exist.
-     */
-    protected Value[] enumToInfoArray(final Value defaultValue,
-                                      final String serviceName,
-                                      final Enumeration<DefaultMutableTreeNode> e) {
+    protected Value[] nodesToServiceInfos(
+            final Value defaultValue,
+            final String serviceName,
+            final Enumeration<DefaultMutableTreeNode> e) {
         final List<Value> list = new ArrayList<Value>();
         if (defaultValue != null) {
             list.add(defaultValue);
         }
-
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n = e.nextElement();
-            final Info i = (Info) n.getUserObject();
-            final ServiceInfo si = getBrowser().getServiceInfoFromId(serviceName, i.getName());
-            if (si == null && !Tools.areEqual(i, defaultValue)) {
-                list.add(i);
+        for (final Info info : treeMenuController.nodesToInfos(e)) {
+            final ServiceInfo si = getBrowser().getServiceInfoFromId(serviceName, info.getName());
+            if (si == null && !Tools.areEqual(info, defaultValue)) {
+                list.add(info);
             }
         }
         return list.toArray(new Value[list.size()]);
@@ -1248,19 +1241,15 @@ public class ServiceInfo extends EditableInfo {
         if (defaultValue != null) {
             list.add(defaultValue);
         }
-        while (drbdResources.hasMoreElements()) {
-            final DefaultMutableTreeNode n = drbdResources.nextElement();
-            if (!(n.getUserObject() instanceof ResourceInfo)) {
+        for (final Info drbdRes : treeMenuController.nodesToInfos(drbdResources)) {
+            if (!(drbdRes instanceof ResourceInfo)) {
                 continue;
             }
-            final ResourceInfo drbdRes = (ResourceInfo) n.getUserObject();
             final DefaultMutableTreeNode drbdResNode = drbdRes.getNode();
             if (drbdResNode != null) {
                 @SuppressWarnings("unchecked")
                 final Enumeration<DefaultMutableTreeNode> drbdVolumes = drbdResNode.children();
-                while (drbdVolumes.hasMoreElements()) {
-                    final DefaultMutableTreeNode vn = drbdVolumes.nextElement();
-                    final Value drbdVol = (Value) vn.getUserObject();
+                for (final Value drbdVol : treeMenuController.nodesToInfos(drbdVolumes)) {
                     list.add(drbdVol);
                 }
             }
@@ -1268,20 +1257,19 @@ public class ServiceInfo extends EditableInfo {
 
         /* block devices that are the same on all hosts */
         @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> wids = getBrowser().getCommonBlockDevicesNode().children();
-        while (wids.hasMoreElements()) {
-            final DefaultMutableTreeNode n = wids.nextElement();
-            final Value wid = (Value) n.getUserObject();
-            list.add(wid);
+        final Enumeration<DefaultMutableTreeNode> commonBlockDevices = getBrowser().getCommonBlockDevicesNode().children();
+        for (Value commonBlockDevice : treeMenuController.nodesToInfos(commonBlockDevices)) {
+            list.add(commonBlockDevice);
         }
 
         return list.toArray(new Value[list.size()]);
     }
 
-    protected void addCloneFields(final JPanel optionsPanel,
-                                  final int leftWidth,
-                                  final int rightWidth,
-                                  final CloneInfo ci) {
+    protected void addCloneFields(
+            final JPanel optionsPanel,
+            final int leftWidth,
+            final int rightWidth,
+            final CloneInfo ci) {
         final String[] params = ci.getParametersFromXML();
         final Info savedMAIdRef = ci.getSavedMetaAttrInfoRef();
         ci.getResource().setValue(GUI_ID, new StringValue(ci.getService().getId()));
@@ -2153,7 +2141,7 @@ public class ServiceInfo extends EditableInfo {
         cleanup();
         ci.cleanup();
         setNode(node);
-        getBrowser().getServicesNode().add(node);
+        treeMenuController.addChild(getBrowser().getServicesNode(), node);
         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
         getBrowser().getCrmGraph().exchangeObjectInTheVertex(this, ci);
         getBrowser().mHeartbeatIdToServiceLock();
@@ -3292,7 +3280,7 @@ public class ServiceInfo extends EditableInfo {
                 clInfo.storeComboBoxValues(cloneParams);
             }
 
-            application.invokeLater(new Runnable() {
+            application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     getWidget(PCMK_ID, null).setValueAndWait(getParamSaved(PCMK_ID));
@@ -3764,13 +3752,13 @@ public class ServiceInfo extends EditableInfo {
             }
         } else {
             getBrowser().addNameToServiceInfoHash(serviceInfo);
-            application.invokeLater(new Runnable() {
+            application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
                     final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(serviceInfo);
                     serviceInfo.setNode(newServiceNode);
 
-                    getBrowser().getServicesNode().add(newServiceNode);
+                    treeMenuController.addChild(getBrowser().getServicesNode(), newServiceNode);
                     if (reloadNode) {
                         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
                         treeMenuController.reloadNode(newServiceNode, false);
@@ -3831,12 +3819,9 @@ public class ServiceInfo extends EditableInfo {
         final int index = giNode.getIndex(node);
         if (index > 0) {
             @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
-                newOrder.add(child.getHeartbeatId(runMode));
+            for (final Info child : treeMenuController.nodesToInfos(giNode.children())) {
+                newOrder.add(((ServiceInfo) child).getHeartbeatId(runMode));
             }
             final String el = newOrder.remove(index);
             newOrder.add(index - 1,  el);
@@ -3863,9 +3848,8 @@ public class ServiceInfo extends EditableInfo {
             @SuppressWarnings("unchecked")
             final Enumeration<DefaultMutableTreeNode> e = giNode.children();
             final List<String> newOrder = new ArrayList<String>();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode n = e.nextElement();
-                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+            for (final Info info : treeMenuController.nodesToInfos(giNode.children())) {
+                final ServiceInfo child = (ServiceInfo) info;
                 newOrder.add(child.getHeartbeatId(runMode));
             }
             final String el = newOrder.remove(index);
@@ -3982,11 +3966,8 @@ public class ServiceInfo extends EditableInfo {
                         final String group = gi.getHeartbeatId(runMode);
                         final DefaultMutableTreeNode giNode = gi.getNode();
                         if (giNode != null) {
-                            @SuppressWarnings("unchecked")
-                            final Enumeration<DefaultMutableTreeNode> e = giNode.children();
-                            while (e.hasMoreElements()) {
-                                final DefaultMutableTreeNode n = e.nextElement();
-                                final ServiceInfo child = (ServiceInfo) n.getUserObject();
+                            for (final Info info : treeMenuController.nodesToInfos(giNode.children())) {
+                                final ServiceInfo child = (ServiceInfo) info;
                                 child.getService().setModified(true);
                                 child.getService().doneModifying();
                             }
@@ -4059,7 +4040,7 @@ public class ServiceInfo extends EditableInfo {
         getBrowser().mHeartbeatIdToServiceUnlock();
         getBrowser().removeFromServiceInfoHash(this);
         final CloneInfo ci = cloneInfo;
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 treeMenuController.removeNode(getNode());

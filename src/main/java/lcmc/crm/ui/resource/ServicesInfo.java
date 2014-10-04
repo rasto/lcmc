@@ -29,7 +29,6 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -735,21 +734,15 @@ public class ServicesInfo extends EditableInfo {
             }
         }
 
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = getNode().children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode n = e.nextElement();
-            final ServiceInfo g = (ServiceInfo) n.getUserObject();
-            if (g.getResourceAgent().isGroup() || g.getResourceAgent().isClone()) {
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> ge = g.getNode().children();
-                while (ge.hasMoreElements()) {
-                    final DefaultMutableTreeNode gn = ge.nextElement();
-                    final ServiceInfo s = (ServiceInfo) gn.getUserObject();
-                    if (!groupServiceIsPresent.contains(s) && !s.getService().isNew()) {
+        for (final Info info : treeMenuController.nodesToInfos(getNode().children())) {
+            final ServiceInfo group = (ServiceInfo) info;
+            if (group.getResourceAgent().isGroup() || group.getResourceAgent().isClone()) {
+                for (final Info groupInfo : treeMenuController.nodesToInfos(group.getNode().children())) {
+                    final ServiceInfo groupService = (ServiceInfo) groupInfo;
+                    if (!groupServiceIsPresent.contains(groupService) && !groupService.getService().isNew()) {
                         /* remove the group service from the menu
                            that does not exist anymore. */
-                        s.removeInfo();
+                        groupService.removeInfo();
                     }
                 }
             }
@@ -1051,12 +1044,7 @@ public class ServicesInfo extends EditableInfo {
                             runMode)) {
             final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
             newServiceInfo.setNode(newServiceNode);
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    getBrowser().getServicesNode().add(newServiceNode);
-                }
-            });
+            treeMenuController.addChild(getBrowser().getServicesNode(), newServiceNode);
             if (interactive) {
                 if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
                     /* only if it was added manually. */
@@ -1246,17 +1234,14 @@ public class ServicesInfo extends EditableInfo {
                     final GroupInfo oldGi = (GroupInfo) oldI;
                     final GroupInfo newGi = (GroupInfo) newSi;
 
-                    application.invokeLater(new Runnable() {
+                    application.invokeInEdt(new Runnable() {
                         @Override
                         public void run() {
-                            @SuppressWarnings("unchecked")
-                            final Enumeration<DefaultMutableTreeNode> e = oldGi.getNode().children();
-                            while (e.hasMoreElements()) {
-                                final DefaultMutableTreeNode n = e.nextElement();
-                                final ServiceInfo oldChild = (ServiceInfo) n.getUserObject();
+                            for (final Info info : treeMenuController.nodesToInfos(oldGi.getNode().children())) {
+                                final ServiceInfo oldChild = (ServiceInfo) info;
                                 oldChild.getInfoPanel();
                                 final ServiceInfo newChild =
-                                                        newGi.addGroupServicePanel(oldChild.getResourceAgent(), false);
+                                        newGi.addGroupServicePanel(oldChild.getResourceAgent(), false);
                                 newChild.getInfoPanel();
                                 copyPasteFields(oldChild, newChild);
                             }

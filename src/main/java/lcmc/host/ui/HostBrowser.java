@@ -22,7 +22,6 @@
 package lcmc.host.ui;
 
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -217,7 +216,7 @@ public class HostBrowser extends Browser {
             public void run() {
                 mNetInfosWriteLock.lock();
                 try {
-                    netInterfacesNode.removeAllChildren();
+                    treeMenuController.removeChildren(netInterfacesNode);
                     for (final NetInterface netInterface : netInterfaces) {
                         final NetInfo netInfo;
                         if (oldNetInterfaces.containsKey(netInterface)) {
@@ -228,7 +227,7 @@ public class HostBrowser extends Browser {
                         }
                         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(netInfo);
                         treeMenuController.setNode(resource);
-                        netInterfacesNode.add(resource);
+                        treeMenuController.addChild(netInterfacesNode, resource);
                     }
                     treeMenuController.reloadNode(netInterfacesNode, false);
                 } finally {
@@ -268,11 +267,11 @@ public class HostBrowser extends Browser {
                 public void run() {
                     mBlockDevInfosWriteLock.lock();
                     try {
-                        blockDevicesNode.removeAllChildren();
+                        treeMenuController.removeChildren(blockDevicesNode);
                         for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
                             final BlockDevInfo bdi = bdEntry.getValue();
                             final MutableTreeNode resource = new DefaultMutableTreeNode(bdi);
-                            blockDevicesNode.add(resource);
+                            treeMenuController.addChild(blockDevicesNode, resource);
                         }
                         treeMenuController.reloadNode(blockDevicesNode, false);
                     } finally {
@@ -289,7 +288,7 @@ public class HostBrowser extends Browser {
             public void run() {
                 mFileSystemsWriteLock.lock();
                 try {
-                    fileSystemsNode.removeAllChildren();
+                    treeMenuController.removeChildren(fileSystemsNode);
                     for (final String fs : fileSystems) {
                         final FSInfo fsi;
                         if (oldFilesystems.containsKey(fs)) {
@@ -301,7 +300,7 @@ public class HostBrowser extends Browser {
                         }
                         final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(fsi);
                         treeMenuController.setNode(resource);
-                        fileSystemsNode.add(resource);
+                        treeMenuController.addChild(fileSystemsNode, resource);
                     }
                     treeMenuController.reloadNode(fileSystemsNode, false);
                 } finally {
@@ -324,12 +323,9 @@ public class HostBrowser extends Browser {
         final Map<NetInterface, NetInfo> netInterfaces = new HashMap<NetInterface, NetInfo>();
         mNetInfosReadLock.lock();
         try {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = netInterfacesNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode niNode = e.nextElement();
-                final NetInfo nii = (NetInfo) niNode.getUserObject();
-                netInterfaces.put(nii.getNetInterface(), nii);
+            for (final Info info : treeMenuController.nodesToInfos(netInterfacesNode.children())) {
+                final NetInfo netInfo = (NetInfo) info;
+                netInterfaces.put(netInfo.getNetInterface(), netInfo);
             }
         } finally {
             mNetInfosReadLock.unlock();
@@ -341,12 +337,9 @@ public class HostBrowser extends Browser {
         final Map<String, FSInfo> filesystems = new HashMap<String, FSInfo>();
         mFileSystemsReadLock.lock();
         try {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e = fileSystemsNode.children();
-            while (e.hasMoreElements()) {
-                final DefaultMutableTreeNode fsiNode = e.nextElement();
-                final FSInfo fsi = (FSInfo) fsiNode.getUserObject();
-                filesystems.put(fsi.getName(), fsi);
+            for (final Info info : treeMenuController.nodesToInfos(fileSystemsNode.children())) {
+                final FSInfo fsInfo = (FSInfo) info;
+                filesystems.put(fsInfo.getName(), fsInfo);
             }
         } finally {
             mFileSystemsReadLock.unlock();

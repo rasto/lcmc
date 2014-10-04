@@ -93,9 +93,9 @@ final class IPaddrInfo extends ServiceInfo {
                 defaultValue = new StringValue(ip.getValueForConfig());
             }
             @SuppressWarnings("unchecked")
-            final Value[] networks = enumToInfoArray(defaultValue,
-                                                     getName(),
-                                                     getBrowser().getNetworksNode().children());
+            final Value[] networks = nodesToServiceInfos(defaultValue,
+                    getName(),
+                    getBrowser().getNetworksNode().children());
 
             final String regexp = "^[\\d.*]*|Select\\.\\.\\.$";
             paramWi = widgetFactory.createInstance(

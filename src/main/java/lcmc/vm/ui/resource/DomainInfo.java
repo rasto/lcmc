@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -674,59 +673,51 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof DiskInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof DiskInfo)) {
                 continue;
             }
-            final DiskInfo vmsdi = (DiskInfo) node.getUserObject();
-            if (vmsdi.getResource().isNew()) {
+            final DiskInfo diskInfo = (DiskInfo) info;
+            if (diskInfo.getResource().isNew()) {
                 /* keep */
-            } else if (diskNames.contains(vmsdi.getName())) {
+            } else if (diskNames.contains(diskInfo.getName())) {
                 /* keeping */
-                diskNames.remove(vmsdi.getName());
+                diskNames.remove(diskInfo.getName());
                 mDiskToInfoLock.lock();
                 try {
-                    diskToInfo.put(vmsdi.getName(), vmsdi);
+                    diskToInfo.put(diskInfo.getName(), diskInfo);
                 } finally {
                     mDiskToInfoLock.unlock();
                 }
-                vmsdi.updateParameters(); /* update old */
+                diskInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mDiskToInfoLock.lock();
                 try {
-                    diskToInfo.remove(vmsdi.getName());
+                    diskToInfo.remove(diskInfo.getName());
                 } finally {
                     mDiskToInfoLock.unlock();
                 }
-                vmsdi.setNode(null);
-                nodesToRemove.add(node);
+                diskInfo.setNode(null);
+                nodesToRemove.add(info.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String disk : diskNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
-            while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = eee.nextElement();
-                if (!(node.getUserObject() instanceof DiskInfo)) {
+            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                if (!(info instanceof DiskInfo)) {
                     continue;
                 }
-                final DiskInfo v = (DiskInfo) node.getUserObject();
-                final String n = v.getName();
-                if (n != null && disk.compareTo(n) < 0) {
+                final DiskInfo diskInfo = (DiskInfo) info;
+                final String name = diskInfo.getName();
+                if (name != null && disk.compareTo(name) < 0) {
                     break;
                 }
                 i++;
@@ -743,7 +734,7 @@ public class DomainInfo extends EditableInfo {
             diskInfo.updateParameters();
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
             treeMenuController.setNode(resource);
-            thisNode.insert(resource, i);
+            treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
         }
         return nodeChanged;
@@ -763,59 +754,51 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof FilesystemInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof FilesystemInfo)) {
                 continue;
             }
-            final FilesystemInfo vmsdi = (FilesystemInfo) node.getUserObject();
-            if (vmsdi.getResource().isNew()) {
+            final FilesystemInfo filesystemInfo = (FilesystemInfo) info;
+            if (filesystemInfo.getResource().isNew()) {
                 /* keep */
-            } else if (filesystemNames.contains(vmsdi.getName())) {
+            } else if (filesystemNames.contains(filesystemInfo.getName())) {
                 /* keeping */
-                filesystemNames.remove(vmsdi.getName());
+                filesystemNames.remove(filesystemInfo.getName());
                 mFilesystemToInfoLock.lock();
                 try {
-                    filesystemToInfo.put(vmsdi.getName(), vmsdi);
+                    filesystemToInfo.put(filesystemInfo.getName(), filesystemInfo);
                 } finally {
                     mFilesystemToInfoLock.unlock();
                 }
-                vmsdi.updateParameters(); /* update old */
+                filesystemInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mFilesystemToInfoLock.lock();
                 try {
-                    filesystemToInfo.remove(vmsdi.getName());
+                    filesystemToInfo.remove(filesystemInfo.getName());
                 } finally {
                     mFilesystemToInfoLock.unlock();
                 }
-                vmsdi.setNode(null);
-                nodesToRemove.add(node);
+                filesystemInfo.setNode(null);
+                nodesToRemove.add(info.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String filesystem : filesystemNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
-            while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = eee.nextElement();
-                if (!(node.getUserObject() instanceof FilesystemInfo)) {
+            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                if (!(info instanceof FilesystemInfo)) {
                     continue;
                 }
-                final FilesystemInfo v = (FilesystemInfo) node.getUserObject();
-                final String n = v.getName();
-                if (n != null && filesystem.compareTo(n) < 0) {
+                final FilesystemInfo filesystemInfo = (FilesystemInfo) info;
+                final String name = filesystemInfo.getName();
+                if (name != null && filesystem.compareTo(name) < 0) {
                     break;
                 }
                 i++;
@@ -832,7 +815,7 @@ public class DomainInfo extends EditableInfo {
             filesystemInfo.updateParameters();
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
             treeMenuController.setNode(resource);
-            thisNode.insert(resource, i);
+            treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
         }
         return nodeChanged;
@@ -852,63 +835,54 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         InterfaceInfo emptySlot = null; /* for generated mac address. */
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof InterfaceInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof InterfaceInfo)) {
                 continue;
             }
-            final InterfaceInfo vmsii = (InterfaceInfo) node.getUserObject();
-            if (vmsii.getResource().isNew()) {
+            final InterfaceInfo interfaceInfo = (InterfaceInfo) info;
+            if (interfaceInfo.getResource().isNew()) {
                 /* keep */
-            } else if ("generate".equals(vmsii.getName())) {
-                emptySlot = vmsii;
-            } else if (interfaceNames.contains(vmsii.getName())) {
+            } else if ("generate".equals(interfaceInfo.getName())) {
+                emptySlot = interfaceInfo;
+            } else if (interfaceNames.contains(interfaceInfo.getName())) {
                 /* keeping */
-                interfaceNames.remove(vmsii.getName());
-                vmsii.updateParameters(); /* update old */
+                interfaceNames.remove(interfaceInfo.getName());
+                interfaceInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mInterfaceToInfoLock.lock();
                 try {
-                    interfaceToInfo.remove(vmsii.getName());
+                    interfaceToInfo.remove(interfaceInfo.getName());
                 } finally {
                     mInterfaceToInfoLock.unlock();
                 }
-                vmsii.setNode(null);
-                nodesToRemove.add(node);
+                interfaceInfo.setNode(null);
+                nodesToRemove.add(interfaceInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String interf : interfaceNames) {
             final InterfaceInfo interfaceInfo;
             if (emptySlot == null) {
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
                 int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = eee.nextElement();
-                    if (!(node.getUserObject() instanceof InterfaceInfo)) {
-                        if (node.getUserObject() instanceof DiskInfo
-                            || node.getUserObject() instanceof FilesystemInfo) {
+                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                    if (!(info instanceof InterfaceInfo)) {
+                        if (info instanceof DiskInfo || info instanceof FilesystemInfo) {
                             i++;
                         }
                         continue;
                     }
-                    final InterfaceInfo v = (InterfaceInfo) node.getUserObject();
+                    final InterfaceInfo v = (InterfaceInfo) info;
 
-                    final String n = v.getName();
-                    if (n != null && interf.compareTo(n) < 0) {
+                    final String name = v.getName();
+                    if (name != null && interf.compareTo(name) < 0) {
                         break;
                     }
                     i++;
@@ -918,7 +892,7 @@ public class DomainInfo extends EditableInfo {
                 interfaceInfo.init(interf, getBrowser(), this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
                 treeMenuController.setNode(resource);
-                thisNode.insert(resource, i);
+                treeMenuController.insertNode(thisNode, resource, i);
                 nodeChanged = true;
             } else {
                 interfaceInfo = emptySlot;
@@ -950,57 +924,47 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof InputDevInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof InputDevInfo)) {
                 continue;
             }
-            final InputDevInfo vmsid = (InputDevInfo) node.getUserObject();
-            if (vmsid.getResource().isNew()) {
+            final InputDevInfo inputDevInfo = (InputDevInfo) info;
+            if (inputDevInfo.getResource().isNew()) {
                 /* keep */
-            } else if (inputDevNames.contains(vmsid.getName())) {
+            } else if (inputDevNames.contains(inputDevInfo.getName())) {
                 /* keeping */
-                inputDevNames.remove(vmsid.getName());
-                vmsid.updateParameters(); /* update old */
+                inputDevNames.remove(inputDevInfo.getName());
+                inputDevInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mInputDevToInfoLock.lock();
                 try {
-                    inputDevToInfo.remove(vmsid.getName());
+                    inputDevToInfo.remove(inputDevInfo.getName());
                 } finally {
                     mInputDevToInfoLock.unlock();
                 }
-                vmsid.setNode(null);
-                nodesToRemove.add(node);
+                inputDevInfo.setNode(null);
+                nodesToRemove.add(inputDevInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String inputDev : inputDevNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
-            while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = eee.nextElement();
-                if (!(node.getUserObject() instanceof InputDevInfo)) {
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo) {
+            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                if (!(info instanceof InputDevInfo)) {
+                    if (info instanceof DiskInfo || info instanceof FilesystemInfo || info instanceof InterfaceInfo) {
                         i++;
                     }
                     continue;
                 }
-                final InputDevInfo v = (InputDevInfo) node.getUserObject();
-                final String n = v.getName();
+                final InputDevInfo inputDevInfo = (InputDevInfo) info;
+                final String n = inputDevInfo.getName();
                 if (n != null && inputDev.compareTo(n) < 0) {
                     break;
                 }
@@ -1011,7 +975,7 @@ public class DomainInfo extends EditableInfo {
             inputDevInfo.init(inputDev, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
             treeMenuController.setNode(resource);
-            thisNode.insert(resource, i);
+            treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mInputDevToInfoLock.lock();
             try {
@@ -1022,28 +986,7 @@ public class DomainInfo extends EditableInfo {
             inputDevInfo.updateParameters();
         }
         /* Sort it. */
-        int i = 0;
-        for (int j = 0; j < thisNode.getChildCount(); j++) {
-            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) thisNode.getChildAt(j);
-            final HardwareInfo v = (HardwareInfo) node.getUserObject();
-            final String n = v.getName();
-            if (i > 0) {
-                final DefaultMutableTreeNode prev = (DefaultMutableTreeNode) thisNode.getChildAt(j - 1);
-                final HardwareInfo prevI = (HardwareInfo) prev.getUserObject();
-                if (prevI.getClass().getName().equals(v.getClass().getName())) {
-                    final String prevN = prevI.getName();
-                    if (!prevI.getResource().isNew()
-                        && !v.getResource().isNew()
-                        && (prevN != null && prevN.compareTo(n) > 0)) {
-                        thisNode.remove(j);
-                        thisNode.insert(node, j - 1);
-                    }
-                } else {
-                    i = 0;
-                }
-            }
-            i++;
-        }
+        treeMenuController.sortChildrenWithNewUp(thisNode);
         return nodeChanged;
     }
 
@@ -1061,64 +1004,56 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof GraphicsInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof GraphicsInfo)) {
                 continue;
             }
-            final GraphicsInfo vmsgi = (GraphicsInfo) node.getUserObject();
-            if (vmsgi.getResource().isNew()) {
+            final GraphicsInfo graphicsInfo = (GraphicsInfo) info;
+            if (graphicsInfo.getResource().isNew()) {
                 /* keep */
-            } else if (graphicsNames.contains(vmsgi.getName())) {
+            } else if (graphicsNames.contains(graphicsInfo.getName())) {
                 /* keeping */
-                graphicsNames.remove(vmsgi.getName());
+                graphicsNames.remove(graphicsInfo.getName());
                 mGraphicsToInfoLock.lock();
                 try {
-                    graphicsToInfo.put(vmsgi.getName(), vmsgi);
+                    graphicsToInfo.put(graphicsInfo.getName(), graphicsInfo);
                 } finally {
                     mGraphicsToInfoLock.unlock();
                 }
-                vmsgi.updateParameters(); /* update old */
+                graphicsInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mGraphicsToInfoLock.lock();
                 try {
-                    graphicsToInfo.remove(vmsgi.getName());
+                    graphicsToInfo.remove(graphicsInfo.getName());
                 } finally {
                     mGraphicsToInfoLock.unlock();
                 }
-                vmsgi.setNode(null);
-                nodesToRemove.add(node);
+                graphicsInfo.setNode(null);
+                nodesToRemove.add(graphicsInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String graphicDisplay : graphicsNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
-            while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = eee.nextElement();
-                if (!(node.getUserObject() instanceof GraphicsInfo)) {
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo) {
+            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                if (!(info instanceof GraphicsInfo)) {
+                    if (info instanceof DiskInfo
+                        || info instanceof FilesystemInfo
+                        || info instanceof InterfaceInfo
+                        || info instanceof InputDevInfo) {
                         i++;
                     }
                     continue;
                 }
-                final GraphicsInfo v = (GraphicsInfo) node.getUserObject();
-                final String n = v.getName();
+                final GraphicsInfo graphicsInfo = (GraphicsInfo) info;
+                final String n = graphicsInfo.getName();
                 if (n != null && graphicDisplay.compareTo(n) < 0) {
                     break;
                 }
@@ -1129,7 +1064,7 @@ public class DomainInfo extends EditableInfo {
             graphicsInfo.init(graphicDisplay, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
             treeMenuController.setNode(resource);
-            thisNode.insert(resource, i);
+            treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mGraphicsToInfoLock.lock();
             try {
@@ -1156,66 +1091,57 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof SoundInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof SoundInfo)) {
                 continue;
             }
-            final SoundInfo vmssi =
-                              (SoundInfo) node.getUserObject();
-            if (vmssi.getResource().isNew()) {
+            final SoundInfo soundInfo = (SoundInfo) info;
+            if (soundInfo.getResource().isNew()) {
                 /* keep */
-            } else if (soundNames.contains(vmssi.getName())) {
+            } else if (soundNames.contains(soundInfo.getName())) {
                 /* keeping */
-                soundNames.remove(vmssi.getName());
+                soundNames.remove(soundInfo.getName());
                 mSoundToInfoLock.lock();
                 try {
-                    soundToInfo.put(vmssi.getName(), vmssi);
+                    soundToInfo.put(soundInfo.getName(), soundInfo);
                 } finally {
                     mSoundToInfoLock.unlock();
                 }
-                vmssi.updateParameters(); /* update old */
+                soundInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mSoundToInfoLock.lock();
                 try {
-                    soundToInfo.remove(vmssi.getName());
+                    soundToInfo.remove(soundInfo.getName());
                 } finally {
                     mSoundToInfoLock.unlock();
                 }
-                vmssi.setNode(null);
-                nodesToRemove.add(node);
+                soundInfo.setNode(null);
+                nodesToRemove.add(soundInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String sound : soundNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
-            while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = eee.nextElement();
-                if (!(node.getUserObject() instanceof SoundInfo)) {
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo
-                        || node.getUserObject() instanceof GraphicsInfo) {
+            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                if (!(info instanceof SoundInfo)) {
+                    if (info instanceof DiskInfo
+                        || info instanceof FilesystemInfo
+                        || info instanceof InterfaceInfo
+                        || info instanceof InputDevInfo
+                        || info instanceof GraphicsInfo) {
                         i++;
                     }
                     continue;
                 }
-                final SoundInfo v = (SoundInfo) node.getUserObject();
-                final String n = v.getName();
+                final SoundInfo soundInfo = (SoundInfo) info;
+                final String n = soundInfo.getName();
                 if (n != null && sound.compareTo(n) < 0) {
                     break;
                 }
@@ -1226,7 +1152,7 @@ public class DomainInfo extends EditableInfo {
             soundInfo.init(sound, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
             treeMenuController.setNode(resource);
-            thisNode.insert(resource, i);
+            treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mSoundToInfoLock.lock();
             try {
@@ -1253,66 +1179,58 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         SerialInfo emptySlot = null; /* for generated target port. */
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof SerialInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof SerialInfo)) {
                 continue;
             }
-            final SerialInfo vmssi = (SerialInfo) node.getUserObject();
-            if (vmssi.getResource().isNew()) {
+            final SerialInfo serialInfo = (SerialInfo) info;
+            if (serialInfo.getResource().isNew()) {
                 /* keep */
-            } else if ("generate".equals(vmssi.getTargetPort())) {
-                emptySlot = vmssi;
-            } else if (serialNames.contains(vmssi.getName())) {
+            } else if ("generate".equals(serialInfo.getTargetPort())) {
+                emptySlot = serialInfo;
+            } else if (serialNames.contains(serialInfo.getName())) {
                 /* keeping */
-                serialNames.remove(vmssi.getName());
-                vmssi.updateParameters(); /* update old */
+                serialNames.remove(serialInfo.getName());
+                serialInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mSerialToInfoLock.lock();
                 try {
-                    serialToInfo.remove(vmssi.getName());
+                    serialToInfo.remove(serialInfo.getName());
                 } finally {
                     mSerialToInfoLock.unlock();
                 }
-                vmssi.setNode(null);
-                nodesToRemove.add(node);
+                serialInfo.setNode(null);
+                nodesToRemove.add(serialInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String serial : serialNames) {
             final SerialInfo serialInfo;
             if (emptySlot == null) {
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
                 int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = eee.nextElement();
-                    if (!(node.getUserObject() instanceof SerialInfo)) {
-                        if (node.getUserObject() instanceof DiskInfo
-                            || node.getUserObject() instanceof FilesystemInfo
-                            || node.getUserObject() instanceof InterfaceInfo
-                            || node.getUserObject() instanceof InputDevInfo
-                            || node.getUserObject() instanceof GraphicsInfo
-                            || node.getUserObject() instanceof SoundInfo) {
+                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                    if (!(info instanceof SerialInfo)) {
+                        if (info instanceof DiskInfo
+                            || info instanceof FilesystemInfo
+                            || info instanceof InterfaceInfo
+                            || info instanceof InputDevInfo
+                            || info instanceof GraphicsInfo
+                            || info instanceof SoundInfo) {
                             i++;
                         }
                         continue;
                     }
-                    final SerialInfo v = (SerialInfo) node.getUserObject();
-                    final String n = v.getName();
-                    if (n != null && serial.compareTo(n) < 0) {
+                    final SerialInfo v = (SerialInfo) info;
+                    final String name = v.getName();
+                    if (name != null && serial.compareTo(name) < 0) {
                         break;
                     }
                     i++;
@@ -1322,7 +1240,7 @@ public class DomainInfo extends EditableInfo {
                 serialInfo.init(serial, getBrowser(), this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
                 treeMenuController.setNode(resource);
-                thisNode.insert(resource, i);
+                treeMenuController.insertNode(thisNode, resource, i);
                 nodeChanged = true;
             } else {
                 serialInfo = emptySlot;
@@ -1354,65 +1272,57 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
         ParallelInfo emptySlot = null; /* for generated target port. */
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof ParallelInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof ParallelInfo)) {
                 continue;
             }
-            final ParallelInfo vmspi = (ParallelInfo) node.getUserObject();
-            if (vmspi.getResource().isNew()) {
+            final ParallelInfo parallelInfo = (ParallelInfo) info;
+            if (parallelInfo.getResource().isNew()) {
                 /* keep */
-            } else if ("generate".equals(vmspi.getTargetPort())) {
-                emptySlot = vmspi;
-            } else if (parallelNames.contains(vmspi.getName())) {
+            } else if ("generate".equals(parallelInfo.getTargetPort())) {
+                emptySlot = parallelInfo;
+            } else if (parallelNames.contains(parallelInfo.getName())) {
                 /* keeping */
-                parallelNames.remove(vmspi.getName());
-                vmspi.updateParameters(); /* update old */
+                parallelNames.remove(parallelInfo.getName());
+                parallelInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mParallelToInfoLock.lock();
                 try {
-                    parallelToInfo.remove(vmspi.getName());
+                    parallelToInfo.remove(parallelInfo.getName());
                 } finally {
                     mParallelToInfoLock.unlock();
                 }
-                vmspi.setNode(null);
-                nodesToRemove.add(node);
+                parallelInfo.setNode(null);
+                nodesToRemove.add(parallelInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String parallel : parallelNames) {
             final ParallelInfo parallelInfo;
             if (emptySlot == null) {
-                @SuppressWarnings("unchecked")
-                final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
                 int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = eee.nextElement();
-                    if (!(node.getUserObject() instanceof ParallelInfo)) {
-                        if (node.getUserObject() instanceof DiskInfo
-                            || node.getUserObject() instanceof FilesystemInfo
-                            || node.getUserObject() instanceof InterfaceInfo
-                            || node.getUserObject() instanceof InputDevInfo
-                            || node.getUserObject() instanceof GraphicsInfo
-                            || node.getUserObject() instanceof SoundInfo
-                            || node.getUserObject() instanceof SerialInfo) {
+                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                    if (!(info instanceof ParallelInfo)) {
+                        if (info instanceof DiskInfo
+                            || info instanceof FilesystemInfo
+                            || info instanceof InterfaceInfo
+                            || info instanceof InputDevInfo
+                            || info instanceof GraphicsInfo
+                            || info instanceof SoundInfo
+                            || info instanceof SerialInfo) {
                             i++;
                         }
                         continue;
                     }
-                    final ParallelInfo v = (ParallelInfo) node.getUserObject();
+                    final ParallelInfo v = (ParallelInfo) info;
                     final String n = v.getName();
                     if (n != null && parallel.compareTo(n) < 0) {
                         break;
@@ -1424,7 +1334,7 @@ public class DomainInfo extends EditableInfo {
                 parallelInfo.init(parallel, getBrowser(), this);
                 final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
                 treeMenuController.setNode(resource);
-                thisNode.insert(resource, i);
+                treeMenuController.insertNode(thisNode, resource, i);
                 nodeChanged = true;
             } else {
                 parallelInfo = emptySlot;
@@ -1456,67 +1366,59 @@ public class DomainInfo extends EditableInfo {
             }
         }
         final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
         boolean nodeChanged = false;
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            if (!(node.getUserObject() instanceof VideoInfo)) {
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (!(info instanceof VideoInfo)) {
                 continue;
             }
-            final VideoInfo vmsvi = (VideoInfo) node.getUserObject();
-            if (vmsvi.getResource().isNew()) {
+            final VideoInfo videoInfo = (VideoInfo) info;
+            if (videoInfo.getResource().isNew()) {
                 /* keep */
-            } else if (videoNames.contains(vmsvi.getName())) {
+            } else if (videoNames.contains(videoInfo.getName())) {
                 /* keeping */
-                videoNames.remove(vmsvi.getName());
+                videoNames.remove(videoInfo.getName());
                 mVideoToInfoLock.lock();
                 try {
-                    videoToInfo.put(vmsvi.getName(), vmsvi);
+                    videoToInfo.put(videoInfo.getName(), videoInfo);
                 } finally {
                     mVideoToInfoLock.unlock();
                 }
-                vmsvi.updateParameters(); /* update old */
+                videoInfo.updateParameters(); /* update old */
             } else {
                 /* remove not existing vms */
                 mVideoToInfoLock.lock();
                 try {
-                    videoToInfo.remove(vmsvi.getName());
+                    videoToInfo.remove(videoInfo.getName());
                 } finally {
                     mVideoToInfoLock.unlock();
                 }
-                vmsvi.setNode(null);
-                nodesToRemove.add(node);
+                videoInfo.setNode(null);
+                nodesToRemove.add(videoInfo.getNode());
                 nodeChanged = true;
             }
         }
 
         /* remove nodes */
         application.isSwingThread();
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            node.removeFromParent();
-        }
+        treeMenuController.removeFromParent(nodesToRemove);
 
         for (final String video : videoNames) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
             int i = 0;
-            while (eee.hasMoreElements()) {
-                final DefaultMutableTreeNode node = eee.nextElement();
-                if (!(node.getUserObject() instanceof VideoInfo)) {
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo
-                        || node.getUserObject() instanceof GraphicsInfo
-                        || node.getUserObject() instanceof SoundInfo
-                        || node.getUserObject() instanceof SerialInfo
-                        || node.getUserObject() instanceof ParallelInfo) {
+            for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                if (!(info instanceof VideoInfo)) {
+                    if (info instanceof DiskInfo
+                        || info instanceof FilesystemInfo
+                        || info instanceof InterfaceInfo
+                        || info instanceof InputDevInfo
+                        || info instanceof GraphicsInfo
+                        || info instanceof SoundInfo
+                        || info instanceof SerialInfo
+                        || info instanceof ParallelInfo) {
                         i++;
                     }
                     continue;
                 }
-                final VideoInfo v = (VideoInfo) node.getUserObject();
+                final VideoInfo v = (VideoInfo) info;
                 final String n = v.getName();
                 if (n != null && video.compareTo(n) < 0) {
                     break;
@@ -1528,7 +1430,7 @@ public class DomainInfo extends EditableInfo {
             videoInfo.init(video, getBrowser(), this);
             final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
             treeMenuController.setNode(resource);
-            thisNode.insert(resource, i);
+            treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mVideoToInfoLock.lock();
             try {
@@ -1741,7 +1643,7 @@ public class DomainInfo extends EditableInfo {
                 uuid = vmsXml.getValue(getDomainName(), VmsXml.VM_PARAM_UUID);
             }
         }
-        application.invokeAndWait(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 final boolean interfaceNodeChanged = updateInterfaceNodes();
@@ -2216,22 +2118,15 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return diskInfo;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         diskInfo.selectMyself();
         return diskInfo;
@@ -2247,22 +2142,15 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return filesystemInfo;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof FilesystemInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof FilesystemInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         filesystemInfo.selectMyself();
         return filesystemInfo;
@@ -2279,25 +2167,18 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return interfaceInfo;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo
+                || info instanceof FilesystemInfo
+                || info instanceof InterfaceInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         interfaceInfo.selectMyself();
         return interfaceInfo;
@@ -2314,26 +2195,19 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo
+                || info instanceof FilesystemInfo
+                || info instanceof InterfaceInfo
+                || info instanceof InputDevInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         inputDevInfo.selectMyself();
     }
@@ -2349,26 +2223,19 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return graphicsInfo;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo
-                        || node.getUserObject() instanceof GraphicsInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo
+                || info instanceof FilesystemInfo
+                || info instanceof InterfaceInfo
+                || info instanceof InputDevInfo
+                || info instanceof GraphicsInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         graphicsInfo.selectMyself();
         return graphicsInfo;
@@ -2384,28 +2251,21 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo
-                        || node.getUserObject() instanceof GraphicsInfo
-                        || node.getUserObject() instanceof SoundInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo
+                || info instanceof FilesystemInfo
+                || info instanceof InterfaceInfo
+                || info instanceof InputDevInfo
+                || info instanceof GraphicsInfo
+                || info instanceof SoundInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         soundInfo.selectMyself();
     }
@@ -2420,29 +2280,22 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo
-                        || node.getUserObject() instanceof GraphicsInfo
-                        || node.getUserObject() instanceof SoundInfo
-                        || node.getUserObject() instanceof SerialInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo
+                || info instanceof FilesystemInfo
+                || info instanceof InterfaceInfo
+                || info instanceof InputDevInfo
+                || info instanceof GraphicsInfo
+                || info instanceof SoundInfo
+                || info instanceof SerialInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         serialInfo.selectMyself();
     }
@@ -2458,30 +2311,23 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return;
         }
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                final Enumeration eee = thisNode.children();
-                int i = 0;
-                while (eee.hasMoreElements()) {
-                    final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                    if (node.getUserObject() instanceof DiskInfo
-                        || node.getUserObject() instanceof FilesystemInfo
-                        || node.getUserObject() instanceof InterfaceInfo
-                        || node.getUserObject() instanceof InputDevInfo
-                        || node.getUserObject() instanceof GraphicsInfo
-                        || node.getUserObject() instanceof SoundInfo
-                        || node.getUserObject() instanceof SerialInfo
-                        || node.getUserObject() instanceof ParallelInfo) {
-                        i++;
-                        continue;
-                    }
-                    break;
-                }
-
-                thisNode.insert(resource, i);
+        int i = 0;
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            if (info instanceof DiskInfo
+                || info instanceof FilesystemInfo
+                || info instanceof InterfaceInfo
+                || info instanceof InputDevInfo
+                || info instanceof GraphicsInfo
+                || info instanceof SoundInfo
+                || info instanceof SerialInfo
+                || info instanceof ParallelInfo) {
+                i++;
+                continue;
             }
-        });
+            break;
+        }
+
+        treeMenuController.insertNode(thisNode, resource, i);
         treeMenuController.reloadNode(thisNode, true);
         parallelInfo.selectMyself();
     }
@@ -2494,12 +2340,7 @@ public class DomainInfo extends EditableInfo {
         treeMenuController.setNode(resource);
         /* all the way till the end */
         final DefaultMutableTreeNode thisNode = getNode();
-        application.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                thisNode.add(resource);
-            }
-        });
+        treeMenuController.addChild(thisNode, resource);
         treeMenuController.reloadNode(thisNode, true);
         videoInfo.selectMyself();
     }
@@ -2881,25 +2722,18 @@ public class DomainInfo extends EditableInfo {
             hi.setApplyButtons(null, hi.getRealParametersFromXML());
         }
         if (getResource().isNew()) {
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    final DefaultMutableTreeNode thisNode = getNode();
-                    if (thisNode != null) {
-                        final Enumeration eee = thisNode.children();
-                        while (eee.hasMoreElements()) {
-                            final DefaultMutableTreeNode node = (DefaultMutableTreeNode) eee.nextElement();
-                            final HardwareInfo vmshi = (HardwareInfo) node.getUserObject();
-                            if (vmshi != null) {
-                                final MyButton mb = vmshi.getApplyButton();
-                                if (mb != null) {
-                                    mb.setVisible(true);
-                                }
-                            }
+            final DefaultMutableTreeNode thisNode = getNode();
+            if (thisNode != null) {
+                for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+                    final HardwareInfo hardwareInfo = (HardwareInfo) info;
+                    if (hardwareInfo != null) {
+                        final MyButton applyButton = hardwareInfo.getApplyButton();
+                        if (applyButton != null) {
+                            applyButton.setVisible(true);
                         }
                     }
                 }
-            });
+            }
         }
         VIRSH.setParameters(definedOnHosts.toArray(new Host[definedOnHosts.size()]),
                             getDomainName(),
@@ -2934,12 +2768,9 @@ public class DomainInfo extends EditableInfo {
         if (thisNode == null) {
             return allParamaters;
         }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> e = thisNode.children();
-        while (e.hasMoreElements()) {
-            final DefaultMutableTreeNode node = e.nextElement();
-            final HardwareInfo hi = (HardwareInfo) node.getUserObject();
-            allParamaters.put(hi, hi.getHWParameters(allParams));
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            final HardwareInfo hardwareInfo = (HardwareInfo) info;
+            allParamaters.put(hardwareInfo, hardwareInfo.getHWParameters(allParams));
         }
         return allParamaters;
     }
@@ -3999,13 +3830,11 @@ public class DomainInfo extends EditableInfo {
             incorrect.add("no host");
         }
         @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
         final Check check = new Check(incorrect, changed);
         check.addCheck(super.checkResourceFields(param, params));
-        while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node = eee.nextElement();
-            final HardwareInfo vmshi = (HardwareInfo) node.getUserObject();
-            check.addCheck(vmshi.checkResourceFields(null, vmshi.getRealParametersFromXML(), true)); 
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            final HardwareInfo hardwareInfo = (HardwareInfo) info;
+            check.addCheck(hardwareInfo.checkResourceFields(null, hardwareInfo.getRealParametersFromXML(), true));
         }
         return check;
     }
@@ -4254,13 +4083,10 @@ public class DomainInfo extends EditableInfo {
             }
             hostWi.setValue(savedValue);
         }
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> eee = thisNode.children();
-        while (eee.hasMoreElements()) {
-            final DefaultMutableTreeNode node = eee.nextElement();
-            final HardwareInfo vmshi = (HardwareInfo) node.getUserObject();
-            if (vmshi.checkResourceFields(null, vmshi.getRealParametersFromXML(), true).isChanged()) {
-                vmshi.revert();
+        for (final Info info : treeMenuController.nodesToInfos(thisNode.children())) {
+            final HardwareInfo hardwareInfo = (HardwareInfo) info;
+            if (hardwareInfo.checkResourceFields(null, hardwareInfo.getRealParametersFromXML(), true).isChanged()) {
+                hardwareInfo.revert();
             }
         }
         super.revert();

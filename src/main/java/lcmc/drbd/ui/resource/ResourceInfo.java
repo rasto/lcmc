@@ -1430,13 +1430,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
             throw new RuntimeException("getNetInterfaces: hostBrowser is null");
         }
         if (hostBrowser.getNetInterfacesNode() != null) {
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> e =
-                                 hostBrowser.getNetInterfacesNode().children();
-
-            while (e.hasMoreElements()) {
-                final Value i = (Value) e.nextElement().getUserObject();
-                list.add(i);
+            for (final Info netInterfaceInfo : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+                list.add(netInterfaceInfo);
             }
         }
         return list.toArray(new Value[list.size()]);
@@ -1446,20 +1441,13 @@ public class ResourceInfo extends AbstractDrbdInfo {
         final List<Value> list = new ArrayList<Value>();
 
         list.add(new StringValue());
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> n = hostBrowser.getNetInterfacesNode().children();
-
-        while (n.hasMoreElements()) {
-            final Value i = (Value) n.nextElement().getUserObject();
-            list.add(i);
+        for (final Info netInterfaces : treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+            list.add(netInterfaces);
         }
 
         /* the same host */
-        @SuppressWarnings("unchecked")
-        final Enumeration<DefaultMutableTreeNode> np = hostBrowser.getNetInterfacesNode().children();
-
-        while (np.hasMoreElements()) {
-            final NetInfo netInfo = (NetInfo) np.nextElement().getUserObject();
+        for (final Info info: treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+            final NetInfo netInfo = (NetInfo) info;
             final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
             proxyNetInfo.init(netInfo, hostBrowser, hostBrowser.getHost());
             list.add(proxyNetInfo);
@@ -1470,18 +1458,14 @@ public class ResourceInfo extends AbstractDrbdInfo {
             if (h == hostBrowser.getHost()) {
                 continue;
             }
-            @SuppressWarnings("unchecked")
-            final Enumeration<DefaultMutableTreeNode> nph = hostBrowser.getNetInterfacesNode().children();
-            if (nph.hasMoreElements()) {
-                while (nph.hasMoreElements()) {
-                    final NetInfo netInfo = (NetInfo) nph.nextElement().getUserObject();
-                    if (netInfo.isLocalHost()) {
-                        continue;
-                    }
-                    final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
-                    proxyNetInfo.init(netInfo, hostBrowser, h);
-                    list.add(proxyNetInfo);
+            for (final Info info :  treeMenuController.nodesToInfos(hostBrowser.getNetInterfacesNode().children())) {
+                final NetInfo netInfo = (NetInfo) info;
+                if (netInfo.isLocalHost()) {
+                    continue;
                 }
+                final ProxyNetInfo proxyNetInfo = proxyNetInfoProvider.get();
+                proxyNetInfo.init(netInfo, hostBrowser, h);
+                list.add(proxyNetInfo);
             }
         }
         return list.toArray(new Value[list.size()]);

@@ -407,16 +407,11 @@ public class GroupInfo extends ServiceInfo {
         } finally {
             mGroupServiceWriteLock.unlock();
         }
-        application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                gn.add(newServiceNode);
-                if (reloadNode) {
-                    treeMenuController.reloadNode(gn, false);
-                    treeMenuController.reloadNode(newServiceNode, true);
-                }
-            }
-        });
+        treeMenuController.addChild(gn, newServiceNode);
+        if (reloadNode) {
+            treeMenuController.reloadNode(gn, false);
+            treeMenuController.reloadNode(newServiceNode, true);
+        }
     }
 
     ServiceInfo addGroupServicePanel(final ResourceAgent newRA, final boolean reloadNode) {
