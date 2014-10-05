@@ -81,12 +81,9 @@ public class CloneInfo extends ServiceInfo {
 
         getBrowser().addToHeartbeatIdList(newServiceInfo);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
-        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(newServiceInfo);
         final DefaultMutableTreeNode node = getNode();
-        if (node != null) {
-            treeMenuController.reloadNode(node, false);
-            treeMenuController.addChild(node, newServiceNode);
-        }
+        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(node, newServiceInfo);
+        treeMenuController.reloadNode(node, false);
         treeMenuController.reloadNode(newServiceNode, true);
     }
 
@@ -97,11 +94,10 @@ public class CloneInfo extends ServiceInfo {
     void setCloneServicePanel(final ServiceInfo newServiceInfo) {
         containedService = newServiceInfo;
         newServiceInfo.setCloneInfo(this);
-        final DefaultMutableTreeNode node = treeMenuController.createMenuItem(this);
-        treeMenuController.addChild(getBrowser().getServicesNode(), node);
-        treeMenuController.addChild(node, newServiceInfo.getNode());
+        final DefaultMutableTreeNode cloneNode = treeMenuController.createMenuItem(getBrowser().getServicesNode(), this);
+        treeMenuController.addChild(cloneNode, newServiceInfo.getNode());
         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
-        treeMenuController.reloadNode(node, true);
+        treeMenuController.reloadNode(cloneNode, true);
     }
 
     @Override

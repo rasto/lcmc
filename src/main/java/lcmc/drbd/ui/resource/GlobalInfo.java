@@ -583,9 +583,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
         getBrowser().getDrbdResourceNameHash().put(name, dri);
         getBrowser().putDrbdResHash();
 
-        final DefaultMutableTreeNode drbdResourceNode = treeMenuController.createMenuItem(dri);
+        final DefaultMutableTreeNode drbdResourceNode = treeMenuController.createMenuItem(getBrowser().getDrbdNode(), dri);
         treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
-        treeMenuController.addChild(getBrowser().getDrbdNode(), drbdResourceNode);
         treeMenuController.reloadNode(drbdResourceNode, true);
     }
 
@@ -615,15 +614,14 @@ public class GlobalInfo extends AbstractDrbdInfo {
 
         bdi2.getInfoPanel();
 
-        final DefaultMutableTreeNode drbdVolumeNode = treeMenuController.createMenuItem(dvi);
+        final DefaultMutableTreeNode drbdVolumeNode = treeMenuController.createMenuItem(
+                dvi.getDrbdResourceInfo().getNode(),
+                dvi);
 
         application.isSwingThread();
-        treeMenuController.addChild(dvi.getDrbdResourceInfo().getNode(), drbdVolumeNode);
 
-        final DefaultMutableTreeNode drbdBDNode1 = treeMenuController.createMenuItem(bdi1);
-        final DefaultMutableTreeNode drbdBDNode2 = treeMenuController.createMenuItem(bdi2);
-        treeMenuController.addChild(drbdVolumeNode, drbdBDNode1);
-        treeMenuController.addChild(drbdVolumeNode, drbdBDNode2);
+        final DefaultMutableTreeNode drbdBDNode1 = treeMenuController.createMenuItem(drbdVolumeNode, bdi1);
+        final DefaultMutableTreeNode drbdBDNode2 = treeMenuController.createMenuItem(drbdVolumeNode, bdi2);
 
         getBrowser().getDrbdGraph().addDrbdVolume(dvi, bdi1, bdi2);
         treeMenuController.reloadNode(drbdVolumeNode, true);
@@ -768,9 +766,8 @@ public class GlobalInfo extends AbstractDrbdInfo {
     public void addProxyHostNode(final Host host) {
         proxyHostInfo = proxyHostInfoProvider.get();
         proxyHostInfo.init(host, host.getBrowser());
-        final DefaultMutableTreeNode proxyHostNode = treeMenuController.createMenuItem(proxyHostInfo);
+        final DefaultMutableTreeNode proxyHostNode = treeMenuController.createMenuItem(getBrowser().getDrbdNode(), proxyHostInfo);
         treeMenuController.reloadNode(getBrowser().getDrbdNode(), true);
-        treeMenuController.addChild(getBrowser().getDrbdNode(), proxyHostNode);
         treeMenuController.reloadNode(proxyHostNode, true);
     }
 

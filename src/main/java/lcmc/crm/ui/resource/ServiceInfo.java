@@ -2170,7 +2170,7 @@ public class ServiceInfo extends EditableInfo {
         final boolean clone = clone0;
         final boolean masterSlave = masterSlave0;
 
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 if (clone) {
@@ -3755,8 +3755,9 @@ public class ServiceInfo extends EditableInfo {
             application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
-                    final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(serviceInfo);
-                    treeMenuController.addChild(getBrowser().getServicesNode(), newServiceNode);
+                    final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
+                            getBrowser().getServicesNode(),
+                            serviceInfo);
                     if (reloadNode) {
                         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
                         treeMenuController.reloadNode(newServiceNode, false);
@@ -4033,10 +4034,6 @@ public class ServiceInfo extends EditableInfo {
 
     /** Removes the service from some global hashes and lists. */
     public void removeInfo() {
-        getBrowser().mHeartbeatIdToServiceLock();
-        getBrowser().getHeartbeatIdToServiceInfo().remove(getService().getCrmId());
-        getBrowser().mHeartbeatIdToServiceUnlock();
-        getBrowser().removeFromServiceInfoHash(this);
         final CloneInfo ci = cloneInfo;
         application.invokeInEdt(new Runnable() {
             @Override
@@ -4048,6 +4045,10 @@ public class ServiceInfo extends EditableInfo {
             }
         });
         super.removeMyself(Application.RunMode.LIVE);
+        getBrowser().mHeartbeatIdToServiceLock();
+        getBrowser().getHeartbeatIdToServiceInfo().remove(getService().getCrmId());
+        getBrowser().mHeartbeatIdToServiceUnlock();
+        getBrowser().removeFromServiceInfoHash(this);
     }
 
     /** Sets this service as part of a group. */

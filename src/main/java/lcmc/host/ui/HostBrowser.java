@@ -178,18 +178,15 @@ public class HostBrowser extends Browser {
 
     public void initHostResources() {
         netInterfacesCategory.init(Tools.getString("HostBrowser.NetInterfaces"), this);
-        netInterfacesNode = treeMenuController.createMenuItem(netInterfacesCategory);
-        treeMenuController.topLevelAdd(treeTop, netInterfacesNode);
+        netInterfacesNode = treeMenuController.createMenuItem(treeTop, netInterfacesCategory);
 
         /* block devices */
         blockDevicesCategory.init(Tools.getString("HostBrowser.BlockDevices"), this);
-        blockDevicesNode = treeMenuController.createMenuItem(blockDevicesCategory);
-        treeMenuController.topLevelAdd(treeTop, blockDevicesNode);
+        blockDevicesNode = treeMenuController.createMenuItem(treeTop, blockDevicesCategory);
 
         /* file systems */
         fileSystemsCategory.init(Tools.getString("HostBrowser.FileSystems"), this);
-        fileSystemsNode = treeMenuController.createMenuItem(fileSystemsCategory);
-        treeMenuController.topLevelAdd(treeTop, fileSystemsNode);
+        fileSystemsNode = treeMenuController.createMenuItem(treeTop, fileSystemsCategory);
     }
 
     public ClusterBrowser getClusterBrowser() {
@@ -221,8 +218,7 @@ public class HostBrowser extends Browser {
                             netInfo = netInfoProvider.get();
                             netInfo.init(netInterface.getName(), netInterface, thisClass);
                         }
-                        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInfo);
-                        treeMenuController.addChild(netInterfacesNode, resource);
+                        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
                     }
                     treeMenuController.reloadNode(netInterfacesNode, false);
                 } finally {
@@ -265,8 +261,7 @@ public class HostBrowser extends Browser {
                         treeMenuController.removeChildren(blockDevicesNode);
                         for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
                             final BlockDevInfo bdi = bdEntry.getValue();
-                            final MutableTreeNode resource = treeMenuController.createMenuItem(bdi);
-                            treeMenuController.addChild(blockDevicesNode, resource);
+                            final MutableTreeNode resource = treeMenuController.createMenuItem(blockDevicesNode, bdi);
                         }
                         treeMenuController.reloadNode(blockDevicesNode, false);
                     } finally {

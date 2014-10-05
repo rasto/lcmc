@@ -391,24 +391,23 @@ public class GroupInfo extends ServiceInfo {
      *      service info object of the new service
      */
     void addGroupServicePanel(final ServiceInfo newServiceInfo, final boolean reloadNode) {
-        final DefaultMutableTreeNode gn = getNode();
-        if (gn == null) {
+        final DefaultMutableTreeNode groupNode = getNode();
+        if (groupNode == null) {
             return;
         }
         newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
         newServiceInfo.setGroupInfo(this);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
-        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(newServiceInfo);
+        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(groupNode, newServiceInfo);
         mGroupServiceWriteLock.lock();
         try {
             groupServices.add(newServiceInfo);
         } finally {
             mGroupServiceWriteLock.unlock();
         }
-        treeMenuController.addChild(gn, newServiceNode);
         if (reloadNode) {
-            treeMenuController.reloadNode(gn, false);
+            treeMenuController.reloadNode(groupNode, false);
             treeMenuController.reloadNode(newServiceNode, true);
         }
     }

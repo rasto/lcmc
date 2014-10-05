@@ -749,7 +749,7 @@ public class ServicesInfo extends EditableInfo {
         }
         hg.setServiceIsPresentList(serviceIsPresent);
         /** Set placeholders to "new", if they have no connections. */
-        application.invokeLater(new Runnable() {
+        application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
                 hg.killRemovedEdges();
@@ -1042,8 +1042,9 @@ public class ServicesInfo extends EditableInfo {
                             false, /* colocation only */
                             false, /* order only */
                             runMode)) {
-            final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(newServiceInfo);
-            treeMenuController.addChild(getBrowser().getServicesNode(), newServiceNode);
+            final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
+                    getBrowser().getServicesNode(),
+                    newServiceInfo);
             if (interactive) {
                 if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
                     /* only if it was added manually. */

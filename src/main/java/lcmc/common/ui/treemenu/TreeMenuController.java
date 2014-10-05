@@ -26,6 +26,7 @@ import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
+import lcmc.vm.ui.resource.DiskInfo;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -68,6 +69,25 @@ public class TreeMenuController {
         final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(info);
         treeModel = new DefaultTreeModel(treeTop);
         return treeTop;
+    }
+
+    public DefaultMutableTreeNode createMenuItem(final DefaultMutableTreeNode parent, Info info) {
+        final DefaultMutableTreeNode child = createMenuItem(info);
+        addChild(parent, child);
+        return child;
+    }
+
+    public DefaultMutableTreeNode createMenuItem(DefaultMutableTreeNode parent, Info info, int position) {
+        final DefaultMutableTreeNode child = createMenuItem(info);
+        insertNode(parent, child, position);
+        return child;
+    }
+
+
+    public DefaultMutableTreeNode createMenuItem(Info info) {
+        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
+        info.setNode(node);
+        return node;
     }
 
     public final JTree getMenuTree() {
@@ -114,15 +134,6 @@ public class TreeMenuController {
                             + " node changed error:\n"
                             + stacktrace + "\n\n", e);
                 }
-            }
-        });
-    }
-
-    public final void topLevelAdd(final DefaultMutableTreeNode treeTop, final MutableTreeNode node) {
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                treeTop.add(node);
             }
         });
     }
@@ -219,14 +230,7 @@ public class TreeMenuController {
         application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
-                if (node == null) {
-                    return;
-                }
-                final MutableTreeNode parent = (MutableTreeNode) node.getParent();
-                if (parent != null) {
-                    parent.remove(node);
-                    reloadNode(parent, true);
-                }
+                removeNodeAndSelectParent(node);
             }
         });
     }
@@ -281,17 +285,8 @@ public class TreeMenuController {
             @Override
             public void run() {
                 for (final DefaultMutableTreeNode node : nodes) {
-                    node.removeFromParent();
+                    removeNodeAndSelectParent(node);
                 }
-            }
-        });
-    }
-
-    public void insertNode(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child, final int i) {
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                parent.insert(child, i);
             }
         });
     }
@@ -311,8 +306,8 @@ public class TreeMenuController {
                         if (prevI.getClass().getName().equals(info.getClass().getName())) {
                             final String prevN = prevI.getName();
                             if (!prevI.getResource().isNew()
-                                && !info.getResource().isNew()
-                                && (prevN != null && prevN.compareTo(name) > 0)) {
+                                    && !info.getResource().isNew()
+                                    && (prevN != null && prevN.compareTo(name) > 0)) {
                                 parent.remove(j);
                                 parent.insert(node, j - 1);
                             }
@@ -335,10 +330,30 @@ public class TreeMenuController {
         });
     }
 
-    public DefaultMutableTreeNode createMenuItem(Info info) {
-        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
-        info.setNode(node);
-        return node;
+
+    private void removeNodeAndSelectParent(DefaultMutableTreeNode node) {
+        final DefaultMutableTreeNode nodeToRemove = node;
+        if (nodeToRemove == null) {
+            return;
+        }
+        final MutableTreeNode parent = (MutableTreeNode) nodeToRemove.getParent();
+        nodeToRemove.removeFromParent();
+        final Info info = (Info) nodeToRemove.getUserObject();
+        if (info != null) {
+            info.setNode(null);
+        }
+        if (parent != null) {
+            reloadNode(parent, true);
+        }
+    }
+
+    private void insertNode(final DefaultMutableTreeNode parent, final DefaultMutableTreeNode child, final int i) {
+        application.invokeInEdt(new Runnable() {
+            @Override
+            public void run() {
+                parent.insert(child, i);
+            }
+        });
     }
 
     private class IntResult {

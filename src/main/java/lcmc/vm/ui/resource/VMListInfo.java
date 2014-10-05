@@ -296,11 +296,10 @@ public final class VMListInfo extends CategoryInfo {
         final DomainInfo domainInfo = domainInfoProvider.get();
         domainInfo.init(null, getBrowser());
         domainInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(domainInfo);
+        treeMenuController.createMenuItem(getNode(), domainInfo);
         application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
-                treeMenuController.addChild(getNode(), resource);
                 treeMenuController.reloadNode(getNode(), true);
                 domainInfo.getInfoPanel();
                 domainInfo.selectMyself();
