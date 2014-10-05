@@ -75,8 +75,7 @@ public final class EmptyBrowser extends Browser {
 
     /** Initializes hosts tree for the empty view. */
     void initHosts() {
-        allHostsNode = new DefaultMutableTreeNode(allHostsInfo);
-        treeMenuController.setNode(allHostsNode);
+        allHostsNode = treeMenuController.createMenuItem(allHostsInfo);
         treeMenuController.topLevelAdd(treeTop, allHostsNode);
     }
 
@@ -86,8 +85,7 @@ public final class EmptyBrowser extends Browser {
         treeMenuController.removeChildren(allHostsNode);
         for (final Host host : allHostsSorted) {
             final HostBrowser hostBrowser = host.getBrowser();
-            final MutableTreeNode resource = new DefaultMutableTreeNode(hostBrowser.getHostInfo());
-            //setNode(resource);
+            final MutableTreeNode resource = treeMenuController.createMenuItem(hostBrowser.getHostInfo());
             treeMenuController.addChild(allHostsNode, resource);
         }
         treeMenuController.reloadNode(allHostsNode, false);

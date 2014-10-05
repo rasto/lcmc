@@ -1042,8 +1042,7 @@ public class ServicesInfo extends EditableInfo {
                             false, /* colocation only */
                             false, /* order only */
                             runMode)) {
-            final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
-            newServiceInfo.setNode(newServiceNode);
+            final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(newServiceInfo);
             treeMenuController.addChild(getBrowser().getServicesNode(), newServiceNode);
             if (interactive) {
                 if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {

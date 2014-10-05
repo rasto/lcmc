@@ -178,21 +178,17 @@ public class HostBrowser extends Browser {
 
     public void initHostResources() {
         netInterfacesCategory.init(Tools.getString("HostBrowser.NetInterfaces"), this);
-
-        netInterfacesNode = new DefaultMutableTreeNode(netInterfacesCategory);
-        treeMenuController.setNode(netInterfacesNode);
+        netInterfacesNode = treeMenuController.createMenuItem(netInterfacesCategory);
         treeMenuController.topLevelAdd(treeTop, netInterfacesNode);
 
         /* block devices */
         blockDevicesCategory.init(Tools.getString("HostBrowser.BlockDevices"), this);
-        blockDevicesNode = new DefaultMutableTreeNode(blockDevicesCategory);
-        treeMenuController.setNode(blockDevicesNode);
+        blockDevicesNode = treeMenuController.createMenuItem(blockDevicesCategory);
         treeMenuController.topLevelAdd(treeTop, blockDevicesNode);
 
         /* file systems */
         fileSystemsCategory.init(Tools.getString("HostBrowser.FileSystems"), this);
-        fileSystemsNode = new DefaultMutableTreeNode(fileSystemsCategory);
-        treeMenuController.setNode(fileSystemsNode);
+        fileSystemsNode = treeMenuController.createMenuItem(fileSystemsCategory);
         treeMenuController.topLevelAdd(treeTop, fileSystemsNode);
     }
 
@@ -225,8 +221,7 @@ public class HostBrowser extends Browser {
                             netInfo = netInfoProvider.get();
                             netInfo.init(netInterface.getName(), netInterface, thisClass);
                         }
-                        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(netInfo);
-                        treeMenuController.setNode(resource);
+                        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInfo);
                         treeMenuController.addChild(netInterfacesNode, resource);
                     }
                     treeMenuController.reloadNode(netInterfacesNode, false);
@@ -270,7 +265,7 @@ public class HostBrowser extends Browser {
                         treeMenuController.removeChildren(blockDevicesNode);
                         for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
                             final BlockDevInfo bdi = bdEntry.getValue();
-                            final MutableTreeNode resource = new DefaultMutableTreeNode(bdi);
+                            final MutableTreeNode resource = treeMenuController.createMenuItem(bdi);
                             treeMenuController.addChild(blockDevicesNode, resource);
                         }
                         treeMenuController.reloadNode(blockDevicesNode, false);
@@ -298,9 +293,7 @@ public class HostBrowser extends Browser {
                             fsi = fsInfoProvider.get();
                             fsi.init(fs, thisClass);
                         }
-                        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(fsi);
-                        treeMenuController.setNode(resource);
-                        treeMenuController.addChild(fileSystemsNode, resource);
+                        treeMenuController.addChild(fileSystemsNode,  treeMenuController.createMenuItem(fsi));
                     }
                     treeMenuController.reloadNode(fileSystemsNode, false);
                 } finally {

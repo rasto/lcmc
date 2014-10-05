@@ -732,8 +732,7 @@ public class DomainInfo extends EditableInfo {
                 mDiskToInfoLock.unlock();
             }
             diskInfo.updateParameters();
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
-            treeMenuController.setNode(resource);
+            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(diskInfo);
             treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
         }
@@ -813,8 +812,7 @@ public class DomainInfo extends EditableInfo {
                 mFilesystemToInfoLock.unlock();
             }
             filesystemInfo.updateParameters();
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
-            treeMenuController.setNode(resource);
+            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(filesystemInfo);
             treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
         }
@@ -890,8 +888,7 @@ public class DomainInfo extends EditableInfo {
                 /* add new vm interface */
                 interfaceInfo = interfaceInfoProvider.get();
                 interfaceInfo.init(interf, getBrowser(), this);
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
-                treeMenuController.setNode(resource);
+                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(interfaceInfo);
                 treeMenuController.insertNode(thisNode, resource, i);
                 nodeChanged = true;
             } else {
@@ -973,8 +970,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm input device */
             final InputDevInfo inputDevInfo = inputDevInfoProvider.get();
             inputDevInfo.init(inputDev, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
-            treeMenuController.setNode(resource);
+            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(inputDevInfo);
             treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mInputDevToInfoLock.lock();
@@ -1062,8 +1058,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm graphics device */
             final GraphicsInfo graphicsInfo = graphicsInfoProvider.get();
             graphicsInfo.init(graphicDisplay, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
-            treeMenuController.setNode(resource);
+            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(graphicsInfo);
             treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mGraphicsToInfoLock.lock();
@@ -1150,8 +1145,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm sound device */
             final SoundInfo soundInfo = soundInfoProvider.get();
             soundInfo.init(sound, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
-            treeMenuController.setNode(resource);
+            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(soundInfo);
             treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mSoundToInfoLock.lock();
@@ -1238,8 +1232,7 @@ public class DomainInfo extends EditableInfo {
                 /* add new vm serial device */
                 serialInfo = serialInfoProvider.get();
                 serialInfo.init(serial, getBrowser(), this);
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
-                treeMenuController.setNode(resource);
+                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(serialInfo);
                 treeMenuController.insertNode(thisNode, resource, i);
                 nodeChanged = true;
             } else {
@@ -1332,8 +1325,7 @@ public class DomainInfo extends EditableInfo {
                 /* add new vm parallel device */
                 parallelInfo = parallelInfoProvider.get();
                 parallelInfo.init(parallel, getBrowser(), this);
-                final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
-                treeMenuController.setNode(resource);
+                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(parallelInfo);
                 treeMenuController.insertNode(thisNode, resource, i);
                 nodeChanged = true;
             } else {
@@ -1428,8 +1420,7 @@ public class DomainInfo extends EditableInfo {
             /* add new vm video device */
             final VideoInfo videoInfo = videoInfoProvider.get();
             videoInfo.init(video, getBrowser(), this);
-            final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
-            treeMenuController.setNode(resource);
+            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(videoInfo);
             treeMenuController.insertNode(thisNode, resource, i);
             nodeChanged = true;
             mVideoToInfoLock.lock();
@@ -2112,8 +2103,7 @@ public class DomainInfo extends EditableInfo {
         final DiskInfo diskInfo = diskInfoProvider.get();
         diskInfo.init(null, getBrowser(), this);
         diskInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(diskInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(diskInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return diskInfo;
@@ -2136,8 +2126,7 @@ public class DomainInfo extends EditableInfo {
         final FilesystemInfo filesystemInfo = filesystemInfoProvider.get();
         filesystemInfo.init(null, getBrowser(), this);
         filesystemInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(filesystemInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(filesystemInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return filesystemInfo;
@@ -2161,8 +2150,7 @@ public class DomainInfo extends EditableInfo {
         final InterfaceInfo interfaceInfo = interfaceInfoProvider.get();
         interfaceInfo.init(null, getBrowser(), this);
         interfaceInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(interfaceInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(interfaceInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return interfaceInfo;
@@ -2189,8 +2177,7 @@ public class DomainInfo extends EditableInfo {
         final InputDevInfo inputDevInfo = inputDevInfoProvider.get();
         inputDevInfo.init(null, getBrowser(), this);
         inputDevInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(inputDevInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(inputDevInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2217,8 +2204,7 @@ public class DomainInfo extends EditableInfo {
         final GraphicsInfo graphicsInfo = graphicsInfoProvider.get();
         graphicsInfo.init(null, getBrowser(), this);
         graphicsInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(graphicsInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(graphicsInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return graphicsInfo;
@@ -2245,8 +2231,7 @@ public class DomainInfo extends EditableInfo {
         final SoundInfo soundInfo = soundInfoProvider.get();
         soundInfo.init(null, getBrowser(), this);
         soundInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(soundInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(soundInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2274,8 +2259,7 @@ public class DomainInfo extends EditableInfo {
         final SerialInfo serialInfo = serialInfoProvider.get();
         serialInfo.init(null, getBrowser(), this);
         serialInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(serialInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(serialInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2305,8 +2289,7 @@ public class DomainInfo extends EditableInfo {
         final ParallelInfo parallelInfo = parallelInfoProvider.get();
         parallelInfo.init(null, getBrowser(), this);
         parallelInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(parallelInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(parallelInfo);
         final DefaultMutableTreeNode thisNode = getNode();
         if (thisNode == null) {
             return;
@@ -2336,8 +2319,7 @@ public class DomainInfo extends EditableInfo {
         final VideoInfo videoInfo = videoInfoProvider.get();
         videoInfo.init(null, getBrowser(), this);
         videoInfo.getResource().setNew(true);
-        final DefaultMutableTreeNode resource = new DefaultMutableTreeNode(videoInfo);
-        treeMenuController.setNode(resource);
+        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(videoInfo);
         /* all the way till the end */
         final DefaultMutableTreeNode thisNode = getNode();
         treeMenuController.addChild(thisNode, resource);

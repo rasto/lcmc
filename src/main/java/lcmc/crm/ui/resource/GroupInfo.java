@@ -399,8 +399,7 @@ public class GroupInfo extends ServiceInfo {
         newServiceInfo.setGroupInfo(this);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         getBrowser().addToHeartbeatIdList(newServiceInfo);
-        final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(newServiceInfo);
-        newServiceInfo.setNode(newServiceNode);
+        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(newServiceInfo);
         mGroupServiceWriteLock.lock();
         try {
             groupServices.add(newServiceInfo);

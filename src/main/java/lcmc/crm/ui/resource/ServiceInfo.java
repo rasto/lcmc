@@ -3755,9 +3755,7 @@ public class ServiceInfo extends EditableInfo {
             application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
-                    final DefaultMutableTreeNode newServiceNode = new DefaultMutableTreeNode(serviceInfo);
-                    serviceInfo.setNode(newServiceNode);
-
+                    final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(serviceInfo);
                     treeMenuController.addChild(getBrowser().getServicesNode(), newServiceNode);
                     if (reloadNode) {
                         treeMenuController.reloadNode(getBrowser().getServicesNode(), false);

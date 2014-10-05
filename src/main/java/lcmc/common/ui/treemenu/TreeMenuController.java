@@ -128,6 +128,7 @@ public class TreeMenuController {
     }
 
     /** Sets node variable in the info object that this tree node points to. */
+    @Deprecated
     public final void setNode(final DefaultMutableTreeNode node) {
         ((Info) node.getUserObject()).setNode(node);
     }
@@ -332,6 +333,12 @@ public class TreeMenuController {
                 parent.removeAllChildren();
             }
         });
+    }
+
+    public DefaultMutableTreeNode createMenuItem(Info info) {
+        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
+        info.setNode(node);
+        return node;
     }
 
     private class IntResult {
