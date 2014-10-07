@@ -2120,7 +2120,7 @@ public class ServiceInfo extends EditableInfo {
         cloneInfo.setCloneServicePanel(this);
         resetInfoPanel();
         infoPanel = null;
-        getInfoPanel();
+        selectMyself();
     }
 
     /** Change type to clone or master/slave resource. */

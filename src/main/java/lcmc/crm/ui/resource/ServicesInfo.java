@@ -1033,40 +1033,40 @@ public class ServicesInfo extends EditableInfo {
                          final boolean reloadNode,
                          final boolean interactive,
                          final Application.RunMode runMode) {
-        newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
-        final CrmGraph hg = getBrowser().getCrmGraph();
-        getBrowser().addNameToServiceInfoHash(newServiceInfo);
-        if (!hg.addResource(newServiceInfo,
-                            null,
-                            pos,
-                            false, /* colocation only */
-                            false, /* order only */
-                            runMode)) {
-            final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
-                    getBrowser().getServicesNode(),
-                    newServiceInfo);
-            if (interactive) {
-                if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
-                    /* only if it was added manually. */
-                    newServiceInfo.changeType(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
-                } else if (newServiceInfo.getResourceAgent().isProbablyClone()) {
-                    newServiceInfo.changeType(ServiceInfo.CLONE_TYPE_STRING);
-                }
-            }
-            if (reloadNode) {
-                /* show it */
-                treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
-                treeMenuController.reloadNode(newServiceNode, true);
-            }
-            getBrowser().reloadAllComboBoxes(newServiceInfo);
-            application.invokeLater(new Runnable() {
-                @Override
-                public void run() {
+        application.invokeAndWait(new Runnable() {
+            @Override
+            public void run() {
+                newServiceInfo.getService().setResourceClass(newServiceInfo.getResourceAgent().getResourceClass());
+                final CrmGraph hg = getBrowser().getCrmGraph();
+                getBrowser().addNameToServiceInfoHash(newServiceInfo);
+                if (!hg.addResource(newServiceInfo,
+                                    null,
+                                    pos,
+                                    false, /* colocation only */
+                                    false, /* order only */
+                                    runMode)) {
+                    final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(
+                            getBrowser().getServicesNode(),
+                            newServiceInfo);
+                    if (interactive) {
+                        if (newServiceInfo.getResourceAgent().isProbablyMasterSlave()) {
+                            /* only if it was added manually. */
+                            newServiceInfo.changeType(ServiceInfo.MASTER_SLAVE_TYPE_STRING);
+                        } else if (newServiceInfo.getResourceAgent().isProbablyClone()) {
+                            newServiceInfo.changeType(ServiceInfo.CLONE_TYPE_STRING);
+                        }
+                    }
+                    if (reloadNode) {
+                        /* show it */
+                        treeMenuController.reloadNode(getBrowser().getServicesNode(), false);
+                        treeMenuController.reloadNode(newServiceNode, true);
+                    }
+                    getBrowser().reloadAllComboBoxes(newServiceInfo);
                     hg.scale();
                 }
-            });
-        }
-        hg.reloadServiceMenus();
+                hg.reloadServiceMenus();
+            }
+        });
     }
 
     /** Returns 'add service' list for graph popup menu. */

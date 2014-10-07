@@ -101,10 +101,8 @@ public class ViewPanel extends JPanel {
                     if (!disabledDuringLoad) {
                         final Object[] selected = e.getChildren();
                         if (selected != null && selected.length > 0) {
-                            final Object o = ((DefaultMutableTreeNode) selected[0]).getUserObject();
-                            if (lastSelectedInfo != o) {
-                                setRightComponentInView(browser, (Info) o);
-                            }
+                            final Info info = (Info) ((DefaultMutableTreeNode) selected[0]).getUserObject();
+                            setRightComponentInView(browser, info);
                         }
                     }
                 }
@@ -129,7 +127,6 @@ public class ViewPanel extends JPanel {
                            application.invokeInEdt(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            tree.expandPath(tp);
                                                             tree.setSelectionPath(tp);
                                                         }
                                                     });
