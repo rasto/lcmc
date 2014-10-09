@@ -66,6 +66,8 @@ public class ProxyHostInfo extends Info {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private ProxyHostMenu proxyHostMenu;
 
     public void init(final Host host, final Browser browser) {
         super.init(host.getName(), browser);
@@ -184,7 +186,6 @@ public class ProxyHostInfo extends Info {
 
     @Override
     public List<UpdatableItem> createPopup() {
-        final ProxyHostMenu proxyHostMenu = new ProxyHostMenu();
         return proxyHostMenu.getPulldownMenu(this);
     }
 

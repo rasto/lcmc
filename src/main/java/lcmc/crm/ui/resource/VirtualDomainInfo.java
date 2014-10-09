@@ -35,6 +35,7 @@ import lcmc.common.domain.Value;
 import lcmc.vm.ui.resource.DomainInfo;
 import lcmc.common.ui.utils.UpdatableItem;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
@@ -55,6 +56,8 @@ public class VirtualDomainInfo extends ServiceInfo {
     private static final String PARAM_ALLOW_MIGRATE = "allow-migrate";
     /** VirtualDomain in the VMs menu. */
     private DomainInfo domainInfo = null;
+    @Inject
+    private VirtualDomainMenu virtualDomainMenu;
 
     VmsXml getVMSXML(final Host host) {
         return getBrowser().getVmsXml(host);
@@ -119,7 +122,6 @@ public class VirtualDomainInfo extends ServiceInfo {
      */
     @Override
     public List<UpdatableItem> createPopup() {
-        final VirtualDomainMenu virtualDomainMenu = new VirtualDomainMenu();
         return virtualDomainMenu.getPulldownMenu(this);
     }
 
