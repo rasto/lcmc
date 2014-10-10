@@ -250,10 +250,15 @@ public class TreeMenuController {
     }
 
     public void addChild(final DefaultMutableTreeNode parent, final MutableTreeNode child) {
+        final DefaultMutableTreeNode parent0 = parent;
+        if (parent0 == null) {
+            LOG.appError("addChild: parent cannot be null");
+            return;
+        }
         application.invokeInEdt(new Runnable() {
             @Override
             public void run() {
-                parent.add(child);
+                parent0.add(child);
             }
         });
     }
