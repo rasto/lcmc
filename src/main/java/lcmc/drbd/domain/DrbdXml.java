@@ -393,6 +393,11 @@ public class DrbdXml extends XML {
             /* prior 8.4 */
             addParameter("resource", PROTOCOL_PARAM, new StringValue(), PROTOCOLS, true);
         }
+        if (paramItemsMap.containsKey("after-sb-0pri")) {
+            for (final Host h : hosts) {
+                paramItemsMap.get("after-sb-0pri").add(new StringValue("discard-node-" + h.getName()));
+            }
+        }
     }
 
     /** Returns config from server. */
