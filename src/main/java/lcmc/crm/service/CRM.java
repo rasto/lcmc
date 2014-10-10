@@ -141,7 +141,7 @@ public final class CRM {
                                           String operationsId,
                                           final String metaAttrsRefId,
                                           final String operationsRefId,
-                                          final boolean stonith,
+                                          final Boolean stonith,
                                           final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         if (resId != null) {
@@ -176,7 +176,7 @@ public final class CRM {
                         nvpairId = nvpairIdsHash.get(paramName);
                     }
                     final String newParamName;
-                    if (stonith && CrmXml.STONITH_PRIORITY_INSTANCE_ATTR.equals(paramName)) {
+                    if ((stonith != null && stonith) && CrmXml.STONITH_PRIORITY_INSTANCE_ATTR.equals(paramName)) {
                         newParamName = "priority";
                     } else {
                         newParamName = paramName;
@@ -281,7 +281,7 @@ public final class CRM {
                                         final String cloneMetaAttrsRefId,
                                         final String groupMetaAttrsRefId,
                                         final String operationsRefId,
-                                        final boolean stonith,
+                                        final Boolean stonith,
                                         final Application.RunMode runMode) {
         final StringBuilder xml = new StringBuilder(360);
         xml.append('\'');
