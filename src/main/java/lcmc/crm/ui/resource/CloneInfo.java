@@ -82,9 +82,11 @@ public class CloneInfo extends ServiceInfo {
         getBrowser().addToHeartbeatIdList(newServiceInfo);
         getBrowser().addNameToServiceInfoHash(newServiceInfo);
         final DefaultMutableTreeNode node = getNode();
-        final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(node, newServiceInfo);
-        treeMenuController.reloadNode(node, false);
-        treeMenuController.reloadNode(newServiceNode, true);
+        if (node != null) {
+            final DefaultMutableTreeNode newServiceNode = treeMenuController.createMenuItem(node, newServiceInfo);
+            treeMenuController.reloadNode(node, false);
+            treeMenuController.reloadNode(newServiceNode, true);
+        }
     }
 
     /**
