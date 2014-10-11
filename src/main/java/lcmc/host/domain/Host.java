@@ -48,11 +48,17 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.swing.JComponent;
 
+import com.google.common.base.Optional;
+import lcmc.ClusterEventBus;
 import lcmc.Exceptions;
 import lcmc.cluster.domain.Cluster;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
+import lcmc.event.BlockDevicesChangedEvent;
+import lcmc.event.BlockDevicesDiskSpaceEvent;
+import lcmc.event.DrbdStatusChangedEvent;
+import lcmc.host.service.BlockDeviceService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.ResourceGraph;
@@ -142,6 +148,16 @@ public class Host implements Comparable<Host>, Value {
                      VERSION_INFO_DELIM,
                      DRBD_PROXY_INFO_DELIM}));
     public static final boolean UPDATE_LVM = true;
+
+    private static final String TOKEN_DISK_ID = "disk-id";
+    private static final String TOKEN_UUID    = "uuid";
+    private static final String TOKEN_SIZE    = "size";
+    private static final String TOKEN_MP      = "mp";
+    private static final String TOKEN_FS      = "fs";
+    private static final String TOKEN_VG      = "vg";
+    private static final String TOKEN_LV      = "lv";
+    private static final String TOKEN_PV      = "pv";
+
     private String name;
     private String enteredHostOrIp = Tools.getDefault("SSH.Host");
     private String ipAddress;
@@ -169,7 +185,6 @@ public class Host implements Comparable<Host>, Value {
     private Set<Value> availableCpuMapModels = new TreeSet<Value>();
     private Set<Value> availableCpuMapVendors = new TreeSet<Value>();
     private Set<String> mountPoints = new TreeSet<String>();
-    private Map<String, BlockDevice> blockDevices = new LinkedHashMap<String, BlockDevice>();
     private Map<String, BlockDevice> drbdBlockDevices = new LinkedHashMap<String, BlockDevice>();
     /** Options for GUI drop down lists. */
     private Map<String, List<String>> guiOptions = new HashMap<String, List<String>>();
@@ -262,6 +277,10 @@ public class Host implements Comparable<Host>, Value {
     private Application application;
     @Inject
     private RoboTest roboTest;
+    @Inject
+    private ClusterEventBus eventBus;
+    @Inject
+    private BlockDeviceService blockDeviceService;
 
     public void init() {
         if (allHosts.size() == 1) {
@@ -271,6 +290,7 @@ public class Host implements Comparable<Host>, Value {
 
         hostBrowser.init(this);
         terminalPanel.initWithHost(this);
+        eventBus.register(this);
     }
 
     public HostBrowser getBrowser() {
@@ -441,47 +461,6 @@ public class Host implements Comparable<Host>, Value {
         return new ArrayList<Value>(bridges);
     }
 
-    public BlockDevice[] getBlockDevices() {
-        return blockDevices.values().toArray(new BlockDevice[blockDevices.size()]);
-    }
-
-    /**
-     * Returns blockDevices as array list of device names. Removes the
-     * ones that are in the drbd and are already used in CRM.
-     */
-    public List<String> getBlockDevicesNames() {
-        final List<String> blockDevicesNames = new ArrayList<String>();
-        for (final String bdName : blockDevices.keySet()) {
-            final BlockDevice bd = blockDevices.get(bdName);
-            if (!bd.isDrbd() && !bd.isUsedByCRM()) {
-                blockDevicesNames.add(bdName);
-            }
-        }
-        return blockDevicesNames;
-    }
-
-    /**
-     * Returns blockDevices as array list of device names.
-     *
-     * @param otherBlockDevices
-     *          list of block devices with which the intersection with
-     *          block devices of this host is made.
-     *
-     */
-    public List<String> getBlockDevicesNamesIntersection(final Iterable<String> otherBlockDevices) {
-        final List<String> blockDevicesIntersection = new ArrayList<String>();
-        if (otherBlockDevices == null) {
-            return getBlockDevicesNames();
-        }
-        for (final String otherBd : otherBlockDevices) {
-            final BlockDevice bd = blockDevices.get(otherBd);
-            if (bd != null && !bd.isDrbd()) {
-                blockDevicesIntersection.add(otherBd);
-            }
-        }
-        return blockDevicesIntersection;
-    }
-
     public Map<String, Integer> getNetworkIps() {
         final Map<String, Integer> networkIps = new LinkedHashMap<String, Integer>();
         for (final NetInterface ni : netInterfacesWithBridges) {
@@ -518,10 +497,6 @@ public class Host implements Comparable<Host>, Value {
             }
         }
         return networkIps;
-    }
-
-    public BlockDevice getBlockDevice(final String device) {
-        return blockDevices.get(device);
     }
 
     public void removeFileSystems() {
@@ -1661,27 +1636,22 @@ public class Host implements Comparable<Host>, Value {
             } else if (BRIDGE_INFO_DELIM.equals(type)) {
                 newBridges.add(new StringValue(line));
             } else if ("disk-info".equals(type)) {
-                BlockDevice blockDevice = new BlockDevice(line);
-                final String bdName = blockDevice.getName();
+                final Optional<BlockDevice> blockDevice = createBlockDevice(line);
+                if (!blockDevice.isPresent()) {
+                    continue;
+                }
+                final String bdName = blockDevice.get().getName();
                 if (bdName != null) {
                     final Matcher drbdM = DRBD_DEV_FILE_PATTERN.matcher(bdName);
                     if (drbdM.matches()) {
                         if (drbdBlockDevices.containsKey(bdName)) {
-                            /* get the existing block device object,
-                               forget the new one. */
-                            blockDevice = drbdBlockDevices.get(bdName);
-                            blockDevice.update(line);
+                            drbdBlockDevices.get(bdName).updateFrom(blockDevice.get());
+                        } else {
+                            newDrbdBlockDevices.put(bdName, blockDevice.get());
                         }
-                        newDrbdBlockDevices.put(bdName, blockDevice);
                     } else {
-                        if (blockDevices.containsKey(bdName)) {
-                            /* get the existing block device object,
-                               forget the new one. */
-                            blockDevice = blockDevices.get(bdName);
-                            blockDevice.update(line);
-                        }
-                        newBlockDevices.put(bdName, blockDevice);
-                        if (blockDevice.getVolumeGroup() == null
+                        newBlockDevices.put(bdName, blockDevice.get());
+                        if (blockDevice.get().getVolumeGroup() == null
                             && bdName.length() > 5 && bdName.indexOf('/', 5) < 0) {
                             final Matcher m = BLOCK_DEV_FILE_PATTERN.matcher(bdName);
                             if (m.matches()) {
@@ -1690,20 +1660,20 @@ public class Host implements Comparable<Host>, Value {
                         }
                     }
                 }
-                final String vg = blockDevice.getVolumeGroup();
+                final String vg = blockDevice.get().getVolumeGroup();
                 if (vg != null) {
                     Set<String> logicalVolumes = newVolumeGroupsLVS.get(vg);
                     if (logicalVolumes == null) {
                         logicalVolumes = new HashSet<String>();
                         newVolumeGroupsLVS.put(vg, logicalVolumes);
                     }
-                    final String lv = blockDevice.getLogicalVolume();
+                    final String lv = blockDevice.get().getLogicalVolume();
                     if (lv != null) {
                         logicalVolumes.add(lv);
                     }
                 }
-                if (blockDevice.isPhysicalVolume()) {
-                    newPhysicalVolumes.add(blockDevice);
+                if (blockDevice.get().isPhysicalVolume()) {
+                    newPhysicalVolumes.add(blockDevice.get());
                 }
             } else if (DISK_SPACE_DELIM.equals(type)) {
                 final Matcher dsM = USED_DISK_SPACE_PATTERN.matcher(line);
@@ -1783,18 +1753,13 @@ public class Host implements Comparable<Host>, Value {
         }
 
         if (changedTypes.contains(DISK_INFO_DELIM)) {
-            blockDevices = newBlockDevices;
+            eventBus.post(new BlockDevicesChangedEvent(this, newBlockDevices.values()));
             drbdBlockDevices = newDrbdBlockDevices;
             physicalVolumes = newPhysicalVolumes;
             volumeGroupsWithLvs = newVolumeGroupsLVS;
         }
         if (changedTypes.contains(DISK_SPACE_DELIM)) {
-            for (final Map.Entry<String, String> entry : diskSpaces.entrySet()) {
-                final BlockDevice bd = blockDevices.get(entry.getKey());
-                if (bd != null) {
-                    bd.setUsed(entry.getValue());
-                }
-            }
+            eventBus.post(new BlockDevicesDiskSpaceEvent(this, diskSpaces));
         }
 
         if (changedTypes.contains(VG_INFO_DELIM)) {
@@ -1837,7 +1802,9 @@ public class Host implements Comparable<Host>, Value {
             drbdResourcesWithProxy = newDrbdResProxy;
         }
 
-        getBrowser().updateHWResources(getNetInterfacesWithBridges(), getBlockDevices(), getAvailableFileSystems());
+        getBrowser().updateHWResources(
+                getNetInterfacesWithBridges(),
+                getAvailableFileSystems());
     }
 
     /** Parses the gui info, with drbd and heartbeat graph positions. */
@@ -2514,7 +2481,7 @@ public class Host implements Comparable<Host>, Value {
             return bds;
         }
         for (final BlockDevice b : physicalVolumes) {
-            if (vg.equals(b.getVolumeGroupOnPhysicalVolume())) {
+            if (vg.equals(b.getVgOnPhysicalVolume())) {
                 bds.add(b);
             }
         }
@@ -2609,7 +2576,7 @@ public class Host implements Comparable<Host>, Value {
 
     public void setDrbdStatusOk(final boolean drbdStatusOk) {
         this.drbdStatusOk = drbdStatusOk;
-        resetDrbdOnBlockDevices(drbdStatusOk);
+        eventBus.post(new DrbdStatusChangedEvent(this, drbdStatusOk));
     }
 
     public boolean isDrbdStatusOk() {
@@ -2690,11 +2657,42 @@ public class Host implements Comparable<Host>, Value {
         return Tools.compareVersions(drbdHost.getDrbdUtilVersion(), drbdVersion) <= 0;
     }
 
-    private void resetDrbdOnBlockDevices(boolean drbdStatus) {
-        if (!drbdStatus) {
-            for (final BlockDevice b : getBlockDevices()) {
-                b.resetDrbd();
+    public Collection<BlockDevice> getBlockDevices() {
+        return blockDeviceService.getBlockDevices(this);
+    }
+
+    private Optional<BlockDevice> createBlockDevice(final String line) {
+        final Pattern p = Pattern.compile("([^:]+):(.*)");
+        final String[] cols = line.split(" ");
+        if (cols.length < 2) {
+            LOG.appWarning("update: cannot parse block device line: " + line);
+            return Optional.absent();
+        } else {
+            final Collection<String> diskIds = new HashSet<String>();
+            final String device = cols[0];
+            final Map<String, String> tokens = new HashMap<String, String>();
+            for (int i = 1; i < cols.length; i++) {
+                final Matcher m = p.matcher(cols[i]);
+                if (m.matches()) {
+                    if (TOKEN_DISK_ID.equals(m.group(1))) {
+                        diskIds.add(m.group(2));
+                    } else {
+                        tokens.put(m.group(1), m.group(2));
+                    }
+                } else {
+                    LOG.appWarning("update: could not parse: " + line);
+                }
             }
+            final BlockDevice blockDevice = new BlockDevice(this, device);
+            blockDevice.setDiskUuid(tokens.get(TOKEN_UUID));
+            blockDevice.setBlockSize(tokens.get(TOKEN_SIZE));
+            blockDevice.setMountedOn(tokens.get(TOKEN_MP));
+            blockDevice.setFsType(tokens.get(TOKEN_FS));
+            blockDevice.setVolumeGroup(tokens.get(TOKEN_VG));
+            blockDevice.setLogicalVolume(tokens.get(TOKEN_LV));
+            blockDevice.setVgOnPhysicalVolume(tokens.get(TOKEN_PV));
+            blockDevice.setDiskIds(diskIds);
+            return Optional.of(blockDevice);
         }
     }
 }

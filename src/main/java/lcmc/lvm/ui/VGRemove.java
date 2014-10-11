@@ -109,9 +109,9 @@ public final class VGRemove extends LV {
 
     private String getVGName(final BlockDevInfo bdi) {
         if (bdi.getBlockDevice().isDrbd()) {
-            return bdi.getBlockDevice().getDrbdBlockDevice().getVolumeGroupOnPhysicalVolume();
+            return bdi.getBlockDevice().getDrbdBlockDevice().getVgOnPhysicalVolume();
         } else {
-            return bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume();
+            return bdi.getBlockDevice().getVgOnPhysicalVolume();
         }
     }
 
@@ -163,14 +163,14 @@ public final class VGRemove extends LV {
         final Collection<Host> selectedHosts = new HashSet<Host>();
         for (final BlockDevInfo bdi : blockDevInfos) {
             for (final BlockDevice bd : bdi.getHost().getBlockDevices()) {
-                final String thisVG = bd.getVolumeGroupOnPhysicalVolume();
+                final String thisVG = bd.getVgOnPhysicalVolume();
                 if (vgNames.get(bdi.getHost()).contains(thisVG)) {
                     bds.add(bd.getName());
                 }
             }
             if (bdi.getBlockDevice().isDrbd()) {
                 for (final BlockDevice bd : bdi.getHost().getDrbdBlockDevices()) {
-                    final String thisVG = bd.getVolumeGroupOnPhysicalVolume();
+                    final String thisVG = bd.getVgOnPhysicalVolume();
                     if (vgNames.get(bdi.getHost()).contains(thisVG)) {
                         bds.add(bd.getName());
                     }

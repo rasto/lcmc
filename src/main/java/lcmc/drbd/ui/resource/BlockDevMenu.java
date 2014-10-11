@@ -935,9 +935,9 @@ public class BlockDevMenu {
                         final BlockDevice bd = getBlockDevice();
                         final BlockDevice drbdBD = bd.getDrbdBlockDevice();
                         if (drbdBD == null) {
-                            vg = bd.getVolumeGroupOnPhysicalVolume();
+                            vg = bd.getVgOnPhysicalVolume();
                         } else {
-                            vg = drbdBD.getVolumeGroupOnPhysicalVolume();
+                            vg = drbdBD.getVgOnPhysicalVolume();
                         }
                         if (getHost().getLogicalVolumesFromVolumeGroup(vg) != null) {
                             return "has LV on it";

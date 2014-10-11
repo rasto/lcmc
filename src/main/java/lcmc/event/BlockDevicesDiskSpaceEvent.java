@@ -18,32 +18,26 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.host.domain;
+package lcmc.event;
 
-import lcmc.host.service.BlockDeviceService;
+import lcmc.host.domain.Host;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import java.util.Map;
 
-@Named
-@Singleton
-public class HostFactory {
-    @Inject
-    private Provider<Host> hostProvider;
-    @Inject
-    private Provider<BlockDeviceService> blockDeviceServiceProvider;
+public class BlockDevicesDiskSpaceEvent {
+    private final Host host;
+    private final Map<String, String> diskSpaces;
 
-    public Host createInstance() {
-        final Host host = hostProvider.get();
-        host.init();
+    public BlockDevicesDiskSpaceEvent(final Host host, final Map<String, String> diskSpaces) {
+        this.host = host;
+        this.diskSpaces = diskSpaces;
+    }
+
+    public Host getHost() {
         return host;
     }
 
-    public Host createInstance(final String ipAddress) {
-        final Host instance = createInstance();
-        instance.setIpAddress(ipAddress);
-        return instance;
+    public Map<String, String> getDiskSpaces() {
+        return diskSpaces;
     }
 }

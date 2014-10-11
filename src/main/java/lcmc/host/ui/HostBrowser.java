@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -42,6 +41,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -50,6 +51,7 @@ import lcmc.common.ui.Browser;
 import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
+import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.NetInterface;
@@ -146,6 +148,8 @@ public class HostBrowser extends Browser {
     private Provider<FSInfo> fsInfoProvider;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private EventBus eventBus;
 
     public void init(final Host host) {
         this.host = host;
@@ -158,6 +162,7 @@ public class HostBrowser extends Browser {
                 initHostResources();
             }
         });
+        eventBus.register(this);
     }
 
     public HostInfo getHostInfo() {
@@ -199,109 +204,98 @@ public class HostBrowser extends Browser {
 
     public void updateHWResources(
             final NetInterface[] netInterfaces,
-            final BlockDevice[] blockDevices,
             final String[] fileSystems) {
         /* net interfaces */
         final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
         final HostBrowser thisClass = this;
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                mNetInfosWriteLock.lock();
-                try {
-                    treeMenuController.removeChildren(netInterfacesNode);
-                    for (final NetInterface netInterface : netInterfaces) {
-                        final NetInfo netInfo;
-                        if (oldNetInterfaces.containsKey(netInterface)) {
-                            netInfo = oldNetInterfaces.get(netInterface);
-                        } else {
-                            netInfo = netInfoProvider.get();
-                            netInfo.init(netInterface.getName(), netInterface, thisClass);
-                        }
-                        final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
-                    }
-                    treeMenuController.reloadNode(netInterfacesNode, false);
-                } finally {
-                    mNetInfosWriteLock.unlock();
+        mNetInfosWriteLock.lock();
+        try {
+            treeMenuController.removeChildren(netInterfacesNode);
+            for (final NetInterface netInterface : netInterfaces) {
+                final NetInfo netInfo;
+                if (oldNetInterfaces.containsKey(netInterface)) {
+                    netInfo = oldNetInterfaces.get(netInterface);
+                } else {
+                    netInfo = netInfoProvider.get();
+                    netInfo.init(netInterface.getName(), netInterface, thisClass);
                 }
+                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
             }
-        });
+            treeMenuController.reloadNode(netInterfacesNode, false);
+        } finally {
+            mNetInfosWriteLock.unlock();
+        }
 
-        /* block devices */
+        /* file systems */
+        final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
+        mFileSystemsWriteLock.lock();
+        try {
+            treeMenuController.removeChildren(fileSystemsNode);
+            for (final String fs : fileSystems) {
+                final FSInfo fsi;
+                if (oldFilesystems.containsKey(fs)) {
+                    fsi = oldFilesystems.get(fs);
+                } else {
+
+                    fsi = fsInfoProvider.get();
+                    fsi.init(fs, thisClass);
+                }
+                treeMenuController.addChild(fileSystemsNode,  treeMenuController.createMenuItem(fsi));
+            }
+            treeMenuController.reloadNode(fileSystemsNode, false);
+        } finally {
+            mFileSystemsWriteLock.unlock();
+        }
+    }
+
+    @Subscribe
+    public void updateBlockDevicesNodes(final BlockDevicesChangedEvent event) {
+        if (event.getHost() != host) {
+            return;
+        }
+        final Collection<BlockDevice> blockDevices = event.getBlockDevices();
         mBlockDevInfosWriteLock.lock();
         boolean changed = false;
         try {
-            final Map<BlockDevice, BlockDevInfo> oldBlockDevices =
-                    new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
+            final Map<BlockDevice, BlockDevInfo> oldBlockDevices = new HashMap<BlockDevice, BlockDevInfo>(blockDevInfos);
             if (oldBlockDevices.size() != blockDevInfos.size()) {
                 changed = true;
             }
             blockDevInfos.clear();
-            for (final BlockDevice bd : blockDevices) {
+            for (final BlockDevice blockDevice : blockDevices) {
                 final BlockDevInfo blockDevInfo;
-                if (oldBlockDevices.containsKey(bd)) {
-                    blockDevInfo = oldBlockDevices.get(bd);
+                if (oldBlockDevices.containsKey(blockDevice)) {
+                    blockDevInfo = oldBlockDevices.get(blockDevice);
                     blockDevInfo.updateInfo();
                 } else {
                     changed = true;
                     blockDevInfo = blockDevInfoFactory.get();
-                    blockDevInfo.init(bd.getName(), bd, thisClass);
+                    blockDevInfo.init(blockDevice.getName(), blockDevice, this);
                 }
-                blockDevInfos.put(bd, blockDevInfo);
+                blockDevInfos.put(blockDevice, blockDevInfo);
             }
         } finally {
             mBlockDevInfosWriteLock.unlock();
         }
         if (changed) {
-            application.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    mBlockDevInfosWriteLock.lock();
-                    try {
-                        treeMenuController.removeChildren(blockDevicesNode);
-                        for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
-                            final BlockDevInfo bdi = bdEntry.getValue();
-                            final MutableTreeNode resource = treeMenuController.createMenuItem(blockDevicesNode, bdi);
-                        }
-                        treeMenuController.reloadNode(blockDevicesNode, false);
-                    } finally {
-                        mBlockDevInfosWriteLock.unlock();
-                    }
+            mBlockDevInfosWriteLock.lock();
+            try {
+                treeMenuController.removeChildren(blockDevicesNode);
+                for (final Map.Entry<BlockDevice, BlockDevInfo> bdEntry : blockDevInfos.entrySet()) {
+                    final BlockDevInfo bdi = bdEntry.getValue();
+                    final MutableTreeNode resource = treeMenuController.createMenuItem(blockDevicesNode, bdi);
                 }
-            });
-        }
-
-        /* file systems */
-        final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
-        application.invokeInEdt(new Runnable() {
-            @Override
-            public void run() {
-                mFileSystemsWriteLock.lock();
-                try {
-                    treeMenuController.removeChildren(fileSystemsNode);
-                    for (final String fs : fileSystems) {
-                        final FSInfo fsi;
-                        if (oldFilesystems.containsKey(fs)) {
-                            fsi = oldFilesystems.get(fs);
-                        } else {
-
-                            fsi = fsInfoProvider.get();
-                            fsi.init(fs, thisClass);
-                        }
-                        treeMenuController.addChild(fileSystemsNode,  treeMenuController.createMenuItem(fsi));
-                    }
-                    treeMenuController.reloadNode(fileSystemsNode, false);
-                } finally {
-                    mFileSystemsWriteLock.unlock();
-                }
+                treeMenuController.reloadNode(blockDevicesNode, false);
+            } finally {
+                mBlockDevInfosWriteLock.unlock();
             }
-        });
+        }
     }
 
     public Set<BlockDevInfo> getSortedBlockDevInfos() {
         mBlockDevInfosReadLock.lock();
         try {
-            return new LinkedHashSet<BlockDevInfo>(new TreeSet<BlockDevInfo>(blockDevInfos.values()));
+            return new TreeSet<BlockDevInfo>(blockDevInfos.values());
         } finally {
             mBlockDevInfosReadLock.unlock();
         }

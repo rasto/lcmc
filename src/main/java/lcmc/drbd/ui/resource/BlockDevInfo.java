@@ -233,7 +233,7 @@ public class BlockDevInfo extends EditableInfo {
         String vg = null;
         String selectedPV = null;
         if (bd.isVolumeGroupOnPhysicalVolume()) {
-            vg = bd.getVolumeGroupOnPhysicalVolume();
+            vg = bd.getVgOnPhysicalVolume();
             selectedPV = bd.getName();
         }  else if (isLVM()) {
             vg = bd.getVolumeGroup();
@@ -1014,7 +1014,7 @@ public class BlockDevInfo extends EditableInfo {
         final String vg = bd.getVolumeGroup();
         if (vg == null) {
             /* vg on pv */
-            return bd.getVolumeGroupOnPhysicalVolume();
+            return bd.getVgOnPhysicalVolume();
         } else {
             /* lv on vg */
             return vg;
@@ -1049,7 +1049,7 @@ public class BlockDevInfo extends EditableInfo {
     @Override
     public String getMainTextForGraph() {
         if (!isLVM()) {
-            final String vg = getBlockDevice().getVolumeGroupOnPhysicalVolume();
+            final String vg = getBlockDevice().getVgOnPhysicalVolume();
             if (vg != null && !"".equals(vg)) {
                 return "VG " + vg;
             }
@@ -1062,7 +1062,7 @@ public class BlockDevInfo extends EditableInfo {
         if (isLVM()) {
             vg = getBlockDevice().getVolumeGroup();
         } else {
-            vg = getBlockDevice().getVolumeGroupOnPhysicalVolume();
+            vg = getBlockDevice().getVgOnPhysicalVolume();
         }
 
         if (getBlockDevice().isDrbdMetaDisk()) {
@@ -1079,7 +1079,7 @@ public class BlockDevInfo extends EditableInfo {
                 s.length());
             }
             if (getBlockDevice().isDrbdPhysicalVolume()) {
-                final String drbdVG = getBlockDevice().getDrbdBlockDevice().getVolumeGroupOnPhysicalVolume();
+                final String drbdVG = getBlockDevice().getDrbdBlockDevice().getVgOnPhysicalVolume();
                 if (drbdVG != null && !"".equals(drbdVG)) {
                     s = s + " VG:" + drbdVG;
                 } else {
@@ -1412,7 +1412,7 @@ public class BlockDevInfo extends EditableInfo {
         if (!bd.isVolumeGroupOnPhysicalVolume()) {
             return false;
         }
-        final String vg = bd.getVolumeGroupOnPhysicalVolume();
+        final String vg = bd.getVgOnPhysicalVolume();
         return getHost().getLogicalVolumesFromVolumeGroup(vg) == null;
     }
 }

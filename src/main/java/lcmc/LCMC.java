@@ -53,6 +53,7 @@ import lcmc.common.ui.MainMenu;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicatorPanel;
+import lcmc.host.service.BlockDeviceService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -81,6 +82,8 @@ public final class LCMC extends JPanel {
     private ProgressIndicatorPanel mainGlassPane;
     @Inject
     private GUIData guiData;
+    @Inject
+    private BlockDeviceService blockDevicesService;
 
     protected void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
@@ -108,6 +111,7 @@ public final class LCMC extends JPanel {
         setupUiLookupFeelAndFeel();
         setupUncaughtExceptionHandler();
         argumentParser.parseOptionsAndReturnAutoArguments(args);
+        setupServices();
     }
     public static void main(final String[] args) {
         final LCMC lcmc = AppContext.getBean(LCMC.class);
@@ -297,5 +301,9 @@ public final class LCMC extends JPanel {
                         }
                     }
                 });
+    }
+
+    private void setupServices() {
+        blockDevicesService.init();
     }
 }

@@ -1194,6 +1194,7 @@ public class ClusterBrowser extends Browser {
         return crmXml.getServices(cl);
     }
 
+    @Deprecated
     public void updateCommonBlockDevices() {
         if (commonBlockDevicesNode != null) {
             final ClusterBrowser thisBrowser = this;

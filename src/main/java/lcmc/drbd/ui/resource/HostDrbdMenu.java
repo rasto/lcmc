@@ -622,9 +622,9 @@ public class HostDrbdMenu {
             final String vg;
             final BlockDevice drbdBD = bd.getDrbdBlockDevice();
             if (drbdBD == null) {
-                vg = bd.getVolumeGroupOnPhysicalVolume();
+                vg = bd.getVgOnPhysicalVolume();
             } else {
-                vg = drbdBD.getVolumeGroupOnPhysicalVolume();
+                vg = drbdBD.getVgOnPhysicalVolume();
             }
             if (vg != null) {
                 submenu.add(getLVMCreateItem(vg, bd, host));

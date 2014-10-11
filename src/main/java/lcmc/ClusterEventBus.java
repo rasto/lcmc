@@ -18,32 +18,14 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.host.domain;
+package lcmc;
 
-import lcmc.host.service.BlockDeviceService;
+import com.google.common.eventbus.EventBus;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Named
 @Singleton
-public class HostFactory {
-    @Inject
-    private Provider<Host> hostProvider;
-    @Inject
-    private Provider<BlockDeviceService> blockDeviceServiceProvider;
-
-    public Host createInstance() {
-        final Host host = hostProvider.get();
-        host.init();
-        return host;
-    }
-
-    public Host createInstance(final String ipAddress) {
-        final Host instance = createInstance();
-        instance.setIpAddress(ipAddress);
-        return instance;
-    }
+public class ClusterEventBus extends EventBus {
 }

@@ -142,39 +142,6 @@ public final class HostITest {
     }
 
     @Test
-    public void testGetBlockDevices() {
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getBlockDevices().length > 0);
-            assertTrue(noValueIsNull(host.getBlockDevices()));
-        }
-    }
-
-    @Test
-    public void testGetBlockDeviceNames() {
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getBlockDevicesNames().size() > 0);
-            assertTrue(noValueIsNull(host.getBlockDevicesNames()));
-            for (final String bd : host.getBlockDevicesNames()) {
-                assertTrue(host.getBlockDevice(bd) != null);
-            }
-        }
-    }
-
-    @Test
-    public void testGetBlockDeviceNamesIntersection() {
-        List<String> otherBlockDevices = null;
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            otherBlockDevices =
-                    host.getBlockDevicesNamesIntersection(otherBlockDevices);
-            assertTrue(noValueIsNull(otherBlockDevices));
-        }
-        if (integrationTestLauncher.getHosts().size() > 0) {
-            assertNotNull(otherBlockDevices);
-            assertTrue(!otherBlockDevices.isEmpty());
-        }
-    }
-
-    @Test
     public void testGetNetworkIps() {
         for (final Host host : integrationTestLauncher.getHosts()) {
             assertTrue(host.getNetworkIps().size() > 0);

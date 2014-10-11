@@ -211,8 +211,8 @@ public class DrbdGraph extends ResourceGraph {
             }
             if (prevBdi != null
                 && bdi.getBlockDevice().isVolumeGroupOnPhysicalVolume()
-                && bdi.getBlockDevice().getVolumeGroupOnPhysicalVolume().equals(
-                                               prevBdi.getBlockDevice().getVolumeGroupOnPhysicalVolume())) {
+                && bdi.getBlockDevice().getVgOnPhysicalVolume().equals(
+                                               prevBdi.getBlockDevice().getVgOnPhysicalVolume())) {
                 devYPos -= 8;
             } else if (prevBdi != null
                 && (!bdi.getBlockDevice().isDrbd() || !prevBdi.getBlockDevice().isDrbd())) {

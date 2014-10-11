@@ -27,15 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lcmc.common.domain.Resource;
+import lcmc.host.domain.Host;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -45,6 +42,8 @@ import lcmc.common.domain.util.Tools;
  */
 public class BlockDevice extends Resource {
     private static final Logger LOG = LoggerFactory.getLogger(BlockDevice.class);
+    private final Host host;
+    private final String deviceName;
     private static final Set<String> CONNECTED_STATES =
         Collections.unmodifiableSet(new HashSet<String>(Arrays.asList("Connected",
                                                                       "SyncTarget",
@@ -65,17 +64,9 @@ public class BlockDevice extends Resource {
                                                                       "PausedSyncS",
                                                                       "PausedSyncT")));
 
-    private static final String TOKEN_UUID    = "uuid";
-    private static final String TOKEN_SIZE    = "size";
-    private static final String TOKEN_MP      = "mp";
-    private static final String TOKEN_FS      = "fs";
-    private static final String TOKEN_VG      = "vg";
-    private static final String TOKEN_LV      = "lv";
-    private static final String TOKEN_PV      = "pv";
-    private static final String TOKEN_DISK_ID = "disk-id";
     private String blockSize;
     private String diskUuid;
-    private final Collection<String> diskIds = new HashSet<String>();
+    private Collection<String> diskIds = new HashSet<String>();
     private String mountedOn;
     private String fsType;
     private boolean drbd = false;
@@ -99,45 +90,21 @@ public class BlockDevice extends Resource {
     private BlockDevice drbdBlockDevice = null;
     private String drbdBackingDisk = null;
 
-    /**
-     * @param line
-     *          line that contains device, blocksize, mount
-     *          point and fs type delimited with space
-     */
-    public BlockDevice(final String line) {
-        super();
-        update(line);
+    public BlockDevice(final Host host, final String device) {
+        super(device);
+        this.host = host;
+        this.deviceName = device;
     }
 
-    public final void update(final String line) {
-        final Pattern p = Pattern.compile("([^:]+):(.*)");
-        final String[] cols = line.split(" ");
-        if (cols.length < 2) {
-            LOG.appWarning("update: cannot parse line: " + line);
-        } else {
-            final String device = cols[0];
-            setName(device);
-            final Map<String, String> tokens = new HashMap<String, String>();
-            for (int i = 1; i < cols.length; i++) {
-                final Matcher m = p.matcher(cols[i]);
-                if (m.matches()) {
-                    if (TOKEN_DISK_ID.equals(m.group(1))) {
-                        diskIds.add(m.group(2));
-                    } else {
-                        tokens.put(m.group(1), m.group(2));
-                    }
-                } else {
-                    LOG.appWarning("update: could not parse: " + line);
-                }
-            }
-            this.diskUuid           = tokens.get(TOKEN_UUID);
-            this.blockSize          = tokens.get(TOKEN_SIZE);
-            this.mountedOn          = tokens.get(TOKEN_MP);
-            this.fsType             = tokens.get(TOKEN_FS);
-            this.volumeGroup        = tokens.get(TOKEN_VG);
-            this.logicalVolume      = tokens.get(TOKEN_LV);
-            this.vgOnPhysicalVolume = tokens.get(TOKEN_PV);
-        }
+    public void updateFrom(final BlockDevice blockDevice) {
+        setDiskUuid(blockDevice.getDiskUuid());
+        setBlockSize(blockDevice.getBlockSize());
+        setMountedOn(blockDevice.getMountedOn());
+        setFsType(blockDevice.getFsType());
+        setVolumeGroup(blockDevice.getVolumeGroup());
+        setLogicalVolume(blockDevice.getLogicalVolume());
+        setVgOnPhysicalVolume(blockDevice.getVgOnPhysicalVolume());
+        setDiskIds(blockDevice.getDiskIds());
     }
 
     public String getBlockSize() {
@@ -282,6 +249,34 @@ public class BlockDevice extends Resource {
     /** Sets disk node state of the other block device as it is in /proc/drbd. */
     public void setDiskStateOther(final String diskStateOther) {
         this.diskStateOther = diskStateOther;
+    }
+
+    public void setDiskUuid(final String diskUuid) {
+        this.diskUuid = diskUuid;
+    }
+
+    public void setBlockSize(final String blockSize) {
+        this.blockSize = blockSize;
+    }
+    public void setMountedOn(final String mountedOn) {
+        this.mountedOn = mountedOn;
+    }
+    public void setFsType(final String fsType) {
+        this.fsType = fsType;
+    }
+    public void setVolumeGroup(final String volumeGroup) {
+        this.volumeGroup = volumeGroup;
+    }
+    public void setLogicalVolume(final String logicalVolume) {
+        this.logicalVolume = logicalVolume;
+
+    }
+    public void setVgOnPhysicalVolume(final String vgOnPhysicalVolume) {
+        this.vgOnPhysicalVolume = vgOnPhysicalVolume;
+    }
+
+    public void setDiskIds(final Collection<String> diskIds) {
+        this.diskIds = diskIds;
     }
 
     public String getConnectionState() {
@@ -482,7 +477,7 @@ public class BlockDevice extends Resource {
         return vgOnPhysicalVolume != null;
     }
 
-    public String getVolumeGroupOnPhysicalVolume() {
+    public String getVgOnPhysicalVolume() {
         return vgOnPhysicalVolume;
     }
 
@@ -528,5 +523,25 @@ public class BlockDevice extends Resource {
         if (usedStr != null) {
             this.used = Integer.parseInt(usedStr);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BlockDevice that = (BlockDevice) o;
+
+        if (!deviceName.equals(that.deviceName)) return false;
+        if (!host.equals(that.host)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = deviceName.hashCode();
+        result = 31 * result + host.hashCode();
+        return result;
     }
 }

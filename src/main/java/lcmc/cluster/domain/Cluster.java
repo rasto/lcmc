@@ -30,6 +30,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Optional;
 import lcmc.Exceptions;
 import lcmc.common.ui.GUIData;
 import lcmc.common.domain.Application;
@@ -38,6 +40,7 @@ import lcmc.drbd.domain.BlockDevice;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;
+import lcmc.host.service.BlockDeviceService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -74,6 +77,8 @@ public class Cluster implements Comparable<Cluster> {
     private final Set<Host> proxyHosts = new LinkedHashSet<Host>();
     @Inject
     private Application application;
+    @Inject
+    private BlockDeviceService blockDeviceService;
 
     public void setName(final String name) {
         this.name = name;
@@ -149,11 +154,7 @@ public class Cluster implements Comparable<Cluster> {
      * drbd are not returned.
      */
     public List<String> getCommonBlockDevices() {
-        List<String> namesIntersection = null;
-
-        for (final Host host : hosts) {
-            namesIntersection = host.getBlockDevicesNamesIntersection(namesIntersection);
-        }
+        final List<String> namesIntersection = blockDeviceService.getCommonBlockDeviceNames(hosts);
 
         final List<String> commonBlockDevices = new ArrayList<String>();
         for (final String i : namesIntersection) {
@@ -166,8 +167,10 @@ public class Cluster implements Comparable<Cluster> {
     public BlockDevice[] getHostBlockDevices(final String device) {
         final List<BlockDevice> list = new ArrayList<BlockDevice>();
         for (final Host host : hosts) {
-            final BlockDevice bd = host.getBlockDevice(device);
-            list.add(bd);
+            final Optional<BlockDevice> bd = blockDeviceService.getBlockDeviceByName(host, device);
+            if (bd.isPresent()) {
+                list.add(bd.get());
+            }
         }
         return list.toArray(new BlockDevice [list.size()]);
     }
