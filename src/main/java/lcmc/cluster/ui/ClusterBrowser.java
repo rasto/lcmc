@@ -65,6 +65,7 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
+import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
@@ -219,6 +220,8 @@ public class ClusterBrowser extends Browser {
     private Provider<ClusterStatus> clusterStatusProvider;
     @Resource(name="categoryInfo")
     private CategoryInfo networksCategory;
+    @Resource(name="categoryInfo")
+    private CategoryInfo commonBlockDevicesCategory;
     @Inject
     private Provider<ResourceAgentClassInfo> resourceAgentClassInfoProvider;
     @Inject
@@ -231,6 +234,8 @@ public class ClusterBrowser extends Browser {
     private TreeMenuController treeMenuController;
     @Inject
     private EventBus eventBus;
+    @Inject
+    private Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -503,9 +508,8 @@ public class ClusterBrowser extends Browser {
         availableServicesNode = treeMenuController.createMenuItem(crmNode, availableServicesInfo);
 
         /* block devices / shared disks, TODO: */
-        final HbCategoryInfo hbCategoryInfo = new HbCategoryInfo();
-        hbCategoryInfo.init(Tools.getString("ClusterBrowser.CommonBlockDevices"), this);
-        commonBlockDevicesNode = treeMenuController.createMenuItem(crmNode, hbCategoryInfo);
+        commonBlockDevicesCategory.init(Tools.getString("ClusterBrowser.CommonBlockDevices"), this);
+        commonBlockDevicesNode = treeMenuController.createMenuItem(commonBlockDevicesCategory);
 
         /* resource defaults */
         rscDefaultsInfo = rscDefaultsInfoProvider.get();
@@ -546,11 +550,6 @@ public class ClusterBrowser extends Browser {
 
         treeMenuController.reloadNode(clusterHostsNode, false);
 
-        /* block devices */
-        updateCommonBlockDevices();
-
-//        /* networks */
-//        updateNetworks();
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -1201,46 +1200,38 @@ public class ClusterBrowser extends Browser {
         return crmXml.getServices(cl);
     }
 
-    @Deprecated
-    public void updateCommonBlockDevices() {
+    @Subscribe
+    public void updateCommonBlockDevices(final BlockDevicesChangedEvent event) {
+        if (!cluster.getHosts().contains(event.getHost())) {
+            return;
+        }
         if (commonBlockDevicesNode != null) {
-            final ClusterBrowser thisBrowser = this;
-            application.invokeInEdt(new Runnable() {
-                @Override
-                public void run() {
-                    final Collection<String> bd = cluster.getCommonBlockDevices();
-                    final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-                    for (final Info info : treeMenuController.nodesToInfos(commonBlockDevicesNode.children())) {
-                        final Info commonBlockDevices = (Info) info;
-                        if (bd.contains(commonBlockDevices.getName())) {
-                            /* keeping */
-                            bd.remove(commonBlockDevices.getName());
-                        } else {
-
-                            /* remove not existing block devices */
-                            nodesToRemove.add(commonBlockDevices.getNode());
-                            commonBlockDevices.setNode(null);
-                        }
-                    }
-
-                    treeMenuController.removeFromParent(nodesToRemove);
-                    /* block devices */
-                    for (final String device : bd) {
-                        /* add new block devices */
-                        final DefaultMutableTreeNode resource =
-                                treeMenuController.createMenuItem(
-                                        commonBlockDevicesNode,
-                                        new CommonBlockDevInfo(
-                                                device,
-                                                cluster.getHostBlockDevices(device),
-                                                thisBrowser));
-                    }
-                    if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
-                        treeMenuController.reloadNode(commonBlockDevicesNode, false);
-                        reloadAllComboBoxes(null);
-                    }
+            final Collection<String> bd = cluster.getCommonBlockDevices();
+            final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
+            for (final Info commonBlockDevices : treeMenuController.nodesToInfos(commonBlockDevicesNode.children())) {
+                if (bd.contains(commonBlockDevices.getName())) {
+                    /* keeping */
+                    bd.remove(commonBlockDevices.getName());
+                } else {
+                    /* remove not existing block devices */
+                    nodesToRemove.add(commonBlockDevices.getNode());
+                    commonBlockDevices.setNode(null);
                 }
-            });
+            }
+            treeMenuController.removeFromParent(nodesToRemove);
+            /* block devices */
+            for (final String device : bd) {
+                /* add new block devices */
+                final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
+                commonBlockDevInfo.init(device, cluster.getHostBlockDevices(device), this);
+
+                final DefaultMutableTreeNode resource =
+                        treeMenuController.createMenuItem(commonBlockDevicesNode, commonBlockDevInfo);
+            }
+            if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
+                treeMenuController.reloadNode(commonBlockDevicesNode, false);
+                reloadAllComboBoxes(null);
+            }
         }
     }
 
@@ -2166,15 +2157,14 @@ public class ClusterBrowser extends Browser {
     public void updateHWInfo(final Host host, final boolean updateLVM) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, crmGraph},
-                       updateLVM);
+                new ResourceGraph[]{drbdGraph, crmGraph},
+                updateLVM);
         application.invokeAndWait(new Runnable() {
             @Override
             public void run() {
                 drbdGraph.addHost(host.getBrowser().getHostDrbdInfo());
             }
         });
-        updateCommonBlockDevices();
         drbdGraph.repaint();
     }
 
@@ -2182,9 +2172,8 @@ public class ClusterBrowser extends Browser {
     public void updateProxyHWInfo(final Host host) {
         host.setIsLoading();
         host.getHWInfo(new CategoryInfo[]{clusterHostsInfo},
-                       new ResourceGraph[]{drbdGraph, crmGraph},
-                       !Host.UPDATE_LVM);
-        updateCommonBlockDevices();
+                new ResourceGraph[]{drbdGraph, crmGraph},
+                !Host.UPDATE_LVM);
         drbdGraph.repaint();
     }
 

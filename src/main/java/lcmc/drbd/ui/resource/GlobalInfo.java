@@ -788,7 +788,6 @@ public class GlobalInfo extends AbstractDrbdInfo {
     }
 
     public void updateDrbdInfo() {
-        getBrowser().updateCommonBlockDevices();
         final DrbdXml newDrbdXml = drbdXmlProvider.get();
         newDrbdXml.init(getCluster().getHostsArray(), getBrowser().getHostDrbdParameters());
         for (final Host host : getCluster().getHosts()) {

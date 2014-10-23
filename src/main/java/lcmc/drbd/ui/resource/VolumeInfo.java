@@ -498,7 +498,6 @@ public class VolumeInfo extends EditableInfo implements CommonDeviceInterface {
             }
             dri.removeMyself(runMode);
         }
-        clusterBrowser.updateCommonBlockDevices();
 
         try {
             getBrowser().getGlobalInfo().createDrbdConfig(runMode);

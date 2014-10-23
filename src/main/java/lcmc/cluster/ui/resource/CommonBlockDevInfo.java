@@ -21,6 +21,7 @@
  */
 package lcmc.cluster.ui.resource;
 
+import javax.inject.Named;
 import javax.swing.ImageIcon;
 import lcmc.common.domain.Application;
 import lcmc.drbd.domain.BlockDevice;
@@ -36,11 +37,12 @@ import lcmc.common.domain.util.Tools;
  * in all hosts in the cluster and can be chosen in the scrolling list in
  * the filesystem service.
  */
-public final class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceInterface {
+@Named
+public class CommonBlockDevInfo extends HbCategoryInfo implements CommonDeviceInterface {
     /** block devices of this common block device on all nodes. */
-    private final BlockDevice[] blockDevices;
+    private BlockDevice[] blockDevices;
 
-    public CommonBlockDevInfo(final String name, final BlockDevice[] blockDevices, final Browser browser) {
+    public void init(final String name, final BlockDevice[] blockDevices, final Browser browser) {
         super.init(name, browser);
         setResource(new CommonBlockDevice(name));
         this.blockDevices = blockDevices;
