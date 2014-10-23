@@ -66,6 +66,8 @@ import lcmc.drbd.domain.DrbdResource;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.host.domain.HostNetworks;
+import lcmc.host.service.NetInterfaceService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Info;
@@ -151,6 +153,8 @@ public class ResourceInfo extends AbstractDrbdInfo {
     private Provider<ProxyNetInfo> proxyNetInfoProvider;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private NetInterfaceService netInterfaceService;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
@@ -244,7 +248,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 if (awi != null && pwi != null) {
                     final Value o = awi.getValue();
                     LOG.debug1("drbdResourceConfig: host: " + host.getName() + " ni: " + o);
-                    for (final NetInterface ni : host.getNetInterfacesWithBridges()) {
+                    for (final NetInterface ni : netInterfaceService.getNetInterfacesWithBridges(host)) {
                         LOG.debug1("drbdResourceConfig: host: " + host.getName() + " nis: " + ni.getIp());
                     }
                     if (o == null) {

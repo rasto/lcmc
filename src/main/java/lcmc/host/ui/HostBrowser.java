@@ -52,6 +52,7 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
+import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.drbd.domain.NetInterface;
@@ -203,30 +204,9 @@ public class HostBrowser extends Browser {
     }
 
     public void updateHWResources(
-            final NetInterface[] netInterfaces,
             final String[] fileSystems) {
-        /* net interfaces */
-        final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
-        final HostBrowser thisClass = this;
-        mNetInfosWriteLock.lock();
-        try {
-            treeMenuController.removeChildren(netInterfacesNode);
-            for (final NetInterface netInterface : netInterfaces) {
-                final NetInfo netInfo;
-                if (oldNetInterfaces.containsKey(netInterface)) {
-                    netInfo = oldNetInterfaces.get(netInterface);
-                } else {
-                    netInfo = netInfoProvider.get();
-                    netInfo.init(netInterface.getName(), netInterface, thisClass);
-                }
-                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
-            }
-            treeMenuController.reloadNode(netInterfacesNode, false);
-        } finally {
-            mNetInfosWriteLock.unlock();
-        }
-
         /* file systems */
+        final HostBrowser thisClass = this;
         final Map<String, FSInfo> oldFilesystems = getFilesystemsMap();
         mFileSystemsWriteLock.lock();
         try {
@@ -291,6 +271,34 @@ public class HostBrowser extends Browser {
             }
         }
     }
+
+    @Subscribe
+    public void onNetInterfacesChanged(final NetInterfacesChangedEvent event) {
+        if (event.getHost() != host) {
+            return;
+        }
+        final Collection<NetInterface> netInterfaces = event.getNetInterfaces();
+        final Map<NetInterface, NetInfo> oldNetInterfaces = getNetInterfacesMap();
+        final HostBrowser thisClass = this;
+        mNetInfosWriteLock.lock();
+        try {
+            treeMenuController.removeChildren(netInterfacesNode);
+            for (final NetInterface netInterface : netInterfaces) {
+                final NetInfo netInfo;
+                if (oldNetInterfaces.containsKey(netInterface)) {
+                    netInfo = oldNetInterfaces.get(netInterface);
+                } else {
+                    netInfo = netInfoProvider.get();
+                    netInfo.init(netInterface.getName(), netInterface, thisClass);
+                }
+                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(netInterfacesNode, netInfo);
+            }
+            treeMenuController.reloadNode(netInterfacesNode, false);
+        } finally {
+            mNetInfosWriteLock.unlock();
+        }
+    }
+
 
     public Set<BlockDevInfo> getSortedBlockDevInfos() {
         mBlockDevInfosReadLock.lock();

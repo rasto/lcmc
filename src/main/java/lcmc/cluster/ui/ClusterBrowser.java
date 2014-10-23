@@ -49,6 +49,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
+
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CallbackAction;
@@ -62,6 +65,7 @@ import lcmc.crm.ui.CrmGraph;
 import lcmc.drbd.domain.DRBDtestData;
 import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
+import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
@@ -225,6 +229,8 @@ public class ClusterBrowser extends Browser {
     private Provider<CRMInfo> crmInfoProvider;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private EventBus eventBus;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -315,6 +321,7 @@ public class ClusterBrowser extends Browser {
         drbdGraph.initGraph(this);
         globalInfo.init(Tools.getString("ClusterBrowser.Drbd"), this);
         treeTop = treeMenuController.createMenuTreeTop();
+        eventBus.register(this);
     }
 
     private void initOperations() {
@@ -542,8 +549,8 @@ public class ClusterBrowser extends Browser {
         /* block devices */
         updateCommonBlockDevices();
 
-        /* networks */
-        updateNetworks();
+//        /* networks */
+//        updateNetworks();
         application.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -1201,13 +1208,13 @@ public class ClusterBrowser extends Browser {
             application.invokeInEdt(new Runnable() {
                 @Override
                 public void run() {
-                    final List<String> bd = cluster.getCommonBlockDevices();
+                    final Collection<String> bd = cluster.getCommonBlockDevices();
                     final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
                     for (final Info info : treeMenuController.nodesToInfos(commonBlockDevicesNode.children())) {
                         final Info commonBlockDevices = (Info) info;
                         if (bd.contains(commonBlockDevices.getName())) {
                             /* keeping */
-                            bd.remove(bd.indexOf(commonBlockDevices.getName()));
+                            bd.remove(commonBlockDevices.getName());
                         } else {
 
                             /* remove not existing block devices */
@@ -1433,9 +1440,13 @@ public class ClusterBrowser extends Browser {
         }
     }
 
-    private void updateNetworks() {
+    @Subscribe
+    public void updateCommonNetworks(final NetInterfacesChangedEvent event) {
+        if (!cluster.getHosts().contains(event.getHost())) {
+            return;
+        }
         if (networksNode != null) {
-            final Network[] networks = cluster.getCommonNetworks();
+            final Collection<Network> networks = cluster.getCommonNetworks();
             treeMenuController.removeChildren(networksNode);
             for (final Network network : networks) {
                 final NetworkInfo networkInfo = networkInfoProvider.get();

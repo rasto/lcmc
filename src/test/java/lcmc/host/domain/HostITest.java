@@ -22,6 +22,7 @@ package lcmc.host.domain;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.Set;
 
 import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
+import lcmc.host.service.NetInterfaceService;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.common.domain.util.Tools;
@@ -44,11 +46,13 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class HostITest {
     private IntegrationTestLauncher integrationTestLauncher;
+    private NetInterfaceService netInterfaceService;
 
     @Before
     public void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
+        netInterfaceService = integrationTestLauncher.getNetInterfaceService();
     }
 
     @Test
@@ -127,47 +131,34 @@ public final class HostITest {
     @Test
     public void testGetNetInterfaces() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getNetInterfacesWithBridges().length > 0);
-            assertNotNull(host.getNetInterfacesWithBridges()[0]);
-            assertTrue(noValueIsNull(host.getNetInterfacesWithBridges()));
+            assertTrue(netInterfaceService.getNetInterfacesWithBridges(host).length > 0);
+            assertNotNull(netInterfaceService.getNetInterfacesWithBridges(host)[0]);
+            assertTrue(noValueIsNull(netInterfaceService.getNetInterfacesWithBridges(host)));
         }
     }
 
     @Test
     public void testGetBridges() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getBridges().size() >= 0);
-            assertTrue(noValueIsNull(host.getBridges()));
-        }
-    }
-
-    @Test
-    public void testGetNetworkIps() {
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(host.getNetworkIps().size() > 0);
-            assertTrue(noValueIsNull(host.getNetworkIps()));
+            assertTrue(integrationTestLauncher.getNetInterfaceService().getBridges(host).size() >= 0);
         }
     }
 
     @Test
     public void testGetNetworksIntersection() {
-        Map<String, Integer> otherNetworks = null;
-        for (final Host host : integrationTestLauncher.getHosts()) {
-            otherNetworks = host.getNetworksIntersection(otherNetworks);
-            assertTrue(noValueIsNull(otherNetworks));
-        }
+        Map<String, Integer> commonNetworks = netInterfaceService.getNetworksIntersection(
+                integrationTestLauncher.getHosts());
         if (integrationTestLauncher.getHosts().size() > 0) {
-            assertNotNull(otherNetworks);
-            assertTrue(!otherNetworks.isEmpty());
+            assertNotNull(commonNetworks);
+            assertTrue(!commonNetworks.isEmpty());
         }
     }
 
     @Test
     public void testGetIpsFromNetwork() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            final List<String> ips = host.getIpsFromNetwork("192.168.133.0");
+            final Collection<String> ips = netInterfaceService.getIpsFromNetwork(host, "192.168.133.0");
             assertTrue(!ips.isEmpty());
-            assertTrue(noValueIsNull(ips));
             for (final String ip : ips) {
                 assertTrue(ip.startsWith("192.168.133."));
             }

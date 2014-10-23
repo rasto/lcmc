@@ -21,6 +21,7 @@
  */
 package lcmc.vm.ui.resource;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
+import lcmc.host.service.NetInterfaceService;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.InterfaceData;
 import lcmc.common.domain.Value;
@@ -139,6 +141,8 @@ public final class InterfaceInfo extends HardwareInfo {
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private NetInterfaceService netInterfaceService;
 
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
@@ -247,10 +251,10 @@ public final class InterfaceInfo extends HardwareInfo {
                 }
             }
         } else if (InterfaceData.SOURCE_BRIDGE.equals(param)) {
-            for (final Host h : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
-                final VmsXml vmsXml = getBrowser().getVmsXml(h);
+            for (final Host host : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
+                final VmsXml vmsXml = getBrowser().getVmsXml(host);
                 if (vmsXml != null) {
-                    final List<Value> bridges = h.getBridges();
+                    final List<Value> bridges = new ArrayList<Value>(netInterfaceService.getBridges(host));
                     bridges.add(0, null);
                     return bridges.toArray(new Value[bridges.size()]);
                 }

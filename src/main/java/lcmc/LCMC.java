@@ -54,6 +54,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.MainPanel;
 import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.host.service.BlockDeviceService;
+import lcmc.host.service.NetInterfaceService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -84,6 +85,8 @@ public final class LCMC extends JPanel {
     private GUIData guiData;
     @Inject
     private BlockDeviceService blockDevicesService;
+    @Inject
+    private NetInterfaceService netInterfaceService;
 
     protected void createAndShowGUI(final Container mainFrame) {
         setupUiManager();
@@ -305,5 +308,6 @@ public final class LCMC extends JPanel {
 
     private void setupServices() {
         blockDevicesService.init();
+        netInterfaceService.init();
     }
 }

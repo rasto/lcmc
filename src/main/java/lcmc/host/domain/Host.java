@@ -57,8 +57,11 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
 import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.BlockDevicesDiskSpaceEvent;
+import lcmc.event.BridgesChangedEvent;
 import lcmc.event.DrbdStatusChangedEvent;
+import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.service.BlockDeviceService;
+import lcmc.host.service.NetInterfaceService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.ResourceGraph;
@@ -177,8 +180,6 @@ public class Host implements Comparable<Host>, Value {
     private String distributionVersionString = "";
     private String kernelVersion = "";
     private String arch = "";
-    private List<NetInterface> netInterfacesWithBridges = new ArrayList<NetInterface>();
-    private List<Value> bridges = new ArrayList<Value>();
     private Set<String> availableFileSystems = new TreeSet<String>();
     private Set<String> availableCryptoModules = new TreeSet<String>();
     private Set<Value> availableQemuKeymaps = new TreeSet<Value>();
@@ -281,6 +282,8 @@ public class Host implements Comparable<Host>, Value {
     private ClusterEventBus eventBus;
     @Inject
     private BlockDeviceService blockDeviceService;
+    @Inject
+    private NetInterfaceService netInterfacesService;
 
     public void init() {
         if (allHosts.size() == 1) {
@@ -451,52 +454,6 @@ public class Host implements Comparable<Host>, Value {
 
     public void setIps(final int hop, final String[] ipsForHop) {
         allIps.put(hop, ipsForHop);
-    }
-
-    public NetInterface[] getNetInterfacesWithBridges() {
-        return netInterfacesWithBridges.toArray(new NetInterface[netInterfacesWithBridges.size()]);
-    }
-
-    public List<Value> getBridges() {
-        return new ArrayList<Value>(bridges);
-    }
-
-    public Map<String, Integer> getNetworkIps() {
-        final Map<String, Integer> networkIps = new LinkedHashMap<String, Integer>();
-        for (final NetInterface ni : netInterfacesWithBridges) {
-            final String netIp = ni.getNetworkIp();
-            networkIps.put(netIp, ni.getCidr());
-        }
-        return networkIps;
-    }
-
-    /** Returns list of networks that exist on all hosts. */
-    public Map<String, Integer> getNetworksIntersection(final Map<String, Integer> otherNetworkIps) {
-        if (otherNetworkIps == null) {
-            return getNetworkIps();
-        }
-        final Map<String, Integer> networksIntersection = new LinkedHashMap<String, Integer>();
-        for (final NetInterface ni : netInterfacesWithBridges) {
-            if (ni.isLocalHost()) {
-                continue;
-            }
-            final String networkIp = ni.getNetworkIp();
-            if (otherNetworkIps.containsKey(networkIp)
-                && !networksIntersection.containsKey(networkIp)) {
-                networksIntersection.put(networkIp, ni.getCidr());
-            }
-        }
-        return networksIntersection;
-    }
-
-    public List<String> getIpsFromNetwork(final String netIp) {
-        final List<String> networkIps = new ArrayList<String>();
-        for (final NetInterface ni : netInterfacesWithBridges) {
-            if (netIp.equals(ni.getNetworkIp())) {
-                networkIps.add(ni.getIp());
-            }
-        }
-        return networkIps;
     }
 
     public void removeFileSystems() {
@@ -1745,11 +1702,11 @@ public class Host implements Comparable<Host>, Value {
                    + ", drbd module: " + drbdHost.getDrbdModuleVersion());
 
         if (changedTypes.contains(NET_INFO_DELIM)) {
-            netInterfacesWithBridges = newNetInterfaces;
+            eventBus.post(new NetInterfacesChangedEvent(this, newNetInterfaces));
         }
 
         if (changedTypes.contains(BRIDGE_INFO_DELIM)) {
-            bridges = newBridges;
+            eventBus.post(new BridgesChangedEvent(this, newBridges));
         }
 
         if (changedTypes.contains(DISK_INFO_DELIM)) {
@@ -1803,7 +1760,6 @@ public class Host implements Comparable<Host>, Value {
         }
 
         getBrowser().updateHWResources(
-                getNetInterfacesWithBridges(),
                 getAvailableFileSystems());
     }
 

@@ -83,15 +83,15 @@ public class BlockDeviceService {
         }
     }
 
-    public List<String> getCommonBlockDeviceNames(final Iterable<Host> hosts) {
-        List<String> namesIntersection = new ArrayList<String>();
+    public Collection<String> getCommonBlockDeviceNames(final Iterable<Host> hosts) {
+        Optional<Collection<String>> namesIntersection = Optional.absent();
         for (final Host host : hosts) {
             final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(host);
             if (hostBlockDevices != null) {
                 namesIntersection = hostBlockDevices.getBlockDevicesNamesIntersection(namesIntersection);
             }
         }
-        return namesIntersection;
+        return namesIntersection.or(new ArrayList<String>());
     }
 
     public Optional<BlockDevice> getBlockDeviceByName(final Host host, final String name) {

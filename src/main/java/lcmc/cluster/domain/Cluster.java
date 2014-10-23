@@ -41,6 +41,7 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;
 import lcmc.host.service.BlockDeviceService;
+import lcmc.host.service.NetInterfaceService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -79,6 +80,8 @@ public class Cluster implements Comparable<Cluster> {
     private Application application;
     @Inject
     private BlockDeviceService blockDeviceService;
+    @Inject
+    private NetInterfaceService netInterfaceService;
 
     public void setName(final String name) {
         this.name = name;
@@ -153,10 +156,10 @@ public class Cluster implements Comparable<Cluster> {
      * The block devices, that are already in the CRM or are used by
      * drbd are not returned.
      */
-    public List<String> getCommonBlockDevices() {
-        final List<String> namesIntersection = blockDeviceService.getCommonBlockDeviceNames(hosts);
+    public Collection<String> getCommonBlockDevices() {
+        final Collection<String> namesIntersection = blockDeviceService.getCommonBlockDeviceNames(hosts);
 
-        final List<String> commonBlockDevices = new ArrayList<String>();
+        final Collection<String> commonBlockDevices = new ArrayList<String>();
         for (final String i : namesIntersection) {
             commonBlockDevices.add(i);
         }
@@ -184,24 +187,21 @@ public class Cluster implements Comparable<Cluster> {
         return false;
     }
 
-    public Network[] getCommonNetworks() {
-        Map<String, Integer> networksIntersection = null;
-        for (final Host host : hosts) {
-            networksIntersection = host.getNetworksIntersection(networksIntersection);
-        }
+    public Collection<Network> getCommonNetworks() {
+        final Map<String, Integer> networksIntersection = netInterfaceService.getNetworksIntersection(hosts);
 
         final List<Network> commonNetworks = new ArrayList<Network>();
         for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
             final List<String> ips = new ArrayList<String>();
             for (final Host host : hosts) {
-                ips.addAll(host.getIpsFromNetwork(stringIntegerEntry.getKey()));
+                ips.addAll(netInterfaceService.getIpsFromNetwork(host, stringIntegerEntry.getKey()));
             }
             final Integer cidr = stringIntegerEntry.getValue();
             final Network network = new Network(stringIntegerEntry.getKey(), ips.toArray(new String[ips.size()]), cidr);
             commonNetworks.add(network);
         }
 
-        return commonNetworks.toArray(new Network[commonNetworks.size()]);
+        return commonNetworks;
     }
 
     public String[] getCommonFileSystems() {
