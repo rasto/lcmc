@@ -1200,41 +1200,6 @@ public class ClusterBrowser extends Browser {
         return crmXml.getServices(cl);
     }
 
-    @Subscribe
-    public void updateCommonBlockDevices(final BlockDevicesChangedEvent event) {
-        if (!cluster.getHosts().contains(event.getHost())) {
-            return;
-        }
-        if (commonBlockDevicesNode != null) {
-            final Collection<String> bd = cluster.getCommonBlockDevices();
-            final Collection<DefaultMutableTreeNode> nodesToRemove = new ArrayList<DefaultMutableTreeNode>();
-            for (final Info commonBlockDevices : treeMenuController.nodesToInfos(commonBlockDevicesNode.children())) {
-                if (bd.contains(commonBlockDevices.getName())) {
-                    /* keeping */
-                    bd.remove(commonBlockDevices.getName());
-                } else {
-                    /* remove not existing block devices */
-                    nodesToRemove.add(commonBlockDevices.getNode());
-                    commonBlockDevices.setNode(null);
-                }
-            }
-            treeMenuController.removeFromParent(nodesToRemove);
-            /* block devices */
-            for (final String device : bd) {
-                /* add new block devices */
-                final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
-                commonBlockDevInfo.init(device, cluster.getHostBlockDevices(device), this);
-
-                final DefaultMutableTreeNode resource =
-                        treeMenuController.createMenuItem(commonBlockDevicesNode, commonBlockDevInfo);
-            }
-            if (!bd.isEmpty() || !nodesToRemove.isEmpty()) {
-                treeMenuController.reloadNode(commonBlockDevicesNode, false);
-                reloadAllComboBoxes(null);
-            }
-        }
-    }
-
     /** Updates available services. */
     private void updateAvailableServices() {
         LOG.debug("updateAvailableServices: start");
@@ -1442,9 +1407,28 @@ public class ClusterBrowser extends Browser {
             for (final Network network : networks) {
                 final NetworkInfo networkInfo = networkInfoProvider.get();
                 networkInfo.init(network.getName(), network, this);
-                final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(networksNode, networkInfo);
+                treeMenuController.createMenuItem(networksNode, networkInfo);
             }
             treeMenuController.reloadNode(networksNode, false);
+        }
+    }
+
+    @Subscribe
+    public void updateCommonBlockDevices(final BlockDevicesChangedEvent event) {
+        if (!cluster.getHosts().contains(event.getHost())) {
+            return;
+        }
+        if (commonBlockDevicesNode != null) {
+            final Collection<String> commonBlockDevices = cluster.getCommonBlockDevices();
+            treeMenuController.removeChildren(commonBlockDevicesNode);
+            for (final String commonBlockDevice : commonBlockDevices) {
+                final CommonBlockDevInfo commonBlockDevInfo = commonBlockDevInfoProvider.get();
+                commonBlockDevInfo.init(commonBlockDevice, cluster.getHostBlockDevices(commonBlockDevice), this);
+                treeMenuController.createMenuItem(commonBlockDevicesNode, commonBlockDevInfo);
+
+            }
+            treeMenuController.reloadNode(commonBlockDevicesNode, false);
+            reloadAllComboBoxes(null);
         }
     }
 
