@@ -607,7 +607,7 @@ public final class DiskInfo extends HardwareInfo {
             if (DiskData.TYPE.equals(param)) {
                 parameters.put(param, value.getValueForConfig());
             } else if (DiskData.TARGET_BUS_TYPE.equals(param)) {
-                if (value == null) {
+                if (value == null || value.getValueForConfig() == null) {
                     parameters.put(DiskData.TARGET_BUS, null);
                     parameters.put(DiskData.TARGET_TYPE, null);
                 } else {
