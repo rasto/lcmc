@@ -88,22 +88,6 @@ public class ServicesInfo extends EditableInfo {
     @Inject
     private GUIData guiData;
     @Inject
-    private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Inject
-    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Inject
-    private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Inject
-    private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Inject
-    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Inject @Named("serviceInfo")
-    private Provider<ServiceInfo> serviceInfoProvider;
-    @Inject
-    private Provider<GroupInfo> groupInfoProvider;
-    @Inject
-    private Provider<CloneInfo> cloneInfoProvider;
-    @Inject
     private Provider<ConstraintPHInfo> constraintPHInfoProvider;
     @Inject
     private Provider<PcmkRscSetsInfo> pcmkRscSetsInfoProvider;
@@ -111,6 +95,8 @@ public class ServicesInfo extends EditableInfo {
     private Application application;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private CrmServiceFactory crmServiceFactory;
 
     @Override
     public void init(final String name, final Browser browser) {
@@ -421,7 +407,7 @@ public class ServicesInfo extends EditableInfo {
             if (clStatus.isOrphaned(hbId) && application.isHideLRM()) {
                 continue;
             }
-            ServiceInfo newSi;
+            ServiceInfo newServiceInfo;
             if (allGroupsAndClones.contains(hbId)) {
                 if (newGi != null) {
                     LOG.appWarning("setGroupResources: group in group not implemented");
@@ -437,10 +423,10 @@ public class ServicesInfo extends EditableInfo {
                                   groupServiceIsPresent,
                                   clStatus,
                                   runMode);
-                newSi = gi;
+                newServiceInfo = gi;
             } else {
-                final ResourceAgent newRA = clStatus.getResourceType(hbId);
-                if (newRA == null) {
+                final ResourceAgent newResourceAgent = clStatus.getResourceType(hbId);
+                if (newResourceAgent == null) {
                     /* This is bad. There is a service but we do not have
                      * the heartbeat script of this service or the we look
                      * in the wrong places.
@@ -450,52 +436,36 @@ public class ServicesInfo extends EditableInfo {
                 /* continue of creating/updating of the
                  * service in the gui.
                  */
-                newSi = getBrowser().getServiceInfoFromCRMId(hbId);
+                newServiceInfo = getBrowser().getServiceInfoFromCRMId(hbId);
                 final Map<String, String> resourceNode = clStatus.getParamValuePairs(hbId);
-                if (newSi == null) {
+                if (newServiceInfo == null) {
                     newService = true;
-                    // TODO: get rid of the service name? (everywhere)
-                    final String serviceName;
-                    if (newRA == null) {
-                        serviceName = hbId;
-                    } else {
-                        serviceName = newRA.getServiceName();
-                    }
-                    if (newRA != null && newRA.isFilesystem()) {
-                        newSi = filesystemInfoProvider.get();
-                    } else if (newRA != null && newRA.isLinbitDrbd()) {
-                        newSi = linbitDrbdInfoProvider.get();
-                    } else if (newRA != null && newRA.isDrbddisk()) {
-                        newSi = drbddiskInfoProvider.get();
-                    } else if (newRA != null && newRA.isIPaddr()) {
-                        newSi = ipaddrInfoProvider.get();
-                    } else if (newRA != null && newRA.isVirtualDomain()) {
-                        newSi = virtualDomainInfoProvider.get();
-                    } else {
-                        newSi = serviceInfoProvider.get();
-                    }
-                    newSi.init(serviceName, newRA, hbId, resourceNode, getBrowser());
-                    newSi.getService().setCrmId(hbId);
-                    getBrowser().addToHeartbeatIdList(newSi);
+                    newServiceInfo = crmServiceFactory.createServiceWithParameters(
+                            hbId,
+                            newResourceAgent,
+                            resourceNode,
+                            getBrowser());
+                    newServiceInfo.getService().setCrmId(hbId);
+                    getBrowser().addToHeartbeatIdList(newServiceInfo);
                     if (newGi != null) {
-                        newGi.addGroupServicePanel(newSi, false);
+                        newGi.addGroupServicePanel(newServiceInfo, false);
                     } else if (newCi != null) {
-                        newCi.addCloneServicePanel(newSi);
+                        newCi.addCloneServicePanel(newServiceInfo);
                     } else {
                         final Point2D p = null;
-                        addServicePanel(newSi, p, false, false, runMode);
+                        addServicePanel(newServiceInfo, p, false, false, runMode);
                     }
                 } else {
-                    getBrowser().addNameToServiceInfoHash(newSi);
-                    setParametersHash.put(newSi, resourceNode);
+                    getBrowser().addNameToServiceInfoHash(newServiceInfo);
+                    setParametersHash.put(newServiceInfo, resourceNode);
                 }
-                newSi.getService().setNew(false);
-                serviceIsPresent.add(newSi);
+                newServiceInfo.getService().setNew(false);
+                serviceIsPresent.add(newServiceInfo);
                 if (newGi != null || newCi != null) {
-                    groupServiceIsPresent.add(newSi);
+                    groupServiceIsPresent.add(newServiceInfo);
                 }
             }
-            final DefaultMutableTreeNode node = newSi.getNode();
+            final DefaultMutableTreeNode node = newServiceInfo.getNode();
             if (node != null) {
                 treeMenuController.moveNodeToPosition(node, pos);
                 pos++;
@@ -971,48 +941,14 @@ public class ServicesInfo extends EditableInfo {
      * Adds service to the list of services.
      * TODO: are they both used?
      */
-    public ServiceInfo addServicePanel(final ResourceAgent newRA,
+    public ServiceInfo addServicePanel(final ResourceAgent newResourceAgent,
                                        final Point2D pos,
                                        final boolean reloadNode,
                                        final String heartbeatId,
                                        final CloneInfo newCi,
                                        final Application.RunMode runMode) {
-        final ServiceInfo newServiceInfo;
-        final String name = newRA.getServiceName();
-        if (newRA.isFilesystem()) {
-            newServiceInfo = filesystemInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isLinbitDrbd()) {
-            newServiceInfo = linbitDrbdInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isDrbddisk()) {
-            newServiceInfo = drbddiskInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isIPaddr()) {
-            newServiceInfo = ipaddrInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isVirtualDomain()) {
-            newServiceInfo = virtualDomainInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isGroup()) {
-            final GroupInfo newGroupInfo = groupInfoProvider.get();
-            newGroupInfo.init(newRA, getBrowser());
-            newServiceInfo = newGroupInfo;
-        } else if (newRA.isClone()) {
-            final boolean master = getBrowser().getClusterStatus().isMaster(heartbeatId);
-            final String cloneName;
-            if (master) {
-                cloneName = Application.PM_MASTER_SLAVE_SET_NAME;
-            } else {
-                cloneName = Application.PM_CLONE_SET_NAME;
-            }
-            final CloneInfo newCloneInfo = cloneInfoProvider.get();
-            newCloneInfo.init(newRA, cloneName, master, getBrowser());
-            newServiceInfo = newCloneInfo;
-        } else {
-            newServiceInfo = serviceInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        }
+        final ServiceInfo newServiceInfo =
+                crmServiceFactory.createFromResourceAgent(newResourceAgent, newResourceAgent.isClone(), getBrowser());
         if (heartbeatId != null) {
             newServiceInfo.getService().setCrmId(heartbeatId);
             getBrowser().addToHeartbeatIdList(newServiceInfo);

@@ -203,27 +203,15 @@ public class ServiceInfo extends EditableInfo {
     @Inject
     private ServiceMenu serviceMenu;
     @Inject
-    private Provider<FilesystemRaInfo> filesystemInfoProvider;
-    @Inject
-    private Provider<LinbitDrbdInfo> linbitDrbdInfoProvider;
-    @Inject
-    private Provider<DrbddiskInfo> drbddiskInfoProvider;
-    @Inject
-    private Provider<IPaddrInfo> ipaddrInfoProvider;
-    @Inject
-    private Provider<VirtualDomainInfo> virtualDomainInfoProvider;
-    @Inject
-    private Provider<GroupInfo> groupInfoProvider;
-    @Inject
     private Provider<CloneInfo> cloneInfoProvider;
-    @Inject @Named("serviceInfo")
-    private Provider<ServiceInfo> serviceInfoProvider;
     @Inject
     private Application application;
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
     private TreeMenuController treeMenuController;
+    @Inject
+    private CrmServiceFactory crmServiceFactory;
 
     protected void init(final String name, final ResourceAgent resourceAgent, final Browser browser) {
         super.init(name, browser);
@@ -243,11 +231,11 @@ public class ServiceInfo extends EditableInfo {
      * heartbeat id with values from xml stored in resourceNode.
      */
     protected void init(final String name,
-                        final ResourceAgent ra,
+                        final ResourceAgent resourceAgent,
                         final String heartbeatId,
                         final Map<String, String> resourceNode,
                         final Browser browser) {
-        init(name, ra, browser);
+        init(name, resourceAgent, browser);
         getService().setCrmId(heartbeatId);
         /* TODO: cannot call setParameters here, only after it is
          * constructed. */
@@ -3619,48 +3607,15 @@ public class ServiceInfo extends EditableInfo {
     }
 
     /** Adds service panel to the position 'pos'. */
-    public ServiceInfo addServicePanel(final ResourceAgent newRA,
+    public ServiceInfo addServicePanel(final ResourceAgent newResourceAgent,
                                        final Point2D pos,
                                        final boolean colocation,
                                        final boolean order,
                                        final boolean reloadNode,
                                        final boolean master,
                                        final Application.RunMode runMode) {
-        final ServiceInfo newServiceInfo;
-
-        final String name = newRA.getServiceName();
-        if (newRA.isFilesystem()) {
-            newServiceInfo = filesystemInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isLinbitDrbd()) {
-            newServiceInfo = linbitDrbdInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isDrbddisk()) {
-            newServiceInfo = drbddiskInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isIPaddr()) {
-            newServiceInfo = ipaddrInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isVirtualDomain()) {
-            newServiceInfo = virtualDomainInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isGroup()) {
-            newServiceInfo = groupInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        } else if (newRA.isClone()) {
-            final String cloneName;
-            if (master) {
-                cloneName = Application.PM_MASTER_SLAVE_SET_NAME;
-            } else {
-                cloneName = Application.PM_CLONE_SET_NAME;
-            }
-            final CloneInfo newCloneInfo = cloneInfoProvider.get();
-            newCloneInfo.init(newRA, cloneName, master, getBrowser());
-            newServiceInfo = newCloneInfo;
-        } else {
-            newServiceInfo = serviceInfoProvider.get();
-            newServiceInfo.init(name, newRA, getBrowser());
-        }
+        final ServiceInfo newServiceInfo =
+                crmServiceFactory.createFromResourceAgent(newResourceAgent, master, getBrowser());
 
         addServicePanel(newServiceInfo,
                         pos,
