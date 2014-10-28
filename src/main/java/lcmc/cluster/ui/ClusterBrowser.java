@@ -1271,8 +1271,8 @@ public class ClusterBrowser extends Browser {
             final DomainInfo domainInfo = domainInfoProvider.get();
             domainInfo.init(domainName, this);
             currentVMSVDIs.add(domainInfo);
+            treeMenuController.createMenuItem(vmsNode, domainInfo, i);
             domainInfo.updateParameters();
-            final DefaultMutableTreeNode resource = treeMenuController.createMenuItem(vmsNode, domainInfo, i);
             nodeChanged = true;
         }
         mVmsUpdateLock.unlock();
