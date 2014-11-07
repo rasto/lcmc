@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
@@ -41,7 +40,7 @@ import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.cluster.ui.ClusterTab;
 import lcmc.cluster.ui.SSHGui;
 import lcmc.host.service.BlockDeviceService;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
@@ -81,7 +80,7 @@ public class Cluster implements Comparable<Cluster> {
     @Inject
     private BlockDeviceService blockDeviceService;
     @Inject
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     public void setName(final String name) {
         this.name = name;
@@ -185,23 +184,6 @@ public class Cluster implements Comparable<Cluster> {
             }
         }
         return false;
-    }
-
-    public Collection<Network> getCommonNetworks() {
-        final Map<String, Integer> networksIntersection = netInterfaceService.getNetworksIntersection(hosts);
-
-        final List<Network> commonNetworks = new ArrayList<Network>();
-        for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
-            final List<String> ips = new ArrayList<String>();
-            for (final Host host : hosts) {
-                ips.addAll(netInterfaceService.getIpsFromNetwork(host, stringIntegerEntry.getKey()));
-            }
-            final Integer cidr = stringIntegerEntry.getValue();
-            final Network network = new Network(stringIntegerEntry.getKey(), ips.toArray(new String[ips.size()]), cidr);
-            commonNetworks.add(network);
-        }
-
-        return commonNetworks;
     }
 
     public String[] getCommonFileSystems() {

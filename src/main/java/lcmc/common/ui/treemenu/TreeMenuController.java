@@ -20,13 +20,13 @@
 
 package lcmc.common.ui.treemenu;
 
+import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.CategoryInfo;
 import lcmc.common.ui.Info;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
-import lcmc.vm.ui.resource.DiskInfo;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -65,28 +65,35 @@ public class TreeMenuController {
         return treeTop;
     }
 
-    public final DefaultMutableTreeNode createMenuTreeTop(final Info info) {
-        final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(info);
+    public final DefaultMutableTreeNode createMenuTreeTop(final InfoPresenter infoPresenter) {
+        final DefaultMutableTreeNode treeTop = new DefaultMutableTreeNode(infoPresenter);
         treeModel = new DefaultTreeModel(treeTop);
         return treeTop;
     }
 
-    public DefaultMutableTreeNode createMenuItem(final DefaultMutableTreeNode parent, Info info) {
-        final DefaultMutableTreeNode child = createMenuItem(info);
+    public DefaultMutableTreeNode createMenuItem(
+            final DefaultMutableTreeNode parent,
+            final InfoPresenter infoPresenter) {
+        final DefaultMutableTreeNode child = createMenuItem(infoPresenter);
         addChild(parent, child);
         return child;
     }
 
-    public DefaultMutableTreeNode createMenuItem(DefaultMutableTreeNode parent, Info info, int position) {
-        final DefaultMutableTreeNode child = createMenuItem(info);
+    public DefaultMutableTreeNode createMenuItem(
+            final DefaultMutableTreeNode parent,
+            final InfoPresenter infoPresenter,
+            final int position) {
+        final DefaultMutableTreeNode child = createMenuItem(infoPresenter);
         insertNode(parent, child, position);
         return child;
     }
 
 
-    public DefaultMutableTreeNode createMenuItem(Info info) {
-        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(info);
-        info.setNode(node);
+    public DefaultMutableTreeNode createMenuItem(final InfoPresenter infoPresenter) {
+        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(infoPresenter);
+        if (infoPresenter instanceof Info) {
+            ((Info) infoPresenter).setNode(node);
+        }
         return node;
     }
 
@@ -206,10 +213,10 @@ public class TreeMenuController {
                 final int selRow = tree.getRowForLocation(e.getX(), e.getY());
                 final TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                 if (selRow != -1 && e.getButton() > 1) {
-                    final Info nodeInfo =
-                            (Info) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
-                    if (nodeInfo != null) {
-                        nodeInfo.showPopup(tree, e.getX(), e.getY());
+                    final InfoPresenter infoPresenter =
+                            (InfoPresenter) ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
+                    if (infoPresenter != null) {
+                        infoPresenter.showPopup(tree, e.getX(), e.getY());
                         tree.setSelectionPath(selPath);
                     }
                 }

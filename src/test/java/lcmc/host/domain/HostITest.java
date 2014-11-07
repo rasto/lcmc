@@ -30,7 +30,7 @@ import java.util.Set;
 
 import lcmc.AppContext;
 import lcmc.cluster.domain.Cluster;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.testutils.IntegrationTestLauncher;
 import lcmc.testutils.annotation.type.IntegrationTest;
 import lcmc.common.domain.util.Tools;
@@ -46,13 +46,13 @@ import org.junit.experimental.categories.Category;
 @Category(IntegrationTest.class)
 public final class HostITest {
     private IntegrationTestLauncher integrationTestLauncher;
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     @Before
     public void setUp() {
         integrationTestLauncher = AppContext.getBean(IntegrationTestLauncher.class);
         integrationTestLauncher.initTestCluster();
-        netInterfaceService = integrationTestLauncher.getNetInterfaceService();
+        networkService = integrationTestLauncher.getNetworkService();
     }
 
     @Test
@@ -131,22 +131,22 @@ public final class HostITest {
     @Test
     public void testGetNetInterfaces() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(netInterfaceService.getNetInterfacesWithBridges(host).length > 0);
-            assertNotNull(netInterfaceService.getNetInterfacesWithBridges(host)[0]);
-            assertTrue(noValueIsNull(netInterfaceService.getNetInterfacesWithBridges(host)));
+            assertTrue(networkService.getNetInterfacesWithBridges(host).length > 0);
+            assertNotNull(networkService.getNetInterfacesWithBridges(host)[0]);
+            assertTrue(noValueIsNull(networkService.getNetInterfacesWithBridges(host)));
         }
     }
 
     @Test
     public void testGetBridges() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            assertTrue(integrationTestLauncher.getNetInterfaceService().getBridges(host).size() >= 0);
+            assertTrue(integrationTestLauncher.getNetworkService().getBridges(host).size() >= 0);
         }
     }
 
     @Test
     public void testGetNetworksIntersection() {
-        Map<String, Integer> commonNetworks = netInterfaceService.getNetworksIntersection(
+        Map<String, Integer> commonNetworks = networkService.getNetworksIntersection(
                 integrationTestLauncher.getHosts());
         if (integrationTestLauncher.getHosts().size() > 0) {
             assertNotNull(commonNetworks);
@@ -157,7 +157,7 @@ public final class HostITest {
     @Test
     public void testGetIpsFromNetwork() {
         for (final Host host : integrationTestLauncher.getHosts()) {
-            final Collection<String> ips = netInterfaceService.getIpsFromNetwork(host, "192.168.133.0");
+            final Collection<String> ips = networkService.getIpsFromNetwork(host, "192.168.133.0");
             assertTrue(!ips.isEmpty());
             for (final String ip : ips) {
                 assertTrue(ip.startsWith("192.168.133."));

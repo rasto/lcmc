@@ -20,25 +20,24 @@
 
 package lcmc.event;
 
-import lcmc.common.domain.Value;
 import lcmc.host.domain.Host;
 
-import java.util.List;
+import java.util.Map;
 
-public class BridgesChangedEvent {
+public class HwBlockDevicesDiskSpaceEvent {
     private final Host host;
-    private final List<Value> bridges;
+    private final Map<String, String> diskSpaces;
+
+    public HwBlockDevicesDiskSpaceEvent(final Host host, final Map<String, String> diskSpaces) {
+        this.host = host;
+        this.diskSpaces = diskSpaces;
+    }
 
     public Host getHost() {
         return host;
     }
 
-    public List<Value> getBridges() {
-        return bridges;
-    }
-
-    public BridgesChangedEvent(final Host host, final List<Value> bridges) {
-        this.host = host;
-        this.bridges = bridges;
+    public Map<String, String> getDiskSpaces() {
+        return diskSpaces;
     }
 }

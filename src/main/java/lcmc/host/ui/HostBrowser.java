@@ -41,8 +41,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import lcmc.ClusterEventBus;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
@@ -52,6 +52,8 @@ import lcmc.common.ui.GUIData;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
+import lcmc.event.HwBlockDevicesChangedEvent;
+import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.drbd.domain.BlockDevice;
@@ -150,7 +152,7 @@ public class HostBrowser extends Browser {
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
-    private EventBus eventBus;
+    private ClusterEventBus clusterEventBus;
 
     public void init(final Host host) {
         this.host = host;
@@ -163,7 +165,7 @@ public class HostBrowser extends Browser {
                 initHostResources();
             }
         });
-        eventBus.register(this);
+        clusterEventBus.register(this);
     }
 
     public HostInfo getHostInfo() {

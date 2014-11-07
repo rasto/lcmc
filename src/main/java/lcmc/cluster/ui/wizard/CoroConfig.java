@@ -67,8 +67,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.crm.service.Corosync;
 import lcmc.common.domain.ExecCallback;
-import lcmc.host.domain.HostNetworks;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
@@ -129,7 +128,7 @@ final class CoroConfig extends DialogCluster {
     private WidgetFactory widgetFactory;
     private MyButton makeConfigButton;
     @Inject
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
         super.init(previousDialog, cluster);
@@ -866,7 +865,7 @@ final class CoroConfig extends DialogCluster {
                                                   Widget.NO_BUTTON);
         typeWidget.setEnabled(false);
 
-        final NetInterface[] ni = netInterfaceService.getNetInterfacesWithBridges(hosts[0]);
+        final NetInterface[] ni = networkService.getNetInterfacesWithBridges(hosts[0]);
         NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */

@@ -20,13 +20,14 @@
 
 package lcmc.common.ui.treemenu;
 
+import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CategoryInfo;
-import lcmc.common.ui.Info;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -55,19 +56,19 @@ public class CellRenderer extends DefaultTreeCellRenderer {
             final int row,
             final boolean hasFocus) {
         super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        final Info info = (Info) ((DefaultMutableTreeNode) value).getUserObject();
-        if (info == null) {
+        final InfoPresenter infoPresenter = (InfoPresenter) ((DefaultMutableTreeNode) value).getUserObject();
+        if (infoPresenter == null) {
             return this;
         }
         if (leaf) {
-            final ImageIcon icon = info.getMenuIcon(Application.RunMode.LIVE);
+            final ImageIcon icon = infoPresenter.getMenuIcon(Application.RunMode.LIVE);
             if (icon != null) {
                 setIcon(icon);
             }
             setToolTipText("");
         } else {
             setToolTipText("");
-            ImageIcon icon = info.getCategoryIcon(Application.RunMode.LIVE);
+            ImageIcon icon = infoPresenter.getCategoryIcon(Application.RunMode.LIVE);
             if (icon == null) {
                 icon = CategoryInfo.CATEGORY_ICON;
             }

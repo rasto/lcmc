@@ -49,19 +49,19 @@ import javax.inject.Provider;
 import javax.swing.JComponent;
 
 import com.google.common.base.Optional;
-import lcmc.ClusterEventBus;
 import lcmc.Exceptions;
+import lcmc.HwEventBus;
 import lcmc.cluster.domain.Cluster;
 import lcmc.configs.DistResource;
 import lcmc.cluster.ui.ClusterBrowser;
 import lcmc.common.ui.GUIData;
-import lcmc.event.BlockDevicesChangedEvent;
-import lcmc.event.BlockDevicesDiskSpaceEvent;
-import lcmc.event.BridgesChangedEvent;
-import lcmc.event.DrbdStatusChangedEvent;
-import lcmc.event.NetInterfacesChangedEvent;
+import lcmc.event.HwBlockDevicesChangedEvent;
+import lcmc.event.HwBlockDevicesDiskSpaceEvent;
+import lcmc.event.HwBridgesChangedEvent;
+import lcmc.event.HwDrbdStatusChangedEvent;
+import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.host.service.BlockDeviceService;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.ProgressBar;
 import lcmc.common.ui.ResourceGraph;
@@ -279,11 +279,11 @@ public class Host implements Comparable<Host>, Value {
     @Inject
     private RoboTest roboTest;
     @Inject
-    private ClusterEventBus eventBus;
+    private HwEventBus hwEventBus;
     @Inject
     private BlockDeviceService blockDeviceService;
     @Inject
-    private NetInterfaceService netInterfacesService;
+    private NetworkService netInterfacesService;
 
     public void init() {
         if (allHosts.size() == 1) {
@@ -293,7 +293,7 @@ public class Host implements Comparable<Host>, Value {
 
         hostBrowser.init(this);
         terminalPanel.initWithHost(this);
-        eventBus.register(this);
+        hwEventBus.register(this);
     }
 
     public HostBrowser getBrowser() {
@@ -1702,21 +1702,21 @@ public class Host implements Comparable<Host>, Value {
                    + ", drbd module: " + drbdHost.getDrbdModuleVersion());
 
         if (changedTypes.contains(NET_INFO_DELIM)) {
-            eventBus.post(new NetInterfacesChangedEvent(this, newNetInterfaces));
+            hwEventBus.post(new HwNetInterfacesChangedEvent(this, newNetInterfaces));
         }
 
         if (changedTypes.contains(BRIDGE_INFO_DELIM)) {
-            eventBus.post(new BridgesChangedEvent(this, newBridges));
+            hwEventBus.post(new HwBridgesChangedEvent(this, newBridges));
         }
 
         if (changedTypes.contains(DISK_INFO_DELIM)) {
-            eventBus.post(new BlockDevicesChangedEvent(this, newBlockDevices.values()));
+            hwEventBus.post(new HwBlockDevicesChangedEvent(this, newBlockDevices.values()));
             drbdBlockDevices = newDrbdBlockDevices;
             physicalVolumes = newPhysicalVolumes;
             volumeGroupsWithLvs = newVolumeGroupsLVS;
         }
         if (changedTypes.contains(DISK_SPACE_DELIM)) {
-            eventBus.post(new BlockDevicesDiskSpaceEvent(this, diskSpaces));
+            hwEventBus.post(new HwBlockDevicesDiskSpaceEvent(this, diskSpaces));
         }
 
         if (changedTypes.contains(VG_INFO_DELIM)) {
@@ -2532,7 +2532,7 @@ public class Host implements Comparable<Host>, Value {
 
     public void setDrbdStatusOk(final boolean drbdStatusOk) {
         this.drbdStatusOk = drbdStatusOk;
-        eventBus.post(new DrbdStatusChangedEvent(this, drbdStatusOk));
+        hwEventBus.post(new HwDrbdStatusChangedEvent(this, drbdStatusOk));
     }
 
     public boolean isDrbdStatusOk() {

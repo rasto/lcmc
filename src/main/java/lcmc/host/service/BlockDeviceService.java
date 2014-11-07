@@ -23,10 +23,12 @@ package lcmc.host.service;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
+import lcmc.HwEventBus;
 import lcmc.drbd.domain.BlockDevice;
 import lcmc.event.BlockDevicesChangedEvent;
-import lcmc.event.BlockDevicesDiskSpaceEvent;
-import lcmc.event.DrbdStatusChangedEvent;
+import lcmc.event.HwBlockDevicesChangedEvent;
+import lcmc.event.HwBlockDevicesDiskSpaceEvent;
+import lcmc.event.HwDrbdStatusChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostBlockDevices;
 
@@ -36,7 +38,6 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,34 +45,39 @@ import java.util.concurrent.ConcurrentHashMap;
 @Singleton
 public class BlockDeviceService {
     @Inject
-    private ClusterEventBus eventBus;
+    private HwEventBus hwEventBus;
+    @Inject
+    private ClusterEventBus clusterEventBus;
     private Map<Host, HostBlockDevices> hostBlockDevicesByHost = new ConcurrentHashMap<Host, HostBlockDevices>();
 
     public void init() {
-        eventBus.register(this);
+        hwEventBus.register(this);
     }
 
     @Subscribe
-    public void blockDevicesChanged(final BlockDevicesChangedEvent event) {
+    public void blockDevicesChanged(final HwBlockDevicesChangedEvent event) {
         final HostBlockDevices hostBlockDevices = new HostBlockDevices();
         hostBlockDevices.setBlockDevices(event.getBlockDevices());
         hostBlockDevicesByHost.put(event.getHost(), hostBlockDevices);
+        clusterEventBus.post(new BlockDevicesChangedEvent(event.getHost(), hostBlockDevices.getBlockDevices()));
     }
 
     @Subscribe
-    public void drbdStatusChanged(final DrbdStatusChangedEvent event) {
+    public void drbdStatusChanged(final HwDrbdStatusChangedEvent event) {
         final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(event.getHost());
         if (hostBlockDevices != null) {
             hostBlockDevices.resetDrbdOnBlockDevices(event.isDrbdStatusOk());
         }
+        clusterEventBus.post(new BlockDevicesChangedEvent(event.getHost(), hostBlockDevices.getBlockDevices()));
     }
 
     @Subscribe
-    public void blockDevicesDiskSpaceEvent(final BlockDevicesDiskSpaceEvent event) {
+    public void blockDevicesDiskSpaceEvent(final HwBlockDevicesDiskSpaceEvent event) {
         final HostBlockDevices hostBlockDevices = hostBlockDevicesByHost.get(event.getHost());
         if (hostBlockDevices != null) {
             hostBlockDevices.setDiskSpace(event.getDiskSpaces());
         }
+        clusterEventBus.post(new BlockDevicesChangedEvent(event.getHost(), hostBlockDevices.getBlockDevices()));
     }
 
     public Collection<BlockDevice> getBlockDevices(final Host host) {

@@ -39,6 +39,10 @@ public class HostNetworks {
         return netInterfacesWithBridges.toArray(new NetInterface[netInterfacesWithBridges.size()]);
     }
 
+    public List<NetInterface> getNetInterfaces() {
+        return netInterfacesWithBridges;
+    }
+
     public List<Value> getBridges() {
         return new ArrayList<Value>(bridges);
     }
@@ -47,6 +51,7 @@ public class HostNetworks {
         final Map<String, Integer> networkIps = new LinkedHashMap<String, Integer>();
         for (final NetInterface ni : netInterfacesWithBridges) {
             final String netIp = ni.getNetworkIp();
+
             networkIps.put(netIp, ni.getCidr());
         }
         return networkIps;

@@ -50,8 +50,10 @@ import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import lcmc.ClusterEventBus;
+import lcmc.cluster.ui.network.NetworkFactory;
+import lcmc.cluster.ui.network.NetworkPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.ui.Browser;
 import lcmc.common.ui.CallbackAction;
@@ -67,6 +69,7 @@ import lcmc.drbd.domain.DrbdXml;
 import lcmc.drbd.ui.DrbdGraph;
 import lcmc.event.BlockDevicesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
+import lcmc.host.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.host.domain.Host;
 import lcmc.crm.domain.PtestData;
@@ -80,12 +83,10 @@ import lcmc.common.ui.CategoryInfo;
 import lcmc.host.ui.ClusterHostsInfo;
 import lcmc.cluster.ui.resource.CommonBlockDevInfo;
 import lcmc.common.ui.Info;
-import lcmc.cluster.ui.resource.NetworkInfo;
 import lcmc.crm.ui.resource.AvailableServiceInfo;
 import lcmc.crm.ui.resource.AvailableServicesInfo;
 import lcmc.crm.ui.resource.CRMInfo;
 import lcmc.crm.ui.resource.GroupInfo;
-import lcmc.crm.ui.resource.HbCategoryInfo;
 import lcmc.crm.ui.resource.HbConnectionInfo;
 import lcmc.crm.ui.resource.ResourceAgentClassInfo;
 import lcmc.crm.ui.resource.RscDefaultsInfo;
@@ -227,15 +228,17 @@ public class ClusterBrowser extends Browser {
     @Inject
     private AvailableServicesInfo availableServicesInfo;
     @Inject
-    private Provider<NetworkInfo> networkInfoProvider;
-    @Inject
     private Provider<CRMInfo> crmInfoProvider;
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
-    private EventBus eventBus;
+    private ClusterEventBus clusterEventBus;
     @Inject
     private Provider<CommonBlockDevInfo> commonBlockDevInfoProvider;
+    @Inject
+    private NetworkService networkService;
+    @Inject
+    private NetworkFactory networkFactory;
 
     public static String getClassMenuName(final String cl) {
         final String name = CRM_CLASS_MENU.get(cl);
@@ -326,7 +329,7 @@ public class ClusterBrowser extends Browser {
         drbdGraph.initGraph(this);
         globalInfo.init(Tools.getString("ClusterBrowser.Drbd"), this);
         treeTop = treeMenuController.createMenuTreeTop();
-        eventBus.register(this);
+        clusterEventBus.register(this);
     }
 
     private void initOperations() {
@@ -1402,12 +1405,11 @@ public class ClusterBrowser extends Browser {
             return;
         }
         if (networksNode != null) {
-            final Collection<Network> networks = cluster.getCommonNetworks();
+            final Collection<Network> networks = networkService.getCommonNetworks(cluster);
             treeMenuController.removeChildren(networksNode);
             for (final Network network : networks) {
-                final NetworkInfo networkInfo = networkInfoProvider.get();
-                networkInfo.init(network.getName(), network, this);
-                treeMenuController.createMenuItem(networksNode, networkInfo);
+                final NetworkPresenter networkPresenter = networkFactory.createPresenter(cluster, network);
+                treeMenuController.createMenuItem(networksNode, networkPresenter);
             }
             treeMenuController.reloadNode(networksNode, false);
         }

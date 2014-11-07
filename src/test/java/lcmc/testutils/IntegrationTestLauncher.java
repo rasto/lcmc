@@ -34,7 +34,7 @@ import lcmc.common.ui.ProgressIndicatorPanel;
 import lcmc.common.domain.Application;
 import lcmc.cluster.domain.Cluster;
 import lcmc.host.domain.Host;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.domain.util.Tools;
 import lcmc.cluster.ui.ClusterTabFactory;
@@ -75,7 +75,7 @@ public class IntegrationTestLauncher {
     @Inject
     private ClusterTabFactory clusterTabFactory;
     @Inject
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     public void initTestCluster() {
         initCluster();
@@ -212,7 +212,7 @@ public class IntegrationTestLauncher {
         boolean passed();
     }
 
-    public NetInterfaceService getNetInterfaceService() {
-        return netInterfaceService;
+    public NetworkService getNetworkService() {
+        return networkService;
     }
 }

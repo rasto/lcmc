@@ -29,7 +29,6 @@ import java.awt.event.ActionListener;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -49,7 +48,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SpringLayout;
-import javax.swing.tree.DefaultMutableTreeNode;
+
 import lcmc.Exceptions;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.configs.AppDefaults;
@@ -66,8 +65,7 @@ import lcmc.drbd.domain.DrbdResource;
 import lcmc.drbd.domain.NetInterface;
 import lcmc.common.ui.Browser;
 import lcmc.cluster.ui.ClusterBrowser;
-import lcmc.host.domain.HostNetworks;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.host.ui.HostBrowser;
 import lcmc.common.ui.SpringUtilities;
 import lcmc.common.ui.Info;
@@ -154,7 +152,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     public void init(final String name, final Set<Host> hosts, final Browser browser) {
         super.init(name, browser);
@@ -248,7 +246,7 @@ public class ResourceInfo extends AbstractDrbdInfo {
                 if (awi != null && pwi != null) {
                     final Value o = awi.getValue();
                     LOG.debug1("drbdResourceConfig: host: " + host.getName() + " ni: " + o);
-                    for (final NetInterface ni : netInterfaceService.getNetInterfacesWithBridges(host)) {
+                    for (final NetInterface ni : networkService.getNetInterfacesWithBridges(host)) {
                         LOG.debug1("drbdResourceConfig: host: " + host.getName() + " nis: " + ni.getIp());
                     }
                     if (o == null) {

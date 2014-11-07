@@ -71,7 +71,7 @@ import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.ExecCallback;
 import lcmc.crm.service.Heartbeat;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.logger.Logger;
 import lcmc.logger.LoggerFactory;
 import lcmc.common.ui.utils.MyButton;
@@ -198,7 +198,7 @@ final class HbConfig extends DialogCluster {
     @Inject
     private InitCluster initCluster;
     @Inject
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     @Override
     public void init(final WizardDialog previousDialog, final Cluster cluster) {
@@ -916,7 +916,7 @@ final class HbConfig extends DialogCluster {
                                       new AccessMode(AccessMode.RO, AccessMode.NORMAL),
                                       Widget.NO_BUTTON);
 
-        final NetInterface[] ni = netInterfaceService.getNetInterfacesWithBridges(hosts[0]);
+        final NetInterface[] ni = networkService.getNetInterfacesWithBridges(hosts[0]);
         NetInterface defaultNi = null;
         for (final NetInterface n : ni) {
             /* skip lo */
@@ -940,7 +940,7 @@ final class HbConfig extends DialogCluster {
         /* ucast links */
         final List<UcastLink> ulList = new ArrayList<UcastLink>();
         for (final Host host : hosts) {
-            final NetInterface[] netInterfaces = netInterfaceService.getNetInterfacesWithBridges(host);
+            final NetInterface[] netInterfaces = networkService.getNetInterfacesWithBridges(host);
             for (final NetInterface n : netInterfaces) {
                 ulList.add(new UcastLink(host, n));
             }

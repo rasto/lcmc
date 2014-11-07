@@ -40,7 +40,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.InterfaceData;
 import lcmc.common.domain.Value;
@@ -142,7 +142,7 @@ public final class InterfaceInfo extends HardwareInfo {
     @Inject
     private WidgetFactory widgetFactory;
     @Inject
-    private NetInterfaceService netInterfaceService;
+    private NetworkService networkService;
 
     /** Source network combo box, so that it can be disabled, depending on
      * type. */
@@ -254,7 +254,7 @@ public final class InterfaceInfo extends HardwareInfo {
             for (final Host host : getVMSVirtualDomainInfo().getDefinedOnHosts()) {
                 final VmsXml vmsXml = getBrowser().getVmsXml(host);
                 if (vmsXml != null) {
-                    final List<Value> bridges = new ArrayList<Value>(netInterfaceService.getBridges(host));
+                    final List<Value> bridges = new ArrayList<Value>(networkService.getBridges(host));
                     bridges.add(0, null);
                     return bridges.toArray(new Value[bridges.size()]);
                 }

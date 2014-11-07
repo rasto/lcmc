@@ -20,24 +20,25 @@
 
 package lcmc.event;
 
+import lcmc.drbd.domain.BlockDevice;
 import lcmc.host.domain.Host;
 
-import java.util.Map;
+import java.util.Collection;
 
-public class BlockDevicesDiskSpaceEvent {
+public class HwBlockDevicesChangedEvent {
     private final Host host;
-    private final Map<String, String> diskSpaces;
+    private final Collection<BlockDevice> blockDevices;
 
-    public BlockDevicesDiskSpaceEvent(final Host host, final Map<String, String> diskSpaces) {
+    public HwBlockDevicesChangedEvent(final Host host, final Collection<BlockDevice> blockDevices) {
         this.host = host;
-        this.diskSpaces = diskSpaces;
+        this.blockDevices = blockDevices;
     }
 
     public Host getHost() {
         return host;
     }
 
-    public Map<String, String> getDiskSpaces() {
-        return diskSpaces;
+    public Collection<BlockDevice> getBlockDevices() {
+        return blockDevices;
     }
 }

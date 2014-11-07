@@ -18,24 +18,32 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-package lcmc.event;
+package lcmc.cluster.ui.network;
 
-import lcmc.host.domain.Host;
+import lcmc.ClusterEventBus;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.Network;
+import lcmc.host.service.NetworkService;
 
-public class DrbdStatusChangedEvent {
-    private final Host host;
-    private final boolean drbdStatusOk;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-    public DrbdStatusChangedEvent(final Host host, final boolean drbdStatusOk) {
-        this.host = host;
-        this.drbdStatusOk = drbdStatusOk;
-    }
+@Named
+public class NetworkFactory {
+    @Inject
+    private ClusterEventBus clusterEventBus;
+    @Inject
+    private NetworkService networkService;
 
-    public Host getHost() {
-        return host;
-    }
-
-    public boolean isDrbdStatusOk() {
-        return drbdStatusOk;
+    public NetworkPresenter createPresenter(final Cluster cluster, final Network network) {
+        final NetworkModel model = new NetworkModel();
+        final NetworkView view = new NetworkView(model);
+        return new NetworkPresenter(
+                network,
+                model,
+                view,
+                clusterEventBus,
+                cluster,
+                networkService);
     }
 }

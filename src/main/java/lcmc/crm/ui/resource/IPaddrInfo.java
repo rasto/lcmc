@@ -22,7 +22,10 @@
 package lcmc.crm.ui.resource;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import lcmc.cluster.domain.Network;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.StringValue;
 import lcmc.common.domain.Value;
@@ -30,6 +33,7 @@ import lcmc.cluster.ui.widget.Check;
 import lcmc.cluster.ui.widget.Widget;
 import lcmc.cluster.ui.widget.WidgetFactory;
 import lcmc.common.domain.util.Tools;
+import lcmc.host.service.NetworkService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,6 +46,8 @@ import javax.inject.Named;
 final class IPaddrInfo extends ServiceInfo {
     @Inject
     private WidgetFactory widgetFactory;
+    @Inject
+    private NetworkService networkService;
 
     /**
      * Returns whether all the parameters are correct. If param is null,
@@ -93,15 +99,20 @@ final class IPaddrInfo extends ServiceInfo {
                 defaultValue = new StringValue(ip.getValueForConfig());
             }
             @SuppressWarnings("unchecked")
-            final Value[] networks = nodesToServiceInfos(defaultValue,
-                    getName(),
-                    getBrowser().getNetworksNode().children());
+            final Collection<Network> networks = networkService.getCommonNetworks(getBrowser().getCluster());
+
+            final Value[] networkValues = new Value[networks.size()];
+            int i = 0;
+            for (final Network network : networks) {
+                networkValues[i] = new StringValue(network.getName());
+                i++;
+            }
 
             final String regexp = "^[\\d.*]*|Select\\.\\.\\.$";
             paramWi = widgetFactory.createInstance(
                                  Widget.Type.COMBOBOX,
                                  ip,
-                                 networks,
+                                 networkValues,
                                  regexp,
                                  width,
                                  Widget.NO_ABBRV,

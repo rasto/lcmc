@@ -21,11 +21,16 @@
 package lcmc.host.service;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.Subscribe;
 import lcmc.ClusterEventBus;
+import lcmc.HwEventBus;
+import lcmc.cluster.domain.Cluster;
+import lcmc.cluster.domain.Network;
 import lcmc.common.domain.Value;
 import lcmc.drbd.domain.NetInterface;
-import lcmc.event.BridgesChangedEvent;
+import lcmc.event.HwBridgesChangedEvent;
+import lcmc.event.HwNetInterfacesChangedEvent;
 import lcmc.event.NetInterfacesChangedEvent;
 import lcmc.host.domain.Host;
 import lcmc.host.domain.HostNetworks;
@@ -37,34 +42,41 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Named
 @Singleton
-public class NetInterfaceService {
+public class NetworkService {
     @Inject
-    private ClusterEventBus eventBus;
+    private HwEventBus hwEventBus;
+    @Inject
+    private ClusterEventBus clusterEventBus;
     private Map<Host, HostNetworks> hostNetInterfacesByHost = new ConcurrentHashMap<Host, HostNetworks>();
+    private Map<Cluster, Collection<Network>> networksByCluster = new ConcurrentHashMap<Cluster, Collection<Network>>();
 
     public void init() {
-        eventBus.register(this);
+        hwEventBus.register(this);
     }
 
     @Subscribe
-    public void onNetInterfacesChanged(final NetInterfacesChangedEvent event) {
+    public void onNetInterfacesChanged(final HwNetInterfacesChangedEvent event) {
         final HostNetworks hostNetworks = new HostNetworks();
         hostNetworks.setNetworkIntefaces(event.getNetInterfaces());
         hostNetInterfacesByHost.put(event.getHost(), hostNetworks);
+        updateCommonNetworks(Optional.fromNullable(event.getHost().getCluster()));
+        clusterEventBus.post(new NetInterfacesChangedEvent(event.getHost(), hostNetworks.getNetInterfaces()));
     }
 
     @Subscribe
-    public void onBridgesChanged(final BridgesChangedEvent event) {
+    public void onBridgesChanged(final HwBridgesChangedEvent event) {
         final HostNetworks hostNetworks = hostNetInterfacesByHost.get(event.getHost());
         if (hostNetworks != null) {
             hostNetworks.setBridges(event.getBridges());
         }
-
+        clusterEventBus.post(new NetInterfacesChangedEvent(event.getHost(), hostNetworks.getNetInterfaces()));
     }
 
     public Collection<Value> getBridges(final Host host) {
@@ -104,5 +116,43 @@ public class NetInterfaceService {
         } else {
             return hostNetworks.getIpsFromNetwork(netIp);
         }
+    }
+
+    public List<Network> getCommonNetworks(final Cluster cluster) {
+        return ImmutableList.copyOf(networksByCluster.get(cluster));
+    }
+
+    public Optional<Network> getCommonNetwork(final Cluster cluster, final Network network) {
+        final List<Network> networks = getCommonNetworks(cluster);
+        final int index = networks.indexOf(network);
+        if (index >= 0) {
+            return Optional.of(networks.get(index));
+        }
+        return Optional.absent();
+    }
+
+
+    private Collection<Network> getCommonNetworks(final Set<Host> hosts) {
+        final Map<String, Integer> networksIntersection = getNetworksIntersection(hosts);
+
+        final List<Network> commonNetworks = new ArrayList<Network>();
+        for (final Map.Entry<String, Integer> stringIntegerEntry : networksIntersection.entrySet()) {
+            final List<String> ips = new ArrayList<String>();
+            for (final Host host : hosts) {
+                ips.addAll(getIpsFromNetwork(host, stringIntegerEntry.getKey()));
+            }
+            final Integer cidr = stringIntegerEntry.getValue();
+            final Network network = new Network(stringIntegerEntry.getKey(), ips.toArray(new String[ips.size()]), cidr);
+            commonNetworks.add(network);
+        }
+
+        return commonNetworks;
+    }
+
+    private void updateCommonNetworks(final Optional<Cluster> cluster) {
+        if (!cluster.isPresent()) {
+            return;
+        }
+        networksByCluster.put(cluster.get(), getCommonNetworks(cluster.get().getHosts()));
     }
 }

@@ -33,16 +33,22 @@ import lcmc.common.domain.util.Tools;
 /**
  * This class holds data of one cluster network.
  */
-public final class Network extends Resource {
+public final class Network {
     private static final Logger LOG = LoggerFactory.getLogger(Network.class);
+    private final String name;
     /** List of all ips in the network. */
     private final String[] allIPs;
     private final Integer cidr;
 
     public Network(final String name, final String[] allIPs, final Integer cidr) {
-        super(name);
+//        super(name);
+        this.name = name;
         this.allIPs = allIPs;
         this.cidr = cidr;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getAllIPs() {
@@ -53,9 +59,26 @@ public final class Network extends Resource {
         return cidr;
     }
 
-    @Override
+//    @Override
     public Value getValue(final String parameter) {
         LOG.appError("getValue: wrong call to getValue");
         return new StringValue("???");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Network network = (Network) o;
+
+        if (!name.equals(network.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

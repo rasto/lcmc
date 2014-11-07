@@ -26,13 +26,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.swing.ImageIcon;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javax.swing.*;
+
+import lcmc.cluster.ui.ClusterBrowser;
+import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 
@@ -62,12 +61,21 @@ public class Browser {
      * graphical view, it returns a split pane with this view and the info
      * underneath.
      */
-    final JComponent getInfoPanel(final Object nodeInfo, final boolean disabledDuringLoad) {
-        if (nodeInfo == null) {
+    final JComponent getInfoPanel(final Object infoPresenter, final boolean disabledDuringLoad) {
+        if (infoPresenter == null) {
             return null;
         }
-        final JPanel gView = ((Info) nodeInfo).getGraphicalView();
-        final JComponent iPanel = ((Info) nodeInfo).getInfoPanel();
+        final JPanel gView = ((InfoPresenter) infoPresenter).getGraphicalView();
+        JComponent iPanel;
+        if (infoPresenter instanceof Info) {
+            iPanel = ((Info) infoPresenter).getInfoPanel();
+        } else {
+            iPanel = new JPanel();
+            iPanel.setBackground(ClusterBrowser.PANEL_BACKGROUND);
+            iPanel.setLayout(new BoxLayout(iPanel, BoxLayout.PAGE_AXIS));
+            iPanel.setPreferredSize(iPanel.getMaximumSize());
+            ((InfoPresenter) infoPresenter).show(iPanel);
+        }
         if (gView == null) {
             return iPanel;
         } else {

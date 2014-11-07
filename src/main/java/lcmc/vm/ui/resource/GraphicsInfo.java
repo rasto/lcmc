@@ -41,8 +41,7 @@ import lcmc.common.domain.Application;
 import lcmc.common.ui.treemenu.TreeMenuController;
 import lcmc.host.domain.Host;
 import lcmc.common.domain.StringValue;
-import lcmc.host.domain.HostNetworks;
-import lcmc.host.service.NetInterfaceService;
+import lcmc.host.service.NetworkService;
 import lcmc.vm.domain.VmsXml;
 import lcmc.vm.domain.GraphicsData;
 import lcmc.common.domain.Value;
@@ -152,7 +151,7 @@ public final class GraphicsInfo extends HardwareInfo {
     @Inject
     private TreeMenuController treeMenuController;
     @Inject
-    private NetInterfaceService  netInterfaceService;
+    private NetworkService networkService;
 
     void init(final String name, final Browser browser, final DomainInfo vmsVirtualDomainInfo) {
         super.init(name, browser, vmsVirtualDomainInfo);
@@ -222,7 +221,7 @@ public final class GraphicsInfo extends HardwareInfo {
 
             final List<Host> definedOnHosts =
                                 getVMSVirtualDomainInfo().getDefinedOnHosts();
-            final Map<String, Integer> networksIntersection = netInterfaceService.getNetworksIntersection(definedOnHosts);
+            final Map<String, Integer> networksIntersection = networkService.getNetworksIntersection(definedOnHosts);
             final List<Value> commonNetworks = new ArrayList<Value>();
             commonNetworks.add(new StringValue());
             commonNetworks.add(new StringValue("0.0.0.0", "All Interfaces/0.0.0.0"));

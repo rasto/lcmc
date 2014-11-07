@@ -65,6 +65,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.text.JTextComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.AccessMode;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.Value;
@@ -89,7 +90,7 @@ import lcmc.common.ui.utils.UpdatableItem;
  * available.
  */
 @Named
-public class Info implements Comparable<Info>, Value {
+public class Info implements Comparable<Info>, Value, InfoPresenter {
     private static final Logger LOG = LoggerFactory.getLogger(Info.class);
     /** Amount of frames per second. */
     public static final ImageIcon LOGFILE_ICON = Tools.createImageIcon(Tools.getDefault("Info.LogIcon"));
@@ -232,6 +233,11 @@ public class Info implements Comparable<Info>, Value {
         if (animationIndex > 100) {
             animationIndex = 0;
         }
+    }
+
+    @Override
+    public void show(JComponent panel) {
+        LOG.appError("unimplemented");
     }
 
     public ImageIcon getMenuIcon(final Application.RunMode runMode) {
@@ -400,7 +406,8 @@ public class Info implements Comparable<Info>, Value {
     }
 
     /** Shows the popup on the specified coordinates. */
-    public final void showPopup(final JComponent c, final int x, final int y) {
+    @Override
+    public void showPopup(final JComponent c, final int x, final int y) {
         final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {

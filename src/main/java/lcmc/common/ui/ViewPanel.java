@@ -38,6 +38,8 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+
+import lcmc.cluster.ui.network.InfoPresenter;
 import lcmc.common.domain.Application;
 import lcmc.common.domain.util.Tools;
 import lcmc.common.ui.treemenu.TreeMenuController;
@@ -122,8 +124,9 @@ public class ViewPanel extends JPanel {
                     final Object[] path = e.getPath();
                     if (!disabledDuringLoad) {
                         final TreePath tp = new TreePath(path);
-                        final Info info = (Info) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
-                        if (info instanceof EditableInfo) {
+                        final InfoPresenter infoPresenter =
+                                (InfoPresenter) ((DefaultMutableTreeNode) tp.getLastPathComponent()).getUserObject();
+                        if (infoPresenter instanceof EditableInfo) {
                            application.invokeInEdt(new Runnable() {
                                                         @Override
                                                         public void run() {
