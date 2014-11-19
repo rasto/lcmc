@@ -121,7 +121,11 @@ public class NetworkService {
     }
 
     public List<Network> getCommonNetworks(final Cluster cluster) {
-        return ImmutableList.copyOf(networksByCluster.get(cluster));
+        final List<Network> networks = networksByCluster.get(cluster);
+        if (networks == null) {
+            return new ArrayList<Network>();
+        }
+        return ImmutableList.copyOf(networks);
     }
 
     public Optional<Network> getCommonNetwork(final Cluster cluster, final Network network) {

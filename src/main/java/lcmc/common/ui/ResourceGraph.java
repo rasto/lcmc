@@ -1274,12 +1274,7 @@ public abstract class ResourceGraph {
          * Is called when mouse was released. Create a multi selection object. */
         @Override
         public void mouseReleased(final MouseEvent e) {
-            if (getPickedVertices().size() > 1) {
-                multiSelection();
-            }
-            if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
-                handlePopup0(e);
-            }
+            super.mouseReleased(e);
         }
 
         /** Is called when mouse was clicked. */
@@ -1298,8 +1293,13 @@ public abstract class ResourceGraph {
 
         /** Creates and displays popup menus for vertices and edges. */
         @Override
-        protected void handlePopup(final MouseEvent me) {
-            /* doesn't work on Windows along the mouseReleased handler. */
+        protected void handlePopup(final MouseEvent e) {
+            if (getPickedVertices().size() > 1) {
+                multiSelection();
+            }
+            if ((e.getModifiers() & MouseEvent.BUTTON3_MASK) != 0) {
+                handlePopup0(e);
+            }
         }
 
         /** Creates and displays popup menus for vertices and edges. */

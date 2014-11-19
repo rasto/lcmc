@@ -85,7 +85,9 @@ public class Browser {
             if (infoPanelSplitPane != null) {
                 if (!disabledDuringLoad) {
                     final int loc = infoPanelSplitPane.getDividerLocation();
-                    infoPanelSplitPane.setLeftComponent(gView);
+                    if (infoPanelSplitPane.getLeftComponent() != gView) {
+                        infoPanelSplitPane.setLeftComponent(gView);
+                    }
                     infoPanelSplitPane.setRightComponent(iPanel);
                     infoPanelSplitPane.setDividerLocation(loc);
                 }

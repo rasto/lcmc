@@ -198,7 +198,9 @@ public class ViewPanel extends JPanel {
                     lastSelectedInfo = nodeInfo;
                     if (!disabledDuringLoad && p != null) {
                         final int loc = viewSP.getDividerLocation();
-                        viewSP.setRightComponent(p);
+                        if (viewSP.getRightComponent() != p) {
+                            viewSP.setRightComponent(p);
+                        }
                         viewSP.setDividerLocation(loc);
                     }
                     mSetPanelLock.unlock();
